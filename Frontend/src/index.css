@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base font sizes - mobile first */
+html {
+  font-size: 16px; /* Base size for mobile */
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px; /* Standard for tablet/desktop */
+  }
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 1rem; /* Use rem for scalability */
+  line-height: 1.5;
+}
+
+/* Improve mobile touch targets */
+button, 
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better mobile scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure content doesn't overflow on mobile */
+* {
+  box-sizing: border-box;
+}
+
+/* Improve text rendering on mobile */
+body {
+  text-rendering: optimizeLegibility;
+}
