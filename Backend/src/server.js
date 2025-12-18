@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import answerRoutes from "./routes/answerRoutes.js";
@@ -9,8 +11,6 @@ import plannerRoutes from "./routes/plannerRoutes.js";
 import mentorRoutes from "./routes/mentorRoutes.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
-
-dotenv.config();
 
 const app = express();
 
