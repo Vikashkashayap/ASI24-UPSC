@@ -4,12 +4,12 @@
 
 /* Base font sizes - mobile first */
 html {
-  font-size: 16px; /* Base size for mobile */
+  font-size: 18px; /* Base size for mobile - increased for better readability */
 }
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px; /* Standard for tablet/desktop */
+    font-size: 18px; /* Standard for tablet/desktop - increased for better readability */
   }
 }
 

@@ -10,6 +10,7 @@ export type User = {
 type AuthContextType = {
   user: User | null;
   token: string | null;
+  loading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
 };
@@ -21,15 +22,22 @@ const STORAGE_KEY = "upsc_mentor_auth";
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored) as { user: User; token: string };
-      setUser(parsed.user);
-      setToken(parsed.token);
+      try {
+        const parsed = JSON.parse(stored) as { user: User; token: string };
+        setUser(parsed.user);
+        setToken(parsed.token);
+      } catch (error) {
+        console.error("Error parsing stored auth:", error);
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
+    setLoading(false);
   }, []);
 
   const login = (nextUser: User, nextToken: string) => {
@@ -47,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>{children}</AuthContext.Provider>
   );
 };
 

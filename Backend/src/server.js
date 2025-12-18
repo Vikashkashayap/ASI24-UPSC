@@ -10,6 +10,7 @@ import performanceRoutes from "./routes/performanceRoutes.js";
 import plannerRoutes from "./routes/plannerRoutes.js";
 import mentorRoutes from "./routes/mentorRoutes.js";
 import chatbotRoutes from "./routes/chatbotRoutes.js";
+import copyEvaluationRoutes from "./routes/copyEvaluationRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/performance", authMiddleware, performanceRoutes);
 app.use("/api/planner", authMiddleware, plannerRoutes);
 app.use("/api/mentor", authMiddleware, mentorRoutes);
 app.use("/api/chatbot", authMiddleware, chatbotRoutes);
+app.use("/api/copy-evaluation", copyEvaluationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
