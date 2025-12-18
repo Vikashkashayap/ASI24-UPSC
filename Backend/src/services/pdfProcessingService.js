@@ -1,5 +1,5 @@
 import fs from "fs";
-import { PDFParse } from "pdf-parse";
+// import { PDFParse } from "pdf-parse";
 import Tesseract from "tesseract.js";
 import { createWorker } from "tesseract.js";
 
