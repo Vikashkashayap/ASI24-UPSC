@@ -5,11 +5,13 @@
  */
 
 import fs from "fs";
-import { createRequire } from "module";
 import { createWorker } from "tesseract.js";
 
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse"); // ✅ SAFE for Node 22 + ESM
+// ESM-compatible import for CJS-only pdf-parse, works everywhere
+async function getPdfParse() {
+  const mod = await import("pdf-parse");
+  return mod.default || mod;
+}
 
 /* ===============================
    PDF TEXT EXTRACTION
@@ -26,6 +28,7 @@ export const extractTextFromPDF = async (filePathOrBuffer) => {
 
     console.log(`📄 Parsing PDF (${buffer.length} bytes)`);
 
+    const pdfParse = await getPdfParse();
     const data = await pdfParse(buffer);
 
     return {
