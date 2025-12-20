@@ -1,0 +1,49 @@
+name: Deploy ASI24 UPSC to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/ec2.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          
+          echo "Connected to EC2"
+
+          cd ASI24-UPSC || exit 1
+
+          echo "Pulling latest code"
+          git pull origin main
+
+          echo "---- BACKEND ----"
+          cd Backend
+          npm install
+          pm2 restart asi24-backend || pm2 start src/server.js --name asi24-backend
+          pm2 save
+
+          echo "---- FRONTEND ----"
+          cd ../Frontend
+          npm install
+          npm run build
+          sudo rm -rf /usr/share/nginx/html/*
+          sudo cp -r dist/* /usr/share/nginx/html/
+          sudo systemctl reload nginx
+
+          echo "DEPLOYMENT DONE 🚀"
+          EOF
