@@ -23,27 +23,20 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -i ~/.ssh/ec2.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          
-          echo "Connected to EC2"
+            cd ~/ASI24-UPSC
+            git pull origin main
 
-          cd ASI24-UPSC || exit 1
+            # Backend
+            cd Backend
+            npm install
+            pm2 restart backend || pm2 start src/server.js --name backend
 
-          echo "Pulling latest code"
-          git pull origin main
+            # Frontend
+            cd ../Frontend
+            npm install
+            npm run build
+            sudo rm -rf /usr/share/nginx/html/*
+            sudo cp -r dist/* /usr/share/nginx/html/
 
-          echo "---- BACKEND ----"
-          cd Backend
-          npm install
-          pm2 restart asi24-backend || pm2 start src/server.js --name asi24-backend
-          pm2 save
-
-          echo "---- FRONTEND ----"
-          cd ../Frontend
-          npm install
-          npm run build
-          sudo rm -rf /usr/share/nginx/html/*
-          sudo cp -r dist/* /usr/share/nginx/html/
-          sudo systemctl reload nginx
-
-          echo "DEPLOYMENT DONE 🚀"
+            sudo systemctl reload nginx
           EOF
