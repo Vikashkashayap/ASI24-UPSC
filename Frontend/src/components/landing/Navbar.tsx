@@ -50,6 +50,7 @@ export const LandingNavbar = () => {
           >
             <X className="w-5 h-5" />
           </button>
+          
         </div>
         <nav className={`flex-1 px-4 py-4 space-y-2 ${
           theme === "dark" ? "text-slate-300" : "text-slate-600"
