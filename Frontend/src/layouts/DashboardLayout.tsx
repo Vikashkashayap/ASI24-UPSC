@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LayoutDashboard, PenLine, LineChart, CalendarClock, MessageCircle, MessageSquare, FileText, Sun, Moon, Menu, X } from "lucide-react";
+import { LayoutDashboard, PenLine, LineChart, CalendarClock, MessageCircle, MessageSquare, FileText, Video, Sun, Moon, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navLinkClass = ({ isActive, theme }: { isActive: boolean; theme: "dark" | "light" }) =>
@@ -84,6 +84,10 @@ export const DashboardLayout = () => {
           <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme })}>
             <FileText className="w-4 h-4" />
             <span>Copy Evaluation</span>
+          </NavLink>
+          <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme })}>
+            <Video className="w-4 h-4" />
+            <span>Live Meeting</span>
           </NavLink>
         </nav>
         <div className={`px-4 py-4 border-t text-xs space-y-1 ${theme === "dark" ? "border-purple-900/80 text-slate-400" : "border-slate-200 text-slate-600"}`}>

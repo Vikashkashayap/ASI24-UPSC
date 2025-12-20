@@ -56,3 +56,18 @@ export const copyEvaluationAPI = {
     return api.delete(`/api/copy-evaluation/${id}`);
   },
 };
+
+// Meeting API
+export const meetingAPI = {
+  createRoom: async () => {
+    return api.post("/api/meeting/create");
+  },
+
+  joinRoom: async (roomId: string, passcode: string) => {
+    return api.post("/api/meeting/join", { roomId, passcode });
+  },
+
+  getRoom: async (roomId: string) => {
+    return api.get(`/api/meeting/${roomId}`);
+  },
+};

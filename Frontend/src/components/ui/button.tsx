@@ -4,7 +4,7 @@ import { cn } from "../../utils/cn";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
-  variant?: "primary" | "outline" | "ghost";
+  variant?: "primary" | "outline" | "ghost" | "default" | "destructive";
 }
 
 const buttonBase =
@@ -13,6 +13,10 @@ const buttonBase =
 const variants: Record<string, string> = {
   primary:
     "bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-slate-950 hover:from-fuchsia-400 hover:to-emerald-300 px-4 py-2 shadow-[0_18px_70px_rgba(147,51,234,0.6)]",
+  default:
+    "bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-slate-950 hover:from-fuchsia-400 hover:to-emerald-300 px-4 py-2 shadow-[0_18px_70px_rgba(147,51,234,0.6)]",
+  destructive:
+    "bg-red-600 text-white hover:bg-red-700 px-4 py-2",
   outline:
     "border border-purple-700/80 bg-black/40 text-slate-200 hover:bg-purple-950/50 px-4 py-2",
   ghost: "text-slate-300 hover:bg-slate-800/80 px-3 py-1.5",

@@ -1,5 +1,4 @@
 import fs from "fs";
-// import { PDFParse } from "pdf-parse";
 import Tesseract from "tesseract.js";
 import { createWorker } from "tesseract.js";
 
@@ -8,32 +7,106 @@ import { createWorker } from "tesseract.js";
  * Handles PDF parsing, OCR, and text extraction
  */
 
+// Lazy load pdf-parse using dynamic import
+let pdfParseModule = null;
+
+async function getPdfParseModule() {
+  if (!pdfParseModule) {
+    pdfParseModule = await import("pdf-parse");
+  }
+  return pdfParseModule;
+}
+
 /**
  * Extract text from PDF using pdf-parse
  */
 export const extractTextFromPDF = async (filePathOrBuffer) => {
+  let pdfParser = null;
   try {
     const buffer = Buffer.isBuffer(filePathOrBuffer) 
       ? filePathOrBuffer 
       : fs.readFileSync(filePathOrBuffer);
-    const pdfParser = new PDFParse({ data: buffer });
+    
+    if (!buffer || buffer.length === 0) {
+      throw new Error("Empty or invalid PDF buffer");
+    }
+    
+    console.log(`📄 Loading PDF parser for buffer of ${buffer.length} bytes`);
+    
+    // Get PDFParse class from the module
+    const module = await getPdfParseModule();
+    if (!module || !module.PDFParse) {
+      throw new Error("Failed to load PDFParse class from pdf-parse module");
+    }
+    
+    const { PDFParse } = module;
+    
+    // Create and load PDF parser
+    console.log("📄 Creating PDFParse instance...");
+    pdfParser = new PDFParse({ data: buffer });
+    await pdfParser.load();
+    console.log("✅ PDF loaded successfully");
+    
+    // Extract text - getText() returns text result
+    console.log("📄 Extracting text...");
     const textResult = await pdfParser.getText();
+    console.log(`📄 Text result type: ${typeof textResult}, keys: ${textResult ? Object.keys(textResult).join(', ') : 'null'}`);
+    
+    // Extract info - getInfo() returns info result
+    console.log("📄 Extracting info...");
     const infoResult = await pdfParser.getInfo();
-    await pdfParser.destroy();
+    console.log(`📄 Info result type: ${typeof infoResult}, keys: ${infoResult ? Object.keys(infoResult).join(', ') : 'null'}`);
+    
+    // Handle different possible response structures
+    // textResult might be a string, object with text property, or object with toString
+    let text = "";
+    if (typeof textResult === 'string') {
+      text = textResult;
+    } else if (textResult && typeof textResult === 'object') {
+      text = textResult.text || textResult.toString?.() || String(textResult);
+    } else {
+      text = String(textResult || "");
+    }
+    
+    // Extract numPages from various possible locations
+    let numPages = 1;
+    if (textResult && typeof textResult === 'object') {
+      numPages = textResult.total || textResult.numPages || textResult.numpages || numPages;
+    }
+    if (infoResult && typeof infoResult === 'object') {
+      numPages = infoResult.numPages || infoResult.numpages || infoResult.total || numPages;
+    }
+    numPages = typeof numPages === 'number' && numPages > 0 ? numPages : 1;
+    
+    const info = (infoResult && typeof infoResult === 'object' && infoResult.info) ? infoResult.info : (infoResult || {});
+    const metadata = (infoResult && typeof infoResult === 'object' && infoResult.metadata) ? infoResult.metadata : {};
+    
+    console.log(`✅ Extracted text (${text.length} chars) and ${numPages} pages`);
     
     return {
       success: true,
-      text: textResult.text,
-      numPages: textResult.total || 1,
-      info: infoResult.info,
-      metadata: infoResult.metadata
+      text,
+      numPages,
+      info,
+      metadata
     };
   } catch (error) {
-    console.error("PDF parse error:", error);
+    console.error("❌ PDF parse error:", error);
+    console.error("Error stack:", error.stack);
     return {
       success: false,
-      error: error.message
+      error: error.message || "Unknown error occurred while parsing PDF"
     };
+  } finally {
+    // Clean up parser instance
+    if (pdfParser) {
+      try {
+        await pdfParser.destroy();
+      } catch (destroyError) {
+        // Ignore cleanup errors
+        console.error("⚠️ Error destroying PDF parser:", destroyError.message);
+      }
+    }
   }
 };
 
@@ -42,6 +115,15 @@ export const extractTextFromPDF = async (filePathOrBuffer) => {
  * This is a heuristic approach since pdf-parse doesn't provide page boundaries directly
  */
 export function splitTextIntoPages(text, numPages) {
+  // Validate inputs
+  if (!text || typeof text !== 'string') {
+    return [];
+  }
+  
+  if (!numPages || numPages < 1) {
+    numPages = 1;
+  }
+
   // Try to split by form feed character (page break)
   let pages = text.split('\f');
   
@@ -59,8 +141,8 @@ export function splitTextIntoPages(text, numPages) {
 
   return pages.map((pageText, index) => ({
     pageNumber: index + 1,
-    text: pageText.trim(),
-    wordCount: pageText.trim().split(/\s+/).length
+    text: (pageText || "").trim(),
+    wordCount: (pageText || "").trim().split(/\s+/).filter(word => word.length > 0).length
   }));
 }
 
@@ -197,58 +279,83 @@ function detectDiagram(text) {
  * Process entire PDF for evaluation
  */
 export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
-  console.log("📄 Processing PDF for evaluation...");
+  try {
+    console.log("📄 Processing PDF for evaluation...");
 
-  // Step 1: Extract text from PDF
-  const extractResult = await extractTextFromPDF(pdfBuffer);
-  
-  if (!extractResult.success) {
+    // Validate input
+    if (!pdfBuffer || (Buffer.isBuffer(pdfBuffer) && pdfBuffer.length === 0)) {
+      return {
+        success: false,
+        error: "Invalid PDF buffer provided"
+      };
+    }
+
+    // Step 1: Extract text from PDF
+    const extractResult = await extractTextFromPDF(pdfBuffer);
+    
+    if (!extractResult.success) {
+      return {
+        success: false,
+        error: extractResult.error || "Failed to extract text from PDF"
+      };
+    }
+
+    const { text, numPages } = extractResult;
+    
+    // Validate extracted data
+    if (!text || numPages < 1) {
+      return {
+        success: false,
+        error: "PDF appears to be empty or corrupted"
+      };
+    }
+
+    console.log(`📊 Extracted ${numPages} pages`);
+
+    // Step 2: Check if scanned (might need OCR)
+    const isScanned = isScannedPDF(text, numPages);
+    
+    if (isScanned) {
+      console.log("🔍 Detected scanned/handwritten PDF - OCR might be needed");
+      // Note: Full OCR implementation would require converting PDF pages to images
+      // For now, we'll work with whatever text was extracted
+    }
+
+    // Step 3: Split into pages
+    const pages = splitTextIntoPages(text, numPages);
+    console.log(`📑 Split into ${pages.length} pages`);
+
+    // Step 4: Extract answers with question detection
+    const extractedAnswers = extractAnswers(pages);
+    console.log(`✅ Detected ${extractedAnswers.length} answers`);
+
+    // Step 5: Add question text (would be better with actual question paper)
+    const answersWithQuestions = extractedAnswers.map(answer => ({
+      ...answer,
+      questionText: `Question ${answer.questionNumber}`, // Placeholder
+      subject: metadata.subject || "General Studies",
+      paper: metadata.paper || "Unknown",
+      year: metadata.year || new Date().getFullYear()
+    }));
+
+    return {
+      success: true,
+      extractedAnswers: answersWithQuestions,
+      metadata: {
+        ...metadata,
+        totalPages: numPages,
+        totalAnswers: extractedAnswers.length,
+        isScanned,
+        processedAt: new Date().toISOString()
+      }
+    };
+  } catch (error) {
+    console.error("Error in processPDFForEvaluation:", error);
     return {
       success: false,
-      error: "Failed to extract text from PDF"
+      error: error.message || "An unexpected error occurred while processing PDF"
     };
   }
-
-  const { text, numPages } = extractResult;
-  console.log(`📊 Extracted ${numPages} pages`);
-
-  // Step 2: Check if scanned (might need OCR)
-  const isScanned = isScannedPDF(text, numPages);
-  
-  if (isScanned) {
-    console.log("🔍 Detected scanned/handwritten PDF - OCR might be needed");
-    // Note: Full OCR implementation would require converting PDF pages to images
-    // For now, we'll work with whatever text was extracted
-  }
-
-  // Step 3: Split into pages
-  const pages = splitTextIntoPages(text, numPages);
-  console.log(`📑 Split into ${pages.length} pages`);
-
-  // Step 4: Extract answers with question detection
-  const extractedAnswers = extractAnswers(pages);
-  console.log(`✅ Detected ${extractedAnswers.length} answers`);
-
-  // Step 5: Add question text (would be better with actual question paper)
-  const answersWithQuestions = extractedAnswers.map(answer => ({
-    ...answer,
-    questionText: `Question ${answer.questionNumber}`, // Placeholder
-    subject: metadata.subject || "General Studies",
-    paper: metadata.paper || "Unknown",
-    year: metadata.year || new Date().getFullYear()
-  }));
-
-  return {
-    success: true,
-    extractedAnswers: answersWithQuestions,
-    metadata: {
-      ...metadata,
-      totalPages: numPages,
-      totalAnswers: extractedAnswers.length,
-      isScanned,
-      processedAt: new Date().toISOString()
-    }
-  };
 }
 
 export default {
