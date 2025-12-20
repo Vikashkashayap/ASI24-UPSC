@@ -4,10 +4,10 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-  "dev": "nodemon src/server.js",
-  "start": "node src/server.js",
-  "build": "echo 'No build needed for plain JS backend!'"
-},
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "build": "echo 'No build needed for plain JS backend!'"
+  },
   "dependencies": {
     "@langchain/core": "^0.2.0",
     "bcryptjs": "^2.4.3",

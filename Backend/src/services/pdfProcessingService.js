@@ -1,363 +1,189 @@
-import fs from "fs";
-import Tesseract from "tesseract.js";
-import { createWorker } from "tesseract.js";
-
 /**
  * PDF Processing Service
- * Handles PDF parsing, OCR, and text extraction
+ * Node.js v22 + ESM SAFE
+ * pdf-parse loaded via createRequire (CJS compatible)
  */
 
-// Lazy load pdf-parse using dynamic import
-let pdfParseModule = null;
+import fs from "fs";
+import { createRequire } from "module";
+import { createWorker } from "tesseract.js";
 
-async function getPdfParseModule() {
-  if (!pdfParseModule) {
-    pdfParseModule = await import("pdf-parse");
-  }
-  return pdfParseModule;
-}
+const require = createRequire(import.meta.url);
+const pdfParse = require("pdf-parse"); // ✅ SAFE for Node 22 + ESM
 
-/**
- * Extract text from PDF using pdf-parse
- */
+/* ===============================
+   PDF TEXT EXTRACTION
+================================ */
 export const extractTextFromPDF = async (filePathOrBuffer) => {
-  let pdfParser = null;
   try {
-    const buffer = Buffer.isBuffer(filePathOrBuffer) 
-      ? filePathOrBuffer 
+    const buffer = Buffer.isBuffer(filePathOrBuffer)
+      ? filePathOrBuffer
       : fs.readFileSync(filePathOrBuffer);
-    
+
     if (!buffer || buffer.length === 0) {
-      throw new Error("Empty or invalid PDF buffer");
+      throw new Error("Invalid or empty PDF buffer");
     }
-    
-    console.log(`📄 Loading PDF parser for buffer of ${buffer.length} bytes`);
-    
-    // Get PDFParse class from the module
-    const module = await getPdfParseModule();
-    if (!module || !module.PDFParse) {
-      throw new Error("Failed to load PDFParse class from pdf-parse module");
-    }
-    
-    const { PDFParse } = module;
-    
-    // Create and load PDF parser
-    console.log("📄 Creating PDFParse instance...");
-    pdfParser = new PDFParse({ data: buffer });
-    await pdfParser.load();
-    console.log("✅ PDF loaded successfully");
-    
-    // Extract text - getText() returns text result
-    console.log("📄 Extracting text...");
-    const textResult = await pdfParser.getText();
-    console.log(`📄 Text result type: ${typeof textResult}, keys: ${textResult ? Object.keys(textResult).join(', ') : 'null'}`);
-    
-    // Extract info - getInfo() returns info result
-    console.log("📄 Extracting info...");
-    const infoResult = await pdfParser.getInfo();
-    console.log(`📄 Info result type: ${typeof infoResult}, keys: ${infoResult ? Object.keys(infoResult).join(', ') : 'null'}`);
-    
-    // Handle different possible response structures
-    // textResult might be a string, object with text property, or object with toString
-    let text = "";
-    if (typeof textResult === 'string') {
-      text = textResult;
-    } else if (textResult && typeof textResult === 'object') {
-      text = textResult.text || textResult.toString?.() || String(textResult);
-    } else {
-      text = String(textResult || "");
-    }
-    
-    // Extract numPages from various possible locations
-    let numPages = 1;
-    if (textResult && typeof textResult === 'object') {
-      numPages = textResult.total || textResult.numPages || textResult.numpages || numPages;
-    }
-    if (infoResult && typeof infoResult === 'object') {
-      numPages = infoResult.numPages || infoResult.numpages || infoResult.total || numPages;
-    }
-    numPages = typeof numPages === 'number' && numPages > 0 ? numPages : 1;
-    
-    const info = (infoResult && typeof infoResult === 'object' && infoResult.info) ? infoResult.info : (infoResult || {});
-    const metadata = (infoResult && typeof infoResult === 'object' && infoResult.metadata) ? infoResult.metadata : {};
-    
-    console.log(`✅ Extracted text (${text.length} chars) and ${numPages} pages`);
-    
+
+    console.log(`📄 Parsing PDF (${buffer.length} bytes)`);
+
+    const data = await pdfParse(buffer);
+
     return {
       success: true,
-      text,
-      numPages,
-      info,
-      metadata
+      text: data.text || "",
+      numPages: data.numpages || 1,
+      info: data.info || {},
+      metadata: data.metadata || {}
     };
   } catch (error) {
     console.error("❌ PDF parse error:", error);
-    console.error("Error stack:", error.stack);
     return {
       success: false,
-      error: error.message || "Unknown error occurred while parsing PDF"
+      error: error.message || "PDF parsing failed"
     };
-  } finally {
-    // Clean up parser instance
-    if (pdfParser) {
-      try {
-        await pdfParser.destroy();
-      } catch (destroyError) {
-        // Ignore cleanup errors
-        console.error("⚠️ Error destroying PDF parser:", destroyError.message);
-      }
-    }
   }
 };
 
-/**
- * Split PDF text into pages
- * This is a heuristic approach since pdf-parse doesn't provide page boundaries directly
- */
-export function splitTextIntoPages(text, numPages) {
-  // Validate inputs
-  if (!text || typeof text !== 'string') {
-    return [];
-  }
-  
-  if (!numPages || numPages < 1) {
-    numPages = 1;
-  }
+/* ===============================
+   SPLIT TEXT INTO PAGES
+================================ */
+export function splitTextIntoPages(text, numPages = 1) {
+  if (!text) return [];
 
-  // Try to split by form feed character (page break)
-  let pages = text.split('\f');
-  
-  // If that doesn't work well, split by estimated length
-  if (pages.length !== numPages && pages.length < numPages) {
-    const avgLength = Math.ceil(text.length / numPages);
-    pages = [];
-    
-    for (let i = 0; i < numPages; i++) {
-      const start = i * avgLength;
-      const end = start + avgLength;
-      pages.push(text.substring(start, end));
-    }
+  let pages = text.split("\f");
+
+  if (pages.length !== numPages) {
+    const avg = Math.ceil(text.length / numPages);
+    pages = Array.from({ length: numPages }, (_, i) =>
+      text.slice(i * avg, (i + 1) * avg)
+    );
   }
 
   return pages.map((pageText, index) => ({
     pageNumber: index + 1,
-    text: (pageText || "").trim(),
-    wordCount: (pageText || "").trim().split(/\s+/).filter(word => word.length > 0).length
+    text: pageText.trim(),
+    wordCount: pageText.trim().split(/\s+/).filter(Boolean).length
   }));
 }
 
-/**
- * Perform OCR on image buffer (for scanned PDFs)
- */
+/* ===============================
+   OCR FOR SCANNED PDF
+================================ */
 export async function performOCR(imageBuffer) {
   const worker = await createWorker();
-  
   try {
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    
-    const { data: { text, confidence } } = await worker.recognize(imageBuffer);
-    
-    await worker.terminate();
-    
-    return {
-      success: true,
-      text,
-      confidence
-    };
+    await worker.loadLanguage("eng");
+    await worker.initialize("eng");
+
+    const {
+      data: { text, confidence }
+    } = await worker.recognize(imageBuffer);
+
+    return { success: true, text, confidence };
   } catch (error) {
-    console.error("Error performing OCR:", error);
+    console.error("OCR error:", error);
+    return { success: false, error: error.message };
+  } finally {
     await worker.terminate();
-    
-    return {
-      success: false,
-      error: error.message
-    };
   }
 }
 
-/**
- * Detect if PDF is handwritten/scanned (low text content)
- */
-export function isScannedPDF(extractedText, numPages) {
-  const textLength = extractedText.trim().length;
-  const avgTextPerPage = textLength / numPages;
-  
-  // If less than 100 characters per page on average, likely scanned
-  return avgTextPerPage < 100;
+/* ===============================
+   SCANNED PDF DETECTION
+================================ */
+export function isScannedPDF(text, numPages) {
+  const avgText = text.length / Math.max(numPages, 1);
+  return avgText < 100;
 }
 
-/**
- * Extract answers with question detection
- */
+/* ===============================
+   ANSWER EXTRACTION
+================================ */
 export function extractAnswers(pages) {
   const answers = [];
-  let questionCounter = 1;
 
   for (const page of pages) {
-    const { pageNumber, text } = page;
+    if (!page.text || page.text.length < 50) continue;
 
-    // Patterns to detect questions
-    const questionPatterns = [
-      /Q\.?\s*(\d+)[.:\s)]+(.*?)(?=Q\.?\s*\d+|$)/gis,
-      /(\d+)[.)\s]+(.*?)(?=\d+[.)]|$)/gis,
-      /Question\s+(\d+)[.:\s)]+(.*?)(?=Question\s+\d+|$)/gis,
-    ];
-
-    let detectedAnswers = [];
-    let patternFound = false;
-
-    // Try each pattern
-    for (const pattern of questionPatterns) {
-      const matches = [...text.matchAll(pattern)];
-      
-      if (matches.length > 0) {
-        detectedAnswers = matches.map(match => {
-          const questionNum = match[1] || questionCounter++;
-          const answerText = match[2] ? match[2].trim() : match[0].trim();
-          
-          return {
-            questionNumber: questionNum,
-            answerText,
-            pageNumber,
-            wordCount: answerText.split(/\s+/).length,
-            wordLimit: estimateWordLimit(answerText.length),
-            hashedDiagram: detectDiagram(answerText)
-          };
-        });
-        
-        patternFound = true;
-        break;
-      }
-    }
-
-    // If no pattern found, treat whole page as one answer
-    if (!patternFound && text.trim().length > 50) {
-      detectedAnswers.push({
-        questionNumber: `P${pageNumber}`,
-        answerText: text.trim(),
-        pageNumber,
-        wordCount: text.trim().split(/\s+/).length,
-        wordLimit: estimateWordLimit(text.length),
-        hashedDiagram: detectDiagram(text)
-      });
-    }
-
-    answers.push(...detectedAnswers);
+    answers.push({
+      questionNumber: `P${page.pageNumber}`,
+      answerText: page.text,
+      pageNumber: page.pageNumber,
+      wordCount: page.wordCount,
+      wordLimit: estimateWordLimit(page.wordCount),
+      hasDiagram: detectDiagram(page.text)
+    });
   }
 
   return answers;
 }
 
-/**
- * Estimate word limit based on answer length
- */
-function estimateWordLimit(textLength) {
-  const wordCount = textLength / 5; // Rough estimate: 5 chars per word
-  
-  if (wordCount > 200) return 250;
-  if (wordCount > 130) return 150;
+function estimateWordLimit(words) {
+  if (words > 200) return 250;
+  if (words > 130) return 150;
   return 100;
 }
 
-/**
- * Detect if answer contains diagrams/flowcharts
- * Simple heuristic based on keywords
- */
 function detectDiagram(text) {
-  const diagramKeywords = [
-    'diagram', 'flowchart', 'chart', 'graph', 'map',
-    'figure', 'illustration', '→', '←', '↑', '↓',
-    '|', '─', '┌', '└', '├', '│', '══', '║'
+  const keywords = [
+    "diagram",
+    "flowchart",
+    "map",
+    "graph",
+    "figure",
+    "→",
+    "←",
+    "↑",
+    "↓"
   ];
-
-  const lowerText = text.toLowerCase();
-  return diagramKeywords.some(keyword => lowerText.includes(keyword));
+  return keywords.some(k => text.toLowerCase().includes(k));
 }
 
-/**
- * Process entire PDF for evaluation
- */
+/* ===============================
+   FULL PDF PIPELINE
+================================ */
 export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
   try {
     console.log("📄 Processing PDF for evaluation...");
 
-    // Validate input
-    if (!pdfBuffer || (Buffer.isBuffer(pdfBuffer) && pdfBuffer.length === 0)) {
-      return {
-        success: false,
-        error: "Invalid PDF buffer provided"
-      };
-    }
-
-    // Step 1: Extract text from PDF
     const extractResult = await extractTextFromPDF(pdfBuffer);
-    
-    if (!extractResult.success) {
-      return {
-        success: false,
-        error: extractResult.error || "Failed to extract text from PDF"
-      };
-    }
+    if (!extractResult.success) return extractResult;
 
     const { text, numPages } = extractResult;
-    
-    // Validate extracted data
-    if (!text || numPages < 1) {
-      return {
-        success: false,
-        error: "PDF appears to be empty or corrupted"
-      };
+
+    const scanned = isScannedPDF(text, numPages);
+    if (scanned) {
+      console.log("⚠️ Scanned/low-text PDF detected");
     }
 
-    console.log(`📊 Extracted ${numPages} pages`);
-
-    // Step 2: Check if scanned (might need OCR)
-    const isScanned = isScannedPDF(text, numPages);
-    
-    if (isScanned) {
-      console.log("🔍 Detected scanned/handwritten PDF - OCR might be needed");
-      // Note: Full OCR implementation would require converting PDF pages to images
-      // For now, we'll work with whatever text was extracted
-    }
-
-    // Step 3: Split into pages
     const pages = splitTextIntoPages(text, numPages);
-    console.log(`📑 Split into ${pages.length} pages`);
+    const answers = extractAnswers(pages);
 
-    // Step 4: Extract answers with question detection
-    const extractedAnswers = extractAnswers(pages);
-    console.log(`✅ Detected ${extractedAnswers.length} answers`);
-
-    // Step 5: Add question text (would be better with actual question paper)
-    const answersWithQuestions = extractedAnswers.map(answer => ({
-      ...answer,
-      questionText: `Question ${answer.questionNumber}`, // Placeholder
-      subject: metadata.subject || "General Studies",
-      paper: metadata.paper || "Unknown",
-      year: metadata.year || new Date().getFullYear()
-    }));
+    console.log(`✅ Extracted ${answers.length} answers`);
 
     return {
       success: true,
-      extractedAnswers: answersWithQuestions,
+      extractedAnswers: answers,
       metadata: {
         ...metadata,
         totalPages: numPages,
-        totalAnswers: extractedAnswers.length,
-        isScanned,
+        totalAnswers: answers.length,
+        scanned,
         processedAt: new Date().toISOString()
       }
     };
   } catch (error) {
-    console.error("Error in processPDFForEvaluation:", error);
+    console.error("processPDFForEvaluation error:", error);
     return {
       success: false,
-      error: error.message || "An unexpected error occurred while processing PDF"
+      error: error.message || "PDF evaluation failed"
     };
   }
 }
 
+/* ===============================
+   EXPORT DEFAULT
+================================ */
 export default {
   extractTextFromPDF,
   splitTextIntoPages,
