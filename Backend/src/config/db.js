@@ -2,16 +2,21 @@ import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
-    const uri = process.env.DATABASE_URL || process.env.MONGODB_URI;
+    const uri = process.env.DATABASE_URL;
+
     if (!uri) {
-      throw new Error("MongoDB URI is undefined. Please check your .env file and environment variables.");
+      console.error("❌ DATABASE_URL is not defined in environment");
+      process.exit(1);
     }
-    const conn = await mongoose.connect(uri, {
+
+    await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
     });
-    console.log(`MongoDB connected: ${conn.connection.host}`);
+
+    console.log("✅ MongoDB connected successfully");
   } catch (error) {
-    console.error("MongoDB connection error", error.message);
+    console.error("❌ MongoDB connection error:", error.message);
     process.exit(1);
   }
 };
+
