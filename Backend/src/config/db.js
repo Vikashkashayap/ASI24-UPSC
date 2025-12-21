@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 export const connectDB = async () => {
   try {
     const uri = process.env.DATABASE_URL || process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error("MongoDB URI is undefined. Please check your .env file and environment variables.");
+    }
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
     });
