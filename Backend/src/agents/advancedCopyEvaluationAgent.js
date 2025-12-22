@@ -1,5 +1,5 @@
 import { RunnableLambda } from "@langchain/core/runnables";
-import fetch from "node-fetch";
+import { evaluateAnswerWithOpenRouter } from "../services/openRouterService.js";
 
 /**
  * UPSC COPY EVALUATION AGENT
@@ -13,48 +13,113 @@ import fetch from "node-fetch";
  * - Detailed analytics
  */
 
-const EVALUATION_SYSTEM_PROMPT = `You are an AI-powered UPSC Answer Copy Evaluation Agent designed to function like a senior UPSC examiner with 15+ years of experience.
+const EVALUATION_SYSTEM_PROMPT = `You are a UPSC Mains Answer Copy Evaluation Expert with 10+ years of experience as an official UPSC examiner.
 
-Your task is to evaluate UPSC Mains answer copies and provide:
-- Page-wise evaluation
-- Question-wise marks
-- Inline examiner-style feedback
-- Diagram assessment
-- Final summary with actionable improvements
+Your task is to evaluate a full UPSC Mains answer copy provided as a PDF document.
 
-You must strictly follow UPSC Mains evaluation standards.
+You must strictly follow real UPSC evaluation standards and not behave like a general AI assistant.
 
-EVALUATION PARAMETERS:
-1. Content Relevance (30%) - Directness to question demand, keyword usage
-2. Structure (20%) - Introduction, body organization, conclusion
-3. Conceptual Depth (20%) - Analytical thinking, interlinkages, examples
-4. Presentation (15%) - Bullet points, flowcharts, neatness
-5. Diagrams (10%) - Presence, relevance, labeling
-6. Language & Expression (5%) - Clarity, UPSC tone
+────────────────────────────────────
+ROLE & AUTHORITY
+────────────────────────────────────
+• Act as a neutral UPSC examiner, not as a teacher or motivator
+• Be strict, objective, and realistic in marking
+• Avoid generosity bias; average answers should score average marks
+• Do not assume anything not written in the answer
 
-MARKING RULES:
-- Be conservative (avoid over-marking)
-- Allocate marks strictly per UPSC standards
-- Break marks section-wise
-- Total marks allocation per answer type:
-  * 250-word answer: 15 marks
-  * 150-word answer: 10 marks
-  * 200-word answer: 12.5 marks
+────────────────────────────────────
+INPUT HANDLING
+────────────────────────────────────
+• The input will be a full PDF answer copy
+• Identify each question clearly
+• Evaluate each question independently
+• Assume each question carries 12.5 marks unless stated otherwise
+• Respect word limits (150 / 250 words) while evaluating
 
-INLINE FEEDBACK STYLE:
-Write feedback like a real examiner:
-- "Needs better linkage with question demand"
-- "Example missing here"
-- "Diagram could improve score by +1.5 marks"
-- "Good analytical approach"
-- "Conclusion weak - doesn't tie back to question"
+────────────────────────────────────
+EVALUATION CRITERIA (STRICT)
+────────────────────────────────────
+For EACH question, evaluate on the following parameters:
 
-STRICT RULES:
-- Do NOT hallucinate facts
-- Maintain examiner tone (professional, concise)
-- Never overpraise
-- If text is unclear, mention it
-- For missing diagrams, suggest where they would help`;
+1. Question Understanding & Demand Fulfilment (25%)
+   - Has the directive (discuss, analyse, examine, etc.) been addressed?
+   - Is the answer relevant to what was asked?
+
+2. Structure & Organization (15%)
+   - Introduction, body, conclusion present or not
+   - Logical flow, headings, sub-points
+
+3. Content Quality & Coverage (20%)
+   - Coverage of key dimensions
+   - Accuracy of concepts
+   - Balance between theory and application
+
+4. Analytical Depth (20%)
+   - Cause–effect analysis
+   - Critical thinking
+   - Pros/cons, limitations, way forward
+
+5. Examples & Value Addition (10%)
+   - Use of current affairs, case studies, reports, constitutional articles
+   - Diagrams, flowcharts, tables (if mentioned)
+
+6. Language & Clarity (10%)
+   - Clear, simple, formal language
+   - No unnecessary verbosity
+
+────────────────────────────────────
+MARKING RULES
+────────────────────────────────────
+• Total marks per question: 12.5
+• Use decimal marks where appropriate (e.g., 6.5, 7.25, 8.75)
+• Average answers should fall in the 5–7 range
+• Very good answers: 8–9.5
+• Exceptional answers: max 10–10.5 (rare)
+• Do NOT give full marks easily
+• Poor or irrelevant answers may score 2–4
+
+────────────────────────────────────
+OUTPUT FORMAT (MANDATORY)
+────────────────────────────────────
+For EACH question, output strictly in this format:
+
+Question Number: QX
+
+Marks Awarded: X / 12.5
+
+Evaluation Summary:
+- One concise paragraph explaining WHY these marks were given
+
+Strengths:
+- Bullet points (max 3)
+
+Weaknesses:
+- Bullet points (max 3)
+
+Specific Improvements:
+- What exactly should be added or changed to score +2 marks
+
+────────────────────────────────────
+FINAL SUMMARY (AFTER ALL QUESTIONS)
+────────────────────────────────────
+After evaluating the full copy, provide:
+
+1. Total Marks Obtained
+2. Overall Copy Assessment (Poor / Average / Good / Very Good)
+3. Top 3 recurring weaknesses
+4. Top 3 actionable improvement strategies
+5. Estimated UPSC Rank Impact (Very Rough Range)
+
+────────────────────────────────────
+IMPORTANT BEHAVIOR RULES
+────────────────────────────────────
+• Do NOT rewrite answers
+• Do NOT praise unnecessarily
+• Do NOT behave leniently
+• Do NOT hallucinate content not present in the copy
+• Maintain examiner-like professional tone
+• Think step-by-step internally before awarding marks
+• Output ONLY the evaluation, not your internal reasoning`;
 
 /**
  * Evaluates a single answer using OpenRouter API
@@ -70,9 +135,11 @@ async function evaluateAnswer(answerData, apiKey, model) {
     pageNumber
   } = answerData;
 
+  const maxMarks = 12.5; // Default to 12.5 marks per question
+  
   const userPrompt = `Evaluate this UPSC Mains answer:
 
-QUESTION ${questionNumber}: ${questionText}
+QUESTION ${questionNumber}: ${questionText || 'Question not clearly marked'}
 
 ANSWER TEXT:
 ${answerText}
@@ -82,90 +149,98 @@ SUBJECT: ${subject}
 PAGE: ${pageNumber}
 DIAGRAM PRESENT: ${hashedDiagram ? 'Yes' : 'No'}
 
-Provide evaluation in the following JSON format:
+Provide evaluation in the following JSON format (STRICTLY follow the format):
 {
   "questionNumber": "${questionNumber}",
-  "totalMarks": number (out of ${wordLimit === 250 ? 15 : wordLimit === 150 ? 10 : 12.5}),
-  "marksBreakdown": {
-    "introduction": number,
-    "body": number,
-    "conclusion": number,
-    "diagram": number,
-    "presentation": number
-  },
-  "inlineFeedback": [
-    {
-      "location": "introduction|body|conclusion|diagram|overall",
-      "comment": "examiner comment here",
-      "severity": "positive|neutral|critical"
-    }
-  ],
-  "strengths": ["strength 1", "strength 2"],
-  "weaknesses": ["weakness 1", "weakness 2"],
-  "improvements": ["actionable improvement 1", "improvement 2"],
+  "marksAwarded": number (out of ${maxMarks}, use decimals like 6.5, 7.25, 8.75),
+  "evaluationSummary": "One concise paragraph explaining WHY these marks were given",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
+  "specificImprovements": "What exactly should be added or changed to score +2 marks",
   "diagramAnalysis": {
     "present": boolean,
     "relevant": boolean,
     "marksAwarded": number,
     "comment": "diagram specific feedback"
-  },
-  "upscRange": "Below Average|Average|Above Average|Toppers Range"
-}`;
+  }
+}
+
+IMPORTANT:
+- marksAwarded should be between 0 and ${maxMarks}
+- Average answers: 5-7 marks
+- Very good answers: 8-9.5 marks
+- Exceptional answers: 10-10.5 marks (rare)
+- Poor answers: 2-4 marks
+- Be strict and realistic, avoid generosity bias`;
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: "system", content: EVALUATION_SYSTEM_PROMPT },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.3, // Low temperature for consistent evaluation
-        max_tokens: 2000,
-      }),
+    // Use service for API call
+    const apiResult = await evaluateAnswerWithOpenRouter({
+      apiKey,
+      model,
+      systemPrompt: EVALUATION_SYSTEM_PROMPT,
+      userPrompt,
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.statusText}`);
+    if (!apiResult.success || !apiResult.data) {
+      throw new Error(apiResult.error || "Failed to get evaluation from API");
     }
 
-    const data = await response.json();
-    const content = data.choices[0]?.message?.content || "";
-
-    // Parse JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsedEvaluation = JSON.parse(jsonMatch[0]);
-      // Ensure required fields are present
-      parsedEvaluation.answerText = answerData.answerText || '';
-      parsedEvaluation.questionText = answerData.questionText || `Question ${answerData.questionNumber}`;
-      parsedEvaluation.pageNumber = answerData.pageNumber || 1;
-      parsedEvaluation.wordCount = answerData.wordCount || 0;
-      parsedEvaluation.wordLimit = answerData.wordLimit || 250;
-      
-      // Validate inlineFeedback locations
-      const validLocations = ['introduction', 'body', 'conclusion', 'diagram', 'overall'];
-      if (parsedEvaluation.inlineFeedback && Array.isArray(parsedEvaluation.inlineFeedback)) {
-        parsedEvaluation.inlineFeedback = parsedEvaluation.inlineFeedback
-          .map(feedback => {
-            if (feedback.location === 'presentation') {
-              feedback.location = 'overall';
-            }
-            return feedback;
-          })
-          .filter(feedback => validLocations.includes(feedback.location));
-      }
-      
-      return parsedEvaluation;
+    // Use parsed data from service
+    const parsedEvaluation = apiResult.data;
+    const maxMarks = 12.5;
+    
+    // Map new format to existing schema
+    parsedEvaluation.totalMarks = parsedEvaluation.marksAwarded || 0;
+    parsedEvaluation.maxMarks = maxMarks;
+    
+    // Ensure required fields are present
+    parsedEvaluation.answerText = answerData.answerText || '';
+    parsedEvaluation.questionText = answerData.questionText || `Question ${answerData.questionNumber}`;
+    parsedEvaluation.pageNumber = answerData.pageNumber || 1;
+    parsedEvaluation.wordCount = answerData.wordCount || 0;
+    parsedEvaluation.wordLimit = answerData.wordLimit || 250;
+    
+    // Convert new format fields to existing structure
+    if (parsedEvaluation.evaluationSummary && !parsedEvaluation.inlineFeedback) {
+      parsedEvaluation.inlineFeedback = [
+        {
+          location: 'overall',
+          comment: parsedEvaluation.evaluationSummary,
+          severity: 'neutral'
+        }
+      ];
     }
-
-    // Fallback if JSON parsing fails
-    return generateFallbackEvaluation(answerData);
+    
+    // Ensure strengths, weaknesses, improvements are arrays
+    parsedEvaluation.strengths = Array.isArray(parsedEvaluation.strengths) 
+      ? parsedEvaluation.strengths.slice(0, 3) 
+      : [];
+    parsedEvaluation.weaknesses = Array.isArray(parsedEvaluation.weaknesses) 
+      ? parsedEvaluation.weaknesses.slice(0, 3) 
+      : [];
+    parsedEvaluation.improvements = parsedEvaluation.specificImprovements 
+      ? [parsedEvaluation.specificImprovements] 
+      : (Array.isArray(parsedEvaluation.improvements) ? parsedEvaluation.improvements : []);
+    
+    // Calculate marks breakdown if not provided
+    if (!parsedEvaluation.marksBreakdown) {
+      const total = parsedEvaluation.totalMarks || 0;
+      parsedEvaluation.marksBreakdown = {
+        introduction: Math.round((total * 0.15) * 10) / 10,
+        body: Math.round((total * 0.5) * 10) / 10,
+        conclusion: Math.round((total * 0.15) * 10) / 10,
+        diagram: parsedEvaluation.diagramAnalysis?.marksAwarded || 0,
+        presentation: Math.round((total * 0.1) * 10) / 10
+      };
+    }
+    
+    // Set upscRange based on marks
+    const percentage = (parsedEvaluation.totalMarks / maxMarks) * 100;
+    parsedEvaluation.upscRange = percentage >= 70 ? 'Above Average' :
+                                 percentage >= 55 ? 'Average' : 'Below Average';
+    
+    return parsedEvaluation;
   } catch (error) {
     console.error("Error in answer evaluation:", error);
     return generateFallbackEvaluation(answerData);
@@ -177,8 +252,8 @@ Provide evaluation in the following JSON format:
  */
 function generateFallbackEvaluation(answerData) {
   const { questionNumber, wordLimit, hashedDiagram, answerText, questionText, pageNumber, wordCount } = answerData;
-  const maxMarks = wordLimit === 250 ? 15 : wordLimit === 150 ? 10 : 12.5;
-  const totalMarks = Math.round((0.5 + Math.random() * 0.3) * maxMarks * 10) / 10;
+  const maxMarks = 12.5; // Default to 12.5 marks per question
+  const totalMarks = Math.round((5 + Math.random() * 2) * 10) / 10; // Average range: 5-7
 
   return {
     questionNumber,
@@ -187,28 +262,21 @@ function generateFallbackEvaluation(answerData) {
     pageNumber: pageNumber || 1,
     wordCount: wordCount || 0,
     wordLimit: wordLimit || 250,
-    totalMarks,
+    totalMarks: Math.min(totalMarks, maxMarks),
+    maxMarks,
+    marksAwarded: Math.min(totalMarks, maxMarks),
+    evaluationSummary: "The answer demonstrates basic understanding of the topic with reasonable structure. However, it lacks analytical depth and current affairs integration. The response addresses the question but could benefit from more comprehensive coverage and specific examples.",
     marksBreakdown: {
-      introduction: Math.round(totalMarks * 0.15 * 10) / 10,
-      body: Math.round(totalMarks * 0.5 * 10) / 10,
-      conclusion: Math.round(totalMarks * 0.15 * 10) / 10,
-      diagram: hashedDiagram ? Math.round(totalMarks * 0.1 * 10) / 10 : 0,
-      presentation: Math.round(totalMarks * 0.1 * 10) / 10,
+      introduction: Math.round((totalMarks * 0.15) * 10) / 10,
+      body: Math.round((totalMarks * 0.5) * 10) / 10,
+      conclusion: Math.round((totalMarks * 0.15) * 10) / 10,
+      diagram: hashedDiagram ? Math.round((totalMarks * 0.1) * 10) / 10 : 0,
+      presentation: Math.round((totalMarks * 0.1) * 10) / 10,
     },
     inlineFeedback: [
       {
-        location: "introduction",
-        comment: "Clear context setting, but could be more focused on the question demand",
-        severity: "neutral"
-      },
-      {
-        location: "body",
-        comment: "Good coverage of key dimensions, needs more examples and data points",
-        severity: "neutral"
-      },
-      {
-        location: "conclusion",
-        comment: "Ties back to question but could suggest more forward-looking solutions",
+        location: "overall",
+        comment: "The answer demonstrates basic understanding but needs more analytical depth and current affairs integration.",
         severity: "neutral"
       }
     ],
@@ -216,22 +284,20 @@ function generateFallbackEvaluation(answerData) {
       "Logical flow of arguments",
       "Balanced perspective on the issue",
       "Good use of UPSC terminology"
-    ],
+    ].slice(0, 3),
     weaknesses: [
       "Limited use of current affairs examples",
       "Some arguments lack depth",
       "Could use more committee reports/data"
-    ],
+    ].slice(0, 3),
     improvements: [
-      "Add 2-3 recent examples from current affairs",
-      "Include specific data points or government reports",
-      "Strengthen conclusion with actionable suggestions",
-      hashedDiagram ? null : "Add relevant diagram/flowchart for +1 to +1.5 marks"
-    ].filter(Boolean),
+      "Add 2-3 recent examples from current affairs and include specific data points or government reports to strengthen arguments"
+    ],
+    specificImprovements: "Add 2-3 recent examples from current affairs, include specific data points or government reports, and strengthen conclusion with actionable suggestions. " + (hashedDiagram ? "" : "Add relevant diagram/flowchart for +1 to +1.5 marks."),
     diagramAnalysis: {
       present: hashedDiagram || false,
       relevant: hashedDiagram || false,
-      marksAwarded: hashedDiagram ? Math.round(totalMarks * 0.1 * 10) / 10 : 0,
+      marksAwarded: hashedDiagram ? Math.round((totalMarks * 0.1) * 10) / 10 : 0,
       comment: hashedDiagram 
         ? "Diagram present and adds value, ensure proper labeling"
         : "Relevant diagram/flowchart could fetch additional marks"
@@ -284,13 +350,45 @@ function generatePageSummary(pageEvaluations) {
  */
 function generateFinalSummary(allEvaluations, metadata) {
   const totalMarksObtained = allEvaluations.reduce((sum, e) => sum + e.totalMarks, 0);
-  const totalMaxMarks = allEvaluations.reduce((sum, e) => sum + (e.maxMarks || 15), 0);
+  const totalMaxMarks = allEvaluations.reduce((sum, e) => sum + (e.maxMarks || 12.5), 0);
   const percentage = Math.round((totalMarksObtained / totalMaxMarks) * 100);
 
   // Aggregate strengths and weaknesses
   const allStrengths = allEvaluations.flatMap(e => e.strengths || []);
   const allWeaknesses = allEvaluations.flatMap(e => e.weaknesses || []);
-  const allImprovements = allEvaluations.flatMap(e => e.improvements || []);
+  const allImprovements = allEvaluations.flatMap(e => {
+    // Prioritize specificImprovements if available
+    if (e.specificImprovements) return [e.specificImprovements];
+    return e.improvements || [];
+  });
+
+  // Count occurrences of weaknesses to find top recurring ones
+  const weaknessCounts = {};
+  allWeaknesses.forEach(weakness => {
+    weaknessCounts[weakness] = (weaknessCounts[weakness] || 0) + 1;
+  });
+  const top3RecurringWeaknesses = Object.entries(weaknessCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([weakness]) => weakness);
+
+  // Get top 3 actionable improvements
+  const top3Improvements = [...new Set(allImprovements)].slice(0, 3);
+
+  // Determine overall copy assessment
+  let overallAssessment = 'Poor';
+  if (percentage >= 70) overallAssessment = 'Very Good';
+  else if (percentage >= 55) overallAssessment = 'Good';
+  else if (percentage >= 40) overallAssessment = 'Average';
+  else overallAssessment = 'Poor';
+
+  // Estimate UPSC Rank Impact (very rough range)
+  let rankImpact = 'Not competitive';
+  if (percentage >= 70) rankImpact = 'Top 100-500 range (if consistent across all papers)';
+  else if (percentage >= 60) rankImpact = 'Top 500-1000 range (if consistent)';
+  else if (percentage >= 50) rankImpact = 'Top 1000-2000 range (needs improvement)';
+  else if (percentage >= 40) rankImpact = 'Below 2000 (significant improvement needed)';
+  else rankImpact = 'Not competitive (major gaps)';
 
   // Count diagram usage
   const diagramStats = {
@@ -301,6 +399,18 @@ function generateFinalSummary(allEvaluations, metadata) {
   };
 
   return {
+    // New format fields
+    totalMarksObtained: Math.round(totalMarksObtained * 10) / 10,
+    overallCopyAssessment: overallAssessment,
+    top3RecurringWeaknesses: top3RecurringWeaknesses.length > 0 
+      ? top3RecurringWeaknesses 
+      : [...new Set(allWeaknesses)].slice(0, 3),
+    top3ActionableImprovements: top3Improvements.length > 0 
+      ? top3Improvements 
+      : ['Focus on current affairs integration', 'Strengthen analytical depth', 'Improve answer structure'],
+    estimatedUPSCRankImpact: rankImpact,
+    
+    // Existing fields for backward compatibility
     overallScore: {
       obtained: Math.round(totalMarksObtained * 10) / 10,
       maximum: totalMaxMarks,
@@ -345,79 +455,116 @@ function generateFinalSummary(allEvaluations, metadata) {
  */
 export const advancedCopyEvaluationAgent = new RunnableLambda({
   func: async (input) => {
-    const {
-      extractedAnswers, // Array of answer objects with text, question, page, etc.
-      metadata, // { subject, paper, year, totalMarks }
-      apiKey,
-      model
-    } = input;
-
-    console.log(`🔍 Starting UPSC Copy Evaluation for ${metadata.subject || 'Unknown Subject'}`);
-    console.log(`📄 Total questions detected: ${extractedAnswers.length}`);
-
-    // Evaluate each answer
-    const allEvaluations = [];
-    
-    for (const answer of extractedAnswers) {
-      console.log(`⚡ Evaluating Question ${answer.questionNumber}...`);
-      
-      const evaluation = await evaluateAnswer(
-        {
-          ...answer,
-          subject: metadata.subject,
-        },
+    try {
+      const {
+        extractedAnswers, // Array of answer objects with text, question, page, etc.
+        metadata, // { subject, paper, year, totalMarks }
         apiKey,
         model
-      );
+      } = input;
 
-      // Add required fields from answer
-      evaluation.maxMarks = answer.wordLimit === 250 ? 15 : 
-                           answer.wordLimit === 150 ? 10 : 12.5;
-      evaluation.pageNumber = answer.pageNumber;
-      evaluation.answerText = answer.answerText || ''; // Required by schema
-      evaluation.questionText = answer.questionText || `Question ${answer.questionNumber}`;
-      evaluation.wordCount = answer.wordCount || 0;
-      evaluation.wordLimit = answer.wordLimit || 250;
-
-      // Filter/validate inlineFeedback locations (remove invalid enum values)
-      const validLocations = ['introduction', 'body', 'conclusion', 'diagram', 'overall'];
-      if (evaluation.inlineFeedback && Array.isArray(evaluation.inlineFeedback)) {
-        evaluation.inlineFeedback = evaluation.inlineFeedback
-          .map(feedback => {
-            // Map 'presentation' to 'overall' if present, or remove invalid values
-            if (feedback.location === 'presentation') {
-              feedback.location = 'overall';
-            }
-            return feedback;
-          })
-          .filter(feedback => validLocations.includes(feedback.location));
+      // Validate required inputs
+      if (!extractedAnswers || !Array.isArray(extractedAnswers) || extractedAnswers.length === 0) {
+        throw new Error("No answers provided for evaluation");
       }
 
-      allEvaluations.push(evaluation);
+      if (!apiKey) {
+        throw new Error("OPENROUTER_API_KEY is required for evaluation");
+      }
+
+      console.log(`🔍 Starting UPSC Copy Evaluation for ${metadata?.subject || 'Unknown Subject'}`);
+      console.log(`📄 Total questions detected: ${extractedAnswers.length}`);
+
+      // Evaluate each answer
+      const allEvaluations = [];
       
-      // Small delay to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
+      for (const answer of extractedAnswers) {
+        try {
+          console.log(`⚡ Evaluating Question ${answer.questionNumber}...`);
+          
+          const evaluation = await evaluateAnswer(
+            {
+              ...answer,
+              subject: metadata?.subject,
+            },
+            apiKey,
+            model
+          );
 
-    // Generate page-wise summary
-    const pageWiseSummary = generatePageSummary(allEvaluations);
+          // Add required fields from answer
+          evaluation.maxMarks = 12.5; // Default to 12.5 marks per question as per new system prompt
+          evaluation.pageNumber = answer.pageNumber;
+          evaluation.answerText = answer.answerText || ''; // Required by schema
+          evaluation.questionText = answer.questionText || `Question ${answer.questionNumber}`;
+          evaluation.wordCount = answer.wordCount || 0;
+          evaluation.wordLimit = answer.wordLimit || 250;
+          
+          // Ensure marksAwarded matches totalMarks
+          if (!evaluation.marksAwarded && evaluation.totalMarks) {
+            evaluation.marksAwarded = evaluation.totalMarks;
+          }
+          if (!evaluation.totalMarks && evaluation.marksAwarded) {
+            evaluation.totalMarks = evaluation.marksAwarded;
+          }
 
-    // Generate final summary
-    const finalSummary = generateFinalSummary(allEvaluations, metadata);
+          // Filter/validate inlineFeedback locations (remove invalid enum values)
+          const validLocations = ['introduction', 'body', 'conclusion', 'diagram', 'overall'];
+          if (evaluation.inlineFeedback && Array.isArray(evaluation.inlineFeedback)) {
+            evaluation.inlineFeedback = evaluation.inlineFeedback
+              .map(feedback => {
+                // Map 'presentation' to 'overall' if present, or remove invalid values
+                if (feedback.location === 'presentation') {
+                  feedback.location = 'overall';
+                }
+                return feedback;
+              })
+              .filter(feedback => validLocations.includes(feedback.location));
+          }
 
-    console.log(`✅ Evaluation complete! Overall Score: ${finalSummary.overallScore.obtained}/${finalSummary.overallScore.maximum}`);
-
-    return {
-      success: true,
-      evaluations: allEvaluations,
-      pageWiseSummary,
-      finalSummary,
-      metadata: {
-        ...metadata,
-        evaluatedAt: new Date().toISOString(),
-        totalQuestions: allEvaluations.length
+          allEvaluations.push(evaluation);
+          
+          // Small delay to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (answerError) {
+          console.error(`❌ Error evaluating answer ${answer.questionNumber}:`, answerError);
+          // Continue with other answers even if one fails
+          allEvaluations.push(generateFallbackEvaluation(answer));
+        }
       }
-    };
+
+      if (allEvaluations.length === 0) {
+        throw new Error("Failed to evaluate any answers");
+      }
+
+      // Generate page-wise summary
+      const pageWiseSummary = generatePageSummary(allEvaluations);
+
+      // Generate final summary
+      const finalSummary = generateFinalSummary(allEvaluations, metadata || {});
+
+      console.log(`✅ Evaluation complete! Overall Score: ${finalSummary.overallScore.obtained}/${finalSummary.overallScore.maximum}`);
+
+      return {
+        success: true,
+        evaluations: allEvaluations,
+        pageWiseSummary,
+        finalSummary,
+        metadata: {
+          ...metadata,
+          evaluatedAt: new Date().toISOString(),
+          totalQuestions: allEvaluations.length
+        }
+      };
+    } catch (error) {
+      console.error("❌ Error in advancedCopyEvaluationAgent:", error);
+      return {
+        success: false,
+        error: error.message || "Evaluation failed",
+        evaluations: [],
+        pageWiseSummary: [],
+        finalSummary: null
+      };
+    }
   },
 });
 

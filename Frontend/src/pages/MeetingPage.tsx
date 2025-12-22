@@ -70,17 +70,30 @@ export const MeetingPage = () => {
    */
   const initializeMedia = async () => {
     try {
+      // Stop existing stream if any
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: isVideoEnabled,
-        audio: isAudioEnabled,
+        video: isVideoEnabled ? { width: 1280, height: 720 } : false,
+        audio: isAudioEnabled ? { echoCancellation: true, noiseSuppression: true } : false,
       });
+      
       setLocalStream(stream);
+      
+      // Set video element source immediately
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
+        localVideoRef.current.muted = true; // Mute local audio to prevent echo
+        localVideoRef.current.play().catch((err) => {
+          console.error("Error playing local video:", err);
+        });
       }
     } catch (error) {
       console.error("Error accessing media devices:", error);
       alert("Failed to access camera/microphone. Please check permissions.");
+      throw error;
     }
   };
 
@@ -165,6 +178,11 @@ export const MeetingPage = () => {
    * Create peer connection for a remote user
    */
   const createPeerConnection = (userId: string) => {
+    // Check if peer connection already exists
+    if (peerConnectionsRef.current.has(userId)) {
+      return peerConnectionsRef.current.get(userId);
+    }
+
     const peerConnection = new RTCPeerConnection(rtcConfig);
 
     // Add local stream tracks
@@ -176,20 +194,34 @@ export const MeetingPage = () => {
 
     // Handle remote stream
     peerConnection.ontrack = (event) => {
+      console.log("Received remote track from:", userId);
       const remoteStream = event.streams[0];
+      
       setRemoteStreams((prev) => {
         const newMap = new Map(prev);
         newMap.set(userId, remoteStream);
         return newMap;
       });
 
-      // Set video element source
+      // Set video element source - ensure audio plays
       setTimeout(() => {
         const videoElement = remoteVideosRef.current.get(userId);
-        if (videoElement) {
+        if (videoElement && remoteStream) {
           videoElement.srcObject = remoteStream;
+          videoElement.muted = false; // Ensure remote audio plays
+          videoElement.play().catch((err) => {
+            console.error("Error playing remote video:", err);
+          });
         }
       }, 100);
+    };
+
+    // Handle connection state changes
+    peerConnection.onconnectionstatechange = () => {
+      console.log(`Peer connection state with ${userId}:`, peerConnection.connectionState);
+      if (peerConnection.connectionState === "failed") {
+        peerConnection.restartIce();
+      }
     };
 
     // Handle ICE candidates
@@ -300,13 +332,24 @@ export const MeetingPage = () => {
    * Leave meeting room
    */
   const handleLeaveRoom = () => {
+    // Emit leave event to socket if in room
+    if (socket && roomId) {
+      socket.emit("leave-room", { roomId });
+    }
+
     // Stop media tracks
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
     }
 
     // Close peer connections
-    peerConnectionsRef.current.forEach((pc) => pc.close());
+    peerConnectionsRef.current.forEach((pc) => {
+      try {
+        pc.close();
+      } catch (error) {
+        console.error("Error closing peer connection:", error);
+      }
+    });
     peerConnectionsRef.current.clear();
 
     // Stop speech recognition
@@ -324,12 +367,53 @@ export const MeetingPage = () => {
   /**
    * Toggle video
    */
-  const toggleVideo = () => {
-    if (localStream) {
-      const videoTrack = localStream.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !isVideoEnabled;
-        setIsVideoEnabled(!isVideoEnabled);
+  const toggleVideo = async () => {
+    if (!localStream) return;
+
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      const newState = !isVideoEnabled;
+      videoTrack.enabled = newState;
+      setIsVideoEnabled(newState);
+
+      // Update all peer connections
+      peerConnectionsRef.current.forEach((peerConnection) => {
+        const sender = peerConnection.getSenders().find((s) => s.track?.kind === "video");
+        if (sender && sender.track) {
+          sender.track.enabled = newState;
+        }
+      });
+
+      // If enabling video and track was stopped, reinitialize
+      if (newState && !videoTrack.enabled) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 1280, height: 720 },
+            audio: isAudioEnabled ? { echoCancellation: true, noiseSuppression: true } : false,
+          });
+          
+          const newVideoTrack = stream.getVideoTracks()[0];
+          if (newVideoTrack && localStream) {
+            const oldTrack = localStream.getVideoTracks()[0];
+            localStream.removeTrack(oldTrack);
+            localStream.addTrack(newVideoTrack);
+            oldTrack.stop();
+
+            // Replace track in all peer connections
+            peerConnectionsRef.current.forEach((peerConnection) => {
+              const sender = peerConnection.getSenders().find((s) => s.track?.kind === "video");
+              if (sender) {
+                sender.replaceTrack(newVideoTrack);
+              }
+            });
+
+            if (localVideoRef.current) {
+              localVideoRef.current.srcObject = localStream;
+            }
+          }
+        } catch (error) {
+          console.error("Error reinitializing video:", error);
+        }
       }
     }
   };
@@ -337,17 +421,55 @@ export const MeetingPage = () => {
   /**
    * Toggle audio
    */
-  const toggleAudio = () => {
-    if (localStream) {
-      const audioTrack = localStream.getAudioTracks()[0];
-      if (audioTrack) {
-        audioTrack.enabled = !isAudioEnabled;
-        setIsAudioEnabled(!isAudioEnabled);
+  const toggleAudio = async () => {
+    if (!localStream) return;
 
-        if (!isAudioEnabled) {
-          startSpeechRecognition();
-        } else {
-          stopSpeechRecognition();
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      const newState = !isAudioEnabled;
+      audioTrack.enabled = newState;
+      setIsAudioEnabled(newState);
+
+      // Update all peer connections
+      peerConnectionsRef.current.forEach((peerConnection) => {
+        const sender = peerConnection.getSenders().find((s) => s.track?.kind === "audio");
+        if (sender && sender.track) {
+          sender.track.enabled = newState;
+        }
+      });
+
+      // Handle speech recognition for translation
+      if (newState) {
+        startSpeechRecognition();
+      } else {
+        stopSpeechRecognition();
+      }
+
+      // If enabling audio and track was stopped, reinitialize
+      if (newState && !audioTrack.enabled) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: isVideoEnabled ? { width: 1280, height: 720 } : false,
+            audio: { echoCancellation: true, noiseSuppression: true },
+          });
+          
+          const newAudioTrack = stream.getAudioTracks()[0];
+          if (newAudioTrack && localStream) {
+            const oldTrack = localStream.getAudioTracks()[0];
+            localStream.removeTrack(oldTrack);
+            localStream.addTrack(newAudioTrack);
+            oldTrack.stop();
+
+            // Replace track in all peer connections
+            peerConnectionsRef.current.forEach((peerConnection) => {
+              const sender = peerConnection.getSenders().find((s) => s.track?.kind === "audio");
+              if (sender) {
+                sender.replaceTrack(newAudioTrack);
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error reinitializing audio:", error);
         }
       }
     }
@@ -371,31 +493,87 @@ export const MeetingPage = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("room-joined", (data: { roomId: string; participants: Participant[] }) => {
+    socket.on("room-joined", async (data: { roomId: string; participants: Participant[] }) => {
       setParticipants(data.participants);
-      initializeSpeechRecognition();
-      initializeTTS();
-      if (isAudioEnabled) {
-        startSpeechRecognition();
+      
+      // Check if translation is needed (if all participants speak same language, skip translation)
+      const needsTranslation = data.participants.some(
+        (p) => p.speakingLanguage !== listeningLanguage || p.listeningLanguage !== speakingLanguage
+      );
+
+      // Only initialize translation if needed
+      if (needsTranslation) {
+        initializeSpeechRecognition();
+        initializeTTS();
+        if (isAudioEnabled) {
+          startSpeechRecognition();
+        }
       }
+
+      // Create peer connections with all existing participants
+      // Wait for localStream to be ready
+      const createConnectionsWithExistingParticipants = async () => {
+        // Retry if localStream is not ready
+        if (!localStream) {
+          console.log("Waiting for local stream...");
+          setTimeout(createConnectionsWithExistingParticipants, 200);
+          return;
+        }
+
+        const currentUserId = user?.id?.toString();
+        
+        for (const participant of data.participants) {
+          const participantUserId = participant.userId?.toString();
+          
+          if (participantUserId && participantUserId !== currentUserId) {
+            const peerConnection = createPeerConnection(participantUserId);
+
+            // Create offer for existing participants
+            try {
+              const offer = await peerConnection.createOffer();
+              await peerConnection.setLocalDescription(offer);
+              
+              socket.emit("offer", {
+                offer: peerConnection.localDescription,
+                targetUserId: participantUserId,
+                roomId,
+              });
+            } catch (error) {
+              console.error("Error creating offer for existing participant:", error);
+            }
+          }
+        }
+      };
+
+      // Start creating connections
+      createConnectionsWithExistingParticipants();
     });
 
-    socket.on("user-joined", (data: Participant) => {
-      setParticipants((prev) => [...prev, data]);
+    socket.on("user-joined", async (data: Participant) => {
+      setParticipants((prev) => {
+        // Avoid duplicates
+        if (prev.find((p) => p.userId === data.userId)) {
+          return prev;
+        }
+        return [...prev, data];
+      });
+      
       // Create peer connection for new user
       const peerConnection = createPeerConnection(data.userId);
 
       // Create offer
-      peerConnection
-        .createOffer()
-        .then((offer) => peerConnection.setLocalDescription(offer))
-        .then(() => {
-          socket.emit("offer", {
-            offer: peerConnection.localDescription,
-            targetUserId: data.userId,
-            roomId,
-          });
+      try {
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        socket.emit("offer", {
+          offer: peerConnection.localDescription,
+          targetUserId: data.userId,
+          roomId,
         });
+      } catch (error) {
+        console.error("Error creating offer for new user:", error);
+      }
     });
 
     socket.on("user-left", (data: { userId: string }) => {
@@ -413,29 +591,53 @@ export const MeetingPage = () => {
     });
 
     socket.on("offer", async (data: { offer: RTCSessionDescriptionInit; fromUserId: string }) => {
-      const peerConnection = createPeerConnection(data.fromUserId);
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
+      try {
+        const peerConnection = createPeerConnection(data.fromUserId);
+        
+        // Check if remote description is already set
+        if (peerConnection.remoteDescription) {
+          console.log("Remote description already set, skipping");
+          return;
+        }
 
-      socket.emit("answer", {
-        answer: peerConnection.localDescription,
-        targetUserId: data.fromUserId,
-        roomId,
-      });
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        socket.emit("answer", {
+          answer: peerConnection.localDescription,
+          targetUserId: data.fromUserId,
+          roomId,
+        });
+      } catch (error) {
+        console.error("Error handling offer:", error);
+      }
     });
 
     socket.on("answer", async (data: { answer: RTCSessionDescriptionInit; fromUserId: string }) => {
-      const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
-      if (peerConnection) {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+      try {
+        const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
+        if (peerConnection) {
+          // Check if remote description is already set
+          if (peerConnection.remoteDescription) {
+            console.log("Answer remote description already set, skipping");
+            return;
+          }
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        }
+      } catch (error) {
+        console.error("Error handling answer:", error);
       }
     });
 
     socket.on("ice-candidate", async (data: { candidate: RTCIceCandidateInit; fromUserId: string }) => {
-      const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
-      if (peerConnection) {
-        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+      try {
+        const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
+        if (peerConnection && data.candidate) {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      } catch (error) {
+        console.error("Error adding ICE candidate:", error);
       }
     });
 
@@ -444,9 +646,11 @@ export const MeetingPage = () => {
       targetLanguage: string;
       fromUserId: string;
       fromUserName: string;
+      needsTranslation?: boolean;
     }) => {
-      // Speak translated text if it's for this user
-      if (data.targetLanguage === listeningLanguage) {
+      // Only use TTS if translation was actually needed
+      // If languages match, WebRTC audio will handle it directly
+      if (data.needsTranslation !== false && data.targetLanguage === listeningLanguage) {
         speakText(data.text, data.targetLanguage);
       }
     });
@@ -466,6 +670,17 @@ export const MeetingPage = () => {
       socket.off("room-error");
     };
   }, [socket, roomId, listeningLanguage, isAudioEnabled]);
+
+  // Update local video when stream changes
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.muted = true;
+      localVideoRef.current.play().catch((err) => {
+        console.error("Error playing local video:", err);
+      });
+    }
+  }, [localStream]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -637,16 +852,22 @@ export const MeetingPage = () => {
       {/* Video Grid */}
       <div className="flex-1 p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto">
         {/* Local Video */}
-        <div className={`relative rounded-lg overflow-hidden ${theme === "dark" ? "bg-slate-900" : "bg-slate-200"}`}>
+        <div className={`relative rounded-lg overflow-hidden aspect-video ${theme === "dark" ? "bg-slate-900" : "bg-slate-200"}`}>
           <video
             ref={localVideoRef}
             autoPlay
             muted
             playsInline
             className="w-full h-full object-cover"
+            style={{ minHeight: "200px" }}
           />
+          {!isVideoEnabled && (
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+              <VideoOff className="w-16 h-16 text-slate-400" />
+            </div>
+          )}
           <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm">
-            {user?.name} (You)
+            {user?.name || "local"} (You)
           </div>
         </div>
 
@@ -656,15 +877,26 @@ export const MeetingPage = () => {
           return (
             <div
               key={userId}
-              className={`relative rounded-lg overflow-hidden ${theme === "dark" ? "bg-slate-900" : "bg-slate-200"}`}
+              className={`relative rounded-lg overflow-hidden aspect-video ${theme === "dark" ? "bg-slate-900" : "bg-slate-200"}`}
             >
               <video
                 ref={(el) => {
-                  if (el) remoteVideosRef.current.set(userId, el);
+                  if (el) {
+                    remoteVideosRef.current.set(userId, el);
+                    // Ensure video is set up properly
+                    if (stream && el.srcObject !== stream) {
+                      el.srcObject = stream;
+                      el.muted = false;
+                      el.play().catch((err) => {
+                        console.error("Error playing remote video:", err);
+                      });
+                    }
+                  }
                 }}
                 autoPlay
                 playsInline
                 className="w-full h-full object-cover"
+                style={{ minHeight: "200px" }}
               />
               <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm">
                 {participant?.name || "Unknown"}

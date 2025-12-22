@@ -245,6 +245,38 @@ export const initializeSocketIO = (server) => {
     });
 
     /**
+     * Handle explicit leave room event
+     */
+    socket.on("leave-room", async ({ roomId }) => {
+      const currentRoomId = socketToRoom.get(socket.id);
+      const targetRoomId = roomId || currentRoomId;
+
+      if (targetRoomId) {
+        // Remove from room
+        await leaveMeetingRoom(targetRoomId, socket.id);
+
+        if (activeRooms.has(targetRoomId)) {
+          activeRooms.get(targetRoomId).delete(socket.id);
+          if (activeRooms.get(targetRoomId).size === 0) {
+            activeRooms.delete(targetRoomId);
+          }
+        }
+
+        socketToRoom.delete(socket.id);
+        socketToUser.delete(socket.id);
+
+        // Notify other participants
+        socket.to(targetRoomId).emit("user-left", {
+          userId: socket.userId,
+          userName: socket.userName,
+        });
+
+        socket.leave(targetRoomId);
+        console.log(`User ${socket.userId} left room ${targetRoomId}`);
+      }
+    });
+
+    /**
      * Handle disconnection
      */
     socket.on("disconnect", async () => {

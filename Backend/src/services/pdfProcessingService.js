@@ -1,45 +1,109 @@
 /**
  * PDF Processing Service
- * Node.js v22 + ESM SAFE
- * pdf-parse loaded via createRequire (CJS compatible)
+ * Node.js v22 + ESM Compatible
+ * Uses CommonJS bridge for pdf-parse stability
  */
 
-import fs from "fs";
-import { createWorker } from "tesseract.js";
+import { createRequire } from "module";
 
-// ESM-compatible import for CJS-only pdf-parse, works everywhere
-async function getPdfParse() {
-  const mod = await import("pdf-parse");
-  return mod.default || mod;
+// Create CommonJS require for pdf-parse compatibility
+const require = createRequire(import.meta.url);
+
+// Load pdf-parse once at module level for better performance and reliability
+const pdfParse = require("pdf-parse");
+
+/**
+ * Extracts text content from PDF buffer
+ * @param {Buffer} buffer - PDF file buffer
+ * @returns {Promise<string>} Extracted text content
+ * @throws {Error} If PDF processing fails or buffer is invalid
+ */
+export async function extractTextFromPDF(buffer) {
+  // Validate input buffer
+  if (!Buffer.isBuffer(buffer)) {
+    throw new Error("Input must be a Buffer");
+  }
+
+  if (buffer.length === 0) {
+    throw new Error("PDF buffer is empty");
+  }
+
+  try {
+    // Convert Buffer to Uint8Array as required by pdf-parse v2.4.5+
+    const uint8Array = new Uint8Array(buffer);
+
+    // Create PDF parser instance with options
+    const parser = new pdfParse.PDFParse(uint8Array, {
+      verbosity: 0, // Disable verbose output
+      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'
+    });
+
+    // Load the PDF
+    await parser.load();
+
+    // Extract text content
+    const result = await parser.getText();
+
+    // Extract and clean the text content
+    const extractedText = result.text || "";
+
+    // Return clean text, trimmed of excess whitespace
+    return extractedText.trim();
+
+  } catch (error) {
+    // Log error for debugging but throw clean error message
+    console.error("PDF processing error:", error.message);
+
+    // Handle specific pdf-parse errors
+    if (error.message.includes("verbosity")) {
+      throw new Error("PDF parsing failed: Invalid PDF structure");
+    }
+
+    if (error.message.includes("Class constructors")) {
+      throw new Error("PDF parsing failed: Compatibility issue");
+    }
+
+    if (error.message.includes("Uint8Array")) {
+      throw new Error("PDF parsing failed: Invalid buffer format");
+    }
+
+    // Generic error for other cases
+    throw new Error(`PDF processing failed: ${error.message}`);
+  }
 }
 
 /* ===============================
-   PDF TEXT EXTRACTION
+   PDF TEXT EXTRACTION WITH METADATA
 ================================ */
-export const extractTextFromPDF = async (filePathOrBuffer) => {
+export const extractTextFromPDFWithMetadata = async (buffer) => {
   try {
-    const buffer = Buffer.isBuffer(filePathOrBuffer)
-      ? filePathOrBuffer
-      : fs.readFileSync(filePathOrBuffer);
+    // Convert Buffer to Uint8Array as required by pdf-parse v2.4.5+
+    const uint8Array = new Uint8Array(buffer);
 
-    if (!buffer || buffer.length === 0) {
-      throw new Error("Invalid or empty PDF buffer");
-    }
+    // Create PDF parser instance with options
+    const parser = new pdfParse.PDFParse(uint8Array, {
+      verbosity: 0, // Disable verbose output
+      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'
+    });
 
-    console.log(`📄 Parsing PDF (${buffer.length} bytes)`);
+    // Load the PDF
+    await parser.load();
 
-    const pdfParse = await getPdfParse();
-    const data = await pdfParse(buffer);
+    // Get document info
+    const info = await parser.getInfo();
+
+    // Extract text content
+    const textResult = await parser.getText();
 
     return {
       success: true,
-      text: data.text || "",
-      numPages: data.numpages || 1,
-      info: data.info || {},
-      metadata: data.metadata || {}
+      text: textResult.text || "",
+      numPages: info.numPages || 1,
+      info: info || {},
+      metadata: info.metadata || {}
     };
   } catch (error) {
-    console.error("❌ PDF parse error:", error);
+    console.error("PDF parse error:", error);
     return {
       success: false,
       error: error.message || "PDF parsing failed"
@@ -67,28 +131,6 @@ export function splitTextIntoPages(text, numPages = 1) {
     text: pageText.trim(),
     wordCount: pageText.trim().split(/\s+/).filter(Boolean).length
   }));
-}
-
-/* ===============================
-   OCR FOR SCANNED PDF
-================================ */
-export async function performOCR(imageBuffer) {
-  const worker = await createWorker();
-  try {
-    await worker.loadLanguage("eng");
-    await worker.initialize("eng");
-
-    const {
-      data: { text, confidence }
-    } = await worker.recognize(imageBuffer);
-
-    return { success: true, text, confidence };
-  } catch (error) {
-    console.error("OCR error:", error);
-    return { success: false, error: error.message };
-  } finally {
-    await worker.terminate();
-  }
 }
 
 /* ===============================
@@ -149,7 +191,7 @@ export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
   try {
     console.log("📄 Processing PDF for evaluation...");
 
-    const extractResult = await extractTextFromPDF(pdfBuffer);
+    const extractResult = await extractTextFromPDFWithMetadata(pdfBuffer);
     if (!extractResult.success) return extractResult;
 
     const { text, numPages } = extractResult;
@@ -183,15 +225,3 @@ export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
     };
   }
 }
-
-/* ===============================
-   EXPORT DEFAULT
-================================ */
-export default {
-  extractTextFromPDF,
-  splitTextIntoPages,
-  performOCR,
-  isScannedPDF,
-  extractAnswers,
-  processPDFForEvaluation
-};
