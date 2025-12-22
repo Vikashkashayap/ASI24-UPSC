@@ -54,21 +54,48 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     console.log("🔄 Processing PDF...");
     const pdfBuffer = req.file.buffer;
     
-    const processResult = await processPDFForEvaluation(pdfBuffer, {
-      subject,
-      paper,
-      year
-    });
-
-    if (!processResult.success) {
+    let processResult;
+    try {
+      processResult = await processPDFForEvaluation(pdfBuffer, {
+        subject,
+        paper,
+        year
+      });
+    } catch (pdfError) {
+      console.error("❌ PDF processing error:", pdfError);
       evaluation.status = 'failed';
-      evaluation.errorMessage = processResult.error;
+      evaluation.errorMessage = pdfError.message || "PDF processing failed";
       await evaluation.save();
 
       return res.status(500).json({
         success: false,
         message: "Failed to process PDF",
-        error: processResult.error
+        error: pdfError.message || "Unknown error during PDF processing"
+      });
+    }
+
+    if (!processResult || !processResult.success) {
+      evaluation.status = 'failed';
+      evaluation.errorMessage = processResult?.error || "PDF processing failed";
+      await evaluation.save();
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to process PDF",
+        error: processResult?.error || "Unknown error during PDF processing"
+      });
+    }
+
+    // Validate that we have extracted answers
+    if (!processResult.extractedAnswers || processResult.extractedAnswers.length === 0) {
+      evaluation.status = 'failed';
+      evaluation.errorMessage = "No answers extracted from PDF";
+      await evaluation.save();
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to process PDF",
+        error: "No answers could be extracted from the PDF. Please ensure the PDF contains readable text."
       });
     }
 
@@ -83,21 +110,48 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet"; // Best model for detailed evaluation
 
-    const evaluationResult = await advancedCopyEvaluationAgent.invoke({
-      extractedAnswers: processResult.extractedAnswers,
-      metadata: processResult.metadata,
-      apiKey,
-      model
-    });
-
-    if (!evaluationResult.success) {
+    // Validate API key
+    if (!apiKey) {
       evaluation.status = 'failed';
-      evaluation.errorMessage = "AI evaluation failed";
+      evaluation.errorMessage = "OPENROUTER_API_KEY is not configured";
       await evaluation.save();
 
       return res.status(500).json({
         success: false,
-        message: "AI evaluation failed"
+        message: "AI evaluation failed: OPENROUTER_API_KEY is not configured. Please set it in your .env file."
+      });
+    }
+
+    let evaluationResult;
+    try {
+      evaluationResult = await advancedCopyEvaluationAgent.invoke({
+        extractedAnswers: processResult.extractedAnswers,
+        metadata: processResult.metadata,
+        apiKey,
+        model
+      });
+    } catch (agentError) {
+      console.error("❌ Agent invocation error:", agentError);
+      evaluation.status = 'failed';
+      evaluation.errorMessage = agentError.message || "Agent invocation failed";
+      await evaluation.save();
+
+      return res.status(500).json({
+        success: false,
+        message: "AI evaluation failed",
+        error: agentError.message || "Unknown error during agent invocation"
+      });
+    }
+
+    if (!evaluationResult || !evaluationResult.success) {
+      evaluation.status = 'failed';
+      evaluation.errorMessage = evaluationResult?.error || "AI evaluation failed";
+      await evaluation.save();
+
+      return res.status(500).json({
+        success: false,
+        message: "AI evaluation failed",
+        error: evaluationResult?.error || "Unknown error during evaluation"
       });
     }
 
