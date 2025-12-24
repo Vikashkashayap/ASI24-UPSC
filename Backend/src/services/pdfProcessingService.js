@@ -1,7 +1,7 @@
 /**
  * PDF Processing Service
  * Node.js v22 + ESM Compatible
- * Uses CommonJS bridge for pdf-parse stability
+ * Uses CommonJS bridge for pdf-parse compatibility
  */
 
 import { createRequire } from "module";
@@ -9,7 +9,7 @@ import { createRequire } from "module";
 // Create CommonJS require for pdf-parse compatibility
 const require = createRequire(import.meta.url);
 
-// Load pdf-parse once at module level for better performance and reliability
+// Compatible with pdf-parse@1.1.1 (CommonJS)
 const pdfParse = require("pdf-parse");
 
 /**
@@ -29,24 +29,9 @@ export async function extractTextFromPDF(buffer) {
   }
 
   try {
-    // Convert Buffer to Uint8Array as required by pdf-parse v2.4.5+
-    const uint8Array = new Uint8Array(buffer);
-
-    // Create PDF parser instance with options
-    const parser = new pdfParse.PDFParse(uint8Array, {
-      verbosity: 0, // Disable verbose output
-      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'
-    });
-
-    // Load the PDF
-    await parser.load();
-
-    // Extract text content
-    const result = await parser.getText();
-
-    // Extract and clean the text content
-    const extractedText = result.text || "";
-
+    // Use official pdf-parse function directly
+    const data = await pdfParse(buffer);
+    const extractedText = data.text || "";
     // Return clean text, trimmed of excess whitespace
     return extractedText.trim();
 
@@ -77,30 +62,14 @@ export async function extractTextFromPDF(buffer) {
 ================================ */
 export const extractTextFromPDFWithMetadata = async (buffer) => {
   try {
-    // Convert Buffer to Uint8Array as required by pdf-parse v2.4.5+
-    const uint8Array = new Uint8Array(buffer);
-
-    // Create PDF parser instance with options
-    const parser = new pdfParse.PDFParse(uint8Array, {
-      verbosity: 0, // Disable verbose output
-      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/standard_fonts/'
-    });
-
-    // Load the PDF
-    await parser.load();
-
-    // Get document info
-    const info = await parser.getInfo();
-
-    // Extract text content
-    const textResult = await parser.getText();
-
+    // Use official pdf-parse function directly
+    const data = await pdfParse(buffer);
     return {
       success: true,
-      text: textResult.text || "",
-      numPages: info.numPages || 1,
-      info: info || {},
-      metadata: info.metadata || {}
+      text: data.text || "",
+      numPages: data.numpages || 1,
+      info: data.info || {},
+      metadata: data.metadata || {}
     };
   } catch (error) {
     console.error("PDF parse error:", error);
@@ -224,4 +193,5 @@ export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
       error: error.message || "PDF evaluation failed"
     };
   }
+  
 }
