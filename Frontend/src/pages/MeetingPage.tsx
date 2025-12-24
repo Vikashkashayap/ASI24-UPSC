@@ -75,11 +75,12 @@ export const MeetingPage = () => {
         localStream.getTracks().forEach((track) => track.stop());
       }
 
+      console.log('Requesting camera/mic permission...', { isVideoEnabled, isAudioEnabled });
       const stream = await navigator.mediaDevices.getUserMedia({
         video: isVideoEnabled ? { width: 1280, height: 720 } : false,
         audio: isAudioEnabled ? { echoCancellation: true, noiseSuppression: true } : false,
       });
-      
+      console.log('Successfully obtained media stream:', stream);
       setLocalStream(stream);
       
       // Set video element source immediately
@@ -92,7 +93,8 @@ export const MeetingPage = () => {
       }
     } catch (error) {
       console.error("Error accessing media devices:", error);
-      alert("Failed to access camera/microphone. Please check permissions.");
+      const errMsg = (error && typeof error === 'object' && 'message' in error) ? (error as any).message : String(error);
+      alert("Failed to access camera/microphone. Please check permissions.\nError: " + errMsg);
       throw error;
     }
   };
@@ -219,10 +221,19 @@ export const MeetingPage = () => {
     // Handle connection state changes
     peerConnection.onconnectionstatechange = () => {
       console.log(`Peer connection state with ${userId}:`, peerConnection.connectionState);
+      if (peerConnection.connectionState === "connected") {
+        console.log("WebRTC connected for " + userId);
+      }
       if (peerConnection.connectionState === "failed") {
         peerConnection.restartIce();
       }
     };
+    
+    // ICE state debugging
+    peerConnection.oniceconnectionstatechange = () => {
+      console.log(`ICE state with ${userId}:`, peerConnection.iceConnectionState);
+    };
+
 
     // Handle ICE candidates
     peerConnection.onicecandidate = (event) => {
@@ -861,9 +872,11 @@ export const MeetingPage = () => {
             className="w-full h-full object-cover"
             style={{ minHeight: "200px" }}
           />
-          {!isVideoEnabled && (
+          {(!isVideoEnabled || !localStream || localStream.getVideoTracks().length === 0) && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
-              <VideoOff className="w-16 h-16 text-slate-400" />
+              <span className="text-white text-lg">
+                {!localStream ? "No video stream" : (!isVideoEnabled ? "Video is disabled" : "No video track found")}
+              </span>
             </div>
           )}
           <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm">
