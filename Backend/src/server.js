@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import http from "http";
+import path from "path";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import answerRoutes from "./routes/answerRoutes.js";
@@ -20,6 +21,9 @@ const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*", credentials: true }));
 app.use(express.json());
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 connectDB();
 

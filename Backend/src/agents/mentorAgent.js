@@ -43,7 +43,7 @@ export const mentorAgent = new RunnableLambda({
     try {
       const model =
         process.env.OPENROUTER_MODEL ||
-        "openai/gpt-3.5-turbo";
+        "openai/gpt-4o-mini";
       const apiKey = process.env.OPENROUTER_API_KEY;
 
       if (!apiKey) {

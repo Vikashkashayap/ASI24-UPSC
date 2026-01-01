@@ -12,6 +12,7 @@ import { MentorChatPage } from "./pages/MentorChatPage";
 import { ChatbotPage } from "./pages/ChatbotPage";
 import CopyEvaluationPage from "./pages/CopyEvaluationPage";
 import CopyEvaluationDetailPage from "./pages/CopyEvaluationDetailPage";
+import CopyEvaluationDetailPageV2 from "./pages/CopyEvaluationDetailPageV2";
 import { MeetingPage } from "./pages/MeetingPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingPage } from "./pages/LandingPage";
@@ -39,7 +40,8 @@ function App() {
             <Route path="mentor" element={<MentorChatPage />} />
             <Route path="chatbot" element={<ChatbotPage />} />
             <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
-            <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
+            <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPageV2 />} />
+            <Route path="copy-evaluation/:id/old" element={<CopyEvaluationDetailPage />} />
             <Route path="meeting" element={<MeetingPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

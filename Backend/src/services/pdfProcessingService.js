@@ -139,18 +139,44 @@ function estimateWordLimit(words) {
 }
 
 function detectDiagram(text) {
-  const keywords = [
-    "diagram",
-    "flowchart",
-    "map",
-    "graph",
-    "figure",
-    "→",
-    "←",
-    "↑",
-    "↓"
+  const diagramKeywords = [
+    // Direct diagram terms
+    "diagram", "flowchart", "flow chart", "flow-chart",
+    "map", "graph", "chart", "figure", "illustration",
+    "structure", "framework", "model", "process",
+
+    // Visual elements
+    "→", "←", "↑", "↓", "⇒", "⇐", "⇑", "⇓",
+    "----", "====", "••••",
+
+    // Process/flow terms
+    "stages", "phases", "steps", "levels", "hierarchy",
+    "cycle", "sequence", "progression", "evolution",
+
+    // Organizational terms
+    " pyramid", "matrix", "tree", "network", "system",
+
+    // UPSC specific
+    "administrative structure", "constitutional framework",
+    "policy framework", "governance model", "decision making process"
   ];
-  return keywords.some(k => text.toLowerCase().includes(k));
+
+  const lowerText = text.toLowerCase();
+
+  // Check for multiple diagram indicators
+  let diagramScore = 0;
+  diagramKeywords.forEach(keyword => {
+    if (lowerText.includes(keyword)) {
+      diagramScore += 1;
+    }
+  });
+
+  // Additional checks for diagram-like content
+  if (lowerText.includes('below') && lowerText.includes('shown')) diagramScore += 2;
+  if (lowerText.includes('as follows') && lowerText.includes(':')) diagramScore += 1;
+  if (/\(\d+\)/g.test(text) && diagramScore > 0) diagramScore += 1; // Numbered elements
+
+  return diagramScore >= 2; // Require at least 2 indicators for diagram detection
 }
 
 /* ===============================
@@ -171,13 +197,23 @@ export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
     }
 
     const pages = splitTextIntoPages(text, numPages);
+
+    // Extract basic answers (fallback)
     const answers = extractAnswers(pages);
 
-    console.log(`✅ Extracted ${answers.length} answers`);
+    // Also return raw page texts for question detection
+    const pageTexts = pages.map(page => ({
+      pageNumber: page.pageNumber,
+      text: page.text,
+      wordCount: page.wordCount
+    }));
+
+    console.log(`✅ Extracted ${answers.length} basic answers from ${pages.length} pages`);
 
     return {
       success: true,
       extractedAnswers: answers,
+      pageTexts: pageTexts, // Raw page texts for question detection
       metadata: {
         ...metadata,
         totalPages: numPages,
@@ -193,5 +229,5 @@ export async function processPDFForEvaluation(pdfBuffer, metadata = {}) {
       error: error.message || "PDF evaluation failed"
     };
   }
-  
+
 }

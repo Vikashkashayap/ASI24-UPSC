@@ -70,19 +70,50 @@ export const MeetingPage = () => {
    */
   const initializeMedia = async () => {
     try {
+      // Check if we're in a secure context (HTTPS required for getUserMedia)
+      if (!window.isSecureContext) {
+        const errorMsg = "Media access requires a secure connection (HTTPS). Please ensure you're accessing the site over HTTPS.";
+        console.error("Insecure context:", errorMsg);
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
+
+      // Check if MediaDevices API is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const errorMsg = "Your browser doesn't support camera/microphone access. Please update your browser or use a modern browser like Chrome, Firefox, or Edge.";
+        console.error("MediaDevices API not available");
+        alert(errorMsg);
+        throw new Error(errorMsg);
+      }
+
       // Stop existing stream if any
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
       }
 
-      console.log('Requesting camera/mic permission...', { isVideoEnabled, isAudioEnabled });
-      const stream = await navigator.mediaDevices.getUserMedia({
+      console.log('📹 Requesting camera/mic permission...', { isVideoEnabled, isAudioEnabled });
+      const constraints = {
         video: isVideoEnabled ? { width: 1280, height: 720 } : false,
         audio: isAudioEnabled ? { echoCancellation: true, noiseSuppression: true } : false,
+      };
+      console.log('🎯 Using constraints:', constraints);
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      console.log('✅ Successfully obtained media stream:', {
+        id: stream.id,
+        videoTracks: stream.getVideoTracks().length,
+        audioTracks: stream.getAudioTracks().length,
+        tracks: stream.getTracks().map(track => ({
+          kind: track.kind,
+          label: track.label,
+          enabled: track.enabled,
+          readyState: track.readyState
+        }))
       });
-      console.log('Successfully obtained media stream:', stream);
+
       setLocalStream(stream);
-      
+
       // Set video element source immediately
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
@@ -93,8 +124,28 @@ export const MeetingPage = () => {
       }
     } catch (error) {
       console.error("Error accessing media devices:", error);
-      const errMsg = (error && typeof error === 'object' && 'message' in error) ? (error as any).message : String(error);
-      alert("Failed to access camera/microphone. Please check permissions.\nError: " + errMsg);
+
+      let userFriendlyMessage = "Failed to access camera/microphone.";
+
+      if (error instanceof Error) {
+        if (error.name === "NotAllowedError") {
+          userFriendlyMessage += "\n\nPlease allow camera and microphone permissions in your browser and try again.";
+        } else if (error.name === "NotFoundError") {
+          userFriendlyMessage += "\n\nNo camera or microphone found. Please connect a camera/microphone and try again.";
+        } else if (error.name === "NotReadableError") {
+          userFriendlyMessage += "\n\nCamera/microphone is already in use by another application. Please close other apps and try again.";
+        } else if (error.name === "OverconstrainedError") {
+          userFriendlyMessage += "\n\nCamera/microphone doesn't support the requested settings. Please try different settings.";
+        } else if (error.message.includes("secure connection") || error.message.includes("HTTPS")) {
+          userFriendlyMessage += "\n\nMedia access requires HTTPS. Please ensure you're accessing the site over a secure connection.";
+        } else {
+          userFriendlyMessage += `\n\nError: ${error.message}`;
+        }
+      } else {
+        userFriendlyMessage += "\n\nPlease check your browser permissions and try again.";
+      }
+
+      alert(userFriendlyMessage);
       throw error;
     }
   };
@@ -178,6 +229,7 @@ export const MeetingPage = () => {
 
   /**
    * Create peer connection for a remote user
+   * IMPORTANT: This should only be called AFTER localStream is available
    */
   const createPeerConnection = (userId: string) => {
     // Check if peer connection already exists
@@ -185,59 +237,63 @@ export const MeetingPage = () => {
       return peerConnectionsRef.current.get(userId);
     }
 
+    if (!localStream) {
+      console.error(`Cannot create peer connection for ${userId}: localStream not available`);
+      return null;
+    }
+
+    console.log(`🎥 Creating peer connection for user: ${userId}`);
     const peerConnection = new RTCPeerConnection(rtcConfig);
 
-    // Add local stream tracks
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-      });
-    }
+    // CRITICAL: Add ALL local tracks BEFORE any signaling
+    console.log(`🎵 Adding local tracks to peer connection for ${userId}:`, {
+      videoTracks: localStream.getVideoTracks().length,
+      audioTracks: localStream.getAudioTracks().length
+    });
+
+    localStream.getTracks().forEach((track) => {
+      console.log(`Adding ${track.kind} track: ${track.label || 'unnamed'}`);
+      peerConnection.addTrack(track, localStream);
+    });
 
     // Handle remote stream
     peerConnection.ontrack = (event) => {
-      console.log("Received remote track from:", userId);
+      console.log(`📡 Received remote ${event.track.kind} track from ${userId}`);
       const remoteStream = event.streams[0];
-      
+
+      console.log(`Remote stream tracks:`, {
+        video: remoteStream.getVideoTracks().length,
+        audio: remoteStream.getAudioTracks().length
+      });
+
       setRemoteStreams((prev) => {
         const newMap = new Map(prev);
         newMap.set(userId, remoteStream);
         return newMap;
       });
-
-      // Set video element source - ensure audio plays
-      setTimeout(() => {
-        const videoElement = remoteVideosRef.current.get(userId);
-        if (videoElement && remoteStream) {
-          videoElement.srcObject = remoteStream;
-          videoElement.muted = false; // Ensure remote audio plays
-          videoElement.play().catch((err) => {
-            console.error("Error playing remote video:", err);
-          });
-        }
-      }, 100);
     };
 
     // Handle connection state changes
     peerConnection.onconnectionstatechange = () => {
-      console.log(`Peer connection state with ${userId}:`, peerConnection.connectionState);
+      console.log(`🔗 Peer connection state with ${userId}:`, peerConnection.connectionState);
       if (peerConnection.connectionState === "connected") {
-        console.log("WebRTC connected for " + userId);
+        console.log("✅ WebRTC connected for " + userId);
       }
       if (peerConnection.connectionState === "failed") {
+        console.log("❌ WebRTC connection failed for " + userId + ", restarting ICE");
         peerConnection.restartIce();
       }
     };
-    
+
     // ICE state debugging
     peerConnection.oniceconnectionstatechange = () => {
-      console.log(`ICE state with ${userId}:`, peerConnection.iceConnectionState);
+      console.log(`🧊 ICE state with ${userId}:`, peerConnection.iceConnectionState);
     };
-
 
     // Handle ICE candidates
     peerConnection.onicecandidate = (event) => {
       if (event.candidate && socket) {
+        console.log(`📤 Sending ICE candidate to ${userId}`);
         socket.emit("ice-candidate", {
           candidate: event.candidate,
           targetUserId: userId,
@@ -505,8 +561,9 @@ export const MeetingPage = () => {
     if (!socket) return;
 
     socket.on("room-joined", async (data: { roomId: string; participants: Participant[] }) => {
+      console.log("🏠 Room joined, participants:", data.participants);
       setParticipants(data.participants);
-      
+
       // Check if translation is needed (if all participants speak same language, skip translation)
       const needsTranslation = data.participants.some(
         (p) => p.speakingLanguage !== listeningLanguage || p.listeningLanguage !== speakingLanguage
@@ -521,46 +578,56 @@ export const MeetingPage = () => {
         }
       }
 
-      // Create peer connections with all existing participants
-      // Wait for localStream to be ready
+      // CRITICAL: Create peer connections ONLY after localStream is confirmed available
       const createConnectionsWithExistingParticipants = async () => {
-        // Retry if localStream is not ready
         if (!localStream) {
-          console.log("Waiting for local stream...");
+          console.log("⏳ Waiting for local stream before creating peer connections...");
           setTimeout(createConnectionsWithExistingParticipants, 200);
           return;
         }
 
+        console.log("🎯 Local stream ready, creating peer connections for existing participants");
+
         const currentUserId = user?.id?.toString();
-        
+
         for (const participant of data.participants) {
           const participantUserId = participant.userId?.toString();
-          
+
           if (participantUserId && participantUserId !== currentUserId) {
+            console.log(`🔗 Creating peer connection for existing participant: ${participantUserId}`);
+
+            // Create peer connection (tracks are added inside this function)
             const peerConnection = createPeerConnection(participantUserId);
 
-            // Create offer for existing participants
-            try {
-              const offer = await peerConnection.createOffer();
-              await peerConnection.setLocalDescription(offer);
-              
-              socket.emit("offer", {
-                offer: peerConnection.localDescription,
-                targetUserId: participantUserId,
-                roomId,
-              });
-            } catch (error) {
-              console.error("Error creating offer for existing participant:", error);
+            if (peerConnection) {
+              try {
+                console.log(`📤 Creating offer for existing participant: ${participantUserId}`);
+                const offer = await peerConnection.createOffer();
+                console.log("📋 Offer created:", offer);
+
+                await peerConnection.setLocalDescription(offer);
+                console.log("📝 Local description set");
+
+                socket.emit("offer", {
+                  offer: peerConnection.localDescription,
+                  targetUserId: participantUserId,
+                  roomId,
+                });
+                console.log(`✅ Offer sent to existing participant: ${participantUserId}`);
+              } catch (error) {
+                console.error("❌ Error creating offer for existing participant:", error);
+              }
             }
           }
         }
       };
 
-      // Start creating connections
+      // Start immediately since localStream should already be available
       createConnectionsWithExistingParticipants();
     });
 
     socket.on("user-joined", async (data: Participant) => {
+      console.log("👋 New user joined:", data);
       setParticipants((prev) => {
         // Avoid duplicates
         if (prev.find((p) => p.userId === data.userId)) {
@@ -568,23 +635,10 @@ export const MeetingPage = () => {
         }
         return [...prev, data];
       });
-      
-      // Create peer connection for new user
-      const peerConnection = createPeerConnection(data.userId);
 
-      // Create offer
-      try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        socket.emit("offer", {
-          offer: peerConnection.localDescription,
-          targetUserId: data.userId,
-          roomId,
-        });
-      } catch (error) {
-        console.error("Error creating offer for new user:", error);
-      }
+      // For new users, we wait for them to send us an offer
+      // We don't create our own peer connection until we receive their offer
+      console.log(`📥 Waiting for offer from new user: ${data.userId}`);
     });
 
     socket.on("user-left", (data: { userId: string }) => {
@@ -603,52 +657,78 @@ export const MeetingPage = () => {
 
     socket.on("offer", async (data: { offer: RTCSessionDescriptionInit; fromUserId: string }) => {
       try {
+        console.log(`📨 Received offer from ${data.fromUserId}`);
+
+        // Create peer connection for the user who sent the offer
         const peerConnection = createPeerConnection(data.fromUserId);
-        
-        // Check if remote description is already set
-        if (peerConnection.remoteDescription) {
-          console.log("Remote description already set, skipping");
+
+        if (!peerConnection) {
+          console.error("❌ Failed to create peer connection for offer");
           return;
         }
 
+        // Check if remote description is already set
+        if (peerConnection.remoteDescription) {
+          console.log("⚠️ Remote description already set, skipping");
+          return;
+        }
+
+        console.log("📝 Setting remote description from offer");
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+
+        console.log("📤 Creating answer");
         const answer = await peerConnection.createAnswer();
+        console.log("📋 Answer created:", answer);
+
+        console.log("📝 Setting local description");
         await peerConnection.setLocalDescription(answer);
 
+        console.log("📤 Sending answer");
         socket.emit("answer", {
           answer: peerConnection.localDescription,
           targetUserId: data.fromUserId,
           roomId,
         });
+        console.log(`✅ Answer sent to ${data.fromUserId}`);
       } catch (error) {
-        console.error("Error handling offer:", error);
+        console.error("❌ Error handling offer:", error);
       }
     });
 
     socket.on("answer", async (data: { answer: RTCSessionDescriptionInit; fromUserId: string }) => {
       try {
+        console.log(`📨 Received answer from ${data.fromUserId}`);
         const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
         if (peerConnection) {
           // Check if remote description is already set
           if (peerConnection.remoteDescription) {
-            console.log("Answer remote description already set, skipping");
+            console.log("⚠️ Answer remote description already set, skipping");
             return;
           }
+          console.log("📝 Setting remote description from answer");
           await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+          console.log(`✅ Answer processed from ${data.fromUserId}`);
+        } else {
+          console.error(`❌ No peer connection found for ${data.fromUserId}`);
         }
       } catch (error) {
-        console.error("Error handling answer:", error);
+        console.error("❌ Error handling answer:", error);
       }
     });
 
     socket.on("ice-candidate", async (data: { candidate: RTCIceCandidateInit; fromUserId: string }) => {
       try {
+        console.log(`🧊 Received ICE candidate from ${data.fromUserId}`);
         const peerConnection = peerConnectionsRef.current.get(data.fromUserId);
         if (peerConnection && data.candidate) {
+          console.log("➕ Adding ICE candidate");
           await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+          console.log(`✅ ICE candidate added from ${data.fromUserId}`);
+        } else {
+          console.warn(`⚠️ No peer connection or candidate for ${data.fromUserId}`);
         }
       } catch (error) {
-        console.error("Error adding ICE candidate:", error);
+        console.error("❌ Error adding ICE candidate:", error);
       }
     });
 
@@ -685,13 +765,44 @@ export const MeetingPage = () => {
   // Update local video when stream changes
   useEffect(() => {
     if (localVideoRef.current && localStream) {
+      console.log("🎥 Setting local video stream", {
+        videoTracks: localStream.getVideoTracks().length,
+        audioTracks: localStream.getAudioTracks().length
+      });
+
       localVideoRef.current.srcObject = localStream;
-      localVideoRef.current.muted = true;
+      localVideoRef.current.muted = true; // Always mute local video to prevent echo
+      localVideoRef.current.playsInline = true; // Required for iOS
       localVideoRef.current.play().catch((err) => {
-        console.error("Error playing local video:", err);
+        console.error("❌ Error playing local video:", err);
       });
     }
   }, [localStream]);
+
+  // Update remote videos when remoteStreams changes
+  useEffect(() => {
+    console.log("🎥 Updating remote videos for", remoteStreams.size, "participants");
+    remoteStreams.forEach((stream, userId) => {
+      const videoElement = remoteVideosRef.current.get(userId);
+      if (videoElement) {
+        if (videoElement.srcObject !== stream) {
+          console.log(`📺 Setting remote video for user ${userId}`, {
+            videoTracks: stream.getVideoTracks().length,
+            audioTracks: stream.getAudioTracks().length
+          });
+
+          videoElement.srcObject = stream;
+          videoElement.muted = false; // Allow remote audio
+          videoElement.playsInline = true; // Required for iOS
+          videoElement.play().catch((err) => {
+            console.error("❌ Error playing remote video for user", userId, ":", err);
+          });
+        }
+      } else {
+        console.warn(`⚠️ No video element found for user ${userId}`);
+      }
+    });
+  }, [remoteStreams]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -875,12 +986,12 @@ export const MeetingPage = () => {
           {(!isVideoEnabled || !localStream || localStream.getVideoTracks().length === 0) && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
               <span className="text-white text-lg">
-                {!localStream ? "No video stream" : (!isVideoEnabled ? "Video is disabled" : "No video track found")}
+                {!localStream ? "📷 Connecting camera..." : (!isVideoEnabled ? "🎥 Video disabled" : "⚠️ No video track")}
               </span>
             </div>
           )}
           <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm">
-            {user?.name || "local"} (You)
+            {user?.name || "You"} (You)
           </div>
         </div>
 
@@ -896,14 +1007,6 @@ export const MeetingPage = () => {
                 ref={(el) => {
                   if (el) {
                     remoteVideosRef.current.set(userId, el);
-                    // Ensure video is set up properly
-                    if (stream && el.srcObject !== stream) {
-                      el.srcObject = stream;
-                      el.muted = false;
-                      el.play().catch((err) => {
-                        console.error("Error playing remote video:", err);
-                      });
-                    }
                   }
                 }}
                 autoPlay

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileText, Menu, X, Trash2, Award, TrendingUp, AlertCircle, Target, CheckCircle, XCircle, BookOpen } from 'lucide-react';
+import { Upload, FileText, Menu, X, Trash2, Award, TrendingUp, AlertCircle, Target, CheckCircle, XCircle, BookOpen, Eye } from 'lucide-react';
 import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -500,12 +500,24 @@ const CopyEvaluationPage: React.FC = () => {
                     onClick={() => navigate(`/copy-evaluation/${selectedEvaluationId}`)}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-4 md:py-6 text-sm md:text-base"
                   >
-                    View Detailed Analysis
+                    <FileText className="w-4 h-4 mr-2" />
+                    View Detailed Analysis with PDF
                   </Button>
+                  <Button
+                    onClick={() => window.open(`/api/copy-evaluation/${selectedEvaluationId}/pdf`, '_blank')}
+                    variant="outline"
+                    className="flex-1 py-4 md:py-6 text-sm md:text-base font-semibold gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View PDF Only
+                  </Button>
+                </div>
+
+                <div className="flex justify-center">
                   <Button
                     onClick={startNewEvaluation}
                     variant="outline"
-                    className="flex-1 py-4 md:py-6 text-sm md:text-base font-semibold"
+                    className="py-3 md:py-4 text-sm md:text-base font-semibold"
                   >
                     Evaluate Another Copy
                   </Button>

@@ -29,7 +29,7 @@ export const translatorAgent = new RunnableLambda({
     }
 
     try {
-      const model = process.env.OPENROUTER_MODEL || "meta-llama/Meta-Llama-3.1-70B-Instruct";
+      const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
       const apiKey = process.env.OPENROUTER_API_KEY;
 
       if (!apiKey) {

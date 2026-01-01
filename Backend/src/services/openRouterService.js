@@ -115,14 +115,16 @@ export const evaluateAnswerWithOpenRouter = async ({
   model,
   systemPrompt,
   userPrompt,
+  temperature = 0.3,
+  maxTokens = 2000,
 }) => {
   const apiResponse = await callOpenRouterAPI({
     apiKey,
     model,
     systemPrompt,
     userPrompt,
-    temperature: 0.3, // Low temperature for consistent evaluation
-    maxTokens: 2000,
+    temperature,
+    maxTokens,
   });
 
   if (!apiResponse.success) {
@@ -158,5 +160,11 @@ export default {
   parseJSONFromResponse,
   evaluateAnswerWithOpenRouter,
 };
+
+
+
+
+
+
 
 

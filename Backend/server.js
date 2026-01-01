@@ -18,7 +18,26 @@ import { initializeSocketIO } from "./src/services/socketService.js";
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*", credentials: true }));
+// Configure CORS to allow multiple origins
+const allowedOrigins = [
+  'http://localhost:5173', // Development frontend
+  'https://studentportal.mentorsdaily.com', // Production domain
+  process.env.CLIENT_ORIGIN // Environment variable (if set)
+].filter(Boolean); // Remove any undefined values
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 connectDB();

@@ -113,6 +113,7 @@ export const initializeSocketIO = (server) => {
      * WebRTC signaling: Offer
      */
     socket.on("offer", ({ offer, targetUserId, roomId }) => {
+      console.log(`Relaying offer from ${socket.userId} to ${targetUserId} in room ${roomId}`);
       socket.to(roomId).emit("offer", {
         offer,
         fromUserId: socket.userId,
@@ -124,6 +125,7 @@ export const initializeSocketIO = (server) => {
      * WebRTC signaling: Answer
      */
     socket.on("answer", ({ answer, targetUserId, roomId }) => {
+      console.log(`Relaying answer from ${socket.userId} to ${targetUserId} in room ${roomId}`);
       socket.to(roomId).emit("answer", {
         answer,
         fromUserId: socket.userId,
@@ -135,6 +137,7 @@ export const initializeSocketIO = (server) => {
      * WebRTC signaling: ICE candidate
      */
     socket.on("ice-candidate", ({ candidate, targetUserId, roomId }) => {
+      console.log(`Relaying ICE candidate from ${socket.userId} to ${targetUserId} in room ${roomId}`);
       socket.to(roomId).emit("ice-candidate", {
         candidate,
         fromUserId: socket.userId,
