@@ -137,7 +137,7 @@ const copyEvaluationSchema = new mongoose.Schema({
   },
   totalPages: {
     type: Number,
-    required: true
+    default: 0
   },
   isScanned: {
     type: Boolean,
@@ -148,11 +148,21 @@ const copyEvaluationSchema = new mongoose.Schema({
   finalSummary: finalSummarySchema,
   status: {
     type: String,
-    enum: ['processing', 'completed', 'failed'],
-    default: 'processing'
+    enum: ['pending', 'processing', 'completed', 'failed'],
+    default: 'pending'
   },
   errorMessage: {
     type: String,
+    default: null
+  },
+  // Temporary storage for extracted answers before AI evaluation
+  extractedAnswers: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
+  // Store PDF processing metadata
+  pdfProcessingMetadata: {
+    type: mongoose.Schema.Types.Mixed,
     default: null
   }
 }, {

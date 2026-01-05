@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(nextUser);
     setToken(nextToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: nextUser, token: nextToken }));
-    navigate("/dashboard", { replace: true });
+    navigate("/performance", { replace: true });
   };
 
   const logout = () => {

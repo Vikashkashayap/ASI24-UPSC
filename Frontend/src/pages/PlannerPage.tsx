@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import { useTheme } from "../hooks/useTheme";
 
 export const PlannerPage = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [planner, setPlanner] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,11 +27,19 @@ export const PlannerPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 md:space-y-6">
-      <div className="flex flex-col gap-1 md:gap-2">
-        <h1 className={`text-xl md:text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>Study planner</h1>
-        <p className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-          AI-shaped daily and weekly scaffolding based on your weak areas.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+        <div className="flex flex-col gap-1 md:gap-2">
+          <h1 className={`text-xl md:text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>Study planner</h1>
+          <p className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            AI-shaped daily and weekly scaffolding based on your weak areas.
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate("/student-profiler")}
+          className="text-xs md:text-sm bg-emerald-500 hover:bg-emerald-600 w-full md:w-auto"
+        >
+          {planner ? "Regenerate Plan" : "Generate Study Plan"}
+        </Button>
       </div>
 
       <Card>

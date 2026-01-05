@@ -8,9 +8,17 @@ import { translatorAgent } from "../agents/translatorAgent.js";
  * Socket.io service for WebRTC signaling and real-time translation
  */
 export const initializeSocketIO = (server) => {
+  // CORS configuration to allow both common Vite dev ports
+  const defaultOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+  const allowedOrigins = [
+    defaultOrigin,
+    "http://localhost:5173",
+    "http://localhost:5174"
+  ].filter((origin, index, self) => self.indexOf(origin) === index); // Remove duplicates
+
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      origin: allowedOrigins,
       credentials: true,
     },
   });
@@ -19,6 +27,7 @@ export const initializeSocketIO = (server) => {
   const activeRooms = new Map(); // roomId -> Set of socketIds
   const socketToRoom = new Map(); // socketId -> roomId
   const socketToUser = new Map(); // socketId -> { userId, speakingLanguage, listeningLanguage }
+  const userIdToSocket = new Map(); // userId -> Set of socketIds (user can have multiple sockets)
 
   // Authentication middleware for Socket.io
   io.use(async (socket, next) => {
@@ -78,6 +87,12 @@ export const initializeSocketIO = (server) => {
           listeningLanguage,
         });
 
+        // Map userId to socketId for direct targeting
+        if (!userIdToSocket.has(socket.userId)) {
+          userIdToSocket.set(socket.userId, new Set());
+        }
+        userIdToSocket.get(socket.userId).add(socket.id);
+
         socket.join(roomId);
 
         // Get all participants
@@ -113,32 +128,73 @@ export const initializeSocketIO = (server) => {
      * WebRTC signaling: Offer
      */
     socket.on("offer", ({ offer, targetUserId, roomId }) => {
-      socket.to(roomId).emit("offer", {
-        offer,
-        fromUserId: socket.userId,
-        fromUserName: socket.userName,
-      });
+      // Find target user's socket(s) and emit directly
+      const targetSockets = userIdToSocket.get(targetUserId);
+      if (targetSockets && targetSockets.size > 0) {
+        targetSockets.forEach((targetSocketId) => {
+          io.to(targetSocketId).emit("offer", {
+            offer,
+            fromUserId: socket.userId,
+            fromUserName: socket.userName,
+          });
+        });
+      } else {
+        console.warn(`Target user ${targetUserId} not found in room ${roomId}`);
+        // Fallback: broadcast to room (excluding sender)
+        socket.to(roomId).emit("offer", {
+          offer,
+          fromUserId: socket.userId,
+          fromUserName: socket.userName,
+        });
+      }
     });
 
     /**
      * WebRTC signaling: Answer
      */
     socket.on("answer", ({ answer, targetUserId, roomId }) => {
-      socket.to(roomId).emit("answer", {
-        answer,
-        fromUserId: socket.userId,
-        fromUserName: socket.userName,
-      });
+      // Find target user's socket(s) and emit directly
+      const targetSockets = userIdToSocket.get(targetUserId);
+      if (targetSockets && targetSockets.size > 0) {
+        targetSockets.forEach((targetSocketId) => {
+          io.to(targetSocketId).emit("answer", {
+            answer,
+            fromUserId: socket.userId,
+            fromUserName: socket.userName,
+          });
+        });
+      } else {
+        console.warn(`Target user ${targetUserId} not found in room ${roomId}`);
+        // Fallback: broadcast to room (excluding sender)
+        socket.to(roomId).emit("answer", {
+          answer,
+          fromUserId: socket.userId,
+          fromUserName: socket.userName,
+        });
+      }
     });
 
     /**
      * WebRTC signaling: ICE candidate
      */
     socket.on("ice-candidate", ({ candidate, targetUserId, roomId }) => {
-      socket.to(roomId).emit("ice-candidate", {
-        candidate,
-        fromUserId: socket.userId,
-      });
+      // Find target user's socket(s) and emit directly
+      const targetSockets = userIdToSocket.get(targetUserId);
+      if (targetSockets && targetSockets.size > 0) {
+        targetSockets.forEach((targetSocketId) => {
+          io.to(targetSocketId).emit("ice-candidate", {
+            candidate,
+            fromUserId: socket.userId,
+          });
+        });
+      } else {
+        console.warn(`Target user ${targetUserId} not found in room ${roomId}`);
+        // Fallback: broadcast to room (excluding sender)
+        socket.to(roomId).emit("ice-candidate", {
+          candidate,
+          fromUserId: socket.userId,
+        });
+      }
     });
 
     /**
@@ -264,6 +320,15 @@ export const initializeSocketIO = (server) => {
 
         socketToRoom.delete(socket.id);
         socketToUser.delete(socket.id);
+        
+        // Remove from userIdToSocket mapping
+        const userSockets = userIdToSocket.get(socket.userId);
+        if (userSockets) {
+          userSockets.delete(socket.id);
+          if (userSockets.size === 0) {
+            userIdToSocket.delete(socket.userId);
+          }
+        }
 
         // Notify other participants
         socket.to(targetRoomId).emit("user-left", {
@@ -295,6 +360,15 @@ export const initializeSocketIO = (server) => {
 
         socketToRoom.delete(socket.id);
         socketToUser.delete(socket.id);
+        
+        // Remove from userIdToSocket mapping
+        const userSockets = userIdToSocket.get(socket.userId);
+        if (userSockets) {
+          userSockets.delete(socket.id);
+          if (userSockets.size === 0) {
+            userIdToSocket.delete(socket.userId);
+          }
+        }
 
         // Notify other participants
         socket.to(roomId).emit("user-left", {

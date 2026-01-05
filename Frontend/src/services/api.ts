@@ -55,6 +55,10 @@ export const copyEvaluationAPI = {
   deleteEvaluation: (id: string) => {
     return api.delete(`/api/copy-evaluation/${id}`);
   },
+
+  processEvaluation: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/process`);
+  },
 };
 
 // Meeting API
@@ -69,5 +73,37 @@ export const meetingAPI = {
 
   getRoom: async (roomId: string) => {
     return api.get(`/api/meeting/${roomId}`);
+  },
+};
+
+// Test API (UPSC Prelims Test Generator)
+export const testAPI = {
+  generateTest: async (params: { subject: string; topic: string; difficulty: string; count: number }) => {
+    return api.post("/api/tests/generate", params);
+  },
+
+  getTest: async (id: string) => {
+    return api.get(`/api/tests/${id}`);
+  },
+
+  submitTest: async (id: string, answers: { answers: { [key: string]: string } }) => {
+    return api.post(`/api/tests/submit/${id}`, answers);
+  },
+
+  getTests: async () => {
+    return api.get("/api/tests");
+  },
+};
+
+// Student Profiler API
+export const studentProfilerAPI = {
+  generatePlan: async (params: {
+    targetYear: string;
+    dailyHours: number;
+    weakSubjects: string[];
+    examStage: "Prelims" | "Mains" | "Both";
+    currentDate: string;
+  }) => {
+    return api.post("/api/agents/student-profiler", params);
   },
 };

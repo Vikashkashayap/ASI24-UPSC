@@ -1,0 +1,257 @@
+{
+  "exampleRequest": {
+    "targetYear": "2026",
+    "dailyHours": 6,
+    "weakSubjects": ["Polity", "Economy"],
+    "examStage": "Prelims",
+    "currentDate": "2024-01-15"
+  },
+  "exampleResponse": {
+    "success": true,
+    "message": "Study plan generated successfully",
+    "data": {
+      "summary": {
+        "strategy": "Focus on strengthening Polity and Economy fundamentals while maintaining balanced coverage. Prioritize concept clarity in weak areas with daily PYQ practice. Sunday reserved for comprehensive revision and tests.",
+        "focusSubjects": ["Polity", "Economy", "History", "Geography"],
+        "dailyLoadType": "moderate"
+      },
+      "dailyPlan": [
+        {
+          "day": "Monday",
+          "subject": "Polity",
+          "topic": "Constitutional Framework - Preamble, Fundamental Rights",
+          "durationHours": 2.5,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Monday",
+          "subject": "Economy",
+          "topic": "Basic Economic Concepts - GDP, Inflation, Monetary Policy",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Monday",
+          "subject": "History",
+          "topic": "Modern India - Freedom Struggle (1857-1947)",
+          "durationHours": 1.5,
+          "activity": "Notes"
+        },
+        {
+          "day": "Tuesday",
+          "subject": "Polity",
+          "topic": "Directive Principles and Fundamental Duties",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Tuesday",
+          "subject": "Economy",
+          "topic": "Fiscal Policy and Budget",
+          "durationHours": 2.5,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Tuesday",
+          "subject": "Geography",
+          "topic": "Physical Geography - Climate and Monsoon",
+          "durationHours": 1.5,
+          "activity": "Notes"
+        },
+        {
+          "day": "Wednesday",
+          "subject": "Polity",
+          "topic": "Revision - Constitutional Framework",
+          "durationHours": 1,
+          "activity": "Revision"
+        },
+        {
+          "day": "Wednesday",
+          "subject": "Economy",
+          "topic": "PYQs - Economic Concepts (2015-2023)",
+          "durationHours": 2,
+          "activity": "PYQs"
+        },
+        {
+          "day": "Wednesday",
+          "subject": "Environment",
+          "topic": "Biodiversity and Conservation",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Wednesday",
+          "subject": "Science & Tech",
+          "topic": "Space Technology and ISRO",
+          "durationHours": 1,
+          "activity": "Notes"
+        },
+        {
+          "day": "Thursday",
+          "subject": "Polity",
+          "topic": "Union Executive - President, Prime Minister, Council of Ministers",
+          "durationHours": 2.5,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Thursday",
+          "subject": "Economy",
+          "topic": "Banking and Financial Institutions",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Thursday",
+          "subject": "History",
+          "topic": "Ancient India - Mauryan and Gupta Empires",
+          "durationHours": 1.5,
+          "activity": "Notes"
+        },
+        {
+          "day": "Friday",
+          "subject": "Polity",
+          "topic": "PYQs - Polity (2020-2023)",
+          "durationHours": 2,
+          "activity": "PYQs"
+        },
+        {
+          "day": "Friday",
+          "subject": "Economy",
+          "topic": "Revision - Economic Concepts and Fiscal Policy",
+          "durationHours": 1.5,
+          "activity": "Revision"
+        },
+        {
+          "day": "Friday",
+          "subject": "Geography",
+          "topic": "Indian Geography - Rivers and Drainage Systems",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Friday",
+          "subject": "Environment",
+          "topic": "Climate Change and International Agreements",
+          "durationHours": 0.5,
+          "activity": "Notes"
+        },
+        {
+          "day": "Saturday",
+          "subject": "Polity",
+          "topic": "Revision - Union Executive",
+          "durationHours": 1,
+          "activity": "Revision"
+        },
+        {
+          "day": "Saturday",
+          "subject": "Economy",
+          "topic": "PYQs - Banking and Financial Institutions",
+          "durationHours": 2,
+          "activity": "PYQs"
+        },
+        {
+          "day": "Saturday",
+          "subject": "History",
+          "topic": "Medieval India - Delhi Sultanate and Mughal Empire",
+          "durationHours": 2,
+          "activity": "Concept reading"
+        },
+        {
+          "day": "Saturday",
+          "subject": "Geography",
+          "topic": "Revision - Physical Geography",
+          "durationHours": 1,
+          "activity": "Revision"
+        },
+        {
+          "day": "Sunday",
+          "subject": "Full Syllabus",
+          "topic": "Weekly Test - Prelims Mock (100 Questions)",
+          "durationHours": 2,
+          "activity": "Test"
+        },
+        {
+          "day": "Sunday",
+          "subject": "All Subjects",
+          "topic": "Comprehensive Revision - Weak Areas",
+          "durationHours": 4,
+          "activity": "Revision"
+        }
+      ],
+      "weeklyPlan": [
+        {
+          "week": "Week 1",
+          "primaryFocus": ["Polity", "Economy"],
+          "revisionDays": ["Wednesday", "Saturday"],
+          "testDay": "Sunday"
+        },
+        {
+          "week": "Week 2",
+          "primaryFocus": ["History", "Geography"],
+          "revisionDays": ["Wednesday", "Saturday"],
+          "testDay": "Sunday"
+        },
+        {
+          "week": "Week 3",
+          "primaryFocus": ["Environment", "Science & Tech"],
+          "revisionDays": ["Wednesday", "Saturday"],
+          "testDay": "Sunday"
+        },
+        {
+          "week": "Week 4",
+          "primaryFocus": ["Polity", "Economy", "History"],
+          "revisionDays": ["Wednesday", "Saturday"],
+          "testDay": "Sunday"
+        }
+      ],
+      "revisionSchedule": [
+        {
+          "topic": "Constitutional Framework - Preamble, Fundamental Rights",
+          "revisionDaysAfter": [3, 7, 21]
+        },
+        {
+          "topic": "Basic Economic Concepts - GDP, Inflation, Monetary Policy",
+          "revisionDaysAfter": [3, 7, 21]
+        },
+        {
+          "topic": "Directive Principles and Fundamental Duties",
+          "revisionDaysAfter": [3, 7, 21]
+        },
+        {
+          "topic": "Fiscal Policy and Budget",
+          "revisionDaysAfter": [3, 7, 21]
+        },
+        {
+          "topic": "Union Executive - President, Prime Minister, Council of Ministers",
+          "revisionDaysAfter": [3, 7, 21]
+        },
+        {
+          "topic": "Banking and Financial Institutions",
+          "revisionDaysAfter": [3, 7, 21]
+        }
+      ],
+      "dynamicRules": [
+        "If dailyHours decreases below 4, reduce topic load by 30% and focus only on weak subjects",
+        "If Polity performance improves above 70%, shift 20% of Polity time to Economy",
+        "If Economy performance improves above 70%, shift 20% of Economy time to History",
+        "If examStage changes from 'Prelims' to 'Mains', replace PYQs with answer writing practice",
+        "If targetYear timeline reduces by 6 months, increase daily load to 'intensive' and add extra revision days"
+      ]
+    },
+    "metadata": {
+      "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+      "usage": {
+        "prompt_tokens": 450,
+        "completion_tokens": 1200,
+        "total_tokens": 1650
+      },
+      "generatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  },
+  "errorResponseExample": {
+    "success": false,
+    "message": "Validation failed: dailyHours must be between 1 and 16 hours",
+    "error": "Validation failed: dailyHours must be between 1 and 16 hours"
+  }
+}
+

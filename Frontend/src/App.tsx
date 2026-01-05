@@ -4,15 +4,17 @@ import { ThemeProvider } from "./hooks/useTheme";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { WriteAnswerPage } from "./pages/WriteAnswerPage";
 import { PerformancePage } from "./pages/PerformancePage";
 import { PlannerPage } from "./pages/PlannerPage";
 import { MentorChatPage } from "./pages/MentorChatPage";
-import { ChatbotPage } from "./pages/ChatbotPage";
 import CopyEvaluationPage from "./pages/CopyEvaluationPage";
 import CopyEvaluationDetailPage from "./pages/CopyEvaluationDetailPage";
 import { MeetingPage } from "./pages/MeetingPage";
+import TestGeneratorPage from "./pages/TestGeneratorPage";
+import TestPage from "./pages/TestPage";
+import TestResultPage from "./pages/TestResultPage";
+import ProfilePage from "./pages/ProfilePage";
+import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingPage } from "./pages/LandingPage";
 
@@ -32,17 +34,19 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="write" element={<WriteAnswerPage />} />
             <Route path="performance" element={<PerformancePage />} />
             <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
-            <Route path="chatbot" element={<ChatbotPage />} />
             <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="meeting" element={<MeetingPage />} />
+            <Route path="prelims-test" element={<TestGeneratorPage />} />
+            <Route path="test/:id" element={<TestPage />} />
+            <Route path="result/:id" element={<TestResultPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="student-profiler" element={<StudentProfilerPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/performance" replace />} />
         </Routes>
       </AuthProvider>
     </ThemeProvider>

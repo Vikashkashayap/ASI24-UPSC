@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import {
   uploadAndEvaluateCopy,
+  processEvaluation,
   getEvaluationById,
   getUserEvaluationHistory,
   getUserAnalytics,
@@ -34,6 +35,9 @@ router.use(authMiddleware);
 
 // Upload and evaluate PDF
 router.post('/upload', upload.single('pdf'), uploadAndEvaluateCopy);
+
+// Process AI evaluation for uploaded PDF
+router.post('/:id/process', processEvaluation);
 
 // Get user's evaluation history (must be before /:id route)
 router.get('/history/list', getUserEvaluationHistory);

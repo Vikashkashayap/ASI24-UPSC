@@ -19,7 +19,11 @@ export const RegisterPage = () => {
     setLoading(true);
     try {
       const res = await api.post("/api/auth/register", { name, email, password });
-      login(res.data.user, res.data.token);
+      // Store auth but navigate to student profiler first
+      const { user, token } = res.data;
+      localStorage.setItem("upsc_mentor_auth", JSON.stringify({ user, token }));
+      // Navigate to student profiler page for onboarding
+      window.location.href = "/student-profiler";
     } catch (err: any) {
       setError(err?.response?.data?.message || "Unable to register");
     } finally {
@@ -66,7 +70,7 @@ export const RegisterPage = () => {
               />
             </div>
             {error && <p className="text-[10px] md:text-xs text-red-500">{error}</p>}
-            <Button type="submit" className="w-full text-xs md:text-sm" size="sm" disabled={loading}>
+            <Button type="submit" className="w-full text-xs md:text-sm" disabled={loading}>
               {loading ? "Creating workspace..." : "Create account"}
             </Button>
           </form>

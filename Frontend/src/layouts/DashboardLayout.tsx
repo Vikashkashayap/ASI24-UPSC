@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LayoutDashboard, PenLine, LineChart, CalendarClock, MessageCircle, MessageSquare, FileText, Video, Sun, Moon, Menu, X } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User } from "lucide-react";
 import { useState } from "react";
 
 const navLinkClass = ({ isActive, theme }: { isActive: boolean; theme: "dark" | "light" }) =>
@@ -57,14 +57,6 @@ export const DashboardLayout = () => {
           </button>
         </div>
         <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto" onClick={() => setMobileMenuOpen(false)}>
-          <NavLink to="/dashboard" className={(props) => navLinkClass({ ...props, theme })}>
-            <LayoutDashboard className="w-4 h-4" />
-            <span>Dashboard</span>
-          </NavLink>
-          <NavLink to="/write" className={(props) => navLinkClass({ ...props, theme })}>
-            <PenLine className="w-4 h-4" />
-            <span>Write Answer</span>
-          </NavLink>
           <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme })}>
             <LineChart className="w-4 h-4" />
             <span>Performance</span>
@@ -77,17 +69,21 @@ export const DashboardLayout = () => {
             <MessageCircle className="w-4 h-4" />
             <span>AI Mentor</span>
           </NavLink>
-          <NavLink to="/chatbot" className={(props) => navLinkClass({ ...props, theme })}>
-            <MessageSquare className="w-4 h-4" />
-            <span>AI Chatbot</span>
-          </NavLink>
           <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme })}>
             <FileText className="w-4 h-4" />
             <span>Copy Evaluation</span>
           </NavLink>
+          <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme })}>
+            <ClipboardList className="w-4 h-4" />
+            <span>Prelims Test</span>
+          </NavLink>
           <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme })}>
             <Video className="w-4 h-4" />
             <span>Live Meeting</span>
+          </NavLink>
+          <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme })}>
+            <User className="w-4 h-4" />
+            <span>Profile</span>
           </NavLink>
         </nav>
         <div className={`px-4 py-4 border-t text-xs space-y-1 ${theme === "dark" ? "border-purple-900/80 text-slate-400" : "border-slate-200 text-slate-600"}`}>

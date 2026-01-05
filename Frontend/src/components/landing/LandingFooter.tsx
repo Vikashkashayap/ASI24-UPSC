@@ -49,11 +49,6 @@ export const LandingFooter = () => {
                   Pricing
                 </Link>
               </li>
-              <li>
-                <Link to="/dashboard" className={theme === "dark" ? "hover:text-slate-200" : "hover:text-slate-900"}>
-                  Dashboard
-                </Link>
-              </li>
             </ul>
           </div>
           <div>

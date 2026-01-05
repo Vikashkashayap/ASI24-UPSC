@@ -151,24 +151,39 @@ const CopyEvaluationPage: React.FC = () => {
     setFullEvaluation(null);
 
     try {
-      const response = await copyEvaluationAPI.uploadAndEvaluate(selectedFile, {
+      // Step 1: Upload PDF and get evaluationId
+      const uploadResponse = await copyEvaluationAPI.uploadAndEvaluate(selectedFile, {
         subject,
         paper,
         year,
       });
 
-      if (response.data.success) {
-        setEvaluationResult(response.data.data);
-        setSelectedEvaluationId(response.data.data.evaluationId);
+      if (!uploadResponse.data.success) {
+        throw new Error(uploadResponse.data.message || 'Upload failed');
+      }
+
+      const evaluationId = uploadResponse.data.data.evaluationId;
+      console.log('✅ PDF uploaded successfully. Evaluation ID:', evaluationId);
+
+      // Step 2: Trigger AI evaluation
+      console.log('🤖 Starting AI evaluation...');
+      const processResponse = await copyEvaluationAPI.processEvaluation(evaluationId);
+
+      if (processResponse.data.success) {
+        setEvaluationResult(processResponse.data.data);
+        setSelectedEvaluationId(evaluationId);
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
         await loadHistory(); // Reload history
+        console.log('✅ AI evaluation completed successfully');
+      } else {
+        throw new Error(processResponse.data.message || 'AI evaluation failed');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to evaluate copy');
-      console.error('Upload error:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to evaluate copy');
+      console.error('Upload/Evaluation error:', err);
     } finally {
       setIsUploading(false);
     }
@@ -246,7 +261,6 @@ const CopyEvaluationPage: React.FC = () => {
               onClick={startNewEvaluation}
               className="w-full mt-2"
               variant="outline"
-              size="sm"
             >
               + New Evaluation
             </Button>

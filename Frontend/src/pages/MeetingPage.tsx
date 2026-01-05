@@ -56,6 +56,7 @@ export const MeetingPage = () => {
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const synthesisRef = useRef<SpeechSynthesis | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
 
   // WebRTC configuration
   const rtcConfig = {
@@ -77,20 +78,40 @@ export const MeetingPage = () => {
 
       console.log('Requesting camera/mic permission...', { isVideoEnabled, isAudioEnabled });
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: isVideoEnabled ? { width: 1280, height: 720 } : false,
-        audio: isAudioEnabled ? { echoCancellation: true, noiseSuppression: true } : false,
+        video: isVideoEnabled ? { 
+          width: { ideal: 1280 }, 
+          height: { ideal: 720 },
+          facingMode: 'user'
+        } : false,
+        audio: isAudioEnabled ? { 
+          echoCancellation: true, 
+          noiseSuppression: true,
+          autoGainControl: true
+        } : false,
       });
       console.log('Successfully obtained media stream:', stream);
+      console.log('Video tracks:', stream.getVideoTracks().map(t => ({ id: t.id, enabled: t.enabled, readyState: t.readyState })));
+      console.log('Audio tracks:', stream.getAudioTracks().map(t => ({ id: t.id, enabled: t.enabled, readyState: t.readyState })));
+      
+      // Update both state and ref
+      localStreamRef.current = stream;
       setLocalStream(stream);
       
-      // Set video element source immediately
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-        localVideoRef.current.muted = true; // Mute local audio to prevent echo
-        localVideoRef.current.play().catch((err) => {
-          console.error("Error playing local video:", err);
-        });
-      }
+      // Set video element source immediately with a small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          localVideoRef.current.muted = true; // Mute local audio to prevent echo
+          localVideoRef.current.autoplay = true;
+          localVideoRef.current.playsInline = true;
+          const playPromise = localVideoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              console.error("Error playing local video:", err);
+            });
+          }
+        }
+      }, 100);
     } catch (error) {
       console.error("Error accessing media devices:", error);
       const errMsg = (error && typeof error === 'object' && 'message' in error) ? (error as any).message : String(error);
@@ -140,8 +161,11 @@ export const MeetingPage = () => {
 
     setIsJoiningRoom(true);
     try {
-      // Initialize media first
+      // Initialize media first and wait for it to be ready
       await initializeMedia();
+      
+      // Small delay to ensure stream is set in state and ref
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Join room via API
       await meetingAPI.joinRoom(roomIdToJoin, passcodeToJoin);
@@ -187,35 +211,46 @@ export const MeetingPage = () => {
 
     const peerConnection = new RTCPeerConnection(rtcConfig);
 
-    // Add local stream tracks
-    if (localStream) {
-      localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
+    // Add local stream tracks (use ref for latest value)
+    const currentStream = localStreamRef.current;
+    if (currentStream) {
+      currentStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, currentStream);
       });
     }
 
     // Handle remote stream
     peerConnection.ontrack = (event) => {
-      console.log("Received remote track from:", userId);
-      const remoteStream = event.streams[0];
+      console.log("Received remote track from:", userId, event);
+      
+      // Get stream from event.streams or create one from the track
+      let streamToUse: MediaStream;
+      if (event.streams && event.streams.length > 0) {
+        streamToUse = event.streams[0];
+      } else {
+        // Create a new stream from the track if streams array is empty
+        streamToUse = new MediaStream([event.track]);
+      }
+      
+      console.log("Setting remote stream for user:", userId, streamToUse, "Tracks:", streamToUse.getTracks());
       
       setRemoteStreams((prev) => {
         const newMap = new Map(prev);
-        newMap.set(userId, remoteStream);
+        // If stream already exists, add the new track to it
+        const existingStream = newMap.get(userId);
+        if (existingStream) {
+          // Check if track already exists
+          const trackExists = existingStream.getTracks().some(t => t.id === event.track.id);
+          if (!trackExists) {
+            existingStream.addTrack(event.track);
+            streamToUse = existingStream;
+          } else {
+            streamToUse = existingStream;
+          }
+        }
+        newMap.set(userId, streamToUse);
         return newMap;
       });
-
-      // Set video element source - ensure audio plays
-      setTimeout(() => {
-        const videoElement = remoteVideosRef.current.get(userId);
-        if (videoElement && remoteStream) {
-          videoElement.srcObject = remoteStream;
-          videoElement.muted = false; // Ensure remote audio plays
-          videoElement.play().catch((err) => {
-            console.error("Error playing remote video:", err);
-          });
-        }
-      }, 100);
     };
 
     // Handle connection state changes
@@ -349,9 +384,11 @@ export const MeetingPage = () => {
     }
 
     // Stop media tracks
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
+    const streamToStop = localStreamRef.current || localStream;
+    if (streamToStop) {
+      streamToStop.getTracks().forEach((track) => track.stop());
     }
+    localStreamRef.current = null;
 
     // Close peer connections
     peerConnectionsRef.current.forEach((pc) => {
@@ -524,14 +561,35 @@ export const MeetingPage = () => {
       // Create peer connections with all existing participants
       // Wait for localStream to be ready
       const createConnectionsWithExistingParticipants = async () => {
-        // Retry if localStream is not ready
-        if (!localStream) {
-          console.log("Waiting for local stream...");
-          setTimeout(createConnectionsWithExistingParticipants, 200);
-          return;
-        }
+        // Retry if localStream is not ready (max 10 retries = 2 seconds)
+        let retries = 0;
+        const maxRetries = 10;
+        
+        const waitForStream = () => {
+          return new Promise<void>((resolve) => {
+            const checkStream = () => {
+              // Use ref to get current stream value (always up-to-date)
+              const currentStream = localStreamRef.current;
+              if (currentStream && currentStream.getTracks().length > 0) {
+                console.log("Local stream is ready, creating peer connections");
+                resolve();
+              } else if (retries < maxRetries) {
+                retries++;
+                console.log(`Waiting for local stream... (${retries}/${maxRetries})`);
+                setTimeout(checkStream, 200);
+              } else {
+                console.warn("Local stream not ready after max retries, proceeding anyway");
+                resolve();
+              }
+            };
+            checkStream();
+          });
+        };
+
+        await waitForStream();
 
         const currentUserId = user?.id?.toString();
+        const currentStream = localStreamRef.current; // Get latest stream from ref
         
         for (const participant of data.participants) {
           const participantUserId = participant.userId?.toString();
@@ -539,11 +597,26 @@ export const MeetingPage = () => {
           if (participantUserId && participantUserId !== currentUserId) {
             const peerConnection = createPeerConnection(participantUserId);
 
+            // Ensure local stream tracks are added
+            if (currentStream) {
+              currentStream.getTracks().forEach((track) => {
+                const sender = peerConnection.getSenders().find(s => s.track?.id === track.id);
+                if (!sender) {
+                  console.log(`Adding ${track.kind} track to peer connection for ${participantUserId}`);
+                  peerConnection.addTrack(track, currentStream);
+                }
+              });
+            }
+
             // Create offer for existing participants
             try {
-              const offer = await peerConnection.createOffer();
+              const offer = await peerConnection.createOffer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true,
+              });
               await peerConnection.setLocalDescription(offer);
               
+              console.log(`Sending offer to ${participantUserId}`);
               socket.emit("offer", {
                 offer: peerConnection.localDescription,
                 targetUserId: participantUserId,
@@ -572,11 +645,27 @@ export const MeetingPage = () => {
       // Create peer connection for new user
       const peerConnection = createPeerConnection(data.userId);
 
+      // Ensure local stream tracks are added (use ref for latest value)
+      const currentStream = localStreamRef.current;
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => {
+          const sender = peerConnection.getSenders().find(s => s.track?.id === track.id);
+          if (!sender) {
+            console.log(`Adding ${track.kind} track to peer connection for new user ${data.userId}`);
+            peerConnection.addTrack(track, currentStream);
+          }
+        });
+      }
+
       // Create offer
       try {
-        const offer = await peerConnection.createOffer();
+        const offer = await peerConnection.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: true,
+        });
         await peerConnection.setLocalDescription(offer);
         
+        console.log(`Sending offer to new user ${data.userId}`);
         socket.emit("offer", {
           offer: peerConnection.localDescription,
           targetUserId: data.userId,
@@ -687,11 +776,80 @@ export const MeetingPage = () => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
       localVideoRef.current.muted = true;
-      localVideoRef.current.play().catch((err) => {
-        console.error("Error playing local video:", err);
+      localVideoRef.current.autoplay = true;
+      localVideoRef.current.playsInline = true;
+      const playPromise = localVideoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.error("Error playing local video:", err);
+        });
+      }
+    }
+  }, [localStream]);
+
+  // Add local stream tracks to all existing peer connections when stream becomes available
+  useEffect(() => {
+    if (localStream) {
+      // Update ref
+      localStreamRef.current = localStream;
+      
+      peerConnectionsRef.current.forEach((peerConnection, userId) => {
+        // Check if tracks are already added
+        const existingTracks = peerConnection.getSenders().map(s => s.track);
+        const videoTrack = localStream.getVideoTracks()[0];
+        const audioTrack = localStream.getAudioTracks()[0];
+        
+        // Add video track if not already added
+        if (videoTrack && !existingTracks.some(t => t?.kind === 'video' && t.id === videoTrack.id)) {
+          console.log(`Adding video track to peer connection for user ${userId}`);
+          peerConnection.addTrack(videoTrack, localStream);
+        }
+        
+        // Add audio track if not already added
+        if (audioTrack && !existingTracks.some(t => t?.kind === 'audio' && t.id === audioTrack.id)) {
+          console.log(`Adding audio track to peer connection for user ${userId}`);
+          peerConnection.addTrack(audioTrack, localStream);
+        }
       });
     }
   }, [localStream]);
+
+  // Update remote videos when streams change
+  useEffect(() => {
+    remoteStreams.forEach((stream, userId) => {
+      const videoElement = remoteVideosRef.current.get(userId);
+      if (videoElement && stream) {
+        // Always update to ensure latest tracks are displayed
+        const currentSrcObject = videoElement.srcObject as MediaStream | null;
+        const needsUpdate = !currentSrcObject || currentSrcObject !== stream;
+        
+        if (needsUpdate) {
+          console.log("Updating remote video element for user:", userId, "Stream tracks:", stream.getTracks().map(t => ({ kind: t.kind, enabled: t.enabled, id: t.id })));
+          videoElement.srcObject = stream;
+          videoElement.muted = false; // Ensure remote audio plays
+          
+          // Force play
+          const playPromise = videoElement.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              console.error("Error playing remote video for user", userId, ":", err);
+            });
+          }
+        }
+        
+        // Ensure video tracks are enabled
+        stream.getVideoTracks().forEach(track => {
+          if (!track.enabled) {
+            console.log("Enabling video track for user:", userId);
+            track.enabled = true;
+          }
+        });
+      } else if (stream && !videoElement) {
+        // Stream exists but video element doesn't yet - will be set in ref callback
+        console.log("Stream exists for user but video element not yet created:", userId);
+      }
+    });
+  }, [remoteStreams]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -887,6 +1045,9 @@ export const MeetingPage = () => {
         {/* Remote Videos */}
         {Array.from(remoteStreams.entries()).map(([userId, stream]) => {
           const participant = participants.find((p) => p.userId === userId);
+          const hasVideoTrack = stream && stream.getVideoTracks().length > 0;
+          const videoTrackEnabled = hasVideoTrack && stream.getVideoTracks()[0]?.enabled;
+          
           return (
             <div
               key={userId}
@@ -896,21 +1057,33 @@ export const MeetingPage = () => {
                 ref={(el) => {
                   if (el) {
                     remoteVideosRef.current.set(userId, el);
-                    // Ensure video is set up properly
-                    if (stream && el.srcObject !== stream) {
+                    // Ensure video is set up properly when element is created
+                    if (stream) {
                       el.srcObject = stream;
                       el.muted = false;
+                      el.autoplay = true;
+                      el.playsInline = true;
                       el.play().catch((err) => {
-                        console.error("Error playing remote video:", err);
+                        console.error("Error playing remote video in ref callback:", err);
                       });
                     }
+                  } else {
+                    // Clean up when element is removed
+                    remoteVideosRef.current.delete(userId);
                   }
                 }}
                 autoPlay
                 playsInline
                 className="w-full h-full object-cover"
-                style={{ minHeight: "200px" }}
+                style={{ minHeight: "200px", display: videoTrackEnabled ? "block" : "none" }}
               />
+              {(!hasVideoTrack || !videoTrackEnabled) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+                  <span className="text-white text-lg">
+                    {!hasVideoTrack ? "No video stream" : "Video is disabled"}
+                  </span>
+                </div>
+              )}
               <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm">
                 {participant?.name || "Unknown"}
               </div>

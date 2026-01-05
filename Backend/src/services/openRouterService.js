@@ -27,43 +27,112 @@ export const callOpenRouterAPI = async ({
   maxTokens = 2000,
 }) => {
   try {
-    if (!apiKey) {
-      throw new Error("OpenRouter API key is required");
+    // Validate API key - use directly like other working agents
+    if (!apiKey || apiKey === "") {
+      throw new Error("OpenRouter API key is required and cannot be empty. Please check your .env file.");
     }
 
     if (!model) {
       throw new Error("Model name is required");
     }
 
+    // Debug: Log API key status (first 15 chars only for security)
+    const maskedKey = apiKey.substring(0, 15) + "...";
+    console.log("🔑 Using API key:", maskedKey);
+    console.log("🤖 Using model:", model);
+    console.log("🌐 Base URL:", OPENROUTER_BASE_URL);
+
+    // OpenRouter requires HTTP-Referer and X-Title headers (exact values as per requirements)
+    // Use API key directly without trimming, same as working agents
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": "http://localhost:5173",
+      "X-Title": "UPSC Mentor - Prelims Test Generator",
+    };
+
+    console.log("📤 Request headers:");
+    console.log("   Authorization:", `Bearer ${apiKey.substring(0, 15)}...`);
+    console.log("   HTTP-Referer:", "http://localhost:5173");
+    console.log("   X-Title:", "UPSC Mentor - Prelims Test Generator");
+
+    const requestBody = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature,
+      max_tokens: maxTokens,
+    };
+
+    console.log("📤 Request body (summary):");
+    console.log("   Model:", model);
+    console.log("   Messages count:", requestBody.messages.length);
+    console.log("   Temperature:", temperature);
+    console.log("   Max tokens:", maxTokens);
+
     const response = await fetch(OPENROUTER_BASE_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature,
-        max_tokens: maxTokens,
-      }),
+      headers,
+      body: JSON.stringify(requestBody),
     });
+
+    console.log("📥 Response status:", response.status, response.statusText);
+    console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        `OpenRouter API error: ${response.status} ${response.statusText} - ${errorText}`
-      );
+      console.error("❌ OpenRouter API Error Response:");
+      console.error("   Status:", response.status, response.statusText);
+      console.error("   Response body:", errorText);
+      
+      let errorMessage = `OpenRouter API error: ${response.status} ${response.statusText}`;
+      
+      // Parse error response for better error messages
+      try {
+        const errorData = JSON.parse(errorText);
+        console.error("   Parsed error data:", JSON.stringify(errorData, null, 2));
+        
+        if (errorData.error?.message) {
+          errorMessage = errorData.error.message;
+        } else if (errorData.error) {
+          errorMessage = JSON.stringify(errorData.error);
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        console.error("   Could not parse error response as JSON, using raw text");
+        errorMessage = errorText || errorMessage;
+      }
+
+      // Provide helpful error messages for common issues
+      if (response.status === 401) {
+        if (errorMessage.includes("User not found") || errorMessage.includes("401") || errorMessage.includes("Unauthorized")) {
+          errorMessage = "Invalid OpenRouter API key. Please check your OPENROUTER_API_KEY in .env file. Make sure it's a valid key from https://openrouter.ai/keys";
+        }
+      } else if (response.status === 400) {
+        if (errorMessage.includes("model")) {
+          errorMessage = `Invalid model name: ${model}. Please check OPENROUTER_MODEL in .env file.`;
+        }
+      }
+
+      console.error("=".repeat(60));
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
 
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error("❌ Invalid response format from OpenRouter API");
+      console.error("   Response data:", JSON.stringify(data, null, 2));
       throw new Error("Invalid response format from OpenRouter API");
     }
+
+    console.log("✅ OpenRouter API call successful");
+    console.log("   Response model:", data.model || model);
+    console.log("   Usage:", JSON.stringify(data.usage || {}));
+    console.log("=".repeat(60));
 
     return {
       success: true,
@@ -72,7 +141,12 @@ export const callOpenRouterAPI = async ({
       usage: data.usage || {},
     };
   } catch (error) {
-    console.error("OpenRouter API call failed:", error);
+    console.error("=".repeat(60));
+    console.error("❌ OpenRouter API call FAILED");
+    console.error("   Error message:", error.message);
+    console.error("   Error stack:", error.stack);
+    console.error("=".repeat(60));
+    
     return {
       success: false,
       error: error.message || "OpenRouter API call failed",

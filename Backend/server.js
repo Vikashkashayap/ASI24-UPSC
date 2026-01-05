@@ -6,11 +6,9 @@ import cors from "cors";
 import http from "http";
 import { connectDB } from "./src/config/db.js";
 import authRoutes from "./src/routes/authRoutes.js";
-import answerRoutes from "./src/routes/answerRoutes.js";
 import performanceRoutes from "./src/routes/performanceRoutes.js";
 import plannerRoutes from "./src/routes/plannerRoutes.js";
 import mentorRoutes from "./src/routes/mentorRoutes.js";
-import chatbotRoutes from "./src/routes/chatbotRoutes.js";
 import copyEvaluationRoutes from "./src/routes/copyEvaluationRoutes.js";
 import meetingRoutes from "./src/routes/meetingRoutes.js";
 import { authMiddleware } from "./src/middleware/authMiddleware.js";
@@ -28,11 +26,9 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/answers", authMiddleware, answerRoutes);
 app.use("/api/performance", authMiddleware, performanceRoutes);
 app.use("/api/planner", authMiddleware, plannerRoutes);
 app.use("/api/mentor", authMiddleware, mentorRoutes);
-app.use("/api/chatbot", authMiddleware, chatbotRoutes);
 app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 
