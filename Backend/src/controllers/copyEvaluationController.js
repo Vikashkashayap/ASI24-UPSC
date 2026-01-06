@@ -54,6 +54,33 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     console.log("🔄 Processing PDF...");
     const pdfBuffer = req.file.buffer;
     
+    // Validate PDF buffer before processing
+    if (!Buffer.isBuffer(pdfBuffer) || pdfBuffer.length === 0) {
+      evaluation.status = 'failed';
+      evaluation.errorMessage = "Invalid PDF file: File is empty or corrupted";
+      await evaluation.save();
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid PDF file",
+        error: "The uploaded file is empty or not a valid PDF. Please check the file and try again."
+      });
+    }
+
+    // Check PDF header
+    const pdfHeader = pdfBuffer.slice(0, 4).toString();
+    if (pdfHeader !== '%PDF') {
+      evaluation.status = 'failed';
+      evaluation.errorMessage = "Invalid PDF file: Missing PDF header";
+      await evaluation.save();
+
+      return res.status(400).json({
+        success: false,
+        message: "Invalid PDF file",
+        error: "The uploaded file does not appear to be a valid PDF. Please ensure you're uploading a PDF file."
+      });
+    }
+    
     let processResult;
     try {
       processResult = await processPDFForEvaluation(pdfBuffer, {
@@ -70,7 +97,8 @@ export const uploadAndEvaluateCopy = async (req, res) => {
       return res.status(500).json({
         success: false,
         message: "Failed to process PDF",
-        error: pdfError.message || "Unknown error during PDF processing"
+        error: pdfError.message || "Unknown error during PDF processing",
+        suggestion: "The PDF may be corrupted. Try re-saving the PDF or use a different file."
       });
     }
 
@@ -79,10 +107,27 @@ export const uploadAndEvaluateCopy = async (req, res) => {
       evaluation.errorMessage = processResult?.error || "PDF processing failed";
       await evaluation.save();
 
+      // Provide helpful error messages based on error type
+      let userFriendlyError = processResult?.error || "Unknown error during PDF processing";
+      let suggestion = "Please try uploading a different PDF file.";
+
+      if (processResult?.error?.includes("bad XRef entry") || 
+          processResult?.error?.includes("corrupted") ||
+          processResult?.error?.includes("invalid structure") ||
+          processResult?.error?.includes("FormatError")) {
+        suggestion = "The PDF appears to be corrupted or has an invalid structure. Please try:\n1. Re-saving the PDF in a PDF editor (like Adobe Acrobat)\n2. Exporting the document as a new PDF\n3. Using a different PDF file";
+        userFriendlyError = "PDF file is corrupted or has invalid structure. Please re-save the PDF or use a different file.";
+      } else if (processResult?.error?.includes("password") || processResult?.error?.includes("encrypted")) {
+        suggestion = "The PDF is password-protected. Please remove the password and try again.";
+      } else if (processResult?.error?.includes("no text")) {
+        suggestion = "The PDF appears to be image-only. Please use a PDF with selectable text, or ensure OCR is enabled.";
+      }
+
       return res.status(500).json({
         success: false,
         message: "Failed to process PDF",
-        error: processResult?.error || "Unknown error during PDF processing"
+        error: userFriendlyError,
+        suggestion: suggestion
       });
     }
 
@@ -104,17 +149,22 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     evaluation.pdfProcessingMetadata = processResult.metadata;
     evaluation.totalPages = processResult.metadata.totalPages;
     evaluation.isScanned = processResult.metadata.isScanned;
+    evaluation.rawText = processResult.raw_text || null; // Store raw text for preview
+    evaluation.confidenceScore = processResult.confidence_score || 1.0; // Store confidence score
     await evaluation.save();
 
     console.log(`✅ PDF processed successfully. Evaluation ID: ${evaluation._id}`);
 
-    // Return immediately with evaluationId - AI evaluation will be triggered separately
+    // Return immediately with evaluationId and raw text for preview
     res.status(200).json({
       success: true,
-      message: "PDF uploaded and processed successfully. AI evaluation will start shortly.",
+      message: "PDF uploaded and processed successfully. Please review the extracted text before evaluation.",
       data: {
         evaluationId: evaluation._id,
-        status: 'pending'
+        status: 'pending',
+        rawText: processResult.raw_text || null,
+        confidenceScore: processResult.confidence_score || 1.0,
+        totalAnswers: processResult.extractedAnswers?.length || 0
       }
     });
 
@@ -136,6 +186,7 @@ export const getEvaluationById = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user._id;
+    const { includeRawText } = req.query; // Optional query param to include raw text
 
     const evaluation = await CopyEvaluation.findOne({
       _id: id,
@@ -149,9 +200,18 @@ export const getEvaluationById = async (req, res) => {
       });
     }
 
+    // Prepare response data
+    const responseData = evaluation.toObject();
+    
+    // Include raw text if requested and available
+    if (includeRawText === 'true' && evaluation.rawText) {
+      responseData.rawText = evaluation.rawText;
+      responseData.confidenceScore = evaluation.confidenceScore || 1.0;
+    }
+
     res.status(200).json({
       success: true,
-      data: evaluation
+      data: responseData
     });
 
   } catch (error) {

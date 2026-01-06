@@ -36,12 +36,25 @@ const questionEvaluationSchema = new mongoose.Schema({
   questionNumber: { type: String, required: true },
   questionText: { type: String, default: '' },
   answerText: { type: String, required: true },
+  annotatedText: { type: String, default: '' }, // Text with highlight tags
   pageNumber: { type: Number, required: true },
   wordCount: { type: Number, default: 0 },
   wordLimit: { type: Number, default: 250 },
   totalMarks: { type: Number, required: true },
   maxMarks: { type: Number, required: true },
   marksBreakdown: marksBreakdownSchema,
+  scoringBreakdown: {
+    structure_score: { type: Number, default: 0 },
+    content_score: { type: Number, default: 0 },
+    analysis_score: { type: Number, default: 0 },
+    language_score: { type: Number, default: 0 },
+    value_addition_score: { type: Number, default: 0 },
+    final_score: { type: Number, default: 0 }
+  },
+  mistakeSummary: [{ type: String }],
+  examinerComment: { type: String, default: '' },
+  modelAnswer: { type: String, default: '' },
+  diagramSuggestions: { type: String, default: '' },
   inlineFeedback: [inlineFeedbackSchema],
   strengths: [{ type: String }],
   weaknesses: [{ type: String }],
@@ -164,6 +177,16 @@ const copyEvaluationSchema = new mongoose.Schema({
   pdfProcessingMetadata: {
     type: mongoose.Schema.Types.Mixed,
     default: null
+  },
+  // Store raw extracted text for user preview
+  rawText: {
+    type: String,
+    default: null
+  },
+  // OCR confidence score
+  confidenceScore: {
+    type: Number,
+    default: 1.0
   }
 }, {
   timestamps: true

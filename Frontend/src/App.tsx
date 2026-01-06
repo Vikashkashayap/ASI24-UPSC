@@ -4,11 +4,14 @@ import { ThemeProvider } from "./hooks/useTheme";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
+import { HomePage } from "./pages/HomePage";
 import { PerformancePage } from "./pages/PerformancePage";
 import { PlannerPage } from "./pages/PlannerPage";
 import { MentorChatPage } from "./pages/MentorChatPage";
 import CopyEvaluationPage from "./pages/CopyEvaluationPage";
 import CopyEvaluationDetailPage from "./pages/CopyEvaluationDetailPage";
+import SingleQuestionEvaluationPage from "./pages/SingleQuestionEvaluationPage";
+import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import TestGeneratorPage from "./pages/TestGeneratorPage";
 import TestPage from "./pages/TestPage";
@@ -34,11 +37,14 @@ function App() {
               </ProtectedRoute>
             }
           >
+            <Route path="home" element={<HomePage />} />
             <Route path="performance" element={<PerformancePage />} />
             <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
             <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
+            <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
+            <Route path="mains-evaluation" element={<SingleQuestionEvaluationPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
             <Route path="test/:id" element={<TestPage />} />
@@ -46,7 +52,7 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="student-profiler" element={<StudentProfilerPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/performance" replace />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </AuthProvider>
     </ThemeProvider>

@@ -79,25 +79,54 @@ MARKING RULES
 • Poor or irrelevant answers may score 2–4
 
 ────────────────────────────────────
+TEXT ANNOTATION (CRITICAL)
+────────────────────────────────────
+You MUST annotate the answer text with inline highlight tags to mark mistakes and strengths.
+
+Use these tags to wrap specific portions of text:
+• <highlight type="irrelevant">...</highlight> - Text that doesn't answer the question
+• <highlight type="weak_structure">...</highlight> - Poorly structured sentences/paragraphs
+• <highlight type="grammar">...</highlight> - Grammar/spelling errors
+• <highlight type="missing_keyword">...</highlight> - Missing important UPSC keywords/concepts
+• <highlight type="good_content">...</highlight> - Well-written, relevant content
+
+IMPORTANT ANNOTATION RULES:
+• DO NOT rewrite or modify the original text
+• ONLY wrap existing text with highlight tags
+• Be specific - highlight exact phrases/sentences, not entire paragraphs
+• Mark both mistakes AND strengths
+• Preserve original text exactly as written
+
+────────────────────────────────────
 OUTPUT FORMAT (MANDATORY)
 ────────────────────────────────────
-For EACH question, output strictly in this format:
+For EACH question, output strictly in this JSON format:
 
-Question Number: QX
-
-Marks Awarded: X / 12.5
-
-Evaluation Summary:
-- One concise paragraph explaining WHY these marks were given
-
-Strengths:
-- Bullet points (max 3)
-
-Weaknesses:
-- Bullet points (max 3)
-
-Specific Improvements:
-- What exactly should be added or changed to score +2 marks
+{
+  "questionNumber": "Q1",
+  "marksAwarded": 7.5,
+  "structure_score": 2,
+  "content_score": 3,
+  "analysis_score": 2,
+  "language_score": 1,
+  "value_addition_score": 1,
+  "final_score": 7.5,
+  "max_marks": 12.5,
+  "word_count": 145,
+  "annotated_text": "The answer text with <highlight type='...'>...</highlight> tags",
+  "mistake_summary": [
+    "No constitutional reference",
+    "Weak conclusion",
+    "Lacked current example"
+  ],
+  "examiner_comment": "Average answer. Needs sharper analysis and better structure.",
+  "evaluationSummary": "One concise paragraph explaining WHY these marks were given",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
+  "improvements": ["improvement 1", "improvement 2", "improvement 3"],
+  "model_answer": "A high-scoring UPSC-style answer would...",
+  "diagram_suggestions": "Textual description of suggested diagrams"
+}
 
 ────────────────────────────────────
 FINAL SUMMARY (AFTER ALL QUESTIONS)
@@ -113,7 +142,7 @@ After evaluating the full copy, provide:
 ────────────────────────────────────
 IMPORTANT BEHAVIOR RULES
 ────────────────────────────────────
-• Do NOT rewrite answers
+• Do NOT rewrite answers - only annotate with highlight tags
 • Do NOT praise unnecessarily
 • Do NOT behave leniently
 • Do NOT hallucinate content not present in the copy
@@ -153,10 +182,23 @@ Provide evaluation in the following JSON format (STRICTLY follow the format):
 {
   "questionNumber": "${questionNumber}",
   "marksAwarded": number (out of ${maxMarks}, use decimals like 6.5, 7.25, 8.75),
+  "structure_score": number (0-2),
+  "content_score": number (0-3),
+  "analysis_score": number (0-2),
+  "language_score": number (0-1),
+  "value_addition_score": number (0-1),
+  "final_score": number (sum of above, max ${maxMarks}),
+  "max_marks": ${maxMarks},
+  "word_count": number,
+  "annotated_text": "The original answer text with <highlight type='irrelevant'>...</highlight>, <highlight type='weak_structure'>...</highlight>, <highlight type='grammar'>...</highlight>, <highlight type='missing_keyword'>...</highlight>, or <highlight type='good_content'>...</highlight> tags wrapping specific portions",
+  "mistake_summary": ["mistake 1", "mistake 2", "mistake 3"],
+  "examiner_comment": "Brief examiner-style comment explaining the marks",
   "evaluationSummary": "One concise paragraph explaining WHY these marks were given",
   "strengths": ["strength 1", "strength 2", "strength 3"],
   "weaknesses": ["weakness 1", "weakness 2", "weakness 3"],
-  "specificImprovements": "What exactly should be added or changed to score +2 marks",
+  "improvements": ["improvement 1", "improvement 2", "improvement 3"],
+  "model_answer": "A high-scoring UPSC-style model answer for this question",
+  "diagram_suggestions": "Textual description of suggested diagrams/flowcharts",
   "diagramAnalysis": {
     "present": boolean,
     "relevant": boolean,
@@ -165,13 +207,24 @@ Provide evaluation in the following JSON format (STRICTLY follow the format):
   }
 }
 
+CRITICAL ANNOTATION REQUIREMENTS:
+- annotated_text MUST contain the original answer text with highlight tags
+- Use <highlight type="irrelevant"> for irrelevant content
+- Use <highlight type="weak_structure"> for poorly structured parts
+- Use <highlight type="grammar"> for grammar/spelling errors
+- Use <highlight type="missing_keyword"> where important UPSC keywords are missing
+- Use <highlight type="good_content"> for well-written, relevant portions
+- DO NOT modify the original text - only wrap it with tags
+- Be specific: highlight exact phrases, not entire paragraphs
+
 IMPORTANT:
 - marksAwarded should be between 0 and ${maxMarks}
 - Average answers: 5-7 marks
 - Very good answers: 8-9.5 marks
 - Exceptional answers: 10-10.5 marks (rare)
 - Poor answers: 2-4 marks
-- Be strict and realistic, avoid generosity bias`;
+- Be strict and realistic, avoid generosity bias
+- final_score should equal the sum of individual scores (structure + content + analysis + language + value_addition)`;
 
   try {
     // Use service for API call
@@ -191,22 +244,47 @@ IMPORTANT:
     const maxMarks = 12.5;
     
     // Map new format to existing schema
-    parsedEvaluation.totalMarks = parsedEvaluation.marksAwarded || 0;
+    parsedEvaluation.totalMarks = parsedEvaluation.final_score || parsedEvaluation.marksAwarded || 0;
     parsedEvaluation.maxMarks = maxMarks;
+    
+    // Store annotated text (with highlight tags)
+    parsedEvaluation.annotatedText = parsedEvaluation.annotated_text || answerData.answerText || '';
     
     // Ensure required fields are present
     parsedEvaluation.answerText = answerData.answerText || '';
     parsedEvaluation.questionText = answerData.questionText || `Question ${answerData.questionNumber}`;
     parsedEvaluation.pageNumber = answerData.pageNumber || 1;
-    parsedEvaluation.wordCount = answerData.wordCount || 0;
+    parsedEvaluation.wordCount = parsedEvaluation.word_count || answerData.wordCount || 0;
     parsedEvaluation.wordLimit = answerData.wordLimit || 250;
+    
+    // Store detailed scoring breakdown
+    parsedEvaluation.scoringBreakdown = {
+      structure_score: parsedEvaluation.structure_score || 0,
+      content_score: parsedEvaluation.content_score || 0,
+      analysis_score: parsedEvaluation.analysis_score || 0,
+      language_score: parsedEvaluation.language_score || 0,
+      value_addition_score: parsedEvaluation.value_addition_score || 0,
+      final_score: parsedEvaluation.final_score || parsedEvaluation.totalMarks
+    };
+    
+    // Store mistake summary
+    parsedEvaluation.mistakeSummary = Array.isArray(parsedEvaluation.mistake_summary) 
+      ? parsedEvaluation.mistake_summary 
+      : [];
+    
+    // Store examiner comment
+    parsedEvaluation.examinerComment = parsedEvaluation.examiner_comment || parsedEvaluation.evaluationSummary || '';
+    
+    // Store model answer and diagram suggestions
+    parsedEvaluation.modelAnswer = parsedEvaluation.model_answer || '';
+    parsedEvaluation.diagramSuggestions = parsedEvaluation.diagram_suggestions || '';
     
     // Convert new format fields to existing structure
     if (parsedEvaluation.evaluationSummary && !parsedEvaluation.inlineFeedback) {
       parsedEvaluation.inlineFeedback = [
         {
           location: 'overall',
-          comment: parsedEvaluation.evaluationSummary,
+          comment: parsedEvaluation.examinerComment || parsedEvaluation.evaluationSummary,
           severity: 'neutral'
         }
       ];
@@ -227,11 +305,11 @@ IMPORTANT:
     if (!parsedEvaluation.marksBreakdown) {
       const total = parsedEvaluation.totalMarks || 0;
       parsedEvaluation.marksBreakdown = {
-        introduction: Math.round((total * 0.15) * 10) / 10,
-        body: Math.round((total * 0.5) * 10) / 10,
-        conclusion: Math.round((total * 0.15) * 10) / 10,
-        diagram: parsedEvaluation.diagramAnalysis?.marksAwarded || 0,
-        presentation: Math.round((total * 0.1) * 10) / 10
+        introduction: Math.round((parsedEvaluation.scoringBreakdown.structure_score * 0.3) * 10) / 10,
+        body: Math.round((parsedEvaluation.scoringBreakdown.content_score + parsedEvaluation.scoringBreakdown.analysis_score) * 10) / 10,
+        conclusion: Math.round((parsedEvaluation.scoringBreakdown.structure_score * 0.2) * 10) / 10,
+        diagram: parsedEvaluation.diagramAnalysis?.marksAwarded || parsedEvaluation.scoringBreakdown.value_addition_score || 0,
+        presentation: Math.round((parsedEvaluation.scoringBreakdown.language_score) * 10) / 10
       };
     }
     

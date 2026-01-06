@@ -34,8 +34,9 @@ export const copyEvaluationAPI = {
     });
   },
 
-  getEvaluationById: (id: string) => {
-    return api.get(`/api/copy-evaluation/${id}`);
+  getEvaluationById: (id: string, includeRawText?: boolean) => {
+    const params = includeRawText ? { includeRawText: 'true' } : {};
+    return api.get(`/api/copy-evaluation/${id}`, { params });
   },
 
   getHistory: (page = 1, limit = 10) => {
@@ -58,6 +59,34 @@ export const copyEvaluationAPI = {
 
   processEvaluation: (id: string) => {
     return api.post(`/api/copy-evaluation/${id}/process`);
+  },
+};
+
+// Single Question Evaluation API
+export const singleQuestionEvaluationAPI = {
+  evaluate: async (data: {
+    question: string;
+    answerText?: string;
+    paper?: string;
+    marks?: number;
+    language?: string;
+    wordLimit?: number;
+    pdfFile?: File;
+  }) => {
+    const formData = new FormData();
+    formData.append('question', data.question);
+    if (data.answerText) formData.append('answerText', data.answerText);
+    if (data.paper) formData.append('paper', data.paper);
+    if (data.marks) formData.append('marks', data.marks.toString());
+    if (data.language) formData.append('language', data.language);
+    if (data.wordLimit) formData.append('wordLimit', data.wordLimit.toString());
+    if (data.pdfFile) formData.append('pdf', data.pdfFile);
+
+    return api.post('/api/single-question-evaluation/evaluate', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 };
 

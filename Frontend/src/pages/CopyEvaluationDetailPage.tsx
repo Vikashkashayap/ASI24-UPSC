@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, TrendingUp, TrendingDown, Target, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, FileText, TrendingUp, TrendingDown, Target, CheckCircle, XCircle, Layout, List } from 'lucide-react';
 import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { useTheme } from '../hooks/useTheme';
+import InlineFeedbackView from '../components/InlineFeedbackView';
+import AnnotatedTextView from '../components/AnnotatedTextView';
 
 interface QuestionEvaluation {
   questionNumber: string;
   questionText: string;
   answerText: string;
+  annotatedText?: string;
   pageNumber: number;
   wordCount: number;
+  wordLimit?: number;
   totalMarks: number;
   maxMarks: number;
   marksBreakdown: {
@@ -21,6 +25,18 @@ interface QuestionEvaluation {
     diagram: number;
     presentation: number;
   };
+  scoringBreakdown?: {
+    structure_score: number;
+    content_score: number;
+    analysis_score: number;
+    language_score: number;
+    value_addition_score: number;
+    final_score: number;
+  };
+  mistakeSummary?: string[];
+  examinerComment?: string;
+  modelAnswer?: string;
+  diagramSuggestions?: string;
   inlineFeedback: Array<{
     location: string;
     comment: string;
@@ -57,6 +73,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
   const [evaluation, setEvaluation] = useState<EvaluationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<'detailed' | 'inline'>('inline');
 
   useEffect(() => {
     loadEvaluation();
@@ -110,8 +127,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => navigate('/copy-evaluation')}
-              className="gap-2"
-              size="sm"
+              className="gap-2 text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -184,6 +200,46 @@ const CopyEvaluationDetailPage: React.FC = () => {
 
         {/* Question Details */}
         <div className="lg:col-span-3 space-y-4 md:space-y-6">
+            {/* View Mode Toggle */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={viewMode === 'inline' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('inline')}
+                  className="gap-2 text-sm"
+                >
+                  <Layout className="w-4 h-4" />
+                  Text & Feedback View
+                </Button>
+                <Button
+                  variant={viewMode === 'detailed' ? 'default' : 'outline'}
+                  onClick={() => setViewMode('detailed')}
+                  className="gap-2 text-sm"
+                >
+                  <List className="w-4 h-4" />
+                  Detailed Analysis
+                </Button>
+              </div>
+            </div>
+
+            {viewMode === 'inline' ? (
+              /* Annotated Text View (Three-Panel) */
+              <AnnotatedTextView
+                annotatedText={currentQuestion.annotatedText || currentQuestion.answerText}
+                originalText={currentQuestion.answerText}
+                questionNumber={currentQuestion.questionNumber}
+                questionText={currentQuestion.questionText}
+                wordCount={currentQuestion.wordCount}
+                wordLimit={currentQuestion.wordLimit}
+                mistakeSummary={currentQuestion.mistakeSummary}
+                examinerComment={currentQuestion.examinerComment}
+                scoringBreakdown={currentQuestion.scoringBreakdown}
+                totalMarks={currentQuestion.totalMarks}
+                maxMarks={currentQuestion.maxMarks}
+              />
+            ) : (
+              /* Detailed View */
+              <>
             {/* Score Card */}
             <Card className={`p-4 md:p-6 ${
               percentage >= 70 
@@ -361,6 +417,35 @@ const CopyEvaluationDetailPage: React.FC = () => {
               </ol>
             </Card>
 
+            {/* Model Answer */}
+            {currentQuestion.modelAnswer && (
+              <Card className="p-4 md:p-6">
+                <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 flex items-center gap-2 ${theme === "dark" ? "text-indigo-300" : "text-indigo-800"}`}>
+                  <FileText className="w-4 h-4 md:w-5 md:h-5" />
+                  Model Answer (UPSC-Ready)
+                </h3>
+                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-indigo-950/30" : "bg-indigo-50"}`}>
+                  <p className={`text-xs md:text-sm whitespace-pre-wrap leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                    {currentQuestion.modelAnswer}
+                  </p>
+                </div>
+              </Card>
+            )}
+
+            {/* Diagram Suggestions */}
+            {currentQuestion.diagramSuggestions && (
+              <Card className="p-4 md:p-6">
+                <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-cyan-300" : "text-cyan-800"}`}>
+                  Diagram Suggestions
+                </h3>
+                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-cyan-950/30" : "bg-cyan-50"}`}>
+                  <p className={`text-xs md:text-sm whitespace-pre-wrap ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                    {currentQuestion.diagramSuggestions}
+                  </p>
+                </div>
+              </Card>
+            )}
+
             {/* Navigation */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
               <Button
@@ -380,6 +465,8 @@ const CopyEvaluationDetailPage: React.FC = () => {
                 Next Question →
               </Button>
             </div>
+              </>
+            )}
         </div>
       </div>
     </div>

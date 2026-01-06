@@ -103,10 +103,10 @@ export const LandingNavbar = () => {
     }`}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-500 to-emerald-400 shadow-[0_0_24px_rgba(168,85,247,0.7)]">
-            <span className="text-xs md:text-sm font-semibold text-black">∞</span>
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-500 to-emerald-400 shadow-[0_0_24px_rgba(168,85,247,0.7)]">
+            <span className="text-sm font-semibold text-black">∞</span>
           </div>
-          <span className={`text-xs md:text-sm font-semibold tracking-tight ${
+          <span className={`text-base font-semibold tracking-tight ${
             theme === "dark" ? "text-slate-50" : "text-slate-900"
           }`}>
             UPSC<span className={theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"}> Mentor</span>
