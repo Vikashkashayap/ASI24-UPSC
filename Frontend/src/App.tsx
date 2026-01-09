@@ -5,7 +5,7 @@ import { DashboardLayout } from "./layouts/DashboardLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { HomePage } from "./pages/HomePage";
-import { PerformancePage } from "./pages/PerformancePage";
+import { PerformanceDashboardPage } from "./pages/PerformanceDashboardPage";
 import { PlannerPage } from "./pages/PlannerPage";
 import { MentorChatPage } from "./pages/MentorChatPage";
 import CopyEvaluationPage from "./pages/CopyEvaluationPage";
@@ -14,12 +14,14 @@ import SingleQuestionEvaluationPage from "./pages/SingleQuestionEvaluationPage";
 import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import TestGeneratorPage from "./pages/TestGeneratorPage";
+import TestHistoryPage from "./pages/TestHistoryPage";
 import TestPage from "./pages/TestPage";
 import TestResultPage from "./pages/TestResultPage";
 import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingPage } from "./pages/LandingPage";
+import HelpSupportPage from "./pages/HelpSupportPage";
 
 function App() {
   return (
@@ -38,7 +40,7 @@ function App() {
             }
           >
             <Route path="home" element={<HomePage />} />
-            <Route path="performance" element={<PerformancePage />} />
+            <Route path="performance" element={<PerformanceDashboardPage />} />
             <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
             <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
@@ -47,9 +49,11 @@ function App() {
             <Route path="mains-evaluation" element={<SingleQuestionEvaluationPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
+            <Route path="test-history" element={<TestHistoryPage />} />
             <Route path="test/:id" element={<TestPage />} />
             <Route path="result/:id" element={<TestResultPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="help-support" element={<HelpSupportPage />} />
             <Route path="student-profiler" element={<StudentProfilerPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />

@@ -5,6 +5,8 @@ import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { ConfirmationDialog } from '../components/ui/dialog';
+import { Pagination } from '../components/ui/pagination';
 
 interface EvaluationHistory {
   _id: string;
@@ -24,6 +26,18 @@ interface EvaluationHistory {
   createdAt: string;
 }
 
+interface PaginationData {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+interface EvaluationHistoryResponse {
+  evaluations: EvaluationHistory[];
+  pagination: PaginationData;
+}
+
 const EvaluationHistoryPage: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -31,10 +45,20 @@ const EvaluationHistoryPage: React.FC = () => {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredHistory, setFilteredHistory] = useState<EvaluationHistory[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [evaluationToDelete, setEvaluationToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadHistory();
   }, []);
+
+  const handlePageChange = (page: number) => {
+    loadHistory(page);
+  };
 
   // Listen for evaluation completion events
   useEffect(() => {
@@ -66,13 +90,16 @@ const EvaluationHistoryPage: React.FC = () => {
     }
   }, [searchQuery, history]);
 
-  const loadHistory = async () => {
+  const loadHistory = async (page = 1) => {
     setLoadingHistory(true);
     try {
-      const response = await copyEvaluationAPI.getHistory(1, 100);
+      const response = await copyEvaluationAPI.getHistory(page, itemsPerPage);
       if (response.data.success) {
-        setHistory(response.data.data.evaluations);
-        setFilteredHistory(response.data.data.evaluations);
+        const data: EvaluationHistoryResponse = response.data.data;
+        setHistory(data.evaluations);
+        setFilteredHistory(data.evaluations);
+        setPagination(data.pagination);
+        setCurrentPage(page);
       }
     } catch (error) {
       console.error('Failed to load history:', error);
@@ -81,17 +108,32 @@ const EvaluationHistoryPage: React.FC = () => {
     }
   };
 
-  const deleteEvaluation = async (id: string, e: React.MouseEvent) => {
+  const deleteEvaluation = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this evaluation?')) return;
-    
+    setEvaluationToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteEvaluation = async () => {
+    if (!evaluationToDelete) return;
+
+    setDeleting(true);
     try {
-      await copyEvaluationAPI.deleteEvaluation(id);
-      await loadHistory();
+      await copyEvaluationAPI.deleteEvaluation(evaluationToDelete);
+      await loadHistory(currentPage);
+      setShowDeleteDialog(false);
+      setEvaluationToDelete(null);
     } catch (error) {
       console.error('Failed to delete evaluation:', error);
       alert('Failed to delete evaluation. Please try again.');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const cancelDeleteEvaluation = () => {
+    setShowDeleteDialog(false);
+    setEvaluationToDelete(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -373,6 +415,28 @@ const EvaluationHistoryPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Pagination */}
+      {pagination && pagination.pages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.pages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showDeleteDialog}
+        title="Delete Evaluation"
+        message="Are you sure you want to delete this evaluation? This action cannot be undone."
+        confirmText="Delete Evaluation"
+        onConfirm={confirmDeleteEvaluation}
+        onCancel={cancelDeleteEvaluation}
+        loading={deleting}
+      />
     </div>
   );
 };

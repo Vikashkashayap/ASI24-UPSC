@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3 } from "lucide-react";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 
 const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
@@ -20,15 +20,17 @@ const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme
 const getPageTitle = (pathname: string): { title: string; icon: React.ReactNode } => {
   const routeMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/home': { title: 'Home', icon: <Home className="w-5 h-5" /> },
-    '/performance': { title: 'Performance Dashboard', icon: <LineChart className="w-5 h-5" /> },
+    '/performance': { title: 'Performance Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/planner': { title: 'Study Planner', icon: <CalendarClock className="w-5 h-5" /> },
     '/mentor': { title: 'AI Mentor', icon: <MessageCircle className="w-5 h-5" /> },
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/student-profiler': { title: 'Student Profiler', icon: <User className="w-5 h-5" /> },
+    '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
     '/mains-evaluation': { title: 'Mains Evaluation', icon: <FileText className="w-5 h-5" /> },
   };
   
@@ -115,39 +117,91 @@ export const DashboardLayout = () => {
     </button>
   </div>
 </div>
-        <nav className={`${sidebarCollapsed ? "px-2" : "px-4"} py-4 space-y-1 flex-1 overflow-y-auto`} onClick={() => setMobileMenuOpen(false)}>
-          <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
-            <Home className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Home</span>}
-          </NavLink>
-          <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance">
-            <LineChart className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Performance</span>}
-          </NavLink>
-          <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
-            <CalendarClock className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Study Planner</span>}
-          </NavLink>
-          <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
-            <MessageCircle className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>AI Mentor</span>}
-          </NavLink>
-          <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
-            <FileText className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Copy Evaluation</span>}
-          </NavLink>
-          <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
-            <History className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Evaluation History</span>}
-          </NavLink>
-          <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
-            <ClipboardList className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Prelims Test</span>}
-          </NavLink>
-          <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Live Meeting">
-            <Video className="w-4 h-4 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Live Meeting</span>}
-          </NavLink>
+        <nav className={`${sidebarCollapsed ? "px-2" : "px-4"} py-4 space-y-2 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
+
+          {/* Main Section */}
+          <div className="space-y-1">
+            <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
+              <Home className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Home</span>}
+            </NavLink>
+          </div>
+
+          {/* Performance & Analytics Section */}
+          {!sidebarCollapsed && (
+            <div className="pt-4 pb-2">
+              <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Performance & Analytics
+              </div>
+            </div>
+          )}
+          <div className="space-y-1">
+            <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance Dashboard">
+              <BarChart3 className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Performance Dashboard</span>}
+            </NavLink>
+            <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
+              <FileText className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Copy Evaluation</span>}
+            </NavLink>
+            <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
+              <History className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Evaluation History</span>}
+            </NavLink>
+          </div>
+
+          {/* Practice & Tests Section */}
+          {!sidebarCollapsed && (
+            <div className="pt-4 pb-2">
+              <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Practice & Tests
+              </div>
+            </div>
+          )}
+          <div className="space-y-1">
+            <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
+              <ClipboardList className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Prelims Test</span>}
+            </NavLink>
+            <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
+              <History className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Test History</span>}
+            </NavLink>
+          </div>
+
+          {/* Study Tools Section */}
+          {!sidebarCollapsed && (
+            <div className="pt-4 pb-2">
+              <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Study Tools
+              </div>
+            </div>
+          )}
+          <div className="space-y-1">
+            <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
+              <CalendarClock className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Study Planner</span>}
+            </NavLink>
+            <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
+              <MessageCircle className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>AI Mentor</span>}
+            </NavLink>
+          </div>
+
+          {/* Communication Section */}
+          {!sidebarCollapsed && (
+            <div className="pt-4 pb-2">
+              <div className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Communication
+              </div>
+            </div>
+          )}
+          <div className="space-y-1">
+            <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Live Meeting">
+              <Video className="w-4 h-4 flex-shrink-0" />
+              {!sidebarCollapsed && <span>Live Meeting</span>}
+            </NavLink>
+          </div>
         </nav>
         
         {/* Bottom Actions Section */}
@@ -162,17 +216,15 @@ export const DashboardLayout = () => {
               <Settings className="w-4 h-4 flex-shrink-0" />
               {!sidebarCollapsed && <span>Settings</span>}
             </NavLink>
-            <button
-              className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} ${sidebarCollapsed ? "px-2" : "px-3"} py-2 rounded-lg text-sm font-medium transition-colors ${
-                theme === "dark"
-                  ? "hover:bg-slate-800 text-slate-300"
-                  : "hover:bg-slate-100 text-slate-700"
-              }`}
+            <NavLink
+              to="/help-support"
+              className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })}
+              onClick={() => setMobileMenuOpen(false)}
               title="Help & Support"
             >
               <HelpCircle className="w-4 h-4 flex-shrink-0" />
               {!sidebarCollapsed && <span>Help & Support</span>}
-            </button>
+            </NavLink>
             <button
               onClick={logout}
               className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} ${sidebarCollapsed ? "px-2" : "px-3"} py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -251,7 +303,7 @@ export const DashboardLayout = () => {
         </header>
         
         {/* Scrollable Main Content */}
-        <main className="flex-1 overflow-y-auto px-4 md:px-8 py-6">
+        <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-hide px-4 md:px-8 py-6">
           <Outlet />
         </main>
       </div>

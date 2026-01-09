@@ -119,8 +119,18 @@ export const testAPI = {
     return api.post(`/api/tests/submit/${id}`, answers);
   },
 
-  getTests: async () => {
-    return api.get("/api/tests");
+  getTests: async (page = 1, limit = 10) => {
+    return api.get("/api/tests", {
+      params: { page, limit },
+    });
+  },
+
+  getAnalytics: async () => {
+    return api.get("/api/tests/analytics");
+  },
+
+  deleteTest: async (id: string) => {
+    return api.delete(`/api/tests/${id}`);
   },
 };
 

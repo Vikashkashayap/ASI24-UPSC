@@ -4,9 +4,16 @@ import {
   submitTest,
   getTest,
   getTests,
+  getTestAnalytics,
+  getPrelimsPerformance,
+  deleteTest,
 } from "../controllers/testController.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+
+// Apply authentication to all test routes
+router.use(authMiddleware);
 
 // Generate new test
 router.post("/generate", generateTest);
@@ -14,11 +21,20 @@ router.post("/generate", generateTest);
 // Submit test answers
 router.post("/submit/:id", submitTest);
 
-// Get test by ID
-router.get("/:id", getTest);
+// Get test analytics
+router.get("/analytics", getTestAnalytics);
+
+// Get pre-lims performance analysis
+router.get("/prelims-performance", getPrelimsPerformance);
 
 // Get all tests (history)
 router.get("/", getTests);
+
+// Get test by ID (must come after specific routes)
+router.get("/:id", getTest);
+
+// Delete a test
+router.delete("/:id", deleteTest);
 
 export default router;
 

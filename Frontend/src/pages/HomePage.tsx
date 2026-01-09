@@ -2,19 +2,20 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../hooks/useTheme";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
-import { 
-  LineChart, 
-  FileText, 
-  MessageCircle, 
+import {
+  LineChart,
+  FileText,
+  MessageCircle,
   CalendarClock,
   ClipboardList,
   TrendingUp,
   BookOpen,
   Target,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  CheckCircle
 } from "lucide-react";
-import { api } from "../services/api";
+import { api, testAPI } from "../services/api";
 
 export const HomePage = () => {
   const { theme } = useTheme();
@@ -22,22 +23,50 @@ export const HomePage = () => {
   const [stats, setStats] = useState({
     totalEvaluations: 0,
     averageScore: 0,
-    recentActivity: []
+    recentActivity: [],
+    totalTests: 0,
+    averageTestScore: 0,
+    averageAccuracy: 0,
+    recentTests: []
   });
 
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const res = await api.get("/api/performance");
-        if (res.data) {
-          setStats({
-            totalEvaluations: res.data.totalEvaluations || 0,
-            averageScore: res.data.averageScore || 0,
-            recentActivity: res.data.recentPerformance || []
-          });
+        // Load evaluation stats
+        const evalRes = await api.get("/api/performance");
+        const evalData = evalRes.data || {};
+
+        // Load test stats
+        let testData = {
+          totalTests: 0,
+          averageTestScore: 0,
+          averageAccuracy: 0,
+          recentTests: []
+        };
+
+        try {
+          const testRes = await testAPI.getAnalytics();
+          if (testRes.data?.success) {
+            testData = testRes.data.data;
+          }
+        } catch (testError) {
+          // Silently fail for test analytics
+          console.log("Test analytics not available yet");
         }
+
+        setStats({
+          totalEvaluations: evalData.totalEvaluations || 0,
+          averageScore: evalData.averageScore || 0,
+          recentActivity: evalData.recentPerformance || [],
+          totalTests: testData.totalTests || 0,
+          averageTestScore: testData.averageScore || 0,
+          averageAccuracy: testData.averageAccuracy || 0,
+          recentTests: testData.recentTests || []
+        });
       } catch (error) {
         // Silently fail, show default stats
+        console.log("Error loading stats:", error);
       }
     };
     loadStats();
@@ -94,7 +123,7 @@ export const HomePage = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Card className="relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
           <CardHeader className="pb-2">
@@ -127,6 +156,60 @@ export const HomePage = () => {
             </div>
             <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Your performance
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xs md:text-sm font-medium">Total Tests</CardTitle>
+              <ClipboardList className={`w-4 h-4 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              {stats.totalTests}
+            </div>
+            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+              MCQ tests completed
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xs md:text-sm font-medium">Test Accuracy</CardTitle>
+              <CheckCircle className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              {stats.averageAccuracy}%
+            </div>
+            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+              Average accuracy
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xs md:text-sm font-medium">Test Score</CardTitle>
+              <Target className={`w-4 h-4 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              {stats.averageTestScore}%
+            </div>
+            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+              Average test score
             </p>
           </CardContent>
         </Card>
@@ -287,6 +370,80 @@ export const HomePage = () => {
                           : theme === "dark" ? "text-red-300" : "text-red-600"
                       }`}>
                         {item.score}%
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Recent Tests */}
+      {stats.recentTests.length > 0 && (
+        <div>
+          <h2 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+            Recent Tests
+          </h2>
+          <Card className="relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
+            <CardHeader>
+              <CardTitle className="text-base font-semibold">Your Latest MCQ Tests</CardTitle>
+              <CardDescription>Track your progress in prelims preparation</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {stats.recentTests.slice(0, 5).map((test: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className={`p-4 rounded-lg border transition-all hover:scale-[1.01] ${
+                      theme === "dark"
+                        ? "bg-slate-900/50 border-slate-700/50 hover:border-amber-700/50"
+                        : "bg-slate-50 border-slate-200 hover:border-amber-300"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${
+                          theme === "dark" ? "bg-amber-900/30" : "bg-amber-100"
+                        }`}>
+                          <ClipboardList className={`w-4 h-4 ${
+                            theme === "dark" ? "text-amber-400" : "text-amber-600"
+                          }`} />
+                        </div>
+                        <div>
+                          <p className={`font-medium text-sm ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+                            {test.topic} - {test.subject}
+                          </p>
+                          <p className={`text-xs mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                            {new Date(test.createdAt).toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric"
+                            })} • {test.difficulty} • {test.totalQuestions} questions
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className={`text-sm font-medium ${
+                          test.accuracy >= 70
+                            ? theme === "dark" ? "text-emerald-300" : "text-emerald-600"
+                            : test.accuracy >= 50
+                            ? theme === "dark" ? "text-amber-300" : "text-amber-600"
+                            : theme === "dark" ? "text-red-300" : "text-red-600"
+                        }`}>
+                          {test.accuracy}% accuracy
+                        </div>
+                        <div className={`text-lg font-bold ${
+                          test.score >= 70
+                            ? theme === "dark" ? "text-emerald-300" : "text-emerald-600"
+                            : test.score >= 50
+                            ? theme === "dark" ? "text-amber-300" : "text-amber-600"
+                            : theme === "dark" ? "text-red-300" : "text-red-600"
+                        }`}>
+                          {test.score}%
+                        </div>
                       </div>
                     </div>
                   </div>

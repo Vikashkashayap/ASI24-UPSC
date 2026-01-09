@@ -6,6 +6,11 @@ import mongoose from "mongoose";
  */
 const testSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false, // Allow backward compatibility for existing tests
+    },
     subject: {
       type: String,
       required: true,
@@ -77,6 +82,82 @@ const testSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Static method to get user analytics
+testSchema.statics.getUserAnalytics = async function(userId) {
+  const tests = await this.find({
+    $or: [
+      { userId, isSubmitted: true },
+      { userId: { $exists: false }, isSubmitted: true }
+    ]
+  });
+
+  if (tests.length === 0) {
+    return {
+      totalTests: 0,
+      averageScore: 0,
+      averageAccuracy: 0,
+      highestScore: 0,
+      totalQuestionsAnswered: 0,
+      subjectWisePerformance: {},
+      difficultyWisePerformance: {},
+      recentTests: []
+    };
+  }
+
+  const scores = tests.map(t => t.score || 0);
+  const accuracies = tests.map(t => t.accuracy || 0);
+  const totalScore = scores.reduce((sum, score) => sum + score, 0);
+  const totalAccuracy = accuracies.reduce((sum, accuracy) => sum + accuracy, 0);
+
+  // Subject-wise performance
+  const subjectWise = {};
+  tests.forEach(test => {
+    if (!subjectWise[test.subject]) {
+      subjectWise[test.subject] = { total: 0, correct: 0, count: 0 };
+    }
+    subjectWise[test.subject].total += test.totalQuestions;
+    subjectWise[test.subject].correct += test.correctAnswers || 0;
+    subjectWise[test.subject].count += 1;
+  });
+
+  // Difficulty-wise performance
+  const difficultyWise = {};
+  tests.forEach(test => {
+    if (!difficultyWise[test.difficulty]) {
+      difficultyWise[test.difficulty] = { total: 0, correct: 0, count: 0 };
+    }
+    difficultyWise[test.difficulty].total += test.totalQuestions;
+    difficultyWise[test.difficulty].correct += test.correctAnswers || 0;
+    difficultyWise[test.difficulty].count += 1;
+  });
+
+  // Recent tests (last 10)
+  const recentTests = tests
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 10)
+    .map(test => ({
+      _id: test._id,
+      subject: test.subject,
+      topic: test.topic,
+      difficulty: test.difficulty,
+      score: test.score,
+      accuracy: test.accuracy,
+      totalQuestions: test.totalQuestions,
+      createdAt: test.createdAt
+    }));
+
+  return {
+    totalTests: tests.length,
+    averageScore: Math.round((totalScore / tests.length) * 100) / 100,
+    averageAccuracy: Math.round((totalAccuracy / tests.length) * 100) / 100,
+    highestScore: Math.max(...scores),
+    totalQuestionsAnswered: tests.reduce((sum, test) => sum + test.totalQuestions, 0),
+    subjectWisePerformance: subjectWise,
+    difficultyWisePerformance: difficultyWise,
+    recentTests
+  };
+};
 
 export default mongoose.model("Test", testSchema);
 

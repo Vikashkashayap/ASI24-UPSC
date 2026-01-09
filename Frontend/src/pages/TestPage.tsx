@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
+import { ConfirmationDialog } from "../components/ui/dialog";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -39,6 +40,7 @@ const TestPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -109,20 +111,15 @@ const TestPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    if (!test) return;
+    setShowSubmitDialog(true);
+  };
+
+  const handleConfirmSubmit = async () => {
     if (!test) return;
 
-    const attemptedCount = Object.keys(answers).length;
-    if (attemptedCount === 0) {
-      if (!window.confirm("You haven't answered any questions. Are you sure you want to submit?")) {
-        return;
-      }
-    } else {
-      if (!window.confirm(`You have attempted ${attemptedCount} out of ${test.totalQuestions} questions. Submit test?`)) {
-        return;
-      }
-    }
-
+    setShowSubmitDialog(false);
     setIsSubmitting(true);
     setError(null);
 
@@ -148,6 +145,10 @@ const TestPage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancelSubmit = () => {
+    setShowSubmitDialog(false);
   };
 
   const formatTime = (seconds: number) => {
@@ -269,7 +270,7 @@ const TestPage: React.FC = () => {
                       >
                         {isSelected ? <CheckCircle className="w-4 h-4" /> : option}
                       </div>
-                      <span className={`flex-1 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+                      <span className={`flex-1 ${theme === "dark" ? "text-slate-400" : "text-slate-700"}`}>
                         {optionText}
                       </span>
                     </div>
@@ -355,6 +356,23 @@ const TestPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Submit Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showSubmitDialog}
+        title="Submit Test"
+        message={
+          attemptedCount === 0
+            ? "You haven't answered any questions. Are you sure you want to submit the test?"
+            : `You have attempted ${attemptedCount} out of ${test.totalQuestions} questions. Once submitted, you cannot change your answers. Are you sure you want to submit the test?`
+        }
+        confirmText="Submit Test"
+        cancelText="Cancel"
+        confirmButtonClass="bg-green-600 hover:bg-green-700 text-white"
+        onConfirm={handleConfirmSubmit}
+        onCancel={handleCancelSubmit}
+        loading={isSubmitting}
+      />
     </div>
   );
 };

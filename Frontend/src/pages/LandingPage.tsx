@@ -10,9 +10,9 @@ import { useTheme } from "../hooks/useTheme";
 
 export const LandingPage = () => {
   const { theme } = useTheme();
-  
+
   return (
-    <div className={`min-h-screen transition-colors ${
+    <div className={`min-h-screen overflow-y-auto scroll-smooth scrollbar-hide transition-colors ${
       theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-white text-slate-900"
     }`}>
       <LandingNavbar />

@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
+import { LandingNavbar } from "../../components/landing/Navbar";
 
 export const LoginPage = () => {
   const { login } = useAuth();
@@ -27,7 +28,9 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#020012] bg-gradient-to-b from-[#050015] via-[#020012] to-black px-4 py-8 text-slate-50">
+    <div className="min-h-screen bg-[#020012] bg-gradient-to-b from-[#050015] via-[#020012] to-black text-slate-50">
+      <LandingNavbar />
+      <div className="flex items-center justify-center px-4 py-8 min-h-[calc(100vh-80px)]">
       <Card className="w-full max-w-md">
         <CardHeader className="pb-3 md:pb-4">
           <CardTitle className="text-base md:text-lg">Welcome back, aspirant</CardTitle>
@@ -68,6 +71,7 @@ export const LoginPage = () => {
           </p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

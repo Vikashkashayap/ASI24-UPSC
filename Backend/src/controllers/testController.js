@@ -1,5 +1,6 @@
 import Test from "../models/Test.js";
 import { generateTestQuestions } from "../services/testGenerationService.js";
+import { getPerformanceSummary } from "../services/performanceService.js";
 
 /**
  * Generate a new test with AI-generated questions
@@ -85,6 +86,7 @@ export const generateTest = async (req, res) => {
 
     // Create test document
     const test = new Test({
+      userId: req.user?.id,
       subject,
       topic,
       difficulty,
@@ -148,8 +150,22 @@ export const submitTest = async (req, res) => {
       });
     }
 
-    // Find test
-    const test = await Test.findById(id);
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // Find test and verify ownership (include tests without userId for backward compatibility)
+    const test = await Test.findOne({
+      _id: id,
+      $or: [
+        { userId },
+        { userId: { $exists: false } }
+      ]
+    });
     if (!test) {
       return res.status(404).json({
         success: false,
@@ -247,7 +263,23 @@ export const submitTest = async (req, res) => {
 export const getTest = async (req, res) => {
   try {
     const { id } = req.params;
-    const test = await Test.findById(id);
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // Find test and verify ownership (include tests without userId for backward compatibility)
+    const test = await Test.findOne({
+      _id: id,
+      $or: [
+        { userId },
+        { userId: { $exists: false } }
+      ]
+    });
 
     if (!test) {
       return res.status(404).json({
@@ -315,22 +347,283 @@ export const getTest = async (req, res) => {
 };
 
 /**
- * Get all tests (history)
- * GET /api/tests
+ * Get all tests (history) with pagination
+ * GET /api/tests?page=1&limit=10
  */
 export const getTests = async (req, res) => {
   try {
-    const tests = await Test.find()
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const { limit = 10, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Include tests with userId or without userId (for backward compatibility)
+    const tests = await Test.find({
+      $or: [
+        { userId },
+        { userId: { $exists: false } }
+      ]
+    })
       .sort({ createdAt: -1 })
-      .limit(50)
-      .select("subject topic difficulty totalQuestions score accuracy isSubmitted createdAt");
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select("userId subject topic difficulty totalQuestions score accuracy isSubmitted createdAt");
+
+    const total = await Test.countDocuments({
+      $or: [
+        { userId },
+        { userId: { $exists: false } }
+      ]
+    });
 
     res.json({
       success: true,
-      data: tests,
+      data: {
+        tests,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          pages: Math.ceil(total / limit)
+        }
+      },
     });
   } catch (error) {
     console.error("Error fetching tests:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+/**
+ * Get user test analytics
+ * GET /api/tests/analytics
+ */
+export const getTestAnalytics = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    const analytics = await Test.getUserAnalytics(userId);
+
+    res.json({
+      success: true,
+      data: analytics,
+    });
+  } catch (error) {
+    console.error("Error fetching test analytics:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+/**
+ * Delete a test
+ * DELETE /api/tests/:id
+ */
+export const deleteTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // Find test and verify ownership (include tests without userId for backward compatibility)
+    const test = await Test.findOne({
+      _id: id,
+      $or: [
+        { userId },
+        { userId: { $exists: false } }
+      ]
+    });
+    if (!test) {
+      return res.status(404).json({
+        success: false,
+        message: "Test not found",
+      });
+    }
+
+    await Test.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "Test deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting test:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+/**
+ * Get pre-lims performance analysis using performance agent
+ * GET /api/tests/prelims-performance
+ */
+export const getPrelimsPerformance = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // Get user's test performance data and transform it for the performance agent
+    const tests = await Test.find({
+      userId,
+      isSubmitted: true
+    }).sort({ createdAt: -1 }).lean();
+
+    if (!tests || tests.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          averageScore: 0,
+          weakSubjects: [],
+          trend: [],
+          consistency: 0,
+          subjectBreakdown: [],
+          history: [],
+          totalTests: 0,
+          highestScore: 0,
+          improvementTrend: 0,
+          recentPerformance: [],
+          preLimsReadiness: {
+            overallReadiness: 0,
+            strengths: [],
+            areasForImprovement: [],
+            recommendedFocus: [],
+            estimatedScore: 0
+          }
+        }
+      });
+    }
+
+    // Transform test data to match performance agent format
+    const processedTestData = tests.map(test => ({
+      id: test._id.toString(),
+      createdAt: test.createdAt,
+      subject: test.subject || 'General Studies',
+      score: test.accuracy || 0, // Use accuracy as percentage score
+      totalMarks: test.score || 0,
+      maxMarks: (test.totalQuestions || 0) * 2, // Max score is total questions * 2
+      grade: test.accuracy >= 80 ? 'A' : test.accuracy >= 60 ? 'B' : test.accuracy >= 40 ? 'C' : 'D',
+      paper: 'Pre-lims Test',
+      year: new Date(test.createdAt).getFullYear(),
+      testType: 'prelims'
+    }));
+
+    // Calculate subject breakdown for tests
+    const subjectMap = {};
+    processedTestData.forEach(item => {
+      const subject = item.subject;
+      if (!subjectMap[subject]) {
+        subjectMap[subject] = { total: 0, count: 0, scores: [] };
+      }
+      subjectMap[subject].total += item.score;
+      subjectMap[subject].count += 1;
+      subjectMap[subject].scores.push(item.score);
+    });
+
+    const subjectBreakdown = Object.entries(subjectMap).map(([subject, data]) => ({
+      subject,
+      average: Math.round(data.total / data.count),
+      count: data.count,
+      highest: Math.max(...data.scores),
+      lowest: Math.min(...data.scores)
+    })).sort((a, b) => a.average - b.average);
+
+    // Calculate overall statistics
+    const scores = processedTestData.map(item => item.score);
+    const averageScore = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+    const highestScore = Math.max(...scores);
+    const lowestScore = Math.min(...scores);
+
+    // Calculate improvement trend
+    let improvementTrend = 0;
+    if (scores.length >= 3) {
+      const recentScores = scores.slice(0, 3);
+      const oldScores = scores.slice(-3);
+      const recentAvg = recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
+      const oldAvg = oldScores.reduce((a, b) => a + b, 0) / oldScores.length;
+      improvementTrend = Math.round(recentAvg - oldAvg);
+    }
+
+    // Calculate consistency
+    let consistency = 100;
+    if (scores.length > 1) {
+      let deltas = 0;
+      for (let i = 1; i < scores.length; i++) {
+        deltas += Math.abs(scores[i] - scores[i - 1]);
+      }
+      const avgDelta = deltas / (scores.length - 1);
+      consistency = Math.max(0, Math.round(100 - avgDelta));
+    }
+
+    // Identify weak subjects
+    const weakSubjects = subjectBreakdown.slice(0, 3).map(s => s.subject);
+
+    // Create trend data
+    const trend = processedTestData.map(item => ({
+      date: item.createdAt,
+      score: item.score,
+      subject: item.subject,
+      createdAt: item.createdAt
+    }));
+
+    // Generate pre-lims readiness analysis
+    const preLimsReadiness = {
+      overallReadiness: Math.min(100, Math.max(0, averageScore + (consistency * 0.3) + (improvementTrend * 2))),
+      strengths: subjectBreakdown.filter(s => s.average >= 70).map(s => s.subject),
+      areasForImprovement: weakSubjects,
+      recommendedFocus: weakSubjects.length > 0 ? weakSubjects : ['General Practice'],
+      estimatedScore: Math.min(100, Math.max(0, averageScore + (consistency * 0.2)))
+    };
+
+    res.json({
+      success: true,
+      data: {
+        averageScore,
+        highestScore,
+        lowestScore,
+        weakSubjects,
+        trend,
+        consistency,
+        subjectBreakdown,
+        history: processedTestData,
+        totalTests: tests.length,
+        improvementTrend,
+        recentPerformance: processedTestData.slice(0, 5),
+        preLimsReadiness
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching pre-lims performance:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Internal server error",

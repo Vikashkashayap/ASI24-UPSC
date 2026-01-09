@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, BookOpen, Target, TrendingUp } from "lucide-react";
+import { Loader2, BookOpen, Target, TrendingUp, History } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { useTheme } from "../hooks/useTheme";
@@ -57,12 +57,24 @@ const TestGeneratorPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-8">
       <div className="flex flex-col gap-2">
-        <h1 className={`text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-          UPSC Prelims Test Generator
-        </h1>
-        <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-          Generate AI-powered UPSC Prelims MCQs and test your knowledge
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className={`text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              UPSC Prelims Test Generator
+            </h1>
+            <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+              Generate AI-powered UPSC Prelims MCQs and test your knowledge
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/test-history')}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <History className="w-4 h-4" />
+            View History
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -82,22 +94,25 @@ const TestGeneratorPage: React.FC = () => {
               <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                 Subject
               </label>
-              <select
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                  theme === "dark"
-                    ? "bg-slate-800 border-slate-700 text-slate-200"
-                    : "border-slate-300 bg-white"
-                }`}
-                disabled={isGenerating}
-              >
+              <div className="grid grid-cols-2 gap-3">
                 {subjects.map((sub) => (
-                  <option key={sub} value={sub}>
+                  <button
+                    key={sub}
+                    type="button"
+                    onClick={() => setSubject(sub)}
+                    disabled={isGenerating}
+                    className={`px-4 py-3 rounded-lg border transition-colors ${
+                      subject === sub
+                        ? "bg-purple-600 text-white border-purple-600"
+                        : theme === "dark"
+                        ? "bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700"
+                        : "border-slate-300 bg-white hover:bg-slate-50"
+                    }`}
+                  >
                     {sub}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Topic Input */}
@@ -188,7 +203,11 @@ const TestGeneratorPage: React.FC = () => {
             <Button
               type="submit"
               disabled={isGenerating || !topic.trim()}
-              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-6 text-base shadow-lg"
+              className={`w-full px-6 py-4 text-base font-semibold ${
+                isGenerating || !topic.trim()
+                  ? "bg-slate-400 border-slate-400 text-slate-200 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg transform hover:scale-[1.01] active:scale-[0.99]"
+              }`}
             >
               {isGenerating ? (
                 <>
