@@ -7,7 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // CRITICAL: Load .env file FIRST, before any other imports that might use env vars
-dotenv.config({ path: join(__dirname, "..", ".env") });
+const envPath = join(__dirname, "..", ".env");
+const envLoaded = dotenv.config({ path: envPath });
+if (envLoaded.error) {
+  console.log("⚠️  .env file not found or could not be loaded:", envPath);
+} else {
+  console.log("✅ .env file loaded successfully from:", envPath);
+}
 
 // Enhanced debug logging for environment variables
 const apiKey = process.env.OPENROUTER_API_KEY;
@@ -48,21 +54,30 @@ import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
 
-// CORS configuration to allow both common Vite dev ports
+// CORS configuration to allow both common Vite dev ports and production
 const defaultOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const allowedOrigins = [
   defaultOrigin,
   "http://localhost:5173",
-  "http://localhost:5174"
+  "http://localhost:5174",
+  "https://studentportal.mentorsdaily.com" // Add production domain
 ].filter((origin, index, self) => self.indexOf(origin) === index); // Remove duplicates
 
-app.use(cors({ 
+app.use(cors({
   origin: allowedOrigins,
-  credentials: true 
+  credentials: true
 }));
 app.use(express.json());
 
 connectDB();
+
+// Log environment info on startup
+console.log("🌍 Environment Check:");
+console.log("  PORT:", process.env.PORT || "5000 (default)");
+console.log("  CLIENT_ORIGIN:", process.env.CLIENT_ORIGIN || "not set");
+console.log("  DATABASE_URL:", process.env.DATABASE_URL ? "set" : "not set");
+console.log("  JWT_SECRET:", process.env.JWT_SECRET ? "set" : "not set");
+console.log("  OPENROUTER_API_KEY:", process.env.OPENROUTER_API_KEY ? "set" : "not set");
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
@@ -87,6 +102,7 @@ app.use("/api/mentor", authMiddleware, mentorRoutes);
 app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/single-question-evaluation", singleQuestionEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
+console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 

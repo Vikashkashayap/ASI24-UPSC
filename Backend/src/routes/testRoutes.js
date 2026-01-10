@@ -15,6 +15,21 @@ const router = express.Router();
 // Apply authentication to all test routes
 router.use(authMiddleware);
 
+// Debug middleware for test routes
+router.use((req, res, next) => {
+  console.log(`🧪 Test route hit: ${req.method} ${req.path}`);
+  next();
+});
+
+// Test endpoint to verify routes are working
+router.get("/test-connection", (req, res) => {
+  res.json({
+    success: true,
+    message: "Test routes are mounted correctly",
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Generate new test
 router.post("/generate", generateTest);
 
