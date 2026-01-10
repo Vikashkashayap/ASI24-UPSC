@@ -184,7 +184,7 @@ export const PrelimsPerformancePage = () => {
               <div>
                 <CardTitle className="text-xl font-semibold flex items-center gap-2">
                   <Target className={`w-6 h-6 ${getReadinessColor(data.preLimsReadiness.overallReadiness)}`} />
-                  Pre-lims Readiness Assessment
+                  Prelims Readiness Assessment
                 </CardTitle>
                 <CardDescription>AI-powered analysis of your pre-lims preparation</CardDescription>
               </div>

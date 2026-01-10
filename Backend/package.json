@@ -19,12 +19,14 @@
     "langchain": "^0.2.0",
     "mongoose": "^8.6.0",
     "multer": "^2.0.2",
+    "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

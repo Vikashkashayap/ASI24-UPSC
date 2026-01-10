@@ -509,7 +509,7 @@ export const PerformanceDashboardPage = () => {
               <div>
                 <CardTitle className="text-xl font-semibold flex items-center gap-2">
                   <Target className={`w-6 h-6 ${getReadinessColor(prelimsPerformanceData.preLimsReadiness.overallReadiness)}`} />
-                  Pre-lims Readiness Assessment
+                  Prelims Readiness Assessment
                 </CardTitle>
                 <CardDescription>AI-powered analysis of your pre-lims preparation</CardDescription>
               </div>
@@ -851,7 +851,7 @@ export const PerformanceDashboardPage = () => {
               : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
-          Pre-lims Tests
+          Prelims
         </button>
       </div>
 

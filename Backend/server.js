@@ -14,6 +14,7 @@ import singleQuestionEvaluationRoutes from "./src/routes/singleQuestionEvaluatio
 import meetingRoutes from "./src/routes/meetingRoutes.js";
 import testRoutes from "./src/routes/testRoutes.js";
 import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
+import currentAffairsRoutes from "./src/routes/currentAffairsRoutes.js";
 import { authMiddleware } from "./src/middleware/authMiddleware.js";
 import { initializeSocketIO } from "./src/services/socketService.js";
 
@@ -70,6 +71,7 @@ app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
+app.use("/api/current-affairs", currentAffairsRoutes);
 
 const PORT = process.env.PORT || 5000;
 
