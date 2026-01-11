@@ -163,14 +163,34 @@ export const callOpenRouterAPI = async ({
  */
 export const parseJSONFromResponse = (content) => {
   try {
-    // Try to find JSON object in the response
+    // First, try to find JSON object in the response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+    if (!jsonMatch) {
+      console.error("No JSON object found in response");
+      return null;
     }
-    return null;
+
+    let jsonString = jsonMatch[0];
+
+    // Clean control characters that might break JSON parsing
+    // Remove unescaped control characters from within string literals
+    jsonString = jsonString.replace(/("(?:[^"\\]|\\.)*")/g, (match) => {
+      // For each string literal, remove control characters except \n, \t, \r
+      return match.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    });
+
+    // Also clean any remaining control characters outside strings (though this shouldn't happen in valid JSON)
+    jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
+
+    // Try to parse the cleaned JSON
+    return JSON.parse(jsonString);
   } catch (error) {
     console.error("Failed to parse JSON from response:", error);
+    console.error("Raw content length:", content.length);
+    // Log a portion of the problematic content for debugging
+    const startPos = Math.max(0, 2300);
+    const endPos = Math.min(content.length, 2400);
+    console.error("Content around error position:", content.substring(startPos, endPos));
     return null;
   }
 };

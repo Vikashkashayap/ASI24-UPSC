@@ -19,7 +19,6 @@
     "langchain": "^0.2.0",
     "mongoose": "^8.6.0",
     "multer": "^2.0.2",
-    "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",

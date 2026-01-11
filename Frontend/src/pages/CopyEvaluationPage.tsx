@@ -162,32 +162,6 @@ const CopyEvaluationPage: React.FC = () => {
         }
       }
 
-      // Step 3: Show text preview (optional - user can skip)
-      if (rawText) {
-        const previewText = rawText.substring(0, 500) + (rawText.length > 500 ? '...' : '');
-        const shouldPreview = window.confirm(
-          `Extracted Text Preview (first 500 chars):\n\n${previewText}\n\n` +
-          `Do you want to see the full extracted text before evaluation?`
-        );
-        
-        if (shouldPreview) {
-          // Open full text in new window/modal
-          const fullTextWindow = window.open('', '_blank');
-          if (fullTextWindow) {
-            fullTextWindow.document.write(`
-              <html>
-                <head><title>Extracted Text Preview</title></head>
-                <body style="font-family: monospace; padding: 20px; white-space: pre-wrap;">
-                  <h2>Extracted Text from PDF</h2>
-                  <p><strong>Confidence Score:</strong> ${(confidenceScore * 100).toFixed(1)}%</p>
-                  <hr>
-                  ${rawText.replace(/\n/g, '<br>')}
-                </body>
-              </html>
-            `);
-          }
-        }
-      }
 
       // Step 4: Trigger AI evaluation
       console.log('🤖 Starting AI evaluation...');
