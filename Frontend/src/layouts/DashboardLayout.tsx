@@ -209,12 +209,12 @@ export const DashboardLayout = () => {
               </div>
             </div>
           )}
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Live Meeting">
               <Video className="w-4 h-4 flex-shrink-0" />
               {!sidebarCollapsed && <span>Live Meeting</span>}
             </NavLink>
-          </div>
+          </div> */}
         </nav>
         
         {/* Bottom Actions Section */}

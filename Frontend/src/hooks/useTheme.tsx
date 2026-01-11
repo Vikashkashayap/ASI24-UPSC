@@ -13,12 +13,12 @@ const THEME_STORAGE_KEY = "upsc_mentor_theme";
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Load theme from localStorage or default to dark
+    // Load theme from localStorage or default to light
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      return stored || "dark";
+      return stored || "light";
     }
-    return "dark";
+    return "light";
   });
 
   // Apply theme to document root on mount and when theme changes
