@@ -25,9 +25,9 @@ export const copyEvaluationAgent = new RunnableLambda({
       ],
       
       improvements: [
-        "Use more current affairs-based examples",
         "Add 1-2 data points or reports to support arguments",
         "Tighten introduction and conclusion to be more exam-oriented",
+        "Include relevant examples from governance and policy",
       ],
       modelAnswer:
         "A high-scoring UPSC-style answer would begin with a sharp definition or context, organize the body into clear sub-headings aligned with the directive, use examples, data and committee reports where relevant, and close with a balanced, forward-looking conclusion that ties back to the core demand of the question.",

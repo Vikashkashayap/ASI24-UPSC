@@ -22,9 +22,6 @@ import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LandingPage } from "./pages/LandingPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
-import CurrentAffairsDashboardPage from "./pages/CurrentAffairsDashboardPage";
-import CurrentAffairsDetailPage from "./pages/CurrentAffairsDetailPage";
-import ModelDrivenCurrentAffairsPage from "./pages/ModelDrivenCurrentAffairsPage";
 
 function App() {
   return (
@@ -58,9 +55,6 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="help-support" element={<HelpSupportPage />} />
             <Route path="student-profiler" element={<StudentProfilerPage />} />
-            <Route path="current-affairs" element={<CurrentAffairsDashboardPage />} />
-            <Route path="current-affairs/:id" element={<CurrentAffairsDetailPage />} />
-            <Route path="model-driven-ca" element={<ModelDrivenCurrentAffairsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>

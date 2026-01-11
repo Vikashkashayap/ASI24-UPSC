@@ -54,7 +54,7 @@ export const FeatureGrid = () => {
           <p className={`mt-1.5 md:mt-2 text-xs md:text-sm ${
             theme === "dark" ? "text-slate-300" : "text-slate-600"
           }`}>
-            A complete UPSC companion — from answer writing to analytics and current affairs.
+            A complete UPSC companion — from answer writing to analytics and performance tracking.
           </p>
         </div>
         <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">

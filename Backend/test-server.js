@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import currentAffairsRoutes from './src/routes/currentAffairsRoutes.js';
 
 const app = express();
 
@@ -17,7 +16,6 @@ mongoose.connect('mongodb://localhost:27017/upsc-mentor', {
   console.error('MongoDB connection error:', err);
 });
 
-app.use('/api/current-affairs', currentAffairsRoutes);
 
 app.listen(5000, () => {
   console.log('Test server running on port 5000');

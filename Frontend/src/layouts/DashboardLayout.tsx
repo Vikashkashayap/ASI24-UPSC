@@ -32,8 +32,6 @@ const getPageTitle = (pathname: string): { title: string; icon: React.ReactNode 
     '/student-profiler': { title: 'Student Profiler', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
     '/mains-evaluation': { title: 'Mains Evaluation', icon: <FileText className="w-5 h-5" /> },
-    '/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
-    '/model-driven-ca': { title: 'Model-Driven CA', icon: <Brain className="w-5 h-5" /> },
   };
   
   // Handle dynamic routes
@@ -45,9 +43,6 @@ const getPageTitle = (pathname: string): { title: string; icon: React.ReactNode 
   }
   if (pathname.startsWith('/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
-  }
-  if (pathname.startsWith('/current-affairs/')) {
-    return { title: 'Current Affairs Detail', icon: <Newspaper className="w-5 h-5" /> };
   }
   
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
@@ -144,14 +139,6 @@ export const DashboardLayout = () => {
             <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance Dashboard">
               <BarChart3 className="w-4 h-4 flex-shrink-0" />
               {!sidebarCollapsed && <span>Performance Dashboard</span>}
-            </NavLink>
-            <NavLink to="/current-affairs" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Current Affairs">
-              <Newspaper className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Current Affairs</span>}
-            </NavLink>
-            <NavLink to="/model-driven-ca" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Model-Driven Current Affairs">
-              <Brain className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Model-Driven CA</span>}
             </NavLink>
             <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
               <FileText className="w-4 h-4 flex-shrink-0" />

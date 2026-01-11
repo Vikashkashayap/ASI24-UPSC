@@ -49,11 +49,8 @@ import singleQuestionEvaluationRoutes from "./routes/singleQuestionEvaluationRou
 import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
-import currentAffairsRoutes from "./routes/currentAffairsRoutes.js";
-import modelDrivenCurrentAffairsRoutes from "./routes/modelDrivenCurrentAffairsRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
-import schedulerService from "./services/schedulerService.js";
 
 const app = express();
 
@@ -73,9 +70,6 @@ app.use(cors({
 app.use(express.json());
 
 connectDB();
-
-// Initialize scheduler service
-await schedulerService.initialize();
 
 // Log environment info on startup
 console.log("🌍 Environment Check:");
@@ -111,8 +105,6 @@ app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
-app.use("/api/current-affairs", currentAffairsRoutes);
-app.use("/api/model-driven", modelDrivenCurrentAffairsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

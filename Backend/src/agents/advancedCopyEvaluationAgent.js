@@ -60,7 +60,7 @@ For EACH question, evaluate on the following parameters:
    - Pros/cons, limitations, way forward
 
 5. Examples & Value Addition (10%)
-   - Use of current affairs, case studies, reports, constitutional articles
+   - Use of case studies, reports, constitutional articles
    - Diagrams, flowcharts, tables (if mentioned)
 
 6. Language & Clarity (10%)
@@ -343,7 +343,7 @@ function generateFallbackEvaluation(answerData) {
     totalMarks: Math.min(totalMarks, maxMarks),
     maxMarks,
     marksAwarded: Math.min(totalMarks, maxMarks),
-    evaluationSummary: "The answer demonstrates basic understanding of the topic with reasonable structure. However, it lacks analytical depth and current affairs integration. The response addresses the question but could benefit from more comprehensive coverage and specific examples.",
+    evaluationSummary: "The answer demonstrates basic understanding of the topic with reasonable structure. However, it lacks analytical depth and practical examples. The response addresses the question but could benefit from more comprehensive coverage and specific case studies.",
     marksBreakdown: {
       introduction: Math.round((totalMarks * 0.15) * 10) / 10,
       body: Math.round((totalMarks * 0.5) * 10) / 10,
@@ -354,7 +354,7 @@ function generateFallbackEvaluation(answerData) {
     inlineFeedback: [
       {
         location: "overall",
-        comment: "The answer demonstrates basic understanding but needs more analytical depth and current affairs integration.",
+        comment: "The answer demonstrates basic understanding but needs more analytical depth and practical examples.",
         severity: "neutral"
       }
     ],
@@ -364,14 +364,14 @@ function generateFallbackEvaluation(answerData) {
       "Good use of UPSC terminology"
     ].slice(0, 3),
     weaknesses: [
-      "Limited use of current affairs examples",
+      "Limited use of practical examples",
       "Some arguments lack depth",
       "Could use more committee reports/data"
     ].slice(0, 3),
     improvements: [
-      "Add 2-3 recent examples from current affairs and include specific data points or government reports to strengthen arguments"
+      "Add 2-3 relevant examples and include specific data points or government reports to strengthen arguments"
     ],
-    specificImprovements: "Add 2-3 recent examples from current affairs, include specific data points or government reports, and strengthen conclusion with actionable suggestions. " + (hashedDiagram ? "" : "Add relevant diagram/flowchart for +1 to +1.5 marks."),
+    specificImprovements: "Add 2-3 relevant examples, include specific data points or government reports, and strengthen conclusion with actionable suggestions. " + (hashedDiagram ? "" : "Add relevant diagram/flowchart for +1 to +1.5 marks."),
     diagramAnalysis: {
       present: hashedDiagram || false,
       relevant: hashedDiagram || false,
@@ -485,7 +485,7 @@ function generateFinalSummary(allEvaluations, metadata) {
       : [...new Set(allWeaknesses)].slice(0, 3),
     top3ActionableImprovements: top3Improvements.length > 0 
       ? top3Improvements 
-      : ['Focus on current affairs integration', 'Strengthen analytical depth', 'Improve answer structure'],
+      : ['Add practical examples', 'Strengthen analytical depth', 'Improve answer structure'],
     estimatedUPSCRankImpact: rankImpact,
     
     // Existing fields for backward compatibility

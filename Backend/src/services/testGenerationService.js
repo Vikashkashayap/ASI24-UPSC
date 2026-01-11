@@ -25,8 +25,8 @@ export const generateTestQuestions = async ({
     }
 
     // System prompt for UPSC question generation
-    const systemPrompt = `You are an expert UPSC Prelims question setter with 20+ years of experience. 
-Your task is to generate high-quality, exam-standard multiple choice questions that test conceptual understanding, analytical thinking, and current affairs knowledge.`;
+    const systemPrompt = `You are an expert UPSC Prelims question setter with 20+ years of experience.
+Your task is to generate high-quality, exam-standard multiple choice questions that test conceptual understanding and analytical thinking.`;
 
     // User prompt with detailed instructions
     const userPrompt = `Generate ${count} UPSC Prelims standard multiple choice questions.

@@ -21,7 +21,7 @@ export const LandingFooter = () => {
             <p className={`mt-2 text-[11px] ${
               theme === "dark" ? "text-slate-400" : "text-slate-600"
             }`}>
-              A focused AI workspace for answer writing, analytics and current affairs — built for UPSC aspirants who
+              A focused AI workspace for answer writing and analytics — built for UPSC aspirants who
               are tired of noise.
             </p>
           </div>

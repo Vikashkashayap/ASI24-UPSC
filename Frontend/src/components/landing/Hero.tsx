@@ -34,7 +34,7 @@ export const LandingHero = () => {
             <p className={`text-xs leading-relaxed md:text-sm lg:text-base ${
               theme === "dark" ? "text-slate-300" : "text-slate-600"
             }`}>
-              Build a calm, focused preparation system around answer writing, PYQ analysis and current affairs —
+              Build a calm, focused preparation system around answer writing and PYQ analysis —
               instead of chasing random PDFs and Telegram notes.
             </p>
           </div>
