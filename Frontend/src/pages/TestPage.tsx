@@ -235,9 +235,39 @@ const TestPage: React.FC = () => {
         <CardContent className="pt-6">
           <div className="space-y-6">
             <div>
-              <h3 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                {currentQuestion.question}
-              </h3>
+              <div className={`text-lg font-semibold mb-4 leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+                {currentQuestion.question.split('\n').map((line, lineIdx, lines) => {
+                  const trimmedLine = line.trim();
+                  if (!trimmedLine) return null;
+                  
+                  // Format numbered statements with proper indentation
+                  const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
+                  if (numberedMatch) {
+                    return (
+                      <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
+                        <span className="font-bold mr-1">{numberedMatch[1]}.</span>
+                        <span>{numberedMatch[2]}</span>
+                      </div>
+                    );
+                  }
+                  
+                  // Format List-I / List-II sections
+                  if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                    return (
+                      <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                        {trimmedLine}
+                      </div>
+                    );
+                  }
+                  
+                  // Format regular lines
+                  return (
+                    <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
+                      {trimmedLine}
+                    </div>
+                  );
+                }).filter(Boolean)}
+              </div>
             </div>
 
             {/* Options */}

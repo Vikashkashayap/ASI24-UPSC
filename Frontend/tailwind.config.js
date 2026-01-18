@@ -17,8 +17,14 @@ export default {
       borderRadius: {
         xl: "1rem",
       },
+      // Mobile-first breakpoints (min-width)
       screens: {
-        'xs': '475px',
+        'xs': '360px',      // Small mobile
+        'sm': '480px',      // Large mobile
+        'md': '768px',      // Tablet
+        'lg': '1024px',     // Laptop
+        'xl': '1280px',     // Desktop
+        '2xl': '1536px',    // Large desktop
       },
       fontSize: {
         'xs': ['0.75rem', { lineHeight: '1rem' }],

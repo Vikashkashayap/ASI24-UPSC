@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileText, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, FileText, X, ChevronLeft, ChevronRight, Sparkles, BookOpen, Award } from 'lucide-react';
 import { copyEvaluationAPI, singleQuestionEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -211,34 +211,34 @@ const CopyEvaluationPage: React.FC = () => {
     const isSingle = evaluationMode === 'single';
     const isFull = evaluationMode === 'full';
     return (
-      <div className={`flex gap-2 mb-6 p-1 rounded-lg ${theme === "dark" ? "bg-slate-800" : "bg-slate-100"}`}>
+      <div className={`flex gap-1.5 xs:gap-2 sm:gap-2 mb-4 xs:mb-5 sm:mb-6 p-1 rounded-xl ${theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-100 border border-slate-200"}`}>
         <button
           onClick={() => setEvaluationMode('single')}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 px-3 xs:px-4 sm:px-4 py-2 xs:py-2.5 sm:py-2.5 rounded-lg text-xs xs:text-sm sm:text-sm font-medium transition-all duration-200 ${
             isSingle
               ? theme === "dark"
-                ? "bg-purple-600 text-white"
-                : "bg-white text-purple-700 shadow-sm"
+                ? "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg shadow-fuchsia-500/30"
+                : "bg-white text-purple-700 shadow-md border border-purple-200"
               : theme === "dark"
-              ? "text-slate-300 hover:bg-slate-700"
-              : "text-slate-600 hover:bg-slate-200"
+              ? "text-slate-300 hover:bg-slate-700/50"
+              : "text-slate-600 hover:bg-slate-200/50"
           }`}
         >
-          Single Question Evaluation
+          Single Question
         </button>
         <button
           onClick={() => setEvaluationMode('full')}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 px-3 xs:px-4 sm:px-4 py-2 xs:py-2.5 sm:py-2.5 rounded-lg text-xs xs:text-sm sm:text-sm font-medium transition-all duration-200 ${
             isFull
               ? theme === "dark"
-                ? "bg-purple-600 text-white"
-                : "bg-white text-purple-700 shadow-sm"
+                ? "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg shadow-fuchsia-500/30"
+                : "bg-white text-purple-700 shadow-md border border-purple-200"
               : theme === "dark"
-              ? "text-slate-300 hover:bg-slate-700"
-              : "text-slate-600 hover:bg-slate-200"
+              ? "text-slate-300 hover:bg-slate-700/50"
+              : "text-slate-600 hover:bg-slate-200/50"
           }`}
         >
-          Full Copy Evaluation
+          Full Copy
         </button>
       </div>
     );
@@ -247,12 +247,27 @@ const CopyEvaluationPage: React.FC = () => {
   // If single question mode, render that component
   if (evaluationMode === 'single') {
     return (
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-8">
-        {/* Mode Toggle */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex flex-col gap-1 md:gap-2">
-            <h1 className={`text-xl md:text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>Copy Evaluation</h1>
-            <p className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Evaluate your UPSC mains answers with detailed feedback</p>
+      <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
+        {/* Enhanced Header */}
+        <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6">
+          <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3">
+            <div className={`p-2 xs:p-2.5 sm:p-2.5 rounded-xl xs:rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
+              theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
+            }`}>
+              <FileText className={`w-4 h-4 xs:w-5 xs:h-5 sm:w-5 sm:h-5 ${
+                theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+              }`} />
+            </div>
+            <div className="flex flex-col gap-0.5 xs:gap-1">
+              <h1 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold tracking-tight ${
+                theme === "dark" ? "text-slate-50" : "text-slate-900"
+              }`}>
+                Copy Evaluation
+              </h1>
+              <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                Evaluate your UPSC mains answers with detailed feedback
+              </p>
+            </div>
           </div>
         </div>
         
@@ -264,19 +279,37 @@ const CopyEvaluationPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-8">
-      <div className="flex flex-col gap-1 md:gap-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-xl md:text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>Copy Evaluation</h1>
-            <p className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Upload your UPSC answer copy PDF for AI-powered evaluation with examiner-style feedback</p>
+    <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
+      {/* Enhanced Header */}
+      <div className="flex flex-col gap-2 xs:gap-2.5 sm:gap-3">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3">
+            <div className={`p-2 xs:p-2.5 sm:p-2.5 rounded-xl xs:rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
+              theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
+            }`}>
+              <FileText className={`w-4 h-4 xs:w-5 xs:h-5 sm:w-5 sm:h-5 ${
+                theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+              }`} />
+            </div>
+            <div>
+              <h1 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold tracking-tight ${
+                theme === "dark" ? "text-slate-50" : "text-slate-900"
+              }`}>
+                Copy Evaluation
+              </h1>
+              <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                Upload your UPSC answer copy PDF for AI-powered evaluation with examiner-style feedback
+              </p>
+            </div>
           </div>
           {!selectedEvaluationId && !evaluationResult && (
             <Button
               onClick={() => setShowUploadModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
             >
-              Upload New Answer
+              <Upload className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">Upload New Answer</span>
+              <span className="xs:hidden">Upload</span>
             </Button>
           )}
         </div>
@@ -285,66 +318,101 @@ const CopyEvaluationPage: React.FC = () => {
       </div>
 
       {/* Main Content - Full width in Full Copy Evaluation mode */}
-      <div className="h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
+      <div className="h-[calc(100vh-10rem)] xs:h-[calc(100vh-11rem)] sm:h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
         {/* Main Content Area */}
         <div className="w-full h-full overflow-hidden">
           {!selectedEvaluationId || !evaluationResult ? (
-            <Card className={`h-full ${theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}`}>
-              <CardContent className="p-8 text-center flex items-center justify-center h-full">
-                <div>
-                  <FileText className={`w-16 h-16 mx-auto mb-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
-                  <h2 className={`text-xl font-semibold mb-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+            <Card className={`h-full ${theme === "dark" ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50" : "bg-white border-slate-200"} shadow-xl`}>
+              <CardContent className="p-6 xs:p-8 text-center flex items-center justify-center h-full">
+                <div className="max-w-md">
+                  <div className={`p-4 xs:p-5 sm:p-6 rounded-full mx-auto mb-4 xs:mb-5 sm:mb-6 w-fit ${
+                    theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
+                  }`}>
+                    <FileText className={`w-8 h-8 xs:w-12 xs:h-12 sm:w-16 sm:h-16 mx-auto ${
+                      theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                    }`} />
+                  </div>
+                  <h2 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold mb-2 xs:mb-3 ${
+                    theme === "dark" ? "text-slate-200" : "text-slate-800"
+                  }`}>
                     No Answer Copy Evaluated Yet
                   </h2>
-                  <p className={`mb-6 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                  <p className={`text-xs xs:text-sm sm:text-sm mb-6 xs:mb-7 sm:mb-8 ${
+                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                  }`}>
                     Upload your full answer copy PDF to get comprehensive evaluation with examiner-style feedback
                   </p>
                   <Button
                     onClick={() => setShowUploadModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
                   >
+                    <Upload className="w-4 h-4 mr-2" />
                     Upload New Answer Copy
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <Card className="h-full flex flex-col">
-              <CardHeader className="pb-3 md:pb-4">
-                <div className="flex items-center justify-between">
-                  <h2 className={`text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
-                    Your Answer Evaluation
-                  </h2>
+            <Card className={`h-full flex flex-col shadow-xl ${
+              theme === "dark" 
+                ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50" 
+                : "bg-white border-slate-200"
+            }`}>
+              <CardHeader className="pb-3 xs:pb-3.5 sm:pb-4 border-b flex-shrink-0">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2 xs:gap-2.5">
+                    <Award className={`w-5 h-5 xs:w-6 xs:h-6 ${
+                      theme === "dark" ? "text-fuchsia-300" : "text-purple-600"
+                    }`} />
+                    <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${
+                      theme === "dark" ? "text-slate-200" : "text-slate-800"
+                    }`}>
+                      Your Answer Evaluation
+                    </h2>
+                  </div>
                   <Button
                     onClick={() => setShowUploadModal(true)}
                     variant="outline"
-                    className="text-sm"
+                    className="text-xs xs:text-sm"
                   >
-                    Upload New Answer
+                    <Upload className="w-3.5 h-3.5 xs:w-4 xs:h-4 mr-1.5" />
+                    <span className="hidden xs:inline">Upload New Answer</span>
+                    <span className="xs:hidden">New</span>
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto pr-1 md:pr-2">
+              <CardContent className="flex-1 overflow-y-auto pr-1 xs:pr-1.5 sm:pr-2 custom-scrollbar">
                 {/* Results Display - Question by Question */}
                 {fullEvaluation && fullEvaluation.evaluations && fullEvaluation.evaluations.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Question Navigation */}
-                    <div className="flex items-center justify-end mb-4">
-                      <div className="flex items-center gap-2">
+                  <div className="space-y-4 xs:space-y-5 sm:space-y-6">
+                    {/* Enhanced Question Navigation */}
+                    <div className={`flex items-center justify-between p-3 xs:p-3.5 sm:p-4 rounded-xl ${
+                      theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-50 border border-slate-200"
+                    }`}>
+                      <div className="flex items-center gap-2 xs:gap-2.5">
+                        <BookOpen className={`w-4 h-4 xs:w-5 xs:h-5 ${
+                          theme === "dark" ? "text-slate-400" : "text-slate-600"
+                        }`} />
+                        <span className={`text-xs xs:text-sm font-medium ${
+                          theme === "dark" ? "text-slate-300" : "text-slate-700"
+                        }`}>
+                          Question {selectedQuestionIndex + 1} of {fullEvaluation.evaluations.length}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 xs:gap-2">
                         <Button
                           variant="outline"
-                          className="text-sm"
+                          size="sm"
+                          className="h-8 xs:h-9 w-8 xs:w-9 p-0"
                           onClick={() => setSelectedQuestionIndex(Math.max(0, selectedQuestionIndex - 1))}
                           disabled={selectedQuestionIndex === 0}
                         >
                           <ChevronLeft className="w-4 h-4" />
                         </Button>
-                        <span className={`text-sm px-3 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                          Question {selectedQuestionIndex + 1} of {fullEvaluation.evaluations.length}
-                        </span>
                         <Button
                           variant="outline"
-                          className="text-sm"
+                          size="sm"
+                          className="h-8 xs:h-9 w-8 xs:w-9 p-0"
                           onClick={() => setSelectedQuestionIndex(Math.min(fullEvaluation.evaluations.length - 1, selectedQuestionIndex + 1))}
                           disabled={selectedQuestionIndex === fullEvaluation.evaluations.length - 1}
                         >
@@ -370,23 +438,42 @@ const CopyEvaluationPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Upload Modal */}
+      {/* Enhanced Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto ${theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}`}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className={`text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
-                  Upload Answer Copy
-                </h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 xs:p-4">
+          <Card className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${
+            theme === "dark" 
+              ? "bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-purple-900/50" 
+              : "bg-white border-slate-200"
+          }`}>
+            <CardContent className="p-4 xs:p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6">
+                <div className="flex items-center gap-2 xs:gap-2.5">
+                  <div className={`p-2 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
+                    theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
+                  }`}>
+                    <Upload className={`w-4 h-4 xs:w-5 xs:h-5 ${
+                      theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+                    }`} />
+                  </div>
+                  <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${
+                    theme === "dark" ? "text-slate-200" : "text-slate-800"
+                  }`}>
+                    Upload Answer Copy
+                  </h2>
+                </div>
                 <button
                   onClick={() => {
                     setShowUploadModal(false);
                     setError(null);
                   }}
-                  className={`p-1 rounded ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-slate-100"}`}
+                  className={`p-1.5 xs:p-2 rounded-lg transition-colors ${
+                    theme === "dark" 
+                      ? "hover:bg-slate-800 text-slate-400 hover:text-slate-200" 
+                      : "hover:bg-slate-100 text-slate-500 hover:text-slate-700"
+                  }`}
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 xs:w-5 xs:h-5" />
                 </button>
               </div>
 
@@ -397,12 +484,21 @@ const CopyEvaluationPage: React.FC = () => {
                     Answer Copy (PDF)
                   </label>
                   {selectedFile ? (
-                    <div className={`p-4 rounded-lg border flex items-center justify-between ${
-                      theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"
+                    <div className={`p-3 xs:p-4 rounded-xl border flex items-center justify-between ${
+                      theme === "dark" 
+                        ? "bg-slate-800/80 border-slate-700/50" 
+                        : "bg-slate-50 border-slate-200"
                     }`}>
-                      <span className={`text-sm ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                        {selectedFile.name}
-                      </span>
+                      <div className="flex items-center gap-2 xs:gap-3 flex-1 min-w-0">
+                        <FileText className={`w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0 ${
+                          theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                        }`} />
+                        <span className={`text-xs xs:text-sm truncate ${
+                          theme === "dark" ? "text-slate-300" : "text-slate-700"
+                        }`}>
+                          {selectedFile.name}
+                        </span>
+                      </div>
                       <button
                         onClick={() => {
                           setSelectedFile(null);
@@ -410,14 +506,20 @@ const CopyEvaluationPage: React.FC = () => {
                             fileInputRef.current.value = '';
                           }
                         }}
-                        className="p-1 hover:bg-slate-700 rounded"
+                        className={`p-1.5 xs:p-2 rounded-lg transition-colors flex-shrink-0 ${
+                          theme === "dark" 
+                            ? "hover:bg-slate-700 text-slate-400 hover:text-slate-200" 
+                            : "hover:bg-slate-200 text-slate-500 hover:text-slate-700"
+                        }`}
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                      theme === "dark" ? "border-slate-700" : "border-slate-300"
+                    <div className={`border-2 border-dashed rounded-xl xs:rounded-2xl p-6 xs:p-8 text-center transition-colors ${
+                      theme === "dark" 
+                        ? "border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50" 
+                        : "border-slate-300 bg-slate-50/50 hover:border-purple-400"
                     }`}>
                       <input
                         ref={fileInputRef}
@@ -427,10 +529,23 @@ const CopyEvaluationPage: React.FC = () => {
                         className="hidden"
                         id="pdf-upload-full"
                       />
-                      <label htmlFor="pdf-upload-full" className="cursor-pointer">
-                        <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
-                        <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      <label htmlFor="pdf-upload-full" className="cursor-pointer block">
+                        <div className={`p-4 xs:p-5 rounded-full mx-auto mb-3 xs:mb-4 w-fit ${
+                          theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
+                        }`}>
+                          <Upload className={`w-6 h-6 xs:w-8 xs:h-8 mx-auto ${
+                            theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                          }`} />
+                        </div>
+                        <p className={`text-xs xs:text-sm font-medium mb-1 ${
+                          theme === "dark" ? "text-slate-300" : "text-slate-700"
+                        }`}>
                           Click to upload PDF or drag and drop
+                        </p>
+                        <p className={`text-[10px] xs:text-xs ${
+                          theme === "dark" ? "text-slate-500" : "text-slate-500"
+                        }`}>
+                          Maximum file size: 10MB
                         </p>
                       </label>
                     </div>
@@ -492,14 +607,19 @@ const CopyEvaluationPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Error Message */}
+                {/* Enhanced Error Message */}
                 {error && (
-                  <div className={`p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm`}>
-                    {error}
+                  <div className={`p-3 xs:p-3.5 rounded-xl border flex items-start gap-2 xs:gap-2.5 ${
+                    theme === "dark"
+                      ? "bg-red-900/20 border-red-700/50 text-red-300"
+                      : "bg-red-50 border-red-200 text-red-800"
+                  }`}>
+                    <X className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs xs:text-sm">{error}</p>
                   </div>
                 )}
 
-                {/* Submit Button */}
+                {/* Enhanced Submit Button */}
                 <Button
                   onClick={async () => {
                     await handleUpload();
@@ -508,17 +628,17 @@ const CopyEvaluationPage: React.FC = () => {
                     }
                   }}
                   disabled={!selectedFile || isUploading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUploading ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Evaluating... This may take 1-2 minutes
+                      <div className="animate-spin rounded-full h-4 w-4 xs:h-5 xs:w-5 border-b-2 border-white mr-2"></div>
+                      <span className="text-xs xs:text-sm">Evaluating... This may take 1-2 minutes</span>
                     </>
                   ) : (
                     <>
-                      <Upload className="mr-2" />
-                      Start Evaluation
+                      <Sparkles className="w-4 h-4 xs:w-5 xs:h-5 mr-2" />
+                      <span className="text-xs xs:text-sm font-medium">Start Evaluation</span>
                     </>
                   )}
                 </Button>

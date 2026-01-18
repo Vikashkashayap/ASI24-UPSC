@@ -111,134 +111,134 @@ export const HomePage = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Welcome Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 px-3 md:px-4 overflow-x-hidden">
+      {/* Welcome Header - Mobile-first */}
+      <div className="flex flex-col gap-1.5 md:gap-2">
+        <h1 className={`text-xl md:text-2xl lg:text-3xl font-bold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
           Welcome Back! 👋
         </h1>
-        <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+        <p className={`text-xs md:text-sm lg:text-base ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
           Continue your UPSC preparation journey with AI-powered tools
         </p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Quick Stats - Mobile-first: 2 columns on mobile, 3 on tablet, 6 on desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Evaluations</CardTitle>
-              <FileText className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Total Evaluations</CardTitle>
+              <FileText className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {stats.totalEvaluations}
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Answer copies evaluated
             </p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Average Score</CardTitle>
-              <TrendingUp className={`w-4 h-4 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Average Score</CardTitle>
+              <TrendingUp className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {stats.averageScore}%
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Your performance
             </p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Tests</CardTitle>
-              <ClipboardList className={`w-4 h-4 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-amber-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Total Tests</CardTitle>
+              <ClipboardList className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {stats.totalTests}
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               MCQ tests completed
             </p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Test Accuracy</CardTitle>
-              <CheckCircle className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-green-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Test Accuracy</CardTitle>
+              <CheckCircle className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {stats.averageAccuracy}%
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Average accuracy
             </p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Test Score</CardTitle>
-              <Target className={`w-4 h-4 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-indigo-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Test Score</CardTitle>
+              <Target className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {stats.averageTestScore}%
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Average test score
             </p>
           </CardContent>
         </Card>
 
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xs md:text-sm font-medium">Study Streak</CardTitle>
-              <Target className={`w-4 h-4 ${theme === "dark" ? "text-teal-400" : "text-teal-600"}`} />
+          <div className="absolute top-0 right-0 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <CardHeader className="pb-1.5 md:pb-2 px-3 md:px-6 pt-3 md:pt-6">
+            <div className="flex items-center justify-between gap-1">
+              <CardTitle className="text-[10px] md:text-xs lg:text-sm font-medium truncate">Study Streak</CardTitle>
+              <Target className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${theme === "dark" ? "text-teal-400" : "text-teal-600"}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+          <CardContent className="px-3 md:px-6 pb-3 md:pb-6">
+            <div className={`text-xl md:text-2xl lg:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
               {Math.floor(Math.random() * 7) + 1}
             </div>
-            <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+            <p className={`text-[9px] md:text-xs mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
               Days in a row
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Mobile-first */}
       <div>
-        <h2 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+        <h2 className={`text-base md:text-lg font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {quickActions.map((action) => {
             const Icon = action.icon;
             const getColorClasses = (color: string) => {
@@ -317,10 +317,10 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity - Mobile-first */}
       {stats.recentActivity.length > 0 && (
         <div>
-          <h2 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+          <h2 className={`text-base md:text-lg font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
             Recent Activity
           </h2>
           <Card className="relative overflow-hidden">
@@ -380,10 +380,10 @@ export const HomePage = () => {
         </div>
       )}
 
-      {/* Recent Tests */}
+      {/* Recent Tests - Mobile-first */}
       {stats.recentTests.length > 0 && (
         <div>
-          <h2 className={`text-lg font-semibold mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+          <h2 className={`text-base md:text-lg font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
             Recent Tests
           </h2>
           <Card className="relative overflow-hidden">
