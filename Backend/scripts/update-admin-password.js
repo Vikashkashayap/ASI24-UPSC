@@ -23,7 +23,7 @@ async function updateAdminPassword() {
     const args = process.argv.slice(2);
     if (args.length < 2) {
       console.error("❌ Usage: node scripts/update-admin-password.js <email> <newpassword>");
-      console.error("Example: node scripts/update-admin-password.js adminai@gmail.com adminai@#123");
+      console.error("Example: node scripts/update-admin-password.js admin@example.com newpassword123");
       process.exit(1);
     }
 

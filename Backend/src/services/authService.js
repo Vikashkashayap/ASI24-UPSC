@@ -16,14 +16,31 @@ export const registerUser = async ({ name, email, password }) => {
 };
 
 export const loginUser = async ({ email, password }) => {
+  // First try to find user in database
   const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error("Invalid credentials");
+  if (user) {
+    const match = await user.comparePassword(password);
+    if (match) {
+      const token = createToken(user);
+      return { user, token };
+    }
   }
-  const match = await user.comparePassword(password);
-  if (!match) {
-    throw new Error("Invalid credentials");
+
+  // If database authentication fails, check admin credentials from env vars
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword && email === adminEmail && password === adminPassword) {
+    // Create a virtual admin user object for JWT token
+    const adminUser = {
+      _id: "admin-user-id",
+      name: "Admin User",
+      email: adminEmail,
+      role: "admin"
+    };
+    const token = createToken(adminUser);
+    return { user: adminUser, token };
   }
-  const token = createToken(user);
-  return { user, token };
+
+  throw new Error("Invalid credentials");
 };

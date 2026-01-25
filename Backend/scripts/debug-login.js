@@ -16,10 +16,18 @@ async function debugLogin() {
     await mongoose.connect(process.env.DATABASE_URL);
     console.log("✅ Connected to database");
 
-    // Find the admin user
-    const user = await User.findOne({ email: "adminai@gmail.com" });
+    // Find the admin user using environment variables
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      console.error("❌ ADMIN_EMAIL not set in environment variables");
+      console.log("   Set ADMIN_EMAIL in your .env file");
+      return;
+    }
+
+    const user = await User.findOne({ email: adminEmail });
     if (!user) {
-      console.error("❌ Admin user not found");
+      console.error("❌ Admin user not found in database");
+      console.log(`   Looking for email: ${adminEmail}`);
       return;
     }
 
@@ -30,8 +38,15 @@ async function debugLogin() {
     console.log(`   Role: ${user.role}`);
     console.log(`   Role type: ${typeof user.role}`);
 
-    // Test password
-    const isValidPassword = await user.comparePassword("adminai@#123");
+    // Test password using environment variables
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword) {
+      console.error("❌ ADMIN_PASSWORD not set in environment variables");
+      console.log("   Set ADMIN_PASSWORD in your .env file");
+      return;
+    }
+
+    const isValidPassword = await user.comparePassword(adminPassword);
     console.log(`   Password valid: ${isValidPassword}`);
 
     // Check what gets returned when we select fields

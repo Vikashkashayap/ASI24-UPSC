@@ -13,9 +13,18 @@ async function testAuthService() {
   try {
     console.log("🔐 Testing auth service login...");
 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.error("❌ Admin credentials not set in environment variables");
+      console.log("   Set ADMIN_EMAIL and ADMIN_PASSWORD in your .env file");
+      return;
+    }
+
     const result = await loginUser({
-      email: "adminai@gmail.com",
-      password: "adminai@#123"
+      email: adminEmail,
+      password: adminPassword
     });
 
     console.log("✅ Login successful!");
