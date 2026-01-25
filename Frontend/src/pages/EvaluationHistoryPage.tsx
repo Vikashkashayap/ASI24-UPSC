@@ -153,29 +153,52 @@ const EvaluationHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-8">
-      {/* Header */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-            Evaluation History
-          </h1>
-          <p className={`text-sm md:text-base mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-            View and manage all your answer copy evaluations
-          </p>
+    <div className="max-w-7xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
+      {/* Enhanced Header */}
+      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
+          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
+      }`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className={`p-2.5 md:p-3 rounded-xl ${
+              theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+            }`}>
+              <FileText className={`w-6 h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            </div>
+            <div className="flex flex-col gap-1 md:gap-2">
+              <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+                theme === "dark" 
+                  ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
+                  : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
+              }`}>
+                Evaluation History
+              </h1>
+              <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                View and manage all your answer copy evaluations
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={startNewEvaluation}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg shadow-purple-500/30"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            New Evaluation
+          </Button>
         </div>
-        <Button
-          onClick={startNewEvaluation}
-          className={`bg-purple-600 hover:bg-purple-700 text-white ${theme === "dark" ? "" : ""}`}
-        >
-          <Upload className="w-4 h-4 mr-2" />
-          New Evaluation
-        </Button>
       </div>
 
       {/* Search Bar */}
-      <Card className={theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}>
-        <CardContent className="p-4">
+      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
+          : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+      }`}>
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <CardContent className="p-4 md:p-6 relative z-10">
           <div className="relative">
             <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
               theme === "dark" ? "text-slate-400" : "text-slate-500"

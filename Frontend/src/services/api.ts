@@ -62,34 +62,6 @@ export const copyEvaluationAPI = {
   },
 };
 
-// Single Question Evaluation API
-export const singleQuestionEvaluationAPI = {
-  evaluate: async (data: {
-    question: string;
-    answerText?: string;
-    paper?: string;
-    marks?: number;
-    language?: string;
-    wordLimit?: number;
-    pdfFile?: File;
-  }) => {
-    const formData = new FormData();
-    formData.append('question', data.question);
-    if (data.answerText) formData.append('answerText', data.answerText);
-    if (data.paper) formData.append('paper', data.paper);
-    if (data.marks) formData.append('marks', data.marks.toString());
-    if (data.language) formData.append('language', data.language);
-    if (data.wordLimit) formData.append('wordLimit', data.wordLimit.toString());
-    if (data.pdfFile) formData.append('pdf', data.pdfFile);
-
-    return api.post('/api/single-question-evaluation/evaluate', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  },
-};
-
 // Meeting API
 export const meetingAPI = {
   createRoom: async () => {

@@ -55,21 +55,42 @@ const TestGeneratorPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-8">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className={`text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-              UPSC Prelims Test Generator
-            </h1>
-            <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-              Generate AI-powered UPSC Prelims MCQs and test your knowledge
-            </p>
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
+      {/* Enhanced Header */}
+      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10" 
+          : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
+      }`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className={`p-2.5 md:p-3 rounded-xl ${
+              theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
+            }`}>
+              <BookOpen className={`w-6 h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+            </div>
+            <div className="flex flex-col gap-1 md:gap-2">
+              <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+                theme === "dark" 
+                  ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent" 
+                  : "from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent"
+              }`}>
+                UPSC Prelims Test Generator
+              </h1>
+              <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+                Generate AI-powered UPSC Prelims MCQs and test your knowledge
+              </p>
+            </div>
           </div>
           <Button
             onClick={() => navigate('/test-history')}
             variant="outline"
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 border-2 ${
+              theme === "dark"
+                ? "border-amber-500/50 bg-amber-900/20 hover:bg-amber-900/30 text-amber-300"
+                : "border-amber-300 bg-white hover:bg-amber-50 text-amber-700"
+            }`}
           >
             <History className="w-4 h-4" />
             View History
@@ -77,15 +98,28 @@ const TestGeneratorPage: React.FC = () => {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            Test Configuration
-          </CardTitle>
-          <CardDescription>
-            Select your preferences to generate a customized test
-          </CardDescription>
+      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg" 
+          : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
+      }`}>
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
+        <CardHeader className="relative z-10 pb-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${
+              theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
+            }`}>
+              <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+            </div>
+            <div>
+              <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+                Test Configuration
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Select your preferences to generate a customized test
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleGenerate} className="space-y-6">

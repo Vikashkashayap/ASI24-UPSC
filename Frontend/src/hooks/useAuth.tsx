@@ -5,6 +5,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  role?: "student" | "admin" | "agent";
 };
 
 type AuthContextType = {
@@ -44,7 +45,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(nextUser);
     setToken(nextToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: nextUser, token: nextToken }));
-    navigate("/performance", { replace: true });
+    // Redirect based on user role
+    if (nextUser.role === "admin") {
+      navigate("/admin/dashboard", { replace: true });
+    } else {
+      navigate("/performance", { replace: true });
+    }
   };
 
   const logout = () => {

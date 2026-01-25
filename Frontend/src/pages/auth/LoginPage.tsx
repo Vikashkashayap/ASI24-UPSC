@@ -16,12 +16,23 @@ export const LoginPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    // Prevent multiple submissions
+    if (loading) return;
+    
     setLoading(true);
     try {
       const res = await api.post("/api/auth/login", { email, password });
       login(res.data.user, res.data.token);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Unable to login");
+      // Handle rate limit and other errors
+      if (err?.response?.status === 429) {
+        setError("Too many login attempts. Please wait a moment and try again.");
+      } else if (err?.response?.data?.code === "RATE_LIMIT") {
+        setError("Too many login attempts. Please wait a moment and try again.");
+      } else {
+        setError(err?.response?.data?.message || "Unable to login");
+      }
     } finally {
       setLoading(false);
     }

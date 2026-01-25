@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, FileText, X, ChevronLeft, ChevronRight, Sparkles, BookOpen, Award } from 'lucide-react';
-import { copyEvaluationAPI, singleQuestionEvaluationAPI } from '../services/api';
+import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import SingleQuestionEvaluationPage from './SingleQuestionEvaluationPage';
 import { QuestionEvaluationView } from '../components/QuestionEvaluationView';
 
 
@@ -54,7 +53,6 @@ const CopyEvaluationPage: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [evaluationMode, setEvaluationMode] = useState<'full' | 'single'>('single'); // Default to single question
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [subject, setSubject] = useState('General Studies');
   const [paper, setPaper] = useState('');
@@ -74,7 +72,6 @@ const CopyEvaluationPage: React.FC = () => {
     const evaluationId = searchParams.get('id');
     if (evaluationId) {
       setSelectedEvaluationId(evaluationId);
-      setEvaluationMode('full'); // Switch to full mode when loading from history
     }
   }, [searchParams]);
 
@@ -207,115 +204,54 @@ const CopyEvaluationPage: React.FC = () => {
 
 
   // Render tabs component
-  const renderTabs = () => {
-    const isSingle = evaluationMode === 'single';
-    const isFull = evaluationMode === 'full';
-    return (
-      <div className={`flex gap-1.5 xs:gap-2 sm:gap-2 mb-4 xs:mb-5 sm:mb-6 p-1 rounded-xl ${theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-100 border border-slate-200"}`}>
-        <button
-          onClick={() => setEvaluationMode('single')}
-          className={`flex-1 px-3 xs:px-4 sm:px-4 py-2 xs:py-2.5 sm:py-2.5 rounded-lg text-xs xs:text-sm sm:text-sm font-medium transition-all duration-200 ${
-            isSingle
-              ? theme === "dark"
-                ? "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg shadow-fuchsia-500/30"
-                : "bg-white text-purple-700 shadow-md border border-purple-200"
-              : theme === "dark"
-              ? "text-slate-300 hover:bg-slate-700/50"
-              : "text-slate-600 hover:bg-slate-200/50"
-          }`}
-        >
-          Single Question
-        </button>
-        <button
-          onClick={() => setEvaluationMode('full')}
-          className={`flex-1 px-3 xs:px-4 sm:px-4 py-2 xs:py-2.5 sm:py-2.5 rounded-lg text-xs xs:text-sm sm:text-sm font-medium transition-all duration-200 ${
-            isFull
-              ? theme === "dark"
-                ? "bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg shadow-fuchsia-500/30"
-                : "bg-white text-purple-700 shadow-md border border-purple-200"
-              : theme === "dark"
-              ? "text-slate-300 hover:bg-slate-700/50"
-              : "text-slate-600 hover:bg-slate-200/50"
-          }`}
-        >
-          Full Copy
-        </button>
-      </div>
-    );
-  };
 
-  // If single question mode, render that component
-  if (evaluationMode === 'single') {
-    return (
-      <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
-        {/* Enhanced Header */}
-        <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6">
-          <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3">
-            <div className={`p-2 xs:p-2.5 sm:p-2.5 rounded-xl xs:rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
-              theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
-            }`}>
-              <FileText className={`w-4 h-4 xs:w-5 xs:h-5 sm:w-5 sm:h-5 ${
-                theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-              }`} />
-            </div>
-            <div className="flex flex-col gap-0.5 xs:gap-1">
-              <h1 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold tracking-tight ${
-                theme === "dark" ? "text-slate-50" : "text-slate-900"
-              }`}>
-                Copy Evaluation
-              </h1>
-              <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Evaluate your UPSC mains answers with detailed feedback
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        {renderTabs()}
-
-        <SingleQuestionEvaluationPage hideHeader={true} />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
       {/* Enhanced Header */}
-      <div className="flex flex-col gap-2 xs:gap-2.5 sm:gap-3">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2 xs:gap-2.5 sm:gap-3">
-            <div className={`p-2 xs:p-2.5 sm:p-2.5 rounded-xl xs:rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
-              theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
-            }`}>
-              <FileText className={`w-4 h-4 xs:w-5 xs:h-5 sm:w-5 sm:h-5 ${
-                theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-              }`} />
-            </div>
-            <div>
-              <h1 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold tracking-tight ${
-                theme === "dark" ? "text-slate-50" : "text-slate-900"
+      <div className={`relative overflow-hidden rounded-2xl p-4 xs:p-5 sm:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
+          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
+      }`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative z-10 flex flex-col gap-2 xs:gap-2.5 sm:gap-3">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3 xs:gap-3.5 sm:gap-4">
+              <div className={`p-2.5 xs:p-3 sm:p-3 rounded-xl ${
+                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
               }`}>
-                Copy Evaluation
-              </h1>
-              <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Upload your UPSC answer copy PDF for AI-powered evaluation with examiner-style feedback
-              </p>
+                <FileText className={`w-5 h-5 xs:w-6 xs:h-6 sm:w-6 sm:h-6 ${
+                  theme === "dark" ? "text-purple-400" : "text-purple-600"
+                }`} />
+              </div>
+              <div>
+                <h1 className={`text-xl xs:text-2xl sm:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+                  theme === "dark" 
+                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
+                    : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
+                }`}>
+                  Copy Evaluation
+                </h1>
+                <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                  Upload your UPSC answer copy PDF for AI-powered evaluation with examiner-style feedback
+                </p>
+              </div>
             </div>
+            {!selectedEvaluationId && !evaluationResult && (
+              <Button
+                onClick={() => setShowUploadModal(true)}
+                className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                <span className="hidden xs:inline">Upload New Answer</span>
+                <span className="xs:hidden">Upload</span>
+              </Button>
+            )}
           </div>
-          {!selectedEvaluationId && !evaluationResult && (
-            <Button
-              onClick={() => setShowUploadModal(true)}
-              className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">Upload New Answer</span>
-              <span className="xs:hidden">Upload</span>
-            </Button>
-          )}
         </div>
-        
-        {renderTabs()}
       </div>
+      
 
       {/* Main Content - Full width in Full Copy Evaluation mode */}
       <div className="h-[calc(100vh-10rem)] xs:h-[calc(100vh-11rem)] sm:h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">

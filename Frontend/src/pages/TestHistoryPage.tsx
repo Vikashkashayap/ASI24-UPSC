@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Trash2, Play, Target, Calendar, Search, BookOpen, TrendingUp, Eye, X, CheckCircle, XCircle } from 'lucide-react';
+import { FileText, Trash2, Play, Target, Calendar, Search, BookOpen, TrendingUp, Eye, X, CheckCircle, XCircle, History } from 'lucide-react';
 import { testAPI } from '../services/api';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
@@ -177,19 +177,43 @@ const TestHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 pb-8">
-      <div className="flex flex-col gap-2">
-        <h1 className={`text-2xl font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-          Test History
-        </h1>
-        <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-          View and manage your previously generated UPSC Prelims tests
-        </p>
+    <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
+      {/* Enhanced Header */}
+      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10" 
+          : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
+      }`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative z-10 flex items-center gap-3 md:gap-4">
+          <div className={`p-2.5 md:p-3 rounded-xl ${
+            theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
+          }`}>
+            <History className={`w-6 h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+          </div>
+          <div className="flex flex-col gap-1 md:gap-2">
+            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+              theme === "dark" 
+                ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent" 
+                : "from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent"
+            }`}>
+              Test History
+            </h1>
+            <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+              View and manage your previously generated UPSC Prelims tests
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Search Bar */}
-      <Card>
-        <CardContent className="pt-6">
+      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg" 
+          : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
+      }`}>
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
+        <CardContent className="pt-6 relative z-10">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <input

@@ -10,11 +10,11 @@ import performanceRoutes from "./src/routes/performanceRoutes.js";
 import plannerRoutes from "./src/routes/plannerRoutes.js";
 import mentorRoutes from "./src/routes/mentorRoutes.js";
 import copyEvaluationRoutes from "./src/routes/copyEvaluationRoutes.js";
-import singleQuestionEvaluationRoutes from "./src/routes/singleQuestionEvaluationRoutes.js";
 import meetingRoutes from "./src/routes/meetingRoutes.js";
 import testRoutes from "./src/routes/testRoutes.js";
 import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
 import currentAffairsRoutes from "./src/routes/currentAffairsRoutes.js";
+import adminRoutes from "./src/routes/adminRoutes.js";
 import { authMiddleware } from "./src/middleware/authMiddleware.js";
 import { initializeSocketIO } from "./src/services/socketService.js";
 
@@ -66,12 +66,12 @@ app.use("/api/performance", authMiddleware, performanceRoutes);
 app.use("/api/planner", authMiddleware, plannerRoutes);
 app.use("/api/mentor", authMiddleware, mentorRoutes);
 app.use("/api/copy-evaluation", copyEvaluationRoutes);
-app.use("/api/single-question-evaluation", singleQuestionEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/current-affairs", currentAffairsRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

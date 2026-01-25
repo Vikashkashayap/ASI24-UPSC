@@ -22,27 +22,58 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-8">
-      {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-          Profile
-        </h1>
-        <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-          Manage your account settings and view your progress
-        </p>
+    <div className="max-w-5xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
+      {/* Enhanced Header */}
+      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-800/90 via-indigo-900/20 to-slate-900/90 border-indigo-500/20 shadow-xl shadow-indigo-500/10" 
+          : "bg-gradient-to-br from-white via-indigo-50/30 to-white border-indigo-200/50 shadow-xl shadow-indigo-100/30"
+      }`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative z-10 flex items-center gap-3 md:gap-4">
+          <div className={`p-2.5 md:p-3 rounded-xl ${
+            theme === "dark" ? "bg-indigo-500/20" : "bg-indigo-100"
+          }`}>
+            <User className={`w-6 h-6 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
+          </div>
+          <div className="flex flex-col gap-1 md:gap-2">
+            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+              theme === "dark" 
+                ? "from-indigo-200 via-indigo-300 to-indigo-400 bg-clip-text text-transparent" 
+                : "from-indigo-600 via-indigo-700 to-indigo-800 bg-clip-text text-transparent"
+            }`}>
+              Profile
+            </h1>
+            <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+              Manage your account settings and view your progress
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Info Card */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-3xl" />
-            <CardHeader>
+          <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+            theme === "dark" 
+              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
+              : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+          }`}>
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+            <CardHeader className="relative z-10 pb-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Personal Information</CardTitle>
-                  <CardDescription>Update your profile details</CardDescription>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${
+                    theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                  }`}>
+                    <User className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  </div>
+                  <div>
+                    <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+                      Personal Information
+                    </CardTitle>
+                    <CardDescription className="mt-1">Update your profile details</CardDescription>
+                  </div>
                 </div>
                 {!isEditing ? (
                   <Button
@@ -142,11 +173,26 @@ const ProfilePage: React.FC = () => {
           </Card>
 
           {/* Study Preferences */}
-          <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-full blur-3xl" />
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Study Preferences</CardTitle>
-              <CardDescription>Customize your learning experience</CardDescription>
+          <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
+            theme === "dark" 
+              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-cyan-500/20 shadow-lg" 
+              : "bg-gradient-to-br from-white to-cyan-50/20 border-cyan-200/50 shadow-lg"
+          }`}>
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
+            <CardHeader className="relative z-10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${
+                  theme === "dark" ? "bg-cyan-500/20" : "bg-cyan-100"
+                }`}>
+                  <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
+                </div>
+                <div>
+                  <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+                    Study Preferences
+                  </CardTitle>
+                  <CardDescription className="mt-1">Customize your learning experience</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

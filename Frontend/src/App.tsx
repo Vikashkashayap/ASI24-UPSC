@@ -10,7 +10,6 @@ import { PlannerPage } from "./pages/PlannerPage";
 import { MentorChatPage } from "./pages/MentorChatPage";
 import CopyEvaluationPage from "./pages/CopyEvaluationPage";
 import CopyEvaluationDetailPage from "./pages/CopyEvaluationDetailPage";
-import SingleQuestionEvaluationPage from "./pages/SingleQuestionEvaluationPage";
 import EvaluationHistoryPage from "./pages/EvaluationHistoryPage";
 import { MeetingPage } from "./pages/MeetingPage";
 import TestGeneratorPage from "./pages/TestGeneratorPage";
@@ -20,8 +19,12 @@ import TestResultPage from "./pages/TestResultPage";
 import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminRoute } from "./components/AdminRoute";
 import { LandingPage } from "./pages/LandingPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
+import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import { StudentsListPage } from "./pages/admin/StudentsListPage";
+import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
 
 function App() {
   return (
@@ -46,7 +49,6 @@ function App() {
             <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
-            <Route path="mains-evaluation" element={<SingleQuestionEvaluationPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
             <Route path="test-history" element={<TestHistoryPage />} />
@@ -55,6 +57,19 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="help-support" element={<HelpSupportPage />} />
             <Route path="student-profiler" element={<StudentProfilerPage />} />
+          </Route>
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <DashboardLayout />
+              </AdminRoute>
+            }
+          >
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="students" element={<StudentsListPage />} />
+            <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>

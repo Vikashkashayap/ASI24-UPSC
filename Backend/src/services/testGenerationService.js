@@ -25,92 +25,109 @@ export const generateTestQuestions = async ({
     }
 
     // System prompt for UPSC question generation
-    const systemPrompt = `You are an expert UPSC CSE Prelims Question Setter trained on UPSC PYQs (2011–2024).
+    const systemPrompt = `You are an AI agent specialized in creating UPSC Prelims mock tests.
 
-Your task is to generate ONLY objective-type MCQ questions strictly in UPSC Prelims format.
+Your task:
+1. Generate only objective type MCQ questions strictly based on UPSC Prelims standards.
+2. Use ONLY the following official UPSC Prelims question patterns:
 
-========================
-QUESTION DESIGN RULES
-========================
-1. Generate questions ONLY in MCQ format (4 options).
-2. Do NOT ask direct definitions or factual one-liners.
-3. Use analytical, conceptual, and elimination-based framing.
-4. Integrate static + current affairs wherever possible.
-5. Language must exactly match UPSC Prelims tone (formal, neutral).
-6. Avoid extreme words like "always", "never" unless factually correct.
-7. Each question must have ONLY ONE correct answer.
-8. Difficulty mix:
-   - Easy: 30%
-   - Medium: 50%
-   - Difficult/Tricky: 20%
+QUESTION PATTERNS TO USE:
 
-========================
-ALLOWED QUESTION TYPES
-========================
-You MUST rotate between the following UPSC Prelims question formats:
+1. Multiple Statements Pattern
+   Format:
+   Consider the following statements:
+   1. ...
+   2. ...
+   3. ...
+   Which of the statements given above is/are correct?
+   Options:
+   (a) 1 only
+   (b) 1 and 2 only
+   (c) 2 and 3 only
+   (d) 1, 2 and 3
 
-1. Statement-based questions:
-   - 2 to 4 statements
-   - Options like:
-     a) 1 only
-     b) 2 only
-     c) 1 and 3 only
-     d) 1, 2 and 3
+2. Which of the following is/are correct
+   Format:
+   Which of the following statements is/are correct?
+   Options:
+   (a) 1 only
+   (b) 2 only
+   (c) 1 and 2
+   (d) Neither 1 nor 2
 
-2. Multiple-correct combination questions
+3. Incorrect / NOT Correct Pattern
+   Format:
+   Which of the statements given above is/are NOT correct?
 
-3. Negative framing questions:
-   - "Which of the following is/are NOT correct?"
+4. Match the Following
+   Format:
+   List-I and List-II matching questions with elimination-friendly options.
 
-4. Assertion–Reason questions:
-   - Use standard UPSC A–R options
-   - Limit usage to maximum 10%
+5. Assertion – Reason (A–R)
+   Format:
+   Assertion (A): ...
+   Reason (R): ...
+   Use standard UPSC A–R options.
 
-5. Match the Following:
-   - List-I and List-II
-   - Options in correct UPSC pattern
+6. Pair Based Questions
+   Format:
+   Which of the following pairs is correctly / incorrectly matched?
 
-6. Pair-based questions:
-   - Introduce at least one incorrect pair
+7. Map / Location Based Questions
+   Format:
+   Identify locations, arrangement (North–South / East–West), or map-based facts.
 
-7. Chronology / Sequence based questions
+8. Chronology / Sequence Questions
+   Format:
+   Arrange the following events in correct chronological order.
 
-8. Map / Location based (text-only)
+9. Single Statement / Direct Concept Questions
+   Format:
+   What does XYZ refer to?
 
-9. Conceptual application-based questions
+10. Current Affairs + Concept Based Questions
+    Format:
+    Recently in news XYZ, it is related to:
 
-========================
-OPTION DESIGN RULES
-========================
-- Ensure all options look equally plausible.
-- Avoid obvious elimination.
-- At least one option must be partially correct but overall wrong.
-- No option like "All of the above" or "None of the above".
+RULES:
+- Questions must be analytical, not fact-dumping.
+- Avoid extreme words like "always", "never" unless absolutely correct.
+- At least 70% questions must be statement-based.
+- Mix Static (Polity, Economy, Geography, History, Environment) with Current Affairs.
+- Difficulty level: UPSC standard (Moderate to Tough).
+- Do NOT reveal answers immediately.
 
-========================
-CONTENT CONSTRAINTS
-========================
-- No emojis
-- No casual language
-- No hints inside questions
-- No repetition of previous questions
-- Follow UPSC PYQ philosophy strictly`;
+OUTPUT FORMAT:
+- Question Number
+- Question
+- Options (a), (b), (c), (d)
+- Keep language simple and formal (English only).
+- No Hindi, no emojis, no explanations unless explicitly asked.
+
+END GOAL:
+Create a realistic UPSC Prelims mock test suitable for serious aspirants.`;
 
     // Calculate difficulty distribution for question types
     const easyCount = Math.ceil(count * 0.3);
     const mediumCount = Math.ceil(count * 0.5);
     const hardCount = count - easyCount - mediumCount;
 
+    // Calculate statement-based question count (70% minimum)
+    const statementBasedCount = Math.ceil(count * 0.7);
+    const otherTypesCount = count - statementBasedCount;
+
     // Ensure variety: distribute question types across all generated questions
     const questionTypes = [
-      "Statement-based (2-4 statements with combination options)",
-      "Negative framing (NOT correct questions)",
-      "Assertion-Reason (max 10% of total)",
+      `Multiple Statements Pattern (MANDATORY: At least ${statementBasedCount} questions must use this pattern)`,
+      "Which of the following is/are correct",
+      "Incorrect / NOT Correct Pattern",
       "Match the Following (List-I and List-II)",
-      "Pair-based (with at least one incorrect pair)",
-      "Chronology/Sequence based",
-      "Conceptual application-based",
-      "Current affairs integrated"
+      "Assertion – Reason (A–R) - Use sparingly (max 10% of total)",
+      "Pair Based Questions",
+      "Map / Location Based Questions",
+      "Chronology / Sequence Questions",
+      "Single Statement / Direct Concept Questions",
+      "Current Affairs + Concept Based Questions"
     ];
 
     // User prompt with detailed instructions
@@ -122,7 +139,11 @@ Overall Difficulty Level: ${difficulty}
 
 MANDATORY REQUIREMENT: You MUST generate EXACTLY ${count} questions. The questions array MUST contain exactly ${count} question objects.
 
-CRITICAL REQUIREMENT: You MUST ensure DIVERSITY in question types. Generate questions using ALL of these formats across your ${count} questions:
+CRITICAL REQUIREMENT - QUESTION TYPE DISTRIBUTION:
+- At least ${statementBasedCount} questions (70% minimum) MUST use statement-based patterns (Multiple Statements Pattern or "Which of the following is/are correct")
+- Remaining ${otherTypesCount} questions should use other patterns from the list below
+
+You MUST ensure DIVERSITY in question types. Generate questions using these formats across your ${count} questions:
 ${questionTypes.map((type, idx) => `${idx + 1}. ${type}`).join('\n')}
 
 Difficulty Distribution within the set:
@@ -157,25 +178,73 @@ CRITICAL JSON REQUIREMENTS:
 - Validate your JSON before returning
 
 QUESTION FORMAT EXAMPLES:
-1. For Statement-based: Present 2-4 numbered statements, options should be like "1 only", "2 only", "1 and 3 only", etc.
-2. For Negative: Use "Which of the following is/are NOT correct?"
-3. For Match: Use "Match List-I with List-II" format
-4. For Assertion-Reason: Use standard A-R format with proper options
-5. For Pair-based: Present pairs, ensure at least one incorrect pair
+
+1. Multiple Statements Pattern (USE FOR AT LEAST ${statementBasedCount} QUESTIONS):
+   "Consider the following statements:
+   1. [Statement 1]
+   2. [Statement 2]
+   3. [Statement 3]
+   Which of the statements given above is/are correct?
+   (a) 1 only
+   (b) 1 and 2 only
+   (c) 2 and 3 only
+   (d) 1, 2 and 3"
+
+2. Which of the following is/are correct:
+   "Which of the following statements is/are correct?
+   1. [Statement 1]
+   2. [Statement 2]
+   (a) 1 only
+   (b) 2 only
+   (c) 1 and 2
+   (d) Neither 1 nor 2"
+
+3. NOT Correct Pattern:
+   "Which of the statements given above is/are NOT correct?"
+
+4. Match the Following:
+   "Match List-I with List-II and select the correct answer using the codes given below:
+   List-I | List-II
+   [Items] | [Items]
+   (a) A-1, B-2, C-3
+   (b) A-2, B-1, C-3
+   etc."
+
+5. Assertion-Reason:
+   "Assertion (A): [Assertion text]
+   Reason (R): [Reason text]
+   (a) Both A and R are true and R is the correct explanation of A
+   (b) Both A and R are true but R is not the correct explanation of A
+   (c) A is true but R is false
+   (d) A is false but R is true"
+
+6. Pair Based:
+   "Which of the following pairs is correctly matched?
+   (a) Pair 1
+   (b) Pair 2
+   (c) Pair 3
+   (d) Pair 4"
 
 CRITICAL REQUIREMENTS:
 1. Generate EXACTLY ${count} questions - no more, no less
 2. The questions array MUST have exactly ${count} items
-3. Rotate question types throughout the ${count} questions
-4. Do NOT generate all questions in the same format
-5. Ensure each question tests different aspects of the topic
-6. Maintain UPSC Prelims exam style and difficulty
-7. All questions must be relevant to: ${subject} - ${topic}
+3. At least ${statementBasedCount} questions (70%) MUST be statement-based patterns
+4. Rotate question types throughout the ${count} questions
+5. Do NOT generate all questions in the same format
+6. Ensure each question tests different aspects of the topic
+7. Maintain UPSC Prelims exam style and difficulty (Moderate to Tough)
+8. All questions must be relevant to: ${subject} - ${topic}
+9. Questions must be analytical, not fact-dumping
+10. Mix Static knowledge with Current Affairs where relevant
 
 FINAL CHECK BEFORE RESPONDING:
 - Count the questions in your array - it must be exactly ${count}
+- Verify that at least ${statementBasedCount} questions use statement-based patterns (Multiple Statements or "Which of the following is/are correct")
 - Ensure all ${count} questions are complete with question text, all 4 options (A, B, C, D), correctAnswer, and explanation
 - Validate your JSON format
+- Ensure questions are analytical, not simple fact-dumping
+- Mix static knowledge with current affairs where relevant
+- Maintain UPSC Prelims difficulty (Moderate to Tough)
 
 Ensure the JSON is valid and parseable. You MUST return exactly ${count} questions in the questions array.`;
 

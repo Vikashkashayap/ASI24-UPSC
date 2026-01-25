@@ -6,13 +6,18 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    role: { 
-      type: String, 
-      enum: ['student', 'agent', 'admin'], 
-      default: 'student' 
+    role: {
+      type: String,
+      enum: ['student', 'agent', 'admin'],
+      default: 'student'
+    },
+    status: {
+      type: String,
+      enum: ['active', 'suspended'],
+      default: 'active'
     },
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
+  { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {

@@ -5,7 +5,7 @@ export const register = async (req, res) => {
     const { name, email, password } = req.body;
     const { user, token } = await registerUser({ name, email, password });
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (error) {
@@ -18,7 +18,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const { user, token } = await loginUser({ email, password });
     res.json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (error) {

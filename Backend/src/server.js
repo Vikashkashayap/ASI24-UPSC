@@ -45,10 +45,10 @@ import performanceRoutes from "./routes/performanceRoutes.js";
 import plannerRoutes from "./routes/plannerRoutes.js";
 import mentorRoutes from "./routes/mentorRoutes.js";
 import copyEvaluationRoutes from "./routes/copyEvaluationRoutes.js";
-import singleQuestionEvaluationRoutes from "./routes/singleQuestionEvaluationRoutes.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
@@ -100,11 +100,11 @@ app.use("/api/performance", authMiddleware, performanceRoutes);
 app.use("/api/planner", authMiddleware, plannerRoutes);
 app.use("/api/mentor", authMiddleware, mentorRoutes);
 app.use("/api/copy-evaluation", copyEvaluationRoutes);
-app.use("/api/single-question-evaluation", singleQuestionEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

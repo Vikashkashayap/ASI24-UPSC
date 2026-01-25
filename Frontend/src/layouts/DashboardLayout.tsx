@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3 } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3 } from "lucide-react";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 
 // Mobile-first nav link: minimum 44px height for touch targets
@@ -18,8 +18,8 @@ const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme
   }`;
 
 
-const getPageTitle = (pathname: string): { title: string; icon: React.ReactNode } => {
-  const routeMap: Record<string, { title: string; icon: React.ReactNode }> = {
+const getPageTitle = (pathname: string, userRole?: string): { title: string; icon: React.ReactNode } => {
+  const studentRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/home': { title: 'Home', icon: <Home className="w-5 h-5" /> },
     '/performance': { title: 'Performance Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/planner': { title: 'Study Planner', icon: <CalendarClock className="w-5 h-5" /> },
@@ -34,6 +34,15 @@ const getPageTitle = (pathname: string): { title: string; icon: React.ReactNode 
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
     '/mains-evaluation': { title: 'Mains Evaluation', icon: <FileText className="w-5 h-5" /> },
   };
+
+  const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
+    '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
+    '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
+    '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
+  };
+
+  const routeMap = userRole === 'admin' ? adminRouteMap : studentRouteMap;
   
   // Handle dynamic routes
   if (pathname.startsWith('/copy-evaluation/')) {
@@ -56,7 +65,7 @@ export const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
-  const pageInfo = getPageTitle(location.pathname);
+  const pageInfo = getPageTitle(location.pathname, user?.role);
 
   return (
     <div
@@ -121,82 +130,149 @@ export const DashboardLayout = () => {
 </div>
         <nav className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 space-y-1 md:space-y-2 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
 
-          {/* Main Section */}
-          <div className="space-y-1">
-            <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
-              <Home className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Home</span>}
-            </NavLink>
-          </div>
-
-          {/* Performance & Analytics Section */}
-          {!sidebarCollapsed && (
-            <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-              <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Performance & Analytics
+          {user?.role === 'admin' ? (
+            // Admin Navigation
+            <>
+              <div className="space-y-1">
+                <NavLink to="/admin/dashboard" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Admin Dashboard">
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Admin Dashboard</span>}
+                </NavLink>
+                <NavLink to="/admin/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Students Management">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Students</span>}
+                </NavLink>
               </div>
-            </div>
-          )}
-          <div className="space-y-1">
-            <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance Dashboard">
-              <BarChart3 className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Performance Dashboard</span>}
-            </NavLink>
-            <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
-              <FileText className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Copy Evaluation</span>}
-            </NavLink>
-            <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
-              <History className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Evaluation History</span>}
-            </NavLink>
-          </div>
 
-          {/* Practice & Tests Section */}
-          {!sidebarCollapsed && (
-            <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-              <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Practice & Tests
+              {/* Admin Tools Section */}
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Admin Tools
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Profile">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Profile</span>}
+                </NavLink>
+                <NavLink to="/help-support" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Help & Support">
+                  <HelpCircle className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Help & Support</span>}
+                </NavLink>
               </div>
-            </div>
-          )}
-          <div className="space-y-1">
-            <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
-              <ClipboardList className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Prelims Test</span>}
-            </NavLink>
-            <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
-              <History className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Test History</span>}
-            </NavLink>
-          </div>
+            </>
+          ) : (
+            // Student Navigation
+            <>
+              {/* Main Section */}
+              <div className="space-y-1">
+                <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
+                  <Home className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Home</span>}
+                </NavLink>
+              </div>
 
-          {/* Study Tools Section */}
-          {!sidebarCollapsed && (
-            <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-              <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Study Tools
+              {/* Performance & Analytics Section */}
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Performance & Analytics
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance Dashboard">
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Performance Dashboard</span>}
+                </NavLink>
+                <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Copy Evaluation</span>}
+                </NavLink>
+                <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
+                  <History className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Evaluation History</span>}
+                </NavLink>
               </div>
-            </div>
-          )}
-          <div className="space-y-1">
-            <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
-              <CalendarClock className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Study Planner</span>}
-            </NavLink>
-            <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
-              <MessageCircle className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>AI Mentor</span>}
-            </NavLink>
-          </div>
 
-          {/* Communication Section */}
-          {!sidebarCollapsed && (
-            <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-              <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Communication
+              {/* Practice & Tests Section */}
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Practice & Tests
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Test</span>}
+                </NavLink>
+                <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
+                  <History className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Test History</span>}
+                </NavLink>
               </div>
-            </div>
+
+              {/* Study Tools Section */}
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Study Tools
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
+                  <CalendarClock className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Study Planner</span>}
+                </NavLink>
+                <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
+                  <MessageCircle className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>AI Mentor</span>}
+                </NavLink>
+              </div>
+
+              {/* Communication Section */}
+              {/* {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Communication
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Live Meeting">
+                  <Video className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Live Meeting</span>}
+                </NavLink>
+              </div> */}
+
+              {/* Profile & Settings Section */}
+              {/* {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Account
+                  </div>
+                </div>
+              )} */}
+              {/* <div className="space-y-1">
+                <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Profile">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Profile</span>}
+                </NavLink>
+                <NavLink to="/student-profiler" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Student Profiler">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Student Profiler</span>}
+                </NavLink>
+                <NavLink to="/help-support" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Help & Support">
+                  <HelpCircle className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Help & Support</span>}
+                </NavLink>
+              </div> */}
+            </>
           )}
           {/* <div className="space-y-1">
             <NavLink to="/meeting" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Live Meeting">

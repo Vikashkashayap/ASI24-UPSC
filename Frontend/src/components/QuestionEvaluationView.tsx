@@ -1,6 +1,7 @@
 import React from 'react';
-import { FileText, AlertCircle, CheckCircle, XCircle, Sparkles } from 'lucide-react';
-import { Card, CardContent } from './ui/card';
+import { FileText, AlertCircle, CheckCircle, XCircle, Sparkles, Download, Share2, Save, TrendingUp, BookOpen, Target, Award, Clock, BarChart3, Lightbulb, ChevronRight } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 import { useTheme } from '../hooks/useTheme';
 
 interface QuestionEvaluation {
@@ -393,6 +394,261 @@ export const QuestionEvaluationView: React.FC<QuestionEvaluationViewProps> = ({ 
               Word limit is considered while calculating your marks. Check word limit guide
             </p>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Action Buttons */}
+      <Card className={`${theme === "dark" ? "bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700" : "bg-gradient-to-br from-blue-50/50 to-white border-blue-200"}`}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+              Actions
+            </h3>
+            <Sparkles className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className={`flex items-center gap-2 h-12 ${theme === "dark" ? "border-slate-600 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50"}`}
+              onClick={() => {/* Download report functionality */}}
+            >
+              <Download className="w-4 h-4" />
+              <span className="text-sm">Download Report</span>
+            </Button>
+            <Button
+              variant="outline"
+              className={`flex items-center gap-2 h-12 ${theme === "dark" ? "border-slate-600 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50"}`}
+              onClick={() => {/* Share results functionality */}}
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="text-sm">Share Results</span>
+            </Button>
+            <Button
+              variant="outline"
+              className={`flex items-center gap-2 h-12 ${theme === "dark" ? "border-slate-600 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50"}`}
+              onClick={() => {/* Save for later functionality */}}
+            >
+              <Save className="w-4 h-4" />
+              <span className="text-sm">Save for Later</span>
+            </Button>
+            <Button
+              variant="outline"
+              className={`flex items-center gap-2 h-12 ${theme === "dark" ? "border-slate-600 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50"}`}
+              onClick={() => {/* Compare with previous functionality */}}
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm">Compare</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Performance Insights */}
+      <Card className={`${theme === "dark" ? "bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700" : "bg-gradient-to-br from-green-50/50 to-white border-green-200"}`}>
+        <CardHeader>
+          <CardTitle className={`flex items-center gap-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+            <BarChart3 className="w-5 h-5" />
+            Performance Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Score Breakdown */}
+          <div>
+            <h4 className={`text-sm font-medium mb-3 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+              Score Distribution
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Introduction</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full" style={{width: '70%'}}></div>
+                  </div>
+                  <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>7/10</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Body Content</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full" style={{width: '60%'}}></div>
+                  </div>
+                  <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>6/10</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Conclusion</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-orange-500 rounded-full" style={{width: '40%'}}></div>
+                  </div>
+                  <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>4/10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Comparison with Average */}
+          <div className={`p-4 rounded-lg border ${theme === "dark" ? "bg-slate-800/50 border-slate-600" : "bg-white border-slate-200"}`}>
+            <div className="flex items-center justify-between mb-2">
+              <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                Your Performance vs Average
+              </span>
+              <span className={`text-xs px-2 py-1 rounded-full ${
+                question.totalMarks >= question.maxMarks * 0.6 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+              }`}>
+                {question.totalMarks >= question.maxMarks * 0.6 ? 'Above Average' : 'Below Average'}
+              </span>
+            </div>
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <div className="text-center mb-1">
+                  <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                    You
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-t h-8 flex items-end justify-center">
+                    <div
+                      className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t text-xs text-white font-medium flex items-end justify-center pb-1"
+                      style={{height: `${(question.totalMarks / question.maxMarks) * 100}%`, minHeight: '20px'}}
+                    >
+                      {question.totalMarks}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="text-center mb-1">
+                  <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                    Average
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-t h-8 flex items-end justify-center">
+                    <div
+                      className="bg-gradient-to-t from-gray-500 to-gray-400 rounded-t text-xs text-white font-medium flex items-end justify-center pb-1"
+                      style={{height: '45%', minHeight: '20px'}}
+                    >
+                      4.5
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Next Steps & Recommendations */}
+      <Card className={`${theme === "dark" ? "bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700" : "bg-gradient-to-br from-purple-50/50 to-white border-purple-200"}`}>
+        <CardHeader>
+          <CardTitle className={`flex items-center gap-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+            <Target className="w-5 h-5" />
+            Next Steps & Recommendations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Priority Improvements */}
+          <div>
+            <h4 className={`text-sm font-medium mb-3 flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+              <Lightbulb className="w-4 h-4" />
+              Priority Improvements
+            </h4>
+            <div className="space-y-2">
+              <div className={`p-3 rounded-lg border ${theme === "dark" ? "bg-red-900/20 border-red-800" : "bg-red-50 border-red-200"}`}>
+                <div className="flex items-start gap-3">
+                  <XCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                      Strengthen Conclusion
+                    </p>
+                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      Your conclusion lacks forward-looking perspective. Add balanced view and future implications.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className={`p-3 rounded-lg border ${theme === "dark" ? "bg-orange-900/20 border-orange-800" : "bg-orange-50 border-orange-200"}`}>
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                      Add Case Studies
+                    </p>
+                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      Include relevant case studies and current affairs examples to strengthen your arguments.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Study Recommendations */}
+          <div>
+            <h4 className={`text-sm font-medium mb-3 flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+              <BookOpen className="w-4 h-4" />
+              Recommended Study Materials
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              <Button
+                variant="ghost"
+                className={`justify-start h-auto p-3 ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-slate-50"}`}
+              >
+                <div className="flex items-center gap-3 w-full">
+                  <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
+                    <BookOpen className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                      UPSC Previous Year Questions
+                    </p>
+                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      Practice similar questions from 2015-2023
+                    </p>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
+                </div>
+              </Button>
+              <Button
+                variant="ghost"
+                className={`justify-start h-auto p-3 ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-slate-50"}`}
+              >
+                <div className="flex items-center gap-3 w-full">
+                  <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-green-900/30" : "bg-green-100"}`}>
+                    <Award className={`w-4 h-4 ${theme === "dark" ? "text-green-400" : "text-green-600"}`} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                      Topper's Answer Copies
+                    </p>
+                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      Study high-scoring answer structures
+                    </p>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
+                </div>
+              </Button>
+              <Button
+                variant="ghost"
+                className={`justify-start h-auto p-3 ${theme === "dark" ? "hover:bg-slate-800" : "hover:bg-slate-50"}`}
+              >
+                <div className="flex items-center gap-3 w-full">
+                  <div className="flex-1 text-left">
+                    <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"}`}>
+                      <Clock className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
+                        Practice Timer Sessions
+                      </p>
+                      <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                        Time yourself for better exam preparation
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
+                </div>
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
