@@ -118,6 +118,7 @@ const RagMockTestPage: React.FC = () => {
       setGenerating(false);
     }
   };
+  
 
   const pollTestStatus = async (testId: string) => {
     const pollInterval = setInterval(async () => {
