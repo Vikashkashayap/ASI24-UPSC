@@ -25,9 +25,9 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/planner': { title: 'Study Planner', icon: <CalendarClock className="w-5 h-5" /> },
     '/mentor': { title: 'AI Mentor', icon: <MessageCircle className="w-5 h-5" /> },
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
-    '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
+    // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
-    '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
+    // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/student-profiler': { title: 'Student Profiler', icon: <User className="w-5 h-5" /> },
@@ -191,10 +191,10 @@ export const DashboardLayout = () => {
                   <FileText className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Copy Evaluation</span>}
                 </NavLink>
-                <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
+                {/* <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
                   <History className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Evaluation History</span>}
-                </NavLink>
+                </NavLink> */}
               </div>
 
               {/* Practice & Tests Section */}
@@ -210,10 +210,10 @@ export const DashboardLayout = () => {
                   <ClipboardList className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Test</span>}
                 </NavLink>
-                <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
+                {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Test History</span>}
-                </NavLink>
+                </NavLink> */}
               </div>
 
               {/* Study Tools Section */}

@@ -39,6 +39,76 @@ export const generateTest = async (req, res) => {
       });
     }
 
+    // ---------------------------------------------------------
+    // CACHING LOGIC START
+    // ---------------------------------------------------------
+    // Check if a test with the same parameters already exists
+    // We want to reuse questions to save AI costs and standardize tests
+    const existingTest = await Test.findOne({
+      subject,
+      topic,
+      difficulty,
+      totalQuestions: parseInt(count),
+      // Ensure we pick a valid test with questions
+      questions: { $exists: true, $not: { $size: 0 } }
+    }).sort({ createdAt: -1 }); // Get the most recent one if multiple exist
+
+    if (existingTest) {
+      console.log(`♻️  CACHE HIT: Found existing test for ${subject} - ${topic} (${difficulty})`);
+
+      // -------------------------------------------------------
+      // SHUFFLE LOGIC
+      // -------------------------------------------------------
+      // We shuffle the questions so different students get different order
+      // even though the content is the same (Standardized Test)
+      const shuffledQuestions = [...existingTest.questions]
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+
+      // Create a NEW test document for this user, but copying the questions from the existing test
+      const newTest = new Test({
+        userId: req.user?.id,
+        subject,
+        topic,
+        difficulty,
+        questions: shuffledQuestions.map(q => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation,
+          userAnswer: null // Reset user answer
+        })),
+        totalQuestions: existingTest.totalQuestions,
+      });
+
+      await newTest.save();
+
+      // Return the new test (without answers)
+      const testForUser = {
+        _id: newTest._id,
+        subject: newTest.subject,
+        topic: newTest.topic,
+        difficulty: newTest.difficulty,
+        totalQuestions: newTest.totalQuestions,
+        questions: newTest.questions.map((q) => ({
+          _id: q._id,
+          question: q.question,
+          options: q.options,
+        })),
+        createdAt: newTest.createdAt,
+      };
+
+      return res.status(201).json({
+        success: true,
+        message: "Test generated successfully (cached)",
+        data: testForUser,
+      });
+    }
+    // ---------------------------------------------------------
+    // CACHING LOGIC END
+    // ---------------------------------------------------------
+
     // Generate questions using AI
     console.log(`📝 Generating ${count} questions for ${subject} - ${topic} (${difficulty})...`);
     const generationResult = await generateTestQuestions({
