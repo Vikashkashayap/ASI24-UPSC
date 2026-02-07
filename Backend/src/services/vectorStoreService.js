@@ -1,110 +1,57 @@
-import { ChromaClient } from 'chromadb';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import DocumentChunk from '../models/DocumentChunk.js';
 
+// Temporary: Using MongoDB-only approach until ChromaDB embedded mode is resolved
+// TODO: Implement proper vector database when ChromaDB embedded mode works
+
 class VectorStoreService {
   constructor() {
-    this.client = null;
-    this.collection = null;
-    this.embeddings = null;
-    this.collectionName = 'upsc_prelims_chunks';
     this.isInitialized = false;
+    this.embeddings = null;
   }
 
   /**
-   * Initialize ChromaDB client and collection
+   * Initialize vector store service (MongoDB-only for now)
    */
   async initialize() {
     try {
       if (this.isInitialized) return;
 
-      // Initialize ChromaDB client
-      this.client = new ChromaClient({
-        path: process.env.CHROMA_DB_URL || 'http://localhost:8000'
-      });
-
-      // Initialize OpenAI embeddings
+      // Initialize OpenAI embeddings via OpenRouter (for future use)
       this.embeddings = new OpenAIEmbeddings({
-        openAIApiKey: process.env.OPENAI_API_KEY,
-        modelName: 'text-embedding-3-small', // Cost-effective for large documents
-        maxRetries: 3
+        openAIApiKey: process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY,
+        modelName: 'text-embedding-3-small',
+        maxRetries: 3,
+        configuration: {
+          baseURL: process.env.OPENROUTER_API_KEY ? 'https://openrouter.ai/api/v1' : undefined
+        }
       });
-
-      // Create or get collection
-      try {
-        this.collection = await this.client.getCollection({
-          name: this.collectionName
-        });
-      } catch (error) {
-        // Collection doesn't exist, create it
-        this.collection = await this.client.createCollection({
-          name: this.collectionName,
-          metadata: {
-            description: 'UPSC Prelims study material chunks with embeddings'
-          }
-        });
-      }
 
       this.isInitialized = true;
-      console.log('✅ Vector store initialized successfully');
+      console.log('✅ Vector store service initialized (MongoDB-only mode)');
     } catch (error) {
-      console.error('❌ Failed to initialize vector store:', error);
-      throw new Error(`Vector store initialization failed: ${error.message}`);
+      console.error('❌ Failed to initialize vector store service:', error);
+      // Don't throw error - allow system to work with MongoDB only
+      this.isInitialized = false;
     }
   }
 
   /**
-   * Add document chunks to vector store
+   * Add document chunks to MongoDB storage (ChromaDB temporarily disabled)
+   * CRITICAL: Admin uploads notes -> stores in MongoDB for retrieval
    */
   async addChunks(chunks, documentId) {
     try {
-      const texts = chunks.map(chunk => chunk.text);
-      const metadatas = chunks.map(chunk => ({
-        documentId: documentId.toString(),
-        chunkIndex: chunk.chunkIndex,
-        subject: chunk.metadata.subject,
-        topic: chunk.metadata.topic,
-        wordCount: chunk.wordCount,
-        filename: chunk.metadata.filename
-      }));
-      const ids = chunks.map(chunk => chunk.vectorId);
+      console.log(`📄 Processing ${chunks.length} chunks for document ${documentId}`);
 
-      let vectorStoreError = null;
-
-      // Try to initialize Chroma and add embeddings, but don't fail the whole
-      // pipeline if the vector store is unavailable. We can still rely on
-      // MongoDB-backed retrieval as a fallback.
-      try {
-        await this.initialize();
-
-        // Generate embeddings
-        const embeddings = await this.embeddings.embedDocuments(texts);
-
-        // Add to ChromaDB
-        await this.collection.add({
-          ids,
-          embeddings,
-          documents: texts,
-          metadatas
-        });
-
-        console.log(`✅ Added ${chunks.length} chunks to ChromaDB collection "${this.collectionName}"`);
-      } catch (error) {
-        vectorStoreError = error;
-        console.warn(
-          '⚠️ Vector store unavailable, skipping ChromaDB add. Retrieval will fall back to MongoDB only:',
-          error.message
-        );
-      }
-
-      // Store chunk metadata in MongoDB
+      // Store chunks in MongoDB only (ChromaDB disabled for now)
       const mongoChunks = chunks.map(chunk => ({
         documentId,
         chunkIndex: chunk.chunkIndex,
         text: chunk.text,
         wordCount: chunk.wordCount,
-        startPosition: 0, // TODO: Calculate actual positions
-        endPosition: chunk.text.length,
+        startPosition: chunk.startPosition || 0,
+        endPosition: chunk.endPosition || chunk.text.length,
         vectorId: chunk.vectorId,
         metadata: {
           subject: chunk.metadata.subject,
@@ -115,73 +62,79 @@ class VectorStoreService {
       }));
 
       await DocumentChunk.insertMany(mongoChunks);
+      console.log(`💾 Stored ${chunks.length} chunks in MongoDB for document ${documentId}`);
 
-      console.log(`✅ Stored ${chunks.length} chunks in MongoDB for document ${documentId}`);
-
-      // If Chroma failed, we still treat the operation as successful from the
-      // document-processing point of view, but surface the degraded state in
-      // the return value for logging/diagnostics.
-      if (vectorStoreError) {
-        return {
-          added: chunks.length,
-          vectorStore: 'unavailable',
-          error: vectorStoreError.message
-        };
-      }
-
-      return { added: chunks.length, vectorStore: 'ok' };
+      return {
+        added: chunks.length,
+        embeddingsGenerated: 0, // No embeddings generated (ChromaDB disabled)
+        vectorStore: 'mongodb-only',
+        message: 'Chunks stored in MongoDB (vector search temporarily disabled)'
+      };
     } catch (error) {
-      console.error('❌ Failed to add chunks to vector store:', error);
+      console.error('❌ Failed to add chunks to storage:', error);
       throw new Error(`Failed to add chunks: ${error.message}`);
     }
   }
 
   /**
-   * Search for relevant chunks
+   * Search MongoDB for relevant UPSC notes chunks (ChromaDB temporarily disabled)
+   * CRITICAL: Students get questions ONLY from admin-uploaded notes
    */
   async search(query, options = {}) {
     try {
-      await this.initialize();
-
       const {
         limit = 10,
         subject = null,
         topic = null,
         difficulty = null,
-        minScore = 0.7
+        minScore = 0.75
       } = options;
 
-      // Generate embedding for query
-      const queryEmbedding = await this.embeddings.embedQuery(query);
+      console.log(`🔍 Searching MongoDB for chunks: subject=${subject}, topic=${topic}, query="${query.substring(0, 50)}..."`);
 
-      // Build where clause for filtering
-      const where = {};
-      if (subject) where.subject = subject;
-      if (topic) where.topic = topic;
-      if (difficulty) where.difficulty = difficulty;
+      // Build MongoDB query
+      const mongoQuery = {};
+      if (subject) mongoQuery['metadata.subject'] = subject;
+      if (topic) mongoQuery['metadata.topic'] = topic;
 
-      // Search in ChromaDB
-      const results = await this.collection.query({
-        queryEmbeddings: [queryEmbedding],
-        nResults: limit * 2, // Get more results for filtering
-        where: Object.keys(where).length > 0 ? where : undefined
-      });
+      // Use text search on the chunk content
+      if (query && query.trim()) {
+        // Simple text matching for now (can be enhanced with better search)
+        mongoQuery.$or = [
+          { text: { $regex: query, $options: 'i' } },
+          { 'metadata.keywords': { $in: query.toLowerCase().split(' ') } },
+          { 'metadata.summary': { $regex: query, $options: 'i' } }
+        ];
+      }
 
-      // Filter by score and format results
-      const filteredResults = results.ids[0]
-        .map((id, index) => ({
-          id,
-          score: results.distances[0][index],
-          document: results.documents[0][index],
-          metadata: results.metadatas[0][index]
-        }))
-        .filter(result => result.score >= minScore)
-        .slice(0, limit);
+      const chunks = await DocumentChunk.find(mongoQuery)
+        .limit(limit * 2)
+        .populate('documentId', 'filename subject topic')
+        .sort({ createdAt: -1 });
 
-      return filteredResults;
+      // Convert to consistent format and score based on relevance
+      const results = chunks.map((chunk, index) => ({
+        id: chunk.vectorId,
+        score: Math.max(0.1, 1.0 - (index * 0.1)), // Decreasing score
+        document: chunk.text,
+        metadata: {
+          subject: chunk.metadata.subject,
+          topic: chunk.metadata.topic,
+          filename: chunk.metadata.filename,
+          documentId: chunk.documentId._id.toString(),
+          chunkIndex: chunk.chunkIndex,
+          keywords: chunk.metadata.keywords,
+          summary: chunk.metadata.summary
+        },
+        mongoData: chunk
+      }));
+
+      console.log(`📄 Found ${results.length} chunks in MongoDB search`);
+      return results;
+
     } catch (error) {
-      console.error('❌ Failed to search vector store:', error);
-      throw new Error(`Search failed: ${error.message}`);
+      console.error('❌ Failed to search MongoDB:', error);
+      return []; // Return empty results instead of throwing
     }
   }
 

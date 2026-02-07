@@ -73,6 +73,10 @@ app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/admin", adminRoutes);
 
+// Import premilRoutes (using dynamic import or regular import if changed to top-level)
+import premilRoutes from "./src/routes/premilRoutes.js";
+app.use("/api/premil", premilRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;

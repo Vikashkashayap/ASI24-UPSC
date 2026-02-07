@@ -7,7 +7,9 @@ class RetrievalService {
   }
 
   /**
-   * Retrieve relevant chunks for a given query
+   * Retrieve relevant chunks for UPSC Prelims questions
+   * PRIMARY: Embedded ChromaDB search (admin-uploaded notes only)
+   * FALLBACK: MongoDB search if ChromaDB unavailable
    */
   async retrieveRelevantChunks(query, options = {}) {
     try {
@@ -20,55 +22,128 @@ class RetrievalService {
         includeMetadata = true
       } = options;
 
-      // Try vector store search first
+      console.log(`📚 Retrieving chunks for UPSC query: "${query.substring(0, 50)}..." (${subject} - ${topic})`);
+
+      // PRIMARY: Search MongoDB (ChromaDB temporarily disabled)
       let searchResults = [];
       try {
         searchResults = await this.vectorStore.search(query, {
           limit,
           subject,
           topic,
-          difficulty,
           minScore
         });
-      } catch (vectorError) {
-        console.warn('Vector store search failed, falling back to MongoDB search:', vectorError.message);
 
-        // Fallback: Search in MongoDB DocumentChunk collection
-        const mongoQuery = {};
-        if (subject) mongoQuery['metadata.subject'] = subject;
-        if (topic) mongoQuery['metadata.topic'] = topic;
+        if (searchResults.length > 0) {
+          console.log(`✅ Found ${searchResults.length} chunks in MongoDB search`);
+        } else {
+          console.log('⚠️ No chunks found in primary search, trying broader search...');
 
-        const mongoChunks = await DocumentChunk.find(mongoQuery)
-          .limit(limit * 2)
-          .populate('documentId', 'filename subject topic');
+      // Try broader search without subject/topic filters
+      searchResults = await this.vectorStore.search(query, {
+        limit,
+        subject: null,
+        topic: null,
+        minScore: minScore * 0.5 // Much lower threshold for broader search
+      });
 
-        // Convert to similar format as vector search results
-        searchResults = mongoChunks.map((chunk, index) => ({
+      // If still no results, get any chunks from the requested subject
+      if (searchResults.length === 0 && subject) {
+        console.log(`🔄 Getting any chunks from subject: ${subject}`);
+        const DocumentChunk = (await import('../models/DocumentChunk.js')).default;
+        const subjectChunks = await DocumentChunk.find({
+          'metadata.subject': subject
+        }).limit(limit).sort({ createdAt: -1 });
+
+        searchResults = subjectChunks.map((chunk, index) => ({
           id: chunk.vectorId,
           document: chunk.text,
-          score: 1.0 - (index * 0.1), // Decreasing score
+          score: 0.3 - (index * 0.05), // Low but decreasing score
+          metadata: {
+            subject: chunk.metadata.subject,
+            topic: chunk.metadata.topic,
+            filename: chunk.metadata.filename,
+            documentId: chunk.documentId.toString(),
+            chunkIndex: chunk.chunkIndex
+          },
           mongoData: chunk
         }));
       }
 
+          if (searchResults.length > 0) {
+            console.log(`✅ Found ${searchResults.length} chunks in broad MongoDB search`);
+          }
+        }
+      } catch (vectorError) {
+        console.warn('⚠️ MongoDB search failed:', vectorError.message);
+      }
+
+      // If still no results, try MongoDB directly with broader criteria
       if (searchResults.length === 0) {
+        console.log('🔄 Trying direct MongoDB query for chunks');
+
+        const mongoQuery = {};
+        if (subject) mongoQuery['metadata.subject'] = subject;
+        if (topic) mongoQuery['metadata.topic'] = topic;
+
+        // If no specific filters, get recent chunks
+        if (!subject && !topic) {
+          // Get all chunks, sorted by recency
+          console.log('📄 Getting recent chunks from all subjects/topics');
+        }
+
+        const mongoChunks = await DocumentChunk.find(mongoQuery)
+          .limit(limit * 2)
+          .populate('documentId', 'filename subject topic')
+          .sort({ createdAt: -1 }); // Prefer newer chunks
+
+        // Convert MongoDB results to consistent format
+        searchResults = mongoChunks.map((chunk, index) => ({
+          id: chunk.vectorId,
+          document: chunk.text,
+          score: 0.8 - (index * 0.1), // Decreasing score for fallback
+          metadata: {
+            subject: chunk.metadata.subject,
+            topic: chunk.metadata.topic,
+            filename: chunk.metadata.filename,
+            documentId: chunk.documentId._id.toString(),
+            chunkIndex: chunk.chunkIndex
+          },
+          mongoData: chunk
+        }));
+
+        console.log(`📄 Found ${searchResults.length} chunks in MongoDB fallback`);
+      }
+
+      if (searchResults.length === 0) {
+        console.warn('❌ No relevant chunks found in either ChromaDB or MongoDB');
         return {
           chunks: [],
           totalFound: 0,
           query,
-          searchTime: 0
+          searchTime: Date.now(),
+          source: 'none'
         };
       }
 
-      // searchResults already contain either vector-store metadata or MongoDB data.
-      // To avoid referencing undefined variables, we simply return them as-is.
-      const enrichedResults = searchResults;
+      // Ensure we have the required metadata for UPSC question generation
+      const enrichedResults = searchResults.map(result => ({
+        ...result,
+        metadata: {
+          subject: result.metadata?.subject || subject,
+          topic: result.metadata?.topic || topic,
+          filename: result.metadata?.filename || 'Unknown',
+          chunk_id: result.id,
+          ...result.metadata
+        }
+      }));
 
       return {
         chunks: enrichedResults,
         totalFound: enrichedResults.length,
         query,
-        searchTime: Date.now()
+        searchTime: Date.now(),
+        source: searchResults[0]?.mongoData ? 'mongodb' : 'chromadb'
       };
     } catch (error) {
       console.error('❌ Retrieval failed:', error);
@@ -77,36 +152,83 @@ class RetrievalService {
   }
 
   /**
-   * Retrieve chunks for mock test generation with enhanced filtering
+   * Retrieve chunks for UPSC Prelims test generation
+   * CRITICAL: Ensures questions are generated ONLY from admin-uploaded notes
    */
   async retrieveForMockTest(subject, topic, difficulty = 'medium', questionCount = 20) {
     try {
-      // Create a comprehensive query for the subject/topic
-      const baseQuery = `UPSC Prelims ${subject} ${topic} important concepts and facts`;
+      // Create UPSC-specific query that matches admin-uploaded content
+      const baseQuery = `${subject} ${topic} UPSC Prelims important concepts facts MCQs`;
 
-      // Retrieve more chunks than needed to allow for filtering
-      const retrievalLimit = Math.max(questionCount * 3, 50);
+      // Retrieve sufficient chunks for question generation (more than needed for diversity)
+      const retrievalLimit = Math.max(questionCount * 4, 60); // More chunks for better coverage
+
+      console.log(`🎯 Retrieving chunks for UPSC test: ${subject} - ${topic} (${difficulty}, ${questionCount} questions)`);
 
       const results = await this.retrieveRelevantChunks(baseQuery, {
         limit: retrievalLimit,
         subject,
         topic,
-        difficulty,
-        minScore: 0.7,
+        minScore: 0.7, // Higher threshold for UPSC accuracy
         includeMetadata: true
       });
 
-      // Filter and diversify chunks
+      if (results.chunks.length === 0) {
+        // Check if any documents exist at all
+        const Document = (await import('../models/Document.js')).default;
+        const DocumentChunk = (await import('../models/DocumentChunk.js')).default;
+
+        const totalDocs = await Document.countDocuments();
+        const totalChunks = await DocumentChunk.countDocuments();
+
+        console.log(`📊 Database status: ${totalDocs} documents, ${totalChunks} chunks`);
+
+        if (totalDocs === 0) {
+          throw new Error('No documents have been uploaded yet. Please ask the admin to upload study materials first.');
+        } else if (totalChunks === 0) {
+          throw new Error('Documents exist but no chunks found. Please re-upload documents or contact admin.');
+        } else {
+          // Show what content is actually available
+          const availableContent = await DocumentChunk.aggregate([
+            {
+              $group: {
+                _id: {
+                  subject: '$metadata.subject',
+                  topic: '$metadata.topic'
+                },
+                count: { $sum: 1 }
+              }
+            },
+            { $sort: { '_id.subject': 1, '_id.topic': 1 } }
+          ]);
+
+          console.log('📋 Available content:', availableContent);
+          throw new Error(`No relevant content found for ${subject} - ${topic}. Available: ${availableContent.map(c => `${c._id.subject}-${c._id.topic}(${c.count})`).join(', ')}`);
+        }
+      }
+
+      // Diversify and filter chunks to ensure broad coverage
       const diversifiedChunks = this.diversifyChunks(results.chunks, questionCount * 2);
+
+      // Ensure we have enough high-quality chunks
+      if (diversifiedChunks.length < questionCount) {
+        console.warn(`⚠️ Limited chunks available (${diversifiedChunks.length}) for ${questionCount} questions`);
+      }
+
+      console.log(`📋 Retrieved ${diversifiedChunks.length} diversified chunks from ${results.source} for test generation`);
 
       return {
         ...results,
         chunks: diversifiedChunks,
-        totalFound: diversifiedChunks.length
+        totalFound: diversifiedChunks.length,
+        subject,
+        topic,
+        difficulty,
+        questionCount
       };
     } catch (error) {
-      console.error('❌ Mock test retrieval failed:', error);
-      throw new Error(`Mock test retrieval failed: ${error.message}`);
+      console.error('❌ UPSC mock test retrieval failed:', error);
+      throw new Error(`Failed to retrieve content for test generation: ${error.message}`);
     }
   }
 

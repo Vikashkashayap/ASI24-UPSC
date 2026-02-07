@@ -106,6 +106,35 @@ export const testAPI = {
   },
 };
 
+// Premil API
+export const premilAPI = {
+  generateTest: async (params: { subject: string; topic: string; difficulty: string; questionCount: number }) => {
+    return api.post("/api/premil/generate", params);
+  },
+
+  submitTest: async (data: { sessionId: string; answers: any[]; timeSpent: number }) => {
+    return api.post("/api/premil/submit", data);
+  },
+
+  getHistory: async (page = 1, limit = 10) => {
+    return api.get("/api/premil/history", {
+      params: { page, limit },
+    });
+  },
+
+  getSession: async (sessionId: string) => {
+    return api.get(`/api/premil/session/${sessionId}`);
+  },
+
+  getSubjects: async () => {
+    return api.get("/api/premil/subjects");
+  },
+
+  getConfig: async () => {
+    return api.get("/api/premil/config");
+  }
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

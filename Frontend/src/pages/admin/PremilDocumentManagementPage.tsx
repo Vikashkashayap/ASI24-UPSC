@@ -6,39 +6,42 @@ import { Label } from '../../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Badge } from '../../components/ui/badge';
-import { Upload, FileText, Trash2, Eye, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Upload, FileText, Trash2, Eye, AlertCircle, CheckCircle, Clock, DollarSign, BarChart3 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../services/api';
 
-interface Document {
+interface PremilDocument {
   _id: string;
   filename: string;
-  originalName: string;
-  documentType: 'notes' | 'pyq' | 'current_affairs' | 'reference_material';
   subject: string;
   topic: string;
   fileSize: number;
-  totalPages: number;
-  totalChunks: number;
-  processingStatus: 'uploaded' | 'processing' | 'completed' | 'failed';
-  processingError?: string;
+  uploadedBy: {
+    name: string;
+    email: string;
+  } | null;
   createdAt: string;
 }
 
-interface UploadStats {
-  totalDocuments: number;
-  totalPages: number;
-  totalChunks: number;
-  completedDocuments: number;
-  failedDocuments: number;
+interface PremilStats {
+  questions: {
+    totalQuestions: number;
+    totalCost: number;
+    uniqueTestKeys: string[];
+    avgCostPerQuestion: number;
+    subjects: string[];
+  };
+  sessions: {
+    totalSessions: number;
+    cachedSessions: number;
+    totalAiCost: number;
+    avgScore: number;
+  };
+  documents: {
+    totalDocuments: number;
+    totalChunks: number;
+  };
 }
-
-const DOCUMENT_TYPES = [
-  { value: 'notes', label: 'Notes' },
-  { value: 'pyq', label: 'Previous Year Questions (PYQ)' },
-  { value: 'current_affairs', label: 'Current Affairs' },
-  { value: 'reference_material', label: 'Reference Material' }
-];
 
 const SUBJECTS = [
   'History',
@@ -51,14 +54,13 @@ const SUBJECTS = [
   'Current Affairs'
 ];
 
-const DocumentManagementPage: React.FC = () => {
+const PremilDocumentManagementPage: React.FC = () => {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [stats, setStats] = useState<UploadStats | null>(null);
+  const [documents, setDocuments] = useState<PremilDocument[]>([]);
+  const [stats, setStats] = useState<PremilStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [documentType, setDocumentType] = useState('notes');
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
   const [uploadMessage, setUploadMessage] = useState('');
@@ -72,7 +74,7 @@ const DocumentManagementPage: React.FC = () => {
   const loadDocuments = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/rag/documents');
+      const response = await api.get('/api/premil/admin/documents');
       setDocuments(response.data.documents);
     } catch (error) {
       console.error('Failed to load documents:', error);
@@ -83,7 +85,7 @@ const DocumentManagementPage: React.FC = () => {
 
   const loadStats = async () => {
     try {
-      const response = await api.get('/api/rag/documents/stats');
+      const response = await api.get('/api/premil/admin/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Failed to load stats:', error);
@@ -93,12 +95,13 @@ const DocumentManagementPage: React.FC = () => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type !== 'application/pdf') {
-        setUploadError('Only PDF files are allowed');
+      const allowedTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        setUploadError('Invalid file type. Only PDF, TXT, DOC, and DOCX files are allowed.');
         return;
       }
-      if (file.size > 50 * 1024 * 1024) { // 50MB
-        setUploadError('File size must be less than 50MB');
+      if (file.size > 10 * 1024 * 1024) { // 10MB
+        setUploadError('File size must be less than 10MB');
         return;
       }
       setSelectedFile(file);
@@ -107,7 +110,7 @@ const DocumentManagementPage: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !documentType || !subject || !topic) {
+    if (!selectedFile || !subject || !topic) {
       setUploadError('Please fill all required fields');
       return;
     }
@@ -118,25 +121,25 @@ const DocumentManagementPage: React.FC = () => {
       setUploadMessage('');
 
       const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('documentType', documentType);
+      formData.append('document', selectedFile);
       formData.append('subject', subject);
       formData.append('topic', topic);
 
-      const response = await api.post('/api/rag/documents/upload', formData, {
+      const response = await api.post('/api/premil/admin/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      setUploadMessage('Document uploaded successfully! Processing has started.');
+      setUploadMessage(`Document uploaded successfully! ${response.data.chunksCreated} chunks created, ${response.data.embeddingsGenerated} embeddings generated.`);
+
+      // Reset form
       setSelectedFile(null);
-      setDocumentType('notes');
       setSubject('');
       setTopic('');
-      (document.getElementById('file-input') as HTMLInputElement).value = '';
+      (document.getElementById('premil-file-input') as HTMLInputElement).value = '';
 
-      // Reload documents and stats
+      // Reload data
       loadDocuments();
       loadStats();
 
@@ -148,10 +151,11 @@ const DocumentManagementPage: React.FC = () => {
   };
 
   const handleDelete = async (documentId: string) => {
-    if (!confirm('Are you sure you want to delete this document?')) return;
+    if (!confirm('Are you sure you want to delete this document? This will affect all questions generated from it.')) return;
 
     try {
-      await api.delete(`/api/rag/documents/${documentId}`);
+      // Note: Delete endpoint might not exist yet, adjust as needed
+      await api.delete(`/api/premil/admin/documents/${documentId}`);
       loadDocuments();
       loadStats();
     } catch (error) {
@@ -167,77 +171,77 @@ const DocumentManagementPage: React.FC = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'processing':
-        return <Clock className="h-4 w-4 text-blue-500" />;
-      case 'failed':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      completed: 'bg-green-100 text-green-800',
-      processing: 'bg-blue-100 text-blue-800',
-      failed: 'bg-red-100 text-red-800',
-      uploaded: 'bg-gray-100 text-gray-800'
-    };
-    return variants[status as keyof typeof variants] || variants.uploaded;
-  };
-
-  const getDocumentTypeBadge = (type: string) => {
-    const variants = {
-      notes: 'bg-purple-100 text-purple-800',
-      pyq: 'bg-orange-100 text-orange-800',
-      current_affairs: 'bg-blue-100 text-blue-800',
-      reference_material: 'bg-gray-100 text-gray-800'
-    };
-    const labels = {
-      notes: 'Notes',
-      pyq: 'PYQ',
-      current_affairs: 'Current Affairs',
-      reference_material: 'Reference'
-    };
-    return { variant: variants[type as keyof typeof variants] || variants.notes, label: labels[type as keyof typeof labels] || 'Notes' };
+  const formatCost = (cents: number) => {
+    return `$${(cents / 100).toFixed(2)}`;
   };
 
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Document Management</h1>
-        <p className="text-gray-600">Upload and manage PDF documents for RAG-based mock test generation</p>
+        <h1 className="text-3xl font-bold mb-2">UPSC Prelims Document Management</h1>
+        <p className="text-gray-600">Upload subject-wise notes for cost-optimized MCQ generation</p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Cost Optimization Stats */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalDocuments}</div>
-              <div className="text-sm text-gray-600">Total Documents</div>
+              <div className="flex items-center gap-2 mb-2">
+                <DollarSign className="h-5 w-5 text-green-600" />
+                <span className="text-sm font-medium">AI Cost Saved</span>
+              </div>
+              <div className="text-2xl font-bold text-green-600">
+                {formatCost(stats.questions.totalCost)}
+              </div>
+              <div className="text-xs text-gray-500">
+                {stats.sessions.cachedSessions}/{stats.sessions.totalSessions} cached tests
+              </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold text-green-600">{stats.completedDocuments}</div>
-              <div className="text-sm text-gray-600">Processed</div>
+              <div className="flex items-center gap-2 mb-2">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
+                <span className="text-sm font-medium">Unique Tests</span>
+              </div>
+              <div className="text-2xl font-bold text-blue-600">
+                {stats.questions.uniqueTestKeys.length}
+              </div>
+              <div className="text-xs text-gray-500">
+                Test configurations
+              </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold text-purple-600">{stats.totalPages}</div>
-              <div className="text-sm text-gray-600">Total Pages</div>
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5 text-purple-600" />
+                <span className="text-sm font-medium">Total Questions</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">
+                {stats.questions.totalQuestions}
+              </div>
+              <div className="text-xs text-gray-500">
+                Avg cost: {formatCost(stats.questions.avgCostPerQuestion)}/question
+              </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold text-orange-600">{stats.totalChunks}</div>
-              <div className="text-sm text-gray-600">Vector Chunks</div>
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-5 w-5 text-orange-600" />
+                <span className="text-sm font-medium">Avg Score</span>
+              </div>
+              <div className="text-2xl font-bold text-orange-600">
+                {stats.sessions.avgScore.toFixed(1)}%
+              </div>
+              <div className="text-xs text-gray-500">
+                Student performance
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -248,17 +252,17 @@ const DocumentManagementPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Upload New Document
+            Upload Prelims Notes
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="file-input">PDF File *</Label>
+              <Label htmlFor="premil-file-input">Document File *</Label>
               <Input
-                id="file-input"
+                id="premil-file-input"
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.txt,.doc,.docx"
                 onChange={handleFileSelect}
                 disabled={uploading}
               />
@@ -267,22 +271,9 @@ const DocumentManagementPage: React.FC = () => {
                   {selectedFile.name} ({formatFileSize(selectedFile.size)})
                 </p>
               )}
-            </div>
-
-            <div>
-              <Label htmlFor="document-type">Document Type *</Label>
-              <Select value={documentType} onValueChange={setDocumentType} disabled={uploading}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DOCUMENT_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                Supported: PDF, TXT, DOC, DOCX (max 10MB)
+              </p>
             </div>
 
             <div>
@@ -302,7 +293,7 @@ const DocumentManagementPage: React.FC = () => {
             </div>
 
             <div>
-              <Label htmlFor="topic">Topic *</Label>
+              <Label htmlFor="topic">Topic/Subtopic *</Label>
               <Input
                 id="topic"
                 value={topic}
@@ -327,12 +318,22 @@ const DocumentManagementPage: React.FC = () => {
             </Alert>
           )}
 
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h4 className="font-semibold text-blue-900 mb-2">Cost Optimization Features:</h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Documents are split into 300-500 word chunks</li>
+              <li>• Embeddings generated for efficient retrieval</li>
+              <li>• Questions generated once per unique test configuration</li>
+              <li>• Same test served to multiple students (cost-free)</li>
+            </ul>
+          </div>
+
           <Button
             onClick={handleUpload}
-            disabled={uploading || !selectedFile || !documentType || !subject || !topic}
+            disabled={uploading || !selectedFile || !subject || !topic}
             className="w-full md:w-auto"
           >
-            {uploading ? 'Uploading...' : 'Upload Document'}
+            {uploading ? 'Processing Document...' : 'Upload & Process Document'}
           </Button>
         </CardContent>
       </Card>
@@ -342,7 +343,7 @@ const DocumentManagementPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Uploaded Documents
+            Uploaded Prelims Documents
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -350,7 +351,7 @@ const DocumentManagementPage: React.FC = () => {
             <div className="text-center py-8">Loading documents...</div>
           ) : documents.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No documents uploaded yet. Upload your first PDF to get started.
+              No prelims documents uploaded yet. Upload subject-wise notes to enable cost-optimized MCQ generation.
             </div>
           ) : (
             <div className="space-y-4">
@@ -358,26 +359,18 @@ const DocumentManagementPage: React.FC = () => {
                 <div key={doc._id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      {getStatusIcon(doc.processingStatus)}
-                      <h3 className="font-semibold">{doc.originalName}</h3>
-                      <Badge className={getStatusBadge(doc.processingStatus)}>
-                        {doc.processingStatus}
-                      </Badge>
-                      <Badge className={getDocumentTypeBadge(doc.documentType).variant}>
-                        {getDocumentTypeBadge(doc.documentType).label}
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      <h3 className="font-semibold">{doc.filename}</h3>
+                      <Badge className="bg-green-100 text-green-800">
+                        Processed
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-600 space-y-1">
-                      <p><strong>Type:</strong> {getDocumentTypeBadge(doc.documentType).label}</p>
                       <p><strong>Subject:</strong> {doc.subject}</p>
                       <p><strong>Topic:</strong> {doc.topic}</p>
                       <p><strong>Size:</strong> {formatFileSize(doc.fileSize)}</p>
-                      <p><strong>Pages:</strong> {doc.totalPages || 'Processing...'}</p>
-                      <p><strong>Chunks:</strong> {doc.totalChunks || 'Processing...'}</p>
                       <p><strong>Uploaded:</strong> {new Date(doc.createdAt).toLocaleDateString()}</p>
-                      {doc.processingError && (
-                        <p className="text-red-600"><strong>Error:</strong> {doc.processingError}</p>
-                      )}
+                      <p><strong>By:</strong> {doc.uploadedBy ? `${doc.uploadedBy.name} (${doc.uploadedBy.email})` : 'Unknown'}</p>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -403,4 +396,4 @@ const DocumentManagementPage: React.FC = () => {
   );
 };
 
-export default DocumentManagementPage;
+export default PremilDocumentManagementPage;

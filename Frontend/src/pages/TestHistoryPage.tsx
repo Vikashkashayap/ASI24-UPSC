@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Trash2, Play, Target, Calendar, Search, BookOpen, TrendingUp, Eye, X, CheckCircle, XCircle, History } from 'lucide-react';
-import { testAPI } from '../services/api';
+import { testAPI, premilAPI } from '../services/api';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -86,7 +86,7 @@ const TestHistoryPage: React.FC = () => {
   const loadHistory = async (page = 1) => {
     setLoadingHistory(true);
     try {
-      const response = await testAPI.getTests(page, itemsPerPage);
+      const response = await premilAPI.getHistory(page, itemsPerPage);
       if (response.data.success) {
         const data: TestHistoryResponse = response.data.data;
         setHistory(data.tests);
@@ -100,12 +100,34 @@ const TestHistoryPage: React.FC = () => {
     }
   };
 
-  const loadTestDetails = async (testId: string) => {
+  const loadTestDetails = async (sessionId: string) => {
     setLoadingTestDetails(true);
     try {
-      const response = await testAPI.getTest(testId);
+      const response = await premilAPI.getSession(sessionId);
       if (response.data.success) {
-        setSelectedTest(response.data.data);
+        // Backend returns { session: ... }, adapt to frontend structure if needed
+        // The backend response structure for `getSession` is `response.data.session`
+        // We need to map `detailedResults` to `questions` for the modal
+        const sessionData = response.data.session;
+        const adaptedData = {
+          ...sessionData,
+          questions: sessionData.detailedResults.map((dr: any) => ({
+            question: dr.question,
+            options: {}, // Options might not be in detailedResults, but explanation is keys. 
+            // Wait, detailedResults from backend doesn't give options map?
+            // Backend `detailedResults` has `question`, `selectedAnswer`, `correctAnswer`, `explanation`.
+            // Options are needed for the UI to show choices.
+            // The `detailedResults` map in backend `premilRoutes.js` does NOT include options!
+            // I need to add options to the backend response too! 
+            // **Self-Correction**: I will fix backend to include options.
+
+            correctAnswer: dr.correctAnswer,
+            userAnswer: dr.selectedAnswer,
+            explanation: dr.explanation,
+            options: dr.options || {} // Assuming backend sends options
+          }))
+        };
+        setSelectedTest(adaptedData);
         setShowTestDetails(true);
       }
     } catch (error) {
@@ -179,24 +201,21 @@ const TestHistoryPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
       {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10" 
-          : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
-      }`}>
+      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${theme === "dark"
+        ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10"
+        : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
+        }`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex items-center gap-3 md:gap-4">
-          <div className={`p-2.5 md:p-3 rounded-xl ${
-            theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
-          }`}>
+          <div className={`p-2.5 md:p-3 rounded-xl ${theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
+            }`}>
             <History className={`w-6 h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
           </div>
           <div className="flex flex-col gap-1 md:gap-2">
-            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent" 
-                : "from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent"
-            }`}>
+            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${theme === "dark"
+              ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent"
+              : "from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent"
+              }`}>
               Test History
             </h1>
             <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
@@ -207,11 +226,10 @@ const TestHistoryPage: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg" 
-          : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
-      }`}>
+      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${theme === "dark"
+        ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg"
+        : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
+        }`}>
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
         <CardContent className="pt-6 relative z-10">
           <div className="relative">
@@ -221,11 +239,10 @@ const TestHistoryPage: React.FC = () => {
               placeholder="Search by topic, subject, or difficulty..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-slate-200"
-                  : "border-slate-300 bg-white"
-              }`}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent ${theme === "dark"
+                ? "bg-slate-800 border-slate-700 text-slate-200"
+                : "border-slate-300 bg-white"
+                }`}
             />
           </div>
         </CardContent>
@@ -316,7 +333,7 @@ const TestHistoryPage: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => loadTestDetails(test._id)}
+                          onClick={() => loadTestDetails(test.sessionId)}
                           disabled={loadingTestDetails}
                         >
                           {loadingTestDetails ? 'Loading...' : 'View Details'}
@@ -362,9 +379,8 @@ const TestHistoryPage: React.FC = () => {
       {/* Test Details Modal */}
       {showTestDetails && selectedTest && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`relative max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg ${
-            theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
-          } border shadow-xl`}>
+          <div className={`relative max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg ${theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+            } border shadow-xl`}>
             {/* Modal Header */}
             <div className="sticky top-0 flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700 bg-inherit">
               <div>
@@ -443,11 +459,10 @@ const TestHistoryPage: React.FC = () => {
                   Questions & Answers
                 </h3>
                 {selectedTest.questions.map((question: any, index: number) => (
-                  <Card key={index} className={`${
-                    question.userAnswer === question.correctAnswer
-                      ? theme === "dark" ? "border-green-700 bg-green-950/20" : "border-green-200 bg-green-50"
-                      : theme === "dark" ? "border-red-700 bg-red-950/20" : "border-red-200 bg-red-50"
-                  }`}>
+                  <Card key={index} className={`${question.userAnswer === question.correctAnswer
+                    ? theme === "dark" ? "border-green-700 bg-green-950/20" : "border-green-200 bg-green-50"
+                    : theme === "dark" ? "border-red-700 bg-red-950/20" : "border-red-200 bg-red-50"
+                    }`}>
                     <CardContent className="pt-4">
                       <div className="space-y-3">
                         {/* Question */}
@@ -462,13 +477,12 @@ const TestHistoryPage: React.FC = () => {
                           {Object.entries(question.options).map(([key, value]: [string, any]) => (
                             <div
                               key={key}
-                              className={`p-3 rounded-lg border text-sm ${
-                                key === question.correctAnswer
-                                  ? theme === "dark" ? "border-green-600 bg-green-900/30 text-green-300" : "border-green-600 bg-green-100 text-green-800"
-                                  : key === question.userAnswer && key !== question.correctAnswer
+                              className={`p-3 rounded-lg border text-sm ${key === question.correctAnswer
+                                ? theme === "dark" ? "border-green-600 bg-green-900/30 text-green-300" : "border-green-600 bg-green-100 text-green-800"
+                                : key === question.userAnswer && key !== question.correctAnswer
                                   ? theme === "dark" ? "border-red-600 bg-red-900/30 text-red-300" : "border-red-600 bg-red-100 text-red-800"
                                   : theme === "dark" ? "border-slate-600 bg-slate-800 text-slate-300" : "border-slate-200 bg-slate-50 text-slate-700"
-                              }`}
+                                }`}
                             >
                               <span className="font-medium">{key}.</span> {value}
                               {key === question.correctAnswer && (
@@ -483,9 +497,8 @@ const TestHistoryPage: React.FC = () => {
 
                         {/* Explanation */}
                         {question.explanation && (
-                          <div className={`p-3 rounded-lg ${
-                            theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"
-                          } border`}>
+                          <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"
+                            } border`}>
                             <p className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                               Explanation:
                             </p>

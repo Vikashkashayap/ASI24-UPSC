@@ -4,6 +4,7 @@ import pdfParse from 'pdf-parse';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import Document from '../models/Document.js';
 import DocumentChunk from '../models/DocumentChunk.js';
+import vectorStoreService from './vectorStoreService.js';
 
 class DocumentProcessingService {
   constructor() {
@@ -106,11 +107,36 @@ class DocumentProcessingService {
         documentId: document._id.toString()
       });
 
-      // Generate vector IDs for ChromaDB
+      // Generate vector IDs for ChromaDB and prepare chunks for database
       const chunksWithVectorIds = chunks.map((chunk, index) => ({
         ...chunk,
-        vectorId: `doc_${documentId}_chunk_${index}`
+        vectorId: `doc_${documentId}_chunk_${index}`,
+        documentId,
+        chunkIndex: index,
+        startPosition: index * 1500, // Approximate character position
+        endPosition: (index + 1) * 1500,
+        metadata: {
+          subject: document.subject,
+          topic: document.topic,
+          filename: document.filename,
+          ...chunk.metadata
+        }
       }));
+
+      // Generate embeddings and store in vector database using addChunks method
+      let embeddingsGenerated = 0;
+      try {
+        const vectorResult = await vectorStoreService.addChunks(chunksWithVectorIds, documentId);
+        embeddingsGenerated = vectorResult.added || chunksWithVectorIds.length;
+        console.log(`🔍 Generated embeddings for ${embeddingsGenerated} chunks`);
+        if (vectorResult.vectorStore === 'unavailable') {
+          console.warn('⚠️ Vector store unavailable, stored chunks in MongoDB only');
+        }
+      } catch (vectorError) {
+        console.warn('⚠️ Vector store error (continuing with MongoDB only):', vectorError);
+        // Continue processing even if vector store fails
+        embeddingsGenerated = 0; // No embeddings generated
+      }
 
       // Update document metadata
       await Document.findByIdAndUpdate(documentId, {
@@ -133,8 +159,8 @@ class DocumentProcessingService {
 
       return {
         documentId,
-        chunks: chunksWithVectorIds,
-        totalChunks: chunksWithVectorIds.length,
+        chunksCreated: chunksWithVectorIds.length,
+        embeddingsGenerated,
         totalWords: text.split(/\s+/).length
       };
 

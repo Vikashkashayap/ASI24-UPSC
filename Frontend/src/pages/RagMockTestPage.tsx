@@ -10,7 +10,7 @@ import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
 import { Brain, FileText, Target, Clock, CheckCircle, AlertCircle, BookOpen } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import api from '../services/api';
+import { api } from '../services/api';
 
 interface Subject {
   name: string;

@@ -38,6 +38,8 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/admin/premil-documents': { title: 'Prelims Documents', icon: <FileText className="w-5 h-5" /> },
+    '/admin/premil-analytics': { title: 'Prelims Cost Analytics', icon: <BarChart3 className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -153,6 +155,14 @@ export const DashboardLayout = () => {
                 </div>
               )}
               <div className="space-y-1">
+                <NavLink to="/admin/premil-documents" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Documents">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Documents</span>}
+                </NavLink>
+                <NavLink to="/admin/premil-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Cost Analytics">
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Cost Analytics</span>}
+                </NavLink>
                 <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Profile">
                   <User className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Profile</span>}

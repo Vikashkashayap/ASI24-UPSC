@@ -25,6 +25,9 @@ import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
+import PremilDocumentManagementPage from "./pages/admin/PremilDocumentManagementPage";
+import PremilCostAnalyticsPage from "./pages/admin/PremilCostAnalyticsPage";
+import PremilTestPage from "./pages/PremilTestPage";
 
 function App() {
   return (
@@ -50,7 +53,7 @@ function App() {
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />
-            <Route path="prelims-test" element={<TestGeneratorPage />} />
+            <Route path="prelims-test" element={<PremilTestPage />} />
             <Route path="test-history" element={<TestHistoryPage />} />
             <Route path="test/:id" element={<TestPage />} />
             <Route path="result/:id" element={<TestResultPage />} />
@@ -70,6 +73,8 @@ function App() {
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
+            <Route path="premil-documents" element={<PremilDocumentManagementPage />} />
+            <Route path="premil-analytics" element={<PremilCostAnalyticsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
