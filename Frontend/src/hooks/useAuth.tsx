@@ -6,6 +6,7 @@ export type User = {
   name: string;
   email: string;
   role?: "student" | "admin" | "agent";
+  mustChangePassword?: boolean;
 };
 
 type AuthContextType = {
@@ -45,9 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(nextUser);
     setToken(nextToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: nextUser, token: nextToken }));
-    // Redirect based on user role
+
+    // Redirect based on user role and password change status
     if (nextUser.role === "admin") {
       navigate("/admin/dashboard", { replace: true });
+    } else if (nextUser.mustChangePassword) {
+      navigate("/change-password", { replace: true });
     } else {
       navigate("/performance", { replace: true });
     }

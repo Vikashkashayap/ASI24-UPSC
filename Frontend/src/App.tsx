@@ -25,6 +25,9 @@ import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
+import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
+import ComingSoon from "./components/ui/ComingSoon";
+
 
 function App() {
   return (
@@ -34,6 +37,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route
             path="/"
             element={
@@ -44,9 +48,11 @@ function App() {
           >
             <Route path="home" element={<HomePage />} />
             <Route path="performance" element={<PerformanceDashboardPage />} />
-            <Route path="planner" element={<PlannerPage />} />
+            <Route path="planner" element={<ComingSoon />} />
+            {/* <Route path="planner" element={<PlannerPage />} /> */}
             <Route path="mentor" element={<MentorChatPage />} />
-            <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
+            <Route path="copy-evaluation" element={<ComingSoon />} />
+            {/* <Route path="copy-evaluation" element={<CopyEvaluationPage />} /> */}
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />

@@ -96,6 +96,8 @@ app.get("/api/debug/apikey", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+console.log("📁 Admin routes mounted at /api/admin");
+app.use("/api/admin", adminRoutes); 
 app.use("/api/performance", authMiddleware, performanceRoutes);
 app.use("/api/planner", authMiddleware, plannerRoutes);
 app.use("/api/mentor", authMiddleware, mentorRoutes);
@@ -104,7 +106,6 @@ app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
-app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -16,6 +16,18 @@ const userSchema = new mongoose.Schema(
       enum: ['active', 'suspended'],
       default: 'active'
     },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    mustChangePassword: {
+      type: Boolean,
+      default: false
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
   },
   { timestamps: true }
 );

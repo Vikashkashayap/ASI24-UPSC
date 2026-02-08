@@ -19,6 +19,10 @@ export const loginUser = async ({ email, password }) => {
   // First try to find user in database
   const user = await User.findOne({ email });
   if (user) {
+    if (user.isActive === false || user.status === 'suspended') {
+      throw new Error("Your account is deactivated. Please contact admin.");
+    }
+
     const match = await user.comparePassword(password);
     if (match) {
       const token = createToken(user);
@@ -33,14 +37,27 @@ export const loginUser = async ({ email, password }) => {
   if (adminEmail && adminPassword && email === adminEmail && password === adminPassword) {
     // Create a virtual admin user object for JWT token
     const adminUser = {
-      _id: "admin-user-id",
+      _id: "000000000000000000000000",
       name: "Admin User",
       email: adminEmail,
-      role: "admin"
+      role: "admin",
+      mustChangePassword: false
     };
     const token = createToken(adminUser);
     return { user: adminUser, token };
   }
 
   throw new Error("Invalid credentials");
+};
+
+export const changeUserPassword = async (userId, newPassword) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  user.password = newPassword;
+  user.mustChangePassword = false;
+  await user.save();
+  return user;
 };

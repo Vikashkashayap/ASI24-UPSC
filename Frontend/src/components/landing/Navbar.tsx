@@ -88,11 +88,11 @@ export const LandingNavbar = () => {
               Sign in
             </Button>
           </Link>
-          <Link to="/register" className="block" onClick={() => setMobileMenuOpen(false)}>
+          {/* <Link to="/register" className="block" onClick={() => setMobileMenuOpen(false)}>
             <Button className="w-full h-[44px] rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-sm font-semibold text-slate-950 shadow-lg hover:from-fuchsia-400 hover:to-emerald-300 min-h-[44px]">
               Get started
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>
@@ -176,11 +176,11 @@ export const LandingNavbar = () => {
               Sign in
             </Button>
           </Link>
-          <Link to="/register" className="hidden sm:block">
+          {/* <Link to="/register" className="hidden sm:block">
             <Button className="h-[44px] md:h-9 rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 px-3 md:px-4 text-xs md:text-sm font-semibold text-slate-950 shadow-[0_0_28px_rgba(52,211,153,0.65)] hover:from-fuchsia-400 hover:to-emerald-300 min-h-[44px]">
               Get started
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </header>

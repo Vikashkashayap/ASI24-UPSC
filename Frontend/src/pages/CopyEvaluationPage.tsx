@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileText, X, ChevronLeft, ChevronRight, Sparkles, BookOpen, Award } from 'lucide-react';
+import { Upload, FileText, X, ChevronLeft, ChevronRight, Sparkles, BookOpen, Award, History } from 'lucide-react';
 import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -143,7 +143,7 @@ const CopyEvaluationPage: React.FC = () => {
       const evaluationId = uploadResponse.data.data.evaluationId;
       const rawText = uploadResponse.data.data.rawText;
       const confidenceScore = uploadResponse.data.data.confidenceScore;
-      
+
       console.log('✅ PDF uploaded successfully. Evaluation ID:', evaluationId);
       console.log('📊 Confidence Score:', confidenceScore);
 
@@ -209,28 +209,24 @@ const CopyEvaluationPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
       {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-4 xs:p-5 sm:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
+      <div className={`relative overflow-hidden rounded-2xl p-4 xs:p-5 sm:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${theme === "dark"
+          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10"
           : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
-      }`}>
+        }`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col gap-2 xs:gap-2.5 sm:gap-3">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3 xs:gap-3.5 sm:gap-4">
-              <div className={`p-2.5 xs:p-3 sm:p-3 rounded-xl ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
-              }`}>
-                <FileText className={`w-5 h-5 xs:w-6 xs:h-6 sm:w-6 sm:h-6 ${
-                  theme === "dark" ? "text-purple-400" : "text-purple-600"
-                }`} />
+              <div className={`p-2.5 xs:p-3 sm:p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                }`}>
+                <FileText className={`w-5 h-5 xs:w-6 xs:h-6 sm:w-6 sm:h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"
+                  }`} />
               </div>
               <div>
-                <h1 className={`text-xl xs:text-2xl sm:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-                  theme === "dark" 
-                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
+                <h1 className={`text-xl xs:text-2xl sm:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${theme === "dark"
+                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent"
                     : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
-                }`}>
+                  }`}>
                   Copy Evaluation
                 </h1>
                 <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
@@ -240,18 +236,18 @@ const CopyEvaluationPage: React.FC = () => {
             </div>
             {!selectedEvaluationId && !evaluationResult && (
               <Button
-                onClick={() => setShowUploadModal(true)}
+                onClick={() => navigate('/evaluation-history')}
                 className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
               >
-                <Upload className="w-4 h-4 mr-2" />
-                <span className="hidden xs:inline">Upload New Answer</span>
-                <span className="xs:hidden">Upload</span>
+                <History className="w-4 h-4 mr-2" />
+                <span className="hidden xs:inline">Evaluation History</span>
+                <span className="xs:hidden">History</span>
               </Button>
             )}
           </div>
         </div>
       </div>
-      
+
 
       {/* Main Content - Full width in Full Copy Evaluation mode */}
       <div className="h-[calc(100vh-10rem)] xs:h-[calc(100vh-11rem)] sm:h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
@@ -261,21 +257,17 @@ const CopyEvaluationPage: React.FC = () => {
             <Card className={`h-full ${theme === "dark" ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50" : "bg-white border-slate-200"} shadow-xl`}>
               <CardContent className="p-6 xs:p-8 text-center flex items-center justify-center h-full">
                 <div className="max-w-md">
-                  <div className={`p-4 xs:p-5 sm:p-6 rounded-full mx-auto mb-4 xs:mb-5 sm:mb-6 w-fit ${
-                    theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
-                  }`}>
-                    <FileText className={`w-8 h-8 xs:w-12 xs:h-12 sm:w-16 sm:h-16 mx-auto ${
-                      theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                    }`} />
+                  <div className={`p-4 xs:p-5 sm:p-6 rounded-full mx-auto mb-4 xs:mb-5 sm:mb-6 w-fit ${theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
+                    }`}>
+                    <FileText className={`w-8 h-8 xs:w-12 xs:h-12 sm:w-16 sm:h-16 mx-auto ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                      }`} />
                   </div>
-                  <h2 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold mb-2 xs:mb-3 ${
-                    theme === "dark" ? "text-slate-200" : "text-slate-800"
-                  }`}>
+                  <h2 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold mb-2 xs:mb-3 ${theme === "dark" ? "text-slate-200" : "text-slate-800"
+                    }`}>
                     No Answer Copy Evaluated Yet
                   </h2>
-                  <p className={`text-xs xs:text-sm sm:text-sm mb-6 xs:mb-7 sm:mb-8 ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>
+                  <p className={`text-xs xs:text-sm sm:text-sm mb-6 xs:mb-7 sm:mb-8 ${theme === "dark" ? "text-slate-400" : "text-slate-600"
+                    }`}>
                     Upload your full answer copy PDF to get comprehensive evaluation with examiner-style feedback
                   </p>
                   <Button
@@ -289,20 +281,17 @@ const CopyEvaluationPage: React.FC = () => {
               </CardContent>
             </Card>
           ) : (
-            <Card className={`h-full flex flex-col shadow-xl ${
-              theme === "dark" 
-                ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50" 
+            <Card className={`h-full flex flex-col shadow-xl ${theme === "dark"
+                ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50"
                 : "bg-white border-slate-200"
-            }`}>
+              }`}>
               <CardHeader className="pb-3 xs:pb-3.5 sm:pb-4 border-b flex-shrink-0">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2 xs:gap-2.5">
-                    <Award className={`w-5 h-5 xs:w-6 xs:h-6 ${
-                      theme === "dark" ? "text-fuchsia-300" : "text-purple-600"
-                    }`} />
-                    <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${
-                      theme === "dark" ? "text-slate-200" : "text-slate-800"
-                    }`}>
+                    <Award className={`w-5 h-5 xs:w-6 xs:h-6 ${theme === "dark" ? "text-fuchsia-300" : "text-purple-600"
+                      }`} />
+                    <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"
+                      }`}>
                       Your Answer Evaluation
                     </h2>
                   </div>
@@ -322,16 +311,13 @@ const CopyEvaluationPage: React.FC = () => {
                 {fullEvaluation && fullEvaluation.evaluations && fullEvaluation.evaluations.length > 0 ? (
                   <div className="space-y-4 xs:space-y-5 sm:space-y-6">
                     {/* Enhanced Question Navigation */}
-                    <div className={`flex items-center justify-between p-3 xs:p-3.5 sm:p-4 rounded-xl ${
-                      theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-50 border border-slate-200"
-                    }`}>
+                    <div className={`flex items-center justify-between p-3 xs:p-3.5 sm:p-4 rounded-xl ${theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-50 border border-slate-200"
+                      }`}>
                       <div className="flex items-center gap-2 xs:gap-2.5">
-                        <BookOpen className={`w-4 h-4 xs:w-5 xs:h-5 ${
-                          theme === "dark" ? "text-slate-400" : "text-slate-600"
-                        }`} />
-                        <span className={`text-xs xs:text-sm font-medium ${
-                          theme === "dark" ? "text-slate-300" : "text-slate-700"
-                        }`}>
+                        <BookOpen className={`w-4 h-4 xs:w-5 xs:h-5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"
+                          }`} />
+                        <span className={`text-xs xs:text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"
+                          }`}>
                           Question {selectedQuestionIndex + 1} of {fullEvaluation.evaluations.length}
                         </span>
                       </div>
@@ -358,8 +344,8 @@ const CopyEvaluationPage: React.FC = () => {
                     </div>
 
                     {/* Question Evaluation View */}
-                    <QuestionEvaluationView 
-                      question={fullEvaluation.evaluations[selectedQuestionIndex]} 
+                    <QuestionEvaluationView
+                      question={fullEvaluation.evaluations[selectedQuestionIndex]}
                       paper={fullEvaluation.paper || 'GS'}
                     />
                   </div>
@@ -377,24 +363,20 @@ const CopyEvaluationPage: React.FC = () => {
       {/* Enhanced Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 xs:p-4">
-          <Card className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${
-            theme === "dark" 
-              ? "bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-purple-900/50" 
+          <Card className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${theme === "dark"
+              ? "bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-purple-900/50"
               : "bg-white border-slate-200"
-          }`}>
+            }`}>
             <CardContent className="p-4 xs:p-5 sm:p-6">
               <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6">
                 <div className="flex items-center gap-2 xs:gap-2.5">
-                  <div className={`p-2 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
-                    theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
-                  }`}>
-                    <Upload className={`w-4 h-4 xs:w-5 xs:h-5 ${
-                      theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-                    }`} />
+                  <div className={`p-2 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
+                    }`}>
+                    <Upload className={`w-4 h-4 xs:w-5 xs:h-5 ${theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+                      }`} />
                   </div>
-                  <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${
-                    theme === "dark" ? "text-slate-200" : "text-slate-800"
-                  }`}>
+                  <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"
+                    }`}>
                     Upload Answer Copy
                   </h2>
                 </div>
@@ -403,11 +385,10 @@ const CopyEvaluationPage: React.FC = () => {
                     setShowUploadModal(false);
                     setError(null);
                   }}
-                  className={`p-1.5 xs:p-2 rounded-lg transition-colors ${
-                    theme === "dark" 
-                      ? "hover:bg-slate-800 text-slate-400 hover:text-slate-200" 
+                  className={`p-1.5 xs:p-2 rounded-lg transition-colors ${theme === "dark"
+                      ? "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
                       : "hover:bg-slate-100 text-slate-500 hover:text-slate-700"
-                  }`}
+                    }`}
                 >
                   <X className="w-4 h-4 xs:w-5 xs:h-5" />
                 </button>
@@ -420,18 +401,15 @@ const CopyEvaluationPage: React.FC = () => {
                     Answer Copy (PDF)
                   </label>
                   {selectedFile ? (
-                    <div className={`p-3 xs:p-4 rounded-xl border flex items-center justify-between ${
-                      theme === "dark" 
-                        ? "bg-slate-800/80 border-slate-700/50" 
+                    <div className={`p-3 xs:p-4 rounded-xl border flex items-center justify-between ${theme === "dark"
+                        ? "bg-slate-800/80 border-slate-700/50"
                         : "bg-slate-50 border-slate-200"
-                    }`}>
+                      }`}>
                       <div className="flex items-center gap-2 xs:gap-3 flex-1 min-w-0">
-                        <FileText className={`w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0 ${
-                          theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                        }`} />
-                        <span className={`text-xs xs:text-sm truncate ${
-                          theme === "dark" ? "text-slate-300" : "text-slate-700"
-                        }`}>
+                        <FileText className={`w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0 ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                          }`} />
+                        <span className={`text-xs xs:text-sm truncate ${theme === "dark" ? "text-slate-300" : "text-slate-700"
+                          }`}>
                           {selectedFile.name}
                         </span>
                       </div>
@@ -442,21 +420,19 @@ const CopyEvaluationPage: React.FC = () => {
                             fileInputRef.current.value = '';
                           }
                         }}
-                        className={`p-1.5 xs:p-2 rounded-lg transition-colors flex-shrink-0 ${
-                          theme === "dark" 
-                            ? "hover:bg-slate-700 text-slate-400 hover:text-slate-200" 
+                        className={`p-1.5 xs:p-2 rounded-lg transition-colors flex-shrink-0 ${theme === "dark"
+                            ? "hover:bg-slate-700 text-slate-400 hover:text-slate-200"
                             : "hover:bg-slate-200 text-slate-500 hover:text-slate-700"
-                        }`}
+                          }`}
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div className={`border-2 border-dashed rounded-xl xs:rounded-2xl p-6 xs:p-8 text-center transition-colors ${
-                      theme === "dark" 
-                        ? "border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50" 
+                    <div className={`border-2 border-dashed rounded-xl xs:rounded-2xl p-6 xs:p-8 text-center transition-colors ${theme === "dark"
+                        ? "border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50"
                         : "border-slate-300 bg-slate-50/50 hover:border-purple-400"
-                    }`}>
+                      }`}>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -466,21 +442,17 @@ const CopyEvaluationPage: React.FC = () => {
                         id="pdf-upload-full"
                       />
                       <label htmlFor="pdf-upload-full" className="cursor-pointer block">
-                        <div className={`p-4 xs:p-5 rounded-full mx-auto mb-3 xs:mb-4 w-fit ${
-                          theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
-                        }`}>
-                          <Upload className={`w-6 h-6 xs:w-8 xs:h-8 mx-auto ${
-                            theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                          }`} />
+                        <div className={`p-4 xs:p-5 rounded-full mx-auto mb-3 xs:mb-4 w-fit ${theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
+                          }`}>
+                          <Upload className={`w-6 h-6 xs:w-8 xs:h-8 mx-auto ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
+                            }`} />
                         </div>
-                        <p className={`text-xs xs:text-sm font-medium mb-1 ${
-                          theme === "dark" ? "text-slate-300" : "text-slate-700"
-                        }`}>
+                        <p className={`text-xs xs:text-sm font-medium mb-1 ${theme === "dark" ? "text-slate-300" : "text-slate-700"
+                          }`}>
                           Click to upload PDF or drag and drop
                         </p>
-                        <p className={`text-[10px] xs:text-xs ${
-                          theme === "dark" ? "text-slate-500" : "text-slate-500"
-                        }`}>
+                        <p className={`text-[10px] xs:text-xs ${theme === "dark" ? "text-slate-500" : "text-slate-500"
+                          }`}>
                           Maximum file size: 10MB
                         </p>
                       </label>
@@ -497,11 +469,10 @@ const CopyEvaluationPage: React.FC = () => {
                     <select
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      className={`w-full px-4 py-2 rounded-lg border ${
-                        theme === "dark"
+                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
                           ? "bg-slate-800 border-slate-700 text-slate-200"
                           : "bg-white border-slate-300"
-                      }`}
+                        }`}
                     >
                       <option>General Studies</option>
                       <option>Essay</option>
@@ -518,11 +489,10 @@ const CopyEvaluationPage: React.FC = () => {
                       value={paper}
                       onChange={(e) => setPaper(e.target.value)}
                       placeholder="e.g., GS Paper 1"
-                      className={`w-full px-4 py-2 rounded-lg border ${
-                        theme === "dark"
+                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
                           ? "bg-slate-800 border-slate-700 text-slate-200"
                           : "bg-white border-slate-300"
-                      }`}
+                        }`}
                     />
                   </div>
 
@@ -534,22 +504,20 @@ const CopyEvaluationPage: React.FC = () => {
                       type="number"
                       value={year}
                       onChange={(e) => setYear(parseInt(e.target.value))}
-                      className={`w-full px-4 py-2 rounded-lg border ${
-                        theme === "dark"
+                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
                           ? "bg-slate-800 border-slate-700 text-slate-200"
                           : "bg-white border-slate-300"
-                      }`}
+                        }`}
                     />
                   </div>
                 </div>
 
                 {/* Enhanced Error Message */}
                 {error && (
-                  <div className={`p-3 xs:p-3.5 rounded-xl border flex items-start gap-2 xs:gap-2.5 ${
-                    theme === "dark"
+                  <div className={`p-3 xs:p-3.5 rounded-xl border flex items-start gap-2 xs:gap-2.5 ${theme === "dark"
                       ? "bg-red-900/20 border-red-700/50 text-red-300"
                       : "bg-red-50 border-red-200 text-red-800"
-                  }`}>
+                    }`}>
                     <X className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0 mt-0.5" />
                     <p className="text-xs xs:text-sm">{error}</p>
                   </div>

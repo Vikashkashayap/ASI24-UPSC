@@ -16,9 +16,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // Load theme from localStorage or default to light
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      return stored || "light";
+      return stored || "dark";
     }
-    return "light";
+    return "dark";
   });
 
   // Apply theme to document root on mount and when theme changes
@@ -26,7 +26,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(theme);
-    
+
     // Also store in localStorage
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);

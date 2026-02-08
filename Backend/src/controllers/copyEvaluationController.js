@@ -436,7 +436,7 @@ export const processEvaluation = async (req, res) => {
     console.log("🤖 Starting AI evaluation...");
     
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-sonnet";
+    const model = process.env.OPENROUTER_MODEL || "google/gemini-1.5-flash";
 
     // Validate API key
     if (!apiKey) {

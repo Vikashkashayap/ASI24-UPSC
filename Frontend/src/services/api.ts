@@ -106,6 +106,44 @@ export const testAPI = {
   },
 };
 
+// Auth API
+export const authAPI = {
+  login: async (credentials: any) => {
+    return api.post("/api/auth/login", credentials);
+  },
+  changePassword: async (newPassword: string) => {
+    return api.post("/api/auth/change-password", { newPassword });
+  },
+  getMe: async () => {
+    return api.get("/api/auth/me");
+  },
+};
+
+// Admin API
+export const adminAPI = {
+  getStudents: async (params: any) => {
+    return api.get("/api/admin/students", { params });
+  },
+  getStudentById: async (id: string) => {
+    return api.get(`/api/admin/students/${id}`);
+  },
+  createStudent: async (studentData: { name: string; email: string }) => {
+    return api.post("/api/admin/students", studentData);
+  },
+  updateStudentStatus: async (id: string, status: string) => {
+    return api.patch(`/api/admin/students/${id}/status`, { status });
+  },
+  resetPassword: async (id: string) => {
+    return api.post(`/api/admin/students/${id}/reset-password`);
+  },
+  getDashboardStats: async () => {
+    return api.get("/api/admin/dashboard");
+  },
+  deleteStudent: async (id: string) => {
+    return api.delete(`/api/admin/students/${id}`);
+  },
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {
