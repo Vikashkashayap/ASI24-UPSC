@@ -1,6 +1,8 @@
 import { User } from "../models/User.js";
 import CopyEvaluation from "../models/CopyEvaluation.js";
 import Test from "../models/Test.js";
+import { MeetingRoom } from "../models/MeetingRoom.js";
+import { MentorChat } from "../models/MentorChat.js";
 
 export const getAllStudents = async (req, res) => {
   try {
@@ -732,6 +734,59 @@ export const updateStudentStatus = async (req, res) => {
   }
 };
 
+export const createStudent = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Name and email are required"
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already registered"
+      });
+    }
+
+    // Auto-generate a password
+    const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    
+    const student = await User.create({
+      name,
+      email,
+      password: tempPassword,
+      role: 'student',
+      isActive: true,
+      mustChangePassword: true,
+      createdBy: req.user?._id
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Student account created successfully",
+      data: {
+        student: {
+          id: student._id,
+          name: student.name,
+          email: student.email
+        },
+        tempPassword // In production, send this via email
+      }
+    });
+  } catch (error) {
+    console.error("Error creating student:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create student account"
+    });
+  }
+};
+
 export const resetStudentPassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -746,27 +801,74 @@ export const resetStudentPassword = async (req, res) => {
 
     // Generate a temporary password
     const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(tempPassword, salt);
 
-    await User.findByIdAndUpdate(id, {
-      password: hashedPassword,
-      updatedAt: new Date()
-    });
+    student.password = tempPassword;
+    student.mustChangePassword = true;
+    await student.save();
 
     res.json({
       success: true,
-      message: "Student password reset successfully",
-      data: {
-        tempPassword, // In production, send this via email instead
-        id: student._id
-      }
+      message: "Password reset successfully",
+      data: { tempPassword }
     });
   } catch (error) {
     console.error("Error resetting student password:", error);
     res.status(500).json({
       success: false,
       message: "Failed to reset student password"
+    });
+  }
+};
+
+export const deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if student exists
+    const student = await User.findById(id);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found"
+      });
+    }
+
+    // Ensure we are deleting a student, not an admin or agent (extra safety)
+    if (student.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: "Only student accounts can be deleted through this endpoint"
+      });
+    }
+
+    // Delete associated data
+    await Promise.all([
+      // Delete evaluations
+      CopyEvaluation.deleteMany({ userId: id }),
+      // Delete tests
+      Test.deleteMany({ userId: id }),
+      // Delete chat history
+      MentorChat.deleteMany({ userId: id }),
+      // Remove from meeting rooms or delete rooms created by them
+      MeetingRoom.deleteMany({ createdBy: id }),
+      MeetingRoom.updateMany(
+        { "participants.userId": id },
+        { $pull: { participants: { userId: id } } }
+      )
+    ]);
+
+    // Finally delete the user
+    await User.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "Student and all associated data deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete student account"
     });
   }
 };
