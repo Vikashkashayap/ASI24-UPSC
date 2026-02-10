@@ -62,6 +62,7 @@ export const mentorAgent = new RunnableLambda({
         throw new Error("Missing OPENROUTER_API_KEY env var");
       }
 
+      
       const response = await fetch(
         "https://openrouter.ai/api/v1/chat/completions",
         {
