@@ -66,11 +66,11 @@ For each question, use this structure:
   "question": "Question text",
   "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
   "answer": "A | B | C | D",
-  "concept": "Core concept tested"
+  "explanation": "Detailed explanation (3–5 sentences) for students: Why the correct answer is right, what concept it tests, and why key wrong options are incorrect. Help students understand and learn from the question."
 }
 
 IMPORTANT CONSTRAINTS:
-- Do NOT include explanations (put them in "concept").
+- "explanation" must be DETAILED (3–5 sentences minimum). Explain the concept clearly so students can understand and remember.
 - Do NOT add any introductory or closing text.
 - Do NOT repeat questions.
 - Keep language concise, formal, and exam-oriented.`;
@@ -160,7 +160,7 @@ Return EXACTLY ${count} questions in a JSON array format as specified.`;
           question: q.question,
           options: optionsObj,
           correctAnswer: q.answer || q.correctAnswer,
-          explanation: q.concept || q.explanation || "No explanation provided.",
+          explanation: q.explanation || q.concept || "No explanation provided.",
           patternType: q.pattern || "GENERAL"
         };
       })

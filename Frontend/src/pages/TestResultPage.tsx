@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -39,6 +39,7 @@ interface TestResult {
 const TestResultPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { theme } = useTheme();
   const [result, setResult] = useState<TestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,16 +118,34 @@ const TestResultPage: React.FC = () => {
 
   const maxScore = result.totalQuestions * 2;
   const scorePercentage = (result.score / maxScore) * 100;
+  const fromAdmin = searchParams.get("fromAdmin") === "1";
+  const studentId = searchParams.get("studentId");
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-3 md:px-4 overflow-x-hidden">
       {/* Header Actions - Mobile-first */}
       <div className="flex items-center justify-between gap-2">
-        <Button onClick={() => navigate("/prelims-test")} variant="outline" className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
-          <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-          <span className="hidden xs:inline">Generate New Test</span>
-          <span className="xs:hidden">New Test</span>
-        </Button>
+        {fromAdmin && studentId ? (
+          <Button
+            onClick={() => navigate(`/admin/students/${studentId}`)}
+            variant="outline"
+            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden xs:inline">Back to Student</span>
+            <span className="xs:hidden">Back</span>
+          </Button>
+        ) : (
+          <Button
+            onClick={() => navigate("/prelims-test")}
+            variant="outline"
+            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden xs:inline">Generate New Test</span>
+            <span className="xs:hidden">New Test</span>
+          </Button>
+        )}
       </div>
 
       {/* Score Summary Card - Mobile-first */}

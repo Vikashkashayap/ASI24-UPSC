@@ -334,6 +334,7 @@ export const getTest = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
+    const userRole = req.user?.role;
 
     if (!userId) {
       return res.status(401).json({
@@ -342,14 +343,16 @@ export const getTest = async (req, res) => {
       });
     }
 
-    // Find test and verify ownership (include tests without userId for backward compatibility)
-    const test = await Test.findOne({
-      _id: id,
-      $or: [
-        { userId },
-        { userId: { $exists: false } }
-      ]
-    });
+    // Admins can view any test; students can only view their own (or legacy tests without userId)
+    const testQuery =
+      userRole === "admin"
+        ? { _id: id }
+        : {
+            _id: id,
+            $or: [{ userId }, { userId: { $exists: false } }],
+          };
+
+    const test = await Test.findOne(testQuery);
 
     if (!test) {
       return res.status(404).json({

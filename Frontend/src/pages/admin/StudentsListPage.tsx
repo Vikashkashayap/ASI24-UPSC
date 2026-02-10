@@ -21,6 +21,8 @@ interface Student {
   lastEvaluationDate: string | null;
   lastSubject: string | null;
   lastPaper: string | null;
+  totalPrelimsTests?: number;
+  prelimsAverageScore?: number;
 }
 
 interface Pagination {
@@ -213,8 +215,13 @@ export const StudentsListPage = () => {
                 <BookOpen className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Evaluations</p>
-                <p className="text-2xl font-black">{students.reduce((acc, s) => acc + s.totalEvaluations, 0)}+</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Activity</p>
+                <p className="text-2xl font-black">
+                  {students.reduce(
+                    (acc, s) => acc + s.totalEvaluations + (s.totalPrelimsTests || 0),
+                    0
+                  )}+
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -266,11 +273,16 @@ export const StudentsListPage = () => {
           </div>
         )}
 
-        {/* Students Grid */}
+        {/* Students List */}
         {loading && students.length === 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-3">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className={`h-64 rounded-[2rem] animate-pulse ${theme === "dark" ? "bg-slate-900/50" : "bg-slate-200/50"}`}></div>
+              <div
+                key={i}
+                className={`h-20 rounded-2xl animate-pulse ${
+                  theme === "dark" ? "bg-slate-900/50" : "bg-slate-200/50"
+                }`}
+              ></div>
             ))}
           </div>
         ) : students.length === 0 ? (
@@ -285,32 +297,44 @@ export const StudentsListPage = () => {
             </p>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-3">
             {students.map((student) => (
               <Card
                 key={student._id}
-                className={`group relative overflow-hidden rounded-[2.5rem] border-2 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/30 ${theme === "dark" ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-100"
-                  }`}
+                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-500/40 ${
+                  theme === "dark"
+                    ? "bg-slate-900/60 border-slate-800"
+                    : "bg-white border-slate-100"
+                }`}
               >
-                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+                <div
+                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
+                ></div>
 
-                <CardContent className="p-7">
-                  <div className="flex items-start justify-between mb-6">
+                <CardContent className="px-5 py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Left: avatar + name/email */}
                     <div className="flex items-center gap-4">
-                      <div className={`h-14 w-14 rounded-2xl flex items-center justify-center text-xl font-black transition-transform group-hover:scale-110 duration-500 ${theme === "dark" ? "bg-purple-500/20 text-purple-400" : "bg-purple-100 text-purple-700"
-                        }`}>
+                      <div
+                        className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-black transition-transform group-hover:scale-110 duration-300 ${
+                          theme === "dark"
+                            ? "bg-purple-500/20 text-purple-300"
+                            : "bg-purple-100 text-purple-700"
+                        }`}
+                      >
                         {getInitials(student.name)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-bold truncate leading-tight group-hover:text-purple-400 transition-colors">
+                        <h3 className="text-sm font-semibold truncate leading-tight group-hover:text-purple-400 transition-colors">
                           {student.name}
                         </h3>
-                        <p className={`text-sm truncate mt-0.5 opacity-60`}>
+                        <p className={`text-xs truncate mt-0.5 opacity-60`}>
                           {student.email}
                         </p>
                       </div>
                     </div>
 
+                    {/* Right top: delete button */}
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Button
                         variant="ghost"
@@ -328,33 +352,55 @@ export const StudentsListPage = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className={`p-4 rounded-3xl ${theme === "dark" ? "bg-slate-800/40" : "bg-slate-50"}`}>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Evaluations</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-bold">{student.totalEvaluations}</span>
-                        </div>
+                  {/* Row content */}
+                  <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    {/* Middle: activity + success */}
+                    <div className="flex flex-1 gap-4 md:gap-8">
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
+                          Total Activity
+                        </p>
+                        <p className="text-base font-semibold">
+                          {student.totalEvaluations + (student.totalPrelimsTests || 0)}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-slate-500">
+                          {student.totalEvaluations} mains • {student.totalPrelimsTests || 0} prelims
+                        </p>
                       </div>
-                      <div className={`p-4 rounded-3xl ${theme === "dark" ? "bg-slate-800/40" : "bg-slate-50"}`}>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Success Rate</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-bold text-emerald-500">
-                            {student.latestScore ? `${Math.round(student.latestScore)}%` : "N/A"}
-                          </span>
-                        </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
+                          Success Rate
+                        </p>
+                        <p className="text-base font-semibold text-emerald-500">
+                          {(() => {
+                            const success =
+                              student.latestScore ??
+                              (student.prelimsAverageScore !== undefined
+                                ? student.prelimsAverageScore
+                                : null);
+                            return success !== null ? `${Math.round(success)}%` : "N/A";
+                          })()}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold opacity-40">
+                    {/* Right: joined + profile button */}
+                    <div className="flex items-center justify-between md:justify-end gap-3 md:min-w-[220px]">
+                      <div className="flex items-center gap-2 text-[11px] font-semibold opacity-50">
                         <Calendar className="h-3.5 w-3.5" />
-                        <span>{new Date(student.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                        <span>
+                          {new Date(student.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
                       </div>
-
                       <Link to={`/admin/students/${student._id}`}>
-                        <Button variant="ghost" className="rounded-xl h-auto py-2 px-4 hover:bg-purple-500/10 hover:text-purple-400 flex items-center gap-2 group/btn">
-                          <span className="text-xs font-bold uppercase tracking-wider">Profile</span>
+                        <Button
+                          variant="ghost"
+                          className="rounded-xl h-8 px-3 hover:bg-purple-500/10 hover:text-purple-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
+                        >
+                          Profile
                           <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
                         </Button>
                       </Link>
