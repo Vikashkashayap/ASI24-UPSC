@@ -4,7 +4,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { api } from "../../services/api";
 import { useTheme } from "../../hooks/useTheme";
-import { Users, FileText, ClipboardCheck, TrendingUp, UserPlus, Activity, Search, Eye, Calendar, Trophy } from "lucide-react";
+import { Users, FileText, ClipboardCheck, TrendingUp, UserPlus, Activity, Search, Eye, Calendar, Trophy, BookOpen } from "lucide-react";
 
 interface DashboardStats {
   totalStudents: number;
@@ -14,6 +14,8 @@ interface DashboardStats {
   recentRegistrations: number;
   activeStudents: number;
   highPerformers: number;
+  totalPrelimsTests: number;
+  prelimsAverageScore: number;
 }
 
 interface SubjectPerformance {
@@ -78,7 +80,9 @@ export const AdminDashboardPage = () => {
           averageScore: overview.averageScore || 0,
           recentRegistrations: overview.recentRegistrations || 0,
           activeStudents: overview.activeStudents || 0,
-          highPerformers: overview.highPerformers || 0
+          highPerformers: overview.highPerformers || 0,
+          totalPrelimsTests: overview.totalPrelimsTests || 0,
+          prelimsAverageScore: overview.prelimsAverageScore || 0
         });
 
         setSubjectPerformance(res.data.data.subjectPerformance || []);
@@ -146,6 +150,13 @@ export const AdminDashboardPage = () => {
       icon: FileText,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
+    },
+    {
+      title: "Prelims Tests (All Time)",
+      value: stats?.totalPrelimsTests || 0,
+      icon: BookOpen,
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-500/10",
     },
     {
       title: "Pending Evaluations",

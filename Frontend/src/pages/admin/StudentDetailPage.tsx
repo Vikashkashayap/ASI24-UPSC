@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
@@ -155,6 +155,7 @@ interface EvaluationDetails {
 export const StudentDetailPage = () => {
   const { theme } = useTheme();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [student, setStudent] = useState<Student | null>(null);
   const [performanceSummary, setPerformanceSummary] = useState<PerformanceSummary | null>(null);
   const [prelimsData, setPrelimsData] = useState<{
@@ -1091,37 +1092,81 @@ export const StudentDetailPage = () => {
                 ) : (
                   <div className="space-y-3">
                     {prelimsData?.tests.map((test) => (
-                      <div key={test.id} className={`p-5 rounded-xl border transition-colors duration-200 ${
-                        theme === "dark"
-                          ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
-                          : "bg-slate-50 border-slate-200 hover:bg-slate-100/80"
-                      }`}>
-                        <div className="flex justify-between items-start">
+                      <div
+                        key={test.id}
+                        className={`p-5 rounded-xl border transition-colors duration-200 cursor-pointer ${
+                          theme === "dark"
+                            ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
+                            : "bg-slate-50 border-slate-200 hover:bg-slate-100/80"
+                        }`}
+                        onClick={() => navigate(`/result/${test.id}?fromAdmin=1&studentId=${id}`)}
+                      >
+                        <div className="flex justify-between items-start gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className={`font-semibold text-lg truncate ${
-                              theme === "dark" ? "text-slate-100" : "text-slate-900"
-                            }`}>{test.subject} - {test.topic}</h3>
-                            <p className={`text-sm mt-1 ${
-                              theme === "dark" ? "text-slate-400" : "text-slate-600"
-                            }`}>{test.difficulty} • {test.totalQuestions} questions</p>
-                            <p className={`text-xs mt-2 ${
-                              theme === "dark" ? "text-slate-500" : "text-slate-500"
-                            }`}>{new Date(test.attemptedAt).toLocaleString()}</p>
+                            <h3
+                              className={`font-semibold text-lg truncate ${
+                                theme === "dark" ? "text-slate-100" : "text-slate-900"
+                              }`}
+                            >
+                              {test.subject} - {test.topic}
+                            </h3>
+                            <p
+                              className={`text-sm mt-1 ${
+                                theme === "dark" ? "text-slate-400" : "text-slate-600"
+                              }`}
+                            >
+                              {test.difficulty} • {test.totalQuestions} questions
+                            </p>
+                            <p
+                              className={`text-xs mt-2 ${
+                                theme === "dark" ? "text-slate-500" : "text-slate-500"
+                              }`}
+                            >
+                              {new Date(test.attemptedAt).toLocaleString()}
+                            </p>
                           </div>
-                          <div className="text-right ml-4">
-                            <div className={`text-xl font-bold ${
-                              theme === "dark" ? "text-slate-100" : "text-slate-900"
-                            }`}>Score: {test.score}</div>
-                            <div className={`text-sm mt-1 ${
-                              theme === "dark" ? "text-slate-400" : "text-slate-600"
-                            }`}>Accuracy: {test.accuracy.toFixed(1)}%</div>
-                            <div className={`text-xs mt-2 px-2 py-1 rounded-full inline-block ${
-                              theme === "dark"
-                                ? "bg-slate-700 text-slate-300"
-                                : "bg-slate-100 text-slate-700"
-                            }`}>
-                              {test.correctAnswers} correct, {test.wrongAnswers} wrong
+                          <div className="text-right ml-4 flex flex-col items-end gap-2">
+                            <div>
+                              <div
+                                className={`text-xl font-bold ${
+                                  theme === "dark" ? "text-slate-100" : "text-slate-900"
+                                }`}
+                              >
+                                Score: {test.score.toFixed(2)}
+                              </div>
+                              <div
+                                className={`text-sm ${
+                                  theme === "dark" ? "text-slate-400" : "text-slate-600"
+                                }`}
+                              >
+                                Accuracy: {test.accuracy.toFixed(1)}%
+                              </div>
+                              <div
+                                className={`text-xs mt-1 px-2 py-1 rounded-full inline-block ${
+                                  theme === "dark"
+                                    ? "bg-slate-700 text-slate-300"
+                                    : "bg-slate-100 text-slate-700"
+                                }`}
+                              >
+                                {test.correctAnswers} correct, {test.wrongAnswers} wrong
+                              </div>
                             </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mt-1 flex items-center gap-1 ${
+                                theme === "dark"
+                                  ? "border-slate-600 text-slate-200 hover:bg-slate-800"
+                                  : "border-slate-300 text-slate-700 hover:bg-slate-100"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/result/${test.id}?fromAdmin=1&studentId=${id}`);
+                              }}
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                              <span className="text-xs font-semibold">View Details</span>
+                            </Button>
                           </div>
                         </div>
                       </div>

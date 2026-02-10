@@ -31,20 +31,39 @@ export const getAllStudents = async (req, res) => {
       .skip((parseInt(page) - 1) * parseInt(limit))
       .limit(parseInt(limit));
 
-    // Get evaluation counts for each student
+    // Get evaluation + prelims test counts for each student
     const studentsWithStats = await Promise.all(
       students.map(async (student) => {
-        const evaluationCount = await CopyEvaluation.countDocuments({
-          userId: student._id,
-          status: 'completed'
-        });
+        const [evaluationCount, latestEvaluation, prelimsAgg] = await Promise.all([
+          CopyEvaluation.countDocuments({
+            userId: student._id,
+            status: 'completed'
+          }),
+          CopyEvaluation.findOne({
+            userId: student._id,
+            status: 'completed'
+          })
+            .sort({ createdAt: -1 })
+            .select('finalSummary.overallScore createdAt subject paper'),
+          // Prelims stats: total tests + average score
+          Test.aggregate([
+            {
+              $match: {
+                userId: student._id,
+                isSubmitted: true
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 },
+                avgScore: { $avg: '$score' }
+              }
+            }
+          ])
+        ]);
 
-        const latestEvaluation = await CopyEvaluation.findOne({
-          userId: student._id,
-          status: 'completed'
-        })
-        .sort({ createdAt: -1 })
-        .select('finalSummary.overallScore createdAt subject paper');
+        const prelimsStats = prelimsAgg[0] || { count: 0, avgScore: 0 };
 
         return {
           _id: student._id,
@@ -55,7 +74,9 @@ export const getAllStudents = async (req, res) => {
           latestScore: latestEvaluation?.finalSummary?.overallScore?.percentage || null,
           lastEvaluationDate: latestEvaluation?.createdAt || null,
           lastSubject: latestEvaluation?.subject || null,
-          lastPaper: latestEvaluation?.paper || null
+          lastPaper: latestEvaluation?.paper || null,
+          totalPrelimsTests: prelimsStats.count || 0,
+          prelimsAverageScore: Math.round(prelimsStats.avgScore || 0)
         };
       })
     );
@@ -467,6 +488,7 @@ export const getDashboardStats = async (req, res) => {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalEvaluations = await CopyEvaluation.countDocuments({ status: 'completed' });
     const pendingEvaluations = await CopyEvaluation.countDocuments({ status: { $in: ['pending', 'processing'] } });
+    const totalPrelimsTests = await Test.countDocuments({ isSubmitted: true });
 
     // Recent registrations (last 7 days)
     const recentRegistrations = await User.countDocuments({
@@ -493,6 +515,12 @@ export const getDashboardStats = async (req, res) => {
     const averageScore = completedEvaluations.length > 0
       ? Math.round(completedEvaluations.reduce((sum, e) =>
           sum + (e.finalSummary?.overallScore?.percentage || 0), 0) / completedEvaluations.length)
+      : 0;
+
+    // Get prelims average score across all submitted tests
+    const prelimsTestsForAverage = await Test.find({ isSubmitted: true }).select('score');
+    const prelimsAverageScore = prelimsTestsForAverage.length > 0
+      ? Math.round(prelimsTestsForAverage.reduce((sum, t) => sum + (t.score || 0), 0) / prelimsTestsForAverage.length)
       : 0;
 
     // Get high performers (above 80%)
@@ -554,6 +582,8 @@ export const getDashboardStats = async (req, res) => {
           pendingEvaluations,
           recentEvaluations,
           averageScore,
+          totalPrelimsTests,
+          prelimsAverageScore,
           recentRegistrations,
           activeStudents: activeStudents.length,
           highPerformers
