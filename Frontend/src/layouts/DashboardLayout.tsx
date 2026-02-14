@@ -24,6 +24,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/prelims-pdf-tests': { title: 'Scheduled PDF Tests', icon: <ClipboardList className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
@@ -35,6 +36,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/admin/prelims-pdf-tests': { title: 'PDF Prelims Tests', icon: <FileText className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -50,6 +52,12 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   }
   if (pathname.startsWith('/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/prelims-pdf-test/') && !pathname.startsWith('/prelims-pdf-tests')) {
+    return { title: 'PDF Test', icon: <ClipboardList className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/prelims-pdf-result/')) {
+    return { title: 'PDF Test Result', icon: <LineChart className="w-5 h-5" /> };
   }
 
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
@@ -134,6 +142,10 @@ export const DashboardLayout = () => {
                 <NavLink to="/admin/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Students Management">
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
+                </NavLink>
+                <NavLink to="/admin/prelims-pdf-tests" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="PDF Prelims Tests">
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>PDF Prelims Tests</span>}
                 </NavLink>
               </div>
 
@@ -220,6 +232,10 @@ export const DashboardLayout = () => {
                       </span>
                     )}
                   </div>
+                </NavLink>
+                <NavLink to="/prelims-pdf-tests" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Scheduled PDF Tests">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Scheduled PDF Tests</span>}
                 </NavLink>
                 {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />

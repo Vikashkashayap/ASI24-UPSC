@@ -47,6 +47,7 @@ import mentorRoutes from "./routes/mentorRoutes.js";
 import copyEvaluationRoutes from "./routes/copyEvaluationRoutes.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
+import prelimsPdfTestRoutes from "./routes/prelimsPdfTestRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
@@ -105,6 +106,7 @@ app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
+app.use("/api/prelims-pdf-tests", prelimsPdfTestRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 
 const PORT = process.env.PORT || 5000;

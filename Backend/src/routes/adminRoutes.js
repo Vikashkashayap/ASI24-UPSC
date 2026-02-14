@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   getAllStudents,
   getStudentById,
@@ -12,9 +13,26 @@ import {
   searchUsers,
   deleteStudent,
 } from "../controllers/adminController.js";
+import {
+  createPrelimsPdfTest,
+  listPrelimsPdfTestsAdmin,
+} from "../controllers/prelimsPdfTestController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const uploadPdf = multer({
+  storage,
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") cb(null, true);
+    else cb(new Error("Only PDF files allowed"), false);
+  },
+}).fields([
+  { name: "questionPdf", maxCount: 1 },
+  { name: "solutionPdf", maxCount: 1 },
+]);
 
 // Debugging: Log all hits to admin routes
 router.use((req, res, next) => {
@@ -30,6 +48,10 @@ router.get("/dashboard", getDashboardStats);
 
 // User search
 router.get("/search", searchUsers);
+
+// PDF-based Prelims tests
+router.get("/prelims-pdf-tests", listPrelimsPdfTestsAdmin);
+router.post("/prelims-pdf-tests", uploadPdf, createPrelimsPdfTest);
 
 // Student management
 router.delete("/students/:id", (req, res, next) => {

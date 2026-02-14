@@ -144,6 +144,112 @@ export const adminAPI = {
   },
 };
 
+// Prelims PDF-based scheduled tests
+export const prelimsPdfTestAPI = {
+  list: () => api.get<{ success: boolean; data: PrelimsPdfTestListItem[] }>("/api/prelims-pdf-tests"),
+  start: (testId: string) =>
+    api.post<{ success: boolean; data: { attemptId: string; testId: string } }>(`/api/prelims-pdf-tests/${testId}/start`),
+  getAttempt: (attemptId: string) =>
+    api.get<{ success: boolean; data: PrelimsPdfTestAttemptData }>(`/api/prelims-pdf-tests/attempt/${attemptId}`),
+  saveAnswers: (attemptId: string, answers: Record<number | string, string>) =>
+    api.patch(`/api/prelims-pdf-tests/attempt/${attemptId}/answers`, { answers }),
+  submit: (attemptId: string) =>
+    api.post<{ success: boolean; data: PrelimsPdfTestSubmitResult }>(`/api/prelims-pdf-tests/attempt/${attemptId}/submit`),
+  getResult: (attemptId: string) =>
+    api.get<{ success: boolean; data: PrelimsPdfTestResultData }>(`/api/prelims-pdf-tests/attempt/${attemptId}/result`),
+};
+
+// Admin: PDF test create & list
+export const adminPrelimsPdfAPI = {
+  list: () => api.get<{ success: boolean; data: PrelimsPdfTestAdminItem[] }>("/api/admin/prelims-pdf-tests"),
+  create: (formData: FormData) =>
+    api.post<{ success: boolean; data: { _id: string; title: string; duration: number; negativeMarking: number; startTime: string; endTime: string; totalQuestions: number; testType: string } }>(
+      "/api/admin/prelims-pdf-tests",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    ),
+};
+
+// Types for PDF tests
+export interface PrelimsPdfTestListItem {
+  _id: string;
+  title: string;
+  duration: number;
+  negativeMarking: number;
+  startTime: string;
+  endTime: string;
+  totalQuestions: number;
+  testType: string;
+  status: "Upcoming" | "Live" | "Expired";
+}
+
+export interface PrelimsPdfTestAdminItem {
+  _id: string;
+  title: string;
+  duration: number;
+  negativeMarking: number;
+  startTime: string;
+  endTime: string;
+  totalQuestions: number;
+  testType: string;
+  createdAt?: string;
+}
+
+export interface PrelimsPdfQuestionText {
+  english: string;
+  hindi: string;
+}
+
+export interface PrelimsPdfOption {
+  key: string;
+  english: string;
+  hindi: string;
+}
+
+export interface PrelimsPdfQuestionInAttempt {
+  _id: string;
+  questionNumber: number;
+  questionText: PrelimsPdfQuestionText;
+  options: PrelimsPdfOption[];
+  userAnswer: string | null;
+}
+
+export interface PrelimsPdfTestAttemptData {
+  attemptId: string;
+  testId: string;
+  title: string;
+  duration: number;
+  negativeMarking: number;
+  startTime: string;
+  endTime: string;
+  totalQuestions: number;
+  questions: PrelimsPdfQuestionInAttempt[];
+  isSubmitted: boolean;
+  startedAt: string;
+}
+
+export interface PrelimsPdfTestSubmitResult {
+  attemptId: string;
+  testId: string;
+  title: string;
+  totalQuestions: number;
+  score: number;
+  correctCount: number;
+  wrongCount: number;
+  questions: Array<{
+    questionNumber: number;
+    questionText: PrelimsPdfQuestionText;
+    options: PrelimsPdfOption[];
+    correctAnswer: string;
+    userAnswer: string | null;
+    explanation: string;
+    isCorrect: boolean;
+  }>;
+  submittedAt: string;
+}
+
+export interface PrelimsPdfTestResultData extends PrelimsPdfTestSubmitResult {}
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

@@ -16,6 +16,9 @@ import TestGeneratorPage from "./pages/TestGeneratorPage";
 import TestHistoryPage from "./pages/TestHistoryPage";
 import TestPage from "./pages/TestPage";
 import TestResultPage from "./pages/TestResultPage";
+import { PrelimsPdfTestListPage } from "./pages/PrelimsPdfTestListPage";
+import PrelimsPdfTestExamPage from "./pages/PrelimsPdfTestExamPage";
+import PrelimsPdfResultPage from "./pages/PrelimsPdfResultPage";
 import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -23,6 +26,7 @@ import { AdminRoute } from "./components/AdminRoute";
 import { LandingPage } from "./pages/LandingPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
+import { AdminPrelimsPdfTestsPage } from "./pages/admin/AdminPrelimsPdfTestsPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
@@ -57,6 +61,9 @@ function App() {
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
+            <Route path="prelims-pdf-tests" element={<PrelimsPdfTestListPage />} />
+            <Route path="prelims-pdf-test/:attemptId" element={<PrelimsPdfTestExamPage />} />
+            <Route path="prelims-pdf-result/:attemptId" element={<PrelimsPdfResultPage />} />
             <Route path="test-history" element={<TestHistoryPage />} />
             <Route path="test/:id" element={<TestPage />} />
             <Route path="result/:id" element={<TestResultPage />} />
@@ -74,6 +81,7 @@ function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="prelims-pdf-tests" element={<AdminPrelimsPdfTestsPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>
