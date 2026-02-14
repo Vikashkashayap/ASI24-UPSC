@@ -2,135 +2,153 @@ import Test from "../models/Test.js";
 import { generateTestQuestions } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 
+const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
+const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
+
 /**
  * Generate a new test with AI-generated questions
  * POST /api/tests/generate
+ * Body: { subjects: string[], topic: string, examType: "GS" | "CSAT", questionCount: number, difficulty?, csatCategories?, currentAffairsPeriod? }
  */
 export const generateTest = async (req, res) => {
   try {
-    const { subject, topic, difficulty, count } = req.body;
+    const { subjects, topic, examType, questionCount, difficulty, csatCategories, currentAffairsPeriod } = req.body;
+    const count = questionCount != null ? parseInt(questionCount, 10) : null;
 
     // Validation
-    if (!subject || !topic || !difficulty || !count) {
+    if (!Array.isArray(subjects) || subjects.length === 0 || !topic || !examType || count == null) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields: subject, topic, difficulty, count",
+        message: "Missing required fields: subjects (array), topic, examType, questionCount",
       });
     }
 
-    if (!["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech"].includes(subject)) {
+    const invalidSubject = subjects.find((s) => !ALLOWED_SUBJECTS.includes(s));
+    if (invalidSubject) {
       return res.status(400).json({
         success: false,
-        message: "Invalid subject. Must be one of: Polity, History, Geography, Economy, Environment, Science & Tech",
+        message: `Invalid subject: ${invalidSubject}. Allowed: ${ALLOWED_SUBJECTS.join(", ")}`,
       });
     }
 
-    if (!["Easy", "Moderate", "Hard"].includes(difficulty)) {
+    const hasCsat = subjects.includes("CSAT");
+    const hasGsSubject = subjects.some((s) => GS_SUBJECTS.includes(s));
+    if (hasCsat && hasGsSubject) {
+      return res.status(400).json({
+        success: false,
+        message: "CSAT cannot be mixed with GS subjects.",
+      });
+    }
+
+    if (!["GS", "CSAT"].includes(examType)) {
+      return res.status(400).json({
+        success: false,
+        message: "examType must be GS or CSAT",
+      });
+    }
+
+    if (examType === "GS" && difficulty && !["Easy", "Moderate", "Hard"].includes(difficulty)) {
       return res.status(400).json({
         success: false,
         message: "Invalid difficulty. Must be: Easy, Moderate, or Hard",
       });
     }
 
-    if (![5, 10, 20].includes(parseInt(count))) {
+    if (![5, 10, 20].includes(count)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid count. Must be: 5, 10, or 20",
+        message: "Invalid questionCount. Must be: 5, 10, or 20",
       });
     }
 
+    const subjectDisplay = subjects.join(", ");
+
     // ---------------------------------------------------------
-    // CACHING LOGIC START
+    // CACHING LOGIC START (GS only; same subject set + topic + difficulty + count)
     // ---------------------------------------------------------
-    // Check if a test with the same parameters already exists
-    // We want to reuse questions to save AI costs and standardize tests
-    const existingTest = await Test.findOne({
-      subject,
-      topic,
-      difficulty,
-      totalQuestions: parseInt(count),
-      // Ensure we pick a valid test with questions
-      questions: { $exists: true, $not: { $size: 0 } }
-    }).sort({ createdAt: -1 }); // Get the most recent one if multiple exist
-
-    if (existingTest) {
-      console.log(`♻️  CACHE HIT: Found existing test for ${subject} - ${topic} (${difficulty})`);
-
-      // -------------------------------------------------------
-      // SHUFFLE LOGIC
-      // -------------------------------------------------------
-      // We shuffle the questions so different students get different order
-      // even though the content is the same (Standardized Test)
-      const shuffledQuestions = [...existingTest.questions]
-        .map(value => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({ value }) => value);
-
-      // Create a NEW test document for this user, but copying the questions from the existing test
-      const newTest = new Test({
-        userId: req.user?.id,
-        subject,
+    if (examType === "GS" && difficulty) {
+      const existingTest = await Test.findOne({
+        subject: subjectDisplay,
         topic,
         difficulty,
-        questions: shuffledQuestions.map(q => ({
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-          explanation: q.explanation,
-          userAnswer: null // Reset user answer
-        })),
-        totalQuestions: existingTest.totalQuestions,
-      });
+        totalQuestions: count,
+        questions: { $exists: true, $not: { $size: 0 } },
+      }).sort({ createdAt: -1 });
 
-      await newTest.save();
+      if (existingTest) {
+        console.log(`♻️  CACHE HIT: Found existing test for ${subjectDisplay} - ${topic} (${difficulty})`);
 
-      // Return the new test (without answers)
-      const testForUser = {
-        _id: newTest._id,
-        subject: newTest.subject,
-        topic: newTest.topic,
-        difficulty: newTest.difficulty,
-        totalQuestions: newTest.totalQuestions,
-        questions: newTest.questions.map((q) => ({
-          _id: q._id,
-          question: q.question,
-          options: q.options,
-        })),
-        createdAt: newTest.createdAt,
-      };
+        const shuffledQuestions = [...existingTest.questions]
+          .map((value) => ({ value, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .map(({ value }) => value);
 
-      return res.status(201).json({
-        success: true,
-        message: "Test generated successfully (cached)",
-        data: testForUser,
-      });
+        const newTest = new Test({
+          userId: req.user?.id,
+          subject: subjectDisplay,
+          examType: "GS",
+          topic,
+          difficulty,
+          questions: shuffledQuestions.map((q) => ({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation,
+            userAnswer: null,
+          })),
+          totalQuestions: existingTest.totalQuestions,
+        });
+
+        await newTest.save();
+
+        const testForUser = {
+          _id: newTest._id,
+          subject: newTest.subject,
+          examType: newTest.examType,
+          topic: newTest.topic,
+          difficulty: newTest.difficulty,
+          totalQuestions: newTest.totalQuestions,
+          questions: newTest.questions.map((q) => ({
+            _id: q._id,
+            question: q.question,
+            options: q.options,
+          })),
+          createdAt: newTest.createdAt,
+        };
+
+        return res.status(201).json({
+          success: true,
+          message: "Test generated successfully (cached)",
+          data: testForUser,
+        });
+      }
     }
     // ---------------------------------------------------------
     // CACHING LOGIC END
     // ---------------------------------------------------------
 
-    // Generate questions using AI
-    console.log(`📝 Generating ${count} questions for ${subject} - ${topic} (${difficulty})...`);
+    console.log(`📝 Generating ${count} questions for ${subjectDisplay} - ${topic} (${examType})...`);
     const generationResult = await generateTestQuestions({
-      subject,
+      subjects,
       topic,
-      difficulty,
-      count: parseInt(count),
+      examType,
+      questionCount: count,
+      difficulty: examType === "GS" ? difficulty || "Moderate" : undefined,
+      csatCategories: examType === "CSAT" ? csatCategories : undefined,
+      currentAffairsPeriod: currentAffairsPeriod || undefined,
     });
 
     if (!generationResult.success) {
-      // Provide more helpful error messages with detailed logging
       let errorMessage = generationResult.error || "Failed to generate questions";
-      
+
       console.error("=".repeat(60));
       console.error("❌ Test generation FAILED in controller");
       console.error("   Error message:", errorMessage);
       console.error("   Generation result:", JSON.stringify(generationResult, null, 2));
       console.error("=".repeat(60));
-      
-      // Check for common API key issues
+
       const lowerError = errorMessage.toLowerCase();
-      if (lowerError.includes("401") || lowerError.includes("unauthorized") || lowerError.includes("user not found") || lowerError.includes("invalid") && lowerError.includes("api key")) {
+      if (lowerError.includes("401") || lowerError.includes("unauthorized") || (lowerError.includes("invalid") && lowerError.includes("api key"))) {
         errorMessage = "Invalid OpenRouter API key. Please check your OPENROUTER_API_KEY in the .env file. Get your key from https://openrouter.ai/keys";
       } else if (lowerError.includes("not configured") || lowerError.includes("missing") || lowerError.includes("required")) {
         errorMessage = "OpenRouter API key is not set. Please add OPENROUTER_API_KEY to your .env file.";
@@ -138,12 +156,10 @@ export const generateTest = async (req, res) => {
         errorMessage = `Invalid model configuration: ${errorMessage}. Please check OPENROUTER_MODEL in .env file.`;
       }
 
-      console.error("   Final error message to user:", errorMessage);
-      
       return res.status(500).json({
         success: false,
         message: errorMessage,
-        error: errorMessage, // Include error field for debugging
+        error: errorMessage,
       });
     }
 
@@ -154,22 +170,22 @@ export const generateTest = async (req, res) => {
       });
     }
 
-    // Create test document
     const test = new Test({
       userId: req.user?.id,
-      subject,
+      subject: subjectDisplay,
+      examType,
       topic,
-      difficulty,
+      ...(examType === "GS" && difficulty && { difficulty }),
       questions: generationResult.questions,
       totalQuestions: generationResult.questions.length,
     });
 
     await test.save();
 
-    // Return test without correct answers (user shouldn't see them during test)
     const testForUser = {
       _id: test._id,
       subject: test.subject,
+      examType: test.examType,
       topic: test.topic,
       difficulty: test.difficulty,
       totalQuestions: test.totalQuestions,
@@ -177,7 +193,6 @@ export const generateTest = async (req, res) => {
         _id: q._id,
         question: q.question,
         options: q.options,
-        // Don't send correctAnswer or explanation yet
       })),
       createdAt: test.createdAt,
     };
@@ -211,7 +226,7 @@ export const generateTest = async (req, res) => {
 export const submitTest = async (req, res) => {
   try {
     const { id } = req.params;
-    const { answers } = req.body; // { questionIndex: "A" | "B" | "C" | "D" }
+    const { answers, questionTimeSpent } = req.body; // answers: { questionId: "A"|"B"|... }, questionTimeSpent: { questionId: seconds }
 
     if (!answers || typeof answers !== "object") {
       return res.status(400).json({
@@ -257,13 +272,16 @@ export const submitTest = async (req, res) => {
     let wrongCount = 0;
 
     test.questions.forEach((question) => {
-      // Support both question ID format (preferred) and array index format
       const questionId = question._id.toString();
       const userAnswer = answers[questionId] || answers[question._id];
-      
+      const seconds = questionTimeSpent && typeof questionTimeSpent[questionId] === "number"
+        ? Math.round(questionTimeSpent[questionId])
+        : 0;
+      question.timeSpent = seconds;
+
       if (userAnswer) {
         question.userAnswer = userAnswer;
-        
+
         if (userAnswer === question.correctAnswer) {
           score += 2;
           correctCount++;
@@ -297,6 +315,7 @@ export const submitTest = async (req, res) => {
       data: {
         _id: test._id,
         subject: test.subject,
+        examType: test.examType || "GS",
         topic: test.topic,
         difficulty: test.difficulty,
         totalQuestions: test.totalQuestions,
@@ -312,6 +331,7 @@ export const submitTest = async (req, res) => {
           userAnswer: q.userAnswer,
           explanation: q.explanation,
           isCorrect: q.userAnswer === q.correctAnswer,
+          timeSpent: q.timeSpent ?? 0,
         })),
         createdAt: test.createdAt,
         submittedAt: test.updatedAt,
@@ -368,6 +388,7 @@ export const getTest = async (req, res) => {
         data: {
           _id: test._id,
           subject: test.subject,
+          examType: test.examType || "GS",
           topic: test.topic,
           difficulty: test.difficulty,
           totalQuestions: test.totalQuestions,
@@ -384,6 +405,7 @@ export const getTest = async (req, res) => {
             userAnswer: q.userAnswer,
             explanation: q.explanation,
             isCorrect: q.userAnswer === q.correctAnswer,
+            timeSpent: q.timeSpent ?? 0,
           })),
           createdAt: test.createdAt,
           submittedAt: test.updatedAt,
@@ -397,6 +419,7 @@ export const getTest = async (req, res) => {
       data: {
         _id: test._id,
         subject: test.subject,
+        examType: test.examType || "GS",
         topic: test.topic,
         difficulty: test.difficulty,
         totalQuestions: test.totalQuestions,
@@ -446,7 +469,7 @@ export const getTests = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
-      .select("userId subject topic difficulty totalQuestions score accuracy isSubmitted createdAt");
+      .select("userId subject examType topic difficulty totalQuestions score accuracy isSubmitted createdAt");
 
     const total = await Test.countDocuments({
       $or: [

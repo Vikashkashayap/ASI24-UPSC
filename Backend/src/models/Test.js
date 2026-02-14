@@ -14,7 +14,12 @@ const testSchema = new mongoose.Schema(
     subject: {
       type: String,
       required: true,
-      enum: ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech"],
+      // Stored as comma-separated for multi-subject (e.g. "Polity, History"); single value for CSAT
+    },
+    examType: {
+      type: String,
+      enum: ["GS", "CSAT"],
+      default: "GS",
     },
     topic: {
       type: String,
@@ -22,7 +27,7 @@ const testSchema = new mongoose.Schema(
     },
     difficulty: {
       type: String,
-      required: true,
+      required: false,
       enum: ["Easy", "Moderate", "Hard"],
     },
     questions: [
@@ -50,6 +55,10 @@ const testSchema = new mongoose.Schema(
           type: String,
           enum: ["A", "B", "C", "D", null],
           default: null,
+        },
+        timeSpent: {
+          type: Number,
+          default: 0,
         },
       },
     ],

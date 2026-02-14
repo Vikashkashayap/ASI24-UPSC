@@ -78,8 +78,17 @@ export const meetingAPI = {
 };
 
 // Test API (UPSC Prelims Test Generator)
+export interface GenerateTestParams {
+  subjects: string[];
+  topic: string;
+  examType: "GS" | "CSAT";
+  questionCount: number;
+  difficulty?: string;
+  csatCategories?: string[];
+  currentAffairsPeriod?: { month?: string; year?: string };
+}
 export const testAPI = {
-  generateTest: async (params: { subject: string; topic: string; difficulty: string; count: number }) => {
+  generateTest: async (params: GenerateTestParams) => {
     return api.post("/api/tests/generate", params);
   },
 
@@ -87,8 +96,11 @@ export const testAPI = {
     return api.get(`/api/tests/${id}`);
   },
 
-  submitTest: async (id: string, answers: { answers: { [key: string]: string } }) => {
-    return api.post(`/api/tests/submit/${id}`, answers);
+  submitTest: async (
+    id: string,
+    payload: { answers: { [key: string]: string }; questionTimeSpent?: { [questionId: string]: number } }
+  ) => {
+    return api.post(`/api/tests/submit/${id}`, payload);
   },
 
   getTests: async (page = 1, limit = 10) => {

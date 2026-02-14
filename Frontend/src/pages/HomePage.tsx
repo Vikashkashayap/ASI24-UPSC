@@ -61,7 +61,7 @@ export const HomePage = () => {
           averageScore: evalData.averageScore || 0,
           recentActivity: evalData.recentPerformance || [],
           totalTests: testData.totalTests || 0,
-          averageTestScore: testData.averageScore || 0,
+          averageTestScore: testData.averageTestScore || 0,
           averageAccuracy: testData.averageAccuracy || 0,
           recentTests: testData.recentTests || []
         });
@@ -112,22 +112,22 @@ export const HomePage = () => {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8 px-3 md:px-4 overflow-x-hidden">
-      {/* Welcome Header - Enhanced */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-8 px-3 md:px-4 overflow-x-hidden pb-2 md:pb-0">
+      {/* Welcome Header - Compact on mobile for full mobile view */}
+      <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 border-2 transition-all duration-300 ${
         theme === "dark" 
           ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
           : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
       }`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col gap-2 md:gap-3">
-          <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-xl ${
+        <div className="relative z-10 flex flex-col gap-1 md:gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className={`p-2 md:p-2.5 rounded-lg md:rounded-xl shrink-0 ${
               theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
             }`}>
-              <Sparkles className={`w-6 h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <Sparkles className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
             </div>
-            <h1 className={`text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r ${
+            <h1 className={`text-xl md:text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r truncate ${
               theme === "dark" 
                 ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
                 : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
@@ -135,14 +135,14 @@ export const HomePage = () => {
               Welcome Back! 👋
             </h1>
           </div>
-          <p className={`text-sm md:text-base lg:text-lg ml-12 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+          <p className={`text-xs md:text-base lg:text-lg ml-0 md:ml-12 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
             Continue your UPSC preparation journey with AI-powered tools
           </p>
         </div>
       </div>
 
-      {/* Quick Stats - Enhanced */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+      {/* Quick Stats - 2 cols mobile, touch-friendly */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
         <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-2 ${
           theme === "dark" 
             ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg shadow-purple-500/10" 
@@ -354,7 +354,7 @@ export const HomePage = () => {
             Quick Actions
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
           {quickActions.map((action) => {
             const Icon = action.icon;
             const getColorClasses = (color: string) => {
@@ -411,7 +411,7 @@ export const HomePage = () => {
             return (
               <Card
                 key={action.path}
-                className={`relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-2 ${
+                className={`relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-2 min-h-[88px] touch-manipulation active:scale-[0.99] ${
                   theme === "dark"
                     ? `bg-gradient-to-br from-slate-800/90 to-slate-900/90 ${colorClasses.borderDark} hover:${colorClasses.borderDark.replace('/50', '')} shadow-lg`
                     : `bg-gradient-to-br from-white to-${action.color}-50/30 ${colorClasses.border} hover:${colorClasses.border.replace('200', '300')} shadow-lg`
@@ -585,23 +585,23 @@ export const HomePage = () => {
         </div>
       )}
 
-      {/* Motivational Section */}
+      {/* Motivational Section - compact on mobile */}
       <Card className="relative overflow-hidden bg-gradient-to-r from-purple-500/10 via-fuchsia-500/10 to-cyan-500/10 border-purple-500/20">
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-fuchsia-500/20 to-transparent rounded-full blur-3xl" />
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className={`p-4 rounded-full ${
+        <CardContent className="p-4 md:p-6">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className={`p-3 md:p-4 rounded-full shrink-0 ${
               theme === "dark" ? "bg-fuchsia-900/30" : "bg-fuchsia-100"
             }`}>
-              <Sparkles className={`w-6 h-6 ${
+              <Sparkles className={`w-5 h-5 md:w-6 md:h-6 ${
                 theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"
               }`} />
             </div>
-            <div>
-              <h3 className={`text-lg font-semibold mb-1 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+            <div className="min-w-0">
+              <h3 className={`text-base md:text-lg font-semibold mb-0.5 md:mb-1 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                 Daily discipline beats motivation
               </h3>
-              <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+              <p className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                 Keep practicing and track your progress to achieve your UPSC goals
               </p>
             </div>

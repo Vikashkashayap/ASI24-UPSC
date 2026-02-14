@@ -88,7 +88,7 @@ export const IntelligenceVsNoise = () => {
                 <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
                   theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
                 }`}>
-                  UPSC Mentor
+                  UPSCRH
                 </p>
                 <h3 className={`text-lg font-semibold leading-snug md:text-xl ${
                   theme === "dark" ? "text-emerald-100" : "text-emerald-700"

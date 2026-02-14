@@ -45,7 +45,7 @@ export const LoginPage = () => {
         <Card className="w-full max-w-md mx-auto">
           <CardHeader className="pb-3 md:pb-4 px-4 md:px-6 pt-4 md:pt-6">
             <CardTitle className="text-base md:text-lg">Welcome back, aspirant</CardTitle>
-            <CardDescription className="text-xs md:text-sm mt-1">Sign in to your AI-powered UPSC mentor workspace.</CardDescription>
+            <CardDescription className="text-xs md:text-sm mt-1">Sign in to your AI-powered UPSCRH workspace.</CardDescription>
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">

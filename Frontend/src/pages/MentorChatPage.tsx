@@ -92,7 +92,7 @@ export const MentorChatPage = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-100px)] xs:h-[calc(100vh-110px)] sm:h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] overflow-x-hidden px-2 xs:px-3 sm:px-4 md:px-6">
+    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-7rem)] min-h-[320px] xs:h-[calc(100vh-7.5rem)] sm:h-[calc(100vh-8rem)] md:h-[calc(100vh-9rem)] overflow-x-hidden px-2 xs:px-3 sm:px-4 md:px-6">
       {/* Enhanced Header Section */}
       <div className="flex flex-col gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 pb-2 xs:pb-2.5 sm:pb-3 md:pb-4 flex-shrink-0 pt-1 xs:pt-2">
         <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3">
@@ -294,7 +294,7 @@ export const MentorChatPage = () => {
             <Button 
               type="submit" 
               disabled={loading || !message.trim()} 
-              className="min-h-[44px] xs:min-h-[46px] sm:min-h-[48px] md:min-h-[52px] px-3 xs:px-3.5 sm:px-4 md:px-6 rounded-xl xs:rounded-2xl md:rounded-3xl font-medium text-xs xs:text-sm md:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              className="min-h-[44px] xs:min-h-[46px] sm:min-h-[48px] md:min-h-[52px] px-3 xs:px-3.5 sm:px-4 md:px-6 rounded-xl xs:rounded-2xl md:rounded-3xl font-medium text-xs xs:text-sm md:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 touch-manipulation"
             >
               {loading ? (
                 <Loader2 className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 animate-spin" />

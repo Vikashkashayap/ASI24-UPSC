@@ -11,8 +11,9 @@ import { Pagination } from '../components/ui/pagination';
 interface TestHistory {
   _id: string;
   subject: string;
+  examType?: "GS" | "CSAT";
   topic: string;
-  difficulty: string;
+  difficulty?: string;
   totalQuestions: number;
   score?: number;
   accuracy?: number;
@@ -77,7 +78,8 @@ const TestHistoryPage: React.FC = () => {
       const filtered = history.filter(test =>
         test.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
         test.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        test.difficulty.toLowerCase().includes(searchQuery.toLowerCase())
+        (test.difficulty && test.difficulty.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (test.examType && test.examType.toLowerCase().includes(searchQuery.toLowerCase()))
       );
       setFilteredHistory(filtered);
     }
@@ -272,13 +274,19 @@ const TestHistoryPage: React.FC = () => {
                         <h3 className={`font-semibold text-lg ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                           {test.topic}
                         </h3>
-                        <div className="flex items-center gap-4 mt-1">
+                        <div className="flex items-center gap-4 mt-1 flex-wrap">
                           <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                             {test.subject}
                           </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(test.difficulty)}`}>
-                            {test.difficulty}
-                          </span>
+                          {test.examType === "CSAT" ? (
+                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                              CSAT
+                            </span>
+                          ) : test.difficulty ? (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(test.difficulty)}`}>
+                              {test.difficulty}
+                            </span>
+                          ) : null}
                           <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                             {test.totalQuestions} questions
                           </span>

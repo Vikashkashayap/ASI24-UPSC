@@ -21,6 +21,11 @@ import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
 import { LandingPage } from "./pages/LandingPage";
+import { FeaturesPage } from "./pages/landing/FeaturesPage";
+import { PricingPage } from "./pages/landing/PricingPage";
+import { ComparePage } from "./pages/landing/ComparePage";
+import { TestimonialsPage } from "./pages/landing/TestimonialsPage";
+import { AboutPage } from "./pages/landing/AboutPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
@@ -35,6 +40,11 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />

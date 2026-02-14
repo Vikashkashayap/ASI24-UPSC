@@ -41,7 +41,7 @@ export const RewardsBanner = () => {
                 <p className={`max-w-md text-xs md:text-sm ${
                   theme === "dark" ? "text-slate-200/90" : "text-slate-600"
                 }`}>
-                  Commit to consistent preparation with UPSC Mentor. If you hit a top rank in CSE, we&apos;ll celebrate
+                  Commit to consistent preparation with UPSCRH. If you hit a top rank in CSE, we&apos;ll celebrate
                   with you.
                 </p>
               </div>
@@ -66,7 +66,7 @@ export const RewardsBanner = () => {
                   }`}>
                     ✓
                   </span>
-                  <span>Active UPSC Mentor Pro subscription for 4+ months.</span>
+                  <span>Active UPSCRH Pro subscription for 4+ months.</span>
                 </li>
               </ul>
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -90,7 +90,7 @@ export const RewardsBanner = () => {
                   <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/40 text-fuchsia-700">
                     <Gift className="h-4 w-4" />
                   </span>
-                  <span className="font-semibold">UPSC Mentor Pro Reward</span>
+                  <span className="font-semibold">UPSCRH Pro Reward</span>
                 </div>
                 <p className="mt-3 text-[11px] leading-relaxed text-slate-900/85">
                   Stay consistent with your mains practice. If you make it to the UPSC rank list, we&apos;ll send a

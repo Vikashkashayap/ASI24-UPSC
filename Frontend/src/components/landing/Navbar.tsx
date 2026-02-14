@@ -3,190 +3,174 @@ import { Button } from "../ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { useState } from "react";
+import logoImg from "../../LOGO/UPSCRH-LOGO.png";
 
 const navItems = [
-  { label: "Home", to: "/" },
-  { label: "Features", to: "/#features" },
-  { label: "Pricing", to: "/#pricing" },
-  { label: "Compare", to: "/#compare" },
-  { label: "Testimonials", to: "/#testimonials" },
-  { label: "About", to: "/#about" },
+  { label: "Features", to: "/features" },
+  { label: "Pricing", to: "/pricing" },
+  { label: "Compare", to: "/compare" },
+  { label: "Testimonials", to: "/testimonials" },
+  { label: "About", to: "/about" },
 ];
 
 export const LandingNavbar = () => {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   return (
     <>
-    {/* Mobile Menu Overlay */}
-    {mobileMenuOpen && (
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-        onClick={() => setMobileMenuOpen(false)}
-      />
-    )}
+      <header className="fixed top-0 left-0 right-0 z-50">
+        
+        {/* Background Glow */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 via-fuchsia-800/20 to-purple-900/30 blur-2xl opacity-60 pointer-events-none" />
 
-    {/* Mobile Menu - Mobile-first */}
-    <div
-      className={`fixed top-0 right-0 h-full w-[280px] sm:w-64 z-50 transition-transform duration-300 ${
-        mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-      } md:hidden overflow-y-auto ${
-        theme === "dark"
-          ? "bg-gradient-to-b from-[#050015] via-[#020012] to-black border-l border-purple-900"
-          : "bg-white border-l border-slate-200"
-      }`}
-    >
-      <div className="flex flex-col h-full">
-        <div className={`flex items-center justify-between p-4 border-b ${
-          theme === "dark" ? "border-purple-900" : "border-slate-200"
-        }`}>
-          <span className={`text-sm font-semibold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-            Menu
-          </span>
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-slate-800 rounded touch-manipulation"
-            aria-label="Close menu"
-          >
-            <X className="w-5 h-5" />
-          </button>
+        <div
+          className={`relative border-b backdrop-blur-xl ${
+            theme === "dark"
+              ? "border-purple-900/50 bg-[#050016]/80"
+              : "border-slate-200 bg-white/80"
+          }`}
+        >
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
 
-        </div>
-        <nav className={`flex-1 px-3 md:px-4 py-4 space-y-1 ${
-          theme === "dark" ? "text-slate-300" : "text-slate-600"
-        }`}>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.label}
-              to={item.to}
-              onClick={() => setMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                `block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center touch-manipulation ${
-                  theme === "dark"
-                    ? `hover:bg-slate-800 ${isActive ? "bg-fuchsia-500/20 text-fuchsia-200" : "text-slate-300"}`
-                    : `hover:bg-slate-100 ${isActive ? "bg-purple-100 text-purple-700" : "text-slate-700"}`
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className={`p-4 border-t space-y-2 ${
-          theme === "dark" ? "border-purple-900" : "border-slate-200"
-        }`}>
-          <Link to="/login" className="block" onClick={() => setMobileMenuOpen(false)}>
-            <Button
-              variant="ghost"
-              className={`w-full h-[44px] rounded-full border text-sm font-semibold transition-colors min-h-[44px] ${
-                theme === "dark"
-                  ? "border-purple-700/70 bg-transparent text-slate-50 hover:bg-purple-950/60"
-                  : "border-purple-300 bg-transparent text-purple-700 hover:bg-purple-50"
-              }`}
-            >
-              Sign in
-            </Button>
-          </Link>
-          {/* <Link to="/register" className="block" onClick={() => setMobileMenuOpen(false)}>
-            <Button className="w-full h-[44px] rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-sm font-semibold text-slate-950 shadow-lg hover:from-fuchsia-400 hover:to-emerald-300 min-h-[44px]">
-              Get started
-            </Button>
-          </Link> */}
-        </div>
-      </div>
-    </div>
+            {/* 🔥 LOGO + TEXT WRAPPER */}
+            <Link to="/" className="flex items-center gap-2 select-none">
 
-    <header className={`sticky top-0 z-30 border-b backdrop-blur-xl transition-colors ${
-      theme === "dark" 
-        ? "border-purple-900/60 bg-gradient-to-r from-[#050016]/95 via-[#06021a]/95 to-[#020617]/95" 
-        : "border-slate-200 bg-white/95"
-    }`}>
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-3 md:px-4 lg:px-6 py-2.5 md:py-3 overflow-x-hidden">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-500 to-emerald-400 shadow-[0_0_24px_rgba(168,85,247,0.7)]">
-            <span className="text-sm font-semibold text-black">∞</span>
-          </div>
-          <span className={`text-sm md:text-base font-semibold tracking-tight ${
-            theme === "dark" ? "text-slate-50" : "text-slate-900"
-          }`}>
-            UPSC<span className={theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"}> Mentor</span>
-          </span>
-        </Link>
+              {/* Logo Image */}
+              <div className="flex items-center justify-center">
+                <img
+                  src={logoImg}
+                  alt="UPSCRH"
+                  className="h-10 md:h-11 w-auto object-contain"
+                />
+              </div>
 
-        <nav className={`hidden items-center gap-7 text-xs font-medium md:flex ${
-          theme === "dark" ? "text-slate-300" : "text-slate-600"
-        }`}>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.label}
-              to={item.to}
-              className={({ isActive }) =>
-                `relative transition-colors ${
-                  theme === "dark"
-                    ? `hover:text-slate-50 ${isActive ? "text-slate-50" : "text-slate-400"}`
-                    : `hover:text-slate-900 ${isActive ? "text-slate-900" : "text-slate-600"}`
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <span>{item.label}</span>
-                  {isActive && (
-                    <span className="absolute inset-x-0 -bottom-1 h-0.5 rounded-full bg-gradient-to-r from-fuchsia-400 to-emerald-300" />
+              {/* Brand Text - smaller on mobile */}
+              <div className="flex items-center">
+                <span className="text-sm md:text-xl lg:text-2xl font-extrabold tracking-wide leading-none bg-gradient-to-r from-[#f5d0fe] via-[#e879f9] to-[#9333ea] bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(217,70,239,0.9)]">
+                  UPSCRH
+                </span>
+              </div>
+            </Link>
+
+            {/* DESKTOP NAV */}
+            <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `relative transition duration-300 ${
+                      isActive
+                        ? "text-white"
+                        : "text-slate-400 hover:text-white"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span>{item.label}</span>
+                      <span
+                        className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-fuchsia-400 to-purple-400 transition-transform duration-300 ${
+                          isActive ? "scale-x-100" : ""
+                        }`}
+                      />
+                    </>
                   )}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+                </NavLink>
+              ))}
+            </nav>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            className={`inline-flex h-[44px] w-[44px] md:h-8 md:w-8 items-center justify-center rounded-full border transition-colors touch-manipulation ${
-              theme === "dark"
-                ? "border-purple-700/60 bg-black/30 text-slate-200 hover:bg-purple-950/60"
-                : "border-purple-300 bg-white text-purple-700 hover:bg-purple-50"
-            }`}
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
-          </button>
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className={`md:hidden inline-flex h-[44px] w-[44px] items-center justify-center rounded-full border transition-colors touch-manipulation ${
-              theme === "dark"
-                ? "border-purple-700/60 bg-black/30 text-slate-200 hover:bg-purple-950/60"
-                : "border-purple-300 bg-white text-purple-700 hover:bg-purple-50"
-            }`}
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <Link to="/login" className="hidden md:block">
-            <Button
-              variant="ghost"
-              className={`h-9 rounded-full border px-4 text-xs font-semibold transition-colors ${
-                theme === "dark"
-                  ? "border-purple-700/70 bg-transparent text-slate-50 hover:bg-purple-950/60"
-                  : "border-purple-300 bg-transparent text-purple-700 hover:bg-purple-50"
-              }`}
-            >
-              Sign in
-            </Button>
-          </Link>
-          {/* <Link to="/register" className="hidden sm:block">
-            <Button className="h-[44px] md:h-9 rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 px-3 md:px-4 text-xs md:text-sm font-semibold text-slate-950 shadow-[0_0_28px_rgba(52,211,153,0.65)] hover:from-fuchsia-400 hover:to-emerald-300 min-h-[44px]">
-              Get started
-            </Button>
-          </Link> */}
+            {/* RIGHT SIDE */}
+            <div className="flex items-center gap-3">
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="h-10 w-10 flex items-center justify-center rounded-full border border-purple-700/50 bg-black/30 text-slate-200 hover:bg-purple-900/40 transition"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+
+              {/* Sign In Button */}
+              <Link to="/login" className="hidden md:block">
+                <Button className="rounded-full px-6 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg hover:scale-105 transition duration-300">
+                  Sign in
+                </Button>
+              </Link>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden h-10 w-10 flex items-center justify-center rounded-full border border-purple-700/50 bg-black/30 text-slate-200 hover:bg-purple-900/40 transition"
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
+
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`fixed top-0 right-0 z-50 h-full w-72 max-w-[85vw] transform transition-transform duration-300 ease-out md:hidden ${
+              mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+            } ${theme === "dark" ? "bg-[#0a0020] border-l border-purple-900/50" : "bg-white border-l border-slate-200"}`}
+          >
+            <div className="flex flex-col h-full p-6 pt-16">
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-purple-700/50 bg-black/30 text-slate-200 hover:bg-purple-900/40"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <nav className="flex flex-col gap-4">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `py-2 text-base font-medium transition ${
+                        isActive
+                          ? "text-fuchsia-400"
+                          : theme === "dark"
+                            ? "text-slate-400 hover:text-white"
+                            : "text-slate-600 hover:text-slate-900"
+                      }`
+                    }
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-6"
+              >
+                <Button className="w-full rounded-full px-6 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow-lg">
+                  Sign in
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
-  
 };
-
-

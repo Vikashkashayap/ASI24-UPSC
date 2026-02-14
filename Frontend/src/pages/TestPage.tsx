@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -22,8 +22,9 @@ interface Question {
 interface TestData {
   _id: string;
   subject: string;
+  examType?: "GS" | "CSAT";
   topic: string;
-  difficulty: string;
+  difficulty?: string;
   totalQuestions: number;
   questions: Question[];
   isSubmitted: boolean;
@@ -41,6 +42,8 @@ const TestPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
+  const [questionTimeSpent, setQuestionTimeSpent] = useState<{ [key: string]: number }>({});
+  const questionStartTimeRef = useRef(Date.now());
 
   useEffect(() => {
     if (id) {
@@ -49,13 +52,15 @@ const TestPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    // Timer
     const interval = setInterval(() => {
       setTimeElapsed((prev) => prev + 1);
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (test) questionStartTimeRef.current = Date.now();
+  }, [test, currentIndex]);
 
   const loadTest = async () => {
     try {
@@ -93,20 +98,38 @@ const TestPage: React.FC = () => {
   };
 
   const handleAnswerSelect = (questionId: string, option: string) => {
-    setAnswers((prev) => ({
+    setAnswers((prev) => {
+      const current = prev[questionId];
+      if (current === option) {
+        const next = { ...prev };
+        delete next[questionId];
+        return next;
+      }
+      return { ...prev, [questionId]: option };
+    });
+  };
+
+  const recordTimeForCurrentQuestion = () => {
+    if (!test) return;
+    const q = test.questions[currentIndex];
+    if (!q) return;
+    const elapsed = (Date.now() - questionStartTimeRef.current) / 1000;
+    setQuestionTimeSpent((prev) => ({
       ...prev,
-      [questionId]: option,
+      [q._id]: (prev[q._id] || 0) + elapsed,
     }));
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      recordTimeForCurrentQuestion();
       setCurrentIndex(currentIndex - 1);
     }
   };
 
   const handleNext = () => {
     if (test && currentIndex < test.questions.length - 1) {
+      recordTimeForCurrentQuestion();
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -123,8 +146,14 @@ const TestPage: React.FC = () => {
     setIsSubmitting(true);
     setError(null);
 
+    const currentQ = test.questions[currentIndex];
+    const timeForCurrent = currentQ ? (Date.now() - questionStartTimeRef.current) / 1000 : 0;
+    const finalTimeSpent: { [key: string]: number } = { ...questionTimeSpent };
+    if (currentQ) {
+      finalTimeSpent[currentQ._id] = (finalTimeSpent[currentQ._id] || 0) + timeForCurrent;
+    }
+
     try {
-      // Convert answers to question ID format for backend
       const answersObject: { [key: string]: string } = {};
       test.questions.forEach((q) => {
         if (answers[q._id]) {
@@ -132,7 +161,10 @@ const TestPage: React.FC = () => {
         }
       });
 
-      const response = await testAPI.submitTest(id!, { answers: answersObject });
+      const response = await testAPI.submitTest(id!, {
+        answers: answersObject,
+        questionTimeSpent: finalTimeSpent,
+      });
 
       if (response.data.success) {
         navigate(`/result/${id}`);
@@ -170,13 +202,13 @@ const TestPage: React.FC = () => {
 
   if (error && !test) {
     return (
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto px-3">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
               <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
               <p className={theme === "dark" ? "text-red-300" : "text-red-800"}>{error}</p>
-              <Button onClick={() => navigate("/prelims-test")} className="mt-4">
+              <Button onClick={() => navigate("/prelims-test")} className="mt-4 min-h-[44px] touch-manipulation">
                 Go Back
               </Button>
             </div>
@@ -193,20 +225,20 @@ const TestPage: React.FC = () => {
   const progress = (attemptedCount / test.totalQuestions) * 100;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-8">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-3 sm:px-4 overflow-x-hidden">
       {/* Header with Progress */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h2 className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+        <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0">
+              <h2 className={`text-base sm:text-lg font-semibold truncate ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                 {test.subject} - {test.topic}
               </h2>
-              <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Difficulty: {test.difficulty} | Question {currentIndex + 1} of {test.totalQuestions}
+              <p className={`text-xs sm:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                {test.examType === "CSAT" ? "CSAT" : `Difficulty: ${test.difficulty ?? "—"}`} | Q {currentIndex + 1}/{test.totalQuestions}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Clock className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
                 <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
@@ -232,10 +264,10 @@ const TestPage: React.FC = () => {
 
       {/* Question Card */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-6">
-            <div>
-              <div className={`text-lg font-semibold mb-4 leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+        <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="min-w-0 overflow-hidden">
+              <div className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 leading-relaxed break-words ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                 {currentQuestion.question.split('\n').map((line, lineIdx, lines) => {
                   const trimmedLine = line.trim();
                   if (!trimmedLine) return null;
@@ -270,8 +302,8 @@ const TestPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Options */}
-            <div className="space-y-3">
+            {/* Options - touch-friendly, tap again to unselect */}
+            <div className="space-y-2 sm:space-y-3">
               {(["A", "B", "C", "D"] as const).map((option) => {
                 const optionText = currentQuestion.options[option];
                 const isSelected = answers[currentQuestion._id] === option;
@@ -279,18 +311,19 @@ const TestPage: React.FC = () => {
                 return (
                   <button
                     key={option}
+                    type="button"
                     onClick={() => handleAnswerSelect(currentQuestion._id, option)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                    className={`w-full text-left p-3 sm:p-4 min-h-[48px] sm:min-h-[56px] rounded-xl border-2 transition-all active:scale-[0.99] touch-manipulation ${
                       isSelected
                         ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20"
                         : theme === "dark"
-                        ? "border-slate-700 bg-slate-800 hover:border-slate-600"
-                        : "border-slate-300 bg-white hover:border-slate-400"
+                        ? "border-slate-700 bg-slate-800 hover:border-slate-600 active:border-slate-500"
+                        : "border-slate-300 bg-white hover:border-slate-400 active:border-slate-500"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-center gap-3">
                       <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center font-semibold ${
+                        className={`flex-shrink-0 w-7 h-7 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center text-sm font-semibold ${
                           isSelected
                             ? "border-purple-600 bg-purple-600 text-white"
                             : theme === "dark"
@@ -300,7 +333,7 @@ const TestPage: React.FC = () => {
                       >
                         {isSelected ? <CheckCircle className="w-4 h-4" /> : option}
                       </div>
-                      <span className={`flex-1 ${theme === "dark" ? "text-slate-400" : "text-slate-700"}`}>
+                      <span className={`flex-1 text-sm sm:text-base break-words ${theme === "dark" ? "text-slate-200" : "text-slate-700"}`}>
                         {optionText}
                       </span>
                     </div>
@@ -312,28 +345,56 @@ const TestPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between gap-4">
-        <Button
-          onClick={handlePrevious}
-          disabled={currentIndex === 0}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Previous
-        </Button>
+      {/* Navigation - mobile friendly: wrap question numbers, touch-friendly buttons */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
+          <Button
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            variant="outline"
+            className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 touch-manipulation"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Previous</span>
+          </Button>
 
-        <div className="flex gap-2">
+          {currentIndex < test.questions.length - 1 ? (
+            <Button
+              onClick={handleNext}
+              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-purple-600 to-indigo-600 touch-manipulation"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 touch-manipulation"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span className="hidden sm:inline">Submitting...</span>
+                </>
+              ) : (
+                "Submit Test"
+              )}
+            </Button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
           {test.questions.map((_, index) => {
             const isAnswered = answers[test.questions[index]._id];
             return (
               <button
                 key={index}
+                type="button"
                 onClick={() => setCurrentIndex(index)}
-                className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                className={`min-w-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                   index === currentIndex
-                    ? "bg-purple-600 text-white"
+                    ? "bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 dark:ring-offset-slate-900"
                     : isAnswered
                     ? theme === "dark"
                       ? "bg-green-900/30 text-green-400 border border-green-700"
@@ -348,31 +409,6 @@ const TestPage: React.FC = () => {
             );
           })}
         </div>
-
-        {currentIndex < test.questions.length - 1 ? (
-          <Button
-            onClick={handleNext}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Submitting...
-              </>
-            ) : (
-              "Submit Test"
-            )}
-          </Button>
-        )}
       </div>
 
       {/* Error Message */}

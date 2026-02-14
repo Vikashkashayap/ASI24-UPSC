@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle, Clock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { useTheme } from "../hooks/useTheme";
@@ -19,13 +19,15 @@ interface QuestionResult {
   userAnswer: string | null;
   explanation: string;
   isCorrect: boolean;
+  timeSpent?: number;
 }
 
 interface TestResult {
   _id: string;
   subject: string;
+  examType?: "GS" | "CSAT";
   topic: string;
-  difficulty: string;
+  difficulty?: string;
   totalQuestions: number;
   score: number;
   correctAnswers: number;
@@ -85,6 +87,14 @@ const TestResultPage: React.FC = () => {
     return "text-red-600";
   };
 
+  const formatTimeSpent = (seconds: number) => {
+    if (seconds == null || seconds < 0) return "—";
+    const m = Math.floor(seconds / 60);
+    const s = Math.round(seconds % 60);
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -129,7 +139,7 @@ const TestResultPage: React.FC = () => {
           <Button
             onClick={() => navigate(`/admin/students/${studentId}`)}
             variant="outline"
-            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
+            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
           >
             <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
             <span className="hidden xs:inline">Back to Student</span>
@@ -139,7 +149,7 @@ const TestResultPage: React.FC = () => {
           <Button
             onClick={() => navigate("/prelims-test")}
             variant="outline"
-            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm"
+            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
           >
             <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
             <span className="hidden xs:inline">Generate New Test</span>
@@ -172,7 +182,7 @@ const TestResultPage: React.FC = () => {
               </div>
             </div>
             <div className="inline-block bg-white/20 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-semibold break-words">
-              {result.subject} - {result.topic} ({result.difficulty})
+              {result.subject} - {result.topic} ({result.examType === "CSAT" ? "CSAT" : result.difficulty ?? "—"})
             </div>
           </div>
         </CardContent>
@@ -301,15 +311,28 @@ const TestResultPage: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        <span
-                          className={`text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded flex-shrink-0 ${
-                            question.isCorrect
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                          }`}
-                        >
-                          {question.isCorrect ? "+2" : "-0.66"}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {question.timeSpent != null && question.timeSpent > 0 && (
+                            <span
+                              className={`text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded flex items-center gap-1 ${
+                                theme === "dark" ? "bg-slate-700 text-slate-300" : "bg-slate-200 text-slate-700"
+                              }`}
+                              title="Time spent on this question"
+                            >
+                              <Clock className="w-3 h-3" />
+                              {formatTimeSpent(question.timeSpent)}
+                            </span>
+                          )}
+                          <span
+                            className={`text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded ${
+                              question.isCorrect
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            }`}
+                          >
+                            {question.isCorrect ? "+2" : "-0.66"}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Options - Mobile-first */}

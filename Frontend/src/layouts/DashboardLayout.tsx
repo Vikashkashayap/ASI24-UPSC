@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3 } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical } from "lucide-react";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
+import logoImg from "../LOGO/UPSCRH-LOGO.png";
 
 // Mobile-first nav link: minimum 44px height for touch targets
 const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
@@ -58,6 +59,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
 export const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const location = useLocation();
@@ -66,8 +68,9 @@ export const DashboardLayout = () => {
 
   return (
     <div
-      className={`min-h-screen h-screen flex overflow-hidden ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+      className={`min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
         }`}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
@@ -85,26 +88,19 @@ export const DashboardLayout = () => {
             : "border-slate-200 bg-white/95 shadow-slate-200/50"
           }`}
       >
-        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-[60px] md:h-[73px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} flex-shrink-0 relative ${theme === "dark" ? "border-purple-900/60" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-purple-900/60" : "border-slate-200"}`}>
           {!sidebarCollapsed && (
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-500 to-emerald-400 shadow-[0_0_24px_rgba(168,85,247,0.7)] flex-shrink-0">
-                <span className="text-sm font-semibold text-black">∞</span>
-              </div>
-              <span className={`text-sm md:text-base font-semibold tracking-tight ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                UPSC<span className={theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"}> Mentor</span>
-              </span>
+            <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+              <img src={logoImg} alt="UPSCRH" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
             </div>
           )}
           {sidebarCollapsed && (
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-fuchsia-500 to-emerald-400 shadow-[0_0_24px_rgba(168,85,247,0.7)] flex-shrink-0">
-              <span className="text-sm font-semibold text-black">∞</span>
-            </div>
+            <img src={logoImg} alt="UPSCRH" className="h-10 w-10 object-contain object-center flex-shrink-0" />
           )}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-1.5 shrink-0">
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`hidden md:flex p-1.5 rounded-lg transition-colors ${theme === "dark"
+              className={`hidden md:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${theme === "dark"
                   ? "hover:bg-slate-800 text-slate-200"
                   : "hover:bg-slate-100 text-slate-700"
                 }`}
@@ -114,7 +110,7 @@ export const DashboardLayout = () => {
             </button>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center hover:bg-slate-800 rounded touch-manipulation"
+              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-slate-800 touch-manipulation text-slate-200"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -349,17 +345,18 @@ export const DashboardLayout = () => {
 
       {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
       <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[280px] lg:ml-64"}`}>
-        {/* Fixed Header - Mobile-first */}
+        {/* Fixed Header - equal alignment, better UI */}
         <header
-          className={`h-[60px] md:h-[73px] flex items-center justify-between px-3 md:px-4 lg:px-8 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
+          className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
               ? "border-purple-900/60 bg-gradient-to-r from-[#050016]/95 via-[#06021a]/95 to-[#020617]/95 shadow-purple-900/20"
               : "border-slate-200 bg-white/95 shadow-slate-200/50"
             }`}
         >
-          <div className="flex items-center gap-4 flex-1">
+          {/* Left: mobile menu | desktop: page pill only */}
+          <div className="flex items-center gap-1.5 md:gap-2 min-w-0 flex-1">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className={`md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors touch-manipulation ${theme === "dark"
+              className={`md:hidden shrink-0 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors touch-manipulation ${theme === "dark"
                   ? "hover:bg-slate-800 text-slate-200"
                   : "hover:bg-slate-100 text-slate-700"
                 }`}
@@ -367,46 +364,59 @@ export const DashboardLayout = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className={`hidden md:flex items-center gap-2 lg:gap-3 ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-              <div className={`p-1.5 md:p-2 rounded-lg transition-all duration-200 ${theme === "dark" ? "bg-purple-900/30 ring-1 ring-purple-700/30" : "bg-purple-100 ring-1 ring-purple-200/50"
-                }`}>
+            {/* Page title pill - icon + text, equal height with row */}
+            <div className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-xl min-h-[40px] ${theme === "dark"
+                ? "bg-purple-900/40 ring-1 ring-purple-600/50 text-slate-50"
+                : "bg-purple-100/80 ring-1 ring-purple-200/80 text-slate-900"
+              }`}>
+              <span className="flex items-center justify-center w-5 h-5 shrink-0 [&>svg]:w-5 [&>svg]:h-5">
                 {pageInfo.icon}
-              </div>
-              <h1 className="text-lg md:text-xl font-bold tracking-tight">{pageInfo.title}</h1>
+              </span>
+              <h1 className="text-sm md:text-base font-semibold tracking-tight truncate">{pageInfo.title}</h1>
             </div>
-            <div className={`text-sm md:text-base font-semibold tracking-tight md:hidden ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-              UPSC Mentor
+            <div className={`text-sm md:text-base font-semibold tracking-tight md:hidden truncate ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              UPSCRH
             </div>
           </div>
-          <div className="flex items-center gap-4 ml-auto">
+
+          {/* Right: theme toggle + motivation + avatar - all items-center */}
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             <button
               onClick={toggleTheme}
-              className={`inline-flex h-[44px] w-[44px] md:h-8 md:w-8 items-center justify-center rounded-full border transition-all duration-200 touch-manipulation active:scale-95 ${theme === "dark"
+              className={`inline-flex items-center justify-center w-9 h-9 md:w-9 md:h-9 rounded-full border transition-all duration-200 touch-manipulation active:scale-95 shrink-0 ${theme === "dark"
                   ? "border-purple-700/60 bg-black/30 text-slate-200 hover:bg-purple-950/60 hover:border-purple-600/80 shadow-sm shadow-purple-900/20"
                   : "border-purple-300 bg-white text-purple-700 hover:bg-purple-50 hover:border-purple-400 shadow-sm shadow-purple-200/50"
                 }`}
               aria-label="Toggle theme"
             >
-              {theme === "dark" ? <Sun className="w-4 h-4 md:w-5 md:h-5 transition-transform hover:rotate-12" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 transition-transform hover:-rotate-12" />}
+              {theme === "dark" ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
             </button>
-            <div className={`hidden md:flex items-center gap-2 lg:gap-3 ${theme === "dark" ? "text-slate-300" : "text-slate-900"}`}>
-              <div className="flex flex-col text-right text-[10px] md:text-xs mr-1 md:mr-2">
-                <span className={`${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                  Daily discipline beats motivation
-                </span>
-              </div>
-              <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold transition-all duration-200 hover:scale-105 ring-2 ${theme === "dark"
-                  ? "bg-gradient-to-br from-purple-600 to-indigo-600 text-white ring-purple-500/30 shadow-lg shadow-purple-600/20"
-                  : "bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 ring-purple-200/50 shadow-md shadow-purple-200/30"
-                }`}>
-                {user?.name?.charAt(0).toUpperCase() || "U"}
-              </div>
+            <button
+              onClick={() => navigate("/profile")}
+              className={`md:hidden inline-flex items-center justify-center w-9 h-9 min-h-[44px] min-w-[44px] rounded-full transition-colors touch-manipulation active:scale-95 shrink-0 ${theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
+              aria-label="More options"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            <div className={`hidden md:flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+              <span className="flex items-center justify-center w-9 h-9 rounded-full shrink-0 border border-purple-500/40 text-purple-400">
+                <Lightbulb className="w-4 h-4" />
+              </span>
+              <span className={`text-xs font-medium max-w-[140px] lg:max-w-[180px] truncate ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                Daily discipline beats motivation
+              </span>
+            </div>
+            <div className={`hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center text-xs md:text-sm font-semibold shrink-0 ring-2 transition-all duration-200 hover:scale-105 ${theme === "dark"
+                ? "bg-gradient-to-br from-purple-600 to-indigo-600 text-white ring-purple-500/30 shadow-lg shadow-purple-600/20"
+                : "bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 ring-purple-200/50 shadow-md shadow-purple-200/30"
+              }`}>
+              {user?.name?.charAt(0).toUpperCase() || "U"}
             </div>
           </div>
         </header>
 
-        {/* Scrollable Main Content - Mobile-first padding */}
-        <main className="flex-1 overflow-y-auto scroll-smooth scrollbar-hide px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-14 md:pb-6 max-w-full overflow-x-hidden">
+        {/* Scrollable Main Content - Mobile-first: extra bottom padding for bottom nav + safe area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6 max-w-full min-h-0">
           <Outlet />
         </main>
       </div>

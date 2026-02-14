@@ -6,29 +6,29 @@ export default function HelpSupportPage() {
   const { theme } = useTheme();
   
   return (
-    <div className="max-w-4xl mx-auto py-6 md:py-10 space-y-6 md:space-y-8 px-3 md:px-4">
-      {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+    <div className="max-w-4xl mx-auto py-4 md:py-10 space-y-4 md:space-y-8 px-3 md:px-4 overflow-x-hidden">
+      {/* Enhanced Header - compact on mobile */}
+      <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 border-2 transition-all duration-300 ${
         theme === "dark" 
           ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
           : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
       }`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex items-center gap-4">
-          <div className={`p-3 rounded-xl ${
+        <div className="relative z-10 flex items-center gap-2 md:gap-4">
+          <div className={`p-2 md:p-3 rounded-lg md:rounded-xl shrink-0 ${
             theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
           }`}>
-            <LifeBuoy className={`w-8 h-8 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            <LifeBuoy className={`w-6 h-6 md:w-8 md:h-8 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
           </div>
-          <div>
-            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+          <div className="min-w-0">
+            <h1 className={`text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
               theme === "dark" 
                 ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
                 : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
             }`}>
               Help & Support
             </h1>
-            <p className={`text-sm md:text-base mt-1 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+            <p className={`text-xs md:text-base mt-0.5 md:mt-1 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
               We're here to help you succeed in your UPSC journey
             </p>
           </div>
