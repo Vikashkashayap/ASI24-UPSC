@@ -11,11 +11,13 @@ export const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Handle virtual admin user from env vars
-    if (decoded.id === "000000000000000000000000") {
+    const decodedId = decoded.id != null ? String(decoded.id) : null;
+
+    // Handle virtual admin user from env vars (compare as string for robustness)
+    if (decodedId === "000000000000000000000000") {
       req.user = {
         _id: "000000000000000000000000",
+        id: "000000000000000000000000",
         name: "Admin User",
         email: process.env.ADMIN_EMAIL,
         role: "admin"
@@ -23,7 +25,7 @@ export const authMiddleware = async (req, res, next) => {
       return next();
     }
 
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decodedId || decoded.id).select("-password");
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }

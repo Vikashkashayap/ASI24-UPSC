@@ -14,8 +14,9 @@ export const adminMiddleware = async (req, res, next) => {
     });
   }
 
-  // Check if user has admin role
-  if (req.user.role !== "admin") {
+  // Check if user has admin role (normalize to string for Mongoose/plain objects)
+  const role = req.user.role != null ? String(req.user.role).toLowerCase() : "";
+  if (role !== "admin") {
     return res.status(403).json({
       success: false,
       message: "Access denied. Admin privileges required.",

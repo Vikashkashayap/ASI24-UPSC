@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "build": "echo 'No build needed for plain JS backend!'"
+    "build": "echo 'No build needed for plain JS backend!'",
+    "test:prelims-pdf": "node scripts/test-prelims-pdf-upload.js"
   },
   "dependencies": {
     "@langchain/core": "^0.2.0",
@@ -22,9 +23,12 @@
     "node-fetch": "^3.3.2",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdf-to-img": "^5.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "tesseract.js": "^7.0.0",
+    "sharp": "^0.33.5",
+    "unidev": "^0.0.5",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

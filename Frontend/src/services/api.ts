@@ -144,6 +144,34 @@ export const adminAPI = {
   },
 };
 
+// Prelims Topper Test (Manual) API
+export const prelimsTopperAPI = {
+  listTests: () => api.get("/api/student/prelims-tests"),
+  startTest: (testId: string) => api.post(`/api/student/prelims-test/start/${testId}`),
+  submitTest: (
+    testId: string,
+    payload: { timeTakenSeconds: number; answers: Record<string, string>; markForReview?: number[] }
+  ) => api.post(`/api/student/prelims-test/submit/${testId}`, payload),
+  getHistory: () => api.get("/api/student/prelims-test/history"),
+  getResult: (attemptId: string) => api.get(`/api/student/prelims-test/result/${attemptId}`),
+  getRank: (testId: string) => api.get(`/api/student/prelims-test/rank/${testId}`),
+  getQuestionPdfUrl: (testId: string) => `${baseURL}/api/student/prelims-test/file/${testId}/question`,
+  getSolutionPdfUrl: (testId: string) => `${baseURL}/api/student/prelims-test/file/${testId}/solution`,
+};
+
+// Admin Prelims Topper API (uses same api instance with auth)
+export const prelimsTopperAdminAPI = {
+  createTest: (formData: FormData) => api.post("/api/admin/prelims-test/create", formData),
+  uploadPdf: (formData: FormData) => api.post("/api/admin/prelims-test/upload-pdf", formData),
+  reparsePdf: (testId: string) => api.post(`/api/admin/prelims-test/reparse/${testId}`),
+  listTests: () => api.get("/api/admin/prelims-test/list"),
+  getAnalytics: (id: string) => api.get(`/api/admin/prelims-test/analytics/${id}`),
+  getRankList: (id: string, limit?: number) =>
+    api.get(`/api/admin/prelims-test/rank-list/${id}`, { params: { limit } }),
+  exportCsv: (id: string) =>
+    api.get(`/api/admin/prelims-test/export/${id}`, { responseType: "blob" }),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

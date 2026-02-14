@@ -6,6 +6,9 @@
  */
 
 import { createRequire } from "module";
+import fs from "fs";
+import path from "path";
+import os from "os";
 import { createWorker } from "tesseract.js";
 
 // Create CommonJS require for pdf-parse compatibility
@@ -69,11 +72,18 @@ export async function extractTextFromPDF(buffer) {
     }
     
     const extractedText = data.text || "";
-    
+
     if (!extractedText || extractedText.trim().length === 0) {
-      throw new Error("PDF parsing succeeded but no text was extracted. The PDF may be image-only or corrupted.");
+      console.log("No text extracted - attempting OCR for image-only PDF...");
+      const ocrResult = await extractTextWithOCR(buffer);
+      if (ocrResult.success && ocrResult.text?.trim()) {
+        return ocrResult.text.trim();
+      }
+      throw new Error(
+        ocrResult.error || "PDF parsing succeeded but no text was extracted. The PDF may be image-only or corrupted."
+      );
     }
-    
+
     // Return clean text, trimmed of excess whitespace
     return extractedText.trim();
 
@@ -259,55 +269,135 @@ export function isScannedPDF(text, numPages) {
 }
 
 /* ===============================
+   OCR PREPROCESSING (300 DPI + GRAYSCALE)
+================================ */
+/** Target DPI for OCR: 72 * scale ≈ 300 => scale ≈ 4.17 */
+const OCR_SCALE = 4.17;
+
+/**
+ * Preprocess image for better OCR: grayscale + optional sharpening.
+ * Uses sharp if available; otherwise returns buffer as-is.
+ */
+async function preprocessImageForOCR(imgBuffer) {
+  try {
+    const sharp = (await import("sharp")).default;
+    const processed = await sharp(imgBuffer)
+      .grayscale()
+      .normalize()
+      .toBuffer();
+    return processed;
+  } catch (err) {
+    console.warn("Sharp preprocessing unavailable, using raw image:", err.message);
+    return imgBuffer;
+  }
+}
+
+/* ===============================
    OCR TEXT EXTRACTION
 ================================ */
 /**
- * Extracts text from scanned PDF using OCR
+ * Extracts text from scanned/image-only PDF using OCR (pdf-to-img + Tesseract).
+ * Preprocessing: ~300 DPI (scale 4.17), grayscale via sharp for better accuracy.
  * @param {Buffer} pdfBuffer - PDF file buffer
  * @returns {Promise<{success: boolean, text: string, confidence: number, error?: string}>}
  */
 export async function extractTextWithOCR(pdfBuffer) {
   let worker = null;
+  let tempPath = null;
   try {
-    console.log("🔍 Starting OCR processing...");
-    
-    // Initialize Tesseract worker
-    worker = await createWorker('eng', 1, {
-      logger: (m) => {
-        if (m.status === 'recognizing text') {
-          console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
-        }
-      }
-    });
+    console.log("🔍 Starting OCR processing for image-only PDF (300 DPI, grayscale)...");
 
-    // Note: Full OCR implementation requires PDF-to-image conversion
-    // For now, this is a placeholder. In production, use:
-    // - pdf2pic or pdf-poppler to convert PDF pages to images
-    // - Then use Tesseract to OCR each image
-    // - Combine all OCR results
-    
-    console.log("⚠️ OCR processing requires PDF-to-image conversion library");
-    console.log("   Recommended: Install pdf2pic or use pdfjs-dist with canvas");
-    
+    const { pdf } = await import("pdf-to-img");
+    tempPath = path.join(os.tmpdir(), `prelims-pdf-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
+    fs.writeFileSync(tempPath, pdfBuffer);
+
+    /** ~300 DPI: 72 * 4.17 ≈ 300 */
+    const doc = await pdf(tempPath, { scale: OCR_SCALE });
+
+    if (!doc || doc.length < 1) {
+      return {
+        success: false,
+        text: "",
+        confidence: 0,
+        error: "PDF has no pages or could not be converted to images.",
+      };
+    }
+
+    const langList = ["eng", "hin+eng"];
+    for (const lang of langList) {
+      try {
+        worker = await createWorker(lang, 1, {
+          logger: (m) => {
+            if (m.status === "recognizing text") {
+              console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
+            }
+          },
+        });
+        break;
+      } catch (workerErr) {
+        console.warn(`OCR worker ${lang} failed:`, workerErr.message);
+        if (worker) try { await worker.terminate(); } catch (_) {}
+        worker = null;
+      }
+    }
+    if (!worker) {
+      return {
+        success: false,
+        text: "",
+        confidence: 0,
+        error: "OCR worker could not be created (hin+eng or eng).",
+      };
+    }
+
+    const pageTexts = [];
+    let totalConfidence = 0;
+
+    for (let pageNum = 1; pageNum <= doc.length; pageNum++) {
+      let imgBuffer = await doc.getPage(pageNum);
+      if (!imgBuffer || (Buffer.isBuffer(imgBuffer) && imgBuffer.length === 0)) {
+        console.warn(`OCR: page ${pageNum} returned empty image`);
+        pageTexts.push("");
+        continue;
+      }
+      imgBuffer = await preprocessImageForOCR(imgBuffer);
+      const {
+        data: { text, confidence },
+      } = await worker.recognize(imgBuffer);
+      pageTexts.push(text || "");
+      totalConfidence += confidence || 0;
+      console.log(`OCR page ${pageNum}/${doc.length} done`);
+    }
+
     await worker.terminate();
-    
+    worker = null;
+    const fullText = pageTexts.join("\n\n").trim();
+    const avgConfidence = doc.length > 0 ? totalConfidence / doc.length : 0;
+
     return {
-      success: false,
-      text: "",
-      confidence: 0,
-      error: "OCR processing requires PDF-to-image conversion. Please ensure the PDF contains selectable text, or implement pdf2pic integration."
+      success: fullText.length > 0,
+      text: fullText,
+      confidence: avgConfidence / 100,
+      error: fullText.length === 0 ? "OCR produced no text." : undefined,
     };
   } catch (error) {
     console.error("OCR Error:", error);
     if (worker) {
-      await worker.terminate();
+      try {
+        await worker.terminate();
+      } catch (_) {}
     }
     return {
       success: false,
       text: "",
       confidence: 0,
-      error: error.message || "OCR processing failed"
+      error: error.message || "OCR processing failed",
     };
+  } finally {
+    if (tempPath && fs.existsSync(tempPath)) {
+      try {
+        fs.unlinkSync(tempPath);
+      } catch (_) {}
+    }
   }
 }
 
