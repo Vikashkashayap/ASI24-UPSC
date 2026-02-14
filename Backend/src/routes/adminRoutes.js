@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   getAllStudents,
   getStudentById,
@@ -12,9 +13,24 @@ import {
   searchUsers,
   deleteStudent,
 } from "../controllers/adminController.js";
+import { createExcelTest } from "../controllers/excelTestController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const uploadExcel = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed =
+      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype === "application/vnd.ms-excel" ||
+      file.originalname?.toLowerCase().endsWith(".xlsx");
+    if (allowed) cb(null, true);
+    else cb(new Error("Only .xlsx Excel files are allowed"), false);
+  },
+});
 
 // Debugging: Log all hits to admin routes
 router.use((req, res, next) => {
@@ -24,6 +40,9 @@ router.use((req, res, next) => {
 
 // All admin routes require authentication + admin role
 router.use(requireAdmin);
+
+// Prelims Topper: create Excel-based test
+router.post("/excel-test/create", uploadExcel.single("excel"), createExcelTest);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);

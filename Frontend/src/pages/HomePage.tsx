@@ -103,11 +103,11 @@ export const HomePage = () => {
       path: "/performance"
     },
     {
-      title: "Prelims Test",
-      description: "Practice with MCQ tests",
+      title: "Prelims Topper",
+      description: "Scheduled Excel-based MCQ tests",
       icon: ClipboardList,
       color: "amber",
-      path: "/prelims-test"
+      path: "/prelims-topper"
     }
   ];
 

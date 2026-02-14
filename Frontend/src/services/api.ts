@@ -144,6 +144,37 @@ export const adminAPI = {
   },
 };
 
+// Prelims Topper (Excel-based tests) API
+export const prelimsTopperAPI = {
+  // Admin: create test from Excel
+  createExcelTest: async (formData: FormData) => {
+    return api.post("/api/admin/excel-test/create", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  // Student: list available scheduled tests
+  getStudentTests: () => api.get("/api/student/tests"),
+
+  // Student: start test (returns questions without correctAnswer)
+  startTest: (testId: string) => api.post(`/api/student/test/start/${testId}`),
+
+  // Student: submit test
+  submitTest: (testId: string, answers: { [questionId: string]: string }) =>
+    api.post(`/api/student/test/submit/${testId}`, { answers }),
+
+  // Student: get result by attemptId
+  getResult: (attemptId: string) =>
+    api.get(`/api/student/test/result/${attemptId}`),
+
+  // Student: get in-progress attempt (for exam page refresh)
+  getAttempt: (attemptId: string) =>
+    api.get(`/api/student/test/attempt/${attemptId}`),
+
+  // Student: attempt history
+  getAttempts: () => api.get("/api/student/test/attempts"),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

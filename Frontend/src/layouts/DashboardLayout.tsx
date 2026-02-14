@@ -24,6 +24,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/prelims-topper': { title: 'Prelims Topper', icon: <ClipboardList className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
@@ -34,6 +35,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
 
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
+    '/admin/prelims-topper': { title: 'Prelims Topper', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
@@ -50,6 +52,9 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   }
   if (pathname.startsWith('/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/prelims-topper')) {
+    return { title: 'Prelims Topper', icon: <ClipboardList className="w-5 h-5" /> };
   }
 
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
@@ -131,6 +136,10 @@ export const DashboardLayout = () => {
                   <BarChart3 className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Admin Dashboard</span>}
                 </NavLink>
+                <NavLink to="/admin/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Topper</span>}
+                </NavLink>
                 <NavLink to="/admin/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Students Management">
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
@@ -208,14 +217,27 @@ export const DashboardLayout = () => {
                 </div>
               )}
               <div className="space-y-1">
-                <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
+                <NavLink to="/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 md:gap-3">
                       <ClipboardList className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>Prelims Test</span>}
+                      {!sidebarCollapsed && <span>Prelims Topper</span>}
                     </div>
                     {!sidebarCollapsed && (
                       <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
+                        Excel
+                      </span>
+                    )}
+                  </div>
+                </NavLink>
+                <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test (AI)">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                      {!sidebarCollapsed && <span>Prelims Test (AI)</span>}
+                    </div>
+                    {!sidebarCollapsed && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
                         Trial
                       </span>
                     )}
@@ -477,9 +499,9 @@ export const DashboardLayout = () => {
           </NavLink>
 
           <NavLink
-            to="/prelims-test"
+            to="/prelims-topper"
             className={({ isActive }) => {
-              const isActiveRoute = location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/");
+              const isActiveRoute = location.pathname === "/prelims-topper" || location.pathname.startsWith("/prelims-topper/") || location.pathname.startsWith("/test/");
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActiveRoute
                     ? "text-fuchsia-300"
@@ -491,21 +513,21 @@ export const DashboardLayout = () => {
             }}
           >
             {(() => {
-              const isActiveRoute = location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/");
+              const isActiveRoute = location.pathname === "/prelims-topper" || location.pathname.startsWith("/prelims-topper/") || location.pathname.startsWith("/test/");
               return isActiveRoute ? (
                 <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
                   }`} />
               ) : null;
             })()}
-            <ClipboardList className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/")
+            <ClipboardList className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/prelims-topper" || location.pathname.startsWith("/prelims-topper/") || location.pathname.startsWith("/test/")
                 ? "scale-105"
                 : "scale-100"
               }`} />
-            <span className={`text-[9px] font-medium leading-tight ${location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/")
+            <span className={`text-[9px] font-medium leading-tight ${location.pathname === "/prelims-topper" || location.pathname.startsWith("/prelims-topper/") || location.pathname.startsWith("/test/")
                 ? "font-semibold"
                 : "font-normal"
               }`}>
-              Test (Trial)
+              Prelims Topper
             </span>
           </NavLink>
 

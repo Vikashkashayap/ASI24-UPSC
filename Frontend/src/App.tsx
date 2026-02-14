@@ -16,6 +16,10 @@ import TestGeneratorPage from "./pages/TestGeneratorPage";
 import TestHistoryPage from "./pages/TestHistoryPage";
 import TestPage from "./pages/TestPage";
 import TestResultPage from "./pages/TestResultPage";
+import { PrelimsTopperPage } from "./pages/PrelimsTopperPage";
+import { PrelimsTopperExamPage } from "./pages/PrelimsTopperExamPage";
+import { PrelimsTopperResultPage } from "./pages/PrelimsTopperResultPage";
+import { PrelimsTopperAdminPage } from "./pages/admin/PrelimsTopperAdminPage";
 import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -57,6 +61,9 @@ function App() {
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
+            <Route path="prelims-topper" element={<PrelimsTopperPage />} />
+            <Route path="prelims-topper/exam" element={<PrelimsTopperExamPage />} />
+            <Route path="prelims-topper/result/:attemptId" element={<PrelimsTopperResultPage />} />
             <Route path="test-history" element={<TestHistoryPage />} />
             <Route path="test/:id" element={<TestPage />} />
             <Route path="result/:id" element={<TestResultPage />} />
@@ -74,6 +81,7 @@ function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="prelims-topper" element={<PrelimsTopperAdminPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>

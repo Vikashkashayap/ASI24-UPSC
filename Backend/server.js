@@ -15,6 +15,7 @@ import testRoutes from "./src/routes/testRoutes.js";
 import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
 
 import adminRoutes from "./src/routes/adminRoutes.js";
+import excelTestRoutes from "./src/routes/excelTestRoutes.js";
 
 import { authMiddleware } from "./src/middleware/authMiddleware.js";
 import { initializeSocketIO } from "./src/services/socketService.js";
@@ -72,6 +73,7 @@ console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", excelTestRoutes);
 
 
 
