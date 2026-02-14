@@ -203,35 +203,26 @@ const PrelimsTopperExamPage: React.FC = () => {
   const currentQuestion = hasParsedQuestions && currentIndex < test.questions!.length ? test.questions![currentIndex] : null;
 
   const getQuestionDisplay = () => {
-    if (!currentQuestion) return { text: "", opts: { A: "", B: "", C: "", D: "" } };
+    if (!currentQuestion) return { questionHindi: "", questionEnglish: "", opts: [] as BilingualOption[] };
     if (isBilingual(currentQuestion)) {
       const q = currentQuestion as BilingualQuestion;
-      const opts: Record<string, string> = {};
-      (q.options || []).forEach((o) => {
-        const txt =
-          language === "hindi"
-            ? o.textHindi || o.textEnglish
-            : language === "english"
-              ? o.textEnglish || o.textHindi
-              : [o.textHindi, o.textEnglish].filter(Boolean).join(" / ");
-        opts[o.key] = txt;
-      });
-      OPTIONS.forEach((k) => {
-        if (!opts[k]) opts[k] = "";
-      });
-      const qText =
-        language === "hindi"
-          ? q.questionHindi || q.questionEnglish || ""
-          : language === "english"
-            ? q.questionEnglish || q.questionHindi || ""
-            : [q.questionHindi, q.questionEnglish].filter(Boolean).join("\n\n");
-      return { text: qText, opts };
+      return {
+        questionHindi: q.questionHindi || "",
+        questionEnglish: q.questionEnglish || "",
+        opts: (q.options || []).length >= 4 ? (q.options || []) : OPTIONS.map((k) => ({ key: k, textHindi: "", textEnglish: "" })),
+      };
     }
     const leg = currentQuestion as LegacyQuestion;
-    return { text: leg.question || "", opts: leg.options || { A: "", B: "", C: "", D: "" } };
+    const legOpts = leg.options || {};
+    return {
+      questionHindi: "",
+      questionEnglish: leg.question || "",
+      opts: OPTIONS.map((k) => ({ key: k, textHindi: "", textEnglish: (legOpts as Record<string, string>)[k] || "" })),
+    };
   };
 
-  const { text: questionText, opts } = getQuestionDisplay();
+  const { questionHindi, questionEnglish, opts } = getQuestionDisplay();
+  const isBilingualQ = hasBilingual && (questionHindi || questionEnglish);
 
   const openQuestionPdf = () => {
     if (!test.questionPdfUrl) return;
@@ -324,49 +315,55 @@ const PrelimsTopperExamPage: React.FC = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           {hasParsedQuestions && currentQuestion ? (
             <>
-              <div
-                className={`text-base leading-relaxed whitespace-pre-wrap ${
-                  theme === "dark" ? "text-slate-200" : "text-slate-900"
-                }`}
-              >
-                {questionText.split("\n").map((line, lineIdx) => {
-                  const trimmedLine = line.trim();
-                  if (!trimmedLine) return null;
-                  const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                  if (numberedMatch) {
-                    return (
-                      <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                        <span className="font-bold mr-1">{numberedMatch[1]}.</span>
-                        <span>{numberedMatch[2]}</span>
-                      </div>
-                    );
-                  }
-                  if (trimmedLine.match(/^(List-I|List-II|Statement I|Statement II|Assertion|Reason):?$/i)) {
-                    return (
-                      <div
-                        key={lineIdx}
-                        className={`mt-3 mb-2 font-bold ${
-                          theme === "dark" ? "text-purple-300" : "text-purple-700"
-                        }`}
-                      >
-                        {trimmedLine}
-                      </div>
-                    );
-                  }
-                  return <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>{trimmedLine}</div>;
-                })}
+              <div className="space-y-4">
+                {isBilingualQ && (language === "both" || language === "hindi") && questionHindi && (
+                  <div
+                    className={`text-base leading-relaxed whitespace-pre-wrap ${
+                      theme === "dark" ? "text-slate-300" : "text-slate-800"
+                    }`}
+                  >
+                    {questionHindi}
+                  </div>
+                )}
+                {isBilingualQ && (language === "both" || language === "english") && questionEnglish && (
+                  <div
+                    className={`text-base leading-relaxed whitespace-pre-wrap ${
+                      theme === "dark" ? "text-slate-200" : "text-slate-900"
+                    }`}
+                  >
+                    {questionEnglish}
+                  </div>
+                )}
+                {!isBilingualQ && questionEnglish && (
+                  <div
+                    className={`text-base leading-relaxed whitespace-pre-wrap ${
+                      theme === "dark" ? "text-slate-200" : "text-slate-900"
+                    }`}
+                  >
+                    {questionEnglish}
+                  </div>
+                )}
               </div>
-              <div className="space-y-3">
-                {OPTIONS.map((opt) => {
-                  const optionText = opts[opt] || "";
-                  const isSelected = answers[String(currentIndex)] === opt;
+              <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                  Select the correct answer:
+                </p>
+                {(opts.length >= 4 ? opts : OPTIONS.map((k) => ({ key: k, textHindi: "", textEnglish: "" }))).map((o) => {
+                  const optKey = (o.key || "").toUpperCase();
+                  const optText =
+                    !hasBilingual || language === "hindi"
+                      ? o.textHindi || o.textEnglish
+                      : language === "english"
+                        ? o.textEnglish || o.textHindi
+                        : [o.textHindi, o.textEnglish].filter(Boolean).join("\n");
+                  const isSelected = answers[String(currentIndex)] === optKey;
                   return (
                     <button
-                      key={opt}
-                      onClick={() => setAnswer(currentIndex, opt)}
+                      key={optKey}
+                      onClick={() => setAnswer(currentIndex, optKey)}
                       className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                         isSelected
                           ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20"
@@ -385,11 +382,11 @@ const PrelimsTopperExamPage: React.FC = () => {
                                 : "border-slate-400 text-slate-600"
                           }`}
                         >
-                          {isSelected ? <CheckCircle className="w-4 h-4" /> : opt}
+                          {isSelected ? <CheckCircle className="w-4 h-4" /> : optKey}
                         </div>
-                        <span className={`flex-1 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                          ({opt}) {optionText || `Option ${opt}`}
-                        </span>
+                        <div className={`flex-1 whitespace-pre-wrap ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                          ({optKey}) {optText || `Option ${optKey}`}
+                        </div>
                       </div>
                     </button>
                   );
