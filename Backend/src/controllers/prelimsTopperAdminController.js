@@ -8,6 +8,7 @@ import { recalculateRanksForTest, getRankList } from "../services/prelimsRanking
 import { extractAndParseQuestionPdf, extractAndParseSolutionPdf } from "../services/prelimsPdfParserService.js";
 import { extractAndParseBilingualPdfs } from "../services/prelimsBilingualPdfParserService.js";
 import { convertPdfToMcq } from "../services/mcqPdfConversionService.js";
+import { parseBilingualPdfPipeline } from "../services/prelimsBilingualPdfService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,33 +100,99 @@ export const createPrelimsTest = async (req, res) => {
     }
     await test.save();
 
-    // OCR/Parse PDFs: extract questions + options from question PDF, answer key from solution PDF
+    // Parse PDFs: try bilingual pipeline first (best for UPSC), then fallback. CAP at 100 questions.
+    const MAX_QUESTIONS = 100;
     if (questionBuf) {
       try {
-        const qResult = await extractAndParseQuestionPdf(questionBuf);
-        if (qResult.success && qResult.questions?.length > 0) {
-          test.questions = qResult.questions;
-          if (qResult.questions.length !== test.totalQuestions) {
-            test.totalQuestions = qResult.questions.length;
+        let qResult = null;
+        if (solutionBuf) {
+          qResult = await parseBilingualPdfPipeline(questionBuf, solutionBuf);
+        }
+        if (!qResult?.success || !qResult.questions?.length) {
+          qResult = await convertPdfToMcq(questionBuf, solutionBuf);
+        }
+        if (!qResult?.success || !qResult.questions?.length) {
+          qResult = await extractAndParseBilingualPdfs(questionBuf, solutionBuf);
+        }
+        if (!qResult?.success || !qResult.questions?.length) {
+          const legacy = await extractAndParseQuestionPdf(questionBuf);
+          if (legacy.success && legacy.questions?.length) {
+            let answerKeyFromSol = {};
+            if (solutionBuf) {
+              try {
+                const s = await extractAndParseSolutionPdf(solutionBuf, MAX_QUESTIONS);
+                answerKeyFromSol = s.answerKey || {};
+              } catch (_) {}
+            }
+            qResult = {
+              success: true,
+              questions: legacy.questions.map((q, idx) => ({
+                questionNumber: idx + 1,
+                questionHindi: "",
+                questionEnglish: (q.question || "").trim(),
+                options: ["A", "B", "C", "D"].map((k) => ({
+                  key: k,
+                  textHindi: "",
+                  textEnglish: (q.options && q.options[k]) ? String(q.options[k]).trim() : "",
+                })),
+                correctAnswer: (answerKeyFromSol[String(idx)] || test.answerKey[String(idx)] || "A").toUpperCase(),
+              })),
+              answerKey: answerKeyFromSol,
+            };
           }
-          console.log(`Parsed ${test.questions.length} questions from question PDF`);
-          // Also save to PrelimsQuestion so student dashboard shows same question+options UI
+        }
+
+        if (qResult?.success && qResult.questions?.length > 0) {
+          const questions = qResult.questions.slice(0, MAX_QUESTIONS);
           const OPTIONS = ["A", "B", "C", "D"];
-          const questionDocs = qResult.questions.map((q, idx) => ({
-            testId: test._id,
-            questionNumber: idx + 1,
-            questionHindi: "",
-            questionEnglish: (q.question || "").trim(),
-            options: OPTIONS.map((k) => ({
-              key: k,
-              textHindi: "",
-              textEnglish: (q.options && q.options[k]) ? String(q.options[k]).trim() : "",
-            })),
-            correctAnswer: (test.answerKey[String(idx)] || "A").toUpperCase(),
+          const optsToObj = (opts) => {
+            if (opts && typeof opts === "object" && !Array.isArray(opts)) {
+              const obj = {};
+              OPTIONS.forEach((k) => { obj[k] = (opts[k] || "").trim(); });
+              return obj;
+            }
+            const arr = Array.isArray(opts) ? opts : [];
+            const obj = {};
+            arr.forEach((o) => {
+              const k = (o.key || "").toUpperCase();
+              if (OPTIONS.includes(k)) obj[k] = (o.textEnglish || o.textHindi || o.english || o.text || "").trim();
+            });
+            return obj;
+          };
+          test.questions = questions.map((q) => ({
+            question: (q.questionEnglish || q.questionHindi || q.question || "").trim(),
+            options: optsToObj(q.options || []),
           }));
+          test.totalQuestions = questions.length;
+          const ansKey = qResult.answerKey || {};
+          test.answerKey = test.answerKey && Object.keys(test.answerKey).length > 0
+            ? test.answerKey
+            : Object.fromEntries(questions.map((q, i) => [String(i), (q.correctAnswer || ansKey[String(i)] || "A").toUpperCase()]));
+
+          await PrelimsQuestion.deleteMany({ testId: test._id });
+          const questionDocs = questions.map((q, idx) => {
+            const opts = Array.isArray(q.options) ? q.options : [];
+            return {
+              testId: test._id,
+              questionNumber: idx + 1,
+              questionHindi: (q.questionHindi || "").trim(),
+              questionEnglish: (q.questionEnglish || q.question || "").trim(),
+              options: OPTIONS.map((k) => {
+                const o = opts.find((x) => (x.key || "").toUpperCase() === k);
+                return {
+                  key: k,
+                  textHindi: (o?.textHindi || o?.hindi || "").trim(),
+                  textEnglish: (o?.textEnglish || o?.english || o?.text || "").trim(),
+                };
+              }),
+              correctAnswer: (q.correctAnswer || test.answerKey[String(idx)] || "A").toUpperCase(),
+              explanation: (q.explanation || "").trim(),
+            };
+          });
           await PrelimsQuestion.insertMany(questionDocs);
+          console.log(`Parsed ${questions.length} questions from PDF (capped at ${MAX_QUESTIONS})`);
         } else {
-          console.warn("Question PDF parse: no questions extracted", qResult.error || "");
+          console.warn("Question PDF parse: no questions extracted", qResult?.error || qResult?.errors?.[0] || "");
         }
       } catch (parseErr) {
         console.error("Question PDF parse error:", parseErr);
@@ -366,16 +433,24 @@ export const uploadPrelimsTestFromPdf = async (req, res) => {
       });
     }
 
-    let parseResult = await convertPdfToMcq(
+    // Primary: Page-wise bilingual parser (exactly 100 questions, Hindi+English)
+    let parseResult = await parseBilingualPdfPipeline(
       questionPdf.buffer,
       answerKeyPdf?.buffer || null
     );
 
-    if (!parseResult.success || !parseResult.questions?.length) {
-      parseResult = await extractAndParseBilingualPdfs(
+    if (!parseResult.success) {
+      // Fallback: mcqPdfConversionService + extractAndParseBilingualPdfs
+      parseResult = await convertPdfToMcq(
         questionPdf.buffer,
         answerKeyPdf?.buffer || null
       );
+      if (!parseResult.success || !parseResult.questions?.length) {
+        parseResult = await extractAndParseBilingualPdfs(
+          questionPdf.buffer,
+          answerKeyPdf?.buffer || null
+        );
+      }
     }
 
     if (!parseResult.success || !parseResult.questions?.length) {
@@ -386,30 +461,62 @@ export const uploadPrelimsTestFromPdf = async (req, res) => {
       });
     }
 
-    // Keep only real MCQs: at least 3 options with non-empty text, question body 20–2500 chars (drops headers/footers/junk)
-    const filtered = parseResult.questions.filter((q) => {
-      const qText = (q.questionEnglish || q.questionHindi || "").trim();
-      if (qText.length < 20 || qText.length > 2500) return false;
-      const opts = q.options || [];
-      const withText = opts.filter((o) => (o.textEnglish || o.textHindi || "").trim().length > 0).length;
-      return withText >= 3;
-    });
-
-    const questions = filtered;
+    // Bilingual pipeline returns exactly 100; fallback may return different count
+    let questions = parseResult.questions;
     const totalQuestions = questions.length;
-    if (totalQuestions === 0) {
+
+    if (totalQuestions < 100) {
       return res.status(400).json({
         success: false,
-        message: "No valid MCQs found (need question text 20–2500 chars and at least 3 options with text). Try a different PDF.",
+        message: `Expected exactly 100 questions. Found ${totalQuestions}. Check PDF structure (alternating Hindi/English pages, question numbers 1–100, options (a)(b)(c)(d)).`,
+        details: parseResult.errors,
       });
     }
+
+    // Normalize questions to PrelimsQuestion schema (fallback parsers may use different format)
+    const OPTIONS = ["A", "B", "C", "D"];
+    const answerKey = parseResult.answerKey || {};
+    questions = questions.slice(0, 100).map((q, idx) => {
+      const optMap = {};
+      if (Array.isArray(q.options)) {
+        q.options.forEach((o) => {
+          const k = (o.key || "").toUpperCase();
+          if (OPTIONS.includes(k)) {
+            optMap[k] = {
+              textHindi: (o.textHindi || "").trim(),
+              textEnglish: (o.textEnglish || o.text || "").trim(),
+            };
+          }
+        });
+      } else if (q.options && typeof q.options === "object") {
+        OPTIONS.forEach((k) => {
+          const v = q.options[k];
+          optMap[k] = {
+            textHindi: (typeof v === "object" ? v?.textHindi : "") || "",
+            textEnglish: (typeof v === "object" ? v?.textEnglish : v) || "",
+          };
+        });
+      }
+      return {
+        questionNumber: idx + 1,
+        questionHindi: (q.questionHindi || "").trim(),
+        questionEnglish: (q.questionEnglish || q.question || "").trim(),
+        options: OPTIONS.map((k) => ({
+          key: k,
+          textHindi: optMap[k]?.textHindi || "",
+          textEnglish: optMap[k]?.textEnglish || "",
+        })),
+        correctAnswer: (q.correctAnswer || answerKey[String(idx)] || "A").toUpperCase(),
+        explanation: (q.explanation || "").trim(),
+      };
+    });
     const marks = parseFloat(totalMarks) || 200;
     const negMark = parseFloat(negativeMarking) || 0.66;
     const duration = parseInt(durationMinutes, 10) || 120;
 
-    const answerKey = {};
+    const finalAnswerKey = {};
     questions.forEach((q, idx) => {
-      answerKey[String(idx)] = q.correctAnswer;
+      finalAnswerKey[String(idx)] = q.correctAnswer;
     });
 
     ensureUploadDir();
@@ -424,7 +531,7 @@ export const uploadPrelimsTestFromPdf = async (req, res) => {
       durationMinutes: duration,
       startTime: start,
       endTime: end,
-      answerKey,
+      answerKey: finalAnswerKey,
       createdBy: adminId,
     });
 
@@ -440,30 +547,20 @@ export const uploadPrelimsTestFromPdf = async (req, res) => {
 
     await test.save();
 
-    // Store in DB as English-only (JSON-like structure). Sequential questionNumber 1,2,3... to avoid duplicate key.
-    const OPTIONS = ["A", "B", "C", "D"];
-    const questionDocs = questions.map((q, idx) => {
-      const opts = (q.options || []).slice(0, 4);
-      const optMap = {};
-      opts.forEach((o) => {
-        const key = (o.key || "").toUpperCase();
-        const text = (o.textEnglish || o.textHindi || "").trim();
-        optMap[key] = { textEnglish: text, textHindi: "" };
-      });
-      const questionText = (q.questionEnglish || q.questionHindi || "").trim();
-      return {
-        testId: test._id,
-        questionNumber: idx + 1,
-        questionHindi: "",
-        questionEnglish: questionText,
-        options: OPTIONS.map((k) => ({
-          key: k,
-          textHindi: "",
-          textEnglish: optMap[k]?.textEnglish || "",
-        })),
-        correctAnswer: (q.correctAnswer || "A").toUpperCase(),
-      };
-    });
+    // Store in DB - bilingual format with explanation
+    const questionDocs = questions.map((q) => ({
+      testId: test._id,
+      questionNumber: q.questionNumber,
+      questionHindi: q.questionHindi || "",
+      questionEnglish: q.questionEnglish || "",
+      options: (q.options || []).slice(0, 4).map((o) => ({
+        key: (o.key || "").toUpperCase(),
+        textHindi: (o.textHindi || "").trim(),
+        textEnglish: (o.textEnglish || "").trim(),
+      })),
+      correctAnswer: (q.correctAnswer || "A").toUpperCase(),
+      explanation: (q.explanation || "").trim(),
+    }));
 
     await PrelimsQuestion.insertMany(questionDocs);
 
@@ -497,7 +594,7 @@ export const uploadPrelimsTestFromPdf = async (req, res) => {
 
 /**
  * POST /api/admin/prelims-test/reparse/:id
- * Re-parse question PDF for existing test - updates test.questions
+ * Re-parse question PDF - uses same pipeline as create, CAP at 100 questions
  */
 export const reparsePrelimsTestPdf = async (req, res) => {
   try {
@@ -516,39 +613,97 @@ export const reparsePrelimsTestPdf = async (req, res) => {
     }
 
     const pdfBuffer = fs.readFileSync(qFilePath);
-    const qResult = await extractAndParseQuestionPdf(pdfBuffer);
+    const solFilePath = path.join(UPLOAD_DIR, `${id}_solution.pdf`);
+    const solutionBuffer = fs.existsSync(solFilePath) ? fs.readFileSync(solFilePath) : null;
 
-    if (!qResult.success || !qResult.questions?.length) {
+    let qResult = null;
+    qResult = await parseBilingualPdfPipeline(pdfBuffer, solutionBuffer);
+    if (!qResult?.success || !qResult.questions?.length) {
+      qResult = await convertPdfToMcq(pdfBuffer, solutionBuffer);
+    }
+    if (!qResult?.success || !qResult.questions?.length) {
+      qResult = await extractAndParseBilingualPdfs(pdfBuffer, solutionBuffer);
+    }
+    if (!qResult?.success || !qResult.questions?.length) {
+      const legacy = await extractAndParseQuestionPdf(pdfBuffer);
+      if (legacy.success && legacy.questions?.length) {
+        let answerKeyFromSol = {};
+        if (solutionBuffer) {
+          try {
+            const s = await extractAndParseSolutionPdf(solutionBuffer, 100);
+            answerKeyFromSol = s.answerKey || {};
+          } catch (_) {}
+        }
+        qResult = {
+          success: true,
+          questions: legacy.questions.map((q, idx) => ({
+            questionNumber: idx + 1,
+            questionHindi: "",
+            questionEnglish: (q.question || "").trim(),
+            options: ["A", "B", "C", "D"].map((k) => ({
+              key: k,
+              textHindi: "",
+              textEnglish: (q.options && q.options[k]) ? String(q.options[k]).trim() : "",
+            })),
+            correctAnswer: (answerKeyFromSol[String(idx)] || test.answerKey[String(idx)] || "A").toUpperCase(),
+          })),
+        };
+      }
+    }
+
+    if (!qResult?.success || !qResult.questions?.length) {
       return res.status(400).json({
         success: false,
-        message: qResult.error || "Could not parse questions from PDF.",
+        message: qResult?.error || qResult?.errors?.[0] || "Could not parse questions from PDF.",
       });
     }
 
-    test.questions = qResult.questions;
-    test.totalQuestions = qResult.questions.length;
-    const answerKey = test.answerKey || {};
+    const MAX_QUESTIONS = 100;
+    const questions = qResult.questions.slice(0, MAX_QUESTIONS);
     const OPTIONS = ["A", "B", "C", "D"];
 
+    test.questions = questions.map((q) => {
+      const opts = Array.isArray(q.options) ? q.options : [];
+      const obj = {};
+      opts.forEach((o) => { obj[(o.key || "").toUpperCase()] = (o.textEnglish || o.textHindi || o.english || o.text || "").trim(); });
+      if (q.options && typeof q.options === "object" && !Array.isArray(q.options)) {
+        OPTIONS.forEach((k) => { obj[k] = (q.options[k] || "").trim(); });
+      }
+      return {
+        question: (q.questionEnglish || q.questionHindi || q.question || "").trim(),
+        options: obj,
+      };
+    });
+    test.totalQuestions = questions.length;
+    test.answerKey = Object.fromEntries(questions.map((q, i) => [String(i), (q.correctAnswer || "A").toUpperCase()]));
+
     await PrelimsQuestion.deleteMany({ testId: id });
-    const questionDocs = qResult.questions.map((q, idx) => ({
-      testId: test._id,
-      questionNumber: idx + 1,
-      questionHindi: "",
-      questionEnglish: (q.question || "").trim(),
-      options: OPTIONS.map((k) => ({
-        key: k,
-        textHindi: "",
-        textEnglish: (q.options && q.options[k]) ? String(q.options[k]).trim() : "",
-      })),
-      correctAnswer: (answerKey[String(idx)] || "A").toUpperCase(),
-    }));
+    const questionDocs = questions.map((q, idx) => {
+      const opts = Array.isArray(q.options) ? q.options : [];
+      return {
+        testId: test._id,
+        questionNumber: idx + 1,
+        questionHindi: (q.questionHindi || "").trim(),
+        questionEnglish: (q.questionEnglish || q.question || "").trim(),
+        options: OPTIONS.map((k) => {
+          const o = opts.find((x) => (x.key || "").toUpperCase() === k);
+          const v = q.options && q.options[k];
+          return {
+            key: k,
+            textHindi: (o?.textHindi || o?.hindi || "").trim(),
+            textEnglish: (o?.textEnglish || o?.english || o?.text || (typeof v === "string" ? v : "") || "").trim(),
+          };
+        }),
+        correctAnswer: (q.correctAnswer || "A").toUpperCase(),
+        explanation: (q.explanation || "").trim(),
+      };
+    });
     await PrelimsQuestion.insertMany(questionDocs);
     await test.save();
 
     res.json({
       success: true,
-      message: `Re-parsed ${test.questions.length} questions`,
+      message: `Re-parsed ${questions.length} questions (capped at ${MAX_QUESTIONS})`,
       data: { totalQuestions: test.totalQuestions },
     });
   } catch (error) {

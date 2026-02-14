@@ -372,6 +372,7 @@ export const getPrelimsTestHistory = async (req, res) => {
 
 /**
  * GET /api/student/prelims-test/result/:attemptId
+ * Returns attempt summary + questions with correctAnswer and explanation (only after submission).
  */
 export const getPrelimsTestResult = async (req, res) => {
   try {
@@ -389,6 +390,26 @@ export const getPrelimsTestResult = async (req, res) => {
     const totalAttempted = await PrelimsTestAttempt.countDocuments({ testId: test._id });
     const rankList = await getRankList(test._id, 1);
     const topperScore = rankList[0]?.score ?? attempt.score;
+
+    // Fetch questions WITH correctAnswer + explanation for review (secure: only for user's own submitted attempt)
+    const questions = await PrelimsQuestion.find({ testId: test._id })
+      .sort({ questionNumber: 1 })
+      .select("questionNumber questionHindi questionEnglish options correctAnswer explanation")
+      .lean();
+
+    const questionReview = questions.map((q) => ({
+      questionNumber: q.questionNumber,
+      questionHindi: q.questionHindi || "",
+      questionEnglish: q.questionEnglish || "",
+      options: (q.options || []).map((o) => ({
+        key: o.key,
+        textHindi: o.textHindi || "",
+        textEnglish: o.textEnglish || "",
+      })),
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation || "",
+      userAnswer: attempt.answers?.[String(q.questionNumber - 1)] || null,
+    }));
 
     res.json({
       success: true,
@@ -413,6 +434,7 @@ export const getPrelimsTestResult = async (req, res) => {
         },
         totalAttempted,
         topperScore,
+        questionReview,
       },
     });
   } catch (error) {

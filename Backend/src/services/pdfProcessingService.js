@@ -9,6 +9,7 @@ import { createRequire } from "module";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { pathToFileURL } from "node:url";
 import { createWorker } from "tesseract.js";
 
 // Create CommonJS require for pdf-parse compatibility
@@ -71,7 +72,8 @@ export async function extractTextFromPDF(buffer) {
       throw parseError;
     }
     
-    const extractedText = data.text || "";
+    let extractedText = data.text || "";
+    const numPages = data.numpages || 1;
 
     if (!extractedText || extractedText.trim().length === 0) {
       console.log("No text extracted - attempting OCR for image-only PDF...");
@@ -84,8 +86,21 @@ export async function extractTextFromPDF(buffer) {
       );
     }
 
-    // Return clean text, trimmed of excess whitespace
-    return extractedText.trim();
+    // For multi-page PDFs with very little text (likely scanned), try OCR - may get better results
+    const trimmed = extractedText.trim();
+    if (numPages >= 2 && trimmed.length < 500) {
+      console.log(`Low text (${trimmed.length} chars for ${numPages} pages) - trying OCR for scanned PDF...`);
+      try {
+        const ocrResult = await extractTextWithOCR(buffer);
+        if (ocrResult.success && ocrResult.text?.trim() && ocrResult.text.length > trimmed.length) {
+          return ocrResult.text.trim();
+        }
+      } catch (ocrErr) {
+        console.warn("OCR fallback failed:", ocrErr.message);
+      }
+    }
+
+    return trimmed;
 
   } catch (error) {
     // Log error for debugging but throw clean error message
@@ -307,7 +322,9 @@ export async function extractTextWithOCR(pdfBuffer) {
   try {
     console.log("🔍 Starting OCR processing for image-only PDF (300 DPI, grayscale)...");
 
-    const { pdf } = await import("pdf-to-img");
+    // Resolve via createRequire so ESM finds the package in Backend/node_modules
+    const pdfToImgPath = require.resolve("pdf-to-img");
+    const { pdf } = await import(pathToFileURL(pdfToImgPath).href);
     tempPath = path.join(os.tmpdir(), `prelims-pdf-${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`);
     fs.writeFileSync(tempPath, pdfBuffer);
 

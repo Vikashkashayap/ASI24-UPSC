@@ -37,6 +37,11 @@ const prelimsQuestionSchema = new mongoose.Schema(
       required: true,
       enum: ["A", "B", "C", "D"],
     },
+    /** Explanation from Solution PDF - shown only after submission */
+    explanation: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true }
 );
