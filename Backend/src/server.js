@@ -49,6 +49,7 @@ import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import prelimsTopperRoutes from "./routes/prelimsTopperRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
@@ -106,6 +107,10 @@ app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
+app.use("/api/prelims-topper", prelimsTopperRoutes);
+
+// Serve Prelims Topper PDFs (question paper, answer key, explanation)
+app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
 
 const PORT = process.env.PORT || 5000;
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target } from "lucide-react";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/UPSCRH-LOGO.png";
 
@@ -131,6 +131,10 @@ export const DashboardLayout = () => {
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
                 </NavLink>
+                <NavLink to="/admin/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper Test">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Topper</span>}
+                </NavLink>
               </div>
 
               {/* Admin Tools Section */}
@@ -216,6 +220,10 @@ export const DashboardLayout = () => {
                       </span>
                     )}
                   </div>
+                </NavLink>
+                <NavLink to="/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper Test">
+                  <Target className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Topper</span>}
                 </NavLink>
                 {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />

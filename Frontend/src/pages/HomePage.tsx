@@ -16,7 +16,7 @@ import {
   CheckCircle,
   Zap
 } from "lucide-react";
-import { api, testAPI } from "../services/api";
+import { api, testAPI, prelimsTopperAPI } from "../services/api";
 
 export const HomePage = () => {
   const { theme } = useTheme();
@@ -28,7 +28,8 @@ export const HomePage = () => {
     totalTests: 0,
     averageTestScore: 0,
     averageAccuracy: 0,
-    recentTests: []
+    recentTests: [],
+    activePrelimsTopperTests: [] as any[],
   });
 
   useEffect(() => {
@@ -56,6 +57,16 @@ export const HomePage = () => {
           console.log("Test analytics not available yet");
         }
 
+        let activePrelimsTopper: any[] = [];
+        try {
+          const prelimsRes = await prelimsTopperAPI.getActiveTests();
+          if (prelimsRes.data?.success && prelimsRes.data.data?.length > 0) {
+            activePrelimsTopper = prelimsRes.data.data;
+          }
+        } catch {
+          // Silently fail
+        }
+
         setStats({
           totalEvaluations: evalData.totalEvaluations || 0,
           averageScore: evalData.averageScore || 0,
@@ -63,7 +74,8 @@ export const HomePage = () => {
           totalTests: testData.totalTests || 0,
           averageTestScore: testData.averageTestScore || 0,
           averageAccuracy: testData.averageAccuracy || 0,
-          recentTests: testData.recentTests || []
+          recentTests: testData.recentTests || [],
+          activePrelimsTopperTests: activePrelimsTopper,
         });
       } catch (error) {
         // Silently fail, show default stats
@@ -341,6 +353,41 @@ export const HomePage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Prelims Topper Test Card - Only show when active tests exist */}
+      {stats.activePrelimsTopperTests.length > 0 && (
+        <div>
+          <h2 className={`text-base md:text-lg font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
+            Prelims Topper Test
+          </h2>
+          <Card
+            className={`relative overflow-hidden cursor-pointer transition-all hover:scale-[1.01] hover:shadow-xl border-2 min-h-[88px] ${
+              theme === "dark"
+                ? "bg-gradient-to-br from-amber-900/40 to-slate-900 border-amber-500/30"
+                : "bg-gradient-to-br from-amber-50 to-white border-amber-200"
+            }`}
+            onClick={() => navigate("/prelims-topper")}
+          >
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/20 to-transparent rounded-full blur-3xl" />
+            <CardContent className="relative z-10 p-4 md:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-3 rounded-xl ${theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"}`}>
+                    <Target className={`w-6 h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">Prelims Topper Test</h3>
+                    <p className={`text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                      {stats.activePrelimsTopperTests.length} active test{stats.activePrelimsTopperTests.length > 1 ? "s" : ""} available
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Quick Actions - Enhanced */}
       <div>

@@ -156,6 +156,27 @@ export const adminAPI = {
   },
 };
 
+// Prelims Topper Test API (PDF-based tests)
+export const prelimsTopperAPI = {
+  getActiveTests: () => api.get("/api/prelims-topper/active"),
+  getTestQuestions: (testId: string) => api.get(`/api/prelims-topper/test/${testId}`),
+  submitTest: (testId: string, answers: Record<string | number, string>) =>
+    api.post(`/api/prelims-topper/submit/${testId}`, { answers }),
+  getResult: (testId: string) => api.get(`/api/prelims-topper/result/${testId}`),
+  getMyAttempts: () => api.get("/api/prelims-topper/my-attempts"),
+
+  // Admin
+  adminUpload: async (formData: FormData) =>
+    api.post("/api/prelims-topper/admin/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+  adminListTests: () => api.get("/api/prelims-topper/admin/tests"),
+  adminUpdateTest: (id: string, data: Partial<{ title: string; duration: number; startTime: string; endTime: string; isPublished: boolean }>) =>
+    api.patch(`/api/prelims-topper/admin/tests/${id}`, data),
+  adminDeleteTest: (id: string) => api.delete(`/api/prelims-topper/admin/tests/${id}`),
+  adminGetAnalytics: (id: string) => api.get(`/api/prelims-topper/admin/tests/${id}/analytics`),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {
