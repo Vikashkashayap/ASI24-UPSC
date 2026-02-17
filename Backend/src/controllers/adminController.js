@@ -3,6 +3,7 @@ import CopyEvaluation from "../models/CopyEvaluation.js";
 import Test from "../models/Test.js";
 import { MeetingRoom } from "../models/MeetingRoom.js";
 import { MentorChat } from "../models/MentorChat.js";
+import { getDartAnalytics, getDart20DayReport, build20DayReportPdf } from "../services/dartService.js";
 
 export const getAllStudents = async (req, res) => {
   try {
@@ -716,6 +717,44 @@ export const getStudentActivity = async (req, res) => {
       success: false,
       message: "Failed to fetch student activity"
     });
+  }
+};
+
+/** GET /api/admin/students/:id/dart-analytics – DART analytics for a student (admin view). */
+export const getStudentDartAnalytics = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const days = req.query.days || 30;
+    const student = await User.findById(id).select("name").lean();
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+    const analytics = await getDartAnalytics(id, days);
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    console.error("Error fetching student DART analytics:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to fetch DART analytics" });
+  }
+};
+
+/** GET /api/admin/students/:id/dart-report-20day – Download 20-day DART report PDF for student (admin). */
+export const getStudentDart20DayReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const student = await User.findById(id).select("name").lean();
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+    const report = await getDart20DayReport(id);
+    if (student?.name) report.enrollmentName = student.name;
+    const pdfBuffer = await build20DayReportPdf(report);
+    const filename = `DART-20-Day-Report-${String(report.enrollmentName || student?.name || id).replace(/\s+/g, "-")}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating student DART report:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to generate report" });
   }
 };
 

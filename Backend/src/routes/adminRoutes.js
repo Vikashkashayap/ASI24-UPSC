@@ -6,6 +6,8 @@ import {
   getStudentPrelims,
   getStudentMains,
   getStudentActivity,
+  getStudentDartAnalytics,
+  getStudentDart20DayReport,
   updateStudentStatus,
   resetStudentPassword,
   createStudent,
@@ -75,6 +77,8 @@ router.get("/students/:id", getStudentById);
 router.get("/students/:id/prelims", getStudentPrelims);
 router.get("/students/:id/mains", getStudentMains);
 router.get("/students/:id/activity", getStudentActivity);
+router.get("/students/:id/dart-analytics", getStudentDartAnalytics);
+router.get("/students/:id/dart-report-20day", getStudentDart20DayReport);
 router.patch("/students/:id/status", updateStudentStatus);
 router.post("/students/:id/reset-password", resetStudentPassword);
 

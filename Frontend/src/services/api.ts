@@ -197,6 +197,26 @@ export const prelimsImportAPI = {
   deleteImportedTest: (id: string) => api.delete(`/api/admin/imported-tests/${id}`),
 };
 
+// DART – Daily Activity & Reflection Tracker API
+export const dartAPI = {
+  submit: (body: Record<string, unknown>) => api.post("/api/dart", body),
+  getEntries: (params?: { from?: string; to?: string }) =>
+    api.get("/api/dart/entries", { params }),
+  getAnalytics: (params?: { days?: number }) =>
+    api.get("/api/dart/analytics", { params }),
+  download20DayReport: () =>
+    api.get("/api/dart/report-20day", { responseType: "blob" }),
+  // Admin: view student DART analytics
+  getStudentAnalytics: (studentId: string, days?: number) =>
+    api.get(`/api/admin/students/${studentId}/dart-analytics`, {
+      params: days ? { days } : undefined,
+    }),
+  getStudentReport20Day: (studentId: string) =>
+    api.get(`/api/admin/students/${studentId}/dart-report-20day`, {
+      responseType: "blob",
+    }),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

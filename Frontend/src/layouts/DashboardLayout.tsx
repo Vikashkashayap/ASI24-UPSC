@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit } from "lucide-react";
+import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/UPSCRH-LOGO.png";
 
@@ -69,9 +70,11 @@ export const DashboardLayout = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [dartModalOpen, setDartModalOpen] = useState(false);
   const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
   const pageInfo = getPageTitle(location.pathname, user?.role);
+  const isStudent = user?.role !== "admin";
 
   return (
     <div
@@ -394,8 +397,22 @@ export const DashboardLayout = () => {
             </div>
           </div>
 
-          {/* Right: theme toggle + motivation + avatar - all items-center */}
+          {/* Right: DART (student only) + theme toggle + motivation + avatar */}
           <div className="flex items-center gap-2 md:gap-3 shrink-0">
+            {isStudent && (
+              <button
+                onClick={() => setDartModalOpen(true)}
+                className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 touch-manipulation shrink-0 ${
+                  theme === "dark"
+                    ? "bg-purple-600/80 hover:bg-purple-600 text-white border border-purple-500/50"
+                    : "bg-purple-600 hover:bg-purple-700 text-white border border-purple-500/30"
+                }`}
+                title="Log daily activity (DART)"
+              >
+                <ClipboardEdit className="w-4 h-4" />
+                <span className="hidden sm:inline">DART</span>
+              </button>
+            )}
             <button
               onClick={toggleTheme}
               className={`inline-flex items-center justify-center w-9 h-9 md:w-9 md:h-9 rounded-full border transition-all duration-200 touch-manipulation active:scale-95 shrink-0 ${theme === "dark"
@@ -601,6 +618,15 @@ export const DashboardLayout = () => {
           </NavLink>
         </div>
       </nav>
+
+      {/* DART form modal – student daily activity entry */}
+      {isStudent && (
+        <DartFormModal
+          open={dartModalOpen}
+          onOpenChange={setDartModalOpen}
+          onSuccess={() => {}}
+        />
+      )}
     </div>
   );
 

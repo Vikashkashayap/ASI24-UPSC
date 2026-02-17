@@ -51,6 +51,7 @@ import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import prelimsTopperRoutes from "./routes/prelimsTopperRoutes.js";
 import prelimsImportRoutes from "./routes/prelimsImportRoutes.js";
+import dartRoutes from "./routes/dartRoutes.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
@@ -110,6 +111,7 @@ app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/prelims-topper", prelimsTopperRoutes);
 app.use("/api/prelims-import", prelimsImportRoutes);
+app.use("/api/dart", dartRoutes);
 
 // Serve Prelims Topper PDFs (question paper, answer key, explanation)
 app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
