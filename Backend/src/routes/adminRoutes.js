@@ -1,10 +1,13 @@
 import express from "express";
+import multer from "multer";
 import {
   getAllStudents,
   getStudentById,
   getStudentPrelims,
   getStudentMains,
   getStudentActivity,
+  getStudentDartAnalytics,
+  getStudentDart20DayReport,
   updateStudentStatus,
   resetStudentPassword,
   createStudent,
@@ -12,9 +15,33 @@ import {
   searchUsers,
   deleteStudent,
 } from "../controllers/adminController.js";
+import {
+  uploadTest,
+  listImportedTests,
+  updateImportedTest,
+  getImportedTestAnalytics,
+  deleteImportedTest,
+} from "../controllers/prelimsImportController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF files are allowed"), false);
+    }
+  },
+});
+const pdfUpload = upload.fields([
+  { name: "questionPdf", maxCount: 1 },
+  { name: "answerKeyPdf", maxCount: 1 },
+]);
 
 // Debugging: Log all hits to admin routes
 router.use((req, res, next) => {
@@ -27,6 +54,13 @@ router.use(requireAdmin);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);
+
+// Prelims Import: upload question paper PDF (parsed English questions)
+router.post("/upload-test", pdfUpload, uploadTest);
+router.get("/imported-tests", listImportedTests);
+router.patch("/imported-tests/:id", updateImportedTest);
+router.get("/imported-tests/:id/analytics", getImportedTestAnalytics);
+router.delete("/imported-tests/:id", deleteImportedTest);
 
 // User search
 router.get("/search", searchUsers);
@@ -43,6 +77,8 @@ router.get("/students/:id", getStudentById);
 router.get("/students/:id/prelims", getStudentPrelims);
 router.get("/students/:id/mains", getStudentMains);
 router.get("/students/:id/activity", getStudentActivity);
+router.get("/students/:id/dart-analytics", getStudentDartAnalytics);
+router.get("/students/:id/dart-report-20day", getStudentDart20DayReport);
 router.patch("/students/:id/status", updateStudentStatus);
 router.post("/students/:id/reset-password", resetStudentPassword);
 

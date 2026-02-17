@@ -60,10 +60,14 @@ export const LandingNavbar = () => {
                   key={item.label}
                   to={item.to}
                   className={({ isActive }) =>
-                    `relative transition duration-300 ${
+                    `group relative transition duration-300 ${
                       isActive
-                        ? "text-white"
-                        : "text-slate-400 hover:text-white"
+                        ? theme === "dark"
+                          ? "text-white"
+                          : "text-slate-900"
+                        : theme === "dark"
+                          ? "text-slate-400 hover:text-white"
+                          : "text-slate-500 hover:text-slate-900"
                     }`
                   }
                 >
@@ -71,7 +75,7 @@ export const LandingNavbar = () => {
                     <>
                       <span>{item.label}</span>
                       <span
-                        className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-fuchsia-400 to-purple-400 transition-transform duration-300 ${
+                        className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-fuchsia-400 to-purple-400 transition-transform duration-300 group-hover:scale-x-100 ${
                           isActive ? "scale-x-100" : ""
                         }`}
                       />

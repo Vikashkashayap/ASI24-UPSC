@@ -156,6 +156,67 @@ export const adminAPI = {
   },
 };
 
+// Prelims Topper Test API (PDF-based tests)
+export const prelimsTopperAPI = {
+  getActiveTests: () => api.get("/api/prelims-topper/active"),
+  getTestQuestions: (testId: string) => api.get(`/api/prelims-topper/test/${testId}`),
+  submitTest: (testId: string, answers: Record<string | number, string>) =>
+    api.post(`/api/prelims-topper/submit/${testId}`, { answers }),
+  getResult: (testId: string) => api.get(`/api/prelims-topper/result/${testId}`),
+  getMyAttempts: () => api.get("/api/prelims-topper/my-attempts"),
+
+  // Admin
+  adminUpload: async (formData: FormData) =>
+    api.post("/api/prelims-topper/admin/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+  adminListTests: () => api.get("/api/prelims-topper/admin/tests"),
+  adminUpdateTest: (id: string, data: Partial<{ title: string; duration: number; startTime: string; endTime: string; isPublished: boolean }>) =>
+    api.patch(`/api/prelims-topper/admin/tests/${id}`, data),
+  adminDeleteTest: (id: string) => api.delete(`/api/prelims-topper/admin/tests/${id}`),
+  adminGetAnalytics: (id: string) => api.get(`/api/prelims-topper/admin/tests/${id}/analytics`),
+};
+
+// Prelims Import API (PDF parsed → structured test, modern UI)
+export const prelimsImportAPI = {
+  // Student
+  getActiveTests: () => api.get("/api/prelims-import/active"),
+  getTest: (id: string) => api.get(`/api/prelims-import/test/${id}`),
+  submitTest: (id: string, answers: Record<string | number, string>) =>
+    api.post(`/api/prelims-import/submit/${id}`, { answers }),
+  getResult: (testId: string) => api.get(`/api/prelims-import/result/${testId}`),
+  // Admin
+  uploadTest: async (formData: FormData) =>
+    api.post("/api/admin/upload-test", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+  listImportedTests: () => api.get("/api/admin/imported-tests"),
+  updateImportedTest: (id: string, data: { title?: string; startTime?: string | null; endTime?: string | null; examType?: string | null; duration?: number; marksPerQuestion?: number; negativeMark?: number; totalMarks?: number }) =>
+    api.patch(`/api/admin/imported-tests/${id}`, data),
+  getImportedTestAnalytics: (id: string) => api.get(`/api/admin/imported-tests/${id}/analytics`),
+  deleteImportedTest: (id: string) => api.delete(`/api/admin/imported-tests/${id}`),
+};
+
+// DART – Daily Activity & Reflection Tracker API
+export const dartAPI = {
+  submit: (body: Record<string, unknown>) => api.post("/api/dart", body),
+  getEntries: (params?: { from?: string; to?: string }) =>
+    api.get("/api/dart/entries", { params }),
+  getAnalytics: (params?: { days?: number }) =>
+    api.get("/api/dart/analytics", { params }),
+  download20DayReport: () =>
+    api.get("/api/dart/report-20day", { responseType: "blob" }),
+  // Admin: view student DART analytics
+  getStudentAnalytics: (studentId: string, days?: number) =>
+    api.get(`/api/admin/students/${studentId}/dart-analytics`, {
+      params: days ? { days } : undefined,
+    }),
+  getStudentReport20Day: (studentId: string) =>
+    api.get(`/api/admin/students/${studentId}/dart-report-20day`, {
+      responseType: "blob",
+    }),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {

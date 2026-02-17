@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../services/api";
+import { api, dartAPI } from "../services/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import {
   LineChart,
@@ -19,6 +19,7 @@ import {
   Legend
 } from "recharts";
 import { useTheme } from "../hooks/useTheme";
+import { useAuth } from "../hooks/useAuth";
 import {
   TrendingUp,
   TrendingDown,
@@ -37,7 +38,10 @@ import {
   ClipboardList,
   Lightbulb,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Download,
+  Sunrise,
+  Smile
 } from "lucide-react";
 
 const COLORS = [
@@ -64,23 +68,49 @@ const GRADIENT_COLORS = {
   }
 };
 
+// DART analytics type
+interface DartAnalytics {
+  enrollmentName?: string | null;
+  performanceScore?: number;
+  performanceScoreLevel?: string;
+  consistencyIndex?: number;
+  // 20-day report unlock meta
+  firstDartDate?: string | null;
+  daysSinceFirstDart?: number;
+  daysUntil20DayReport?: number;
+  canDownload20DayReport?: boolean;
+  dailyTimeDistribution?: { name: string; value: number; color: string }[];
+  sevenDayStudyTrend?: { day: string; studyHours: number; targetHours: number }[];
+  targetVsActual?: { date: string; target: number; actual: number }[];
+  subjectFrequency?: { name: string; count: number }[];
+  wakeUpConsistency?: { date: string; wakeUpTime: string; before6: boolean }[];
+  answerWritingWeeklyCount?: number;
+  emotionalStatusPie?: { name: string; value: number }[];
+  todaySummary?: any;
+}
+
 export const PerformanceDashboardPage = () => {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const [copyPerformanceData, setCopyPerformanceData] = useState<any | null>(null);
   const [prelimsPerformanceData, setPrelimsPerformanceData] = useState<any | null>(null);
+  const [dartAnalytics, setDartAnalytics] = useState<DartAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'all' | 'month' | 'week'>('all');
   const [activeTab, setActiveTab] = useState<'overview' | 'copy-evaluation' | 'prelims'>('overview');
+  const [reportDownloading, setReportDownloading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [copyRes, prelimsRes] = await Promise.all([
+        const [copyRes, prelimsRes, dartRes] = await Promise.all([
           api.get("/api/performance"),
-          api.get("/api/tests/prelims-performance")
+          api.get("/api/tests/prelims-performance"),
+          dartAPI.getAnalytics({ days: 30 }).catch(() => ({ data: { success: false } }))
         ]);
         setCopyPerformanceData(copyRes.data);
         setPrelimsPerformanceData(prelimsRes.data.data);
+        if (dartRes?.data?.success && dartRes.data.data) setDartAnalytics(dartRes.data.data);
       } catch {
         // Handle errors gracefully
       } finally {
@@ -89,6 +119,28 @@ export const PerformanceDashboardPage = () => {
     };
     loadData();
   }, []);
+
+  const handleDownload20DayReport = async () => {
+    setReportDownloading(true);
+    try {
+      const res = await dartAPI.download20DayReport();
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `DART-20-Day-Report-${user?.name || "Student"}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        "20-day report is not available yet. Please continue filling your DART entries.";
+      // Simple, universal feedback
+      window.alert(message);
+    } finally {
+      setReportDownloading(false);
+    }
+  };
 
   // Filter data based on timeframe
   const getFilteredHistory = (data: any) => {
@@ -519,6 +571,209 @@ export const PerformanceDashboardPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* DART Analytics Sections */}
+      {dartAnalytics && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-purple-500/20" : "bg-white border-purple-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">Daily Time Distribution</CardTitle>
+                <CardDescription>Study, Sleep, Work, Waste (avg)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dartAnalytics.dailyTimeDistribution?.length && dartAnalytics.dailyTimeDistribution[0]?.name !== "No data" ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={dartAnalytics.dailyTimeDistribution}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label={({ name, value }) => `${name}: ${value}h`}
+                      >
+                        {dartAnalytics.dailyTimeDistribution.map((entry, i) => (
+                          <Cell key={i} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    Log DART entries to see distribution
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-cyan-500/20" : "bg-white border-cyan-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">7 Day Study Trend</CardTitle>
+                <CardDescription>Study hours over last 7 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dartAnalytics.sevenDayStudyTrend?.length ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <LineChart data={dartAnalytics.sevenDayStudyTrend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
+                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
+                      <Line type="monotone" dataKey="studyHours" stroke="#8b5cf6" strokeWidth={2} name="Study (hrs)" />
+                      <Line type="monotone" dataKey="targetHours" stroke="#06b6d4" strokeWidth={2} name="Target (hrs)" strokeDasharray="4 4" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    Log DART entries to see trend
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-amber-500/20" : "bg-white border-amber-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">Target vs Actual Study</CardTitle>
+                <CardDescription>Last 7 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dartAnalytics.targetVsActual?.length ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={dartAnalytics.targetVsActual} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
+                      <Bar dataKey="target" fill="#94a3b8" name="Target (hrs)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="actual" fill="#8b5cf6" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    Log DART entries to see comparison
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-teal-500/20" : "bg-white border-teal-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">Subject Frequency</CardTitle>
+                <CardDescription>Days studied per subject</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dartAnalytics.subjectFrequency?.length ? (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={dartAnalytics.subjectFrequency.slice(0, 10)} layout="vertical" margin={{ top: 5, right: 20, left: 60, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
+                      <XAxis type="number" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <YAxis type="category" dataKey="name" width={55} tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
+                      <Bar dataKey="count" fill="#14b8a6" name="Days" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    Log subjects in DART to see frequency
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-cyan-500/20" : "bg-white border-cyan-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sunrise className="w-4 h-4" /> Wake-up Consistency
+                </CardTitle>
+                <CardDescription>Last 7 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dartAnalytics.wakeUpConsistency?.length ? (
+                  <div className="space-y-2">
+                    {dartAnalytics.wakeUpConsistency.map((row, i) => (
+                      <div key={i} className={`flex justify-between items-center py-1.5 px-3 rounded-lg ${theme === "dark" ? "bg-slate-700/50" : "bg-slate-100"}`}>
+                        <span className="text-sm font-medium">{row.date}</span>
+                        <span className={`text-sm ${row.before6 ? "text-green-500" : "text-slate-500"}`}>
+                          {row.wakeUpTime} {row.before6 && "✓ Before 6 AM"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={`h-[180px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    Log wake-up time in DART
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className={`relative overflow-hidden border-2 ${
+              theme === "dark" ? "bg-slate-800/90 border-fuchsia-500/20" : "bg-white border-fuchsia-200/50"
+            }`}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">Answer Writing (Last 7 Days)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-3xl font-bold ${theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"}`}>
+                  {dartAnalytics.answerWritingWeeklyCount ?? 0} days
+                </div>
+                <p className="text-sm text-slate-500 mt-1">Days with answer writing done</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className={`relative overflow-hidden border-2 mb-8 ${
+            theme === "dark" ? "bg-slate-800/90 border-slate-600" : "bg-white border-slate-200"
+          }`}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Smile className="w-4 h-4" /> Emotional Status (Mental Health Insights)
+              </CardTitle>
+              <CardDescription>Distribution over logged days</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {dartAnalytics.emotionalStatusPie?.length && dartAnalytics.emotionalStatusPie.some((d) => d.value > 0) ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={dartAnalytics.emotionalStatusPie}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={70}
+                      label={({ name, value }) => `${name}: ${value}`}
+                    >
+                      {dartAnalytics.emotionalStatusPie.map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className={`h-[200px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                  Log emotional status in DART to see insights
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </>
   );
 
@@ -1158,12 +1413,138 @@ export const PerformanceDashboardPage = () => {
     </>
   );
 
+  const enrollmentName = dartAnalytics?.enrollmentName || user?.name || "Student";
+
   return (
     <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 px-3 md:px-0 overflow-x-hidden pb-2">
+      {/* Welcome + DART Performance Score & Consistency */}
+      <div className={`rounded-xl md:rounded-2xl p-4 md:p-6 border-2 ${
+        theme === "dark" ? "bg-slate-800/80 border-purple-500/20" : "bg-white border-purple-200/50"
+      }`}>
+        <h2 className={`text-lg md:text-xl font-bold mb-4 flex items-center gap-2 ${
+          theme === "dark" ? "text-slate-100" : "text-slate-900"
+        }`}>
+          <Sparkles className="w-5 h-5 text-purple-500" />
+          Welcome, {enrollmentName}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Card className={`${
+            theme === "dark" ? "bg-slate-900/80 border-purple-500/30" : "bg-purple-50/50 border-purple-200"
+          } border-2`}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Target className="w-4 h-4 text-purple-500" />
+                Performance Score
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl md:text-3xl font-bold ${
+                (dartAnalytics?.performanceScore ?? 0) >= 80 ? "text-green-500" :
+                (dartAnalytics?.performanceScore ?? 0) >= 60 ? "text-blue-500" :
+                (dartAnalytics?.performanceScore ?? 0) >= 40 ? "text-amber-500" : "text-slate-500"
+              }`}>
+                {dartAnalytics?.performanceScore ?? 0}
+              </div>
+              <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
+                {dartAnalytics?.performanceScoreLevel ?? "Needs Improvement"}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className={`${
+            theme === "dark" ? "bg-slate-900/80 border-cyan-500/30" : "bg-cyan-50/50 border-cyan-200"
+          } border-2`}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-cyan-500" />
+                Consistency Index
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-3">
+                <div className="relative w-16 h-16 rounded-full flex items-center justify-center">
+                  <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      className="text-cyan-500/20 stroke-[3]"
+                      stroke="currentColor"
+                      fill="none"
+                      strokeDasharray="100"
+                      d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
+                    />
+                    <path
+                      className="text-cyan-500 stroke-[3] transition-all duration-500"
+                      stroke="currentColor"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray="100"
+                      strokeDashoffset={100 - (dartAnalytics?.consistencyIndex ?? 0)}
+                      d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
+                    />
+                  </svg>
+                  <span className="absolute text-sm font-bold text-cyan-500">
+                    {dartAnalytics?.consistencyIndex ?? 0}%
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Days with 6+ hrs study
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className={`sm:col-span-2 lg:col-span-1 ${
+            theme === "dark" ? "bg-slate-900/80 border-amber-500/30" : "bg-amber-50/50 border-amber-200"
+          } border-2`}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Download className="w-4 h-4 text-amber-500" />
+                20 Day Report
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <button
+                onClick={handleDownload20DayReport}
+              disabled={reportDownloading || !dartAnalytics?.canDownload20DayReport}
+                className={`text-sm font-medium px-3 py-2 rounded-lg ${
+                  theme === "dark"
+                    ? `text-amber-400 ${
+                        dartAnalytics?.canDownload20DayReport
+                          ? "bg-amber-500/20 hover:bg-amber-500/30"
+                          : "bg-slate-800/70 cursor-not-allowed"
+                      }`
+                    : `text-amber-800 ${
+                        dartAnalytics?.canDownload20DayReport
+                          ? "bg-amber-100 hover:bg-amber-200"
+                          : "bg-amber-50 cursor-not-allowed"
+                      }`
+                }`}
+              >
+                {reportDownloading
+                  ? "Generating..."
+                  : dartAnalytics?.canDownload20DayReport
+                  ? "Download 20-Day Report"
+                  : `Available after 20 days`}
+              </button>
+              {dartAnalytics && (
+                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                  {dartAnalytics.daysSinceFirstDart && dartAnalytics.daysSinceFirstDart > 0
+                    ? `You have filled DART for ${dartAnalytics.daysSinceFirstDart}/20 days.`
+                    : "Start filling your DART form daily to unlock the 20-day report."}
+                  {dartAnalytics.daysUntil20DayReport !== undefined &&
+                    dartAnalytics.daysUntil20DayReport > 0 &&
+                    dartAnalytics.daysSinceFirstDart !== undefined &&
+                    dartAnalytics.daysSinceFirstDart > 0 && (
+                      <> {`(${dartAnalytics.daysUntil20DayReport} more day${dartAnalytics.daysUntil20DayReport === 1 ? "" : "s"} remaining)`}</>
+                    )}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Header Section - compact on mobile */}
       <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 mb-4 md:mb-6 border-2 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
+        theme === "dark"
+          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10"
           : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
       }`}>
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
@@ -1177,8 +1558,8 @@ export const PerformanceDashboardPage = () => {
                   <BarChart3 className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
                 </div>
                 <h1 className={`text-xl md:text-4xl font-bold tracking-tight bg-gradient-to-r truncate ${
-                  theme === "dark" 
-                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
+                  theme === "dark"
+                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent"
                     : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
                 }`}>
                   Performance Dashboard
