@@ -25,6 +25,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/prelims-topper': { title: 'Prelims Topper', icon: <Target className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
@@ -36,6 +37,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/admin/prelims-topper': { title: 'Prelims Topper', icon: <ClipboardList className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -52,7 +54,12 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   if (pathname.startsWith('/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
   }
-
+  if (pathname.startsWith('/prelims-topper/test/')) {
+    return { title: 'Prelims Topper Test', icon: <ClipboardList className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/prelims-topper/result/')) {
+    return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
+  }
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
 };
 

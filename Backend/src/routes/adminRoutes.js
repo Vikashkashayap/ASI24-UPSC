@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   getAllStudents,
   getStudentById,
@@ -12,9 +13,33 @@ import {
   searchUsers,
   deleteStudent,
 } from "../controllers/adminController.js";
+import {
+  uploadTest,
+  listImportedTests,
+  updateImportedTest,
+  getImportedTestAnalytics,
+  deleteImportedTest,
+} from "../controllers/prelimsImportController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
+
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF files are allowed"), false);
+    }
+  },
+});
+const pdfUpload = upload.fields([
+  { name: "questionPdf", maxCount: 1 },
+  { name: "answerKeyPdf", maxCount: 1 },
+]);
 
 // Debugging: Log all hits to admin routes
 router.use((req, res, next) => {
@@ -27,6 +52,13 @@ router.use(requireAdmin);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);
+
+// Prelims Import: upload question paper PDF (parsed English questions)
+router.post("/upload-test", pdfUpload, uploadTest);
+router.get("/imported-tests", listImportedTests);
+router.patch("/imported-tests/:id", updateImportedTest);
+router.get("/imported-tests/:id/analytics", getImportedTestAnalytics);
+router.delete("/imported-tests/:id", deleteImportedTest);
 
 // User search
 router.get("/search", searchUsers);

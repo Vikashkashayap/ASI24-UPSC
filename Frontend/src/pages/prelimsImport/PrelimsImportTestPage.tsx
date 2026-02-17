@@ -32,10 +32,6 @@ interface TestInfo {
   _id: string;
   title: string;
   totalQuestions: number;
-  duration?: number;
-  marksPerQuestion?: number;
-  negativeMark?: number;
-  totalMarks?: number;
 }
 
 const formatTime = (seconds: number) => {
@@ -44,7 +40,7 @@ const formatTime = (seconds: number) => {
   return `${m}:${s.toString().padStart(2, "0")}`;
 };
 
-export const PrelimsTopperTestPage: React.FC = () => {
+export const PrelimsImportTestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -88,9 +84,10 @@ export const PrelimsTopperTestPage: React.FC = () => {
     }
   };
 
+  // Timer: 2 minutes per question, max 3 hours
   useEffect(() => {
     if (!test || !questions.length) return;
-    const totalMinutes = test.duration && test.duration > 0 ? test.duration : Math.min(questions.length * 2, 180);
+    const totalMinutes = Math.min(questions.length * 2, 180);
     const initialSeconds = totalMinutes * 60;
     setTimeLeft(initialSeconds);
     let mounted = true;
@@ -116,7 +113,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
     setError(null);
     try {
       const res = await prelimsImportAPI.submitTest(id, ans);
-      if (res.data.success) navigate(`/prelims-topper/result/${id}`);
+      if (res.data.success) navigate(`/prelims-import/result/${id}`);
       else setError(res.data.message || "Failed to submit");
     } catch (err: unknown) {
       const ax = err as { response?: { data?: { message?: string } } };
@@ -144,7 +141,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 animate-spin text-amber-500" />
+        <Loader2 className="w-12 h-12 animate-spin text-slate-400" />
       </div>
     );
   }
@@ -156,8 +153,8 @@ export const PrelimsTopperTestPage: React.FC = () => {
           <CardContent className="pt-6 flex flex-col items-center gap-4">
             <AlertCircle className="w-12 h-12 text-red-500" />
             <p className="text-center text-red-600 dark:text-red-400">{error}</p>
-            <Button variant="outline" onClick={() => navigate("/prelims-topper")}>
-              Back to Prelims Topper
+            <Button variant="outline" onClick={() => navigate("/prelims-import")}>
+              Back to tests
             </Button>
           </CardContent>
         </Card>
@@ -169,6 +166,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#0f0a1a]" : "bg-slate-100"}`}>
+      {/* Top bar: Timer + progress + title */}
       <div
         className={`sticky top-0 z-10 flex items-center justify-between gap-4 px-4 py-3 border-b shadow-sm ${
           isDark ? "bg-slate-900/95 border-slate-700" : "bg-white border-slate-200"
@@ -195,6 +193,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
         </div>
       )}
 
+      {/* Question card - clean white/dark card with shadow like reference */}
       <div className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full">
         <div
           className={`rounded-2xl shadow-lg p-6 md:p-8 ${
@@ -230,7 +229,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
                   onClick={() => setAnswer(key)}
                   className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
                     isSelected
-                      ? "border-amber-500 bg-amber-50 text-amber-900 dark:border-amber-400 dark:bg-amber-500/25 dark:text-amber-100"
+                      ? "border-purple-500 bg-purple-50 text-purple-900 dark:border-purple-400 dark:bg-purple-500/25 dark:text-purple-100"
                       : isDark
                         ? "border-slate-600 bg-slate-700/50 text-slate-200 hover:border-slate-500 hover:bg-slate-700"
                         : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300 hover:bg-slate-100"
@@ -244,6 +243,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Prev / Next - Previous solid style, Next with gradient like reference */}
         <div className="flex items-center justify-between mt-6 gap-4">
           <button
             type="button"
@@ -253,8 +253,8 @@ export const PrelimsTopperTestPage: React.FC = () => {
               currentIndex === 0
                 ? "opacity-50 cursor-not-allowed bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
                 : isDark
-                  ? "bg-amber-600 text-white hover:bg-amber-500"
-                  : "bg-amber-600 text-white hover:bg-amber-700"
+                  ? "bg-purple-600 text-white hover:bg-purple-500"
+                  : "bg-purple-600 text-white hover:bg-purple-700"
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
@@ -264,13 +264,14 @@ export const PrelimsTopperTestPage: React.FC = () => {
             type="button"
             onClick={() => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1))}
             disabled={currentIndex === questions.length - 1}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-amber-600 to-emerald-500 hover:from-amber-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-400 transition shadow-md"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-purple-600 to-emerald-500 hover:from-purple-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-400 transition shadow-md"
           >
             Next
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
+        {/* Question navigator - current question clearly highlighted */}
         <div className="mt-8">
           <p
             className={`text-sm font-medium mb-2 ${
@@ -290,7 +291,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
                   onClick={() => setCurrentIndex(i)}
                   className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
                     isCurrent
-                      ? "bg-amber-600 text-white ring-2 ring-amber-400 ring-offset-2 dark:ring-offset-slate-900"
+                      ? "bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 dark:ring-offset-slate-900"
                       : hasAnswer
                         ? isDark
                           ? "bg-slate-600 text-slate-200 hover:bg-slate-500"
@@ -307,11 +308,12 @@ export const PrelimsTopperTestPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Submit */}
         <div className="mt-8 flex justify-center">
           <Button
+            size="lg"
             onClick={() => setShowSubmitConfirm(true)}
             disabled={submitting}
-            className="bg-amber-600 hover:bg-amber-700"
           >
             {submitting ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -323,6 +325,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Submit confirmation */}
       {showSubmitConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="max-w-sm w-full">
@@ -335,7 +338,7 @@ export const PrelimsTopperTestPage: React.FC = () => {
                 <Button variant="outline" onClick={() => setShowSubmitConfirm(false)}>
                   Cancel
                 </Button>
-                <Button onClick={() => handleSubmit(answers)} disabled={submitting} className="bg-amber-600 hover:bg-amber-700">
+                <Button onClick={() => handleSubmit(answers)} disabled={submitting}>
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit"}
                 </Button>
               </div>

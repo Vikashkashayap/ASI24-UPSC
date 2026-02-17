@@ -32,7 +32,6 @@ interface ResultData {
   testId: string;
   title: string;
   totalQuestions: number;
-  totalMarks?: number;
   score: number;
   correctCount: number;
   wrongCount: number;
@@ -42,7 +41,7 @@ interface ResultData {
   submittedAt: string;
 }
 
-export const PrelimsTopperResultPage: React.FC = () => {
+export const PrelimsImportResultPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -87,7 +86,7 @@ export const PrelimsTopperResultPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 animate-spin text-amber-500" />
+        <Loader2 className="w-12 h-12 animate-spin text-slate-400" />
       </div>
     );
   }
@@ -99,8 +98,8 @@ export const PrelimsTopperResultPage: React.FC = () => {
           <CardContent className="pt-6 flex flex-col items-center gap-4">
             <AlertCircle className="w-12 h-12 text-red-500" />
             <p className="text-center text-red-600 dark:text-red-400">{error}</p>
-            <Button variant="outline" onClick={() => navigate("/prelims-topper")}>
-              Back to Prelims Topper
+            <Button variant="outline" onClick={() => navigate("/prelims-import")}>
+              Back to tests
             </Button>
           </CardContent>
         </Card>
@@ -111,14 +110,16 @@ export const PrelimsTopperResultPage: React.FC = () => {
   if (!result) return null;
 
   const hasScore = result.correctCount + result.wrongCount > 0;
-  const maxScore = result.totalMarks ?? result.totalQuestions * 2;
+  const maxScore = result.totalQuestions * 2;
+
   const isDark = theme === "dark";
 
   return (
     <div className={`min-h-screen pb-12 ${isDark ? "bg-[#0f0a1a]" : "bg-slate-100"}`}>
       <div className="p-4 md:p-6 max-w-4xl mx-auto">
+        {/* Back + Title */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="outline" onClick={() => navigate("/prelims-topper")}>
+          <Button variant="outline" size="sm" onClick={() => navigate("/prelims-import")}>
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back
           </Button>
@@ -127,6 +128,7 @@ export const PrelimsTopperResultPage: React.FC = () => {
           </h1>
         </div>
 
+        {/* Score summary */}
         <Card
           className={`mb-8 rounded-2xl shadow-lg ${isDark ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-slate-200/50"}`}
         >
@@ -170,6 +172,7 @@ export const PrelimsTopperResultPage: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Legend */}
         <div className="flex flex-wrap gap-4 mb-4 text-sm">
           <span className="flex items-center gap-2">
             <span className="w-4 h-4 rounded border-2 border-green-500 bg-green-100 dark:bg-green-900/30" />
@@ -185,6 +188,7 @@ export const PrelimsTopperResultPage: React.FC = () => {
           </span>
         </div>
 
+        {/* Question list */}
         <div className="space-y-3">
           {result.questions.map((q) => {
             const isExpanded = expandedId === q._id;
@@ -270,12 +274,6 @@ export const PrelimsTopperResultPage: React.FC = () => {
               </Card>
             );
           })}
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          <Button variant="outline" onClick={() => navigate("/prelims-topper")}>
-            Back to Prelims Topper
-          </Button>
         </div>
       </div>
     </div>

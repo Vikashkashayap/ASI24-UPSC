@@ -4,27 +4,33 @@ import { ArrowLeft, BarChart3, Loader2, Users, Award, TrendingUp } from "lucide-
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { useTheme } from "../../hooks/useTheme";
-import { prelimsTopperAPI } from "../../services/api";
+import { prelimsImportAPI } from "../../services/api";
 
-interface Analytics {
+interface AttemptRow {
+  _id: string;
+  studentName: string;
+  studentEmail: string;
+  score: number;
+  correctCount: number;
+  wrongCount: number;
+  notAttempted: number;
+  accuracy: number;
+  submittedAt: string;
+}
+
+interface AnalyticsData {
+  test: { _id: string; title: string; totalQuestions: number };
   totalAttempts: number;
+  submittedCount: number;
   averageScore: number;
-  topScore: number;
-  highPerformersCount: number;
-  highPerformers: Array<{
-    studentId: string;
-    name: string;
-    email: string;
-    score: number;
-    accuracy: number;
-  }>;
+  attempts: AttemptRow[];
 }
 
 export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { theme } = useTheme();
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +40,7 @@ export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
   const loadAnalytics = async () => {
     try {
       setLoading(true);
-      const res = await prelimsTopperAPI.adminGetAnalytics(id!);
+      const res = await prelimsImportAPI.getImportedTestAnalytics(id!);
       if (res.data.success) setAnalytics(res.data.data);
     } catch {
       setAnalytics(null);
@@ -42,6 +48,11 @@ export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const topScore = analytics?.attempts?.length
+    ? Math.max(...analytics.attempts.map((a) => a.score || 0))
+    : 0;
+  const highPerformers = analytics?.attempts?.filter((a) => a.accuracy >= 80) || [];
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-8 px-3 md:px-4">
@@ -62,7 +73,7 @@ export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
           Test Analytics
         </h1>
         <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-          Prelims Topper Test performance overview
+          {analytics?.test?.title || "Prelims Topper Test"} — performance overview
         </p>
       </div>
 
@@ -73,20 +84,20 @@ export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
       ) : analytics ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30">
                     <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{analytics.totalAttempts}</p>
-                    <p className="text-sm text-slate-500">Total Attempts</p>
+                    <p className="text-2xl font-bold">{analytics.submittedCount}</p>
+                    <p className="text-sm text-slate-500">Submissions</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-lg bg-green-100 dark:bg-green-900/30">
@@ -99,65 +110,85 @@ export const PrelimsTopperAdminAnalyticsPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-lg bg-amber-100 dark:bg-amber-900/30">
                     <Award className="w-6 h-6 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{analytics.topScore}</p>
+                    <p className="text-2xl font-bold">{topScore}</p>
                     <p className="text-sm text-slate-500">Top Score</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/30">
                     <Award className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{analytics.highPerformersCount}</p>
-                    <p className="text-sm text-slate-500">High Performers (≥80%)</p>
+                    <p className="text-2xl font-bold">{highPerformers.length}</p>
+                    <p className="text-sm text-slate-500">≥80% accuracy</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {analytics.highPerformers.length > 0 && (
+          {analytics.attempts.length > 0 && (
             <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
               <CardHeader>
-                <CardTitle>High Performers (≥80% accuracy)</CardTitle>
+                <CardTitle>All attempts</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  {analytics.highPerformers.map((p) => (
-                    <div
-                      key={p.studentId}
-                      className={`flex items-center justify-between p-4 rounded-lg ${
-                        theme === "dark" ? "bg-slate-900/50" : "bg-slate-50"
-                      }`}
-                    >
-                      <div>
-                        <p className="font-semibold">{p.name || "Unknown"}</p>
-                        <p className="text-sm text-slate-500">{p.email}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-green-600">{p.score} pts</p>
-                        <p className="text-sm">{p.accuracy.toFixed(1)}% accuracy</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className={`border-b ${theme === "dark" ? "border-slate-700" : "border-slate-200"}`}>
+                        <th className="text-left py-2 font-medium">Student</th>
+                        <th className="text-left py-2 font-medium">Score</th>
+                        <th className="text-left py-2 font-medium">Correct</th>
+                        <th className="text-left py-2 font-medium">Wrong</th>
+                        <th className="text-left py-2 font-medium">Accuracy</th>
+                        <th className="text-left py-2 font-medium">Submitted</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analytics.attempts.map((a) => (
+                        <tr key={a._id} className={`border-b ${theme === "dark" ? "border-slate-700/50" : "border-slate-100"}`}>
+                          <td className="py-3">
+                            <p className="font-medium">{a.studentName}</p>
+                            <p className="text-slate-500 text-xs">{a.studentEmail}</p>
+                          </td>
+                          <td className="py-3">{a.score?.toFixed(2) ?? "—"}</td>
+                          <td className="py-3">{a.correctCount}</td>
+                          <td className="py-3">{a.wrongCount}</td>
+                          <td className="py-3">{a.accuracy != null ? `${a.accuracy}%` : "—"}</td>
+                          <td className="py-3 text-slate-500">
+                            {a.submittedAt ? new Date(a.submittedAt).toLocaleString() : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {analytics.attempts.length === 0 && (
+            <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
+              <CardContent className="py-12 text-center">
+                <p className="text-slate-500">No submissions yet for this test.</p>
               </CardContent>
             </Card>
           )}
         </>
       ) : (
-        <Card>
+        <Card className={theme === "dark" ? "bg-slate-800/50 border-slate-700" : ""}>
           <CardContent className="py-12 text-center">
             <p className="text-slate-500">No analytics data available</p>
           </CardContent>

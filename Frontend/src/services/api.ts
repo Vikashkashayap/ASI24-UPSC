@@ -177,6 +177,26 @@ export const prelimsTopperAPI = {
   adminGetAnalytics: (id: string) => api.get(`/api/prelims-topper/admin/tests/${id}/analytics`),
 };
 
+// Prelims Import API (PDF parsed → structured test, modern UI)
+export const prelimsImportAPI = {
+  // Student
+  getActiveTests: () => api.get("/api/prelims-import/active"),
+  getTest: (id: string) => api.get(`/api/prelims-import/test/${id}`),
+  submitTest: (id: string, answers: Record<string | number, string>) =>
+    api.post(`/api/prelims-import/submit/${id}`, { answers }),
+  getResult: (testId: string) => api.get(`/api/prelims-import/result/${testId}`),
+  // Admin
+  uploadTest: async (formData: FormData) =>
+    api.post("/api/admin/upload-test", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+  listImportedTests: () => api.get("/api/admin/imported-tests"),
+  updateImportedTest: (id: string, data: { title?: string; startTime?: string | null; endTime?: string | null; examType?: string | null; duration?: number; marksPerQuestion?: number; negativeMark?: number; totalMarks?: number }) =>
+    api.patch(`/api/admin/imported-tests/${id}`, data),
+  getImportedTestAnalytics: (id: string) => api.get(`/api/admin/imported-tests/${id}/analytics`),
+  deleteImportedTest: (id: string) => api.delete(`/api/admin/imported-tests/${id}`),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {
