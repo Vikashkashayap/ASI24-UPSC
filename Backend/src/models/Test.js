@@ -25,6 +25,11 @@ const testSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    prelimsMockId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PrelimsMock",
+      required: false,
+    },
     difficulty: {
       type: String,
       required: false,

@@ -26,7 +26,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
-    '/prelims-topper': { title: 'Prelims Topper', icon: <Target className="w-5 h-5" /> },
+    '/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
@@ -38,7 +38,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
-    '/admin/prelims-topper': { title: 'Prelims Topper', icon: <ClipboardList className="w-5 h-5" /> },
+    '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -53,12 +53,6 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     return { title: 'Test', icon: <ClipboardList className="w-5 h-5" /> };
   }
   if (pathname.startsWith('/result/')) {
-    return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
-  }
-  if (pathname.startsWith('/prelims-topper/test/')) {
-    return { title: 'Prelims Topper Test', icon: <ClipboardList className="w-5 h-5" /> };
-  }
-  if (pathname.startsWith('/prelims-topper/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
   }
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
@@ -141,9 +135,9 @@ export const DashboardLayout = () => {
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
                 </NavLink>
-                <NavLink to="/admin/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper Test">
-                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Prelims Topper</span>}
+                <NavLink to="/admin/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Schedule tests">
+                  <Target className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Prelims Mock</span>}
                 </NavLink>
               </div>
 
@@ -231,9 +225,9 @@ export const DashboardLayout = () => {
                     )}
                   </div>
                 </NavLink>
-                <NavLink to="/prelims-topper" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Topper Test">
+                <NavLink to="/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Scheduled tests">
                   <Target className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Prelims Topper</span>}
+                  {!sidebarCollapsed && <span>Prelims Mock</span>}
                 </NavLink>
                 {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />
@@ -447,9 +441,15 @@ export const DashboardLayout = () => {
           </div>
         </header>
 
-        {/* Scrollable Main Content - Mobile-first: extra bottom padding for bottom nav + safe area */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6 max-w-full min-h-0">
-          <Outlet />
+        {/* Scrollable Main Content - full-height wrapper for /mentor so only chat scrolls */}
+        <main className={`flex-1 flex flex-col min-h-0 max-w-full overflow-hidden ${location.pathname === "/mentor" ? "px-0 py-0 pb-0" : "overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6"}`}>
+          {location.pathname === "/mentor" ? (
+            <div className="flex-1 min-h-0 flex flex-col">
+              <Outlet />
+            </div>
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
 

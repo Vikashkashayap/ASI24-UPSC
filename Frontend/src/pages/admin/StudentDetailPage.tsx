@@ -91,6 +91,7 @@ interface PrelimsTest {
   correctAnswers: number;
   wrongAnswers: number;
   attemptedAt: string;
+  isPrelimsMock?: boolean;
 }
 
 interface MainsEvaluation {
@@ -1165,13 +1166,24 @@ export const StudentDetailPage = () => {
                       >
                         <div className="flex justify-between items-start gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3
-                              className={`font-semibold text-lg truncate ${
-                                theme === "dark" ? "text-slate-100" : "text-slate-900"
-                              }`}
-                            >
-                              {test.subject} - {test.topic}
-                            </h3>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3
+                                className={`font-semibold text-lg truncate ${
+                                  theme === "dark" ? "text-slate-100" : "text-slate-900"
+                                }`}
+                              >
+                                {test.subject} - {test.topic}
+                              </h3>
+                              {test.isPrelimsMock && (
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-800"
+                                  }`}
+                                >
+                                  Prelims Mock
+                                </span>
+                              )}
+                            </div>
                             <p
                               className={`text-sm mt-1 ${
                                 theme === "dark" ? "text-slate-400" : "text-slate-600"

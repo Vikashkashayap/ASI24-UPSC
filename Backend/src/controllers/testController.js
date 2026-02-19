@@ -1,9 +1,104 @@
 import Test from "../models/Test.js";
-import { generateTestQuestions } from "../services/testGenerationService.js";
+import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
+
+/**
+ * Generate a FULL-LENGTH UPSC Prelims GS Paper 1 Mock (100 questions).
+ * Subject is provided by admin / user (SUBJECT_FROM_ADMIN).
+ * POST /api/tests/generate-full-mock
+ * Body: { subject: string } — e.g. "Polity" or "Polity, History, Geography"
+ */
+export const generateFullMockTest = async (req, res) => {
+  try {
+    const { subject } = req.body;
+    const subjectStr = typeof subject === "string" ? subject.trim() : "";
+
+    if (!subjectStr) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required field: subject (string). Example: Polity or Polity, History, Geography",
+      });
+    }
+
+    const allowed = [...GS_SUBJECTS];
+    const subjectList = subjectStr.split(",").map((s) => s.trim()).filter(Boolean);
+    const invalid = subjectList.filter((s) => !allowed.includes(s));
+    if (invalid.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid subject(s): ${invalid.join(", ")}. Allowed: ${allowed.join(", ")}`,
+      });
+    }
+
+    console.log(`📝 Generating full-length mock (100 questions) for subject: ${subjectStr}...`);
+    const result = await generateFullMockTestQuestions({ subject: subjectStr });
+
+    if (!result.success) {
+      let errorMessage = result.error || "Failed to generate full mock";
+      const lower = errorMessage.toLowerCase();
+      if (lower.includes("401") || lower.includes("unauthorized") || (lower.includes("invalid") && lower.includes("api key"))) {
+        errorMessage = "Invalid OpenRouter API key. Please check OPENROUTER_API_KEY in .env.";
+      } else if (lower.includes("missing") || lower.includes("required")) {
+        errorMessage = "OpenRouter API key is not set. Add OPENROUTER_API_KEY to .env.";
+      }
+      return res.status(500).json({
+        success: false,
+        message: errorMessage,
+        error: errorMessage,
+      });
+    }
+
+    if (!result.questions || result.questions.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: "No questions were generated for the full mock. Please try again.",
+      });
+    }
+
+    const test = new Test({
+      userId: req.user?.id,
+      subject: subjectStr,
+      examType: "GS",
+      topic: result.testName || "Full Mock - Prelims GS Paper 1",
+      difficulty: "Moderate",
+      questions: result.questions,
+      totalQuestions: result.questions.length,
+    });
+
+    await test.save();
+
+    const testForUser = {
+      _id: test._id,
+      subject: test.subject,
+      examType: test.examType,
+      topic: test.topic,
+      difficulty: test.difficulty,
+      totalQuestions: test.totalQuestions,
+      questions: test.questions.map((q) => ({
+        _id: q._id,
+        question: q.question,
+        options: q.options,
+      })),
+      createdAt: test.createdAt,
+    };
+
+    return res.status(201).json({
+      success: true,
+      message: "Full-length mock test generated successfully",
+      data: testForUser,
+    });
+  } catch (error) {
+    console.error("Error in generateFullMockTest:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
 /**
  * Generate a new test with AI-generated questions

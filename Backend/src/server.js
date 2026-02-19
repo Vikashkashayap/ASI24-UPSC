@@ -49,9 +49,10 @@ import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import prelimsTopperRoutes from "./routes/prelimsTopperRoutes.js";
 import prelimsImportRoutes from "./routes/prelimsImportRoutes.js";
 import dartRoutes from "./routes/dartRoutes.js";
+import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
+import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./controllers/prelimsMockController.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
@@ -109,14 +110,22 @@ app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
-app.use("/api/prelims-topper", prelimsTopperRoutes);
 app.use("/api/prelims-import", prelimsImportRoutes);
 app.use("/api/dart", dartRoutes);
+// Prelims Mock: student list live mocks + start attempt (admin schedule is under /api/admin/prelims-mock)
+app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
+app.use("/api/prelims-mock", prelimsMockRoutes);
+console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
 
-// Serve Prelims Topper PDFs (question paper, answer key, explanation)
 app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
 
 const PORT = process.env.PORT || 5000;
+
+// Cron: at scheduled time, auto-generate questions and set Prelims Mock live
+const CRON_INTERVAL_MS = 60 * 1000;
+setInterval(() => {
+  processScheduledPrelimsMocks().catch((err) => console.error("Prelims Mock cron:", err));
+}, CRON_INTERVAL_MS);
 
 // Create HTTP server for Socket.io
 const server = http.createServer(app);

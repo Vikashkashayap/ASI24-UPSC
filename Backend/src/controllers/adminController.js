@@ -239,7 +239,8 @@ export const getStudentPrelims = async (req, res) => {
         totalQuestions: test.totalQuestions,
         correctAnswers: test.correctAnswers,
         wrongAnswers: test.wrongAnswers,
-        attemptedAt: test.createdAt
+        attemptedAt: test.createdAt,
+        isPrelimsMock: !!test.prelimsMockId,
       })),
       statistics: await getPrelimsStats(id, dateFilter)
     };
