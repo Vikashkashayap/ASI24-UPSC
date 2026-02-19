@@ -37,6 +37,12 @@ export const MentorChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [projectFilter, setProjectFilter] = useState<string | null>(null);
+
+  // On mobile, start with sidebar closed so user sees chat area first
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 767px)");
+    if (m.matches) setSidebarOpen(false);
+  }, []);
   const [menuSessionId, setMenuSessionId] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [createProjectName, setCreateProjectName] = useState("");
@@ -71,11 +77,14 @@ export const MentorChatPage = () => {
     loadProjects();
   }, [projectFilter]);
 
+  const isMobile = () => typeof window !== "undefined" && window.innerWidth < 768;
+
   // Load a specific chat
   const selectChat = async (sessionId: string) => {
     setCurrentSessionId(sessionId);
     setLoadingChat(true);
     setMenuSessionId(null);
+    if (isMobile()) setSidebarOpen(false);
     try {
       const res = await mentorAPI.getChat(sessionId);
       setMessages(res.data?.messages || []);
@@ -91,6 +100,7 @@ export const MentorChatPage = () => {
   // New chat (optional: use project filter or typed project name)
   const startNewChat = async () => {
     setMenuSessionId(null);
+    if (isMobile()) setSidebarOpen(false);
     const project = newProjectName.trim() || projectFilter || undefined;
     if (newProjectName.trim()) setNewProjectName("");
     try {
@@ -215,10 +225,23 @@ export const MentorChatPage = () => {
     : "bg-slate-50 border-r border-slate-200";
 
   return (
-    <div className="flex flex-1 h-full min-h-0 overflow-hidden">
-      {/* Sidebar - fixed; only "Your chats" list scrolls inside */}
+    <div className="flex flex-1 h-full min-h-0 overflow-hidden relative">
+      {/* Mobile backdrop when sidebar open */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      {/* Sidebar: overlay on mobile, in-flow on md+ */}
       <aside
-        className={`${sidebarOpen ? "w-64 md:w-72" : "w-0"} flex-shrink-0 flex flex-col min-h-0 h-full overflow-hidden border-r transition-all duration-300 ${sidebarBg}`}
+        className={`fixed md:relative inset-y-0 left-0 z-40 md:z-auto flex flex-col min-h-0 h-full overflow-hidden border-r transition-all duration-300 ${sidebarBg} flex-shrink-0 ${
+          sidebarOpen
+            ? "translate-x-0 w-[280px] max-w-[85vw] md:w-64 md:max-w-none lg:w-72"
+            : "-translate-x-full md:translate-x-0 w-0 md:w-0 overflow-hidden"
+        }`}
       >
         {/* Fixed top: New chat, Search, Project input, Create project */}
         <div className="flex-shrink-0 p-3 space-y-2">
@@ -369,33 +392,33 @@ export const MentorChatPage = () => {
 
       {/* Main content: header (fixed) + scrollable messages + input (fixed bottom) */}
       <main className={`relative flex-1 flex flex-col min-w-0 min-h-0 ${isDark ? "bg-[#020012]" : "bg-slate-50"}`}>
-        {/* Toggle sidebar */}
+        {/* Toggle sidebar - touch-friendly on mobile */}
         <button
           type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className={`absolute left-2 top-3 z-20 p-2 rounded-lg ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-200 hover:bg-slate-300 text-slate-700"} md:left-4 md:top-4`}
+          className={`absolute left-2 top-3 z-20 p-2.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center touch-manipulation md:left-4 md:top-4 md:min-h-0 md:min-w-0 md:p-2 ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-200 hover:bg-slate-300 text-slate-700"}`}
           aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
         >
           {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
         </button>
 
-        {/* Header - fixed */}
-        <header className={`flex-shrink-0 flex items-center justify-between gap-4 px-4 md:px-6 py-3.5 border-b pl-12 md:pl-6 ${isDark ? "border-slate-800 bg-[#020012]/95" : "border-slate-200 bg-slate-50/95"}`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className={`p-2 rounded-xl ${isDark ? "bg-purple-500/20" : "bg-purple-100"}`}>
-              <MessageCircle className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+        {/* Header - fixed; responsive padding and text */}
+        <header className={`flex-shrink-0 flex items-center justify-between gap-2 sm:gap-4 px-3 pl-14 sm:pl-14 md:px-6 md:pl-14 py-3 sm:py-3.5 border-b ${isDark ? "border-slate-800 bg-[#020012]/95" : "border-slate-200 bg-slate-50/95"}`}>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl shrink-0 ${isDark ? "bg-purple-500/20" : "bg-purple-100"}`}>
+              <MessageCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
             </div>
             <div className="min-w-0">
-              <h1 className={`font-bold text-lg truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+              <h1 className={`font-bold text-base sm:text-lg truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                 {currentTitle || "AI Mentor"}
               </h1>
-              <p className={`text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                {currentSessionId ? "Ask follow-ups or start a new chat from the sidebar" : "Ask doubts, strategy, or next steps"}
+              <p className={`text-[11px] sm:text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                {currentSessionId ? "Ask follow-ups or open sidebar for more chats" : "Ask doubts, strategy, or next steps"}
               </p>
             </div>
             {currentSessionId && (
-              <span className={`text-xs px-2.5 py-1 rounded-full shrink-0 font-medium ${isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
-                {messages.length} messages
+              <span className={`text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shrink-0 font-medium hidden sm:inline-flex ${isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
+                {messages.length} msgs
               </span>
             )}
           </div>
@@ -408,24 +431,24 @@ export const MentorChatPage = () => {
               <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
             </div>
           ) : !currentSessionId && messages.length === 0 ? (
-            /* Empty state */
-            <div className={`flex flex-col items-center justify-center min-h-[280px] px-4 py-12 text-center ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              <div className={`p-4 rounded-2xl mb-4 ${isDark ? "bg-purple-500/10" : "bg-purple-100"}`}>
-                <MessageCircle className={`w-12 h-12 md:w-14 md:h-14 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+            /* Empty state - responsive spacing and copy */
+            <div className={`flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] px-4 sm:px-6 py-8 sm:py-12 text-center ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 ${isDark ? "bg-purple-500/10" : "bg-purple-100"}`}>
+                <MessageCircle className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
               </div>
-              <h2 className={`text-xl md:text-2xl font-bold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+              <h2 className={`text-lg sm:text-xl md:text-2xl font-bold mb-1.5 sm:mb-2 px-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                 Where should we begin?
               </h2>
-              <p className="text-sm md:text-base max-w-md mb-6">
+              <p className="text-sm sm:text-base max-w-md mb-4 sm:mb-6 px-1">
                 Ask doubts, next steps, or strategy questions like you would with a senior mentor.
               </p>
-              <p className="text-xs md:text-sm max-w-sm">
-                Create a project from the sidebar, then start a chat. Or type below to begin.
+              <p className="text-xs sm:text-sm max-w-sm px-1">
+                Open the menu to create a project or pick a chat. Or type below to begin.
               </p>
             </div>
           ) : (
-            /* Message list - scrollable */
-            <div className="px-4 md:px-6 py-4 space-y-4 pb-4">
+            /* Message list - scrollable, responsive padding */
+            <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4 pb-4">
               {messages.map((m, idx) => (
                 <div
                   key={idx}
@@ -481,8 +504,8 @@ export const MentorChatPage = () => {
           )}
         </div>
 
-        {/* Input area - fixed at bottom, never scrolls */}
-        <div className={`flex-shrink-0 p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-[#020012]" : "border-slate-200 bg-slate-50"}`}>
+        {/* Input area - fixed at bottom, responsive padding */}
+        <div className={`flex-shrink-0 p-3 sm:p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-[#020012]" : "border-slate-200 bg-slate-50"}`}>
             <form ref={formRef} onSubmit={handleSubmit} className="max-w-3xl mx-auto">
               <div
                 className={`flex gap-2 rounded-2xl border-2 overflow-hidden transition-colors ${

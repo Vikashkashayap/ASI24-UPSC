@@ -72,7 +72,7 @@ export const DashboardLayout = () => {
 
   return (
     <div
-      className={`min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+      className={`dashboard-scroll min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
         }`}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
@@ -442,13 +442,18 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Scrollable Main Content - full-height wrapper for /mentor so only chat scrolls */}
-        <main className={`flex-1 flex flex-col min-h-0 max-w-full overflow-hidden ${location.pathname === "/mentor" ? "px-0 py-0 pb-0" : "overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6"}`}>
+        <main className={`flex-1 flex flex-col min-h-0 max-w-full overflow-hidden ${location.pathname === "/mentor" ? "px-0 py-0 pb-0" : ""}`}>
           {location.pathname === "/mentor" ? (
-            <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-1 min-h-0 flex flex-col pb-20 md:pb-0">
               <Outlet />
             </div>
           ) : (
-            <Outlet />
+            /* Full-width scroll wrapper so scroll works even over empty side space */
+            <div className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
+              <div className="w-full min-h-full px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6">
+                <Outlet />
+              </div>
+            </div>
           )}
         </main>
       </div>

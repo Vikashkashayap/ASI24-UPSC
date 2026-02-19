@@ -129,7 +129,29 @@ code {
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
+  display: none !important;  /* Safari and Chrome */
+  width: 0;
+  height: 0;
+}
+
+/* Dashboard: smooth scroll + scrollbar hidden everywhere – scroll works, scrollbar dikhega nahi */
+.dashboard-scroll,
+.dashboard-scroll * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.dashboard-scroll *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.dashboard-scroll {
+  scroll-behavior: smooth;
+}
+.dashboard-scroll main,
+.dashboard-scroll [class*="overflow-y-auto"],
+.dashboard-scroll [class*="overflow-auto"] {
+  scroll-behavior: smooth;
 }
 
 /* Safe area insets for mobile devices with notches */
