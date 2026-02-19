@@ -30,11 +30,8 @@ import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
-import { PrelimsTopperPage } from "./pages/prelimsTopper/PrelimsTopperPage";
-import { PrelimsTopperTestPage } from "./pages/prelimsTopper/PrelimsTopperTestPage";
-import { PrelimsTopperResultPage } from "./pages/prelimsTopper/PrelimsTopperResultPage";
-import { PrelimsTopperAdminPage } from "./pages/prelimsTopper/PrelimsTopperAdminPage";
-import { PrelimsTopperAdminAnalyticsPage } from "./pages/prelimsTopper/PrelimsTopperAdminAnalyticsPage";
+import { PrelimsMockAdminPage } from "./pages/admin/PrelimsMockAdminPage";
+import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import ComingSoon from "./components/ui/ComingSoon";
 
@@ -72,9 +69,7 @@ function App() {
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />
             <Route path="prelims-test" element={<TestGeneratorPage />} />
-            <Route path="prelims-topper" element={<PrelimsTopperPage />} />
-            <Route path="prelims-topper/test/:id" element={<PrelimsTopperTestPage />} />
-            <Route path="prelims-topper/result/:id" element={<PrelimsTopperResultPage />} />
+            <Route path="prelims-mock" element={<PrelimsMockPage />} />
             <Route path="test-history" element={<TestHistoryPage />} />
             <Route path="test/:id" element={<TestPage />} />
             <Route path="result/:id" element={<TestResultPage />} />
@@ -92,8 +87,7 @@ function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="prelims-topper" element={<PrelimsTopperAdminPage />} />
-            <Route path="prelims-topper/analytics/:id" element={<PrelimsTopperAdminAnalyticsPage />} />
+            <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>

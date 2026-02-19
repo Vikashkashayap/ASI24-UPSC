@@ -5,9 +5,8 @@ import { MentorChat } from "../models/MentorChat.js";
 export const mentorChat = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { message, sessionId } = req.body;
+    const { message, sessionId, project } = req.body;
 
-    // Save user message to chat history
     let chatSession;
     if (sessionId) {
       chatSession = await MentorChat.findOne({
@@ -21,11 +20,17 @@ export const mentorChat = async (req, res) => {
       chatSession = new MentorChat({
         userId,
         sessionId: sessionId || new mongoose.Types.ObjectId().toString(),
+        title: message.slice(0, 50) || 'New chat',
+        project: project || null,
         messages: []
       });
     }
 
-    // Add user message
+    // Auto-title from first user message
+    if (chatSession.messages.length === 0 && (chatSession.title === 'New chat' || !chatSession.title)) {
+      chatSession.title = message.slice(0, 50) || 'New chat';
+    }
+
     chatSession.messages.push({
       role: 'user',
       text: message,
@@ -34,7 +39,6 @@ export const mentorChat = async (req, res) => {
 
     const result = await getMentorResponse({ userId, message });
 
-    // Add mentor response
     chatSession.messages.push({
       role: 'mentor',
       text: result.mentorMessage,

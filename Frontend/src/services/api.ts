@@ -87,9 +87,16 @@ export interface GenerateTestParams {
   csatCategories?: string[];
   currentAffairsPeriod?: { month?: string; year?: string };
 }
+export interface GenerateFullMockParams {
+  subject: string; // One subject or comma-separated, e.g. "Polity" or "Polity, History, Geography"
+}
 export const testAPI = {
   generateTest: async (params: GenerateTestParams) => {
     return api.post("/api/tests/generate", params);
+  },
+
+  generateFullMockTest: async (params: GenerateFullMockParams) => {
+    return api.post("/api/tests/generate-full-mock", params);
   },
 
   getTest: async (id: string) => {
@@ -156,27 +163,6 @@ export const adminAPI = {
   },
 };
 
-// Prelims Topper Test API (PDF-based tests)
-export const prelimsTopperAPI = {
-  getActiveTests: () => api.get("/api/prelims-topper/active"),
-  getTestQuestions: (testId: string) => api.get(`/api/prelims-topper/test/${testId}`),
-  submitTest: (testId: string, answers: Record<string | number, string>) =>
-    api.post(`/api/prelims-topper/submit/${testId}`, { answers }),
-  getResult: (testId: string) => api.get(`/api/prelims-topper/result/${testId}`),
-  getMyAttempts: () => api.get("/api/prelims-topper/my-attempts"),
-
-  // Admin
-  adminUpload: async (formData: FormData) =>
-    api.post("/api/prelims-topper/admin/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
-  adminListTests: () => api.get("/api/prelims-topper/admin/tests"),
-  adminUpdateTest: (id: string, data: Partial<{ title: string; duration: number; startTime: string; endTime: string; isPublished: boolean }>) =>
-    api.patch(`/api/prelims-topper/admin/tests/${id}`, data),
-  adminDeleteTest: (id: string) => api.delete(`/api/prelims-topper/admin/tests/${id}`),
-  adminGetAnalytics: (id: string) => api.get(`/api/prelims-topper/admin/tests/${id}/analytics`),
-};
-
 // Prelims Import API (PDF parsed → structured test, modern UI)
 export const prelimsImportAPI = {
   // Student
@@ -197,6 +183,21 @@ export const prelimsImportAPI = {
   deleteImportedTest: (id: string) => api.delete(`/api/admin/imported-tests/${id}`),
 };
 
+// Prelims Mock – Admin schedules; at scheduled time test goes live; students attempt under "Prelims Mock"
+export const prelimsMockAPI = {
+  // Admin
+  createSchedule: (data: { subject: string; scheduledAt: string; isMix?: boolean; isPyo?: boolean; isCsat?: boolean; yearFrom?: number; yearTo?: number }) =>
+    api.post("/api/admin/prelims-mock", data),
+  listAdmin: () => api.get("/api/admin/prelims-mock"),
+  goLive: (id: string) => api.post(`/api/admin/prelims-mock/${id}/go-live`),
+  updateSchedule: (id: string, data: { scheduledAt: string }) =>
+    api.patch(`/api/admin/prelims-mock/${id}`, data),
+  delete: (id: string) => api.delete(`/api/admin/prelims-mock/${id}`),
+  // Student
+  listLive: () => api.get("/api/prelims-mock"),
+  startAttempt: (mockId: string) => api.post(`/api/prelims-mock/${mockId}/start`),
+};
+
 // DART – Daily Activity & Reflection Tracker API
 export const dartAPI = {
   submit: (body: Record<string, unknown>) => api.post("/api/dart", body),
@@ -215,6 +216,21 @@ export const dartAPI = {
     api.get(`/api/admin/students/${studentId}/dart-report-20day`, {
       responseType: "blob",
     }),
+};
+
+// Mentor (AI) – multiple chats & projects
+export const mentorAPI = {
+  listChats: (project?: string) =>
+    api.get("/api/mentor/chats", { params: project ? { project } : undefined }),
+  getChat: (sessionId: string) => api.get(`/api/mentor/chats/${sessionId}`),
+  createChat: (body?: { title?: string; project?: string }) =>
+    api.post("/api/mentor/chats", body || {}),
+  updateChat: (sessionId: string, body: { title?: string; project?: string }) =>
+    api.patch(`/api/mentor/chats/${sessionId}`, body),
+  deleteChat: (sessionId: string) => api.delete(`/api/mentor/chats/${sessionId}`),
+  listProjects: () => api.get("/api/mentor/projects"),
+  sendMessage: (body: { message: string; sessionId?: string; project?: string }) =>
+    api.post("/api/mentor/chat", body),
 };
 
 // Student Profiler API

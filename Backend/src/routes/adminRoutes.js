@@ -22,6 +22,13 @@ import {
   getImportedTestAnalytics,
   deleteImportedTest,
 } from "../controllers/prelimsImportController.js";
+import {
+  createPrelimsMockSchedule,
+  listAdminPrelimsMocks,
+  goLivePrelimsMock,
+  updatePrelimsMockSchedule,
+  deletePrelimsMock,
+} from "../controllers/prelimsMockController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
@@ -61,6 +68,13 @@ router.get("/imported-tests", listImportedTests);
 router.patch("/imported-tests/:id", updateImportedTest);
 router.get("/imported-tests/:id/analytics", getImportedTestAnalytics);
 router.delete("/imported-tests/:id", deleteImportedTest);
+
+// Prelims Mock: schedule, go-live, update schedule, delete
+router.post("/prelims-mock", createPrelimsMockSchedule);
+router.get("/prelims-mock", listAdminPrelimsMocks);
+router.post("/prelims-mock/:id/go-live", goLivePrelimsMock);
+router.patch("/prelims-mock/:id", updatePrelimsMockSchedule);
+router.delete("/prelims-mock/:id", deletePrelimsMock);
 
 // User search
 router.get("/search", searchUsers);

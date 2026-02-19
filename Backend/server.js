@@ -15,6 +15,8 @@ import testRoutes from "./src/routes/testRoutes.js";
 import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
 
 import adminRoutes from "./src/routes/adminRoutes.js";
+import prelimsMockRoutes from "./src/routes/prelimsMockRoutes.js";
+import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./src/controllers/prelimsMockController.js";
 
 import { authMiddleware } from "./src/middleware/authMiddleware.js";
 import { initializeSocketIO } from "./src/services/socketService.js";
@@ -72,8 +74,15 @@ console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/admin", adminRoutes);
+// Explicit GET so student list always matches (avoids 404 when router base path is ambiguous)
+app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
+app.use("/api/prelims-mock", prelimsMockRoutes);
+console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
 
-
+const CRON_INTERVAL_MS = 60 * 1000;
+setInterval(() => {
+  processScheduledPrelimsMocks().catch((err) => console.error("Prelims Mock cron:", err));
+}, CRON_INTERVAL_MS);
 
 const PORT = process.env.PORT || 5000;
 

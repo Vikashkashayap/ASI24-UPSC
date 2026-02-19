@@ -1,86 +1,166 @@
 import { FormEvent, useState, useEffect, useRef } from "react";
-import { api } from "../services/api";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
+import { mentorAPI } from "../services/api";
 import { Button } from "../components/ui/button";
 import { useTheme } from "../hooks/useTheme";
 import { FormattedText } from "../components/FormattedText";
-import { Trash2, MessageCircle, Send, Sparkles, Loader2 } from "lucide-react";
+import {
+  MessageCircle,
+  Send,
+  Sparkles,
+  Loader2,
+  Plus,
+  Search,
+  FolderOpen,
+  MoreVertical,
+  Trash2,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
+
+export interface ChatItem {
+  sessionId: string;
+  title: string;
+  project: string | null;
+  lastActivity: string;
+}
 
 export const MentorChatPage = () => {
   const { theme } = useTheme();
+  const [chats, setChats] = useState<ChatItem[]>([]);
+  const [projects, setProjects] = useState<string[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [currentTitle, setCurrentTitle] = useState<string>("");
+  const [messages, setMessages] = useState<{ role: "user" | "mentor"; text: string }[]>([]);
   const [message, setMessage] = useState("");
-  const [history, setHistory] = useState<{ role: "user" | "mentor"; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [projectFilter, setProjectFilter] = useState<string | null>(null);
+  const [menuSessionId, setMenuSessionId] = useState<string | null>(null);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [createProjectName, setCreateProjectName] = useState("");
+  const [showCreateProject, setShowCreateProject] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load chat history
-  useEffect(() => {
-    const loadChatHistory = async () => {
-      try {
-        const res = await api.get("/api/mentor/chat-history");
-        if (res.data.sessionId) {
-          setSessionId(res.data.sessionId);
-          setHistory(res.data.messages);
-        }
-      } catch (error) {
-        console.error("Failed to load chat history:", error);
-      }
-    };
+  const isDark = theme === "dark";
 
-    loadChatHistory();
-  }, []);
-
-  // Auto scroll (smooth) - with slight delay for better UX
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [history, loading]);
-
-  // Auto resize textarea
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
-    }
-  }, [message]);
-
-  const clearChatHistory = async () => {
+  // Load chat list and projects
+  const loadChats = async () => {
     try {
-      await api.delete("/api/mentor/chat-history", {
-        data: { sessionId },
-      });
-      setHistory([]);
-      setSessionId(null);
-    } catch (error) {
-      console.error("Failed to clear chat history:", error);
+      const res = await mentorAPI.listChats(projectFilter || undefined);
+      setChats(res.data?.chats || []);
+    } catch (e) {
+      console.error("Failed to load chats:", e);
     }
   };
 
+  const loadProjects = async () => {
+    try {
+      const res = await mentorAPI.listProjects();
+      setProjects(res.data?.projects || []);
+    } catch (e) {
+      console.error("Failed to load projects:", e);
+    }
+  };
+
+  useEffect(() => {
+    loadChats();
+    loadProjects();
+  }, [projectFilter]);
+
+  // Load a specific chat
+  const selectChat = async (sessionId: string) => {
+    setCurrentSessionId(sessionId);
+    setLoadingChat(true);
+    setMenuSessionId(null);
+    try {
+      const res = await mentorAPI.getChat(sessionId);
+      setMessages(res.data?.messages || []);
+      setCurrentTitle(res.data?.title || "New chat");
+    } catch (e) {
+      console.error("Failed to load chat:", e);
+      setMessages([]);
+    } finally {
+      setLoadingChat(false);
+    }
+  };
+
+  // New chat (optional: use project filter or typed project name)
+  const startNewChat = async () => {
+    setMenuSessionId(null);
+    const project = newProjectName.trim() || projectFilter || undefined;
+    if (newProjectName.trim()) setNewProjectName("");
+    try {
+      const res = await mentorAPI.createChat({
+        title: "New chat",
+        project,
+      });
+      const sessionId = res.data?.sessionId;
+      if (sessionId) {
+        setCurrentSessionId(sessionId);
+        setCurrentTitle("New chat");
+        setMessages([]);
+        await loadChats();
+        await loadProjects();
+      }
+    } catch (e) {
+      console.error("Failed to create chat:", e);
+    }
+  };
+
+  // Create project = new chat in that project so project appears in list
+  const createProject = async () => {
+    const name = createProjectName.trim();
+    if (!name) return;
+    setShowCreateProject(false);
+    setCreateProjectName("");
+    try {
+      const res = await mentorAPI.createChat({ title: "New chat", project: name });
+      const sessionId = res.data?.sessionId;
+      if (sessionId) {
+        setProjectFilter(name);
+        setCurrentSessionId(sessionId);
+        setCurrentTitle("New chat");
+        setMessages([]);
+        await loadChats();
+        await loadProjects();
+      }
+    } catch (e) {
+      console.error("Failed to create project:", e);
+    }
+  };
+
+  // Send message
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || loading) return;
 
-    const current = message.trim();
-    setHistory((h) => [...h, { role: "user", text: current }]);
+    const text = message.trim();
     setMessage("");
+    setMessages((prev) => [...prev, { role: "user", text }]);
     setLoading(true);
 
     try {
-      const res = await api.post("/api/mentor/chat", {
-        message: current,
-        sessionId,
+      const res = await mentorAPI.sendMessage({
+        message: text,
+        sessionId: currentSessionId || undefined,
+        project: projectFilter || undefined,
       });
-      setSessionId(res.data.sessionId);
-      setHistory((h) => [...h, { role: "mentor", text: res.data.mentorMessage }]);
+      const sessionId = res.data?.sessionId;
+      const mentorMessage = res.data?.mentorMessage;
+
+      if (!currentSessionId) {
+        setCurrentSessionId(sessionId);
+        setCurrentTitle(text.slice(0, 50) || "New chat");
+      }
+      setMessages((prev) => [...prev, { role: "mentor", text: mentorMessage }]);
+      await loadChats();
     } catch {
-      setHistory((h) => [
-        ...h,
+      setMessages((prev) => [
+        ...prev,
         {
           role: "mentor",
           text: "I could not fetch a response right now. Try again in a bit.",
@@ -91,224 +171,356 @@ export const MentorChatPage = () => {
     }
   };
 
-  return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-7rem)] min-h-[320px] xs:h-[calc(100vh-7.5rem)] sm:h-[calc(100vh-8rem)] md:h-[calc(100vh-9rem)] overflow-x-hidden px-2 xs:px-3 sm:px-4 md:px-6">
-      {/* Enhanced Header Section */}
-      <div className="flex flex-col gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 pb-2 xs:pb-2.5 sm:pb-3 md:pb-4 flex-shrink-0 pt-1 xs:pt-2">
-        <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3">
-          <div className={`p-1.5 xs:p-2 sm:p-2 md:p-2.5 rounded-lg xs:rounded-xl sm:rounded-xl md:rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${
-            theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
-          }`}>
-            <MessageCircle className={`w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 ${
-              theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-            }`} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h1
-              className={`text-lg xs:text-xl sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight truncate ${
-                theme === "dark" 
-                  ? "bg-gradient-to-r from-slate-50 to-slate-200 bg-clip-text text-transparent" 
-                  : "text-slate-900"
-              }`}
-            >
-              AI Mentor
-            </h1>
-          </div>
-        </div>
-        <p
-          className={`text-[11px] xs:text-xs sm:text-xs md:text-sm leading-relaxed ml-0 xs:ml-0 sm:ml-12 md:ml-14 ${
-            theme === "dark" ? "text-slate-400" : "text-slate-600"
-          }`}
-        >
-          Ask doubts, next steps, or strategy questions like you would with a senior mentor.
-        </p>
-      </div>
+  // Delete chat
+  const deleteChat = async (sessionId: string) => {
+    setMenuSessionId(null);
+    try {
+      await mentorAPI.deleteChat(sessionId);
+      if (currentSessionId === sessionId) {
+        setCurrentSessionId(null);
+        setCurrentTitle("");
+        setMessages([]);
+      }
+      await loadChats();
+    } catch (e) {
+      console.error("Failed to delete chat:", e);
+    }
+  };
 
-      {/* Enhanced Chat Card */}
-      <Card className={`flex-1 flex flex-col min-h-0 shadow-xl overflow-hidden ${
-        theme === "dark"
-          ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50"
-          : "bg-white border-slate-200"
-      }`}>
-        <CardHeader className="pb-2 xs:pb-2.5 sm:pb-3 md:pb-4 border-b flex-shrink-0 px-3 xs:px-4 sm:px-5 pt-3 xs:pt-3 sm:pt-4 md:pt-5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 xs:gap-2 mb-0.5 xs:mb-1">
-                <CardTitle className="text-sm xs:text-sm sm:text-base md:text-lg font-semibold truncate">
-                  Mentor chat
-                </CardTitle>
-                {history.length > 0 && (
-                  <span className={`text-[10px] xs:text-xs px-1.5 xs:px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    theme === "dark" 
-                      ? "bg-fuchsia-500/20 text-fuchsia-300" 
-                      : "bg-purple-100 text-purple-700"
-                  }`}>
-                    {history.length}
-                  </span>
+  useEffect(() => {
+    const t = setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(t);
+  }, [messages, loading]);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = Math.min(ta.scrollHeight, 160) + "px";
+    }
+  }, [message]);
+
+  const filteredChats = searchQuery.trim()
+    ? chats.filter(
+        (c) =>
+          c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (c.project && c.project.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : chats;
+
+  const sidebarBg = isDark
+    ? "bg-gradient-to-b from-[#0a0618] to-[#06021a] border-r border-slate-800"
+    : "bg-slate-50 border-r border-slate-200";
+
+  return (
+    <div className="flex flex-1 h-full min-h-0 overflow-hidden">
+      {/* Sidebar - fixed; only "Your chats" list scrolls inside */}
+      <aside
+        className={`${sidebarOpen ? "w-64 md:w-72" : "w-0"} flex-shrink-0 flex flex-col min-h-0 h-full overflow-hidden border-r transition-all duration-300 ${sidebarBg}`}
+      >
+        {/* Fixed top: New chat, Search, Project input, Create project */}
+        <div className="flex-shrink-0 p-3 space-y-2">
+          <Button
+            onClick={startNewChat}
+            className={`w-full justify-start gap-2 rounded-xl ${isDark ? "bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white" : "bg-white hover:bg-slate-100 text-slate-800 border border-slate-200"}`}
+          >
+            <Plus className="w-4 h-4" />
+            New chat
+          </Button>
+
+          <div className={`relative rounded-xl overflow-hidden ${isDark ? "bg-slate-800/80" : "bg-white border border-slate-200"}`}>
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
+            <input
+              type="text"
+              placeholder="Search chats"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={`w-full pl-9 pr-3 py-2.5 text-sm bg-transparent border-0 focus:outline-none focus:ring-0 ${isDark ? "text-slate-200 placeholder-slate-500" : "text-slate-800 placeholder-slate-400"}`}
+            />
+          </div>
+
+          <input
+            type="text"
+            placeholder="New chat in project (optional)"
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+            className={`w-full rounded-xl px-3 py-2 text-sm border ${isDark ? "bg-slate-800/80 border-slate-700 text-slate-200 placeholder-slate-500" : "bg-white border-slate-200 text-slate-800 placeholder-slate-400"}`}
+          />
+
+          {/* Create project */}
+          {!showCreateProject ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCreateProject(true)}
+              className={`w-full justify-start gap-2 rounded-xl ${isDark ? "border-slate-600 text-slate-300 hover:bg-slate-800" : "border-slate-200 text-slate-700 hover:bg-slate-100"}`}
+            >
+              <FolderOpen className="w-4 h-4" />
+              Create project
+            </Button>
+          ) : (
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                placeholder="Project name (e.g. Polity)"
+                value={createProjectName}
+                onChange={(e) => setCreateProjectName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && createProject()}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm border ${isDark ? "bg-slate-800/80 border-slate-700 text-slate-200 placeholder-slate-500" : "bg-white border-slate-200 text-slate-800 placeholder-slate-400"}`}
+                autoFocus
+              />
+              <Button type="button" onClick={createProject} className="rounded-xl px-3 bg-purple-600 hover:bg-purple-500 text-white shrink-0">
+                Add
+              </Button>
+              <Button type="button" variant="ghost" size="icon" onClick={() => { setShowCreateProject(false); setCreateProjectName(""); }} className="shrink-0 rounded-xl">
+                <span className="text-sm">✕</span>
+              </Button>
+            </div>
+          )}
+
+          {/* Projects list - fixed height block */}
+          {projects.length > 0 && (
+            <div className="pt-1 flex-shrink-0">
+              <p className={`text-[10px] font-semibold uppercase tracking-wider px-2 mb-1.5 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                Projects
+              </p>
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => setProjectFilter(null)}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${!projectFilter ? (isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
+                >
+                  <FolderOpen className="w-4 h-4 shrink-0" />
+                  All chats
+                </button>
+                {projects.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setProjectFilter(p)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${projectFilter === p ? (isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
+                  >
+                    <FolderOpen className="w-4 h-4 shrink-0" />
+                    <span className="truncate">{p}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className={`text-[10px] font-semibold uppercase tracking-wider px-2 pt-2 mb-1.5 flex-shrink-0 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+            Your chats
+          </p>
+        </div>
+
+        {/* Scrollable chat history only - sidebar does not move; only this list scrolls */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 pb-3">
+          <div className="space-y-0.5">
+            {filteredChats.map((chat) => (
+              <div
+                key={chat.sessionId}
+                className={`group relative rounded-lg ${currentSessionId === chat.sessionId ? (isDark ? "bg-slate-800" : "bg-slate-200/80") : ""}`}
+              >
+                <button
+                  type="button"
+                  onClick={() => selectChat(chat.sessionId)}
+                  className={`w-full text-left px-3 py-2.5 pr-8 rounded-lg text-sm truncate ${currentSessionId === chat.sessionId ? (isDark ? "text-slate-100" : "text-slate-900") : isDark ? "text-slate-300 hover:bg-slate-800/80" : "text-slate-700 hover:bg-slate-100"}`}
+                >
+                  {chat.title || "New chat"}
+                </button>
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuSessionId(menuSessionId === chat.sessionId ? null : chat.sessionId);
+                    }}
+                    className={`p-1.5 rounded-lg ${isDark ? "hover:bg-slate-700" : "hover:bg-slate-300"}`}
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                </div>
+                {menuSessionId === chat.sessionId && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setMenuSessionId(null)}
+                      aria-hidden
+                    />
+                    <div
+                      className={`absolute right-2 top-full mt-1 z-20 py-1 rounded-lg shadow-xl border min-w-[120px] ${isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => deleteChat(chat.sessionId)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md ${isDark ? "text-red-400 hover:bg-slate-700" : "text-red-600 hover:bg-slate-100"}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
-              <CardDescription className={`text-[10px] xs:text-xs sm:text-xs md:text-sm flex items-center gap-1 xs:gap-1.5 mt-0.5 ${
-                theme === "dark" ? "text-slate-400" : "text-slate-600"
-              }`}>
-                <Sparkles className="w-2.5 h-2.5 xs:w-3 xs:h-3 flex-shrink-0" />
-                <span className="truncate">Grounded in your recent evaluations and weak areas.</span>
-              </CardDescription>
-            </div>
+            ))}
+          </div>
+        </div>
+      </aside>
 
-            {history.length > 0 && (
-              <Button
-                variant="ghost"
-                onClick={clearChatHistory}
-                className="h-8 w-8 xs:h-9 xs:w-9 sm:h-9 sm:w-9 md:h-10 md:w-10 p-0 rounded-lg hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/20 transition-colors flex-shrink-0"
-                title="Clear chat history"
-              >
-                <Trash2 className="h-3.5 w-3.5 xs:h-4 xs:w-4 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              </Button>
+      {/* Main content: header (fixed) + scrollable messages + input (fixed bottom) */}
+      <main className={`relative flex-1 flex flex-col min-w-0 min-h-0 ${isDark ? "bg-[#020012]" : "bg-slate-50"}`}>
+        {/* Toggle sidebar */}
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className={`absolute left-2 top-3 z-20 p-2 rounded-lg ${isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-200 hover:bg-slate-300 text-slate-700"} md:left-4 md:top-4`}
+          aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+        >
+          {sidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
+        </button>
+
+        {/* Header - fixed */}
+        <header className={`flex-shrink-0 flex items-center justify-between gap-4 px-4 md:px-6 py-3.5 border-b pl-12 md:pl-6 ${isDark ? "border-slate-800 bg-[#020012]/95" : "border-slate-200 bg-slate-50/95"}`}>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={`p-2 rounded-xl ${isDark ? "bg-purple-500/20" : "bg-purple-100"}`}>
+              <MessageCircle className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+            </div>
+            <div className="min-w-0">
+              <h1 className={`font-bold text-lg truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                {currentTitle || "AI Mentor"}
+              </h1>
+              <p className={`text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                {currentSessionId ? "Ask follow-ups or start a new chat from the sidebar" : "Ask doubts, strategy, or next steps"}
+              </p>
+            </div>
+            {currentSessionId && (
+              <span className={`text-xs px-2.5 py-1 rounded-full shrink-0 font-medium ${isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
+                {messages.length} messages
+              </span>
             )}
           </div>
-        </CardHeader>
+        </header>
 
-        {/* Enhanced Chat Messages Area */}
-        <CardContent className="flex-1 flex flex-col gap-2 xs:gap-2.5 sm:gap-3 md:gap-4 overflow-hidden px-2 xs:px-3 sm:px-4 md:px-6 pb-3 xs:pb-3 sm:pb-4 md:pb-6 pt-2 xs:pt-2.5 sm:pt-3 min-h-0">
-          <div className="flex-1 overflow-y-auto overscroll-contain space-y-2 xs:space-y-2.5 sm:space-y-3 md:space-y-4 pr-1 xs:pr-1.5 sm:pr-2 md:pr-3 custom-scrollbar pb-2">
-            {history.map((m, idx) => (
-              <div
-                key={idx}
-                className={`flex items-start gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 animate-[fadeIn_0.3s_ease-in-out] ${
-                  m.role === "user" ? "flex-row-reverse" : ""
-                }`}
-              >
-                {/* Avatar/Icon */}
-                <div className={`flex-shrink-0 w-6 h-6 xs:w-7 xs:h-7 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center ${
-                  m.role === "user"
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : theme === "dark"
-                    ? "bg-fuchsia-500/20 text-fuchsia-300"
-                    : "bg-purple-100 text-purple-600"
-                }`}>
-                  {m.role === "user" ? (
-                    <MessageCircle className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                  ) : (
-                    <Sparkles className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                  )}
-                </div>
-
-                {/* Message Bubble */}
-                <div
-                  className={`max-w-[90%] xs:max-w-[88%] sm:max-w-[85%] md:max-w-[80%] lg:max-w-[75%] break-words whitespace-pre-wrap rounded-xl xs:rounded-2xl md:rounded-3xl px-2.5 xs:px-3 sm:px-3 md:px-4 py-1.5 xs:py-2 sm:py-2 md:py-3 leading-relaxed shadow-lg transition-all hover:shadow-xl ${
-                    m.role === "user"
-                      ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-tr-md"
-                      : theme === "dark"
-                      ? "bg-slate-800/80 text-slate-100 border border-slate-700/50 rounded-tl-md backdrop-blur-sm"
-                      : "bg-slate-50 text-slate-900 border border-slate-200 rounded-tl-md"
-                  }`}
-                >
-                  {m.role === "user" ? (
-                    <div className="text-xs xs:text-sm sm:text-sm md:text-base font-medium">{m.text}</div>
-                  ) : (
-                    <FormattedText text={m.text} />
-                  )}
-                </div>
+        {/* Scrollable area only - messages or empty state */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+          {loadingChat ? (
+            <div className="flex items-center justify-center h-full min-h-[200px]">
+              <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+            </div>
+          ) : !currentSessionId && messages.length === 0 ? (
+            /* Empty state */
+            <div className={`flex flex-col items-center justify-center min-h-[280px] px-4 py-12 text-center ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <div className={`p-4 rounded-2xl mb-4 ${isDark ? "bg-purple-500/10" : "bg-purple-100"}`}>
+                <MessageCircle className={`w-12 h-12 md:w-14 md:h-14 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
               </div>
-            ))}
-
-            {/* Loading Indicator */}
-            {loading && (
-              <div className="flex items-start gap-1.5 xs:gap-2 sm:gap-2.5 md:gap-3 animate-[fadeIn_0.3s_ease-in-out]">
-                <div className="flex-shrink-0 w-6 h-6 xs:w-7 xs:h-7 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-fuchsia-500/20 text-fuchsia-300 flex items-center justify-center">
-                  <Sparkles className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                </div>
-                <div className={`rounded-xl xs:rounded-2xl md:rounded-3xl rounded-tl-md px-2.5 xs:px-3 sm:px-3 md:px-4 py-1.5 xs:py-2 sm:py-2 md:py-3 ${
-                  theme === "dark"
-                    ? "bg-slate-800/80 border border-slate-700/50"
-                    : "bg-slate-50 border border-slate-200"
-                }`}>
-                  <div className="flex items-center gap-1.5 xs:gap-2">
-                    <Loader2 className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 animate-spin" />
-                    <span className={`text-xs xs:text-sm md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                      Thinking...
-                    </span>
+              <h2 className={`text-xl md:text-2xl font-bold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                Where should we begin?
+              </h2>
+              <p className="text-sm md:text-base max-w-md mb-6">
+                Ask doubts, next steps, or strategy questions like you would with a senior mentor.
+              </p>
+              <p className="text-xs md:text-sm max-w-sm">
+                Create a project from the sidebar, then start a chat. Or type below to begin.
+              </p>
+            </div>
+          ) : (
+            /* Message list - scrollable */
+            <div className="px-4 md:px-6 py-4 space-y-4 pb-4">
+              {messages.map((m, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-start gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}
+                >
+                  <div
+                    className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                      m.role === "user"
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : isDark
+                        ? "bg-purple-500/20 text-purple-300"
+                        : "bg-purple-100 text-purple-600"
+                    }`}
+                  >
+                    {m.role === "user" ? (
+                      <MessageCircle className="w-4 h-4" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                      m.role === "user"
+                        ? "bg-emerald-600 text-white rounded-tr-md"
+                        : isDark
+                        ? "bg-slate-800/80 text-slate-100 border border-slate-700 rounded-tl-md"
+                        : "bg-white border border-slate-200 text-slate-900 rounded-tl-md"
+                    }`}
+                  >
+                    {m.role === "user" ? (
+                      <p className="text-sm md:text-base whitespace-pre-wrap">{m.text}</p>
+                    ) : (
+                      <FormattedText text={m.text} />
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Enhanced Empty State */}
-            {history.length === 0 && !loading && (
-              <div className={`flex flex-col items-center justify-center h-full min-h-[150px] xs:min-h-[180px] sm:min-h-[200px] md:min-h-[300px] text-center px-3 xs:px-4 sm:px-4 md:px-4 py-6 xs:py-7 sm:py-8 md:py-8 ${
-                theme === "dark" ? "text-slate-400" : "text-slate-500"
-              }`}>
-                <div className={`p-3 xs:p-3.5 sm:p-4 md:p-6 rounded-full mb-3 xs:mb-3 sm:mb-4 ${
-                  theme === "dark" 
-                    ? "bg-fuchsia-500/10" 
-                    : "bg-purple-100"
-                }`}>
-                  <MessageCircle className={`w-6 h-6 xs:w-8 xs:h-8 sm:w-8 sm:h-8 md:w-12 md:h-12 ${
-                    theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                  }`} />
+              ))}
+              {loading && (
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div className={`rounded-2xl rounded-tl-md px-4 py-3 ${isDark ? "bg-slate-800/80 border border-slate-700" : "bg-white border border-slate-200"}`}>
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className={isDark ? "text-slate-400" : "text-slate-500"}>Thinking...</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs xs:text-sm sm:text-sm md:text-base font-medium mb-1.5 xs:mb-2 px-2">
-                  Start a conversation with your AI mentor
-                </p>
-                <p className="text-[10px] xs:text-xs sm:text-xs md:text-sm max-w-xs xs:max-w-sm sm:max-w-md px-2">
-                  Try asking: <span className={`font-medium ${
-                    theme === "dark" ? "text-slate-300" : "text-slate-700"
-                  }`}>
-                    "How should I structure a 10-marker GS2 answer this week?"
-                  </span>
-                </p>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Enhanced Input Area */}
-          <form 
-            ref={formRef}
-            onSubmit={handleSubmit} 
-            className={`flex gap-1.5 xs:gap-2 sm:gap-2 md:gap-3 items-end pt-2 xs:pt-2.5 sm:pt-3 md:pt-4 border-t ${
-              theme === "dark" ? "border-slate-700/50" : "border-slate-200"
-            } flex-shrink-0`}
-          >
-            <div className="flex-1 relative min-w-0">
-              <textarea
-                ref={textareaRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your doubt or next-step question here..."
-                disabled={loading}
-                className={`w-full rounded-xl xs:rounded-2xl md:rounded-3xl border px-3 xs:px-3.5 sm:px-4 md:px-5 py-2 xs:py-2.5 sm:py-3 md:py-3.5 text-xs xs:text-sm sm:text-sm md:text-base shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 resize-none overflow-hidden min-h-[44px] xs:min-h-[46px] sm:min-h-[48px] md:min-h-[52px] max-h-[120px] transition-all ${
-                  theme === "dark"
-                    ? "border-fuchsia-500/30 bg-slate-950/80 text-slate-100 placeholder-slate-500 focus:border-fuchsia-500/50"
-                    : "border-purple-300 bg-white text-slate-900 placeholder-slate-400 focus:border-purple-400"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    formRef.current?.requestSubmit();
-                  }
-                }}
-              />
-            </div>
-            <Button 
-              type="submit" 
-              disabled={loading || !message.trim()} 
-              className="min-h-[44px] xs:min-h-[46px] sm:min-h-[48px] md:min-h-[52px] px-3 xs:px-3.5 sm:px-4 md:px-6 rounded-xl xs:rounded-2xl md:rounded-3xl font-medium text-xs xs:text-sm md:text-base shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 touch-manipulation"
-            >
-              {loading ? (
-                <Loader2 className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 animate-spin" />
-              ) : (
-                <>
-                  <span className="hidden xs:inline sm:inline mr-1 xs:mr-1.5 sm:mr-2">Send</span>
-                  <Send className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                </>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Input area - fixed at bottom, never scrolls */}
+        <div className={`flex-shrink-0 p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-[#020012]" : "border-slate-200 bg-slate-50"}`}>
+            <form ref={formRef} onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+              <div
+                className={`flex gap-2 rounded-2xl border-2 overflow-hidden transition-colors ${
+                  isDark
+                    ? "bg-slate-900/80 border-slate-700 focus-within:border-purple-500/50"
+                    : "bg-white border-slate-200 focus-within:border-purple-400"
+                }`}
+              >
+                <textarea
+                  ref={textareaRef}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Ask anything..."
+                  disabled={loading}
+                  rows={1}
+                  className={`flex-1 min-h-[52px] max-h-[160px] px-4 py-3 bg-transparent resize-none text-sm md:text-base focus:outline-none ${isDark ? "text-slate-100 placeholder-slate-500" : "text-slate-900 placeholder-slate-400"}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      formRef.current?.requestSubmit();
+                    }
+                  }}
+                />
+                <Button
+                  type="submit"
+                  disabled={loading || !message.trim()}
+                  className={`self-end m-2 rounded-xl px-4 bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white shrink-0`}
+                >
+                  {loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </Button>
+              </div>
+            </form>
+        </div>
+      </main>
     </div>
   );
 };
-

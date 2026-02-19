@@ -28,6 +28,14 @@ const mentorChatSchema = new mongoose.Schema(
       required: true,
       default: () => new mongoose.Types.ObjectId().toString()
     },
+    title: {
+      type: String,
+      default: 'New chat'
+    },
+    project: {
+      type: String,
+      default: null
+    },
     messages: [mentorChatMessageSchema],
     isActive: {
       type: Boolean,
