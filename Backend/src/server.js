@@ -41,6 +41,7 @@ import cors from "cors";
 import http from "http";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import asi24AuthRoutes from "./routes/asi24AuthRoutes.js";
 import performanceRoutes from "./routes/performanceRoutes.js";
 import plannerRoutes from "./routes/plannerRoutes.js";
 import mentorRoutes from "./routes/mentorRoutes.js";
@@ -54,6 +55,7 @@ import dartRoutes from "./routes/dartRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
 import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./controllers/prelimsMockController.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "./middleware/dashboardAuthMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
@@ -100,11 +102,12 @@ app.get("/api/debug/apikey", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/asi24/auth", asi24AuthRoutes);
 console.log("📁 Admin routes mounted at /api/admin");
 app.use("/api/admin", adminRoutes); 
-app.use("/api/performance", authMiddleware, performanceRoutes);
-app.use("/api/planner", authMiddleware, plannerRoutes);
-app.use("/api/mentor", authMiddleware, mentorRoutes);
+app.use("/api/performance", dashboardAuthMiddleware, performanceRoutes);
+app.use("/api/planner", dashboardAuthMiddleware, plannerRoutes);
+app.use("/api/mentor", dashboardAuthMiddleware, mentorRoutes);
 app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
@@ -113,7 +116,7 @@ app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/prelims-import", prelimsImportRoutes);
 app.use("/api/dart", dartRoutes);
 // Prelims Mock: student list live mocks + start attempt (admin schedule is under /api/admin/prelims-mock)
-app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
+app.get("/api/prelims-mock", dashboardAuthMiddleware, listLivePrelimsMocks);
 app.use("/api/prelims-mock", prelimsMockRoutes);
 console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
 

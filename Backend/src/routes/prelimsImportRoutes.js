@@ -9,13 +9,13 @@ import {
   submitImportedTest,
   getImportedResult,
 } from "../controllers/prelimsImportController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 
 const router = express.Router();
 
-router.get("/active", authMiddleware, getActiveImportedTests);
-router.get("/test/:id", authMiddleware, getImportedTest);
-router.post("/submit/:id", authMiddleware, submitImportedTest);
-router.get("/result/:testId", authMiddleware, getImportedResult);
+router.get("/active", dashboardAuthMiddleware, getActiveImportedTests);
+router.get("/test/:id", dashboardAuthMiddleware, getImportedTest);
+router.post("/submit/:id", dashboardAuthMiddleware, submitImportedTest);
+router.get("/result/:testId", dashboardAuthMiddleware, getImportedResult);
 
 export default router;

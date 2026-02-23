@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 import {
   submitDartEntry,
   listDartEntries,
@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.use(dashboardAuthMiddleware);
 
 router.post("/", submitDartEntry);
 router.get("/entries", listDartEntries);

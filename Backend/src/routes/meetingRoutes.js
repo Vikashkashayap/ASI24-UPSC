@@ -1,12 +1,12 @@
 import express from "express";
 import { createRoom, joinRoom, getRoom } from "../controllers/meetingController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 
 const router = express.Router();
 
-router.post("/create", authMiddleware, createRoom);
-router.post("/join", authMiddleware, joinRoom);
-router.get("/:roomId", authMiddleware, getRoom);
+router.post("/create", dashboardAuthMiddleware, createRoom);
+router.post("/join", dashboardAuthMiddleware, joinRoom);
+router.get("/:roomId", dashboardAuthMiddleware, getRoom);
 
 export default router;
 

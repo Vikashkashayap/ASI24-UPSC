@@ -7,12 +7,36 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const stored = localStorage.getItem("upsc_mentor_auth");
-  if (stored) {
-    const parsed = JSON.parse(stored) as { token: string };
-    if (parsed.token) {
+  const url = config.url ?? "";
+  if (url.includes("/api/asi24/")) {
+    const stored = localStorage.getItem("asi24_auth");
+    if (stored) {
+      const parsed = JSON.parse(stored) as { token: string };
+      if (parsed.token) {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${parsed.token}`;
+      }
+    }
+  } else {
+    let token: string | null = null;
+    const upscStored = localStorage.getItem("upsc_mentor_auth");
+    if (upscStored) {
+      const parsed = JSON.parse(upscStored) as { token: string };
+      token = parsed.token || null;
+    }
+    // UPSC dashboard: allow ASI24 token when student is examType upsc (logged in via /upsc/login)
+    if (!token) {
+      const asi24Stored = localStorage.getItem("asi24_auth");
+      if (asi24Stored) {
+        const parsed = JSON.parse(asi24Stored) as { student?: { examType?: string }; token: string };
+        if (parsed.student?.examType === "upsc" && parsed.token) {
+          token = parsed.token;
+        }
+      }
+    }
+    if (token) {
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${parsed.token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
   return config;
@@ -231,6 +255,15 @@ export const mentorAPI = {
   listProjects: () => api.get("/api/mentor/projects"),
   sendMessage: (body: { message: string; sessionId?: string; project?: string }) =>
     api.post("/api/mentor/chat", body),
+};
+
+// ASI24 – Multi-Exam Government Platform (student register/login per exam)
+export const asi24AuthAPI = {
+  register: (examSlug: string, data: { name: string; email: string; password: string }) =>
+    api.post(`/api/asi24/auth/${examSlug}/register`, data),
+  login: (examSlug: string, data: { email: string; password: string }) =>
+    api.post(`/api/asi24/auth/${examSlug}/login`, data),
+  getMe: (examSlug: string) => api.get(`/api/asi24/auth/${examSlug}/me`),
 };
 
 // Student Profiler API

@@ -4,7 +4,7 @@ import { studentProfilerAPI } from "../services/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { useTheme } from "../hooks/useTheme";
-import { useAuth } from "../hooks/useAuth";
+import { useDashboardUser } from "../hooks/useDashboardAuth";
 import { User, Calendar, Target, BookOpen } from "lucide-react";
 
 interface StudyPlan {
@@ -35,13 +35,12 @@ interface StudyPlan {
 
 export const StudentProfilerPage = () => {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const user = useDashboardUser();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // Redirect to login if not authenticated
   useEffect(() => {
-    if (!user) {
+    if (user === null) {
       navigate("/login");
     }
   }, [user, navigate]);

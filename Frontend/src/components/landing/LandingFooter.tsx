@@ -68,21 +68,6 @@ export const LandingFooter = () => {
                   Features
                 </Link>
               </li>
-              <li>
-                <Link to="/pricing" className="hover:text-fuchsia-400 transition">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link to="/compare" className="hover:text-fuchsia-400 transition">
-                  Compare
-                </Link>
-              </li>
-              <li>
-                <Link to="/testimonials" className="hover:text-fuchsia-400 transition">
-                  Testimonials
-                </Link>
-              </li>
             </ul>
           </div>
 

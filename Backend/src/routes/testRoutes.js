@@ -9,12 +9,12 @@ import {
   getPrelimsPerformance,
   deleteTest,
 } from "../controllers/testController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 
 const router = express.Router();
 
 // Apply authentication to all test routes
-router.use(authMiddleware);
+router.use(dashboardAuthMiddleware);
 
 // Debug middleware for test routes
 router.use((req, res, next) => {

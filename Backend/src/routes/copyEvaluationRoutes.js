@@ -9,7 +9,7 @@ import {
   deleteEvaluation,
   getEvaluationStats
 } from "../controllers/copyEvaluationController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ const upload = multer({
 });
 
 // All routes require authentication
-router.use(authMiddleware);
+router.use(dashboardAuthMiddleware);
 
 // Upload and evaluate PDF
 router.post('/upload', upload.single('pdf'), uploadAndEvaluateCopy);

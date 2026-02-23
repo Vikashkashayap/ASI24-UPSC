@@ -206,3 +206,12 @@ html {
     transform: translateY(0);
   }
 }
+
+/* ASI24 – dark purple gradient theme */
+.asi24-gradient {
+  background: linear-gradient(135deg, #050015 0%, #10002b 40%, #0f0a1e 70%, #020617 100%);
+  color: #f8fafc;
+}
+.asi24-section {
+  background: linear-gradient(180deg, rgba(15, 10, 30, 0.6) 0%, rgba(5, 0, 21, 0.8) 100%);
+}

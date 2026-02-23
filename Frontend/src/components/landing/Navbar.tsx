@@ -7,9 +7,6 @@ import logoImg from "../../LOGO/UPSCRH-LOGO.png";
 
 const navItems = [
   { label: "Features", to: "/features" },
-  { label: "Pricing", to: "/pricing" },
-  { label: "Compare", to: "/compare" },
-  { label: "Testimonials", to: "/testimonials" },
   { label: "About", to: "/about" },
 ];
 

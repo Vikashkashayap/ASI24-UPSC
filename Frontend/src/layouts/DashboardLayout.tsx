@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useDashboardAuth } from "../hooks/useDashboardAuth";
 import { useTheme } from "../hooks/useTheme";
 import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
-import logoImg from "../LOGO/UPSCRH-LOGO.png";
 
 // Mobile-first nav link: minimum 44px height for touch targets
 const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
@@ -59,7 +58,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
 };
 
 export const DashboardLayout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout } = useDashboardAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -94,12 +93,12 @@ export const DashboardLayout = () => {
       >
         <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-purple-900/60" : "border-slate-200"}`}>
           {!sidebarCollapsed && (
-            <div className="flex items-center gap-1.5 min-w-0 shrink-0">
-              <img src={logoImg} alt="UPSCRH" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
-            </div>
+            <span className="text-lg font-extrabold tracking-wide md:text-xl bg-gradient-to-r from-fuchsia-300 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent">
+              UPSCRH
+            </span>
           )}
           {sidebarCollapsed && (
-            <img src={logoImg} alt="UPSCRH" className="h-10 w-10 object-contain object-center flex-shrink-0" />
+            <span className={`text-sm font-bold ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"}`}>U</span>
           )}
           <div className="flex items-center justify-center gap-1.5 shrink-0">
             <button

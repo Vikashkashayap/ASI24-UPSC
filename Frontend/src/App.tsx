@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
+import { ASI24AuthProvider } from "./hooks/useASI24Auth";
 import { ThemeProvider } from "./hooks/useTheme";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
@@ -19,13 +20,20 @@ import TestResultPage from "./pages/TestResultPage";
 import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ProtectedExamRoute } from "./components/asi24/ProtectedExamRoute";
 import { AdminRoute } from "./components/AdminRoute";
-import { LandingPage } from "./pages/LandingPage";
+import { ASI24LandingPage } from "./pages/asi24/ASI24LandingPage";
+import { ExamLandingPage } from "./pages/asi24/ExamLandingPage";
+import { ASI24RegisterPage } from "./pages/asi24/ASI24RegisterPage";
+import { ASI24LoginPage } from "./pages/asi24/ASI24LoginPage";
+import { ASI24DashboardPage } from "./pages/asi24/ASI24DashboardPage";
+import { ASI24PerformanceDashboardPage } from "./pages/asi24/ASI24PerformanceDashboardPage";
+import { ASI24ComingSoonPage } from "./pages/asi24/ASI24ComingSoonPage";
+import { ASI24ExamLayout } from "./layouts/ASI24ExamLayout";
 import { FeaturesPage } from "./pages/landing/FeaturesPage";
 import { PricingPage } from "./pages/landing/PricingPage";
 import { ComparePage } from "./pages/landing/ComparePage";
 import { TestimonialsPage } from "./pages/landing/TestimonialsPage";
-import { AboutPage } from "./pages/landing/AboutPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
@@ -40,16 +48,33 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/compare" element={<ComparePage />} />
-          <Route path="/testimonials" element={<TestimonialsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/change-password" element={<ChangePasswordPage />} />
+        <ASI24AuthProvider>
+          <Routes>
+            <Route path="/" element={<ASI24LandingPage />} />
+            <Route path="/features" element={<Navigate to="/#features" replace />} />
+            <Route path="/about" element={<Navigate to="/#about" replace />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/compare" element={<ComparePage />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/login" element={<Navigate to="/upsc/login" replace />} />
+            <Route path="/register" element={<Navigate to="/upsc/register" replace />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
+            {/* ASI24: Dynamic exam routes */}
+            <Route path="/:examSlug" element={<ExamLandingPage />} />
+            <Route path="/:examSlug/register" element={<ASI24RegisterPage />} />
+            <Route path="/:examSlug/login" element={<ASI24LoginPage />} />
+            <Route path="/:examSlug/dashboard" element={<ProtectedExamRoute><ASI24ExamLayout /></ProtectedExamRoute>}>
+              <Route index element={<ASI24DashboardPage />} />
+              <Route path="performance" element={<ASI24PerformanceDashboardPage />} />
+              <Route path="mock-tests" element={<ASI24ComingSoonPage />} />
+              <Route path="pyq" element={<ASI24ComingSoonPage />} />
+              <Route path="ai-tests" element={<ASI24ComingSoonPage />} />
+              <Route path="profile" element={<ASI24ComingSoonPage />} />
+              <Route path="help-support" element={<ASI24ComingSoonPage />} />
+              <Route path="planner" element={<ASI24ComingSoonPage />} />
+              <Route path="mentor" element={<ASI24ComingSoonPage />} />
+              <Route path="copy-evaluation" element={<ASI24ComingSoonPage />} />
+            </Route>
           <Route
             path="/"
             element={
@@ -91,8 +116,9 @@ function App() {
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ASI24AuthProvider>
       </AuthProvider>
     </ThemeProvider>
   );

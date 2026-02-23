@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTheme } from "../hooks/useTheme";
 import { useSocket } from "../hooks/useSocket";
 import { meetingAPI } from "../services/api";
-import { useAuth } from "../hooks/useAuth";
+import { useDashboardUser } from "../hooks/useDashboardAuth";
 import { Video, VideoOff, Mic, MicOff, PhoneOff, Users, Copy, Check } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -28,7 +28,7 @@ interface Participant {
 
 export const MeetingPage = () => {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const user = useDashboardUser();
   const { socket, isConnected } = useSocket();
 
   // Room state

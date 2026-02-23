@@ -19,7 +19,7 @@ import {
   Legend
 } from "recharts";
 import { useTheme } from "../hooks/useTheme";
-import { useAuth } from "../hooks/useAuth";
+import { useDashboardUser } from "../hooks/useDashboardAuth";
 import {
   TrendingUp,
   TrendingDown,
@@ -91,7 +91,7 @@ interface DartAnalytics {
 
 export const PerformanceDashboardPage = () => {
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const user = useDashboardUser();
   const [copyPerformanceData, setCopyPerformanceData] = useState<any | null>(null);
   const [prelimsPerformanceData, setPrelimsPerformanceData] = useState<any | null>(null);
   const [dartAnalytics, setDartAnalytics] = useState<DartAnalytics | null>(null);

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useDashboardUser } from "../hooks/useDashboardAuth";
 import { useTheme } from "../hooks/useTheme";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { User, Mail, Calendar, Award, BookOpen, Target, TrendingUp, Edit2, Save, X } from "lucide-react";
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
+  const user = useDashboardUser();
   const { theme } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(user?.name || "");

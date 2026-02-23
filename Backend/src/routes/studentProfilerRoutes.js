@@ -1,6 +1,6 @@
 import express from "express";
 import { generateStudyPlan } from "../controllers/studentProfilerController.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { dashboardAuthMiddleware } from "../middleware/dashboardAuthMiddleware.js";
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ const router = express.Router();
  *   "currentDate": "2024-01-15"
  * }
  */
-router.post("/", authMiddleware, generateStudyPlan);
+router.post("/", dashboardAuthMiddleware, generateStudyPlan);
 
 export default router;
 
