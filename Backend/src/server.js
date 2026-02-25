@@ -52,8 +52,11 @@ import adminRoutes from "./routes/adminRoutes.js";
 import prelimsImportRoutes from "./routes/prelimsImportRoutes.js";
 import dartRoutes from "./routes/dartRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
 import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./controllers/prelimsMockController.js";
+import { getActivePlans } from "./controllers/pricingController.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { requireActiveSubscription } from "./middleware/subscriptionMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
@@ -102,20 +105,24 @@ app.get("/api/debug/apikey", (req, res) => {
 app.use("/api/auth", authRoutes);
 console.log("📁 Admin routes mounted at /api/admin");
 app.use("/api/admin", adminRoutes); 
-app.use("/api/performance", authMiddleware, performanceRoutes);
-app.use("/api/planner", authMiddleware, plannerRoutes);
-app.use("/api/mentor", authMiddleware, mentorRoutes);
-app.use("/api/copy-evaluation", copyEvaluationRoutes);
+app.use("/api/performance", requireActiveSubscription, performanceRoutes);
+app.use("/api/planner", requireActiveSubscription, plannerRoutes);
+app.use("/api/mentor", requireActiveSubscription, mentorRoutes);
+app.use("/api/copy-evaluation", requireActiveSubscription, copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 console.log("🔗 Mounting test routes at /api/tests");
-app.use("/api/tests", testRoutes);
+app.use("/api/tests", requireActiveSubscription, testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/prelims-import", prelimsImportRoutes);
 app.use("/api/dart", dartRoutes);
-// Prelims Mock: student list live mocks + start attempt (admin schedule is under /api/admin/prelims-mock)
-app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
-app.use("/api/prelims-mock", prelimsMockRoutes);
+app.use("/api/payment", paymentRoutes);
+// Prelims Mock: health is public; list + start require auth + active subscription
+app.get("/api/prelims-mock/health", (req, res) => res.json({ ok: true, service: "prelims-mock" }));
+app.use("/api/prelims-mock", requireActiveSubscription, prelimsMockRoutes);
 console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
+
+// Public pricing: active plans only (for landing page)
+app.get("/api/pricing", getActivePlans);
 
 app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
 

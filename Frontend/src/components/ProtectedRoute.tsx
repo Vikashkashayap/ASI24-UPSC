@@ -18,5 +18,23 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Subscription guard for self-registered users.
+  // Admins and admin-created users bypass payment.
+  const isStudent = user.role !== "admin";
+  const isAdminCreated = user.accountType === "admin-created";
+  const isActiveSubscription = user.subscriptionStatus === "active";
+  // Routes that a new (unpaid) student can still see – they will see banners/CTAs,
+  // but premium actions are blocked by the backend.
+  const allowedWithoutSubscription = ["/home", "/student-profiler", "/help-support", "/profile"];
+
+  if (
+    isStudent &&
+    !isAdminCreated &&
+    !isActiveSubscription &&
+    !allowedWithoutSubscription.includes(location.pathname)
+  ) {
+    return <Navigate to="/pricing" replace />;
+  }
+
   return <>{children}</>;
 };

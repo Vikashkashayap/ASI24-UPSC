@@ -10,7 +10,14 @@ export const registerUser = async ({ name, email, password }) => {
   if (existing) {
     throw new Error("Email already registered");
   }
-  const user = await User.create({ name, email, password });
+  // Self-registered users are treated as paid users who must purchase a plan.
+  const user = await User.create({
+    name,
+    email,
+    password,
+    accountType: "paid-user",
+    subscriptionStatus: "inactive",
+  });
   const token = createToken(user);
   return { user, token };
 };
@@ -21,6 +28,19 @@ export const loginUser = async ({ email, password }) => {
   if (user) {
     if (user.isActive === false || user.status === 'suspended') {
       throw new Error("Your account is deactivated. Please contact admin.");
+    }
+
+    // Auto-expire subscription if end date has passed (paid users only)
+    if (
+      user.accountType === "paid-user" &&
+      user.subscriptionEndDate &&
+      new Date(user.subscriptionEndDate) < new Date()
+    ) {
+      user.subscriptionStatus = "inactive";
+      user.subscriptionPlanId = undefined;
+      user.subscriptionStartDate = undefined;
+      user.subscriptionEndDate = undefined;
+      await user.save();
     }
 
     const match = await user.comparePassword(password);

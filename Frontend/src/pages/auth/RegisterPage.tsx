@@ -1,11 +1,13 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 
 export const RegisterPage = () => {
+  const [searchParams] = useSearchParams();
+  const planId = searchParams.get("planId");
   const { login } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,10 +21,15 @@ export const RegisterPage = () => {
     setLoading(true);
     try {
       const res = await api.post("/api/auth/register", { name, email, password });
-      // Store auth but navigate to student profiler first
       const { user, token } = res.data;
-      localStorage.setItem("upsc_mentor_auth", JSON.stringify({ user, token }));
-      // Navigate to student profiler page for onboarding
+      // Normalize user shape for frontend (id vs _id)
+      const authUser = { ...user, id: user.id || user._id };
+      login(authUser, token);
+      // If they came from pricing with a plan, send them back to complete payment
+      if (planId) {
+        window.location.href = `/pricing?planId=${encodeURIComponent(planId)}`;
+        return;
+      }
       window.location.href = "/student-profiler";
     } catch (err: any) {
       setError(err?.response?.data?.message || "Unable to register");

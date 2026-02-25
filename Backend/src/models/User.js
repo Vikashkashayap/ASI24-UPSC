@@ -6,27 +6,57 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
+    // Authorization role used across the app (admin vs non-admin)
     role: {
       type: String,
-      enum: ['student', 'agent', 'admin'],
-      default: 'student'
+      enum: ["student", "agent", "admin"],
+      default: "student",
     },
+    // Subscription user type (spec: "role" for subscription) – controls access
+    // - "admin-created": created from admin dashboard, full access without payment
+    // - "paid-user": self-registered user who must purchase a plan
+    accountType: {
+      type: String,
+      enum: ["admin-created", "paid-user"],
+      default: "paid-user",
+    },
+    // High-level lifecycle of the account
     status: {
       type: String,
-      enum: ['active', 'suspended'],
-      default: 'active'
+      enum: ["active", "suspended"],
+      default: "active",
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: true,
     },
     mustChangePassword: {
       type: Boolean,
-      default: false
+      default: false,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+      ref: "User",
+    },
+    // Subscription fields – used for Razorpay-based plans
+    subscriptionStatus: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "inactive",
+    },
+    // Store reference to the pricing plan the user purchased
+    subscriptionPlanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PricingPlan",
+      default: null,
+    },
+    subscriptionStartDate: {
+      type: Date,
+      default: null,
+    },
+    subscriptionEndDate: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true }

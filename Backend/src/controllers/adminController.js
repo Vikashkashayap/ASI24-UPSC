@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import { PricingPlan } from "../models/PricingPlan.js";
 import CopyEvaluation from "../models/CopyEvaluation.js";
 import Test from "../models/Test.js";
 import { MeetingRoom } from "../models/MeetingRoom.js";
@@ -9,12 +10,14 @@ export const getAllStudents = async (req, res) => {
   try {
     const { search, page = 1, limit = 20 } = req.query;
 
-    // Build query based on search parameter
-    let query = { role: 'student' };
+    // Build query based on search parameter.
+    // This endpoint powers the \"free\" / admin-created students list.
+    let query = { role: 'student', accountType: { $ne: 'paid-user' } };
     if (search && search.trim().length >= 2) {
       const searchRegex = new RegExp(search.trim(), 'i');
       query = {
         role: 'student',
+        accountType: { $ne: 'paid-user' },
         $or: [
           { name: searchRegex },
           { email: searchRegex }
@@ -104,6 +107,151 @@ export const getAllStudents = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch students"
+    });
+  }
+};
+
+// Pro-plan students (self-registered / paid users)
+export const getProStudents = async (req, res) => {
+  try {
+    const { search, page = 1, limit = 20 } = req.query;
+
+    let query = {
+      role: 'student',
+      accountType: 'paid-user',
+    };
+
+    if (search && search.trim().length >= 2) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      query = {
+        ...query,
+        $or: [
+          { name: searchRegex },
+          { email: searchRegex },
+        ],
+      };
+    }
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    const [totalProStudents, proStudents] = await Promise.all([
+      User.countDocuments(query),
+      User.find(query)
+        .select('name email createdAt subscriptionStatus subscriptionPlanId subscriptionStartDate subscriptionEndDate')
+        .sort({ createdAt: -1 })
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum),
+    ]);
+
+    const planIds = [
+      ...new Set(
+        proStudents
+          .map((u) => u.subscriptionPlanId)
+          .filter((id) => !!id)
+          .map((id) => String(id)),
+      ),
+    ];
+
+    const plans = planIds.length
+      ? await PricingPlan.find({ _id: { $in: planIds } })
+          .select('name price duration')
+          .lean()
+      : [];
+    const planMap = new Map(plans.map((p) => [String(p._id), p]));
+
+    let totalActiveRevenue = 0;
+
+    const students = await Promise.all(
+      proStudents.map(async (student) => {
+        const plan = student.subscriptionPlanId
+          ? planMap.get(String(student.subscriptionPlanId)) || null
+          : null;
+
+        if (student.subscriptionStatus === 'active' && plan) {
+          totalActiveRevenue += Number(plan.price || 0);
+        }
+
+        const [evaluationCount, prelimsAgg] = await Promise.all([
+          CopyEvaluation.countDocuments({
+            userId: student._id,
+            status: 'completed',
+          }),
+          Test.aggregate([
+            {
+              $match: {
+                userId: student._id,
+                isSubmitted: true,
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 },
+                avgScore: { $avg: '$score' },
+              },
+            },
+          ]),
+        ]);
+
+        const prelimsStats = prelimsAgg[0] || { count: 0, avgScore: 0 };
+
+        return {
+          _id: student._id,
+          name: student.name,
+          email: student.email,
+          createdAt: student.createdAt,
+          subscriptionStatus: student.subscriptionStatus,
+          subscriptionPlanId: student.subscriptionPlanId,
+          subscriptionStartDate: student.subscriptionStartDate,
+          subscriptionEndDate: student.subscriptionEndDate,
+          plan: plan
+            ? {
+                id: plan._id,
+                name: plan.name,
+                price: plan.price,
+                duration: plan.duration,
+              }
+            : null,
+          totalEvaluations: evaluationCount,
+          totalPrelimsTests: prelimsStats.count || 0,
+          prelimsAverageScore: Math.round(prelimsStats.avgScore || 0),
+        };
+      }),
+    );
+
+    const activeProStudents = await User.countDocuments({
+      role: 'student',
+      accountType: 'paid-user',
+      subscriptionStatus: 'active',
+    });
+
+    const totalPages = Math.ceil(totalProStudents / limitNum);
+
+    res.json({
+      success: true,
+      data: {
+        students,
+        pagination: {
+          currentPage: pageNum,
+          totalPages,
+          total: totalProStudents,
+          hasNext: pageNum < totalPages,
+          hasPrev: pageNum > 1,
+          pages: totalPages,
+        },
+        stats: {
+          totalProStudents,
+          activeProStudents,
+          totalActiveRevenue,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching pro students:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch pro students',
     });
   }
 };
@@ -830,10 +978,16 @@ export const createStudent = async (req, res) => {
       name,
       email,
       password: tempPassword,
-      role: 'student',
+      role: "student",
       isActive: true,
       mustChangePassword: true,
-      createdBy: req.user?._id
+      createdBy: req.user?._id,
+      // Admin-created users should have active subscriptions by default
+      accountType: "admin-created",
+      subscriptionStatus: "active",
+      subscriptionPlanId: null,
+      subscriptionStartDate: new Date(),
+      subscriptionEndDate: null,
     });
 
     res.status(201).json({

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/UPSCRH-LOGO.png";
@@ -39,6 +39,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
+    '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -58,8 +59,18 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   return routeMap[pathname] || { title: 'Dashboard', icon: <Home className="w-5 h-5" /> };
 };
 
+const formatExpiryDate = (dateStr: string | null | undefined) => {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? null : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  } catch {
+    return null;
+  }
+};
+
 export const DashboardLayout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -69,6 +80,16 @@ export const DashboardLayout = () => {
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
   const pageInfo = getPageTitle(location.pathname, user?.role);
   const isStudent = user?.role !== "admin";
+  const hasActiveSubscription =
+    user?.role === "admin" ||
+    user?.accountType === "admin-created" ||
+    user?.subscriptionStatus === "active";
+
+  // Refresh user (e.g. subscription plan name) when dashboard loads for students
+  useEffect(() => {
+    if (user?.role === "admin") return;
+    if (user) refreshUser().catch(() => {});
+  }, []);
 
   return (
     <div
@@ -135,9 +156,17 @@ export const DashboardLayout = () => {
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
                 </NavLink>
+                <NavLink to="/admin/pro-students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Pro Plan Students">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Pro Students</span>}
+                </NavLink>
                 <NavLink to="/admin/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Schedule tests">
                   <Target className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
+                </NavLink>
+                <NavLink to="/admin/pricing" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Pricing Plans">
+                  <IndianRupee className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Pricing Plans</span>}
                 </NavLink>
               </div>
 
@@ -163,6 +192,30 @@ export const DashboardLayout = () => {
           ) : (
             // Student Navigation
             <>
+              {/* Subscription badge in sidebar */}
+              {!sidebarCollapsed && (
+                <div className="mb-2 px-2">
+                  {hasActiveSubscription ? (
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${
+                      theme === "dark" ? "bg-emerald-500/10 border-emerald-500/40" : "bg-emerald-50 border-emerald-200"
+                    }`}>
+                      <Lightbulb className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                        {user?.subscriptionPlan?.name || "Pro"} • Active
+                      </span>
+                    </div>
+                  ) : (
+                    <NavLink
+                      to="/pricing"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-fuchsia-500/40 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Lightbulb className="w-3.5 h-3.5 text-fuchsia-400 flex-shrink-0" />
+                      <span className="text-[10px] font-semibold text-fuchsia-400">Subscribe to Pro</span>
+                    </NavLink>
+                  )}
+                </div>
+              )}
               {/* Main Section */}
               <div className="space-y-1">
                 <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
@@ -425,12 +478,39 @@ export const DashboardLayout = () => {
               <MoreVertical className="w-5 h-5" />
             </button>
             <div className={`hidden md:flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
-              <span className="flex items-center justify-center w-9 h-9 rounded-full shrink-0 border border-purple-500/40 text-purple-400">
-                <Lightbulb className="w-4 h-4" />
-              </span>
-              <span className={`text-xs font-medium max-w-[140px] lg:max-w-[180px] truncate ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Daily discipline beats motivation
-              </span>
+              {hasActiveSubscription ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-gradient-to-r from-fuchsia-600 to-emerald-500 text-white shadow-sm shadow-fuchsia-500/40">
+                    <Lightbulb className="w-3.5 h-3.5" />
+                    <span>{user?.subscriptionPlan?.name || "UPSCRH Pro"} Active</span>
+                  </span>
+                  {user?.subscriptionEndDate && (
+                    <span className="text-[10px] text-slate-500">
+                      Expires {formatExpiryDate(user.subscriptionEndDate)}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/pricing")}
+                    className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors ${
+                      theme === "dark"
+                        ? "border-fuchsia-500/50 text-fuchsia-300 hover:bg-fuchsia-500/10"
+                        : "border-purple-300 text-purple-700 hover:bg-purple-50"
+                    }`}
+                  >
+                    Upgrade Plan
+                  </button>
+                </div>
+              ) : isStudent ? (
+                <button
+                  type="button"
+                  onClick={() => navigate("/pricing")}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border border-fuchsia-500/40 text-fuchsia-400 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 transition-colors"
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  <span>Subscribe Now</span>
+                </button>
+              ) : null}
             </div>
             <div className={`hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center text-xs md:text-sm font-semibold shrink-0 ring-2 transition-all duration-200 hover:scale-105 ${theme === "dark"
                 ? "bg-gradient-to-br from-purple-600 to-indigo-600 text-white ring-purple-500/30 shadow-lg shadow-purple-600/20"
@@ -443,6 +523,34 @@ export const DashboardLayout = () => {
 
         {/* Scrollable Main Content - full-height wrapper for /mentor so only chat scrolls */}
         <main className={`flex-1 flex flex-col min-h-0 max-w-full overflow-hidden ${location.pathname === "/mentor" ? "px-0 py-0 pb-0" : ""}`}>
+          {/* Inactive subscription warning banner for students */}
+          {isStudent && !hasActiveSubscription && (
+            <div
+              className={`flex items-center justify-between gap-3 px-3 md:px-4 py-2.5 border-b shrink-0 ${
+                theme === "dark"
+                  ? "bg-amber-500/10 border-amber-500/40 text-amber-200"
+                  : "bg-amber-50 border-amber-200 text-amber-800"
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span className="text-sm font-medium truncate">
+                  Your plan is not active. Please subscribe to access all features.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate("/pricing")}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  theme === "dark"
+                    ? "bg-amber-500/30 hover:bg-amber-500/50 text-amber-100"
+                    : "bg-amber-200 hover:bg-amber-300 text-amber-900"
+                }`}
+              >
+                Subscribe Now
+              </button>
+            </div>
+          )}
           {location.pathname === "/mentor" ? (
             <div className="flex-1 min-h-0 flex flex-col pb-20 md:pb-0">
               <Outlet />

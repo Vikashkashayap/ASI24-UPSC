@@ -9,16 +9,21 @@ export const authMiddleware = async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    return res.status(500).json({ message: "Server auth not configured" });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
+    const decoded = jwt.verify(token, secret);
+
     // Handle virtual admin user from env vars
     if (decoded.id === "000000000000000000000000") {
       req.user = {
         _id: "000000000000000000000000",
         name: "Admin User",
         email: process.env.ADMIN_EMAIL,
-        role: "admin"
+        role: "admin",
       };
       return next();
     }
@@ -30,6 +35,12 @@ export const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Token failed" });
+    const message =
+      error.name === "TokenExpiredError"
+        ? "Token expired"
+        : error.name === "JsonWebTokenError"
+          ? "Invalid token"
+          : "Token failed";
+    return res.status(401).json({ message });
   }
 };
