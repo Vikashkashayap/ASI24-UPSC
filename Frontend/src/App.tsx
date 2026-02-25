@@ -29,8 +29,10 @@ import { AboutPage } from "./pages/landing/AboutPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
+import { AdminProStudentsPage } from "./pages/admin/AdminProStudentsPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
 import { PrelimsMockAdminPage } from "./pages/admin/PrelimsMockAdminPage";
+import { AdminPricingPage } from "./pages/admin/AdminPricingPage";
 import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import ComingSoon from "./components/ui/ComingSoon";
@@ -87,7 +89,9 @@ function App() {
             }
           >
             <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="pro-students" element={<AdminProStudentsPage />} />
             <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
+            <Route path="pricing" element={<AdminPricingPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>

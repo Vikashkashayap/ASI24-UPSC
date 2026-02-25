@@ -18,6 +18,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Redirect to /pricing when backend returns 402 (subscription required or expired)
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const status = err?.response?.status;
+    const redirectTo = err?.response?.data?.redirectTo;
+    const currentPath = window.location.pathname;
+
+    // For most pages, send user to pricing when subscription is required/expired.
+    // On the home dashboard, we handle the "locked" state in the UI instead.
+    if (
+      status === 402 &&
+      redirectTo === "/pricing" &&
+      currentPath !== "/home"
+    ) {
+      const from = currentPath + window.location.search;
+      window.location.href = `/pricing?from=${encodeURIComponent(from)}`;
+    }
+    return Promise.reject(err);
+  }
+);
+
 // Copy Evaluation API
 export const copyEvaluationAPI = {
   uploadAndEvaluate: async (file: File, metadata: { subject?: string; paper?: string; year?: number }) => {
@@ -244,4 +266,41 @@ export const studentProfilerAPI = {
   }) => {
     return api.post("/api/agents/student-profiler", params);
   },
+};
+
+// Pricing plans – public (active only) and admin CRUD
+export interface PricingPlanType {
+  _id: string;
+  name: string;
+  price: number;
+  duration: string;
+  description: string;
+  features: string[];
+  isPopular: boolean;
+  status: "active" | "draft";
+  createdAt: string;
+}
+
+export const pricingAPI = {
+  // Public: fetch active plans only (for landing /pricing page)
+  getActive: () => api.get<{ success: boolean; data: PricingPlanType[] }>("/api/pricing"),
+  // Admin: list all plans
+  list: () => api.get<{ success: boolean; data: PricingPlanType[] }>("/api/admin/pricing"),
+  create: (data: Omit<PricingPlanType, "_id" | "createdAt">) =>
+    api.post<{ success: boolean; data: PricingPlanType }>("/api/admin/pricing", data),
+  update: (id: string, data: Partial<Omit<PricingPlanType, "_id" | "createdAt">>) =>
+    api.put<{ success: boolean; data: PricingPlanType }>(`/api/admin/pricing/${id}`, data),
+  delete: (id: string) => api.delete<{ success: boolean }>(`/api/admin/pricing/${id}`),
+};
+
+// Payments – Razorpay integration
+export const paymentAPI = {
+  createOrder: (planId: string) =>
+    api.post("/api/payment/create-order", { planId }),
+  verifyPayment: (payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    planId: string;
+  }) => api.post("/api/payment/verify", payload),
 };

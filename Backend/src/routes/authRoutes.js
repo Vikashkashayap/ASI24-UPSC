@@ -6,7 +6,8 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// register route removed as per requirement: Students must NOT self-register.
+// Public register: creates paid-user with subscriptionStatus inactive (must subscribe after)
+router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", authMiddleware, changePassword);
 router.get("/me", authMiddleware, me);

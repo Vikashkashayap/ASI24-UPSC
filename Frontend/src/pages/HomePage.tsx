@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../hooks/useTheme";
+import { useAuth } from "../hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import {
   LineChart,
@@ -21,6 +22,7 @@ import { api, testAPI } from "../services/api";
 export const HomePage = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalEvaluations: 0,
     averageScore: 0,
@@ -31,7 +33,17 @@ export const HomePage = () => {
     recentTests: [],
   });
 
+  const isStudent = user?.role !== "admin";
+  const isAdminCreated = user?.accountType === "admin-created";
+  const hasActiveSubscription = user?.subscriptionStatus === "active" || user?.role === "admin" || isAdminCreated;
+  const isLockedStudent = Boolean(user && isStudent && !hasActiveSubscription);
+
   useEffect(() => {
+    if (isLockedStudent) {
+      // For unpaid students, we don't call premium analytics APIs;
+      // the dashboard will show an upgrade CTA instead.
+      return;
+    }
     const loadStats = async () => {
       try {
         // Load evaluation stats
@@ -71,7 +83,7 @@ export const HomePage = () => {
       }
     };
     loadStats();
-  }, []);
+  }, [isLockedStudent]);
 
   const quickActions = [
     {
@@ -110,6 +122,81 @@ export const HomePage = () => {
       path: "/prelims-test"
     }
   ];
+
+  if (isLockedStudent) {
+    return (
+      <div className="w-full max-w-4xl mx-auto space-y-6 md:space-y-8 px-3 md:px-4 overflow-x-hidden pb-4 md:pb-0">
+        <Card
+          className={`relative overflow-hidden rounded-xl md:rounded-2xl border-2 ${
+            theme === "dark"
+              ? "bg-gradient-to-br from-slate-900 via-purple-950 to-slate-950 border-fuchsia-500/40 shadow-xl shadow-fuchsia-900/30"
+              : "bg-gradient-to-br from-white via-purple-50 to-fuchsia-50 border-fuchsia-200 shadow-xl shadow-fuchsia-100"
+          }`}
+        >
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-fuchsia-500/20 to-transparent rounded-full blur-3xl" />
+          <CardContent className="relative z-10 p-5 md:p-8">
+            <h1
+              className={`text-xl md:text-2xl lg:text-3xl font-extrabold mb-2 md:mb-3 tracking-tight ${
+                theme === "dark" ? "text-slate-50" : "text-slate-900"
+              }`}
+            >
+              Your UPSCRH workspace is ready ✨
+            </h1>
+            <p
+              className={`text-xs md:text-sm max-w-xl ${
+                theme === "dark" ? "text-slate-300" : "text-slate-600"
+              }`}
+            >
+              You&apos;ve created your account. To unlock AI mentor, tests, analytics and mock exams,
+              activate a <span className="font-semibold text-fuchsia-300">UPSCRH Pro</span> plan.
+            </p>
+            <div className="mt-4 md:mt-5 flex flex-col md:flex-row gap-3 md:items-center">
+              <button
+                onClick={() => navigate("/pricing")}
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-xs md:text-sm font-semibold bg-gradient-to-r from-fuchsia-600 to-emerald-500 text-white shadow-md shadow-fuchsia-900/40 hover:shadow-lg hover:scale-[1.02] transition-all"
+              >
+                Upgrade plan to start using tools
+              </button>
+              <p
+                className={`text-[11px] md:text-xs ${
+                  theme === "dark" ? "text-slate-400" : "text-slate-600"
+                }`}
+              >
+                Already upgraded? Re-open this dashboard after payment and your access will be active.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card
+          className={
+            theme === "dark"
+              ? "border-slate-800 bg-slate-950/60"
+              : "border-slate-200 bg-white"
+          }
+        >
+          <CardHeader>
+            <CardTitle className="text-sm md:text-base">What you&apos;ll unlock with Pro</CardTitle>
+            <CardDescription className="text-xs md:text-sm">
+              Designed as a proper SaaS workspace for serious UPSC aspirants.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul
+              className={`grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] md:text-xs ${
+                theme === "dark" ? "text-slate-200" : "text-slate-700"
+              }`}
+            >
+              <li>✅ AI Mentor chat for any GS / Essay doubt</li>
+              <li>✅ Prelims tests and scheduled mocks with analytics</li>
+              <li>✅ Performance dashboard tracking your scores</li>
+              <li>✅ Future tools: copy evaluation, planner and more</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-8 px-3 md:px-4 overflow-x-hidden pb-2 md:pb-0">

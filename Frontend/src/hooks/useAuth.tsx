@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
 
 export type User = {
   id: string;
@@ -7,6 +8,13 @@ export type User = {
   email: string;
   role?: "student" | "admin" | "agent";
   mustChangePassword?: boolean;
+  // Subscription / billing metadata (optional; provided by backend)
+  accountType?: "admin-created" | "paid-user";
+  subscriptionStatus?: "active" | "inactive";
+  subscriptionPlanId?: string | null;
+  subscriptionStartDate?: string | null;
+  subscriptionEndDate?: string | null;
+  subscriptionPlan?: { name: string; duration: string } | null;
 };
 
 type AuthContextType = {
@@ -15,6 +23,7 @@ type AuthContextType = {
   loading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,7 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else if (nextUser.mustChangePassword) {
       navigate("/change-password", { replace: true });
     } else {
-      navigate("/performance", { replace: true });
+      // For students, land on Home dashboard first.
+      navigate("/home", { replace: true });
     }
   };
 
@@ -64,8 +74,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate("/login", { replace: true });
   };
 
+  const refreshUser = async () => {
+    const t = token ?? (() => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return (JSON.parse(stored) as { token: string }).token;
+      } catch { /* ignore */ }
+      return null;
+    })();
+    if (!t) return;
+    try {
+      const res = await authAPI.getMe();
+      if (res.data?.user) {
+        const nextUser = res.data.user as User;
+        setUser(nextUser);
+        setToken(t);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: nextUser, token: t }));
+      }
+    } catch {
+      // Keep existing user on failure
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshUser }}>{children}</AuthContext.Provider>
   );
 };
 

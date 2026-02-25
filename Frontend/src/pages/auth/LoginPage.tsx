@@ -76,7 +76,27 @@ export const LoginPage = () => {
                 {loading ? "Signing you in..." : "Login"}
               </Button>
             </form>
-            {/* Registration is admin-controlled. Contact admin for an account. */}
+            <div className="mt-4 md:mt-5 space-y-1.5 text-center">
+              <p className="text-[11px] md:text-xs text-slate-400">
+                <span className="font-medium text-slate-200">Free access</span> is created by your mentor/admin.
+              </p>
+              <p className="text-[11px] md:text-xs text-slate-400">
+                New aspirant and want{" "}
+                <span className="font-semibold text-emerald-300">UPSCRH Pro</span>?
+              </p>
+              <Link
+                to="/pricing"
+                className="inline-flex items-center justify-center mt-2 px-4 py-2 rounded-full text-[11px] md:text-xs font-semibold bg-gradient-to-r from-fuchsia-600 to-emerald-500 text-white shadow-sm shadow-fuchsia-800/40 hover:shadow-md hover:shadow-fuchsia-700/50 transition-transform hover:scale-[1.02]"
+              >
+                View Pro plans &amp; Register
+              </Link>
+              <p className="text-[11px] md:text-xs text-slate-500 pt-1">
+                Prefer direct sign-up?{" "}
+                <Link to="/register" className="text-emerald-300 font-semibold underline-offset-2 hover:underline">
+                  Create a new account
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

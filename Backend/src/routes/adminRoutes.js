@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import {
   getAllStudents,
+  getProStudents,
   getStudentById,
   getStudentPrelims,
   getStudentMains,
@@ -29,6 +30,12 @@ import {
   updatePrelimsMockSchedule,
   deletePrelimsMock,
 } from "../controllers/prelimsMockController.js";
+import {
+  getAllPlans,
+  createPlan,
+  updatePlan,
+  deletePlan,
+} from "../controllers/pricingController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
@@ -76,6 +83,12 @@ router.post("/prelims-mock/:id/go-live", goLivePrelimsMock);
 router.patch("/prelims-mock/:id", updatePrelimsMockSchedule);
 router.delete("/prelims-mock/:id", deletePrelimsMock);
 
+// Pricing plans: CRUD (admin only)
+router.get("/pricing", getAllPlans);
+router.post("/pricing", createPlan);
+router.put("/pricing/:id", updatePlan);
+router.delete("/pricing/:id", deletePlan);
+
 // User search
 router.get("/search", searchUsers);
 
@@ -87,6 +100,7 @@ router.delete("/students/:id", (req, res, next) => {
 
 router.post("/students", createStudent);
 router.get("/students", getAllStudents);
+router.get("/pro-students", getProStudents);
 router.get("/students/:id", getStudentById);
 router.get("/students/:id/prelims", getStudentPrelims);
 router.get("/students/:id/mains", getStudentMains);

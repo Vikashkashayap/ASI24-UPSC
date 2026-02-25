@@ -1,10 +1,15 @@
-import { Rocket, Sparkles, Gift, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Sparkles, Gift, Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { LandingLayout } from "../../layouts/LandingLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { LandingFooter } from "../../components/landing/LandingFooter";
 import { SketchIllustration } from "../../components/landing/SketchIllustration";
 import { Card, CardContent } from "../../components/ui/card";
+import { PricingCard } from "../../components/PricingCard";
+import { pricingAPI, type PricingPlanType } from "../../services/api";
+import { SubscribeButton } from "../../components/SubscribeButton";
 
 const whatToExpect = [
   "Transparent pricing — no hidden charges",
@@ -14,43 +19,129 @@ const whatToExpect = [
 ];
 
 export const PricingPage = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
+  const [plans, setPlans] = useState<PricingPlanType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await pricingAPI.getActive();
+        if (!cancelled && res.data.success) setPlans(res.data.data || []);
+      } catch {
+        if (!cancelled) setPlans([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const hasActivePlans = plans.length > 0;
 
   return (
     <LandingLayout>
-      {/* Hero - Coming Soon + Beta */}
+      {/* Hero: dynamic pricing cards or Coming Soon */}
       <section className={`border-b py-12 md:py-20 transition-colors ${
         theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
       }`}>
-        <div className="mx-auto max-w-4xl px-4 md:px-6 text-center">
-          <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-6 ${
-            theme === "dark"
-              ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-500/40"
-              : "bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200"
-          }`}>
-            <Sparkles className="w-3.5 h-3.5" />
-            Beta Version
-          </span>
-
-          <div className={`inline-flex p-6 rounded-full mb-6 relative ${
-            theme === "dark" ? "bg-fuchsia-500/10" : "bg-fuchsia-100"
-          }`}>
-            <div className="absolute inset-0 rounded-full animate-ping opacity-25 bg-fuchsia-500" />
-            <SketchIllustration type="rocket" className="w-14 h-14 relative z-10" />
-          </div>
-
-          <h1 className={`text-3xl md:text-5xl font-extrabold mb-4 tracking-tight ${
-            theme === "dark" ? "text-slate-50" : "text-slate-900"
-          }`}>
-            Coming <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-emerald-500">Soon</span>
-          </h1>
-
-          <p className={`text-base md:text-lg max-w-md mx-auto ${
-            theme === "dark" ? "text-slate-300" : "text-slate-600"
-          }`}>
-            We're crafting UPSCRH Pro pricing — simple, clear, aspirant-friendly.
-            Stay tuned, something good is coming.
-          </p>
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          {successMessage && (
+            <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+              theme === "dark"
+                ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-200"
+                : "bg-emerald-50 border-emerald-200 text-emerald-800"
+            }`}>
+              {successMessage}
+            </div>
+          )}
+          {errorMessage && (
+            <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+              theme === "dark"
+                ? "bg-red-500/10 border-red-500/40 text-red-200"
+                : "bg-red-50 border-red-200 text-red-800"
+            }`}>
+              {errorMessage}
+            </div>
+          )}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"}`} />
+              <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading pricing...</p>
+            </div>
+          ) : hasActivePlans ? (
+            <>
+              <div className="text-center mb-10">
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-4 ${
+                  theme === "dark"
+                    ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-500/40"
+                    : "bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200"
+                }`}>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  UPSCRH Pro
+                </span>
+                <h1 className={`text-3xl md:text-4xl font-extrabold mb-2 tracking-tight ${
+                  theme === "dark" ? "text-slate-50" : "text-slate-900"
+                }`}>
+                  Choose your plan
+                </h1>
+                <p className={`text-base max-w-lg mx-auto ${
+                  theme === "dark" ? "text-slate-300" : "text-slate-600"
+                }`}>
+                  Simple, clear, aspirant-friendly pricing.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {plans.map((plan) => (
+                  <PricingCard key={plan._id} plan={plan} ctaText={undefined}>
+                    <SubscribeButton
+                      plan={plan}
+                      onSuccess={() => {
+                        setErrorMessage(null);
+                        setSuccessMessage("Payment successful. Your UPSCRH Pro subscription is now active.");
+                        navigate("/dashboard", { replace: true });
+                      }}
+                      onError={(msg) => {
+                        setSuccessMessage(null);
+                        setErrorMessage(msg);
+                      }}
+                    />
+                  </PricingCard>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="max-w-4xl mx-auto text-center">
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-6 ${
+                theme === "dark"
+                  ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-500/40"
+                  : "bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200"
+              }`}>
+                <Sparkles className="w-3.5 h-3.5" />
+                Beta Version
+              </span>
+              <div className={`inline-flex p-6 rounded-full mb-6 relative ${
+                theme === "dark" ? "bg-fuchsia-500/10" : "bg-fuchsia-100"
+              }`}>
+                <div className="absolute inset-0 rounded-full animate-ping opacity-25 bg-fuchsia-500" />
+                <SketchIllustration type="rocket" className="w-14 h-14 relative z-10" />
+              </div>
+              <h1 className={`text-3xl md:text-5xl font-extrabold mb-4 tracking-tight ${
+                theme === "dark" ? "text-slate-50" : "text-slate-900"
+              }`}>
+                Pricing launching soon. Stay tuned 🚀
+              </h1>
+              <p className={`text-base md:text-lg max-w-md mx-auto ${
+                theme === "dark" ? "text-slate-300" : "text-slate-600"
+              }`}>
+                We're crafting UPSCRH Pro pricing — simple, clear, aspirant-friendly.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
