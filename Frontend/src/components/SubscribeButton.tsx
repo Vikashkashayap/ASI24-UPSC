@@ -57,7 +57,7 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
         key: data.razorpayKeyId,
         amount: data.amount,
         currency: data.currency || "INR",
-        name: "UPSCRH – AI Mentor for UPSC",
+        name: "MentorsDaily – AI Mentor for UPSC",
         description: plan.name,
         order_id: data.orderId,
         prefill: {

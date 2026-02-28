@@ -46,9 +46,9 @@ export const sendPaymentReceiptEmail = async (user, plan) => {
 
   const emailUser = process.env.EMAIL_USER;
   const supportEmail =
-    process.env.SUPPORT_EMAIL || process.env.EMAIL_USER || "support@upscrh.com";
+    process.env.SUPPORT_EMAIL || process.env.EMAIL_USER || "support@mentorsdaily.com";
 
-  const planName = plan?.name || "UPSCRH Pro Plan";
+  const planName = plan?.name || "MentorsDaily Pro Plan";
   const price = plan?.price ?? 0;
   const duration = plan?.duration || "";
   const transactionId = plan?.transactionId || "-";
@@ -71,13 +71,13 @@ export const sendPaymentReceiptEmail = async (user, plan) => {
             <tr>
               <td style="padding:28px 32px 20px;background:radial-gradient(circle at top left,rgba(244,114,182,0.22),transparent 55%),radial-gradient(circle at bottom right,rgba(56,189,248,0.18),transparent 55%);border-bottom:1px solid rgba(148,163,184,0.25);">
                 <div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#a855f7;font-weight:700;margin-bottom:8px;">
-                  UPSCRH • SUBSCRIPTION
+                  MentorsDaily • SUBSCRIPTION
                 </div>
                 <h1 style="margin:0;font-size:24px;line-height:1.25;font-weight:800;background:linear-gradient(90deg,#f97316,#e879f9,#38bdf8);-webkit-background-clip:text;color:transparent;">
                   Subscription Activated 🎉
                 </h1>
                 <p style="margin:8px 0 0;font-size:13px;color:#cbd5f5;">
-                  Hi ${user.name || "Aspirant"}, your UPSCRH workspace is now upgraded. Here are your plan details.
+                  Hi ${user.name || "Aspirant"}, your MentorsDaily workspace is now upgraded. Here are your plan details.
                 </p>
               </td>
             </tr>
@@ -155,7 +155,7 @@ export const sendPaymentReceiptEmail = async (user, plan) => {
                   <a href="mailto:${supportEmail}" style="color:#e879f9;text-decoration:none;">${supportEmail}</a>.
                 </p>
                 <p style="margin:0;font-size:10px;color:#6b7280;">
-                  © ${new Date().getFullYear()} UPSCRH. All rights reserved.
+                  © ${new Date().getFullYear()} MentorsDaily. All rights reserved.
                 </p>
               </td>
             </tr>
@@ -167,9 +167,9 @@ export const sendPaymentReceiptEmail = async (user, plan) => {
   `;
 
   await mailer.sendMail({
-    from: `"UPSCRH" <${emailUser}>`,
+    from: `"MentorsDaily" <${emailUser}>`,
     to: user.email,
-    subject: "UPSCRH Subscription Activated 🎉",
+    subject: "MentorsDaily Subscription Activated 🎉",
     html,
   });
 };

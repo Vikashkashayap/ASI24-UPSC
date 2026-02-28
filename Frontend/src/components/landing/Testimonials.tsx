@@ -26,15 +26,13 @@ export const TestimonialsSection = () => {
   const { theme } = useTheme();
   
   return (
-    <section id="testimonials" className={`border-b py-16 transition-colors ${
-      theme === "dark"
-        ? "border-purple-900/70 bg-[#090316]"
-        : "border-slate-200 bg-white"
+    <section id="testimonials" className={`py-16 transition-colors ${
+      theme === "dark" ? "bg-[#030712]" : "bg-slate-50"
     }`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
           <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${
-            theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+            theme === "dark" ? "text-purple-300" : "text-purple-600"
           }`}>
             Testimonials
           </p>
@@ -48,10 +46,10 @@ export const TestimonialsSection = () => {
           {testimonials.map((t) => (
             <Card
               key={t.name}
-              className={`h-full rounded-[26px] ${
+              className={`h-full rounded-2xl ${
                 theme === "dark"
-                  ? "border-purple-800/60 bg-gradient-to-br from-[#020617] via-[#050018] to-[#022c22] text-slate-50 shadow-[0_18px_70px_rgba(15,23,42,0.95)]"
-                  : "border-slate-200 bg-white text-slate-900 shadow-lg"
+                  ? "border-slate-700/60 bg-slate-900/50 text-slate-50 shadow-xl"
+                  : "border-slate-200 bg-white text-slate-900 shadow-md"
               }`}
             >
               <CardContent className="space-y-4 p-6 text-[11px] md:p-7">

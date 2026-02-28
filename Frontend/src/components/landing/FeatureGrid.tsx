@@ -41,10 +41,8 @@ export const FeatureGrid = () => {
   const { theme } = useTheme();
   
   return (
-    <section id="features" className={`border-b py-10 md:py-14 lg:py-18 transition-colors ${
-      theme === "dark"
-        ? "border-purple-900/70 bg-[#0b0618]"
-        : "border-slate-200 bg-slate-50"
+    <section id="features" className={`py-10 md:py-14 lg:py-18 transition-colors ${
+      theme === "dark" ? "bg-[#030712]" : "bg-slate-50"
     }`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="mb-6 md:mb-8 text-center">
@@ -61,17 +59,17 @@ export const FeatureGrid = () => {
           {features.map((feature) => (
             <Card
               key={feature.title}
-              className={`h-full rounded-[20px] md:rounded-[26px] ${
+              className={`h-full rounded-2xl ${
                 theme === "dark"
-                  ? `border-purple-800/60 bg-gradient-to-br text-slate-50 shadow-[0_18px_60px_rgba(15,23,42,0.9)] ${feature.variant}`
-                  : "border-slate-200 bg-white text-slate-900 shadow-lg"
+                  ? "border-slate-700/60 bg-slate-900/50 text-slate-50 shadow-xl"
+                  : "border-slate-200 bg-white text-slate-900 shadow-md"
               }`}
             >
               <CardHeader className="pb-3 md:pb-4">
-                <div className={`mb-3 md:mb-4 inline-flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-xl md:rounded-2xl ${
+                <div className={`mb-3 md:mb-4 inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl ${
                   theme === "dark"
-                    ? "bg-black/40 text-emerald-200"
-                    : "bg-purple-100 text-purple-700"
+                    ? "bg-blue-500/20 text-blue-200"
+                    : "bg-blue-100 text-[#2563eb]"
                 }`}>
                   <feature.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 </div>
@@ -86,10 +84,10 @@ export const FeatureGrid = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className={`pt-0 text-[10px] md:text-[11px] ${
-                theme === "dark" ? "text-emerald-200/90" : "text-emerald-700"
+                theme === "dark" ? "text-emerald-300" : "text-emerald-700"
               }`}>
-                <span className="inline-flex items-center gap-1">
-                  <span className={`h-1.5 w-1.5 rounded-full ${
+                <span className="inline-flex items-center gap-1.5">
+                  <span className={`h-2 w-2 rounded-full flex-shrink-0 ${
                     theme === "dark" ? "bg-emerald-400" : "bg-emerald-500"
                   }`} />
                   <span>Built for serious aspirants.</span>

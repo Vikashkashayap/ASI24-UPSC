@@ -55,6 +55,7 @@ import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./controllers/prelimsMockController.js";
 import { getActivePlans } from "./controllers/pricingController.js";
+import { getActiveOffer } from "./controllers/offerController.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { requireActiveSubscription } from "./middleware/subscriptionMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
@@ -123,6 +124,8 @@ console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
 
 // Public pricing: active plans only (for landing page)
 app.get("/api/pricing", getActivePlans);
+// Public: current active offer for banner
+app.get("/api/offers/active", getActiveOffer);
 
 app.use("/uploads", express.static(join(__dirname, "..", "uploads")));
 

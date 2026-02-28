@@ -1,5 +1,4 @@
 import { Quote } from "lucide-react";
-import { LandingLayout } from "../../layouts/LandingLayout";
 import { LandingFooter } from "../../components/landing/LandingFooter";
 import { SketchIllustration } from "../../components/landing/SketchIllustration";
 import { useTheme } from "../../hooks/useTheme";
@@ -21,7 +20,7 @@ const testimonials = [
   {
     name: "Karthik Iyer",
     role: "Working Professional",
-    quote: "I only get 2–3 hours a day. UPSCRH ensures that time goes into practice, not hunting for resources.",
+    quote: "I only get 2–3 hours a day. MentorsDaily ensures that time goes into practice, not hunting for resources.",
     highlight: "Working aspirant friendly",
   },
   {
@@ -36,7 +35,7 @@ export const TestimonialsPage = () => {
   const { theme } = useTheme();
 
   return (
-    <LandingLayout>
+    <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
         theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
@@ -126,6 +125,6 @@ export const TestimonialsPage = () => {
         </div>
       </section>
       <LandingFooter />
-    </LandingLayout>
+    </>
   );
 };
