@@ -5,10 +5,8 @@ export const AboutSection = () => {
   const { theme } = useTheme();
   
   return (
-    <section id="about" className={`border-b py-16 transition-colors ${
-      theme === "dark"
-        ? "border-purple-900/70 bg-[#050012]"
-        : "border-slate-200 bg-slate-50"
+    <section id="about" className={`py-16 transition-colors ${
+      theme === "dark" ? "bg-[#030712]" : "bg-slate-50"
     }`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
@@ -23,16 +21,16 @@ export const AboutSection = () => {
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <Card className={`rounded-[26px] ${
+          <Card className={`rounded-2xl ${
             theme === "dark"
-              ? "border-purple-800/60 bg-gradient-to-br from-[#020617] via-[#050018] to-[#022c22] text-slate-50 shadow-[0_18px_70px_rgba(15,23,42,0.95)]"
-              : "border-slate-200 bg-white text-slate-900 shadow-lg"
+              ? "border-slate-700/60 bg-slate-900/50 text-slate-50 shadow-xl"
+              : "border-slate-200 bg-white text-slate-900 shadow-md"
           }`}>
             <CardContent className="flex flex-col items-center gap-3 p-6 text-center text-[11px] md:p-7">
               <div className={`h-20 w-20 rounded-full ${
                 theme === "dark"
-                  ? "bg-[radial-gradient(circle_at_center,_rgba(147,51,234,0.35),_transparent_70%)]"
-                  : "bg-gradient-to-br from-purple-100 to-purple-200"
+                  ? "bg-blue-500/20"
+                  : "bg-gradient-to-br from-blue-100 to-blue-200"
               }`} />
               <div>
                 <p className={`text-sm font-semibold ${
@@ -50,15 +48,15 @@ export const AboutSection = () => {
             </CardContent>
           </Card>
 
-          <Card className={`rounded-[26px] ${
+          <Card className={`rounded-2xl ${
             theme === "dark"
-              ? "border-purple-800/60 bg-gradient-to-br from-[#020617] via-[#050018] to-[#022c22] text-slate-50 shadow-[0_18px_70px_rgba(15,23,42,0.95)]"
-              : "border-slate-200 bg-white text-slate-900 shadow-lg"
+              ? "border-slate-700/60 bg-slate-900/50 text-slate-50 shadow-xl"
+              : "border-slate-200 bg-white text-slate-900 shadow-md"
           }`}>
             <CardContent className="flex flex-col items-center gap-3 p-6 text-center text-[11px] md:p-7">
               <div className={`h-20 w-20 rounded-full ${
                 theme === "dark"
-                  ? "bg-[radial-gradient(circle_at_center,_rgba(16,185,129,0.35),_transparent_70%)]"
+                  ? "bg-emerald-500/20"
                   : "bg-gradient-to-br from-emerald-100 to-emerald-200"
               }`} />
               <div>

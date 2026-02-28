@@ -1,5 +1,4 @@
 import { Target, Heart, Zap } from "lucide-react";
-import { LandingLayout } from "../../layouts/LandingLayout";
 import { LandingFooter } from "../../components/landing/LandingFooter";
 import { SketchIllustration } from "../../components/landing/SketchIllustration";
 import { useTheme } from "../../hooks/useTheme";
@@ -30,7 +29,7 @@ export const AboutPage = () => {
   const { theme } = useTheme();
 
   return (
-    <LandingLayout>
+    <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
         theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
@@ -47,7 +46,7 @@ export const AboutPage = () => {
           <p className={`mt-3 max-w-2xl mx-auto text-sm md:text-base ${
             theme === "dark" ? "text-slate-300" : "text-slate-600"
           }`}>
-            UPSC aspirants need calm, focused preparation. We built UPSCRH — a team of mentors, builders and technologists.
+            UPSC aspirants need calm, focused preparation. We built MentorsDaily — a team of mentors, builders and technologists.
           </p>
         </div>
       </section>
@@ -180,6 +179,6 @@ export const AboutPage = () => {
         </div>
       </section>
       <LandingFooter />
-    </LandingLayout>
+    </>
   );
 };

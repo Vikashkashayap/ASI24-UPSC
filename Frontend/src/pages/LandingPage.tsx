@@ -1,4 +1,3 @@
-import { LandingLayout } from "../layouts/LandingLayout";
 import { LandingHero } from "../components/landing/Hero";
 import { FeatureGrid } from "../components/landing/FeatureGrid";
 import { RewardsBanner } from "../components/landing/RewardsBanner";
@@ -9,7 +8,7 @@ import { LandingFooter } from "../components/landing/LandingFooter";
 
 export const LandingPage = () => {
   return (
-    <LandingLayout>
+    <>
       <LandingHero />
       <FeatureGrid />
       <RewardsBanner />
@@ -17,7 +16,7 @@ export const LandingPage = () => {
       <AboutSection />
       <TestimonialsSection />
       <LandingFooter />
-    </LandingLayout>
+    </>
   );
 };
 

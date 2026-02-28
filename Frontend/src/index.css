@@ -41,7 +41,8 @@ html {
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply text-slate-900 antialiased;
+  background-color: #f0f9ff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 1rem;
@@ -181,18 +182,18 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(147, 51, 234, 0.3);
+  background: rgba(37, 99, 235, 0.3);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(147, 51, 234, 0.5);
+  background: rgba(37, 99, 235, 0.5);
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar - royal blue theme */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(147, 51, 234, 0.3) transparent;
+  scrollbar-color: rgba(37, 99, 235, 0.3) transparent;
 }
 
 /* Fade in animation */
@@ -205,4 +206,58 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Shared banner height – OfferBanner & TopBanner same size */
+.banner-strip {
+  height: 2.75rem; /* 44px */
+}
+@media (min-width: 768px) {
+  .banner-strip {
+    height: 3.5rem; /* 56px */
+  }
+}
+
+/* Top banner marquee – scrolls left */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+/* Offer banner marquee – scrolls right */
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-33.333%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.animate-marquee-right {
+  animation: marquee-right 25s linear infinite;
+}
+
+/* ============================================
+   MENTORSDAILY-STYLE DOT BACKGROUND (bhud bhund)
+   Light blue/off-white base + scattered semi-transparent circles
+   ============================================ */
+.hero-dots-bg-light,
+.page-dots-bg-light {
+  background-color: #f0f9ff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%2393c5fd' fill-opacity='0.25'%3E%3Ccircle cx='12' cy='18' r='3'/%3E%3Ccircle cx='48' cy='8' r='2.5'/%3E%3Ccircle cx='78' cy='22' r='2'/%3E%3Ccircle cx='95' cy='45' r='3.5'/%3E%3Ccircle cx='22' cy='55' r='2'/%3E%3Ccircle cx='58' cy='62' r='2.5'/%3E%3Ccircle cx='88' cy='78' r='2'/%3E%3Ccircle cx='15' cy='88' r='3'/%3E%3Ccircle cx='42' cy='95' r='2'/%3E%3Ccircle cx='72' cy='42' r='2.5'/%3E%3Ccircle cx='5' cy='42' r='2'/%3E%3Ccircle cx='105' cy='12' r='2'/%3E%3Ccircle cx='35' cy='28' r='3'/%3E%3Ccircle cx='65' cy='95' r='2'/%3E%3Ccircle cx='98' cy='68' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+
+.hero-dots-bg-dark,
+.page-dots-bg-dark {
+  background-color: #020617;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='%2360a5fa' fill-opacity='0.08'%3E%3Ccircle cx='12' cy='18' r='3'/%3E%3Ccircle cx='48' cy='8' r='2.5'/%3E%3Ccircle cx='78' cy='22' r='2'/%3E%3Ccircle cx='95' cy='45' r='3.5'/%3E%3Ccircle cx='22' cy='55' r='2'/%3E%3Ccircle cx='58' cy='62' r='2.5'/%3E%3Ccircle cx='88' cy='78' r='2'/%3E%3Ccircle cx='15' cy='88' r='3'/%3E%3Ccircle cx='42' cy='95' r='2'/%3E%3Ccircle cx='72' cy='42' r='2.5'/%3E%3Ccircle cx='5' cy='42' r='2'/%3E%3Ccircle cx='105' cy='12' r='2'/%3E%3Ccircle cx='35' cy='28' r='3'/%3E%3Ccircle cx='65' cy='95' r='2'/%3E%3Ccircle cx='98' cy='68' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
 }

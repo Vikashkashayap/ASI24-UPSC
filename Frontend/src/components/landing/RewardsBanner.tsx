@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Gift } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
@@ -7,23 +8,21 @@ export const RewardsBanner = () => {
   const { theme } = useTheme();
   
   return (
-    <section id="pricing" className={`border-b py-14 transition-colors ${
-      theme === "dark"
-        ? "border-purple-900 bg-[#070213]"
-        : "border-slate-200 bg-white"
+    <section className={`py-14 transition-colors ${
+      theme === "dark" ? "bg-[#030712]" : "bg-slate-50"
     }`}>
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <Card className={`overflow-hidden rounded-[30px] ${
+        <Card className={`overflow-hidden rounded-3xl ${
           theme === "dark"
-            ? "border-fuchsia-500/25 bg-gradient-to-r from-[#1e1035] via-[#020617] to-[#022c22] text-slate-50 shadow-[0_22px_90px_rgba(147,51,234,0.6)]"
-            : "border-purple-200 bg-gradient-to-r from-purple-50 via-white to-emerald-50 text-slate-900 shadow-xl"
+            ? "border-slate-700/50 bg-gradient-to-r from-slate-900/80 via-slate-900/60 to-slate-900/80 text-slate-50 shadow-xl"
+            : "border-slate-200 bg-gradient-to-r from-purple-50/80 via-white to-emerald-50/80 text-slate-900 shadow-lg"
         }`}>
           <CardContent className="grid gap-8 px-6 py-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:px-10 md:py-10">
             <div className="space-y-4">
               <p className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${
                 theme === "dark"
-                  ? "bg-fuchsia-500/20 text-fuchsia-200"
-                  : "bg-fuchsia-100 text-fuchsia-700"
+                  ? "bg-purple-500/20 text-purple-200"
+                  : "bg-purple-100 text-purple-700"
               }`}>
                 Limited offer
               </p>
@@ -32,7 +31,7 @@ export const RewardsBanner = () => {
                   theme === "dark" ? "text-slate-50" : "text-slate-900"
                 }`}>
                   Achieve{" "}
-                  <span className="bg-gradient-to-r from-fuchsia-500 via-violet-500 to-emerald-500 bg-clip-text text-transparent">
+                  <span className="text-[#9333ea]">
                     greatness.
                   </span>
                   <br />
@@ -41,7 +40,7 @@ export const RewardsBanner = () => {
                 <p className={`max-w-md text-xs md:text-sm ${
                   theme === "dark" ? "text-slate-200/90" : "text-slate-600"
                 }`}>
-                  Commit to consistent preparation with UPSCRH. If you hit a top rank in CSE, we&apos;ll celebrate
+                  Commit to consistent preparation with MentorsDaily. If you hit a top rank in CSE, we&apos;ll celebrate
                   with you.
                 </p>
               </div>
@@ -66,13 +65,15 @@ export const RewardsBanner = () => {
                   }`}>
                     ✓
                   </span>
-                  <span>Active UPSCRH Pro subscription for 4+ months.</span>
+                  <span>Active MentorsDaily Pro subscription for 4+ months.</span>
                 </li>
               </ul>
               <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button className="h-9 rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 px-5 text-xs font-semibold tracking-tight text-white hover:from-fuchsia-400 hover:to-emerald-300 md:h-10 md:px-6 md:text-sm">
-                  View Pro plans
-                </Button>
+                <Link to="/pricing">
+                  <Button className="h-9 rounded-lg bg-gradient-to-r from-purple-500 to-emerald-500 px-5 text-xs font-semibold text-white hover:opacity-90 md:h-10 md:px-6 md:text-sm shadow-md">
+                    View Pro plans
+                  </Button>
+                </Link>
                 <span className={`text-[11px] ${
                   theme === "dark" ? "text-slate-200/80" : "text-slate-600"
                 }`}>Transparent terms • No lottery • Pure reward.</span>
@@ -85,12 +86,12 @@ export const RewardsBanner = () => {
                   ? "bg-[radial-gradient(circle_at_center,_rgba(129,140,248,0.28),_transparent_70%)]"
                   : "bg-[radial-gradient(circle_at_center,_rgba(168,85,247,0.15),_transparent_70%)]"
               }`} />
-              <div className="relative w-full max-w-xs rounded-[26px] bg-gradient-to-tr from-fuchsia-400 via-violet-300 to-emerald-300 p-4 shadow-2xl">
+              <div className="relative w-full max-w-xs rounded-2xl bg-gradient-to-br from-purple-100 via-white to-emerald-100 p-4 shadow-lg border border-slate-200">
                 <div className="flex items-center gap-2 text-[11px] text-slate-900/90">
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/40 text-fuchsia-700">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-purple-600">
                     <Gift className="h-4 w-4" />
                   </span>
-                  <span className="font-semibold">UPSCRH Pro Reward</span>
+                  <span className="font-semibold">MentorsDaily Pro Reward</span>
                 </div>
                 <p className="mt-3 text-[11px] leading-relaxed text-slate-900/85">
                   Stay consistent with your mains practice. If you make it to the UPSC rank list, we&apos;ll send a

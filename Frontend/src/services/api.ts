@@ -293,6 +293,34 @@ export const pricingAPI = {
   delete: (id: string) => api.delete<{ success: boolean }>(`/api/admin/pricing/${id}`),
 };
 
+// Festival / offer banner – public (active only) and admin CRUD
+export interface OfferType {
+  _id: string;
+  title: string;
+  description: string;
+  discount: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  isHidden: boolean;
+  ctaText: string;
+  redirectUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const offersAPI = {
+  getActive: () =>
+    api.get<{ success: boolean; data: OfferType | null }>("/api/offers/active"),
+  list: () =>
+    api.get<{ success: boolean; data: OfferType[] }>("/api/admin/offers"),
+  create: (data: Omit<OfferType, "_id" | "createdAt" | "updatedAt">) =>
+    api.post<{ success: boolean; data: OfferType }>("/api/admin/offers", data),
+  update: (id: string, data: Partial<Omit<OfferType, "_id" | "createdAt" | "updatedAt">>) =>
+    api.put<{ success: boolean; data: OfferType }>(`/api/admin/offers/${id}`, data),
+  delete: (id: string) => api.delete<{ success: boolean }>(`/api/admin/offers/${id}`),
+};
+
 // Payments – Razorpay integration
 export const paymentAPI = {
   createOrder: (planId: string) =>

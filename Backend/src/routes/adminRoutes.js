@@ -36,6 +36,12 @@ import {
   updatePlan,
   deletePlan,
 } from "../controllers/pricingController.js";
+import {
+  listOffers,
+  createOffer,
+  updateOffer,
+  deleteOffer,
+} from "../controllers/offerController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
@@ -88,6 +94,12 @@ router.get("/pricing", getAllPlans);
 router.post("/pricing", createPlan);
 router.put("/pricing/:id", updatePlan);
 router.delete("/pricing/:id", deletePlan);
+
+// Offer Manager: CRUD (admin only)
+router.get("/offers", listOffers);
+router.post("/offers", createOffer);
+router.put("/offers/:id", updateOffer);
+router.delete("/offers/:id", deleteOffer);
 
 // User search
 router.get("/search", searchUsers);

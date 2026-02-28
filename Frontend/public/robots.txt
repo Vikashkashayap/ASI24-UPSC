@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /home
+Disallow: /login
+Disallow: /register
+Disallow: /admin
+
+Sitemap: http://studentportal.mentorsdaily.com/sitemap.xml

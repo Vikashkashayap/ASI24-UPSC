@@ -140,7 +140,7 @@ export const HomePage = () => {
                 theme === "dark" ? "text-slate-50" : "text-slate-900"
               }`}
             >
-              Your UPSCRH workspace is ready ✨
+              Your MentorsDaily workspace is ready ✨
             </h1>
             <p
               className={`text-xs md:text-sm max-w-xl ${
@@ -148,7 +148,7 @@ export const HomePage = () => {
               }`}
             >
               You&apos;ve created your account. To unlock AI mentor, tests, analytics and mock exams,
-              activate a <span className="font-semibold text-fuchsia-300">UPSCRH Pro</span> plan.
+              activate a <span className="font-semibold text-fuchsia-300">MentorsDaily Pro</span> plan.
             </p>
             <div className="mt-4 md:mt-5 flex flex-col md:flex-row gap-3 md:items-center">
               <button

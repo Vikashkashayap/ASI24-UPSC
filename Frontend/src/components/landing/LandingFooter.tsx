@@ -1,36 +1,27 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme";
-import logoImg from "../../LOGO/UPSCRH-LOGO.png";
+import logoImg from "../../LOGO/mentorsdaily.png";
 
 export const LandingFooter = () => {
   const { theme } = useTheme();
 
   return (
     <footer
-      className={`relative border-t py-12 text-sm transition-colors ${
-        theme === "dark"
-          ? "border-purple-900 bg-[#020012] text-slate-400"
-          : "border-slate-200 bg-white text-slate-600"
+      className={`relative py-12 text-sm transition-colors ${
+        theme === "dark" ? "bg-[#020617] text-slate-400" : "bg-slate-50 text-slate-600"
       }`}
     >
-      {/* Ambient Glow (same feel as navbar) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-fuchsia-800/10 to-purple-900/20 blur-3xl opacity-50 pointer-events-none" />
+      <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-4 sm:px-6 md:flex-row md:justify-between">
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:justify-between md:px-6">
-
-        {/* LEFT SECTION */}
+        {/* LEFT SECTION - logo aligned same as navbar */}
         <div className="space-y-4 md:max-w-xs">
 
-          {/* 🔥 Logo + Text Same as Navbar */}
-          <Link to="/" className="flex items-center gap-2 select-none">
+          <Link to="/" className="flex items-center shrink-0 select-none" aria-label="Home">
             <img
               src={logoImg}
-              alt="UPSCRH"
-              className="h-12 md:h-14 w-auto object-contain"
+              alt="MentorsDaily"
+              className="h-9 md:h-10 w-auto object-contain object-left"
             />
-            <span className="text-xl md:text-2xl font-extrabold tracking-wide leading-none bg-gradient-to-r from-[#f5d0fe] via-[#e879f9] to-[#9333ea] bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(217,70,239,0.9)]">
-              UPSCRH
-            </span>
           </Link>
 
           <p
@@ -43,7 +34,7 @@ export const LandingFooter = () => {
           </p>
 
           <div className="flex gap-3 text-xs text-slate-500">
-            <span>© {new Date().getFullYear()} UPSCRH</span>
+            <span>© {new Date().getFullYear()} MentorsDaily</span>
             <span>Made with ♥ in India</span>
           </div>
         </div>
@@ -64,22 +55,22 @@ export const LandingFooter = () => {
             </h4>
             <ul className="mt-4 space-y-2">
               <li>
-                <Link to="/features" className="hover:text-fuchsia-400 transition">
+                <Link to="/features" className="hover:text-[#2563eb] transition">
                   Features
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="hover:text-fuchsia-400 transition">
+                <Link to="/pricing" className="hover:text-[#2563eb] transition">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link to="/compare" className="hover:text-fuchsia-400 transition">
+                <Link to="/compare" className="hover:text-[#2563eb] transition">
                   Compare
                 </Link>
               </li>
               <li>
-                <Link to="/testimonials" className="hover:text-fuchsia-400 transition">
+                <Link to="/testimonials" className="hover:text-[#2563eb] transition">
                   Testimonials
                 </Link>
               </li>
@@ -99,18 +90,18 @@ export const LandingFooter = () => {
             </h4>
             <ul className="mt-4 space-y-2">
               <li>
-                <Link to="/about" className="hover:text-fuchsia-400 transition">
+                <Link to="/about" className="hover:text-[#2563eb] transition">
                   About
                 </Link>
               </li>
               <li>
                 <a
-                  href={`https://wa.me/916394563575?text=${encodeURIComponent(
-                    "Hi! I want to know more about UPSCRH."
+                  href={`https://wa.me/918766233193?text=${encodeURIComponent(
+                    "Hi! I want to know more about MentorsDaily."
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-fuchsia-400 transition"
+                  className="hover:text-[#2563eb] transition"
                 >
                   Contact
                 </a>
@@ -131,12 +122,12 @@ export const LandingFooter = () => {
             </h4>
             <ul className="mt-4 space-y-2">
               <li>
-                <a href="#privacy" className="hover:text-fuchsia-400 transition">
+                <a href="#privacy" className="hover:text-[#2563eb] transition">
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="#terms" className="hover:text-fuchsia-400 transition">
+                <a href="#terms" className="hover:text-[#2563eb] transition">
                   Terms of Service
                 </a>
               </li>

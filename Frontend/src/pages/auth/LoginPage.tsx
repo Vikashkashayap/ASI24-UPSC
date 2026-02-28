@@ -39,35 +39,35 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020012] bg-gradient-to-b from-[#050015] via-[#020012] to-black text-slate-50 overflow-x-hidden">
+    <div className="min-h-screen bg-[#0f172a] text-slate-50 overflow-x-hidden">
       <LandingNavbar />
-      <div className="flex items-center justify-center px-3 md:px-4 py-6 md:py-8 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-80px)]">
-        <Card className="w-full max-w-md mx-auto">
+      <div className="flex items-center justify-center px-3 md:px-4 py-6 md:py-8 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-80px)] pt-20 md:pt-24">
+        <Card className="w-full max-w-md mx-auto bg-white border border-slate-200 rounded-2xl shadow-xl">
           <CardHeader className="pb-3 md:pb-4 px-4 md:px-6 pt-4 md:pt-6">
-            <CardTitle className="text-base md:text-lg">Welcome back, aspirant</CardTitle>
-            <CardDescription className="text-xs md:text-sm mt-1">Sign in to your AI-powered UPSCRH workspace.</CardDescription>
+            <CardTitle className="text-base md:text-lg text-slate-900">Welcome back, aspirant</CardTitle>
+            <CardDescription className="text-xs md:text-sm mt-1 text-slate-600">Sign in to your AI-powered MentorsDaily workspace.</CardDescription>
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               <div className="space-y-1.5">
-                <label className="text-sm md:text-base text-slate-200 block">Email</label>
+                <label className="text-sm md:text-base text-slate-700 block">Email</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 md:px-4 py-2.5 md:py-3 text-base md:text-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 min-h-[44px]"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-base md:text-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/70 focus:border-[#2563eb] min-h-[44px]"
                   placeholder="Enter your email"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm md:text-base text-slate-200 block">Password</label>
+                <label className="text-sm md:text-base text-slate-700 block">Password</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 md:px-4 py-2.5 md:py-3 text-base md:text-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/70 min-h-[44px]"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-base md:text-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2563eb]/70 focus:border-[#2563eb] min-h-[44px]"
                   placeholder="Enter your password"
                 />
               </div>
@@ -77,22 +77,22 @@ export const LoginPage = () => {
               </Button>
             </form>
             <div className="mt-4 md:mt-5 space-y-1.5 text-center">
-              <p className="text-[11px] md:text-xs text-slate-400">
-                <span className="font-medium text-slate-200">Free access</span> is created by your mentor/admin.
+              <p className="text-[11px] md:text-xs text-slate-500">
+                <span className="font-medium text-slate-700">Free access</span> is created by your mentor/admin.
               </p>
-              <p className="text-[11px] md:text-xs text-slate-400">
+              <p className="text-[11px] md:text-xs text-slate-500">
                 New aspirant and want{" "}
-                <span className="font-semibold text-emerald-300">UPSCRH Pro</span>?
+                <span className="font-semibold text-[#2563eb]">MentorsDaily Pro</span>?
               </p>
               <Link
                 to="/pricing"
-                className="inline-flex items-center justify-center mt-2 px-4 py-2 rounded-full text-[11px] md:text-xs font-semibold bg-gradient-to-r from-fuchsia-600 to-emerald-500 text-white shadow-sm shadow-fuchsia-800/40 hover:shadow-md hover:shadow-fuchsia-700/50 transition-transform hover:scale-[1.02]"
+                className="inline-flex items-center justify-center mt-2 px-4 py-2 rounded-lg text-[11px] md:text-xs font-semibold bg-gradient-to-r from-purple-600 to-emerald-500 text-white shadow-md hover:opacity-90 transition-opacity"
               >
                 View Pro plans &amp; Register
               </Link>
               <p className="text-[11px] md:text-xs text-slate-500 pt-1">
                 Prefer direct sign-up?{" "}
-                <Link to="/register" className="text-emerald-300 font-semibold underline-offset-2 hover:underline">
+                <Link to="/register" className="text-[#2563eb] font-semibold underline-offset-2 hover:underline">
                   Create a new account
                 </Link>
               </p>

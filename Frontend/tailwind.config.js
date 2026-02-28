@@ -7,9 +7,12 @@ export default {
         background: "#f8fafc",
         card: "#ffffff",
         primary: {
-          DEFAULT: "#0f766e",
-          foreground: "#ecfdf3",
+          DEFAULT: "#2563eb",
+          foreground: "#ffffff",
         },
+        "royal-blue": "#2563eb",
+        "royal-blue-dark": "#1d4ed8",
+        "hero-bg": "#f0f9ff",
       },
       boxShadow: {
         soft: "0 10px 30px rgba(15, 23, 42, 0.08)",

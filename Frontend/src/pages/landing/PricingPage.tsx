@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Gift, Check, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { LandingLayout } from "../../layouts/LandingLayout";
 import { useTheme } from "../../hooks/useTheme";
 import { LandingFooter } from "../../components/landing/LandingFooter";
 import { SketchIllustration } from "../../components/landing/SketchIllustration";
@@ -44,10 +43,10 @@ export const PricingPage = () => {
   const hasActivePlans = plans.length > 0;
 
   return (
-    <LandingLayout>
+    <>
       {/* Hero: dynamic pricing cards or Coming Soon */}
       <section className={`border-b py-12 md:py-20 transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800/50 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           {successMessage && (
@@ -70,7 +69,7 @@ export const PricingPage = () => {
           )}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"}`} />
+              <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
               <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading pricing...</p>
             </div>
           ) : hasActivePlans ? (
@@ -78,11 +77,11 @@ export const PricingPage = () => {
               <div className="text-center mb-10">
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-4 ${
                   theme === "dark"
-                    ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-500/40"
-                    : "bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200"
+                    ? "bg-purple-500/20 text-purple-200 border border-purple-500/40"
+                    : "bg-purple-100 text-purple-700 border border-purple-200"
                 }`}>
                   <Sparkles className="w-3.5 h-3.5" />
-                  UPSCRH Pro
+                  MentorsDaily Pro
                 </span>
                 <h1 className={`text-3xl md:text-4xl font-extrabold mb-2 tracking-tight ${
                   theme === "dark" ? "text-slate-50" : "text-slate-900"
@@ -102,7 +101,7 @@ export const PricingPage = () => {
                       plan={plan}
                       onSuccess={() => {
                         setErrorMessage(null);
-                        setSuccessMessage("Payment successful. Your UPSCRH Pro subscription is now active.");
+                        setSuccessMessage("Payment successful. Your MentorsDaily Pro subscription is now active.");
                         navigate("/dashboard", { replace: true });
                       }}
                       onError={(msg) => {
@@ -118,8 +117,8 @@ export const PricingPage = () => {
             <div className="max-w-4xl mx-auto text-center">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-6 ${
                 theme === "dark"
-                  ? "bg-fuchsia-500/20 text-fuchsia-200 border border-fuchsia-500/40"
-                  : "bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200"
+? "bg-purple-500/20 text-purple-200 border border-purple-500/40"
+                    : "bg-purple-100 text-purple-700 border border-purple-200"
               }`}>
                 <Sparkles className="w-3.5 h-3.5" />
                 Beta Version
@@ -138,7 +137,7 @@ export const PricingPage = () => {
               <p className={`text-base md:text-lg max-w-md mx-auto ${
                 theme === "dark" ? "text-slate-300" : "text-slate-600"
               }`}>
-                We're crafting UPSCRH Pro pricing — simple, clear, aspirant-friendly.
+                We're crafting MentorsDaily Pro pricing — simple, clear, aspirant-friendly.
               </p>
             </div>
           )}
@@ -160,7 +159,7 @@ export const PricingPage = () => {
               theme === "dark" ? "bg-black/40" : "bg-slate-100"
             }`}>
               <Gift className={`w-14 h-14 ${
-                theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"
+                theme === "dark" ? "text-purple-400" : "text-purple-600"
               }`} />
             </div>
             <Card className={`flex-1 rounded-[24px] ${
@@ -212,6 +211,6 @@ export const PricingPage = () => {
         </div>
       </section>
       <LandingFooter />
-    </LandingLayout>
+    </>
   );
 };

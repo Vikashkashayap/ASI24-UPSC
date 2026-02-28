@@ -1,5 +1,4 @@
 import { X, Check, ArrowRight } from "lucide-react";
-import { LandingLayout } from "../../layouts/LandingLayout";
 import { LandingFooter } from "../../components/landing/LandingFooter";
 import { SketchIllustration } from "../../components/landing/SketchIllustration";
 import { useTheme } from "../../hooks/useTheme";
@@ -13,7 +12,7 @@ const oldWay = [
   "Analytics — just marks, can't see trends",
 ];
 
-const upscrhWay = [
+const portalWay = [
   "Write answers — everything in one workspace",
   "AI evaluates — instant, consistent, structure + content feedback",
   "PYQ analytics — decide which topics to study",
@@ -25,7 +24,7 @@ export const ComparePage = () => {
   const { theme } = useTheme();
 
   return (
-    <LandingLayout>
+    <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
         theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
@@ -37,7 +36,7 @@ export const ComparePage = () => {
           <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${
             theme === "dark" ? "text-slate-50" : "text-slate-900"
           }`}>
-            Old way vs UPSCRH
+            Old way vs MentorsDaily
           </h1>
           <p className={`mt-3 max-w-2xl mx-auto text-sm md:text-base ${
             theme === "dark" ? "text-slate-300" : "text-slate-600"
@@ -108,7 +107,7 @@ export const ComparePage = () => {
               </CardContent>
             </Card>
 
-            {/* UPSCRH way */}
+            {/* MentorsDaily way */}
             <Card className={`overflow-hidden rounded-[24px] ${
               theme === "dark"
                 ? "border-emerald-500/40 bg-gradient-to-br from-[#0d1f1a] to-[#051810]"
@@ -119,7 +118,7 @@ export const ComparePage = () => {
                   <SketchIllustration type="chart" className="w-8 h-8" />
                   <h2 className={`text-lg font-semibold ${
                     theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-                  }`}>UPSCRH</h2>
+                  }`}>MentorsDaily</h2>
                 </div>
                 <h3 className={`text-xl font-semibold mb-4 ${
                   theme === "dark" ? "text-emerald-100" : "text-emerald-800"
@@ -127,7 +126,7 @@ export const ComparePage = () => {
                   Instant clarity, answer-first workflow
                 </h3>
                 <ul className="space-y-3">
-                  {upscrhWay.map((item) => (
+                  {portalWay.map((item) => (
                     <li key={item} className="flex items-start gap-3">
                       <span className={`mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
                         theme === "dark" ? "bg-emerald-500 text-black" : "bg-emerald-500 text-white"
@@ -160,6 +159,6 @@ export const ComparePage = () => {
         </div>
       </section>
       <LandingFooter />
-    </LandingLayout>
+    </>
   );
 };

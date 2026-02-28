@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
-import logoImg from "../LOGO/UPSCRH-LOGO.png";
+import logoImg from "../LOGO/mentorsdaily.png";
 
 // Mobile-first nav link: minimum 44px height for touch targets
 const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
   `flex items-center ${collapsed ? "justify-center" : "gap-2 md:gap-3"} ${collapsed ? "px-2" : "px-2 md:px-3"} py-2.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 min-h-[44px] touch-manipulation relative ${theme === "dark"
-    ? `hover:bg-slate-800/80 active:scale-95 ${isActive ? "bg-fuchsia-500/20 text-fuchsia-200 shadow-sm shadow-fuchsia-500/10" : "text-slate-300"
+    ? `hover:bg-slate-800/80 active:scale-95 ${isActive ? "bg-blue-500/20 text-blue-200 shadow-sm shadow-blue-500/10" : "text-slate-300"
     }`
-    : `hover:bg-slate-100 active:scale-95 ${isActive ? "bg-purple-100 text-purple-700 shadow-sm shadow-purple-200/50" : "text-slate-700"
+    : `hover:bg-slate-100 active:scale-95 ${isActive ? "bg-blue-100 text-blue-700 shadow-sm shadow-blue-200/50" : "text-slate-700"
     }`
   }`;
 
@@ -40,6 +40,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
+    '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -93,7 +94,7 @@ export const DashboardLayout = () => {
 
   return (
     <div
-      className={`dashboard-scroll min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+      className={`dashboard-scroll min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020617] text-slate-50" : "bg-slate-50 text-slate-900"
         }`}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
@@ -109,18 +110,18 @@ export const DashboardLayout = () => {
       <aside
         className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[280px] md:w-64"} flex flex-col border-r backdrop-blur-xl fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 shadow-lg ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${theme === "dark"
-            ? "border-purple-900/60 bg-gradient-to-r from-[#050016]/95 via-[#06021a]/95 to-[#020617]/95 shadow-purple-900/20"
+            ? "border-blue-900/50 bg-[#020617]/95 shadow-blue-900/10"
             : "border-slate-200 bg-white/95 shadow-slate-200/50"
           }`}
       >
-        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-purple-900/60" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
           {!sidebarCollapsed && (
             <div className="flex items-center gap-1.5 min-w-0 shrink-0">
-              <img src={logoImg} alt="UPSCRH" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
+              <img src={logoImg} alt="MentorsDaily" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
             </div>
           )}
           {sidebarCollapsed && (
-            <img src={logoImg} alt="UPSCRH" className="h-10 w-10 object-contain object-center flex-shrink-0" />
+            <img src={logoImg} alt="MentorsDaily" className="h-10 w-10 object-contain object-center flex-shrink-0" />
           )}
           <div className="flex items-center justify-center gap-1.5 shrink-0">
             <button
@@ -168,6 +169,10 @@ export const DashboardLayout = () => {
                   <IndianRupee className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Pricing Plans</span>}
                 </NavLink>
+                <NavLink to="/admin/offer-manager" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Offer Manager">
+                  <Tag className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Offer Manager</span>}
+                </NavLink>
               </div>
 
               {/* Admin Tools Section */}
@@ -207,11 +212,11 @@ export const DashboardLayout = () => {
                   ) : (
                     <NavLink
                       to="/pricing"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-fuchsia-500/40 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 transition-colors"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-blue-500/40 bg-blue-500/5 hover:bg-blue-500/10 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Lightbulb className="w-3.5 h-3.5 text-fuchsia-400 flex-shrink-0" />
-                      <span className="text-[10px] font-semibold text-fuchsia-400">Subscribe to Pro</span>
+                      <Lightbulb className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                      <span className="text-[10px] font-semibold text-blue-600">Subscribe to Pro</span>
                     </NavLink>
                   )}
                 </div>
@@ -244,7 +249,7 @@ export const DashboardLayout = () => {
                       {!sidebarCollapsed && <span>Copy Evaluation</span>}
                     </div>
                     {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
                         Soon
                       </span>
                     )}
@@ -304,7 +309,7 @@ export const DashboardLayout = () => {
                       {!sidebarCollapsed && <span>Study Planner</span>}
                     </div>
                     {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
                         Soon
                       </span>
                     )}
@@ -373,7 +378,7 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* Bottom Actions Section */}
-        <div className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 border-t flex-shrink-0 ${theme === "dark" ? "border-purple-900/80" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 border-t flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
           <div className="space-y-1">
             <NavLink
               to="/profile"
@@ -413,7 +418,7 @@ export const DashboardLayout = () => {
         {/* Fixed Header - equal alignment, better UI */}
         <header
           className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
-              ? "border-purple-900/60 bg-gradient-to-r from-[#050016]/95 via-[#06021a]/95 to-[#020617]/95 shadow-purple-900/20"
+              ? "border-blue-900/50 bg-[#020617]/95 shadow-blue-900/10"
               : "border-slate-200 bg-white/95 shadow-slate-200/50"
             }`}
         >
@@ -431,8 +436,8 @@ export const DashboardLayout = () => {
             </button>
             {/* Page title pill - icon + text, equal height with row */}
             <div className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-xl min-h-[40px] ${theme === "dark"
-                ? "bg-purple-900/40 ring-1 ring-purple-600/50 text-slate-50"
-                : "bg-purple-100/80 ring-1 ring-purple-200/80 text-slate-900"
+                ? "bg-blue-900/40 ring-1 ring-blue-600/50 text-slate-50"
+                : "bg-blue-100/80 ring-1 ring-blue-200/80 text-slate-900"
               }`}>
               <span className="flex items-center justify-center w-5 h-5 shrink-0 [&>svg]:w-5 [&>svg]:h-5">
                 {pageInfo.icon}
@@ -440,7 +445,7 @@ export const DashboardLayout = () => {
               <h1 className="text-sm md:text-base font-semibold tracking-tight truncate">{pageInfo.title}</h1>
             </div>
             <div className={`text-sm md:text-base font-semibold tracking-tight md:hidden truncate ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-              UPSCRH
+              MentorsDaily
             </div>
           </div>
 
@@ -451,8 +456,8 @@ export const DashboardLayout = () => {
                 onClick={() => setDartModalOpen(true)}
                 className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 touch-manipulation shrink-0 ${
                   theme === "dark"
-                    ? "bg-purple-600/80 hover:bg-purple-600 text-white border border-purple-500/50"
-                    : "bg-purple-600 hover:bg-purple-700 text-white border border-purple-500/30"
+                    ? "bg-blue-600/80 hover:bg-blue-600 text-white border border-blue-500/50"
+                    : "bg-[#2563eb] hover:bg-[#1d4ed8] text-white border border-blue-500/30"
                 }`}
                 title="Log daily activity (DART)"
               >
@@ -463,8 +468,8 @@ export const DashboardLayout = () => {
             <button
               onClick={toggleTheme}
               className={`inline-flex items-center justify-center w-9 h-9 md:w-9 md:h-9 rounded-full border transition-all duration-200 touch-manipulation active:scale-95 shrink-0 ${theme === "dark"
-                  ? "border-purple-700/60 bg-black/30 text-slate-200 hover:bg-purple-950/60 hover:border-purple-600/80 shadow-sm shadow-purple-900/20"
-                  : "border-purple-300 bg-white text-purple-700 hover:bg-purple-50 hover:border-purple-400 shadow-sm shadow-purple-200/50"
+                  ? "border-blue-700/60 bg-black/30 text-slate-200 hover:bg-blue-950/60 hover:border-blue-600/80 shadow-sm shadow-blue-900/20"
+                  : "border-blue-300 bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-400 shadow-sm shadow-blue-200/50"
                 }`}
               aria-label="Toggle theme"
             >
@@ -480,9 +485,9 @@ export const DashboardLayout = () => {
             <div className={`hidden md:flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
               {hasActiveSubscription ? (
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-gradient-to-r from-fuchsia-600 to-emerald-500 text-white shadow-sm shadow-fuchsia-500/40">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#2563eb] text-white shadow-sm">
                     <Lightbulb className="w-3.5 h-3.5" />
-                    <span>{user?.subscriptionPlan?.name || "UPSCRH Pro"} Active</span>
+                    <span>{user?.subscriptionPlan?.name || "MentorsDaily Pro"} Active</span>
                   </span>
                   {user?.subscriptionEndDate && (
                     <span className="text-[10px] text-slate-500">
@@ -494,8 +499,8 @@ export const DashboardLayout = () => {
                     onClick={() => navigate("/pricing")}
                     className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors ${
                       theme === "dark"
-                        ? "border-fuchsia-500/50 text-fuchsia-300 hover:bg-fuchsia-500/10"
-                        : "border-purple-300 text-purple-700 hover:bg-purple-50"
+                        ? "border-blue-500/50 text-blue-300 hover:bg-blue-500/10"
+                        : "border-blue-300 text-blue-700 hover:bg-blue-50"
                     }`}
                   >
                     Upgrade Plan
@@ -505,7 +510,7 @@ export const DashboardLayout = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/pricing")}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border border-fuchsia-500/40 text-fuchsia-400 bg-fuchsia-500/5 hover:bg-fuchsia-500/10 transition-colors"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border border-blue-500/40 text-blue-600 bg-blue-500/5 hover:bg-blue-500/10 transition-colors"
                 >
                   <Lightbulb className="w-3.5 h-3.5" />
                   <span>Subscribe Now</span>
@@ -513,8 +518,8 @@ export const DashboardLayout = () => {
               ) : null}
             </div>
             <div className={`hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center text-xs md:text-sm font-semibold shrink-0 ring-2 transition-all duration-200 hover:scale-105 ${theme === "dark"
-                ? "bg-gradient-to-br from-purple-600 to-indigo-600 text-white ring-purple-500/30 shadow-lg shadow-purple-600/20"
-                : "bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700 ring-purple-200/50 shadow-md shadow-purple-200/30"
+                ? "bg-[#2563eb] text-white ring-blue-500/30 shadow-lg shadow-blue-600/20"
+                : "bg-blue-100 text-blue-700 ring-blue-200/50 shadow-md shadow-blue-200/30"
               }`}>
               {user?.name?.charAt(0).toUpperCase() || "U"}
             </div>
@@ -569,7 +574,7 @@ export const DashboardLayout = () => {
       {/* Bottom Navigation Bar - Mobile Only */}
       <nav
         className={`fixed bottom-0 left-0 right-0 z-50 md:hidden border-t backdrop-blur-xl transition-all duration-300 shadow-lg ${theme === "dark"
-            ? "border-purple-900/40 bg-gradient-to-t from-[#050016]/98 via-[#06021a]/95 to-[#020617]/95 shadow-purple-900/30"
+            ? "border-blue-900/40 bg-[#020617]/98 shadow-blue-900/20"
             : "border-slate-200 bg-white/98 shadow-slate-300/40"
           }`}
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 4px)" }}
@@ -581,16 +586,16 @@ export const DashboardLayout = () => {
               const isActiveRoute = location.pathname === "/home";
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActiveRoute
-                    ? "text-fuchsia-300"
+                    ? "text-blue-300"
                     : "text-slate-400 active:bg-slate-800/50 active:scale-95"
                   : isActiveRoute
-                    ? "text-purple-700"
+                    ? "text-blue-700"
                     : "text-slate-600 active:bg-slate-100 active:scale-95"
                 }`;
             }}
           >
             {location.pathname === "/home" && (
-              <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
+              <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                 }`} />
             )}
             <Home className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/home"
@@ -609,16 +614,16 @@ export const DashboardLayout = () => {
               const isActiveRoute = location.pathname === "/performance";
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActiveRoute
-                    ? "text-fuchsia-300"
+                    ? "text-blue-300"
                     : "text-slate-400 active:bg-slate-800/50 active:scale-95"
                   : isActiveRoute
-                    ? "text-purple-700"
+                    ? "text-blue-700"
                     : "text-slate-600 active:bg-slate-100 active:scale-95"
                 }`;
             }}
           >
             {location.pathname === "/performance" && (
-              <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
+              <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                 }`} />
             )}
             <BarChart3 className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/performance"
@@ -637,10 +642,10 @@ export const DashboardLayout = () => {
               const isActiveRoute = location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/");
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActiveRoute
-                    ? "text-fuchsia-300"
+                    ? "text-blue-300"
                     : "text-slate-400 active:bg-slate-800/50 active:scale-95"
                   : isActiveRoute
-                    ? "text-purple-700"
+                    ? "text-blue-700"
                     : "text-slate-600 active:bg-slate-100 active:scale-95"
                 }`;
             }}
@@ -648,7 +653,7 @@ export const DashboardLayout = () => {
             {(() => {
               const isActiveRoute = location.pathname === "/prelims-test" || location.pathname.startsWith("/prelims-test/") || location.pathname.startsWith("/test/");
               return isActiveRoute ? (
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                   }`} />
               ) : null;
             })()}
@@ -670,10 +675,10 @@ export const DashboardLayout = () => {
               const isActiveRoute = location.pathname === "/mentor" || location.pathname.startsWith("/mentor/");
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActiveRoute
-                    ? "text-fuchsia-300"
+                    ? "text-blue-300"
                     : "text-slate-400 active:bg-slate-800/50 active:scale-95"
                   : isActiveRoute
-                    ? "text-purple-700"
+                    ? "text-blue-700"
                     : "text-slate-600 active:bg-slate-100 active:scale-95"
                 }`;
             }}
@@ -681,7 +686,7 @@ export const DashboardLayout = () => {
             {(() => {
               const isActiveRoute = location.pathname === "/mentor" || location.pathname.startsWith("/mentor/");
               return isActiveRoute ? (
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                   }`} />
               ) : null;
             })()}
@@ -703,10 +708,10 @@ export const DashboardLayout = () => {
               const isActiveRoute = location.pathname === "/copy-evaluation" || location.pathname.startsWith("/copy-evaluation/");
               return `flex flex-col items-center justify-center gap-0.5 h-12 rounded-lg transition-all duration-200 touch-manipulation relative ${theme === "dark"
                   ? isActive || isActiveRoute
-                    ? "text-fuchsia-300"
+                    ? "text-blue-300"
                     : "text-slate-400 active:bg-slate-800/50 active:scale-95"
                   : isActive || isActiveRoute
-                    ? "text-purple-700"
+                    ? "text-blue-700"
                     : "text-slate-600 active:bg-slate-100 active:scale-95"
                 }`;
             }}
@@ -714,7 +719,7 @@ export const DashboardLayout = () => {
             {(() => {
               const isActiveRoute = location.pathname === "/copy-evaluation" || location.pathname.startsWith("/copy-evaluation/");
               return isActiveRoute ? (
-                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-fuchsia-400" : "bg-purple-600"
+                <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                   }`} />
               ) : null;
             })()}

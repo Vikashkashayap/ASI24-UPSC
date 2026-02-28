@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "./hooks/useTheme";
 import { DashboardLayout } from "./layouts/DashboardLayout";
+import { LandingLayout } from "./layouts/LandingLayout";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { HomePage } from "./pages/HomePage";
@@ -33,6 +34,7 @@ import { AdminProStudentsPage } from "./pages/admin/AdminProStudentsPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
 import { PrelimsMockAdminPage } from "./pages/admin/PrelimsMockAdminPage";
 import { AdminPricingPage } from "./pages/admin/AdminPricingPage";
+import { AdminOfferManagerPage } from "./pages/admin/AdminOfferManagerPage";
 import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import ComingSoon from "./components/ui/ComingSoon";
@@ -43,12 +45,15 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/compare" element={<ComparePage />} />
-          <Route path="/testimonials" element={<TestimonialsPage />} />
-          <Route path="/about" element={<AboutPage />} />
+          {/* Landing: one layout, no refresh on nav – only content (Outlet) changes */}
+          <Route path="/" element={<LandingLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="features" element={<FeaturesPage />} />
+            <Route path="pricing" element={<PricingPage />} />
+            <Route path="compare" element={<ComparePage />} />
+            <Route path="testimonials" element={<TestimonialsPage />} />
+            <Route path="about" element={<AboutPage />} />
+          </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
@@ -92,6 +97,7 @@ function App() {
             <Route path="pro-students" element={<AdminProStudentsPage />} />
             <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
             <Route path="pricing" element={<AdminPricingPage />} />
+            <Route path="offer-manager" element={<AdminOfferManagerPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
           </Route>
