@@ -34,6 +34,8 @@ import passport from "passport";
 import "./config/passport.js";
 
 const app = express();
+// So req.protocol and req.get('host') are correct behind nginx/reverse proxy (for Google OAuth callback URL)
+app.set("trust proxy", 1);
 app.use(passport.initialize());
 
 // CORS configuration to allow both common Vite dev ports and production
