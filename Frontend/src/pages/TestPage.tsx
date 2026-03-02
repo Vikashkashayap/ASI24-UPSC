@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle } from "luci
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { ConfirmationDialog } from "../components/ui/dialog";
+import { SafeQuestionHtml } from "../components/SafeQuestionHtml";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -17,6 +18,10 @@ interface Question {
     D: string;
   };
   userAnswer?: string | null;
+  questionType?: string;
+  tableData?: { headers: string[]; rows: string[][] } | null;
+  matchColumns?: { columnA: string[]; columnB: string[] } | null;
+  assertionReason?: { assertion: string; reason: string } | null;
 }
 
 interface TestData {
@@ -26,6 +31,7 @@ interface TestData {
   topic: string;
   difficulty?: string;
   totalQuestions: number;
+  durationMinutes?: number;
   questions: Question[];
   isSubmitted: boolean;
 }
@@ -231,18 +237,23 @@ const TestPage: React.FC = () => {
         <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div className="min-w-0">
-              <h2 className={`text-base sm:text-lg font-semibold truncate ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                {test.subject} - {test.topic}
+              <h2 className={`text-base sm:text-lg font-semibold truncate ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`} title={test.topic}>
+                {test.topic}
               </h2>
               <p className={`text-xs sm:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                {test.examType === "CSAT" ? "CSAT" : `Difficulty: ${test.difficulty ?? "—"}`} | Q {currentIndex + 1}/{test.totalQuestions}
+                {test.subject} {test.examType === "CSAT" ? "| CSAT" : `| Difficulty: ${test.difficulty ?? "—"}`} | Q {currentIndex + 1}/{test.totalQuestions}
               </p>
             </div>
             <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Clock className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
-                <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`} title={test.durationMinutes ? `${Math.floor(timeElapsed / 60)}:${String(timeElapsed % 60).padStart(2, "0")} / ${test.durationMinutes} min` : undefined}>
                   {formatTime(timeElapsed)}
+                  {test.durationMinutes != null && (
+                    <span className={`ml-1 ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}>
+                      / {test.durationMinutes} min
+                    </span>
+                  )}
                 </span>
               </div>
               <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
@@ -268,37 +279,91 @@ const TestPage: React.FC = () => {
           <div className="space-y-4 sm:space-y-6">
             <div className="min-w-0 overflow-hidden">
               <div className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 leading-relaxed break-words ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                {currentQuestion.question.split('\n').map((line, lineIdx, lines) => {
-                  const trimmedLine = line.trim();
-                  if (!trimmedLine) return null;
-                  
-                  // Format numbered statements with proper indentation
-                  const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                  if (numberedMatch) {
-                    return (
-                      <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                        <span className="font-bold mr-1">{numberedMatch[1]}.</span>
-                        <span>{numberedMatch[2]}</span>
+                {/* Assertion–Reason block */}
+                {currentQuestion.assertionReason?.assertion != null && (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
+                  <div className={`mb-4 rounded-lg border p-3 sm:p-4 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
+                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
+                    <div className="mb-3">{currentQuestion.assertionReason.assertion}</div>
+                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Reason (R)</div>
+                    <div>{currentQuestion.assertionReason.reason}</div>
+                  </div>
+                )}
+                {/* Match columns: side-by-side */}
+                {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && (
+                  <div className="overflow-x-auto mb-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-[280px]">
+                      <div>
+                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-I</div>
+                        <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
+                          {currentQuestion.matchColumns.columnA.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
                       </div>
-                    );
-                  }
-                  
-                  // Format List-I / List-II sections
-                  if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                      <div>
+                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-II</div>
+                        <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
+                          {(currentQuestion.matchColumns.columnB || []).map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {/* Table */}
+                {currentQuestion.tableData?.headers?.length != null && currentQuestion.tableData.headers.length > 0 && (
+                  <div className="overflow-x-auto mb-4">
+                    <table className={`w-full border-collapse border text-sm sm:text-base ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>
+                      <thead>
+                        <tr className={theme === "dark" ? "bg-slate-700" : "bg-slate-100"}>
+                          {currentQuestion.tableData!.headers.map((h, i) => (
+                            <th key={i} className="border border-slate-400 px-2 py-1.5 text-left font-semibold">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(currentQuestion.tableData!.rows || []).map((row, ri) => (
+                          <tr key={ri}>
+                            {row.map((cell, ci) => (
+                              <td key={ci} className={`border px-2 py-1.5 ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {/* Question text: HTML tables or plain lines */}
+                {currentQuestion.question.includes("<table") ? (
+                  <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                ) : (
+                  currentQuestion.question.split("\n").map((line, lineIdx) => {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine) return null;
+                    const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
+                    if (numberedMatch) {
+                      return (
+                        <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
+                          <span className="font-bold mr-1">{numberedMatch[1]}.</span>
+                          <span>{numberedMatch[2]}</span>
+                        </div>
+                      );
+                    }
+                    if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                      return (
+                        <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                          {trimmedLine}
+                        </div>
+                      );
+                    }
                     return (
-                      <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                      <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
                         {trimmedLine}
                       </div>
                     );
-                  }
-                  
-                  // Format regular lines
-                  return (
-                    <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                      {trimmedLine}
-                    </div>
-                  );
-                }).filter(Boolean)}
+                  }).filter(Boolean)
+                )}
               </div>
             </div>
 

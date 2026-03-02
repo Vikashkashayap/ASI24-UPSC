@@ -15,7 +15,7 @@ const PYQ_MAX_YEAR = 2025;
 
 export const createPrelimsMockSchedule = async (req, res) => {
   try {
-    const { subject, scheduledAt, isMix, isPyo, isCsat, yearFrom, yearTo } = req.body;
+    const { subject, scheduledAt, isMix, isPyo, isCsat, yearFrom, yearTo, title: customTitle, totalQuestions: reqTotalQuestions, difficulty, avoidPreviouslyUsed } = req.body;
     const useMix = Boolean(isMix);
     const usePyo = Boolean(isPyo);
     const useCsat = Boolean(isCsat);
@@ -29,11 +29,13 @@ export const createPrelimsMockSchedule = async (req, res) => {
       durationMinutes: 120,
       totalMarks: 200,
       negativeMark: 0.66,
+      difficulty: ["easy", "moderate", "hard"].includes(String(difficulty || "").toLowerCase()) ? String(difficulty).toLowerCase() : "moderate",
+      avoidPreviouslyUsed: Boolean(avoidPreviouslyUsed),
     };
 
     if (useCsat) {
       subjectStr = "CSAT Paper 2";
-      titleStr = "Prelims Mock - CSAT Paper 2";
+      titleStr = (typeof customTitle === "string" && customTitle.trim()) ? customTitle.trim() : "Prelims Mock - CSAT Paper 2";
       mockPayload.subject = subjectStr;
       mockPayload.isCsat = true;
       mockPayload.title = titleStr;
@@ -54,7 +56,7 @@ export const createPrelimsMockSchedule = async (req, res) => {
         });
       }
       subjectStr = `PYQ ${yFrom}-${yTo}`;
-      titleStr = `Prelims Mock - PYQ ${yFrom}-${yTo}`;
+      titleStr = (typeof customTitle === "string" && customTitle.trim()) ? customTitle.trim() : `Prelims Mock - PYQ ${yFrom}-${yTo}`;
       mockPayload.isPyo = true;
       mockPayload.yearFrom = yFrom;
       mockPayload.yearTo = yTo;
@@ -62,7 +64,13 @@ export const createPrelimsMockSchedule = async (req, res) => {
       mockPayload.title = titleStr;
     } else if (useMix) {
       subjectStr = FULL_LENGTH_MIX_SUBJECT;
-      titleStr = "Prelims Mock - Full Length GS Mix";
+      const totalQ = Math.min(100, Math.max(50, parseInt(reqTotalQuestions, 10) || 100));
+      mockPayload.totalQuestions = totalQ;
+      if (totalQ === 50) {
+        mockPayload.durationMinutes = 60;
+        mockPayload.totalMarks = 100;
+      }
+      titleStr = (typeof customTitle === "string" && customTitle.trim()) ? customTitle.trim() : (totalQ === 50 ? "Prelims Mock - Sectional 50" : "Prelims Mock - Full Length GS Mix");
       mockPayload.subject = subjectStr;
       mockPayload.isMix = true;
       mockPayload.title = titleStr;
@@ -79,8 +87,9 @@ export const createPrelimsMockSchedule = async (req, res) => {
           message: `Invalid subject(s): ${invalid.join(", ")}. Allowed: ${GS_SUBJECTS.join(", ")}`,
         });
       }
+      titleStr = (typeof customTitle === "string" && customTitle.trim()) ? customTitle.trim() : `Prelims Mock - ${subjectStr}`;
       mockPayload.subject = subjectStr;
-      mockPayload.title = `Prelims Mock - ${subjectStr}`;
+      mockPayload.title = titleStr;
     }
 
     const at = scheduledAt ? new Date(scheduledAt) : null;
@@ -155,6 +164,57 @@ export const updatePrelimsMockSchedule = async (req, res) => {
 };
 
 /**
+ * Admin: Export Prelims Mock as structured JSON (UPSC format).
+ * GET /api/admin/prelims-mock/:id/export
+ * Returns: { examTitle, totalQuestions, questions[] } with questionText, tableData, matchColumns, assertionReason, options [{key, text}], correctAnswer, explanation {A,B,C,D}, eliminationLogic, conceptualSource.
+ */
+export const exportPrelimsMockAsJson = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const mock = await PrelimsMock.findById(id).lean();
+    if (!mock) {
+      return res.status(404).json({ success: false, message: "Prelims Mock not found" });
+    }
+    const questions = (mock.questions || []).map((q, i) => {
+      const opts = q.options || {};
+      const options = ["A", "B", "C", "D"].map((k) => ({ key: k, text: opts[k] != null ? String(opts[k]) : "" }));
+      let explanation = q.explanation;
+      if (typeof explanation === "string") {
+        explanation = { A: explanation, B: explanation, C: explanation, D: explanation };
+      } else if (!explanation || typeof explanation !== "object") {
+        explanation = { A: "", B: "", C: "", D: "" };
+      }
+      return {
+        id: i + 1,
+        subject: q.subject != null ? String(q.subject) : "",
+        questionType: q.questionType || "direct",
+        difficulty: q.difficulty || "moderate",
+        questionText: q.question || "",
+        tableData: q.tableData && (q.tableData.headers?.length || q.tableData.rows?.length) ? q.tableData : null,
+        matchColumns: q.matchColumns && (q.matchColumns.columnA?.length || q.matchColumns.columnB?.length) ? q.matchColumns : null,
+        assertionReason: q.assertionReason && (q.assertionReason.assertion || q.assertionReason.reason) ? q.assertionReason : null,
+        options,
+        correctAnswer: q.correctAnswer || "A",
+        explanation: { A: String(explanation.A ?? ""), B: String(explanation.B ?? ""), C: String(explanation.C ?? ""), D: String(explanation.D ?? "") },
+        eliminationLogic: q.eliminationLogic != null ? String(q.eliminationLogic) : "",
+        conceptualSource: q.conceptualSource != null ? String(q.conceptualSource) : "",
+      };
+    });
+    const payload = {
+      examTitle: mock.title || "UPSC GS Paper 1 Full Mock",
+      totalQuestions: questions.length,
+      questions,
+    };
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", `attachment; filename="prelims-mock-${id}.json"`);
+    return res.send(JSON.stringify(payload, null, 0));
+  } catch (error) {
+    console.error("exportPrelimsMockAsJson:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal server error" });
+  }
+};
+
+/**
  * Admin: Delete a Prelims Mock
  * DELETE /api/admin/prelims-mock/:id
  */
@@ -176,10 +236,24 @@ export const deletePrelimsMock = async (req, res) => {
 /**
  * Admin: List all Prelims Mocks (scheduled, live, ended)
  * GET /api/admin/prelims-mock
+ * Query: difficulty, subject (substring match on subject/title), year (for PYQ: match yearFrom/yearTo)
  */
 export const listAdminPrelimsMocks = async (req, res) => {
   try {
-    const mocks = await PrelimsMock.find().sort({ scheduledAt: -1 }).lean();
+    const { difficulty, subject, year } = req.query;
+    const filter = {};
+    if (difficulty && ["easy", "moderate", "hard"].includes(String(difficulty))) {
+      filter.difficulty = difficulty;
+    }
+    if (subject && typeof subject === "string" && subject.trim()) {
+      filter.$or = [{ subject: new RegExp(subject.trim(), "i") }, { title: new RegExp(subject.trim(), "i") }];
+    }
+    if (year && /^\d{4}$/.test(String(year))) {
+      const y = parseInt(year, 10);
+      filter.yearFrom = { $lte: y };
+      filter.yearTo = { $gte: y };
+    }
+    const mocks = await PrelimsMock.find(filter).sort({ scheduledAt: -1 }).lean();
     const data = mocks.map((m) => ({
       _id: m._id,
       subject: m.subject,
@@ -226,12 +300,44 @@ export const goLivePrelimsMock = async (req, res) => {
     mock.status = "generating";
     await mock.save();
 
+    let mixOpts = {};
+    if (mock.isMix) {
+      mixOpts = {
+        totalQuestions: mock.totalQuestions || 100,
+        difficulty: mock.difficulty || "moderate",
+        avoidPreviouslyUsed: mock.avoidPreviouslyUsed,
+      };
+      if (mock.avoidPreviouslyUsed) {
+        const existing = await PrelimsMock.find({
+          _id: { $ne: mock._id },
+          status: { $in: ["live", "ended"] },
+          "questions.0": { $exists: true },
+        })
+          .select("questions.question")
+          .lean();
+        const snippets = [];
+        const seen = new Set();
+        for (const doc of existing) {
+          for (const q of doc.questions || []) {
+            const text = (q.question || "").trim().slice(0, 120);
+            if (text && !seen.has(text)) {
+              seen.add(text);
+              snippets.push(text);
+              if (snippets.length >= 25) break;
+            }
+          }
+          if (snippets.length >= 25) break;
+        }
+        mixOpts.excludeSnippets = snippets;
+      }
+    }
+
     const result = mock.isCsat
       ? await generateFullMockCsatTestQuestions()
       : mock.isPyo
         ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
         : mock.isMix
-          ? await generateFullMockMixTestQuestions()
+          ? await generateFullMockMixTestQuestions(mixOpts)
           : await generateFullMockTestQuestions({ subject: mock.subject });
     if (!result.success || !result.questions || result.questions.length === 0) {
       mock.status = "scheduled";
@@ -244,9 +350,13 @@ export const goLivePrelimsMock = async (req, res) => {
 
     mock.questions = result.questions;
     mock.totalQuestions = result.questions.length;
+    if (mock.totalQuestions === 50) {
+      mock.durationMinutes = 60;
+      mock.totalMarks = 100;
+    }
     mock.status = "live";
     mock.liveAt = new Date();
-    mock.title = result.testName || mock.title;
+    if (result.testName && !mock.title) mock.title = result.testName;
     await mock.save();
 
     return res.json({
@@ -283,19 +393,54 @@ export const processScheduledPrelimsMocks = async () => {
     try {
       mock.status = "generating";
       await mock.save();
+      let mixOpts = {};
+      if (mock.isMix) {
+        mixOpts = {
+          totalQuestions: mock.totalQuestions || 100,
+          difficulty: mock.difficulty || "moderate",
+          avoidPreviouslyUsed: mock.avoidPreviouslyUsed,
+        };
+        if (mock.avoidPreviouslyUsed) {
+          const existing = await PrelimsMock.find({
+            _id: { $ne: mock._id },
+            status: { $in: ["live", "ended"] },
+            "questions.0": { $exists: true },
+          })
+            .select("questions.question")
+            .lean();
+          const snippets = [];
+          const seen = new Set();
+          for (const doc of existing) {
+            for (const q of doc.questions || []) {
+              const text = (q.question || "").trim().slice(0, 120);
+              if (text && !seen.has(text)) {
+                seen.add(text);
+                snippets.push(text);
+                if (snippets.length >= 25) break;
+              }
+            }
+            if (snippets.length >= 25) break;
+          }
+          mixOpts.excludeSnippets = snippets;
+        }
+      }
       const result = mock.isCsat
         ? await generateFullMockCsatTestQuestions()
         : mock.isPyo
           ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
           : mock.isMix
-            ? await generateFullMockMixTestQuestions()
+            ? await generateFullMockMixTestQuestions(mixOpts)
             : await generateFullMockTestQuestions({ subject: mock.subject });
       if (result.success && result.questions && result.questions.length > 0) {
         mock.questions = result.questions;
         mock.totalQuestions = result.questions.length;
+        if (mock.totalQuestions === 50) {
+          mock.durationMinutes = 60;
+          mock.totalMarks = 100;
+        }
         mock.status = "live";
         mock.liveAt = new Date();
-        mock.title = result.testName || mock.title;
+        if (result.testName && !mock.title) mock.title = result.testName;
         await mock.save();
         console.log(`✅ Prelims Mock ${mock._id} went live at scheduled time`);
       } else {
@@ -394,10 +539,11 @@ export const startPrelimsMockAttempt = async (req, res) => {
     const test = new Test({
       userId,
       subject: mock.subject,
-      examType: "GS",
+      examType: mock.isCsat ? "CSAT" : "GS",
       topic: mock.title || "Prelims Mock",
-      difficulty: "Moderate",
+      difficulty: (mock.difficulty && String(mock.difficulty)[0].toUpperCase() + String(mock.difficulty).slice(1)) || "Moderate",
       prelimsMockId: mock._id,
+      durationMinutes: mock.durationMinutes,
       questions: mock.questions.map((q) => ({
         question: q.question,
         options: q.options,
@@ -405,6 +551,12 @@ export const startPrelimsMockAttempt = async (req, res) => {
         explanation: q.explanation,
         userAnswer: null,
         timeSpent: 0,
+        questionType: q.questionType,
+        tableData: q.tableData,
+        matchColumns: q.matchColumns,
+        assertionReason: q.assertionReason,
+        eliminationLogic: q.eliminationLogic,
+        conceptualSource: q.conceptualSource,
       })),
       totalQuestions: mock.questions.length,
     });

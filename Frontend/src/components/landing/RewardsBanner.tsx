@@ -70,7 +70,7 @@ export const RewardsBanner = () => {
               </ul>
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link to="/pricing">
-                  <Button className="h-9 rounded-lg bg-gradient-to-r from-purple-500 to-emerald-500 px-5 text-xs font-semibold text-white hover:opacity-90 md:h-10 md:px-6 md:text-sm shadow-md">
+                  <Button className="h-9 rounded-lg px-5 text-xs font-semibold md:h-10 md:px-6 md:text-sm">
                     View Pro plans
                   </Button>
                 </Link>

@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { Sun, Moon, Menu, X } from "lucide-react";
@@ -16,6 +16,8 @@ const navItems = [
 export const LandingNavbar = () => {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   return (
     <>
@@ -86,10 +88,10 @@ export const LandingNavbar = () => {
                 )}
               </button>
 
-              {/* Sign In Button */}
-              <Link to="/login" className="hidden md:block">
-                <Button className="rounded-lg px-6">
-                  Sign in
+              {/* Auth CTA: Sign up on login page, Sign in elsewhere */}
+              <Link to={isLoginPage ? "/register" : "/login"} className="hidden md:block">
+                <Button className="rounded-lg px-6" variant={isLoginPage ? "outline" : "primary"}>
+                  {isLoginPage ? "Sign up" : "Sign in"}
                 </Button>
               </Link>
 
@@ -156,12 +158,12 @@ export const LandingNavbar = () => {
                 ))}
               </nav>
               <Link
-                to="/login"
+                to={isLoginPage ? "/register" : "/login"}
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-6"
               >
-                <Button className="w-full rounded-lg px-6">
-                  Sign in
+                <Button className="w-full rounded-lg px-6" variant={isLoginPage ? "outline" : "primary"}>
+                  {isLoginPage ? "Sign up" : "Sign in"}
                 </Button>
               </Link>
             </div>

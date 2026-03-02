@@ -1,40 +1,11 @@
-import dotenv from "dotenv";
+// MUST be first so .env is loaded before passport.js (which needs GOOGLE_CLIENT_ID etc.)
+import "./loadEnv.js";
+
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
-// Get current file directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// CRITICAL: Load .env file FIRST, before any other imports that might use env vars
-const envPath = join(__dirname, "..", ".env");
-const envLoaded = dotenv.config({ path: envPath });
-if (envLoaded.error) {
-  console.log("⚠️  .env file not found or could not be loaded:", envPath);
-} else {
-  console.log("✅ .env file loaded successfully from:", envPath);
-}
-
-// Enhanced debug logging for environment variables
-const apiKey = process.env.OPENROUTER_API_KEY;
-const model = process.env.OPENROUTER_MODEL;
-
-// console.log("=".repeat(60));
-// console.log("🔍 ENVIRONMENT VARIABLES DEBUG");
-// console.log("=".repeat(60));
-// console.log("📁 .env file path:", join(__dirname, "..", ".env"));
-// console.log("🔑 OPENROUTER_API_KEY exists:", !!apiKey);
-// console.log("🔑 OPENROUTER_API_KEY length:", apiKey?.length || 0);
-// if (apiKey) {
-//   const maskedKey = apiKey.substring(0, 15) + "...";
-//   console.log("🔑 OPENROUTER_API_KEY preview:", maskedKey);
-//   console.log("🔑 OPENROUTER_API_KEY starts with:", apiKey.substring(0, 10));
-// } else {
-//   console.error("❌ OPENROUTER_API_KEY is UNDEFINED or EMPTY!");
-// }
-// console.log("🤖 OPENROUTER_MODEL:", model || "NOT SET (will use default)");
-// console.log("🌐 CLIENT_ORIGIN:", process.env.CLIENT_ORIGIN || "NOT SET");
-// console.log("=".repeat(60));
 
 import express from "express";
 import cors from "cors";
@@ -59,8 +30,11 @@ import { getActiveOffer } from "./controllers/offerController.js";
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { requireActiveSubscription } from "./middleware/subscriptionMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
+import passport from "passport";
+import "./config/passport.js";
 
 const app = express();
+app.use(passport.initialize());
 
 // CORS configuration to allow both common Vite dev ports and production
 const defaultOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
@@ -80,12 +54,19 @@ app.use(express.json());
 connectDB();
 
 // Log environment info on startup
+const baseUrl = (process.env.BASE_URL || process.env.BACKEND_URL || `http://localhost:${process.env.PORT || "5000"}`).replace(/\/$/, "");
+const callbackUrl = baseUrl + "/api/auth/google/callback";
 console.log("🌍 Environment Check:");
 console.log("  PORT:", process.env.PORT || "5000 (default)");
 console.log("  CLIENT_ORIGIN:", process.env.CLIENT_ORIGIN || "not set");
+console.log("  BASE_URL:", process.env.BASE_URL || process.env.BACKEND_URL || "not set (default: http://localhost:5000)");
+console.log("  Callback URL:", callbackUrl);
 console.log("  DATABASE_URL:", process.env.DATABASE_URL ? "set" : "not set");
 console.log("  JWT_SECRET:", process.env.JWT_SECRET ? "set" : "not set");
 console.log("  OPENROUTER_API_KEY:", process.env.OPENROUTER_API_KEY ? "set" : "not set");
+if (process.env.GOOGLE_CLIENT_ID) {
+  console.log("  Google OAuth: Add this exact redirect URI in Google Cloud Console →", callbackUrl);
+}
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });

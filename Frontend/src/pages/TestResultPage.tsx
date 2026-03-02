@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle, Clock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { SafeQuestionHtml } from "../components/SafeQuestionHtml";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -17,9 +18,15 @@ interface QuestionResult {
   };
   correctAnswer: string;
   userAnswer: string | null;
-  explanation: string;
+  explanation: string | { A?: string; B?: string; C?: string; D?: string };
   isCorrect: boolean;
   timeSpent?: number;
+  questionType?: string;
+  tableData?: { headers: string[]; rows: string[][] } | null;
+  matchColumns?: { columnA: string[]; columnB: string[] } | null;
+  assertionReason?: { assertion: string; reason: string } | null;
+  eliminationLogic?: string;
+  conceptualSource?: string;
 }
 
 interface TestResult {
@@ -182,7 +189,7 @@ const TestResultPage: React.FC = () => {
               </div>
             </div>
             <div className="inline-block bg-white/20 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-semibold break-words">
-              {result.subject} - {result.topic} ({result.examType === "CSAT" ? "CSAT" : result.difficulty ?? "—"})
+              {result.topic} {result.subject ? `· ${result.subject}` : ""} ({result.examType === "CSAT" ? "CSAT" : result.difficulty ?? "—"})
             </div>
           </div>
         </CardContent>
@@ -277,37 +284,83 @@ const TestResultPage: React.FC = () => {
                           <div className={`text-sm md:text-base leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-900"} break-words`}>
                             <span className="font-bold">Q{index + 1}.</span>{" "}
                             <div className="mt-1 font-normal">
-                              {question.question.split('\n').map((line, lineIdx, lines) => {
-                                const trimmedLine = line.trim();
-                                if (!trimmedLine) return null;
-                                
-                                // Format numbered statements with proper indentation
-                                const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                                if (numberedMatch) {
-                                  return (
-                                    <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                                      <span className="font-semibold mr-1">{numberedMatch[1]}.</span>
-                                      <span>{numberedMatch[2]}</span>
+                              {question.assertionReason?.assertion != null && (question.assertionReason.assertion || question.assertionReason.reason) && (
+                                <div className={`mb-3 rounded-lg border p-2 sm:p-3 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
+                                  <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
+                                  <div className="mb-2 text-sm">{question.assertionReason.assertion}</div>
+                                  <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Reason (R)</div>
+                                  <div className="text-sm">{question.assertionReason.reason}</div>
+                                </div>
+                              )}
+                              {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && (
+                                <div className="overflow-x-auto mb-3">
+                                  <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
+                                    <div>
+                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-I</div>
+                                      <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
+                                        {question.matchColumns.columnA.map((item, i) => <li key={i}>{item}</li>)}
+                                      </ul>
                                     </div>
-                                  );
-                                }
-                                
-                                // Format List-I / List-II sections
-                                if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                                    <div>
+                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-II</div>
+                                      <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
+                                        {(question.matchColumns.columnB || []).map((item, i) => <li key={i}>{item}</li>)}
+                                      </ul>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {question.tableData?.headers?.length != null && question.tableData.headers.length > 0 && (
+                                <div className="overflow-x-auto mb-3">
+                                  <table className={`w-full border-collapse border text-xs sm:text-sm ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>
+                                    <thead>
+                                      <tr className={theme === "dark" ? "bg-slate-700" : "bg-slate-100"}>
+                                        {question.tableData!.headers.map((h, i) => (
+                                          <th key={i} className="border border-slate-400 px-1.5 py-1 text-left font-semibold">{h}</th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {(question.tableData!.rows || []).map((row, ri) => (
+                                        <tr key={ri}>
+                                          {row.map((cell, ci) => (
+                                            <td key={ci} className={`border px-1.5 py-1 ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>{cell}</td>
+                                          ))}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                              {question.question.includes("<table") ? (
+                                <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                              ) : (
+                                question.question.split("\n").map((line, lineIdx) => {
+                                  const trimmedLine = line.trim();
+                                  if (!trimmedLine) return null;
+                                  const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
+                                  if (numberedMatch) {
+                                    return (
+                                      <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
+                                        <span className="font-semibold mr-1">{numberedMatch[1]}.</span>
+                                        <span>{numberedMatch[2]}</span>
+                                      </div>
+                                    );
+                                  }
+                                  if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                                    return (
+                                      <div key={lineIdx} className={`mt-3 mb-2 font-semibold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                                        {trimmedLine}
+                                      </div>
+                                    );
+                                  }
                                   return (
-                                    <div key={lineIdx} className={`mt-3 mb-2 font-semibold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                                    <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
                                       {trimmedLine}
                                     </div>
                                   );
-                                }
-                                
-                                // Format regular lines
-                                return (
-                                  <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                                    {trimmedLine}
-                                  </div>
-                                );
-                              }).filter(Boolean)}
+                                })
+                              )}
                             </div>
                           </div>
                         </div>
@@ -431,11 +484,62 @@ const TestResultPage: React.FC = () => {
                               Explanation:
                             </span>
                           </div>
-                          <p className={`text-xs md:text-sm break-words ${
-                            theme === "dark" ? "text-slate-300" : "text-slate-700"
-                          }`}>
-                            {question.explanation}
-                          </p>
+                          {question.explanation &&
+                          typeof question.explanation === "object" &&
+                          (question.explanation.A != null || question.explanation.B != null || question.explanation.C != null || question.explanation.D != null) ? (
+                            <div className="space-y-2 text-xs md:text-sm">
+                              {(["A", "B", "C", "D"] as const).map((opt) => {
+                                const expl = question.explanation as { A?: string; B?: string; C?: string; D?: string };
+                                const text = expl[opt];
+                                if (text == null || text === "") return null;
+                                const isCorrect = opt === question.correctAnswer;
+                                return (
+                                  <div
+                                    key={opt}
+                                    className={`p-2.5 rounded-lg border ${
+                                      isCorrect
+                                        ? "border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-600"
+                                        : theme === "dark"
+                                        ? "border-slate-600 bg-slate-700/50"
+                                        : "border-slate-200 bg-white/80"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-400" : theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                                        Option {opt}:
+                                      </span>
+                                      {isCorrect ? (
+                                        <span className="text-[10px] font-bold uppercase tracking-wide text-green-700 dark:text-green-400 bg-green-200/80 dark:bg-green-800/50 px-1.5 py-0.5 rounded">Correct</span>
+                                      ) : (
+                                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Incorrect</span>
+                                      )}
+                                    </div>
+                                    <span className={`break-words block ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                                      {text}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <p className={`text-xs md:text-sm break-words ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                              {typeof question.explanation === "string" ? question.explanation : ""}
+                            </p>
+                          )}
+                          {isExpanded && (question.eliminationLogic || question.conceptualSource) && (
+                            <div className="mt-3 pt-3 border-t border-slate-600/50 space-y-1.5 text-xs md:text-sm">
+                              {question.eliminationLogic && (
+                                <p><span className={`font-semibold ${theme === "dark" ? "text-amber-400" : "text-amber-700"}`}>Elimination logic:</span>{" "}
+                                  <span className={theme === "dark" ? "text-slate-300" : "text-slate-700"}>{question.eliminationLogic}</span>
+                                </p>
+                              )}
+                              {question.conceptualSource && (
+                                <p><span className={`font-semibold ${theme === "dark" ? "text-sky-400" : "text-sky-700"}`}>Source:</span>{" "}
+                                  <span className={theme === "dark" ? "text-slate-300" : "text-slate-700"}>{question.conceptualSource}</span>
+                                </p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
