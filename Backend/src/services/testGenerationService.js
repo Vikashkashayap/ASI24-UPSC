@@ -1,4 +1,26 @@
 import fetch from "node-fetch";
+import crypto from "crypto";
+
+/** Generate unique question ID for deduplication (hash of normalized question text). */
+function hashQuestion(questionText) {
+  const normalized = String(questionText || "").trim().replace(/\s+/g, " ");
+  return crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 24);
+}
+
+/**
+ * Remove duplicate questions within array by questionId (or by hash if missing).
+ * Ensures SELECT DISTINCT / shuffle without repetition at insert time.
+ */
+function dedupeQuestions(questions) {
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
+  const seen = new Set();
+  return questions.filter((q) => {
+    const id = q.questionId || hashQuestion(q.question);
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
 
 /**
  * Build GS Paper 1 system prompt with optional Current Affairs and Art & Culture emphasis.
@@ -56,12 +78,17 @@ Return ONLY valid JSON. For each question:
   "question": "Question text",
   "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
   "answer": "A | B | C | D",
-  "explanation": "Detailed explanation (3–5 sentences).",
+  "explanation": { "A": "", "B": "", "C": "", "D": "" },
   "subject": "One of: ${subjectsText}"
 }
 
+EXPLANATION (OPTION-WISE, MANDATORY – same as CSAT):
+- explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+- For the CORRECT option: write "correct statement" — WHY it is correct (reason, fact, concept). User should see sahi hai toh kyu.
+- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong fact, trap, common mistake). User should see galat hai toh kyu.
+- At least 1–2 sentences per option. No empty explanation for any option.
+
 IMPORTANT:
-- "explanation" must be DETAILED (3–5 sentences minimum).
 - Do NOT add any introductory or closing text.
 - Do NOT repeat questions.
 - For assertion-type and statement-based questions: always use 2 or 3 statements, and options must be statement-type (e.g. "1 only", "2 only", "1 and 2 only", "1, 2 and 3"). Do not use unrelated option text.
@@ -99,9 +126,15 @@ Return ONLY valid JSON. For each question:
   "question": "Question text (include passage for RC/DI if needed)",
   "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
   "answer": "A | B | C | D",
-  "explanation": "Detailed explanation (2–4 sentences).",
+  "explanation": { "A": "", "B": "", "C": "", "D": "" },
   "subject": "CSAT"
 }
+
+EXPLANATION (OPTION-WISE, MANDATORY):
+- explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+- For the CORRECT option: write "correct statement" — WHY it is correct (reason, logic, fact).
+- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong step, trap, common mistake).
+- At least 1–2 sentences per option. No empty explanation for any option.
 
 IMPORTANT:
 - Do NOT add any introductory or closing text.
@@ -177,10 +210,18 @@ Return response ONLY in JSON format like below:
         "D": "Option text"
       },
       "correct_answer": "B",
-      "explanation": "Detailed explanation explaining why correct and why others are incorrect"
+      "explanation": { "A": "", "B": "", "C": "", "D": "" }
     }
   ]
 }
+
+--------------------------------------------
+EXPLANATION (OPTION-WISE, MANDATORY – same as CSAT):
+--------------------------------------------
+• explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+• For the CORRECT option: write "correct statement" — WHY it is correct (reason, fact, concept).
+• For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong fact, trap, common mistake).
+• At least 1–2 sentences per option. No empty explanation for any option.
 
 --------------------------------------------
 IMPORTANT RULES:
@@ -189,7 +230,6 @@ IMPORTANT RULES:
 • Do NOT reduce total questions. Must generate exactly 100 questions.
 • Maintain UPSC language tone.
 • Avoid repetition.
-• Ensure high-quality analytical explanations.
 • Output MUST be valid JSON.
 • Do NOT add extra commentary outside JSON.
 • "type" for each question must be one of: "multi-statement", "assertion-reason", "match", "analytical".
@@ -197,73 +237,98 @@ IMPORTANT RULES:
 }
 
 /**
- * Build system prompt for FULL-LENGTH UPSC Prelims GS Paper 1 MIX (all subjects mixed like real exam).
- * Uses official paper-setter persona and strict subject distribution. For Gemini 2.0.
+ * Build system prompt for FULL-LENGTH UPSC Prelims GS Paper 1 MIX.
+ * Uses structured output: tableData, matchColumns, assertionReason, questionType, difficulty mix 50% Moderate / 35% Hard / 15% Easy.
  */
-function buildFullMockMixSystemPrompt() {
-  return `You are an official UPSC Civil Services Prelims Paper Setter.
+function buildFullMockMixSystemPrompt(difficulty = "moderate", excludeSnippets = []) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nAVOID repeating or closely mimicking these previous question snippets (do not duplicate themes/wording):\n${excludeSnippets.map((s) => `- ${s}`).join("\n")}\n`
+      : "";
+  const difficultyMix =
+    difficulty === "moderate"
+      ? "50% Moderate, 35% Hard, 15% Easy"
+      : difficulty === "hard"
+        ? "80% Hard, 20% Moderate"
+        : "50% Easy, 50% Moderate";
+  return `You are an expert UPSC Prelims GS Paper 1 question setter and structured exam formatter.
 
-Generate a FULL-LENGTH UPSC Prelims GS Paper 1 exactly like the real examination.
+Generate a full-length UPSC Prelims mock test strictly following the 2015–2024 trend.
 
-STRICT RULES:
+VERY IMPORTANT:
+Output MUST be structured JSON array.
+Each question must be UI-renderable.
+Support table-based and column-based formatting.
+${avoidLine}
+---------------------------------------------------
+EXAM CONFIGURATION
+---------------------------------------------------
+Total Questions: as requested per batch. For 100-question full-length: 20 per batch × 5. For 50-question sectional: 25 per batch × 2. Same format and same question types for both; only count changes.
 
-• Total Questions: 100
-• Total Marks: 200
-• Each Question: 2 Marks
-• Negative Marking: 0.66
-• Duration: 120 Minutes
-• Difficulty: Moderate to Tough (2014–2023 level)
+Subject Distribution (scale proportionally for 50Q sectional):
+Full 100: Polity 14 | History 14 | Geography 11 | Economy 14 | Environment 16 | Science & Tech 10 | Art & Culture 6 | Current Affairs integrated.
+Sectional 50: roughly half each (e.g. Polity 7, History 7, Geography 6, Economy 7, Environment 8, Science & Tech 5, Art & Culture 3, rest Current Affairs).
 
-Subjects must be mixed like real UPSC:
+Question Type Distribution (same for 100 and 50):
+60% Statement Based | 12% Match the Following | 6% Assertion–Reason | 8% Pair Matching | 4% Chronology | 5% Map Conceptual | 5% Direct (concept-linked only)
 
-- Polity: 15–20
-- History: 15–20
-- Geography: 15–20
-- Economy: 15–20
-- Environment: 15–20
-- Science & Tech: 10–15
-- Current Affairs: 15–20
+Difficulty: ${difficultyMix}
 
-Question Types Must Include:
-1. Multi-statement analysis
-2. Assertion & Reason
-3. Match the Following
-4. Analytical / Elimination based tricky questions
-
-Avoid:
-- Direct factual one-line questions
-- Repeated themes
-- Coaching style easy questions
-
-Return ONLY valid JSON in this format:
+---------------------------------------------------
+STRUCTURED OUTPUT FORMAT (MANDATORY)
+---------------------------------------------------
+Return output in this exact structure:
 
 {
-  "test_name": "UPSC Real Prelims Mock",
-  "type": "Full Length GS",
-  "total_questions": 100,
-  "total_marks": 200,
-  "negative_marking": 0.66,
-  "duration_minutes": 120,
+  "examTitle": "UPSC GS Paper 1 Full Mock",
+  "totalQuestions": 100,
   "questions": [
     {
-      "question_number": 1,
+      "id": 1,
       "subject": "",
-      "type": "",
-      "question": "",
-      "options": {
-        "A": "",
-        "B": "",
-        "C": "",
-        "D": ""
-      },
-      "correct_answer": "",
-      "explanation": ""
+      "questionType": "statement | match | assertion | chronology | pair | map | direct",
+      "difficulty": "easy | moderate | hard",
+      "questionText": "",
+      "tableData": null OR { "headers": [], "rows": [[]] },
+      "matchColumns": null OR { "columnA": [], "columnB": [] },
+      "assertionReason": null OR { "assertion": "", "reason": "" },
+      "options": [ { "key": "A", "text": "" }, { "key": "B", "text": "" }, { "key": "C", "text": "" }, { "key": "D", "text": "" } ],
+      "correctAnswer": "A|B|C|D",
+      "explanation": { "A": "", "B": "", "C": "", "D": "" },
+      "eliminationLogic": "",
+      "conceptualSource": ""
     }
   ]
 }
 
-Generate exactly the number of questions requested in this batch (20 per batch when splitting).
-Do not write anything outside JSON.`;
+---------------------------------------------------
+FORMAT RULES
+---------------------------------------------------
+1. If questionType = "match": Fill matchColumns with two arrays. UI will render side-by-side.
+2. If questionType = "statement": Write statements numbered 1, 2, 3. Options: A. 1 only | B. 2 only | C. 1 and 2 only | D. 1, 2 and 3
+3. If questionType = "assertion": Use assertionReason object. Options: A. Both A and R true and R correct explanation | B. Both true but R not explanation | C. A true, R false | D. A false, R true
+4. If questionType = "chronology": Provide events list in question. Options must show correct order.
+5. If questionType = "pair": Provide list of pairs. Use elimination logic.
+6. If questionType = "map": Concept-based location logic. Avoid actual image.
+7. If table needed: Fill tableData with headers and rows.
+
+---------------------------------------------------
+EXPLANATION (MANDATORY – OPTION-WISE, same as CSAT)
+---------------------------------------------------
+- For EVERY question, explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+- For the CORRECT option: write "correct statement" — WHY it is correct (reason, facts, chronology, concept). User should see sahi hai toh kyu.
+- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong order, wrong fact, trap, common mistake). User should see galat hai toh kyu.
+- At least 2-3 sentences per option. No empty explanation for any option.
+- At least 120 words total per question explanation (across all four options combined).
+
+---------------------------------------------------
+QUALITY CONTROL
+---------------------------------------------------
+- Avoid repetition. Use elimination traps. Integrate current + static. Deep conceptual reasoning.
+- Mention eliminationLogic (how to eliminate wrong options). Mention conceptualSource (e.g. NCERT, Laxmikanth, Spectrum).
+
+OUTPUT MUST BE CLEAN JSON. NO EXTRA TEXT. NO MARKDOWN. NO COMMENTS. ONLY JSON.
+Generate exactly the number of questions requested in this batch.`;
 }
 
 /**
@@ -302,7 +367,7 @@ Return ONLY valid JSON in this format. No commentary outside JSON.
     {
       "question_number": 1,
       "subject": "",
-      "type": "",
+      "type": "statement | assertion | match | pair | direct",
       "question": "",
       "options": {
         "A": "",
@@ -310,11 +375,17 @@ Return ONLY valid JSON in this format. No commentary outside JSON.
         "C": "",
         "D": ""
       },
-      "correct_answer": "",
-      "explanation": ""
+      "correct_answer": "A|B|C|D",
+      "explanation": { "A": "", "B": "", "C": "", "D": "" }
     }
   ]
 }
+
+EXPLANATION (option-wise, mandatory – same as CSAT):
+- explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+- For the CORRECT option: write "correct statement" — WHY it is correct (sahi hai toh kyu — reason, facts, concept).
+- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (galat hai toh kyu — wrong fact, trap, common mistake).
+- At least 1-2 sentences per option. No empty explanation for any option.
 
 Generate exactly the number of questions requested in this batch (20 per batch).
 Do not write anything outside JSON.`;
@@ -367,7 +438,10 @@ IMPORTANT RULES
 OUTPUT FORMAT (STRICT JSON ONLY)
 ----------------------------------------
 
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON. For real exam-style rendering:
+- Reading Comprehension: put passage in question text, then the question.
+- Data Interpretation: when a table is needed, use "tableData": { "headers": ["Col1","Col2",...], "rows": [["r1c1","r1c2"],...] } so the UI can render a table.
+- Other sections: standard question + options.
 
 {
   "test_name": "UPSC CSAT Full Mock",
@@ -379,19 +453,23 @@ Return ONLY valid JSON in this exact format:
   "questions": [
     {
       "question_number": 1,
-      "section": "Reading Comprehension / Logical Reasoning / Analytical Ability / Basic Numeracy / Data Interpretation",
-      "question": "Full question text here",
-      "options": {
-        "A": "Option A",
-        "B": "Option B",
-        "C": "Option C",
-        "D": "Option D"
-      },
+      "section": "Reading Comprehension | Logical Reasoning | Analytical Ability | Basic Numeracy | Data Interpretation",
+      "question": "Full question text (or passage + question for RC)",
+      "tableData": null OR { "headers": [], "rows": [[]] },
+      "options": { "A": "", "B": "", "C": "", "D": "" },
       "correct_answer": "A",
-      "explanation": "Clear explanation of logic or calculation."
+      "explanation": { "A": "", "B": "", "C": "", "D": "" }
     }
   ]
 }
+
+----------------------------------------
+EXPLANATION (OPTION-WISE, MANDATORY)
+----------------------------------------
+• explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
+• For the CORRECT option: write "correct statement" — WHY it is correct (sahi hai toh kyu — reason, logic, fact).
+• For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (galat hai toh kyu — wrong step, trap, common mistake).
+• At least 1-2 sentences per option. No empty explanation for any option.
 
 ----------------------------------------
 CRITICAL INSTRUCTIONS
@@ -408,7 +486,7 @@ CRITICAL INSTRUCTIONS
  * Generate one batch of CSAT Paper 2 questions (20 per batch).
  */
 async function generateFullMockCsatBatch(apiKey, model, batchSize, batchLabel) {
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC CSAT Paper 2 questions. This is ${batchLabel}. Mix sections: Reading Comprehension (25-30%), Logical Reasoning (15-20%), Analytical Ability (10-15%), Basic Numeracy (10-15%), Data Interpretation (5-10%). Return ONLY valid JSON with "test_name", "questions" array. Each question: question_number, section, question, options (A,B,C,D), correct_answer, explanation.`;
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC CSAT Paper 2 questions. This is ${batchLabel}. Mix sections: Reading Comprehension (25-30%), Logical Reasoning (15-20%), Analytical Ability (10-15%), Basic Numeracy (10-15%), Data Interpretation (5-10%). Return ONLY valid JSON with "test_name", "questions" array. Each question: question_number, section, question, options (A,B,C,D), correct_answer, explanation as object { "A": "why A correct or wrong", "B": "...", "C": "...", "D": "..." } — for correct option say why it is right, for each wrong option say why it is wrong.`;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -453,8 +531,13 @@ async function generateFullMockCsatBatch(apiKey, model, batchSize, batchLabel) {
   }
 }
 
+/** Display count for CSAT: we generate more to avoid duplicates, then show only this many. */
+const CSAT_DISPLAY_COUNT = 80;
+/** Generate this many CSAT questions; after dedupe we take first CSAT_DISPLAY_COUNT for the paper. */
+const CSAT_GENERATE_COUNT = 100;
+
 /**
- * Generate full-length (80 questions) CSAT Paper 2 mock: 4 batches of 20. Gemini 2.0.
+ * Generate full-length (80 questions) CSAT Paper 2 mock: generate 100 (5 batches of 20), show 80. Gemini 2.0.
  * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
  */
 export const generateFullMockCsatTestQuestions = async () => {
@@ -466,7 +549,7 @@ export const generateFullMockCsatTestQuestions = async () => {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = 4;
+    const batches = Math.ceil(CSAT_GENERATE_COUNT / 20);
     const perBatch = 20;
     const all = [];
     let testName = "UPSC CSAT Full Mock";
@@ -478,13 +561,14 @@ export const generateFullMockCsatTestQuestions = async () => {
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const finalQuestions = all.slice(0, 80);
+    const deduped = dedupeQuestions(all);
+    const finalQuestions = deduped.slice(0, CSAT_DISPLAY_COUNT);
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid CSAT questions generated. Please try again.");
     }
 
-    console.log(`✅ Full mock CSAT: generated ${finalQuestions.length} questions`);
+    console.log(`✅ Full mock CSAT: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
     return {
       success: true,
@@ -506,7 +590,7 @@ export const generateFullMockCsatTestQuestions = async () => {
  * Generate one batch of PYQ-style questions (20 per batch).
  */
 async function generateFullMockPyoBatch(apiKey, model, batchSize, batchLabel, yearFrom, yearTo) {
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims PYQ-style questions for ${yearFrom}–${yearTo}. This is ${batchLabel}. Recreate based on trends and themes; do not copy exact PYQs. Mix subjects like real UPSC. Multi-statement heavy (2018–2023 style). Return ONLY valid JSON with "test_name", "questions" array. Each question: question_number, subject, type, question, options (A,B,C,D), correct_answer, explanation.`;
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims PYQ-style questions for ${yearFrom}–${yearTo}. This is ${batchLabel}. Recreate based on trends and themes; do not copy exact PYQs. Mix subjects like real UPSC. Include real UPSC question types: statement-based, assertion-reason, match the following, pair-based, which correct/incorrect. For each question give explanation as object { "A": "...", "B": "...", "C": "...", "D": "..." }: for correct option explain why it is right, for each wrong option explain why it is wrong. Return ONLY valid JSON with "test_name", "questions" array.`;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -551,8 +635,12 @@ async function generateFullMockPyoBatch(apiKey, model, batchSize, batchLabel, ye
   }
 }
 
+/** Display count for PYQ full mock; we generate more to avoid duplicates. */
+const PYQ_DISPLAY_COUNT = 100;
+const PYQ_GENERATE_COUNT = 120;
+
 /**
- * Generate full-length (100 questions) PYQ-style mock: 5 batches of 20. Gemini 2.0.
+ * Generate full-length (100 questions) PYQ-style mock: generate 120 (6 batches of 20), show 100. Gemini 2.0.
  * @param {Object} params
  * @param {number} params.yearFrom - e.g. 2010
  * @param {number} params.yearTo - e.g. 2025
@@ -566,7 +654,7 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = 5;
+    const batches = Math.ceil(PYQ_GENERATE_COUNT / 20);
     const perBatch = 20;
     const all = [];
     let testName = `UPSC PYQ Style Mock ${yearFrom}–${yearTo}`;
@@ -578,13 +666,14 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const finalQuestions = all.slice(0, 100);
+    const deduped = dedupeQuestions(all);
+    const finalQuestions = deduped.slice(0, PYQ_DISPLAY_COUNT);
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for PYQ mock. Please try again.");
     }
 
-    console.log(`✅ Full mock PYQ: generated ${finalQuestions.length} questions`);
+    console.log(`✅ Full mock PYQ: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
     return {
       success: true,
@@ -603,10 +692,21 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
 };
 
 /**
- * Generate one batch of mixed full-mock questions (20 per batch, same as subject-wise).
+ * Generate one batch of mixed full-mock questions (20 per batch for 100Q, or 25 per batch for 50-question sectional).
  */
-async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel) {
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims GS Paper 1 questions with MIXED subjects as per the rules. This is ${batchLabel}. Mix all subjects (Polity, History, Geography, Economy, Environment, Science & Tech, Current Affairs) in the given proportions. Return ONLY valid JSON with "test_name", "questions" array. Each question must have question_number, subject, type, question, options (A,B,C,D), correct_answer, explanation.`;
+async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel, difficulty = "moderate", excludeSnippets = [], totalQuestions = 100) {
+  const isSectional = totalQuestions === 50;
+  const contextLine = isSectional
+    ? `This is ${batchLabel} of a 50-question SECTIONAL mock. Use the SAME format as full-length: same question types (statement, match, assertion, chronology, pair, map, direct), same structured JSON (questionText, tableData, matchColumns, assertionReason, options array, explanation per option). Generate exactly ${batchSize} questions.`
+    : `This is ${batchLabel} of a 100-question full-length mock. Generate exactly ${batchSize} questions.`;
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims GS Paper 1 questions. ${contextLine}
+
+Subject mix in this batch (scale to batch size): Polity, History, Geography, Economy, Environment, Science & Tech, Art & Culture; integrate Current Affairs where relevant.
+Question type mix: ~60% statement, ~12% match, ~6% assertion, ~8% pair, ~4% chronology, ~5% map, ~5% direct.
+Difficulty mix: 50% moderate, 35% hard, 15% easy.
+
+For each question: option-wise explanation (explanation.A/B/C/D), at least 120 words total per question; eliminationLogic; conceptualSource (e.g. NCERT, standard text).
+Return ONLY valid JSON with "examTitle" or "test_name", "questions" array. Each question: id/question_number, subject, questionType, difficulty, questionText/question, tableData (if needed), matchColumns (if match), assertionReason (if assertion), options as [ { "key": "A", "text": "..." }, ... ], correctAnswer (A|B|C|D), explanation as { "A": "", "B": "", "C": "", "D": "" }, eliminationLogic, conceptualSource.`;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -619,7 +719,7 @@ async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel) {
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: buildFullMockMixSystemPrompt() },
+        { role: "system", content: buildFullMockMixSystemPrompt(difficulty, excludeSnippets) },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.35,
@@ -652,12 +752,29 @@ async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel) {
   }
 }
 
+/** For 100Q mock we generate 120 and show 100; for 50Q we generate 60 and show 50 (avoids duplicates in paper). 50-question mock duration = 60 minutes. */
+const MIX_GENERATE_100 = 120;
+const MIX_GENERATE_50 = 60;
+const MIX_DISPLAY_100 = 100;
+const MIX_DISPLAY_50 = 50;
+
 /**
- * Generate full-length (100 questions) UPSC Prelims GS Paper 1 MIX mock using Gemini 2.0.
- * Five batches of 20 (same as subject-wise) to avoid truncation; combines to 100 questions.
- * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
+ * Generate full-length or sectional UPSC Prelims GS Paper 1 MIX mock (100 or 50 questions).
+ * Generates more than display count to avoid duplicate questions in the same paper; returns only display count.
+ * @param {Object} [opts]
+ * @param {number} [opts.totalQuestions=100] - 100 full-length or 50 sectional (display count)
+ * @param {string} [opts.difficulty=moderate] - easy | moderate | hard (moderate = 60% moderate + 40% hard)
+ * @param {boolean} [opts.avoidPreviouslyUsed=false] - if true, pass hint to avoid repeating themes (prompt-level)
  */
-export const generateFullMockMixTestQuestions = async () => {
+export const generateFullMockMixTestQuestions = async (opts = {}) => {
+  const displayCount = Math.min(100, Math.max(50, parseInt(opts.totalQuestions, 10) || 100));
+  const isSectional = displayCount === 50;
+  const generateCount = isSectional ? MIX_GENERATE_50 : MIX_GENERATE_100;
+  const difficulty = ["easy", "moderate", "hard"].includes(String(opts.difficulty || "").toLowerCase())
+    ? String(opts.difficulty).toLowerCase()
+    : "moderate";
+  const excludeSnippets = Array.isArray(opts.excludeSnippets) ? opts.excludeSnippets : [];
+
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
@@ -666,31 +783,40 @@ export const generateFullMockMixTestQuestions = async () => {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = 5;
+    const batches = Math.ceil(generateCount / (isSectional ? 20 : 20));
     const perBatch = 20;
     const all = [];
-    let testName = "UPSC Real Prelims Mock";
+    let testName = isSectional ? "UPSC GS Sectional Mock (50 Q)" : "UPSC Real Prelims Mock";
 
     for (let b = 1; b <= batches; b++) {
-      console.log(`📝 Full mock MIX: generating batch ${b}/${batches} (${perBatch} questions)...`);
-      const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(apiKey, model, perBatch, `Part ${b}`);
+      console.log(`📝 Full mock MIX: generating batch ${b}/${batches} (${perBatch} questions, difficulty=${difficulty})...`);
+      const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(
+        apiKey,
+        model,
+        perBatch,
+        `Part ${b}`,
+        difficulty,
+        excludeSnippets,
+        displayCount
+      );
       if (batchTestName) testName = batchTestName;
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const finalQuestions = all.slice(0, 100);
+    const deduped = dedupeQuestions(all);
+    const finalQuestions = deduped.slice(0, displayCount);
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for full mock mix. Please try again.");
     }
 
-    console.log(`✅ Full mock MIX: generated ${finalQuestions.length} questions`);
+    console.log(`✅ Full mock MIX: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
     return {
       success: true,
       questions: finalQuestions,
       count: finalQuestions.length,
-      testName: testName || "Prelims Mock - Full Length GS Mix",
+      testName: testName || (isSectional ? "Prelims Mock - Sectional 50" : "Prelims Mock - Full Length GS Mix"),
     };
   } catch (error) {
     console.error("Error generating full mock MIX questions:", error);
@@ -703,27 +829,81 @@ export const generateFullMockMixTestQuestions = async () => {
 };
 
 /**
- * Normalize raw question items to app schema (question, options A-D, correctAnswer, explanation).
+ * Normalize explanation: object { A,B,C,D } or string (legacy).
+ */
+function normalizeExplanation(raw) {
+  if (typeof raw === "object" && raw !== null && (raw.A != null || raw.B != null || raw.C != null || raw.D != null)) {
+    return {
+      A: String(raw.A ?? "").trim() || "—",
+      B: String(raw.B ?? "").trim() || "—",
+      C: String(raw.C ?? "").trim() || "—",
+      D: String(raw.D ?? "").trim() || "—",
+    };
+  }
+  const str = String(raw ?? "").trim() || "No explanation provided.";
+  return { A: str, B: str, C: str, D: str };
+}
+
+/**
+ * Normalize options from either array [{ key, text }] or object { A, B, C, D }.
+ */
+function normalizeOptions(q) {
+  const optionsObj = { A: "", B: "", C: "", D: "" };
+  if (Array.isArray(q.options) && q.options.length >= 4) {
+    q.options.forEach((opt) => {
+      const key = (opt.key || opt.Key || "").toUpperCase().charAt(0);
+      if (["A", "B", "C", "D"].includes(key)) optionsObj[key] = String(opt.text ?? opt.value ?? "").trim();
+    });
+  } else if (typeof q.options === "object" && q.options !== null) {
+    optionsObj.A = String(q.options.A ?? q.options.a ?? "").trim();
+    optionsObj.B = String(q.options.B ?? q.options.b ?? "").trim();
+    optionsObj.C = String(q.options.C ?? q.options.c ?? "").trim();
+    optionsObj.D = String(q.options.D ?? q.options.d ?? "").trim();
+  }
+  return optionsObj;
+}
+
+/**
+ * Normalize raw question items to app schema.
+ * Supports new structured format (questionText, tableData, matchColumns, assertionReason, options array) and legacy format.
  */
 function normalizeFullMockQuestions(questions) {
   if (!Array.isArray(questions)) return [];
   return questions
     .map((q) => {
-      const optionsObj = {};
-      if (typeof q.options === "object" && q.options !== null) {
-        optionsObj.A = q.options.A || q.options.a || "";
-        optionsObj.B = q.options.B || q.options.b || "";
-        optionsObj.C = q.options.C || q.options.c || "";
-        optionsObj.D = q.options.D || q.options.d || "";
-      }
+      const questionText = q.questionText ?? q.question ?? "";
+      const optionsObj = normalizeOptions(q);
       const correct = (q.correct_answer || q.correctAnswer || q.answer || "").toUpperCase().charAt(0);
-      return {
-        question: q.question,
+      const difficulty = ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
+        ? String(q.difficulty).toLowerCase()
+        : "moderate";
+      const questionType = q.questionType || q.type || "direct";
+      const base = {
+        questionId: hashQuestion(questionText),
+        subject: q.subject != null && String(q.subject).trim() ? String(q.subject).trim() : undefined,
+        difficulty,
+        question: questionText,
         options: optionsObj,
         correctAnswer: ["A", "B", "C", "D"].includes(correct) ? correct : null,
-        explanation: q.explanation || q.concept || "No explanation provided.",
-        patternType: q.type || "analytical",
+        explanation: normalizeExplanation(q.explanation),
+        patternType: questionType,
+        questionType,
       };
+      if (q.tableData && typeof q.tableData === "object" && (q.tableData.headers?.length || q.tableData.rows?.length)) {
+        base.tableData = { headers: q.tableData.headers || [], rows: q.tableData.rows || [] };
+      }
+      if (q.matchColumns && typeof q.matchColumns === "object" && (q.matchColumns.columnA?.length || q.matchColumns.columnB?.length)) {
+        base.matchColumns = { columnA: q.matchColumns.columnA || [], columnB: q.matchColumns.columnB || [] };
+      }
+      if (q.assertionReason && typeof q.assertionReason === "object" && (q.assertionReason.assertion || q.assertionReason.reason)) {
+        base.assertionReason = {
+          assertion: String(q.assertionReason.assertion ?? "").trim(),
+          reason: String(q.assertionReason.reason ?? "").trim(),
+        };
+      }
+      if (q.eliminationLogic != null && String(q.eliminationLogic).trim()) base.eliminationLogic = String(q.eliminationLogic).trim();
+      if (q.conceptualSource != null && String(q.conceptualSource).trim()) base.conceptualSource = String(q.conceptualSource).trim();
+      return base;
     })
     .filter(
       (q) =>
@@ -767,7 +947,7 @@ function parseFullMockResponse(aiContent) {
       return { validatedQuestions: normalizeFullMockQuestions(data), testName };
     }
     if (data && typeof data.questions !== "undefined") {
-      testName = data.test_name || data.title || testName;
+      testName = data.test_name || data.title || data.examTitle || testName;
       return { validatedQuestions: normalizeFullMockQuestions(data.questions), testName };
     }
   }
@@ -779,7 +959,7 @@ function parseFullMockResponse(aiContent) {
       return { validatedQuestions: normalizeFullMockQuestions(data), testName };
     }
     if (data && typeof data.questions !== "undefined") {
-      testName = data.test_name || data.title || testName;
+      testName = data.test_name || data.title || data.examTitle || testName;
       return { validatedQuestions: normalizeFullMockQuestions(data.questions), testName };
     }
   }
@@ -820,8 +1000,8 @@ async function generateFullMockBatch(apiKey, model, subject, batchLabel) {
   const userPrompt = `Generate EXACTLY 20 UPSC Prelims GS Paper 1 MCQs. Subjects: ${subjectsList.join(", ")}. Topic: Full Mock - ${batchLabel}. Difficulty: Moderate.
 
 Output ONLY a valid JSON array of 20 objects. No markdown, no code fences, no explanation before or after.
-Each object must have: "question" (string), "options" (array of 4 strings in order A,B,C,D), "answer" (one of "A","B","C","D"), "explanation" (string). Optional: "pattern", "subject".
-Example: [{"question":"...","options":["opt A","opt B","opt C","opt D"],"answer":"B","explanation":"..."}, ...]`;
+Each object must have: "question" (string), "options" (array of 4 strings in order A,B,C,D), "answer" (one of "A","B","C","D"), "explanation" (object { "A": "", "B": "", "C": "", "D": "" } — for correct option write correct statement (why right), for each wrong option write wrong statement (why wrong)). Optional: "pattern", "subject".
+Example: [{"question":"...","options":["opt A","opt B","opt C","opt D"],"answer":"B","explanation":{"A":"wrong because...","B":"correct because...","C":"wrong because...","D":"wrong because..."}}, ...]`;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -859,9 +1039,12 @@ Example: [{"question":"...","options":["opt A","opt B","opt C","opt D"],"answer"
   }
 }
 
+/** Subject-based full mock: generate 120, show 100 to avoid duplicates in paper. */
+const SUBJECT_FULL_DISPLAY_COUNT = 100;
+const SUBJECT_FULL_GENERATE_COUNT = 120;
+
 /**
- * Generate full-length (100 questions) UPSC Prelims GS Paper 1 mock in 5 batches of 20.
- * Smaller batches reduce truncation; truncated responses can still yield complete questions.
+ * Generate full-length (100 questions) UPSC Prelims GS Paper 1 mock: 6 batches of 20 (120 generated), show 100.
  * @param {Object} params
  * @param {string} params.subject - Subject from admin (e.g. "Polity", "History, Geography")
  * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
@@ -875,7 +1058,7 @@ export const generateFullMockTestQuestions = async ({ subject }) => {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = 5;
+    const batches = Math.ceil(SUBJECT_FULL_GENERATE_COUNT / 20);
     const perBatch = 20;
     const all = [];
     for (let b = 1; b <= batches; b++) {
@@ -883,13 +1066,14 @@ export const generateFullMockTestQuestions = async ({ subject }) => {
       const batch = await generateFullMockBatch(apiKey, model, subject, `Part ${b}`);
       if (batch && batch.length) all.push(...batch);
     }
-    const questions = all.slice(0, 100);
+    const deduped = dedupeQuestions(all);
+    const questions = deduped.slice(0, SUBJECT_FULL_DISPLAY_COUNT);
 
     if (questions.length === 0) {
       throw new Error("No valid UPSC questions generated for full mock. Please try again.");
     }
 
-    console.log(`✅ Full mock: generated ${questions.length} questions`);
+    console.log(`✅ Full mock: generated ${deduped.length}, showing ${questions.length} questions (no duplicates in paper)`);
 
     return {
       success: true,
@@ -1040,11 +1224,17 @@ function parseAndValidateQuestions(aiContent, count) {
       correct = String(correct).toUpperCase().trim().charAt(0);
       if (["1", "2", "3", "4"].includes(correct)) correct = ["A", "B", "C", "D"][parseInt(correct, 10) - 1];
       if (!["A", "B", "C", "D"].includes(correct)) correct = null;
+      const questionText = String(q.question ?? "").trim();
+      const difficulty = ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
+        ? String(q.difficulty).toLowerCase()
+        : "moderate";
       return {
-        question: String(q.question ?? "").trim(),
+        questionId: hashQuestion(questionText),
+        difficulty,
+        question: questionText,
         options: optionsObj,
         correctAnswer: correct,
-        explanation: String(q.explanation || q.concept || "No explanation provided.").trim(),
+        explanation: normalizeExplanation(q.explanation),
         patternType: q.pattern || "GENERAL",
       };
     })

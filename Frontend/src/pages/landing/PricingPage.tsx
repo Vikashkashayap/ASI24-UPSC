@@ -195,11 +195,7 @@ export const PricingPage = () => {
         <div className="mx-auto max-w-4xl px-4 md:px-6 text-center">
           <Link
             to="/"
-            className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-fuchsia-600 to-emerald-600 text-white shadow-fuchsia-900/40"
-                : "bg-gradient-to-r from-fuchsia-500 to-emerald-500 text-white shadow-fuchsia-200/50"
-            }`}
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white bg-[#2563eb] hover:bg-[#1d4ed8] transition-all duration-300 transform hover:scale-105 shadow-md"
           >
             Back to Home
           </Link>

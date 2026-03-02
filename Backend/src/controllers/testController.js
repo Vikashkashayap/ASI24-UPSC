@@ -487,6 +487,7 @@ export const getTest = async (req, res) => {
           topic: test.topic,
           difficulty: test.difficulty,
           totalQuestions: test.totalQuestions,
+          durationMinutes: test.durationMinutes,
           score: test.score,
           correctAnswers: test.correctAnswers,
           wrongAnswers: test.wrongAnswers,
@@ -518,6 +519,7 @@ export const getTest = async (req, res) => {
         topic: test.topic,
         difficulty: test.difficulty,
         totalQuestions: test.totalQuestions,
+        durationMinutes: test.durationMinutes,
         questions: test.questions.map((q) => ({
           _id: q._id,
           question: q.question,

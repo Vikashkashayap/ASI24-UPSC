@@ -131,7 +131,7 @@ export const OfferBanner = () => {
             <button
               type="button"
               onClick={handleCta}
-              className="rounded-md bg-amber-400 text-slate-900 font-semibold text-xs md:text-sm px-3 py-1.5 hover:bg-amber-300 transition-colors whitespace-nowrap"
+              className="rounded-md bg-[#2563eb] text-white font-semibold text-xs md:text-sm px-3 py-1.5 hover:bg-[#1d4ed8] transition-colors whitespace-nowrap"
             >
               {offer.ctaText || "Claim Offer"}
             </button>

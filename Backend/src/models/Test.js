@@ -52,8 +52,9 @@ const testSchema = new mongoose.Schema(
           required: true,
           enum: ["A", "B", "C", "D"],
         },
+        // Option-wise: { A: "...", B: "...", C: "...", D: "..." } or legacy string
         explanation: {
-          type: String,
+          type: mongoose.Schema.Types.Mixed,
           required: true,
         },
         userAnswer: {
@@ -65,6 +66,13 @@ const testSchema = new mongoose.Schema(
           type: Number,
           default: 0,
         },
+        // Structured question types (UI-renderable)
+        questionType: { type: String, required: false },
+        tableData: { type: mongoose.Schema.Types.Mixed, required: false },
+        matchColumns: { type: mongoose.Schema.Types.Mixed, required: false },
+        assertionReason: { type: mongoose.Schema.Types.Mixed, required: false },
+        eliminationLogic: { type: String, required: false },
+        conceptualSource: { type: String, required: false },
       },
     ],
     score: {
@@ -74,6 +82,10 @@ const testSchema = new mongoose.Schema(
     totalQuestions: {
       type: Number,
       required: true,
+    },
+    durationMinutes: {
+      type: Number,
+      required: false,
     },
     correctAnswers: {
       type: Number,

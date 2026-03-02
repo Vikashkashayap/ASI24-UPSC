@@ -26,7 +26,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       {/* Most Popular — above the card, outside the border (bhr line ke) */}
       {plan.isPopular && (
         <div className="mb-2 flex justify-center">
-          <span className="inline-block rounded-t-lg px-4 py-1.5 text-xs font-bold bg-gradient-to-r from-purple-500 to-emerald-500 text-white shadow-sm">
+          <span className="inline-block rounded-t-lg px-4 py-1.5 text-xs font-bold bg-[#2563eb] text-white shadow-sm">
             Most Popular
           </span>
         </div>

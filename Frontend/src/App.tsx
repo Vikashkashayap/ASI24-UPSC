@@ -37,6 +37,8 @@ import { AdminPricingPage } from "./pages/admin/AdminPricingPage";
 import { AdminOfferManagerPage } from "./pages/admin/AdminOfferManagerPage";
 import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
+import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
+import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
 import ComingSoon from "./components/ui/ComingSoon";
 
 
@@ -56,7 +58,9 @@ function App() {
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path="/"
             element={

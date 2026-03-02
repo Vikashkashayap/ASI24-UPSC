@@ -81,3 +81,41 @@ export const changeUserPassword = async (userId, newPassword) => {
   await user.save();
   return user;
 };
+
+/**
+ * Find or create user from Google profile (for OAuth login/register).
+ * Returns { user, token }.
+ */
+export const findOrCreateGoogleUser = async (profile) => {
+  const email = profile.emails?.[0]?.value?.toLowerCase();
+  const name = profile.displayName || profile.name?.givenName || email?.split("@")[0] || "User";
+  const googleId = profile.id;
+
+  if (!email) {
+    throw new Error("Google profile has no email");
+  }
+
+  let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+  if (user) {
+    if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+  } else {
+    user = await User.create({
+      name,
+      email,
+      googleId,
+      accountType: "paid-user",
+      subscriptionStatus: "inactive",
+    });
+  }
+
+  if (user.isActive === false || user.status === "suspended") {
+    throw new Error("Your account is deactivated. Please contact admin.");
+  }
+
+  const token = createToken(user);
+  return { user, token };
+};

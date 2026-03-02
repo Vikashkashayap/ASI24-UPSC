@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const baseURL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+export const apiBaseURL = baseURL;
 
 export const api = axios.create({
   baseURL,
@@ -206,11 +207,26 @@ export const prelimsImportAPI = {
 };
 
 // Prelims Mock – Admin schedules; at scheduled time test goes live; students attempt under "Prelims Mock"
+export interface PrelimsMockSchedulePayload {
+  subject: string;
+  scheduledAt: string;
+  isMix?: boolean;
+  isPyo?: boolean;
+  isCsat?: boolean;
+  yearFrom?: number;
+  yearTo?: number;
+  title?: string;
+  totalQuestions?: number;
+  difficulty?: "easy" | "moderate" | "hard";
+  avoidPreviouslyUsed?: boolean;
+}
+
 export const prelimsMockAPI = {
   // Admin
-  createSchedule: (data: { subject: string; scheduledAt: string; isMix?: boolean; isPyo?: boolean; isCsat?: boolean; yearFrom?: number; yearTo?: number }) =>
+  createSchedule: (data: PrelimsMockSchedulePayload) =>
     api.post("/api/admin/prelims-mock", data),
-  listAdmin: () => api.get("/api/admin/prelims-mock"),
+  listAdmin: (params?: { difficulty?: string; subject?: string; year?: string }) =>
+    api.get("/api/admin/prelims-mock", { params }),
   goLive: (id: string) => api.post(`/api/admin/prelims-mock/${id}/go-live`),
   updateSchedule: (id: string, data: { scheduledAt: string }) =>
     api.patch(`/api/admin/prelims-mock/${id}`, data),

@@ -48,6 +48,13 @@ export const PrelimsMockAdminPage: React.FC = () => {
   const [yearFrom, setYearFrom] = useState<number>(2018);
   const [yearTo, setYearTo] = useState<number>(2025);
   const [scheduledAt, setScheduledAt] = useState("");
+  const [testName, setTestName] = useState("");
+  const [totalQuestions, setTotalQuestions] = useState<100 | 50>(100);
+  const [difficulty, setDifficulty] = useState<"easy" | "moderate" | "hard">("moderate");
+  const [avoidPreviouslyUsed, setAvoidPreviouslyUsed] = useState(false);
+  const [filterDifficulty, setFilterDifficulty] = useState<string>("");
+  const [filterSubject, setFilterSubject] = useState("");
+  const [filterYear, setFilterYear] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [goLiveId, setGoLiveId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -66,7 +73,11 @@ export const PrelimsMockAdminPage: React.FC = () => {
   const load = async () => {
     try {
       setLoading(true);
-      const res = await prelimsMockAPI.listAdmin();
+      const params: { difficulty?: string; subject?: string; year?: string } = {};
+      if (filterDifficulty) params.difficulty = filterDifficulty;
+      if (filterSubject.trim()) params.subject = filterSubject.trim();
+      if (filterYear.trim()) params.year = filterYear.trim();
+      const res = await prelimsMockAPI.listAdmin(params);
       if (res.data.success) setList(res.data.data || []);
     } catch (err: unknown) {
       const ax = err as { response?: { data?: { message?: string } } };
@@ -109,10 +120,15 @@ export const PrelimsMockAdminPage: React.FC = () => {
         isPyo: usePyo,
         isCsat: useCsat,
         ...(usePyo ? { yearFrom, yearTo } : {}),
+        ...(testName.trim() ? { title: testName.trim() } : {}),
+        ...(useMix ? { totalQuestions } : {}),
+        difficulty,
+        avoidPreviouslyUsed,
       });
       if (res.data.success) {
         setSuccess("Mock scheduled. At the scheduled time, questions will auto-generate and the test will go live.");
         setScheduledAt("");
+        setTestName("");
         load();
       } else {
         setError(res.data.message || "Failed to schedule");
@@ -219,6 +235,19 @@ export const PrelimsMockAdminPage: React.FC = () => {
         <form onSubmit={handleSchedule} className="space-y-4">
           <div>
             <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+              Test name (optional)
+            </label>
+            <input
+              type="text"
+              value={testName}
+              onChange={(e) => setTestName(e.target.value)}
+              placeholder="e.g. UPSC Real Prelims Mock"
+              className={`w-full max-w-md px-4 py-2 rounded-lg border ${theme === "dark" ? "bg-slate-800 border-slate-600 text-slate-200" : "bg-white border-slate-300"}`}
+              disabled={submitting}
+            />
+          </div>
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
               Mock type
             </label>
             <div className={`flex flex-wrap gap-3 mb-3 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
@@ -276,15 +305,66 @@ export const PrelimsMockAdminPage: React.FC = () => {
               </>
             )}
             {mockMode === "mix" && (
-              <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                100 questions mixed: Polity, History, Geography, Economy, Environment, Science &amp; Tech, Current Affairs (Gemini 2.0).
-              </p>
+              <>
+                <div className="flex flex-wrap items-center gap-4 mt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="totalQuestions"
+                      checked={totalQuestions === 100}
+                      onChange={() => setTotalQuestions(100)}
+                      disabled={submitting}
+                      className="rounded border-slate-400 text-amber-600 focus:ring-amber-500"
+                    />
+                    <span>Full length (100 Q)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="totalQuestions"
+                      checked={totalQuestions === 50}
+                      onChange={() => setTotalQuestions(50)}
+                      disabled={submitting}
+                      className="rounded border-slate-400 text-amber-600 focus:ring-amber-500"
+                    />
+                    <span>Sectional (50 Q)</span>
+                  </label>
+                </div>
+                <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                  {totalQuestions} questions mixed: Polity, History, Geography, Economy, Environment, Science &amp; Tech, <strong>Current Affairs</strong> (Gemini 2.0).
+                </p>
+              </>
             )}
             {mockMode === "csat" && (
               <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                 80 questions: Reading Comprehension, Logical Reasoning, Analytical Ability, Basic Numeracy, Data Interpretation. 200 marks, 0.83 negative. 4×20 batches, Gemini 2.0.
               </p>
             )}
+            <div className="mt-3 space-y-2">
+              <label className={`block text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                Difficulty
+              </label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as "easy" | "moderate" | "hard")}
+                disabled={submitting}
+                className={`px-3 py-2 rounded-lg border text-sm ${theme === "dark" ? "bg-slate-800 border-slate-600 text-slate-200" : "bg-white border-slate-300"}`}
+              >
+                <option value="easy">Easy</option>
+                <option value="moderate">Moderate (60% Moderate + 40% Hard)</option>
+                <option value="hard">Hard</option>
+              </select>
+              <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={avoidPreviouslyUsed}
+                  onChange={(e) => setAvoidPreviouslyUsed(e.target.checked)}
+                  disabled={submitting}
+                  className="rounded border-slate-400 text-amber-600 focus:ring-amber-500"
+                />
+                <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Avoid previously used questions</span>
+              </label>
+            </div>
             {mockMode === "pyo" && (
               <div className="flex flex-wrap items-center gap-4 mt-2">
                 <div>
@@ -361,6 +441,37 @@ export const PrelimsMockAdminPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className={`flex flex-wrap items-center gap-3 mb-4 p-3 rounded-lg border ${theme === "dark" ? "bg-slate-800/30 border-slate-700" : "bg-slate-50 border-slate-200"}`}>
+            <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Filter:</span>
+            <select
+              value={filterDifficulty}
+              onChange={(e) => setFilterDifficulty(e.target.value)}
+              className={`px-2 py-1.5 rounded border text-sm ${theme === "dark" ? "bg-slate-800 border-slate-600 text-slate-200" : "bg-white border-slate-300"}`}
+            >
+              <option value="">All difficulties</option>
+              <option value="easy">Easy</option>
+              <option value="moderate">Moderate</option>
+              <option value="hard">Hard</option>
+            </select>
+            <input
+              type="text"
+              value={filterSubject}
+              onChange={(e) => setFilterSubject(e.target.value)}
+              placeholder="Subject / title"
+              className={`px-2 py-1.5 rounded border text-sm w-40 ${theme === "dark" ? "bg-slate-800 border-slate-600 text-slate-200" : "bg-white border-slate-300"}`}
+            />
+            <input
+              type="text"
+              value={filterYear}
+              onChange={(e) => setFilterYear(e.target.value)}
+              placeholder="Year (PYQ)"
+              maxLength={4}
+              className={`px-2 py-1.5 rounded border text-sm w-24 ${theme === "dark" ? "bg-slate-800 border-slate-600 text-slate-200" : "bg-white border-slate-300"}`}
+            />
+            <Button type="button" variant="outline" size="sm" onClick={load} disabled={loading}>
+              Apply
+            </Button>
+          </div>
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-amber-500" />

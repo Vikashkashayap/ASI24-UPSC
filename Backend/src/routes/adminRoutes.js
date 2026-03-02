@@ -29,6 +29,7 @@ import {
   goLivePrelimsMock,
   updatePrelimsMockSchedule,
   deletePrelimsMock,
+  exportPrelimsMockAsJson,
 } from "../controllers/prelimsMockController.js";
 import {
   getAllPlans,
@@ -85,6 +86,7 @@ router.delete("/imported-tests/:id", deleteImportedTest);
 // Prelims Mock: schedule, go-live, update schedule, delete
 router.post("/prelims-mock", createPrelimsMockSchedule);
 router.get("/prelims-mock", listAdminPrelimsMocks);
+router.get("/prelims-mock/:id/export", exportPrelimsMockAsJson);
 router.post("/prelims-mock/:id/go-live", goLivePrelimsMock);
 router.patch("/prelims-mock/:id", updatePrelimsMockSchedule);
 router.delete("/prelims-mock/:id", deletePrelimsMock);

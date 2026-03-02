@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+// explanation can be: string (legacy) or { A: string, B: string, C: string, D: string }
+
 /**
  * Scheduled Prelims Mock (Full-length GS Paper 1).
  * Admin schedules a test; at scheduledAt time questions are auto-generated and test goes live.
@@ -41,6 +43,9 @@ const prelimsMockSchema = new mongoose.Schema(
     },
     questions: [
       {
+        questionId: { type: String, required: false },
+        subject: { type: String, required: false },
+        difficulty: { type: String, enum: ["easy", "moderate", "hard"], default: "moderate" },
         question: { type: String, required: true },
         options: {
           A: { type: String, required: true },
@@ -49,10 +54,18 @@ const prelimsMockSchema = new mongoose.Schema(
           D: { type: String, required: true },
         },
         correctAnswer: { type: String, required: true, enum: ["A", "B", "C", "D"] },
-        explanation: { type: String, required: true },
+        explanation: { type: mongoose.Schema.Types.Mixed, required: true },
+        questionType: { type: String, required: false },
+        tableData: { type: mongoose.Schema.Types.Mixed, required: false },
+        matchColumns: { type: mongoose.Schema.Types.Mixed, required: false },
+        assertionReason: { type: mongoose.Schema.Types.Mixed, required: false },
+        eliminationLogic: { type: String, required: false },
+        conceptualSource: { type: String, required: false },
       },
     ],
-    totalQuestions: { type: Number, default: 100 },
+    totalQuestions: { type: Number, default: 100 }, // 100 full-length or 50 sectional
+    difficulty: { type: String, enum: ["easy", "moderate", "hard"], default: "moderate" }, // for filtering & generation mix
+    avoidPreviouslyUsed: { type: Boolean, default: false },
     durationMinutes: { type: Number, default: 120 },
     totalMarks: { type: Number, default: 200 },
     negativeMark: { type: Number, default: 0.66 },

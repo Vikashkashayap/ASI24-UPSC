@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
+  Copy,
   Eye,
   UserCheck,
   UserX,
@@ -195,6 +196,7 @@ export const StudentDetailPage = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [dartAnalytics, setDartAnalytics] = useState<any | null>(null);
   const [dartReportDownloading, setDartReportDownloading] = useState(false);
+  const [resetPasswordResult, setResetPasswordResult] = useState<{ tempPassword: string } | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -268,7 +270,15 @@ export const StudentDetailPage = () => {
 
       const res = await api[method](endpoint, data);
       if (res.data.success) {
-        alert(res.data.message);
+        if (action === 'reset-password') {
+          if (res.data.data?.tempPassword) {
+            setResetPasswordResult({ tempPassword: res.data.data.tempPassword });
+          } else {
+            alert(res.data.message || "Password reset successfully.");
+          }
+        } else {
+          alert(res.data.message);
+        }
         fetchStudentData(); // Refresh data
       }
     } catch (err: any) {
@@ -1876,6 +1886,51 @@ export const StudentDetailPage = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Reset Password – show new password so admin can share with user */}
+        <Dialog open={!!resetPasswordResult} onOpenChange={(open) => !open && setResetPasswordResult(null)}>
+          <DialogContent className={`max-w-md transition-colors duration-300 ${
+            theme === "dark"
+              ? "bg-slate-900 border-slate-700"
+              : "bg-white border-slate-300"
+          }`}>
+            <DialogHeader>
+              <DialogTitle className={`${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}>
+                Password reset successfully
+              </DialogTitle>
+            </DialogHeader>
+            <div className={`p-6 pt-2 space-y-4 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+              <p className="text-sm">
+                Share this temporary password with the student. They can use it to sign in; they will be prompted to change it after login.
+              </p>
+              <div className="flex items-center gap-2">
+                <code className={`flex-1 px-3 py-2 rounded-lg text-sm font-mono ${
+                  theme === "dark" ? "bg-slate-800 text-slate-100" : "bg-slate-100 text-slate-900"
+                }`}>
+                  {resetPasswordResult?.tempPassword ?? ""}
+                </code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const p = resetPasswordResult?.tempPassword ?? "";
+                    if (p) {
+                      navigator.clipboard.writeText(p);
+                      alert("Copied to clipboard");
+                    }
+                  }}
+                  className="shrink-0"
+                >
+                  <Copy className="h-4 w-4 mr-1" />
+                  Copy
+                </Button>
+              </div>
+              <div className="flex justify-end pt-2">
+                <Button onClick={() => setResetPasswordResult(null)}>OK</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Evaluation Details Modal */}
         <Dialog open={showEvaluationModal} onOpenChange={setShowEvaluationModal}>
