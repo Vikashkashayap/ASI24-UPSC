@@ -5,10 +5,11 @@ import { Sun, Moon, Menu, X } from "lucide-react";
 import { useState } from "react";
 import logoImg from "../../LOGO/mentorsdaily.png";
 
-const navItems = [
+const navItems: { label: string; to: string; external?: boolean }[] = [
   { label: "Features", to: "/features" },
   { label: "Pricing", to: "/pricing" },
   { label: "Compare", to: "/compare" },
+  { label: "Current Affairs", to: "/daily-current-affairs" },
   { label: "Testimonials", to: "/testimonials" },
   { label: "About", to: "/about" },
 ];
@@ -41,32 +42,49 @@ export const LandingNavbar = () => {
 
             {/* DESKTOP NAV */}
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.label}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `group relative transition duration-300 ${
-                      isActive
-                        ? "text-[#2563eb]"
-                        : theme === "dark"
-                          ? "text-slate-400 hover:text-slate-200"
-                          : "text-slate-500 hover:text-slate-700"
-                    }`
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span>{item.label}</span>
-                      <span
-                        className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-[#2563eb] transition-transform duration-300 group-hover:scale-x-100 ${
-                          isActive ? "scale-x-100" : ""
-                        }`}
-                      />
-                    </>
-                  )}
-                </NavLink>
-              ))}
+              {navItems.map((item) =>
+                item.external ? (
+                  <a
+                    key={item.label}
+                    href={item.to}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`group relative transition duration-300 ${
+                      theme === "dark"
+                        ? "text-slate-400 hover:text-slate-200"
+                        : "text-slate-500 hover:text-slate-700"
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    <span className="absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-[#2563eb] transition-transform duration-300 group-hover:scale-x-100" />
+                  </a>
+                ) : (
+                  <NavLink
+                    key={item.label}
+                    to={item.to}
+                    className={({ isActive }) =>
+                      `group relative transition duration-300 ${
+                        isActive
+                          ? "text-[#2563eb]"
+                          : theme === "dark"
+                            ? "text-slate-400 hover:text-slate-200"
+                            : "text-slate-500 hover:text-slate-700"
+                      }`
+                    }
+                  >
+                    {({ isActive }) => (
+                      <>
+                        <span>{item.label}</span>
+                        <span
+                          className={`absolute left-0 -bottom-1 h-[2px] w-full origin-left scale-x-0 bg-[#2563eb] transition-transform duration-300 group-hover:scale-x-100 ${
+                            isActive ? "scale-x-100" : ""
+                          }`}
+                        />
+                      </>
+                    )}
+                  </NavLink>
+                )
+              )}
             </nav>
 
             {/* RIGHT SIDE */}
@@ -138,24 +156,41 @@ export const LandingNavbar = () => {
                 <X className="w-5 h-5" />
               </button>
               <nav className="flex flex-col gap-4">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.label}
-                    to={item.to}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `py-2 text-base font-medium transition ${
-                        isActive
-                          ? "text-[#2563eb] font-semibold"
-                          : theme === "dark"
-                            ? "text-slate-400 hover:text-slate-200"
-                            : "text-slate-600 hover:text-slate-700"
-                      }`
-                    }
-                  >
-                    {item.label}
-                  </NavLink>
-                ))}
+                {navItems.map((item) =>
+                  item.external ? (
+                    <a
+                      key={item.label}
+                      href={item.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`py-2 text-base font-medium transition ${
+                        theme === "dark"
+                          ? "text-slate-400 hover:text-slate-200"
+                          : "text-slate-600 hover:text-slate-700"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <NavLink
+                      key={item.label}
+                      to={item.to}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `py-2 text-base font-medium transition ${
+                          isActive
+                            ? "text-[#2563eb] font-semibold"
+                            : theme === "dark"
+                              ? "text-slate-400 hover:text-slate-200"
+                              : "text-slate-600 hover:text-slate-700"
+                        }`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  )
+                )}
               </nav>
               <Link
                 to={isLoginPage ? "/register" : "/login"}

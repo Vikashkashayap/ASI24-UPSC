@@ -36,6 +36,9 @@ import { PrelimsMockAdminPage } from "./pages/admin/PrelimsMockAdminPage";
 import { AdminPricingPage } from "./pages/admin/AdminPricingPage";
 import { AdminOfferManagerPage } from "./pages/admin/AdminOfferManagerPage";
 import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
+import CurrentAffairsPage from "./pages/CurrentAffairsPage";
+import CurrentAffairDetailPage from "./pages/CurrentAffairDetailPage";
+import AdminCurrentAffairsPage from "./pages/admin/AdminCurrentAffairsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
@@ -53,6 +56,8 @@ function App() {
             <Route path="features" element={<FeaturesPage />} />
             <Route path="pricing" element={<PricingPage />} />
             <Route path="compare" element={<ComparePage />} />
+            <Route path="daily-current-affairs" element={<CurrentAffairsPage />} />
+            <Route path="daily-current-affairs/:slug" element={<CurrentAffairDetailPage />} />
             <Route path="testimonials" element={<TestimonialsPage />} />
             <Route path="about" element={<AboutPage />} />
           </Route>
@@ -87,6 +92,8 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="help-support" element={<HelpSupportPage />} />
             <Route path="student-profiler" element={<StudentProfilerPage />} />
+            <Route path="current-affairs" element={<CurrentAffairsPage />} />
+            <Route path="current-affairs/:slug" element={<CurrentAffairDetailPage />} />
           </Route>
           {/* Admin Routes */}
           <Route
@@ -104,6 +111,7 @@ function App() {
             <Route path="offer-manager" element={<AdminOfferManagerPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
+            <Route path="current-affairs" element={<AdminCurrentAffairsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>

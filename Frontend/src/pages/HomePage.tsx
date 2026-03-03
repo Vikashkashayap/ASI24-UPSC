@@ -15,7 +15,8 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle,
-  Zap
+  Zap,
+  Newspaper
 } from "lucide-react";
 import { api, testAPI } from "../services/api";
 
@@ -120,6 +121,13 @@ export const HomePage = () => {
       icon: ClipboardList,
       color: "amber",
       path: "/prelims-test"
+    },
+    {
+      title: "Daily Current Affairs",
+      description: "UPSC-relevant news analysis",
+      icon: Newspaper,
+      color: "violet",
+      path: "/current-affairs"
     }
   ];
 
@@ -490,6 +498,15 @@ export const HomePage = () => {
                   gradient: "from-amber-500/10",
                   border: "border-amber-200",
                   borderDark: "border-amber-700/50"
+                },
+                violet: {
+                  bg: "bg-violet-100",
+                  bgDark: "bg-violet-900/30",
+                  text: "text-violet-600",
+                  textDark: "text-violet-400",
+                  gradient: "from-violet-500/10",
+                  border: "border-violet-200",
+                  borderDark: "border-violet-700/50"
                 }
               };
               return colors[color] || colors.purple;

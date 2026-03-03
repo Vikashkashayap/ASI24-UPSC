@@ -361,3 +361,43 @@ export const paymentAPI = {
     planId: string;
   }) => api.post("/api/payment/verify", payload),
 };
+
+// Current Affairs – Daily UPSC (student: list/detail; admin: list all, toggle, run job)
+export interface CurrentAffairType {
+  _id: string;
+  title: string;
+  summary: string;
+  keyPoints: string[];
+  gsPaper: string;
+  prelimsFocus: string;
+  mainsAngle: string;
+  keywords: string[];
+  difficulty: "Easy" | "Moderate" | "Hard";
+  sourceUrl: string;
+  date: string;
+  slug: string;
+  isActive: boolean;
+  createdAt?: string;
+}
+
+export const currentAffairsAPI = {
+  list: (params?: {
+    date?: string;
+    gsPaper?: string;
+    difficulty?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) => api.get<{ success: boolean; data: { items: CurrentAffairType[]; total: number; page: number; limit: number; totalPages: number } }>("/api/current-affairs", { params }),
+  getBySlug: (slug: string) =>
+    api.get<{ success: boolean; data: CurrentAffairType }>(`/api/current-affairs/${slug}`),
+  generateMcqs: (id: string) =>
+    api.get<{ success: boolean; data: { mcqs: Array<{ question: string; options: Record<string, string>; correctAnswer: string; explanation: string }> } }>(`/api/current-affairs/mcqs/${id}`),
+};
+
+export const currentAffairsAdminAPI = {
+  list: (params?: { page?: number; limit?: number; isActive?: string; gsPaper?: string; difficulty?: string }) =>
+    api.get<{ success: boolean; data: { items: CurrentAffairType[]; total: number; page: number; limit: number; totalPages: number } }>("/api/admin/current-affairs/list", { params }),
+  runNow: () => api.post<{ success: boolean; data: { created: number; skipped: number }; message: string }>("/api/admin/current-affairs/run-now"),
+  toggle: (id: string) => api.patch<{ success: boolean; data: { _id: string; isActive: boolean } }>(`/api/current-affairs/${id}`),
+};
