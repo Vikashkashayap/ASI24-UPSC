@@ -24,6 +24,8 @@ import prelimsImportRoutes from "./routes/prelimsImportRoutes.js";
 import dartRoutes from "./routes/dartRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import currentAffairsRoutes, { currentAffairsAdminRouter } from "./routes/currentAffairsRoutes.js";
+import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
 import { processScheduledPrelimsMocks, listLivePrelimsMocks } from "./controllers/prelimsMockController.js";
 import { getActivePlans } from "./controllers/pricingController.js";
 import { getActiveOffer } from "./controllers/offerController.js";
@@ -105,6 +107,11 @@ app.get("/api/prelims-mock/health", (req, res) => res.json({ ok: true, service: 
 app.use("/api/prelims-mock", requireActiveSubscription, prelimsMockRoutes);
 console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
 
+// Current Affairs: list & detail public; MCQs require subscription (enforced in route); admin toggle protected
+app.use("/api/current-affairs", currentAffairsRoutes);
+app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
+console.log("🔗 Mounting current-affairs at /api/current-affairs, admin at /api/admin/current-affairs");
+
 // Public pricing: active plans only (for landing page)
 app.get("/api/pricing", getActivePlans);
 // Public: current active offer for banner
@@ -119,6 +126,9 @@ const CRON_INTERVAL_MS = 60 * 1000;
 setInterval(() => {
   processScheduledPrelimsMocks().catch((err) => console.error("Prelims Mock cron:", err));
 }, CRON_INTERVAL_MS);
+
+// Cron: daily 6 AM – fetch GNews + Claude → save current affairs
+startCurrentAffairsCron();
 
 // Create HTTP server for Socket.io
 const server = http.createServer(app);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/mentorsdaily.png";
@@ -27,6 +27,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
     '/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
+    '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
@@ -41,6 +42,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
+    '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -50,6 +52,9 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   // Handle dynamic routes
   if (pathname.startsWith('/copy-evaluation/')) {
     return { title: 'Copy Evaluation Details', icon: <FileText className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/current-affairs/') && pathname !== '/current-affairs') {
+    return { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> };
   }
   if (pathname.startsWith('/test/')) {
     return { title: 'Test', icon: <ClipboardList className="w-5 h-5" /> };
@@ -173,6 +178,10 @@ export const DashboardLayout = () => {
                   <Tag className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Offer Manager</span>}
                 </NavLink>
+                <NavLink to="/admin/current-affairs" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Current Affairs">
+                  <Newspaper className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Current Affairs</span>}
+                </NavLink>
               </div>
 
               {/* Admin Tools Section */}
@@ -286,6 +295,10 @@ export const DashboardLayout = () => {
                 <NavLink to="/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Scheduled tests">
                   <Target className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
+                </NavLink>
+                <NavLink to="/current-affairs" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Daily Current Affairs">
+                  <Newspaper className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Daily Current Affairs</span>}
                 </NavLink>
                 {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />
