@@ -76,8 +76,7 @@ function App() {
           >
             <Route path="home" element={<HomePage />} />
             <Route path="performance" element={<PerformanceDashboardPage />} />
-            <Route path="planner" element={<ComingSoon />} />
-            {/* <Route path="planner" element={<PlannerPage />} /> */}
+            <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
             <Route path="copy-evaluation" element={<ComingSoon />} />
             {/* <Route path="copy-evaluation" element={<CopyEvaluationPage />} /> */}

@@ -316,17 +316,8 @@ export const DashboardLayout = () => {
               )}
               <div className="space-y-1">
                 <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <CalendarClock className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>Study Planner</span>}
-                    </div>
-                    {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
-                        Soon
-                      </span>
-                    )}
-                  </div>
+                  <CalendarClock className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Study Planner</span>}
                 </NavLink>
                 <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
                   <div className="flex items-center justify-between w-full">

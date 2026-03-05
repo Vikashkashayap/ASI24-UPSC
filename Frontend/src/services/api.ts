@@ -284,6 +284,59 @@ export const mentorAPI = {
     api.post("/api/mentor/chat", body),
 };
 
+// Study Plan API (UPSC Study Planner: setup, tasks, progress, streak)
+export interface StudyPlanTask {
+  _id: string;
+  date: string;
+  subject: string;
+  topic: string;
+  taskType: "subject_study" | "current_affairs" | "mcq_practice" | "revision" | "mock_test";
+  duration: number;
+  startTime?: string | null;
+  endTime?: string | null;
+  completed: boolean;
+  completedAt: string | null;
+}
+
+export interface StudyPlanType {
+  _id: string;
+  userId: string;
+  examDate: string;
+  dailyHours: number;
+  preparationLevel: "beginner" | "intermediate" | "advanced";
+  subjects: string[];
+  tasks: StudyPlanTask[];
+  currentStreak: number;
+  lastCompletedDate: string | null;
+  longestStreak: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StudyPlanProgress {
+  date: string | null;
+  daily: { total: number; completed: number; percent: number };
+  weekly: { total: number; completed: number; percent: number };
+  streak: number;
+  longestStreak: number;
+  daysRemaining?: number | null;
+}
+
+export const studyPlanAPI = {
+  setup: (data: { examDate: string; dailyHours?: number; preparationLevel?: string }) =>
+    api.post<{ plan: StudyPlanType; progress: StudyPlanProgress }>("/api/study-plan/setup", data),
+  get: () =>
+    api.get<{ plan: StudyPlanType | null; progress: StudyPlanProgress | null; daysRemaining?: number | null }>("/api/study-plan"),
+  toggleTask: (taskId: string) =>
+    api.patch<{ plan: StudyPlanType; task: StudyPlanTask; progress: StudyPlanProgress }>(
+      `/api/study-plan/tasks/${taskId}/complete`
+    ),
+  getProgress: (date?: string) =>
+    api.get<{ progress: StudyPlanProgress }>("/api/study-plan/progress", {
+      params: date ? { date } : undefined,
+    }),
+};
+
 // Student Profiler API
 export const studentProfilerAPI = {
   generatePlan: async (params: {
