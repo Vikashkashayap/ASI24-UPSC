@@ -26,6 +26,7 @@ const currentAffairSchema = new mongoose.Schema(
 );
 
 currentAffairSchema.index({ date: -1, isActive: 1 });
+currentAffairSchema.index({ sourceUrl: 1 }); // duplicate check by URL
 // slug already has unique: true → index created automatically
 currentAffairSchema.index({ title: 1 });
 currentAffairSchema.index({ gsPaper: 1, isActive: 1 });

@@ -1,6 +1,5 @@
-import CurrentAffair, { slugify } from "../models/CurrentAffair.js";
-import { fetchGNews } from "../services/gnewsService.js";
-import { generateCurrentAffairFromNews } from "../services/aiService.js";
+import CurrentAffair from "../models/CurrentAffair.js";
+import { runCurrentAffairsPipeline } from "../services/currentAffairsPipeline.js";
 
 /**
  * GET /api/current-affairs
@@ -131,61 +130,20 @@ export async function toggleCurrentAffair(req, res) {
 
 /**
  * POST /api/current-affairs/run-now
- * Manually trigger fetch + AI + save (admin only). Idempotent by title.
+ * Manually trigger pipeline (admin only): diverse fetch → dedupe → relevance → max 5 → save.
+ * Does not delete existing current affairs.
  */
 export async function runCurrentAffairsJob(req, res) {
   try {
-    const articles = await fetchGNews({ max: 5 });
-    if (!articles.length) {
-      return res.json({
-        success: true,
-        message: "No articles fetched from GNews",
-        data: { created: 0, skipped: 0 },
-      });
-    }
-
-    let created = 0;
-    let skipped = 0;
-
-    for (const article of articles) {
-      const title = (article.title || "").trim();
-      if (!title) continue;
-
-      const existing = await CurrentAffair.findOne({
-        title: { $regex: new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
-      });
-      if (existing) {
-        skipped += 1;
-        continue;
-      }
-
-      try {
-        const structured = await generateCurrentAffairFromNews(article, article.url);
-        const slugBase = slugify(structured.title);
-        let slug = slugBase;
-        let counter = 0;
-        while (await CurrentAffair.findOne({ slug })) {
-          counter += 1;
-          slug = `${slugBase}-${counter}`;
-        }
-        await CurrentAffair.create({
-          ...structured,
-          slug,
-          sourceUrl: structured.sourceUrl || article.url || "",
-          date: new Date(),
-          isActive: true,
-        });
-        created += 1;
-      } catch (aiErr) {
-        console.error("AI generation failed for article:", title, aiErr);
-        skipped += 1;
-      }
-    }
-
+    const result = await runCurrentAffairsPipeline();
     return res.json({
       success: true,
-      message: `Processed ${articles.length} articles`,
-      data: { created, skipped },
+      message: result.message,
+      data: {
+        created: result.created,
+        skipped: result.skipped,
+        totalFetched: result.totalFetched,
+      },
     });
   } catch (err) {
     console.error("runCurrentAffairsJob error:", err);

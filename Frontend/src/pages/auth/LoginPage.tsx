@@ -85,9 +85,9 @@ export const LoginPage = () => {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm md:text-base text-slate-700 block">Password</label>
-                  <Link to="/forgot-password" className="text-xs md:text-sm text-[#2563eb] font-medium hover:underline">
+                  {/* <Link to="/forgot-password" className="text-xs md:text-sm text-[#2563eb] font-medium hover:underline">
                     Forgot password?
-                  </Link>
+                  </Link> */}
                 </div>
                 <input
                   type="password"
