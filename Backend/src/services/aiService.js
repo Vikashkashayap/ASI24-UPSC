@@ -8,6 +8,23 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "openai/gpt-4o-mini";
 const TEMPERATURE = 0.2;
 
+const RELEVANCE_SYSTEM =
+  "You are a UPSC civil services exam expert. Check if news is relevant for UPSC preparation. Return only YES or NO.";
+const RELEVANCE_QUESTION = `Check if the following news is relevant for UPSC Civil Services Exam preparation.
+
+Relevant categories include:
+government policy
+Supreme Court judgement
+economy
+environment
+international relations
+science and technology
+defence
+governance
+social issues
+
+Return only YES or NO.`;
+
 const SYSTEM_PROMPT = `You are a former UPSC Mains examiner and policy analyst.
 Analyze the given news and generate structured UPSC current affairs.
 Focus on constitutional provisions, governance impact, socio-economic implications, international context and exam relevance.
@@ -31,6 +48,49 @@ Rules:
 - gsPaper: one of GS1, GS2, GS3, GS4.
 - difficulty: Easy | Moderate | Hard.
 Return only the JSON object.`;
+
+/**
+ * Check if a news article is UPSC-relevant using OpenRouter LLM.
+ * @param {Object} article - { title, description, content, url }
+ * @returns {Promise<boolean>} true if response is YES (relevant)
+ */
+export async function isUpscRelevant(article) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY is not set in environment");
+  }
+
+  const { title = "", description = "", content = "" } = article;
+  const text = [title, description, (content || "").slice(0, 1500)].filter(Boolean).join("\n\n");
+  const userContent = `${RELEVANCE_QUESTION}\n\nNews:\n${text}`;
+
+  const response = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      "X-Title": "MentorsDaily - UPSC Relevance",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      temperature: 0,
+      messages: [
+        { role: "system", content: RELEVANCE_SYSTEM },
+        { role: "user", content: userContent },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`OpenRouter relevance check failed: ${response.status} – ${errText.slice(0, 200)}`);
+  }
+
+  const data = await response.json();
+  const raw = (data?.choices?.[0]?.message?.content || "").trim().toUpperCase();
+  return raw.startsWith("YES");
+}
 
 /**
  * Build user prompt from a single news article
