@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme";
 import logoImg from "../../LOGO/mentorsdaily.png";
+import { VedixLabBanner } from "./VedixLabBanner";
 
 export const LandingFooter = () => {
   const { theme } = useTheme();
@@ -122,19 +123,28 @@ export const LandingFooter = () => {
             </h4>
             <ul className="mt-4 space-y-2">
               <li>
-                <a href="#privacy" className="hover:text-[#2563eb] transition">
+                <Link to="/privacy" className="hover:text-[#2563eb] transition">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#terms" className="hover:text-[#2563eb] transition">
+                <Link to="/terms" className="hover:text-[#2563eb] transition">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
         </div>
+      </div>
+
+      {/* Technology partner — Vedix Lab */}
+      <div
+        className={`mx-auto mt-10 flex max-w-7xl justify-center border-t px-4 pt-8 sm:px-6 ${
+          theme === "dark" ? "border-slate-800" : "border-slate-200"
+        }`}
+      >
+        <VedixLabBanner variant="footer" className="mx-auto" />
       </div>
     </footer>
   );

@@ -16,7 +16,7 @@ export interface PageSEO {
 }
 
 const defaultSEO: PageSEO = {
-  title: "MentorsDaily – Student Portal Dashboard Powered by AI | UPSC Preparation",
+  title: "MentorsDaily – India's AI Student Portal | UPSC Preparation",
   description:
     "MentorsDaily is an AI-powered student portal dashboard for UPSC preparation. One dashboard for answer writing, tests, analytics and mentor support. Built for serious aspirants.",
   path: "/",
@@ -28,11 +28,12 @@ const defaultSEO: PageSEO = {
 export const LANDING_SEO: Record<string, PageSEO> = {
   "/": defaultSEO,
   "/features": {
-    title: "Features – Answer Lab, Analytics, Mentor | MentorsDaily",
+    title: "Features – Answer Lab, Prelims, Analytics, Mentor | MentorsDaily",
     description:
-      "Answer Lab for daily writing & feedback, performance analytics, PYQ insights, and 24/7 AI mentor. Everything you need for UPSC preparation in one dashboard.",
+      "Answer Lab, Performance Analytics, Current Affairs Lab, Concept Simplifier, student dashboard, prelims practice, AI Mentor, study planner, copy evaluation, profiler, live meetings — all in one UPSC student portal.",
     path: "/features",
-    keywords: "UPSC answer writing, UPSC analytics, AI mentor, UPSC features, answer lab",
+    keywords:
+      "UPSC answer writing, prelims MCQ mock, performance analytics, AI mentor, study planner, current affairs, concept notes, MentorsDaily",
   },
   "/pricing": {
     title: "Pricing – MentorsDaily Plans | UPSC Preparation",

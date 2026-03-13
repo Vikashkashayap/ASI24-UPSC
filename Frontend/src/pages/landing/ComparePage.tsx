@@ -15,7 +15,11 @@ const oldWay = [
 const portalWay = [
   "Write answers — everything in one workspace",
   "AI evaluates — instant, consistent, structure + content feedback",
-  "PYQ analytics — decide which topics to study",
+  "Prelims test practice — timed MCQs, topic drills, instant scoring",
+  "Student dashboard — prep, tests, analytics & plans in one place",
+  "Performance analysis — trends, weak areas, not just marks",
+  "Plan generator — daily & weekly study plans from your data",
+  "PYQ analytics — decide which topics to study next",
   "Mentor-style chat — trained on UPSC reasoning",
   "Current affairs + concepts — all linked, revise-friendly",
 ];
@@ -120,11 +124,16 @@ export const ComparePage = () => {
                     theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
                   }`}>MentorsDaily</h2>
                 </div>
-                <h3 className={`text-xl font-semibold mb-4 ${
+                <h3 className={`text-xl font-semibold mb-2 ${
                   theme === "dark" ? "text-emerald-100" : "text-emerald-800"
                 }`}>
                   Instant clarity, answer-first workflow
                 </h3>
+                <p className={`text-xs mb-4 ${
+                  theme === "dark" ? "text-emerald-200/80" : "text-emerald-700/90"
+                }`}>
+                  Dashboard · Prelims practice · Performance insights · Smart plans
+                </p>
                 <ul className="space-y-3">
                   {portalWay.map((item) => (
                     <li key={item} className="flex items-start gap-3">

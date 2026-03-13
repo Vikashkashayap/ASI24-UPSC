@@ -121,12 +121,12 @@ export const AboutPage = () => {
         theme === "dark" ? "border-purple-900/70 bg-[#0b0618]" : "border-slate-200 bg-white"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <h2 className={`text-lg font-semibold text-center mb-8 ${
+          {/* <h2 className={`text-lg font-semibold text-center mb-8 ${
             theme === "dark" ? "text-slate-50" : "text-slate-900"
           }`}>
             Team
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          </h2> */}
+          {/* <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             <Card className={`overflow-hidden rounded-[24px] ${
               theme === "dark"
                 ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#0a1520]"
@@ -175,7 +175,7 @@ export const AboutPage = () => {
                 </p>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </section>
       <LandingFooter />

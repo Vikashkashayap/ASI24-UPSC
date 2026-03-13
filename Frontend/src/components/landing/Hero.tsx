@@ -36,7 +36,7 @@ export const LandingHero = () => {
             theme === "dark" ? "text-blue-300/90" : "text-blue-600"
           }`}
         >
-          • India&apos;s Premier AI-Powered Student Portal
+          India&apos;s Premier AI-Powered Student Portal
         </p>
 
         {/* Main heading */}
@@ -45,8 +45,8 @@ export const LandingHero = () => {
             theme === "dark" ? "text-slate-50" : "text-slate-900"
           }`}
         >
-          Your Student Portal Dashboard,{" "}
-          <span className="text-[#2563eb]">Powered by AI.</span>
+          India&apos;s UPSC Preparation Portal{" "}
+          <span className="text-[#2563eb]">Powered by MentorsDaily.</span>
         </h1>
 
         {/* Description */}

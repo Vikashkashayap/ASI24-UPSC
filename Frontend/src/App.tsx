@@ -27,6 +27,8 @@ import { PricingPage } from "./pages/landing/PricingPage";
 import { ComparePage } from "./pages/landing/ComparePage";
 import { TestimonialsPage } from "./pages/landing/TestimonialsPage";
 import { AboutPage } from "./pages/landing/AboutPage";
+import { PrivacyPolicyPage } from "./pages/landing/PrivacyPolicyPage";
+import { TermsOfServicePage } from "./pages/landing/TermsOfServicePage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
@@ -60,6 +62,8 @@ function App() {
             <Route path="daily-current-affairs/:slug" element={<CurrentAffairDetailPage />} />
             <Route path="testimonials" element={<TestimonialsPage />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="privacy" element={<PrivacyPolicyPage />} />
+            <Route path="terms" element={<TermsOfServicePage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
