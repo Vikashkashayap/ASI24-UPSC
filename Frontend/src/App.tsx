@@ -29,6 +29,10 @@ import { TestimonialsPage } from "./pages/landing/TestimonialsPage";
 import { AboutPage } from "./pages/landing/AboutPage";
 import { PrivacyPolicyPage } from "./pages/landing/PrivacyPolicyPage";
 import { TermsOfServicePage } from "./pages/landing/TermsOfServicePage";
+import { TermsConditionsPage } from "./pages/TermsConditions";
+import { RefundPolicyPage } from "./pages/RefundPolicy";
+import { DisclaimerPage } from "./pages/Disclaimer";
+import { ContactUsPage } from "./pages/ContactUs";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
 import { StudentsListPage } from "./pages/admin/StudentsListPage";
@@ -64,6 +68,10 @@ function App() {
             <Route path="about" element={<AboutPage />} />
             <Route path="privacy" element={<PrivacyPolicyPage />} />
             <Route path="terms" element={<TermsOfServicePage />} />
+            <Route path="terms-conditions" element={<TermsConditionsPage />} />
+            <Route path="refund-policy" element={<RefundPolicyPage />} />
+            <Route path="disclaimer" element={<DisclaimerPage />} />
+            <Route path="contact-us" element={<ContactUsPage />} />
           </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

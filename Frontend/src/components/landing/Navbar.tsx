@@ -7,7 +7,7 @@ import logoImg from "../../LOGO/mentorsdaily.png";
 
 const navItems: { label: string; to: string; external?: boolean }[] = [
   { label: "Features", to: "/features" },
-  { label: "Pricing", to: "/pricing" },
+  { label: "Plans", to: "/pricing" },
   { label: "Compare", to: "/compare" },
   { label: "Current Affairs", to: "/daily-current-affairs" },
   { label: "Testimonials", to: "/testimonials" },

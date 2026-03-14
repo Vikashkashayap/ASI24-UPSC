@@ -36,11 +36,11 @@ export const LANDING_SEO: Record<string, PageSEO> = {
       "UPSC answer writing, prelims MCQ mock, performance analytics, AI mentor, study planner, current affairs, concept notes, MentorsDaily",
   },
   "/pricing": {
-    title: "Pricing – MentorsDaily Plans | UPSC Preparation",
+    title: "Plans – MentorsDaily Pro | UPSC Preparation",
     description:
-      "Transparent pricing for MentorsDaily. Aspirant-friendly plans with unlimited practice, analytics, and mentor chat. No hidden charges.",
+      "Choose your MentorsDaily Pro plan. Aspirant-friendly subscriptions with unlimited practice, analytics, and mentor chat. No hidden charges.",
     path: "/pricing",
-    keywords: "MentorsDaily pricing, UPSC preparation cost, UPSC mentor subscription",
+    keywords: "MentorsDaily plans, UPSC preparation cost, UPSC mentor subscription",
   },
   "/compare": {
     title: "Compare – MentorsDaily vs Others | UPSC Prep",
@@ -62,6 +62,41 @@ export const LANDING_SEO: Record<string, PageSEO> = {
       "Learn about MentorsDaily: our mission to help UPSC aspirants with one dashboard for answer writing, tests, analytics and 24/7 mentor support.",
     path: "/about",
     keywords: "about MentorsDaily, UPSC preparation platform, UPSC mentor",
+  },
+  "/terms-conditions": {
+    title: "Terms & Conditions | MentorsDaily",
+    description:
+      "Terms and conditions for MentorsDaily Student Portal: courses, test series, study materials, accounts and payments at studentportal.mentorsdaily.com.",
+    path: "/terms-conditions",
+    keywords: "MentorsDaily terms, UPSC portal terms, student portal legal",
+  },
+  "/refund-policy": {
+    title: "Refund Policy | MentorsDaily",
+    description:
+      "Refund policy for MentorsDaily: 3-day window, test series access rules, 7 working days processing. UPSC preparation.",
+    path: "/refund-policy",
+    keywords: "MentorsDaily refund, UPSC course refund policy",
+  },
+  "/disclaimer": {
+    title: "Disclaimer | MentorsDaily",
+    description:
+      "Disclaimer for MentorsDaily: educational use, no exam result guarantee, third-party links. UPSC platform.",
+    path: "/disclaimer",
+    keywords: "MentorsDaily disclaimer, UPSC prep disclaimer",
+  },
+  "/contact-us": {
+    title: "Contact Us | MentorsDaily",
+    description:
+      "Contact MentorsDaily: support for courses, test series, accounts. Email hr@mentorsdaily.com.",
+    path: "/contact-us",
+    keywords: "contact MentorsDaily, student portal support, hr@mentorsdaily.com",
+  },
+  "/privacy": {
+    title: "Privacy Policy | MentorsDaily",
+    description:
+      "Privacy policy for MentorsDaily at studentportal.mentorsdaily.com. How we collect and protect your data.",
+    path: "/privacy",
+    keywords: "MentorsDaily privacy policy, student data",
   },
 };
 

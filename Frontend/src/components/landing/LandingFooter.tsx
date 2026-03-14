@@ -62,7 +62,7 @@ export const LandingFooter = () => {
               </li>
               <li>
                 <Link to="/pricing" className="hover:text-[#2563eb] transition">
-                  Pricing
+                  Plans
                 </Link>
               </li>
               <li>
@@ -104,7 +104,7 @@ export const LandingFooter = () => {
                   rel="noopener noreferrer"
                   className="hover:text-[#2563eb] transition"
                 >
-                  Contact
+                  Contact Us
                 </a>
               </li>
             </ul>
@@ -128,8 +128,23 @@ export const LandingFooter = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/terms-conditions" className="hover:text-[#2563eb] transition">
+                  Terms &amp; Conditions
+                </Link>
+              </li>
+              <li>
                 <Link to="/terms" className="hover:text-[#2563eb] transition">
                   Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link to="/refund-policy" className="hover:text-[#2563eb] transition">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/disclaimer" className="hover:text-[#2563eb] transition">
+                  Disclaimer
                 </Link>
               </li>
             </ul>

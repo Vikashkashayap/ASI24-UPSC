@@ -752,11 +752,13 @@ Return ONLY valid JSON with "examTitle" or "test_name", "questions" array. Each 
   }
 }
 
-/** For 100Q mock we generate 120 and show 100; for 50Q we generate 60 and show 50 (avoids duplicates in paper). 50-question mock duration = 60 minutes. */
+/** For 100Q mock we generate 120 first; refill batches run until 100 UNIQUE questions (dedupe drops dupes). 50Q: 60 then refill to 50. */
 const MIX_GENERATE_100 = 120;
 const MIX_GENERATE_50 = 60;
 const MIX_DISPLAY_100 = 100;
 const MIX_DISPLAY_50 = 50;
+/** Max extra API batches if dedupe leaves us short of display count (each batch = 20 questions). */
+const MIX_MAX_REFILL_BATCHES = 35;
 
 /**
  * Generate full-length or sectional UPSC Prelims GS Paper 1 MIX mock (100 or 50 questions).
@@ -803,14 +805,43 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const deduped = dedupeQuestions(all);
+    let deduped = dedupeQuestions(all);
+    let refill = 0;
+    while (deduped.length < displayCount && refill < MIX_MAX_REFILL_BATCHES) {
+      const fromDeduped = deduped
+        .map((q) => String(q.question || q.questionText || "").trim().slice(0, 120))
+        .filter(Boolean);
+      const snippetPool = [...new Set([...excludeSnippets, ...fromDeduped])].slice(0, 28);
+      console.log(
+        `📝 Full mock MIX: refill ${refill + 1}/${MIX_MAX_REFILL_BATCHES} (unique so far ${deduped.length}/${displayCount}, need ${displayCount - deduped.length} more)...`
+      );
+      const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(
+        apiKey,
+        model,
+        perBatch,
+        `Refill ${refill + 1}`,
+        difficulty,
+        snippetPool,
+        displayCount
+      );
+      if (batchTestName) testName = batchTestName;
+      if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
+      deduped = dedupeQuestions(all);
+      refill += 1;
+    }
+
     const finalQuestions = deduped.slice(0, displayCount);
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for full mock mix. Please try again.");
     }
+    if (finalQuestions.length < displayCount) {
+      throw new Error(
+        `Full mock MIX: only ${finalQuestions.length} unique questions after ${batches + refill} batches (need ${displayCount}). Try again or increase MIX_MAX_REFILL_BATCHES.`
+      );
+    }
 
-    console.log(`✅ Full mock MIX: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
+    console.log(`✅ Full mock MIX: ${deduped.length} unique generated, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
     return {
       success: true,

@@ -128,7 +128,7 @@ export default function CurrentAffairsPage() {
       </div>
 
       {/* Filters + Search */}
-      <Card
+      {/* <Card
         className={
           isDark
             ? "border-slate-800 bg-slate-950/60"
@@ -206,7 +206,7 @@ export default function CurrentAffairsPage() {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {error && (
         <div

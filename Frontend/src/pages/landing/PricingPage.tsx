@@ -11,7 +11,7 @@ import { pricingAPI, type PricingPlanType } from "../../services/api";
 import { SubscribeButton } from "../../components/SubscribeButton";
 
 const whatToExpect = [
-  "Transparent pricing — no hidden charges",
+  "Transparent plans — no hidden charges",
   "Aspirant-friendly — fits working professionals' budget",
   "Pro plans — unlimited practice, analytics, mentor chat",
   "Rewards — gift for top rank (terms are clear)",
@@ -70,7 +70,7 @@ export const PricingPage = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
-              <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading pricing...</p>
+              <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading plans...</p>
             </div>
           ) : hasActivePlans ? (
             <>
@@ -91,7 +91,7 @@ export const PricingPage = () => {
                 <p className={`text-base max-w-lg mx-auto ${
                   theme === "dark" ? "text-slate-300" : "text-slate-600"
                 }`}>
-                  Simple, clear, aspirant-friendly pricing.
+                  Simple, clear, aspirant-friendly plans.
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -132,12 +132,12 @@ export const PricingPage = () => {
               <h1 className={`text-3xl md:text-5xl font-extrabold mb-4 tracking-tight ${
                 theme === "dark" ? "text-slate-50" : "text-slate-900"
               }`}>
-                Pricing launching soon. Stay tuned 🚀
+                Plans launching soon. Stay tuned 🚀
               </h1>
               <p className={`text-base md:text-lg max-w-md mx-auto ${
                 theme === "dark" ? "text-slate-300" : "text-slate-600"
               }`}>
-                We're crafting MentorsDaily Pro pricing — simple, clear, aspirant-friendly.
+                We're crafting MentorsDaily Pro plans — simple, clear, aspirant-friendly.
               </p>
             </div>
           )}
