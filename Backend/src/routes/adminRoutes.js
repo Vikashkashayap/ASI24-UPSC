@@ -5,6 +5,7 @@ import {
   getProStudents,
   getStudentById,
   getStudentPrelims,
+  getStudentPerformance,
   getStudentMains,
   getStudentActivity,
   getStudentDartAnalytics,
@@ -30,6 +31,7 @@ import {
   updatePrelimsMockSchedule,
   deletePrelimsMock,
   exportPrelimsMockAsJson,
+  getMockResults,
 } from "../controllers/prelimsMockController.js";
 import {
   getAllPlans,
@@ -86,6 +88,7 @@ router.delete("/imported-tests/:id", deleteImportedTest);
 // Prelims Mock: schedule, go-live, update schedule, delete
 router.post("/prelims-mock", createPrelimsMockSchedule);
 router.get("/prelims-mock", listAdminPrelimsMocks);
+router.get("/prelims-mock/:id/results", getMockResults);
 router.get("/prelims-mock/:id/export", exportPrelimsMockAsJson);
 router.post("/prelims-mock/:id/go-live", goLivePrelimsMock);
 router.patch("/prelims-mock/:id", updatePrelimsMockSchedule);
@@ -115,6 +118,7 @@ router.delete("/students/:id", (req, res, next) => {
 router.post("/students", createStudent);
 router.get("/students", getAllStudents);
 router.get("/pro-students", getProStudents);
+router.get("/students/:id/performance", getStudentPerformance);
 router.get("/students/:id", getStudentById);
 router.get("/students/:id/prelims", getStudentPrelims);
 router.get("/students/:id/mains", getStudentMains);

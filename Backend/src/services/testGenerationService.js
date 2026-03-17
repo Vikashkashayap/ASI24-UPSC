@@ -24,8 +24,13 @@ function dedupeQuestions(questions) {
 
 /**
  * Build GS Paper 1 system prompt with optional Current Affairs and Art & Culture emphasis.
+ * @param {string[]} subjects
+ * @param {string} topic
+ * @param {string} difficulty
+ * @param {Object} [currentAffairsPeriod]
+ * @param {string[]} [patternsToInclude] - If non-empty, use ONLY these question patterns in balanced proportion.
  */
-function buildGSSystemPrompt(subjects, topic, difficulty, currentAffairsPeriod) {
+function buildGSSystemPrompt(subjects, topic, difficulty, currentAffairsPeriod, patternsToInclude = []) {
   const subjectsText = Array.isArray(subjects) ? subjects.join(", ") : subjects;
   let contentRules = `- Subjects: ${subjectsText}\n- Topic: ${topic}\n- Difficulty: ${difficulty}\n- Stay within UPSC GS-I syllabus.\n- Avoid direct factual recall.\n- At least one option must be a close UPSC-style trap.\n- Options must be logically eliminable.`;
 
@@ -56,6 +61,7 @@ OBJECTIVE:
 Generate UPSC-standard MCQs for mock tests. Questions must feel like real Prelims — conceptual, eliminable, and trap-based.
 
 MANDATORY QUESTION PATTERNS:
+${Array.isArray(patternsToInclude) && patternsToInclude.length > 0 ? `Use ONLY these patterns in balanced proportion: ${patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join("; ")}. Still follow format rules below for each type.\n\n` : ""}
 1. Statement-based questions: Use 2 or 3 statements. Options must be statement-type combinations, e.g. "1 only", "2 only", "1 and 2 only", "1 and 3 only", "1, 2 and 3" (for 3 statements). Do NOT use generic options; use only statement-number combinations.
 2. Assertion-Reason: Use exactly 2 statements (Assertion + Reason). Options: (a) Both correct, A explains R (b) Both correct, A does not explain R (c) A correct, R wrong (d) A wrong, R correct. Keep assertion-type questions with 2 or 3 statement-type options as above where applicable.
 3. "How many of the above are correct?" structure (with 2–4 statements)
@@ -236,11 +242,28 @@ IMPORTANT RULES:
 • For assertion-reason: options must be (a) Both correct, A explains R (b) Both correct, A does not explain R (c) A correct, R wrong (d) A wrong, R correct.`;
 }
 
+/** Human-readable labels for pattern IDs (for prompt text). */
+const PATTERN_LABELS = {
+  statement_based: "Statement-based (which are correct)",
+  statement_not_correct: "Statement-based (NOT correct)",
+  pair_matching: "Pair matching / Match the following",
+  assertion_reason: "Assertion–Reason",
+  direct_conceptual: "Direct conceptual MCQs",
+  chronology: "Chronology-based",
+  sequence_arrangement: "Sequence arrangement",
+  map_location: "Map/location-based",
+  odd_one_out: "Odd one out",
+  multi_statement_elimination: "Multi-statement elimination",
+};
+
 /**
  * Build system prompt for FULL-LENGTH UPSC Prelims GS Paper 1 MIX.
  * Uses structured output: tableData, matchColumns, assertionReason, questionType, difficulty mix 50% Moderate / 35% Hard / 15% Easy.
+ * @param {string} [difficulty]
+ * @param {string[]} [excludeSnippets]
+ * @param {string[]} [patternsToInclude] - If non-empty, use ONLY these patterns in balanced proportion.
  */
-function buildFullMockMixSystemPrompt(difficulty = "moderate", excludeSnippets = []) {
+function buildFullMockMixSystemPrompt(difficulty = "moderate", excludeSnippets = [], patternsToInclude = []) {
   const avoidLine =
     Array.isArray(excludeSnippets) && excludeSnippets.length > 0
       ? `\nAVOID repeating or closely mimicking these previous question snippets (do not duplicate themes/wording):\n${excludeSnippets.map((s) => `- ${s}`).join("\n")}\n`
@@ -251,6 +274,12 @@ function buildFullMockMixSystemPrompt(difficulty = "moderate", excludeSnippets =
       : difficulty === "hard"
         ? "80% Hard, 20% Moderate"
         : "50% Easy, 50% Moderate";
+
+  const questionTypeSection =
+    Array.isArray(patternsToInclude) && patternsToInclude.length > 0
+      ? `Question types to use (ONLY these, in balanced proportion): ${patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join(" | ")}. Map to questionType as: statement_based/statement_not_correct/multi_statement_elimination/odd_one_out → "statement" where appropriate; pair_matching → "match" or "pair"; assertion_reason → "assertion"; direct_conceptual → "direct"; chronology/sequence_arrangement → "chronology"; map_location → "map".`
+      : "Question Type Distribution (same for 100 and 50): 60% Statement Based | 12% Match the Following | 6% Assertion–Reason | 8% Pair Matching | 4% Chronology | 5% Map Conceptual | 5% Direct (concept-linked only)";
+
   return `You are an expert UPSC Prelims GS Paper 1 question setter and structured exam formatter.
 
 Generate a full-length UPSC Prelims mock test strictly following the 2015–2024 trend.
@@ -269,8 +298,7 @@ Subject Distribution (scale proportionally for 50Q sectional):
 Full 100: Polity 14 | History 14 | Geography 11 | Economy 14 | Environment 16 | Science & Tech 10 | Art & Culture 6 | Current Affairs integrated.
 Sectional 50: roughly half each (e.g. Polity 7, History 7, Geography 6, Economy 7, Environment 8, Science & Tech 5, Art & Culture 3, rest Current Affairs).
 
-Question Type Distribution (same for 100 and 50):
-60% Statement Based | 12% Match the Following | 6% Assertion–Reason | 8% Pair Matching | 4% Chronology | 5% Map Conceptual | 5% Direct (concept-linked only)
+${questionTypeSection}
 
 Difficulty: ${difficultyMix}
 
@@ -693,16 +721,21 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
 
 /**
  * Generate one batch of mixed full-mock questions (20 per batch for 100Q, or 25 per batch for 50-question sectional).
+ * @param {string[]} [patternsToInclude] - If provided, use only these question patterns in balanced proportion.
  */
-async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel, difficulty = "moderate", excludeSnippets = [], totalQuestions = 100) {
+async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel, difficulty = "moderate", excludeSnippets = [], totalQuestions = 100, patternsToInclude = []) {
   const isSectional = totalQuestions === 50;
   const contextLine = isSectional
     ? `This is ${batchLabel} of a 50-question SECTIONAL mock. Use the SAME format as full-length: same question types (statement, match, assertion, chronology, pair, map, direct), same structured JSON (questionText, tableData, matchColumns, assertionReason, options array, explanation per option). Generate exactly ${batchSize} questions.`
     : `This is ${batchLabel} of a 100-question full-length mock. Generate exactly ${batchSize} questions.`;
+  const typeMixLine =
+    Array.isArray(patternsToInclude) && patternsToInclude.length > 0
+      ? `Use ONLY these question patterns in balanced proportion: ${patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join(", ")}.`
+      : "Question type mix: ~60% statement, ~12% match, ~6% assertion, ~8% pair, ~4% chronology, ~5% map, ~5% direct.";
   const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims GS Paper 1 questions. ${contextLine}
 
 Subject mix in this batch (scale to batch size): Polity, History, Geography, Economy, Environment, Science & Tech, Art & Culture; integrate Current Affairs where relevant.
-Question type mix: ~60% statement, ~12% match, ~6% assertion, ~8% pair, ~4% chronology, ~5% map, ~5% direct.
+${typeMixLine}
 Difficulty mix: 50% moderate, 35% hard, 15% easy.
 
 For each question: option-wise explanation (explanation.A/B/C/D), at least 120 words total per question; eliminationLogic; conceptualSource (e.g. NCERT, standard text).
@@ -719,7 +752,7 @@ Return ONLY valid JSON with "examTitle" or "test_name", "questions" array. Each 
     body: JSON.stringify({
       model,
       messages: [
-        { role: "system", content: buildFullMockMixSystemPrompt(difficulty, excludeSnippets) },
+        { role: "system", content: buildFullMockMixSystemPrompt(difficulty, excludeSnippets, patternsToInclude) },
         { role: "user", content: userPrompt },
       ],
       temperature: 0.35,
@@ -776,6 +809,7 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
     ? String(opts.difficulty).toLowerCase()
     : "moderate";
   const excludeSnippets = Array.isArray(opts.excludeSnippets) ? opts.excludeSnippets : [];
+  const patternsToInclude = Array.isArray(opts.patternsToInclude) && opts.patternsToInclude.length > 0 ? opts.patternsToInclude : [];
 
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -799,7 +833,8 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
         `Part ${b}`,
         difficulty,
         excludeSnippets,
-        displayCount
+        displayCount,
+        patternsToInclude
       );
       if (batchTestName) testName = batchTestName;
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
@@ -822,7 +857,8 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
         `Refill ${refill + 1}`,
         difficulty,
         snippetPool,
-        displayCount
+        displayCount,
+        patternsToInclude
       );
       if (batchTestName) testName = batchTestName;
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
@@ -1024,10 +1060,11 @@ function parseFullMockResponse(aiContent) {
 
 /**
  * Generate 20 questions per batch using GS prompt (array format). Used for full-mock.
+ * @param {string[]} [patternsToInclude] - If provided, use only these question patterns in balanced proportion.
  */
-async function generateFullMockBatch(apiKey, model, subject, batchLabel) {
+async function generateFullMockBatch(apiKey, model, subject, batchLabel, patternsToInclude = []) {
   const subjectsList = typeof subject === "string" ? subject.split(",").map((s) => s.trim()) : [subject];
-  const systemPrompt = buildGSSystemPrompt(subjectsList, `Full Mock - ${batchLabel}`, "Moderate", null);
+  const systemPrompt = buildGSSystemPrompt(subjectsList, `Full Mock - ${batchLabel}`, "Moderate", null, patternsToInclude);
   const userPrompt = `Generate EXACTLY 20 UPSC Prelims GS Paper 1 MCQs. Subjects: ${subjectsList.join(", ")}. Topic: Full Mock - ${batchLabel}. Difficulty: Moderate.
 
 Output ONLY a valid JSON array of 20 objects. No markdown, no code fences, no explanation before or after.
@@ -1080,7 +1117,7 @@ const SUBJECT_FULL_GENERATE_COUNT = 120;
  * @param {string} params.subject - Subject from admin (e.g. "Polity", "History, Geography")
  * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
  */
-export const generateFullMockTestQuestions = async ({ subject }) => {
+export const generateFullMockTestQuestions = async ({ subject, patternsToInclude = [] }) => {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
@@ -1089,12 +1126,13 @@ export const generateFullMockTestQuestions = async ({ subject }) => {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
+    const patterns = Array.isArray(patternsToInclude) && patternsToInclude.length > 0 ? patternsToInclude : [];
     const batches = Math.ceil(SUBJECT_FULL_GENERATE_COUNT / 20);
     const perBatch = 20;
     const all = [];
     for (let b = 1; b <= batches; b++) {
       console.log(`📝 Full mock: generating batch ${b}/${batches} (${perBatch} questions)...`);
-      const batch = await generateFullMockBatch(apiKey, model, subject, `Part ${b}`);
+      const batch = await generateFullMockBatch(apiKey, model, subject, `Part ${b}`, patterns);
       if (batch && batch.length) all.push(...batch);
     }
     const deduped = dedupeQuestions(all);

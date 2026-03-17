@@ -65,6 +65,8 @@ const prelimsMockSchema = new mongoose.Schema(
     ],
     totalQuestions: { type: Number, default: 100 }, // 100 full-length or 50 sectional
     difficulty: { type: String, enum: ["easy", "moderate", "hard"], default: "moderate" }, // for filtering & generation mix
+    /** UPSC question patterns to include. Empty = default balanced mix. Keys: statement_based, statement_not_correct, pair_matching, assertion_reason, direct_conceptual, chronology, sequence_arrangement, map_location, odd_one_out, multi_statement_elimination */
+    patternsToInclude: [{ type: String, trim: true }],
     avoidPreviouslyUsed: { type: Boolean, default: false },
     durationMinutes: { type: Number, default: 120 },
     totalMarks: { type: Number, default: 200 },

@@ -2,6 +2,7 @@ import { User } from "../models/User.js";
 import { PricingPlan } from "../models/PricingPlan.js";
 import CopyEvaluation from "../models/CopyEvaluation.js";
 import Test from "../models/Test.js";
+import PrelimsMock from "../models/PrelimsMock.js";
 import { MeetingRoom } from "../models/MeetingRoom.js";
 import { MentorChat } from "../models/MentorChat.js";
 import { getDartAnalytics, getDart20DayReport, build20DayReportPdf } from "../services/dartService.js";
@@ -403,6 +404,142 @@ export const getStudentPrelims = async (req, res) => {
       success: false,
       message: "Failed to fetch student prelims data"
     });
+  }
+};
+
+/**
+ * GET /api/admin/students/:id/performance
+ * Full performance dashboard: summary, tests with rank, subject analysis.
+ */
+export const getStudentPerformance = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+
+    const student = await User.findById(studentId).select("name email").lean();
+    if (!student) {
+      return res.status(404).json({ success: false, message: "Student not found" });
+    }
+
+    // Only mock tests (Prelims Mock) — exclude regular topic tests
+    const tests = await Test.find({
+      userId: studentId,
+      isSubmitted: true,
+      prelimsMockId: { $exists: true, $ne: null },
+    })
+      .select("prelimsMockId subject topic score correctAnswers wrongAnswers accuracy createdAt updatedAt")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const mockIds = [...new Set(tests.map((t) => t.prelimsMockId).filter(Boolean))];
+    const mockTitles = {};
+    if (mockIds.length > 0) {
+      const mocks = await PrelimsMock.find({ _id: { $in: mockIds } }).select("_id title").lean();
+      mocks.forEach((m) => {
+        mockTitles[m._id.toString()] = m.title || m._id.toString();
+      });
+    }
+
+    // Build rank per mock: for each prelimsMockId, get all submissions, sort, assign rank
+    const rankByTestId = {};
+    for (const mockId of mockIds) {
+      const submissions = await Test.find({
+        prelimsMockId: mockId,
+        isSubmitted: true,
+      })
+        .select("_id userId score correctAnswers wrongAnswers accuracy createdAt updatedAt")
+        .lean();
+
+      const rows = submissions.map((t) => {
+        const attempted = (t.correctAnswers || 0) + (t.wrongAnswers || 0);
+        const acc = attempted > 0 ? ((t.correctAnswers || 0) / attempted) * 100 : 0;
+        const timeTaken = t.updatedAt && t.createdAt ? new Date(t.updatedAt) - new Date(t.createdAt) : 0;
+        return {
+          _id: t._id.toString(),
+          userId: t.userId?.toString(),
+          score: t.score != null ? Number(t.score) : 0,
+          accuracy: acc,
+          timeTaken,
+        };
+      });
+
+      rows.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;
+        return a.timeTaken - b.timeTaken;
+      });
+
+      rows.forEach((r, index) => {
+        rankByTestId[r._id] = index + 1;
+      });
+    }
+
+    const testsPayload = tests.map((t) => {
+      const attempted = (t.correctAnswers || 0) + (t.wrongAnswers || 0);
+      const correct = t.correctAnswers || 0;
+      const wrong = t.wrongAnswers || 0;
+      const accuracy = attempted > 0 ? parseFloat((((t.correctAnswers || 0) / attempted) * 100).toFixed(2)) : (t.accuracy != null ? Number(t.accuracy) : 0);
+      const timeTaken = t.updatedAt && t.createdAt ? new Date(t.updatedAt) - new Date(t.createdAt) : 0;
+      const mockId = t.prelimsMockId?.toString() || null;
+      const mockTitle = mockId ? (mockTitles[mockId] || t.topic) : t.topic;
+      const date = t.updatedAt || t.createdAt;
+      const rank = t._id ? rankByTestId[t._id.toString()] : null;
+
+      return {
+        testId: t._id?.toString(),
+        mockId,
+        mockTitle,
+        date: date ? new Date(date).toISOString() : null,
+        score: t.score != null ? Number(t.score) : 0,
+        accuracy,
+        rank,
+        attempted,
+        correct,
+        wrong,
+        timeTaken,
+      };
+    });
+
+    // Subject-wise aggregation (by test.subject string)
+    const subjectMap = {};
+    tests.forEach((t) => {
+      const sub = t.subject || "Other";
+      if (!subjectMap[sub]) subjectMap[sub] = { attempted: 0, correct: 0 };
+      subjectMap[sub].attempted += (t.correctAnswers || 0) + (t.wrongAnswers || 0);
+      subjectMap[sub].correct += t.correctAnswers || 0;
+    });
+    const subjectAnalysis = Object.entries(subjectMap).map(([subject, v]) => ({
+      subject,
+      attempted: v.attempted,
+      correct: v.correct,
+      accuracy: v.attempted > 0 ? parseFloat(((v.correct / v.attempted) * 100).toFixed(2)) : 0,
+    }));
+
+    const scores = tests.map((t) => (t.score != null ? Number(t.score) : 0)).filter((n) => typeof n === "number");
+    const accuracies = tests.map((t) => {
+      const a = (t.correctAnswers || 0) + (t.wrongAnswers || 0);
+      return a > 0 ? ((t.correctAnswers || 0) / a) * 100 : (t.accuracy != null ? Number(t.accuracy) : 0);
+    });
+
+    const summary = {
+      totalTests: tests.length,
+      avgScore: scores.length > 0 ? parseFloat((scores.reduce((s, n) => s + n, 0) / scores.length).toFixed(2)) : 0,
+      avgAccuracy: accuracies.length > 0 ? parseFloat((accuracies.reduce((s, n) => s + n, 0) / accuracies.length).toFixed(2)) : 0,
+      highestScore: scores.length > 0 ? Math.max(...scores) : 0,
+      lowestScore: scores.length > 0 ? Math.min(...scores) : 0,
+    };
+
+    return res.json({
+      success: true,
+      data: {
+        student: { name: student.name, email: student.email },
+        summary,
+        tests: testsPayload,
+        subjectAnalysis,
+      },
+    });
+  } catch (error) {
+    console.error("getStudentPerformance:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal server error" });
   }
 };
 

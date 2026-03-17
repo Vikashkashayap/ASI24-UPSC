@@ -1,5 +1,6 @@
 import PrelimsMock from "../models/PrelimsMock.js";
 import Test from "../models/Test.js";
+import { User } from "../models/User.js";
 import { generateFullMockTestQuestions, generateFullMockMixTestQuestions, generateFullMockPyoTestQuestions, generateFullMockCsatTestQuestions } from "../services/testGenerationService.js";
 
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
@@ -13,9 +14,22 @@ const FULL_LENGTH_MIX_SUBJECT = "Full Length GS Mix";
 const PYQ_MIN_YEAR = 2010;
 const PYQ_MAX_YEAR = 2025;
 
+const ALLOWED_PATTERNS = [
+  "statement_based",
+  "statement_not_correct",
+  "pair_matching",
+  "assertion_reason",
+  "direct_conceptual",
+  "chronology",
+  "sequence_arrangement",
+  "map_location",
+  "odd_one_out",
+  "multi_statement_elimination",
+];
+
 export const createPrelimsMockSchedule = async (req, res) => {
   try {
-    const { subject, scheduledAt, isMix, isPyo, isCsat, yearFrom, yearTo, title: customTitle, totalQuestions: reqTotalQuestions, difficulty, avoidPreviouslyUsed } = req.body;
+    const { subject, scheduledAt, isMix, isPyo, isCsat, yearFrom, yearTo, title: customTitle, totalQuestions: reqTotalQuestions, difficulty, patternsToInclude: reqPatterns, avoidPreviouslyUsed } = req.body;
     const useMix = Boolean(isMix);
     const usePyo = Boolean(isPyo);
     const useCsat = Boolean(isCsat);
@@ -32,6 +46,10 @@ export const createPrelimsMockSchedule = async (req, res) => {
       difficulty: ["easy", "moderate", "hard"].includes(String(difficulty || "").toLowerCase()) ? String(difficulty).toLowerCase() : "moderate",
       avoidPreviouslyUsed: Boolean(avoidPreviouslyUsed),
     };
+    if (Array.isArray(reqPatterns) && reqPatterns.length > 0) {
+      const valid = reqPatterns.filter((p) => typeof p === "string" && ALLOWED_PATTERNS.includes(p.trim())).map((p) => p.trim());
+      mockPayload.patternsToInclude = [...new Set(valid)];
+    }
 
     if (useCsat) {
       subjectStr = "CSAT Paper 2";
@@ -254,20 +272,47 @@ export const listAdminPrelimsMocks = async (req, res) => {
       filter.yearTo = { $gte: y };
     }
     const mocks = await PrelimsMock.find(filter).sort({ scheduledAt: -1 }).lean();
-    const data = mocks.map((m) => ({
-      _id: m._id,
-      subject: m.subject,
-      title: m.title,
-      scheduledAt: m.scheduledAt,
-      status: m.status,
-      totalQuestions: m.totalQuestions,
-      durationMinutes: m.durationMinutes,
-      totalMarks: m.totalMarks,
-      liveAt: m.liveAt,
-      endedAt: m.endedAt,
-      createdAt: m.createdAt,
-      questionCount: (m.questions || []).length,
-    }));
+    const mockIds = mocks.map((m) => m._id);
+    const attempts = await Test.find({ prelimsMockId: { $in: mockIds } })
+      .select("prelimsMockId userId isSubmitted score")
+      .lean();
+    const userIds = [...new Set(attempts.map((a) => a.userId).filter(Boolean))];
+    const users = userIds.length
+      ? await User.find({ _id: { $in: userIds } }).select("_id name email").lean()
+      : [];
+    const userMap = Object.fromEntries(users.map((u) => [u._id.toString(), { name: u.name, email: u.email }]));
+    const attemptsByMock = {};
+    attempts.forEach((a) => {
+      const mid = a.prelimsMockId?.toString();
+      if (!mid) return;
+      if (!attemptsByMock[mid]) attemptsByMock[mid] = [];
+      attemptsByMock[mid].push({
+        userId: a.userId?.toString(),
+        name: a.userId ? (userMap[a.userId.toString()]?.name || "—") : "—",
+        email: a.userId ? (userMap[a.userId.toString()]?.email || "") : "",
+        isSubmitted: !!a.isSubmitted,
+        score: a.score,
+      });
+    });
+    const data = mocks.map((m) => {
+      const list = attemptsByMock[m._id.toString()] || [];
+      return {
+        _id: m._id,
+        subject: m.subject,
+        title: m.title,
+        scheduledAt: m.scheduledAt,
+        status: m.status,
+        totalQuestions: m.totalQuestions,
+        durationMinutes: m.durationMinutes,
+        totalMarks: m.totalMarks,
+        liveAt: m.liveAt,
+        endedAt: m.endedAt,
+        createdAt: m.createdAt,
+        questionCount: (m.questions || []).length,
+        attemptCount: list.length,
+        attemptedBy: list,
+      };
+    });
     return res.json({ success: true, data });
   } catch (error) {
     console.error("listAdminPrelimsMocks:", error);
@@ -306,6 +351,7 @@ export const goLivePrelimsMock = async (req, res) => {
         totalQuestions: mock.totalQuestions || 100,
         difficulty: mock.difficulty || "moderate",
         avoidPreviouslyUsed: mock.avoidPreviouslyUsed,
+        patternsToInclude: Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0 ? mock.patternsToInclude : undefined,
       };
       if (mock.avoidPreviouslyUsed) {
         const existing = await PrelimsMock.find({
@@ -332,13 +378,15 @@ export const goLivePrelimsMock = async (req, res) => {
       }
     }
 
+    const subjectOpts = { subject: mock.subject };
+    if (Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0) subjectOpts.patternsToInclude = mock.patternsToInclude;
     const result = mock.isCsat
       ? await generateFullMockCsatTestQuestions()
       : mock.isPyo
         ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
         : mock.isMix
           ? await generateFullMockMixTestQuestions(mixOpts)
-          : await generateFullMockTestQuestions({ subject: mock.subject });
+          : await generateFullMockTestQuestions(subjectOpts);
     if (!result.success || !result.questions || result.questions.length === 0) {
       mock.status = "scheduled";
       await mock.save();
@@ -399,6 +447,7 @@ export const processScheduledPrelimsMocks = async () => {
           totalQuestions: mock.totalQuestions || 100,
           difficulty: mock.difficulty || "moderate",
           avoidPreviouslyUsed: mock.avoidPreviouslyUsed,
+          patternsToInclude: Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0 ? mock.patternsToInclude : undefined,
         };
         if (mock.avoidPreviouslyUsed) {
           const existing = await PrelimsMock.find({
@@ -424,13 +473,15 @@ export const processScheduledPrelimsMocks = async () => {
           mixOpts.excludeSnippets = snippets;
         }
       }
+      const subjectOpts = { subject: mock.subject };
+      if (Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0) subjectOpts.patternsToInclude = mock.patternsToInclude;
       const result = mock.isCsat
         ? await generateFullMockCsatTestQuestions()
         : mock.isPyo
           ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
           : mock.isMix
             ? await generateFullMockMixTestQuestions(mixOpts)
-            : await generateFullMockTestQuestions({ subject: mock.subject });
+            : await generateFullMockTestQuestions(subjectOpts);
       if (result.success && result.questions && result.questions.length > 0) {
         mock.questions = result.questions;
         mock.totalQuestions = result.questions.length;
@@ -500,6 +551,90 @@ export const listLivePrelimsMocks = async (req, res) => {
     return res.json({ success: true, data });
   } catch (error) {
     console.error("listLivePrelimsMocks:", error);
+    res.status(500).json({ success: false, message: error.message || "Internal server error" });
+  }
+};
+
+/**
+ * Admin: Get results for a Prelims Mock (all submitted attempts, ranked).
+ * GET /api/admin/prelims-mock/:mockId/results
+ * Rank: highest score first; tie-break: higher accuracy, then less time taken.
+ */
+export const getMockResults = async (req, res) => {
+  try {
+    const mockId = req.params.id;
+    const mock = await PrelimsMock.findById(mockId).select("title subject totalQuestions").lean();
+    if (!mock) {
+      return res.status(404).json({ success: false, message: "Prelims Mock not found" });
+    }
+
+    const tests = await Test.find({
+      prelimsMockId: mockId,
+      isSubmitted: true,
+    })
+      .select("userId score correctAnswers wrongAnswers accuracy createdAt updatedAt")
+      .lean();
+
+    const userIds = [...new Set(tests.map((t) => t.userId).filter(Boolean))];
+    const users = userIds.length
+      ? await User.find({ _id: { $in: userIds } }).select("_id name email").lean()
+      : [];
+    const userMap = Object.fromEntries(users.map((u) => [u._id.toString(), { name: u.name || "—", email: u.email || "" }]));
+
+    const rows = tests.map((t) => {
+      const attempted = (t.correctAnswers || 0) + (t.wrongAnswers || 0);
+      const correct = t.correctAnswers || 0;
+      const wrong = t.wrongAnswers || 0;
+      const accuracy = attempted > 0 ? ((correct / attempted) * 100) : 0;
+      const timeTakenMs = t.updatedAt && t.createdAt ? new Date(t.updatedAt) - new Date(t.createdAt) : 0;
+      return {
+        studentId: t.userId?.toString(),
+        name: t.userId ? (userMap[t.userId.toString()]?.name || "—") : "—",
+        email: t.userId ? (userMap[t.userId.toString()]?.email || "") : "",
+        attempted,
+        correct,
+        wrong,
+        score: t.score != null ? Number(t.score) : 0,
+        accuracy: parseFloat(accuracy.toFixed(2)),
+        timeTaken: timeTakenMs,
+      };
+    });
+
+    // Rank: 1) score desc, 2) accuracy desc, 3) timeTaken asc (less time = better)
+    rows.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;
+      return a.timeTaken - b.timeTaken;
+    });
+
+    const data = rows.map((row, index) => ({
+      ...row,
+      rank: index + 1,
+    }));
+
+    const scores = data.map((r) => r.score).filter((n) => typeof n === "number");
+    const totalAttempted = data.length;
+    const averageScore = totalAttempted > 0 && scores.length > 0
+      ? parseFloat((scores.reduce((s, n) => s + n, 0) / scores.length).toFixed(2))
+      : 0;
+    const highestScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const lowestScore = scores.length > 0 ? Math.min(...scores) : 0;
+
+    return res.json({
+      success: true,
+      data: {
+        mock: { _id: mockId, title: mock.title, subject: mock.subject, totalQuestions: mock.totalQuestions },
+        results: data,
+        stats: {
+          totalAttempted,
+          averageScore,
+          highestScore,
+          lowestScore,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("getMockResults:", error);
     res.status(500).json({ success: false, message: error.message || "Internal server error" });
   }
 };
