@@ -172,10 +172,10 @@ const features: {
 
 const colorIcon = (c: (typeof features)[0]["color"], dark: boolean) => {
   const map = {
-    fuchsia: dark ? "text-fuchsia-400" : "text-fuchsia-600",
+    fuchsia: dark ? "text-blue-400" : "text-[#2563eb]",
     cyan: dark ? "text-cyan-400" : "text-cyan-600",
     indigo: dark ? "text-indigo-400" : "text-indigo-600",
-    emerald: dark ? "text-emerald-400" : "text-emerald-600",
+    emerald: dark ? "text-blue-400" : "text-[#2563eb]",
     violet: dark ? "text-violet-400" : "text-violet-600",
     amber: dark ? "text-amber-400" : "text-amber-600",
     sky: dark ? "text-sky-400" : "text-sky-600",
@@ -192,7 +192,7 @@ export const FeaturesPage = () => {
     <>
       <section
         className={`border-b py-12 md:py-16 transition-colors ${
-          dark ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
+          dark ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
         }`}
       >
         <div className="mx-auto max-w-6xl px-4 md:px-6 text-center">
@@ -229,7 +229,7 @@ export const FeaturesPage = () => {
               key={f.title}
               className={`overflow-hidden rounded-[24px] ${
                 dark
-                  ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#070313]"
+                  ? "border-slate-700/60 bg-slate-900/50"
                   : "border-slate-200 bg-white shadow-lg"
               }`}
             >
@@ -255,7 +255,7 @@ export const FeaturesPage = () => {
                     </div>
                     <p
                       className={`mt-2 text-sm font-medium ${
-                        dark ? "text-fuchsia-300" : "text-fuchsia-600"
+                        dark ? "text-blue-400" : "text-[#2563eb]"
                       }`}
                     >
                       {f.tagline}
@@ -265,10 +265,10 @@ export const FeaturesPage = () => {
                         <li key={point} className="flex items-start gap-3">
                           <span
                             className={`mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full ${
-                              dark ? "bg-emerald-500/20" : "bg-emerald-100"
+                              dark ? "bg-[#2563eb]/20" : "bg-[#2563eb]/10"
                             }`}
                           >
-                            <Check className="h-3 w-3 text-emerald-500" />
+                            <Check className="h-3 w-3 text-[#2563eb]" />
                           </span>
                           <span
                             className={`text-sm ${dark ? "text-slate-200" : "text-slate-700"}`}
@@ -288,7 +288,7 @@ export const FeaturesPage = () => {
 
       <section
         className={`border-t py-10 transition-colors ${
-          dark ? "border-purple-900/70 bg-[#050012]" : "border-slate-200 bg-slate-50"
+          dark ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
         }`}
       >
         <div className="mx-auto max-w-6xl px-4 text-center md:px-6">

@@ -39,6 +39,8 @@ import { StudentsListPage } from "./pages/admin/StudentsListPage";
 import { AdminProStudentsPage } from "./pages/admin/AdminProStudentsPage";
 import { StudentDetailPage } from "./pages/admin/StudentDetailPage";
 import { PrelimsMockAdminPage } from "./pages/admin/PrelimsMockAdminPage";
+import { MockResultsPage } from "./pages/admin/MockResultsPage";
+import { StudentPerformancePage } from "./pages/admin/StudentPerformancePage";
 import { AdminPricingPage } from "./pages/admin/AdminPricingPage";
 import { AdminOfferManagerPage } from "./pages/admin/AdminOfferManagerPage";
 import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
@@ -118,6 +120,8 @@ function App() {
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="pro-students" element={<AdminProStudentsPage />} />
             <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
+            <Route path="mock-results/:mockId" element={<MockResultsPage />} />
+            <Route path="student-performance/:studentId" element={<StudentPerformancePage />} />
             <Route path="pricing" element={<AdminPricingPage />} />
             <Route path="offer-manager" element={<AdminOfferManagerPage />} />
             <Route path="students" element={<StudentsListPage />} />

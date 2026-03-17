@@ -85,76 +85,72 @@ export const FeatureGrid = () => {
   return (
     <section
       id="features"
-      className={`py-10 transition-colors md:py-14 lg:py-18 ${
+      className={`py-12 transition-colors md:py-16 lg:py-20 ${
         dark ? "bg-[#030712]" : "bg-slate-50"
       }`}
     >
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <div className="mb-6 text-center md:mb-8">
+        <div className="mb-8 text-center md:mb-10">
           <h2
-            className={`text-base font-semibold tracking-tight md:text-lg lg:text-xl ${
+            className={`text-xl font-bold tracking-tight md:text-2xl lg:text-3xl ${
               dark ? "text-slate-50" : "text-slate-900"
             }`}
           >
             Features — in simple terms
           </h2>
           <p
-            className={`mt-1.5 text-xs md:mt-2 md:text-sm ${
-              dark ? "text-slate-300" : "text-slate-600"
+            className={`mt-2 max-w-2xl mx-auto text-sm md:mt-3 md:text-base ${
+              dark ? "text-slate-400" : "text-slate-600"
             }`}
           >
             Answer Lab, Analytics, Current Affairs, Concept Simplifier — plus dashboard, prelims, AI
             Mentor, planner & copy evaluation. Same as your logged-in portal.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 md:gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-5 lg:gap-6">
           {features.map((feature) => (
             <Card
               key={feature.title}
-              className={`h-full rounded-2xl ${
+              className={`h-full rounded-2xl border-2 transition-all duration-200 hover:shadow-lg ${
                 dark
-                  ? "border-slate-700/60 bg-slate-900/50 text-slate-50 shadow-xl"
-                  : "border-slate-200 bg-white text-slate-900 shadow-md"
+                  ? "border-slate-700/60 bg-slate-800/50 text-slate-50 shadow-lg hover:border-[#2563eb]/30"
+                  : "border-slate-200/80 bg-white text-slate-900 shadow-md hover:border-[#2563eb]/20 hover:shadow-xl"
               }`}
             >
-              <CardHeader className="pb-2 md:pb-3">
+              <CardHeader className="pb-2 md:pb-3 pt-5 md:pt-6 px-5 md:px-6">
                 <div
-                  className={`mb-2 inline-flex h-8 w-8 items-center justify-center rounded-xl md:mb-3 md:h-9 md:w-9 ${
-                    dark ? "bg-blue-500/20 text-blue-200" : "bg-blue-100 text-[#2563eb]"
+                  className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl md:h-11 md:w-11 ${
+                    dark ? "bg-[#2563eb]/20 text-blue-300" : "bg-[#2563eb]/10 text-[#2563eb]"
                   }`}
                 >
-                  <feature.icon className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <feature.icon className="h-5 w-5 md:h-5 md:w-5" strokeWidth={1.75} />
                 </div>
                 <CardTitle
-                  className={`text-xs md:text-sm ${dark ? "text-slate-50" : "text-slate-900"}`}
+                  className={`text-sm font-bold md:text-base ${dark ? "text-slate-50" : "text-slate-900"}`}
                 >
                   {feature.title}
                 </CardTitle>
                 <p
-                  className={`mt-0.5 text-[10px] font-medium md:text-[11px] ${
-                    dark ? "text-slate-300" : "text-slate-600"
+                  className={`mt-1 text-[11px] font-medium md:text-xs ${
+                    dark ? "text-[#2563eb]/90" : "text-[#2563eb]"
                   }`}
                 >
                   {feature.subtitle}
                 </p>
                 <CardDescription
-                  className={`mt-2 text-[10px] leading-relaxed md:text-[11px] ${
-                    dark ? "text-slate-300" : "text-slate-600"
+                  className={`mt-2 text-[11px] leading-relaxed md:text-xs ${
+                    dark ? "text-slate-400" : "text-slate-600"
                   }`}
                 >
                   {feature.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className={`space-y-1.5 pt-0 text-[10px] md:text-[11px] ${
-                dark ? "text-emerald-300/95" : "text-emerald-800"
+              <CardContent className={`space-y-2 pt-0 px-5 md:px-6 pb-5 md:pb-6 text-[11px] md:text-xs ${
+                dark ? "text-slate-300" : "text-slate-700"
               }`}>
                 {feature.bullets.map((b) => (
-                  <div key={b} className="flex items-center gap-1.5">
-                    <span
-                      className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${
-                        dark ? "bg-emerald-400" : "bg-emerald-500"
-                      }`}
-                    />
+                  <div key={b} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#2563eb]" />
                     <span>{b}</span>
                   </div>
                 ))}

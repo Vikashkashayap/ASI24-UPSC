@@ -52,8 +52,8 @@ export const PricingPage = () => {
           {successMessage && (
             <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
               theme === "dark"
-                ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-200"
-                : "bg-emerald-50 border-emerald-200 text-emerald-800"
+                ? "bg-[#2563eb]/10 border-[#2563eb]/40 text-blue-200"
+                : "bg-[#2563eb]/5 border-[#2563eb]/30 text-[#2563eb]"
             }`}>
               {successMessage}
             </div>
@@ -69,7 +69,7 @@ export const PricingPage = () => {
           )}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <Loader2 className={`w-10 h-10 animate-spin mb-4 ${theme === "dark" ? "text-blue-400" : "text-[#2563eb]"}`} />
               <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading plans...</p>
             </div>
           ) : hasActivePlans ? (
@@ -77,8 +77,8 @@ export const PricingPage = () => {
               <div className="text-center mb-10">
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-4 ${
                   theme === "dark"
-                    ? "bg-purple-500/20 text-purple-200 border border-purple-500/40"
-                    : "bg-purple-100 text-purple-700 border border-purple-200"
+                    ? "bg-[#2563eb]/20 text-blue-200 border border-[#2563eb]/40"
+                    : "bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/30"
                 }`}>
                   <Sparkles className="w-3.5 h-3.5" />
                   MentorsDaily Pro
@@ -117,16 +117,16 @@ export const PricingPage = () => {
             <div className="max-w-4xl mx-auto text-center">
               <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold mb-6 ${
                 theme === "dark"
-? "bg-purple-500/20 text-purple-200 border border-purple-500/40"
-                    : "bg-purple-100 text-purple-700 border border-purple-200"
+? "bg-[#2563eb]/20 text-blue-200 border border-[#2563eb]/40"
+                    : "bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/30"
               }`}>
                 <Sparkles className="w-3.5 h-3.5" />
                 Beta Version
               </span>
               <div className={`inline-flex p-6 rounded-full mb-6 relative ${
-                theme === "dark" ? "bg-fuchsia-500/10" : "bg-fuchsia-100"
+                theme === "dark" ? "bg-[#2563eb]/10" : "bg-[#2563eb]/10"
               }`}>
-                <div className="absolute inset-0 rounded-full animate-ping opacity-25 bg-fuchsia-500" />
+                <div className="absolute inset-0 rounded-full animate-ping opacity-25 bg-[#2563eb]" />
                 <SketchIllustration type="rocket" className="w-14 h-14 relative z-10" />
               </div>
               <h1 className={`text-3xl md:text-5xl font-extrabold mb-4 tracking-tight ${
@@ -159,12 +159,12 @@ export const PricingPage = () => {
               theme === "dark" ? "bg-black/40" : "bg-slate-100"
             }`}>
               <Gift className={`w-14 h-14 ${
-                theme === "dark" ? "text-purple-400" : "text-purple-600"
+                theme === "dark" ? "text-blue-400" : "text-[#2563eb]"
               }`} />
             </div>
             <Card className={`flex-1 rounded-[24px] ${
               theme === "dark"
-                ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#051810]"
+                ? "border-slate-700/60 bg-slate-900/50"
                 : "border-slate-200 bg-white shadow-lg"
             }`}>
               <CardContent className="p-6 md:p-8">
@@ -172,9 +172,9 @@ export const PricingPage = () => {
                   {whatToExpect.map((item) => (
                     <li key={item} className="flex items-center gap-3">
                       <span className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                        theme === "dark" ? "bg-emerald-500/20" : "bg-emerald-100"
+                        theme === "dark" ? "bg-[#2563eb]/20" : "bg-[#2563eb]/10"
                       }`}>
-                        <Check className="w-3 h-3 text-emerald-500" />
+                        <Check className="w-3 h-3 text-[#2563eb]" />
                       </span>
                       <span className={`text-sm md:text-base ${
                         theme === "dark" ? "text-slate-200" : "text-slate-700"
@@ -190,7 +190,7 @@ export const PricingPage = () => {
 
       {/* CTA */}
       <section className={`py-10 border-t transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#050012]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-4xl px-4 md:px-6 text-center">
           <Link

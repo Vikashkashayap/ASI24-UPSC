@@ -89,29 +89,29 @@ export default function CurrentAffairsPage() {
       <div
         className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 border-2 transition-all duration-300 ${
           isDark
-            ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20"
-            : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50"
+            ? "bg-slate-800/90 border-[#2563eb]/20"
+            : "bg-white border-slate-200/80"
         }`}
       >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[#2563eb]/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col gap-2 md:gap-3">
           <div className="flex items-center gap-2 md:gap-3">
             <div
               className={`p-2 md:p-2.5 rounded-lg shrink-0 ${
-                isDark ? "bg-purple-500/20" : "bg-purple-100"
+                isDark ? "bg-[#2563eb]/20" : "bg-[#2563eb]/10"
               }`}
             >
               <Newspaper
                 className={`w-5 h-5 md:w-6 md:h-6 ${
-                  isDark ? "text-purple-400" : "text-purple-600"
+                  isDark ? "text-blue-400" : "text-[#2563eb]"
                 }`}
               />
             </div>
             <h1
               className={`text-xl md:text-3xl font-bold tracking-tight ${
                 isDark
-                  ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent bg-gradient-to-r"
-                  : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent bg-gradient-to-r"
+                  ? "text-slate-50"
+                  : "text-slate-900"
               }`}
             >
               Daily UPSC Current Affairs
@@ -195,7 +195,7 @@ export default function CurrentAffairsPage() {
                 onClick={() => setDifficulty(difficulty === d ? "" : d)}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   difficulty === d
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-[#2563eb] text-white"
                     : isDark
                     ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -220,7 +220,7 @@ export default function CurrentAffairsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2563eb]" />
         </div>
       ) : items.length === 0 ? (
         <Card className={isDark ? "border-slate-800 bg-slate-950/60" : "border-slate-200 bg-white"}>
@@ -244,12 +244,12 @@ export default function CurrentAffairsPage() {
                 key={item._id}
                 className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-2 ${
                   isDark
-                    ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20"
-                    : "bg-gradient-to-br from-white to-purple-50/30 border-purple-200/50"
+                    ? "bg-slate-800/90 border-slate-700/60"
+                    : "bg-white border-slate-200"
                 }`}
               >
                 <Link to={item.slug} className="block" relative="path">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#2563eb]/10 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
                   <CardHeader className="relative z-10 pb-2">
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       <span
@@ -297,7 +297,7 @@ export default function CurrentAffairsPage() {
                         </span>
                       ))}
                     </div>
-                    <div className="mt-2 flex items-center gap-1 text-xs font-medium text-purple-500">
+                    <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#2563eb]">
                       <span>Read more</span>
                       <ChevronRight className="w-4 h-4" />
                     </div>

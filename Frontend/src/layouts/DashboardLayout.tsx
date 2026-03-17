@@ -59,6 +59,12 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   if (pathname.startsWith('/test/')) {
     return { title: 'Test', icon: <ClipboardList className="w-5 h-5" /> };
   }
+  if (pathname.startsWith('/admin/mock-results/')) {
+    return { title: 'Mock Results', icon: <Target className="w-5 h-5" /> };
+  }
+  if (pathname.startsWith('/admin/student-performance/')) {
+    return { title: 'Student Performance', icon: <Target className="w-5 h-5" /> };
+  }
   if (pathname.startsWith('/result/')) {
     return { title: 'Test Result', icon: <LineChart className="w-5 h-5" /> };
   }

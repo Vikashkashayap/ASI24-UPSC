@@ -284,6 +284,25 @@ const TestResultPage: React.FC = () => {
                           <div className={`text-sm md:text-base leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-900"} break-words`}>
                             <span className="font-bold">Q{index + 1}.</span>{" "}
                             <div className="mt-1 font-normal">
+                              {/* Match the following: show question/statement at TOP above the lists */}
+                              {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && question.question?.trim() && (
+                                <div className="mb-2">
+                                  {question.question.includes("<table") ? (
+                                    <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                                  ) : (
+                                    question.question.split("\n").map((line, lineIdx) => {
+                                      const trimmedLine = line.trim();
+                                      if (!trimmedLine) return null;
+                                      return (
+                                        <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-1"}>
+                                          {trimmedLine}
+                                        </div>
+                                      );
+                                    })
+                                  )}
+                                </div>
+                              )}
+                              {/* Assertion–Reason block (no repeat of assertion in question text below) */}
                               {question.assertionReason?.assertion != null && (question.assertionReason.assertion || question.assertionReason.reason) && (
                                 <div className={`mb-3 rounded-lg border p-2 sm:p-3 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
                                   <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
@@ -292,6 +311,7 @@ const TestResultPage: React.FC = () => {
                                   <div className="text-sm">{question.assertionReason.reason}</div>
                                 </div>
                               )}
+                              {/* Match columns (question text already shown above) */}
                               {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && (
                                 <div className="overflow-x-auto mb-3">
                                   <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
@@ -332,35 +352,41 @@ const TestResultPage: React.FC = () => {
                                   </table>
                                 </div>
                               )}
-                              {question.question.includes("<table") ? (
-                                <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                              ) : (
-                                question.question.split("\n").map((line, lineIdx) => {
-                                  const trimmedLine = line.trim();
-                                  if (!trimmedLine) return null;
-                                  const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                                  if (numberedMatch) {
+                              {/* Question text: skip for assertion-reason (no repeat) and for match (already at top) */}
+                              {!(
+                                question.assertionReason?.assertion != null &&
+                                (question.assertionReason.assertion || question.assertionReason.reason)
+                              ) &&
+                                !(question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0) &&
+                                (question.question.includes("<table") ? (
+                                  <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                                ) : (
+                                  question.question.split("\n").map((line, lineIdx) => {
+                                    const trimmedLine = line.trim();
+                                    if (!trimmedLine) return null;
+                                    const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
+                                    if (numberedMatch) {
+                                      return (
+                                        <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
+                                          <span className="font-semibold mr-1">{numberedMatch[1]}.</span>
+                                          <span>{numberedMatch[2]}</span>
+                                        </div>
+                                      );
+                                    }
+                                    if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                                      return (
+                                        <div key={lineIdx} className={`mt-3 mb-2 font-semibold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                                          {trimmedLine}
+                                        </div>
+                                      );
+                                    }
                                     return (
-                                      <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                                        <span className="font-semibold mr-1">{numberedMatch[1]}.</span>
-                                        <span>{numberedMatch[2]}</span>
-                                      </div>
-                                    );
-                                  }
-                                  if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
-                                    return (
-                                      <div key={lineIdx} className={`mt-3 mb-2 font-semibold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                                      <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
                                         {trimmedLine}
                                       </div>
                                     );
-                                  }
-                                  return (
-                                    <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                                      {trimmedLine}
-                                    </div>
-                                  );
-                                })
-                              )}
+                                  })
+                                ))}
                             </div>
                           </div>
                         </div>

@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Loader2, Play, Clock, BookOpen, Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Loader2, Play, Clock, BookOpen, Pencil, Trash2, Users, ChevronDown, ChevronUp, BarChart2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { useTheme } from "../../hooks/useTheme";
 import { prelimsMockAPI } from "../../services/api";
-import { GS_SUBJECTS } from "../../constants/testGenerator";
+import { GS_SUBJECTS, PRELIM_MOCK_PATTERNS } from "../../constants/testGenerator";
 import { SubjectToggle } from "../../components/SubjectToggle";
 
 const GS_ARR = [...GS_SUBJECTS];
+const DEFAULT_PATTERNS = PRELIM_MOCK_PATTERNS.map((p) => p.id);
+
+interface AttemptedByItem {
+  userId: string;
+  name: string;
+  email?: string;
+  isSubmitted: boolean;
+  score?: number;
+}
 
 interface PrelimsMockItem {
   _id: string;
@@ -21,6 +31,8 @@ interface PrelimsMockItem {
   liveAt?: string;
   questionCount?: number;
   createdAt: string;
+  attemptCount?: number;
+  attemptedBy?: AttemptedByItem[];
 }
 
 function toDatetimeLocal(d: Date): string {
@@ -37,6 +49,7 @@ function formatDate(iso: string): string {
 }
 
 export const PrelimsMockAdminPage: React.FC = () => {
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [list, setList] = useState<PrelimsMockItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +64,7 @@ export const PrelimsMockAdminPage: React.FC = () => {
   const [testName, setTestName] = useState("");
   const [totalQuestions, setTotalQuestions] = useState<100 | 50>(100);
   const [difficulty, setDifficulty] = useState<"easy" | "moderate" | "hard">("moderate");
+  const [patternsToInclude, setPatternsToInclude] = useState<string[]>(DEFAULT_PATTERNS);
   const [avoidPreviouslyUsed, setAvoidPreviouslyUsed] = useState(false);
   const [filterDifficulty, setFilterDifficulty] = useState<string>("");
   const [filterSubject, setFilterSubject] = useState("");
@@ -61,6 +75,7 @@ export const PrelimsMockAdminPage: React.FC = () => {
   const [editScheduledAt, setEditScheduledAt] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedAttemptsId, setExpandedAttemptsId] = useState<string | null>(null);
 
   const PYQ_YEAR_MIN = 2010;
   const PYQ_YEAR_MAX = 2025;
@@ -123,6 +138,7 @@ export const PrelimsMockAdminPage: React.FC = () => {
         ...(testName.trim() ? { title: testName.trim() } : {}),
         ...(useMix ? { totalQuestions } : {}),
         difficulty,
+        ...(patternsToInclude.length > 0 && patternsToInclude.length < DEFAULT_PATTERNS.length ? { patternsToInclude } : {}),
         avoidPreviouslyUsed,
       });
       if (res.data.success) {
@@ -365,6 +381,31 @@ export const PrelimsMockAdminPage: React.FC = () => {
                 <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Avoid previously used questions</span>
               </label>
             </div>
+            <div className="mt-3">
+              <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                Patterns to include
+              </label>
+              <p className={`text-xs mb-2 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                Balanced mix of UPSC question types. Leave all selected for default mix, or choose specific patterns.
+              </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-2">
+                {PRELIM_MOCK_PATTERNS.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={patternsToInclude.includes(p.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) setPatternsToInclude((prev) => [...prev, p.id]);
+                        else setPatternsToInclude((prev) => prev.filter((id) => id !== p.id));
+                      }}
+                      disabled={submitting}
+                      className="rounded border-slate-400 text-amber-600 focus:ring-amber-500"
+                    />
+                    <span className={`text-sm ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>{p.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
             {mockMode === "pyo" && (
               <div className="flex flex-wrap items-center gap-4 mt-2">
                 <div>
@@ -525,6 +566,41 @@ export const PrelimsMockAdminPage: React.FC = () => {
                           {m.status}
                         </span>
                         {m.liveAt && <span>Live at: {formatDate(m.liveAt)}</span>}
+                        {(m.status === "live" || m.status === "ended") && (
+                          <span className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            {(m.attemptCount ?? 0) > 0 ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedAttemptsId(expandedAttemptsId === m._id ? null : m._id)}
+                                  className={`font-medium underline underline-offset-1 ${theme === "dark" ? "text-amber-400 hover:text-amber-300" : "text-amber-600 hover:text-amber-700"}`}
+                                >
+                                  {m.attemptCount} attempted
+                                </button>
+                                {expandedAttemptsId === m._id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                              </>
+                            ) : (
+                              <span className={theme === "dark" ? "text-slate-500" : "text-slate-500"}>0 attempted</span>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {expandedAttemptsId === m._id && (m.attemptedBy?.length ?? 0) > 0 && (
+                      <div className={`mt-3 pt-3 border-t ${theme === "dark" ? "border-slate-600" : "border-slate-200"}`}>
+                        <p className={`text-xs font-medium mb-2 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Attempted by</p>
+                        <ul className="space-y-1.5 max-h-48 overflow-y-auto">
+                          {m.attemptedBy!.map((a, idx) => (
+                            <li key={a.userId || idx} className={`text-sm flex flex-wrap items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
+                              <span className="font-medium">{a.name}</span>
+                              {a.email && <span className="opacity-80">({a.email})</span>}
+                              <span className={`px-1.5 py-0.5 rounded text-xs ${a.isSubmitted ? "bg-green-500/20 text-green-600 dark:text-green-400" : "bg-amber-500/20 text-amber-600 dark:text-amber-400"}`}>
+                                {a.isSubmitted ? `Submitted · ${a.score ?? "—"}` : "In progress"}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
@@ -558,6 +634,16 @@ export const PrelimsMockAdminPage: React.FC = () => {
                           )}
                         </Button>
                       )}
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate(`/admin/mock-results/${m._id}`)}
+                        disabled={!!updatingId}
+                        className={theme === "dark" ? "border-slate-600 text-slate-200" : ""}
+                        title="View Results"
+                      >
+                        <BarChart2 className="w-4 h-4 mr-1" />
+                        View Results
+                      </Button>
                       <Button
                         variant="outline"
                         onClick={() => setDeleteId(m._id)}

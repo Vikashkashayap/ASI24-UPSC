@@ -182,6 +182,39 @@ export const adminAPI = {
   getStudentById: async (id: string) => {
     return api.get(`/api/admin/students/${id}`);
   },
+  getStudentPerformance: (studentId: string) =>
+    api.get<{
+      success: boolean;
+      data: {
+        student: { name: string; email: string };
+        summary: {
+          totalTests: number;
+          avgScore: number;
+          avgAccuracy: number;
+          highestScore: number;
+          lowestScore: number;
+        };
+        tests: Array<{
+          testId: string;
+          mockId: string | null;
+          mockTitle: string;
+          date: string | null;
+          score: number;
+          accuracy: number;
+          rank: number | null;
+          attempted: number;
+          correct: number;
+          wrong: number;
+          timeTaken: number;
+        }>;
+        subjectAnalysis: Array<{
+          subject: string;
+          accuracy: number;
+          attempted: number;
+          correct: number;
+        }>;
+      };
+    }>(`/api/admin/students/${studentId}/performance`),
   createStudent: async (studentData: { name: string; email: string }) => {
     return api.post("/api/admin/students", studentData);
   },
@@ -231,6 +264,8 @@ export interface PrelimsMockSchedulePayload {
   title?: string;
   totalQuestions?: number;
   difficulty?: "easy" | "moderate" | "hard";
+  /** UPSC question pattern IDs to include. Empty = default balanced mix. */
+  patternsToInclude?: string[];
   avoidPreviouslyUsed?: boolean;
 }
 
@@ -244,6 +279,26 @@ export const prelimsMockAPI = {
   updateSchedule: (id: string, data: { scheduledAt: string }) =>
     api.patch(`/api/admin/prelims-mock/${id}`, data),
   delete: (id: string) => api.delete(`/api/admin/prelims-mock/${id}`),
+  getResults: (mockId: string) =>
+    api.get<{
+      success: boolean;
+      data: {
+        mock: { _id: string; title: string; subject: string; totalQuestions: number };
+        results: Array<{
+          rank: number;
+          studentId: string;
+          name: string;
+          email: string;
+          attempted: number;
+          correct: number;
+          wrong: number;
+          score: number;
+          accuracy: number;
+          timeTaken: number;
+        }>;
+        stats: { totalAttempted: number; averageScore: number; highestScore: number; lowestScore: number };
+      };
+    }>(`/api/admin/prelims-mock/${mockId}/results`),
   // Student
   listLive: () => api.get("/api/prelims-mock"),
   startAttempt: (mockId: string) => api.post(`/api/prelims-mock/${mockId}/start`),

@@ -279,7 +279,25 @@ const TestPage: React.FC = () => {
           <div className="space-y-4 sm:space-y-6">
             <div className="min-w-0 overflow-hidden">
               <div className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 leading-relaxed break-words ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                {/* Assertion–Reason block */}
+                {/* Match the following: show question/statement at TOP above the lists */}
+                {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && currentQuestion.question?.trim() && (
+                  <div className="mb-3">
+                    {currentQuestion.question.includes("<table") ? (
+                      <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                    ) : (
+                      currentQuestion.question.split("\n").map((line, lineIdx) => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) return null;
+                        return (
+                          <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
+                            {trimmedLine}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+                {/* Assertion–Reason block (do not repeat assertion in question text below) */}
                 {currentQuestion.assertionReason?.assertion != null && (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
                   <div className={`mb-4 rounded-lg border p-3 sm:p-4 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
                     <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
@@ -288,7 +306,7 @@ const TestPage: React.FC = () => {
                     <div>{currentQuestion.assertionReason.reason}</div>
                   </div>
                 )}
-                {/* Match columns: side-by-side */}
+                {/* Match columns: side-by-side (question text already shown above) */}
                 {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && (
                   <div className="overflow-x-auto mb-4">
                     <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-[280px]">
@@ -334,35 +352,43 @@ const TestPage: React.FC = () => {
                     </table>
                   </div>
                 )}
-                {/* Question text: HTML tables or plain lines */}
-                {currentQuestion.question.includes("<table") ? (
-                  <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                ) : (
-                  currentQuestion.question.split("\n").map((line, lineIdx) => {
-                    const trimmedLine = line.trim();
-                    if (!trimmedLine) return null;
-                    const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                    if (numberedMatch) {
-                      return (
-                        <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                          <span className="font-bold mr-1">{numberedMatch[1]}.</span>
-                          <span>{numberedMatch[2]}</span>
-                        </div>
-                      );
-                    }
-                    if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
-                      return (
-                        <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
-                          {trimmedLine}
-                        </div>
-                      );
-                    }
-                    return (
-                      <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                        {trimmedLine}
-                      </div>
-                    );
-                  }).filter(Boolean)
+                {/* Question text: skip for assertion-reason (no repeat) and for match (already shown at top) */}
+                {!(
+                  currentQuestion.assertionReason?.assertion != null &&
+                  (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason)
+                ) &&
+                  !(currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0) && (
+                  <>
+                    {currentQuestion.question.includes("<table") ? (
+                      <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
+                    ) : (
+                      currentQuestion.question.split("\n").map((line, lineIdx) => {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) return null;
+                        const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
+                        if (numberedMatch) {
+                          return (
+                            <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
+                              <span className="font-bold mr-1">{numberedMatch[1]}.</span>
+                              <span>{numberedMatch[2]}</span>
+                            </div>
+                          );
+                        }
+                        if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
+                          return (
+                            <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                              {trimmedLine}
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
+                            {trimmedLine}
+                          </div>
+                        );
+                      }).filter(Boolean)
+                    )}
+                  </>
                 )}
               </div>
             </div>

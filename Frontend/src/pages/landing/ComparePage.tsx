@@ -31,7 +31,7 @@ export const ComparePage = () => {
     <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6 text-center">
           <div className="inline-flex mb-4">
@@ -63,7 +63,7 @@ export const ComparePage = () => {
               Noise
             </span>
             <SketchIllustration type="arrow" className="w-10 h-10 opacity-60" />
-            <span className={`text-sm font-medium ${theme === "dark" ? "text-emerald-300" : "text-emerald-600"}`}>
+            <span className={`text-sm font-medium ${theme === "dark" ? "text-blue-400" : "text-[#2563eb]"}`}>
               Intelligence
             </span>
           </div>
@@ -114,32 +114,30 @@ export const ComparePage = () => {
             {/* MentorsDaily way */}
             <Card className={`overflow-hidden rounded-[24px] ${
               theme === "dark"
-                ? "border-emerald-500/40 bg-gradient-to-br from-[#0d1f1a] to-[#051810]"
-                : "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white"
+                ? "border-[#2563eb]/40 bg-slate-800/50"
+                : "border-slate-200 bg-white"
             }`}>
               <CardContent className="p-6 md:p-8">
                 <div className="flex items-center gap-2 mb-4">
                   <SketchIllustration type="chart" className="w-8 h-8" />
                   <h2 className={`text-lg font-semibold ${
-                    theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+                    theme === "dark" ? "text-blue-400" : "text-[#2563eb]"
                   }`}>MentorsDaily</h2>
                 </div>
                 <h3 className={`text-xl font-semibold mb-2 ${
-                  theme === "dark" ? "text-emerald-100" : "text-emerald-800"
+                  theme === "dark" ? "text-slate-100" : "text-slate-900"
                 }`}>
                   Instant clarity, answer-first workflow
                 </h3>
                 <p className={`text-xs mb-4 ${
-                  theme === "dark" ? "text-emerald-200/80" : "text-emerald-700/90"
+                  theme === "dark" ? "text-slate-400" : "text-slate-600"
                 }`}>
                   Dashboard · Prelims practice · Performance insights · Smart plans
                 </p>
                 <ul className="space-y-3">
                   {portalWay.map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className={`mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                        theme === "dark" ? "bg-emerald-500 text-black" : "bg-emerald-500 text-white"
-                      }`}>
+                      <span className="mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-[#2563eb] text-white">
                         <Check className="w-3 h-3" />
                       </span>
                       <span className={`text-sm ${
@@ -156,7 +154,7 @@ export const ComparePage = () => {
 
       {/* Summary */}
       <section className={`py-10 border-t transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#050012]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-3xl px-4 md:px-6 text-center">
           <p className={`text-sm md:text-base ${

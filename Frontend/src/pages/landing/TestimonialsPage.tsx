@@ -38,7 +38,7 @@ export const TestimonialsPage = () => {
     <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6 text-center">
           <div className="inline-flex mb-4">
@@ -68,20 +68,20 @@ export const TestimonialsPage = () => {
                 key={t.name}
                 className={`overflow-hidden rounded-[24px] ${
                   theme === "dark"
-                    ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] via-[#080414] to-[#0a1820]"
+                    ? "border-slate-700/60 bg-slate-900/50"
                     : "border-slate-200 bg-white shadow-lg"
                 }`}
               >
                 <CardContent className="p-6 md:p-8">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
-                    theme === "dark" ? "bg-fuchsia-500/10" : "bg-fuchsia-100"
+                    theme === "dark" ? "bg-[#2563eb]/20" : "bg-[#2563eb]/10"
                   }`}>
                     <Quote className={`w-5 h-5 ${
-                      theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
+                      theme === "dark" ? "text-blue-400" : "text-[#2563eb]"
                     }`} />
                   </div>
                   <span className={`inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full mb-3 ${
-                    theme === "dark" ? "bg-emerald-500/20 text-emerald-300" : "bg-emerald-100 text-emerald-700"
+                    theme === "dark" ? "bg-[#2563eb]/20 text-blue-300" : "bg-[#2563eb]/10 text-[#2563eb]"
                   }`}>
                     {t.highlight}
                   </span>
@@ -93,8 +93,8 @@ export const TestimonialsPage = () => {
                   <div className="mt-4 flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full ${
                       theme === "dark"
-                        ? "bg-gradient-to-br from-fuchsia-500/30 to-emerald-500/30"
-                        : "bg-gradient-to-br from-fuchsia-200 to-emerald-200"
+                        ? "bg-[#2563eb]/30"
+                        : "bg-[#2563eb]/20"
                     }`} />
                     <div>
                       <p className={`font-semibold text-sm ${
@@ -114,7 +114,7 @@ export const TestimonialsPage = () => {
 
       {/* Bottom note */}
       <section className={`py-10 border-t transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#050012]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-3xl px-4 md:px-6 text-center">
           <p className={`text-sm ${

@@ -32,7 +32,7 @@ export const AboutPage = () => {
     <>
       {/* Hero */}
       <section className={`border-b py-12 md:py-16 transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#070313]" : "border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-slate-50"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6 text-center">
           <div className="inline-flex mb-4">
@@ -58,7 +58,7 @@ export const AboutPage = () => {
         <div className="mx-auto max-w-4xl px-4 md:px-6">
           <Card className={`overflow-hidden rounded-[24px] ${
             theme === "dark"
-              ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#051810]"
+              ? "border-slate-700/60 bg-slate-900/50"
               : "border-slate-200 bg-white shadow-lg"
           }`}>
             <CardContent className="p-8 md:p-12 text-center">
@@ -93,7 +93,7 @@ export const AboutPage = () => {
                 key={v.title}
                 className={`overflow-hidden rounded-[20px] ${
                   theme === "dark"
-                    ? "border-purple-800/50 bg-[#0a0512]"
+                    ? "border-slate-700/50 bg-slate-900/50"
                     : "border-slate-200 bg-white"
                 }`}
               >
@@ -118,7 +118,7 @@ export const AboutPage = () => {
 
       {/* Team */}
       <section className={`py-12 md:py-16 border-t transition-colors ${
-        theme === "dark" ? "border-purple-900/70 bg-[#0b0618]" : "border-slate-200 bg-white"
+        theme === "dark" ? "border-slate-800 bg-[#030712]" : "border-slate-200 bg-white"
       }`}>
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           {/* <h2 className={`text-lg font-semibold text-center mb-8 ${
@@ -129,14 +129,14 @@ export const AboutPage = () => {
           {/* <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             <Card className={`overflow-hidden rounded-[24px] ${
               theme === "dark"
-                ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#0a1520]"
+                ? "border-slate-700/60 bg-slate-900/50"
                 : "border-slate-200 bg-white shadow-lg"
             }`}>
               <CardContent className="p-6 md:p-8 flex flex-col items-center text-center">
                 <div className={`w-20 h-20 rounded-full mb-4 ${
                   theme === "dark"
-                    ? "bg-[radial-gradient(circle,rgba(147,51,234,0.4),transparent)] border-2 border-purple-500/40"
-                    : "bg-gradient-to-br from-purple-100 to-purple-200"
+                    ? "bg-[radial-gradient(circle,rgba(37,99,235,0.3),transparent)] border-2 border-[#2563eb]/40"
+                    : "bg-[#2563eb]/10 border border-[#2563eb]/30"
                 }`} />
                 <h3 className={`font-semibold ${
                   theme === "dark" ? "text-slate-50" : "text-slate-900"
@@ -153,14 +153,14 @@ export const AboutPage = () => {
             </Card>
             <Card className={`overflow-hidden rounded-[24px] ${
               theme === "dark"
-                ? "border-purple-800/60 bg-gradient-to-br from-[#0d0718] to-[#0a1520]"
+                ? "border-slate-700/60 bg-slate-900/50"
                 : "border-slate-200 bg-white shadow-lg"
             }`}>
               <CardContent className="p-6 md:p-8 flex flex-col items-center text-center">
                 <div className={`w-20 h-20 rounded-full mb-4 ${
                   theme === "dark"
-                    ? "bg-[radial-gradient(circle,rgba(16,185,129,0.4),transparent)] border-2 border-emerald-500/40"
-                    : "bg-gradient-to-br from-emerald-100 to-emerald-200"
+                    ? "bg-[radial-gradient(circle,rgba(37,99,235,0.3),transparent)] border-2 border-[#2563eb]/40"
+                    : "bg-[#2563eb]/10 border border-[#2563eb]/30"
                 }`} />
                 <h3 className={`font-semibold ${
                   theme === "dark" ? "text-slate-50" : "text-slate-900"

@@ -107,44 +107,40 @@ export const IntelligenceVsNoise = () => {
               <div
                 className={`space-y-4 px-6 py-8 ${
                   theme === "dark"
-                    ? "bg-gradient-to-br from-[#1e1035] via-[#020617] to-[#064e3b]"
-                    : "bg-gradient-to-br from-purple-50 via-white to-emerald-50"
+                    ? "bg-slate-800/50"
+                    : "bg-white"
                 }`}
               >
                 <p
                   className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${
-                    theme === "dark" ? "text-purple-300" : "text-purple-600"
+                    theme === "dark" ? "text-blue-300" : "text-[#2563eb]"
                   }`}
                 >
                   MentorsDaily
                 </p>
                 <h3
                   className={`text-lg font-semibold leading-snug md:text-xl ${
-                    theme === "dark" ? "text-emerald-100" : "text-emerald-700"
+                    theme === "dark" ? "text-slate-100" : "text-slate-900"
                   }`}
                 >
                   Instant clarity, answer-first workflow.
                 </h3>
                 <p
                   className={`text-[11px] font-medium ${
-                    theme === "dark" ? "text-emerald-200/90" : "text-emerald-800/90"
+                    theme === "dark" ? "text-slate-400" : "text-slate-600"
                   }`}
                 >
                   Dashboard · Prelims practice · Performance analysis · Plan generator
                 </p>
                 <ul
                   className={`max-h-[320px] space-y-2 overflow-y-auto pr-1 text-xs md:max-h-none md:text-[13px] ${
-                    theme === "dark" ? "text-emerald-50" : "text-slate-700"
+                    theme === "dark" ? "text-slate-300" : "text-slate-700"
                   }`}
                 >
                   {mentorsDailyWins.map((item) => (
                     <li key={item} className="flex items-start gap-2">
                       <span
-                        className={`mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-[10px] ${
-                          theme === "dark"
-                            ? "bg-emerald-500 text-black"
-                            : "bg-emerald-500 text-white"
-                        }`}
+                        className={`mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-[10px] bg-[#2563eb] text-white`}
                       >
                         ✓
                       </span>

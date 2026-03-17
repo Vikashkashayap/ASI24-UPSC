@@ -29,7 +29,7 @@ export const AboutSection = () => {
     <section
       id="about"
       className={`py-16 transition-colors ${
-        theme === "dark" ? "border-t border-purple-900/40 bg-[#070313]" : "border-t border-slate-200 bg-slate-50"
+        theme === "dark" ? "border-t border-slate-800 bg-[#030712]" : "border-t border-slate-200 bg-slate-50"
       }`}
     >
       <div className="mx-auto max-w-6xl px-4 text-center md:px-6">
@@ -65,7 +65,7 @@ export const AboutSection = () => {
               <CardContent className="p-5">
                 <Icon
                   className={`mb-3 h-8 w-8 ${
-                    theme === "dark" ? "text-emerald-400" : "text-emerald-600"
+                    theme === "dark" ? "text-[#2563eb]" : "text-[#2563eb]"
                   }`}
                   aria-hidden
                 />
@@ -91,7 +91,7 @@ export const AboutSection = () => {
         <Link
           to="/about"
           className={`mt-8 inline-flex text-sm font-semibold underline-offset-4 hover:underline ${
-            theme === "dark" ? "text-emerald-400" : "text-emerald-700"
+            theme === "dark" ? "text-blue-400" : "text-[#2563eb]"
           }`}
         >
           Read more about us →
