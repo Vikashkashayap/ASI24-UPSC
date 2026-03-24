@@ -1,9 +1,64 @@
 import Test from "../models/Test.js";
-import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
+import {
+  generateTestQuestions,
+  generateFullMockTestQuestions,
+  generateTopicQuestionsForPlanner,
+  generateMainsQuestionsForPlanner,
+} from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
+
+/**
+ * Generate topic-based UPSC questions for planner.
+ * POST /api/tests/generate-questions
+ * Body: { subject: string, chapter?: string, topic: string, questionType?: "prelims" | "mains" }
+ */
+export const generateTopicQuestions = async (req, res) => {
+  try {
+    const { subject, chapter, topic, questionType } = req.body || {};
+    if (!subject || !topic) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: subject, topic",
+      });
+    }
+
+    const mode = String(questionType || "prelims").toLowerCase();
+    if (!["prelims", "mains"].includes(mode)) {
+      return res.status(400).json({
+        success: false,
+        message: "questionType must be either 'prelims' or 'mains'",
+      });
+    }
+
+    const result =
+      mode === "mains"
+        ? await generateMainsQuestionsForPlanner({ subject, chapter, topic })
+        : await generateTopicQuestionsForPlanner({ subject, chapter, topic });
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: result.error || "Failed to generate questions",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.questions,
+      count: result.count,
+      cached: Boolean(result.cached),
+      questionType: mode,
+    });
+  } catch (error) {
+    console.error("Error in generateTopicQuestions:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
 
 /**
  * Generate a FULL-LENGTH UPSC Prelims GS Paper 1 Mock (100 questions).

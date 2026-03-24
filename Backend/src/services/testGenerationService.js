@@ -1,6 +1,9 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
 
+const TOPIC_TEST_CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
+const topicQuestionCache = new Map();
+
 /** Generate unique question ID for deduplication (hash of normalized question text). */
 function hashQuestion(questionText) {
   const normalized = String(questionText || "").trim().replace(/\s+/g, " ");
@@ -1321,6 +1324,287 @@ function parseAndValidateQuestions(aiContent, count) {
   return validatedQuestions;
 }
 
+function buildPlannerTopicPrompt({ subject, chapter, topic }) {
+  return `Generate 20 UPSC Prelims level multiple choice questions from the topic:
+Subject: ${subject}
+Chapter: ${chapter}
+Topic: ${topic}
+
+Rules:
+- Questions must be conceptual and analytical
+- Avoid direct factual repetition
+- Include tricky options
+- Ensure only ONE correct answer
+- Provide explanation for each answer
+- Follow strict JSON format`;
+}
+
+function buildCacheKey({ subject, chapter, topic }) {
+  return [subject, chapter, topic].map((v) => String(v || "").trim().toLowerCase()).join("||");
+}
+
+function buildMainsCacheKey({ subject, chapter, topic }) {
+  return `mains::${buildCacheKey({ subject, chapter, topic })}`;
+}
+
+function normalizePlannerTopicQuestions(questions) {
+  return questions.map((q) => ({
+    question: q.question,
+    options: q.options,
+    correctAnswer: q.correctAnswer,
+    explanation:
+      typeof q.explanation === "string"
+        ? q.explanation
+        : q.explanation?.[q.correctAnswer] ||
+          q.explanation?.A ||
+          q.explanation?.B ||
+          q.explanation?.C ||
+          q.explanation?.D ||
+          "No explanation provided.",
+  }));
+}
+
+function buildMainsPrompt({ subject, chapter, topic }) {
+  return `Generate 5 UPSC Mains answer-writing questions from the topic:
+Subject: ${subject}
+Chapter: ${chapter}
+Topic: ${topic}
+
+Rules:
+- Questions must be UPSC-relevant and analytical
+- Cover diverse dimensions (conceptual, governance, socio-economic, critical analysis)
+- Include directive words like Discuss, Examine, Critically Analyze where appropriate
+- For each question include key points for structuring a strong answer
+- Return strict JSON format only`;
+}
+
+function normalizeMainsQuestions(items) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((q) => {
+      const keyPoints = Array.isArray(q.keyPoints)
+        ? q.keyPoints.map((v) => String(v || "").trim()).filter(Boolean)
+        : [];
+      return {
+        question: String(q.question || "").trim(),
+        marks: Number(q.marks) || 10,
+        wordLimit: Number(q.wordLimit) || 150,
+        keyPoints,
+      };
+    })
+    .filter((q) => q.question && q.keyPoints.length > 0);
+}
+
+/**
+ * Generate 20 topic-based UPSC MCQs for planner tasks.
+ * Returns strict array format for frontend quiz rendering.
+ */
+export const generateTopicQuestionsForPlanner = async ({ subject, chapter, topic }) => {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+  if (!apiKey) {
+    return { success: false, error: "Missing OPENROUTER_API_KEY in environment variables", questions: [] };
+  }
+
+  const payload = {
+    subject: String(subject || "").trim(),
+    chapter: String(chapter || "").trim() || "General",
+    topic: String(topic || "").trim(),
+  };
+
+  if (!payload.subject || !payload.topic) {
+    return { success: false, error: "subject and topic are required", questions: [] };
+  }
+
+  const cacheKey = buildCacheKey(payload);
+  const cached = topicQuestionCache.get(cacheKey);
+  if (cached && Date.now() - cached.createdAt < TOPIC_TEST_CACHE_TTL_MS) {
+    return { success: true, questions: cached.questions, count: cached.questions.length, cached: true };
+  }
+
+  const systemPrompt = `You are a UPSC CSE Prelims question setter.
+Return ONLY valid JSON array in this schema:
+[
+  {
+    "question": "string",
+    "options": { "A": "string", "B": "string", "C": "string", "D": "string" },
+    "correctAnswer": "A|B|C|D",
+    "explanation": "string"
+  }
+]
+Generate exactly 20 questions.`;
+
+  const userPrompt = buildPlannerTopicPrompt(payload);
+
+  const callModel = async (messages) => {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+        "X-Title": "UPSC Mentor - Planner Topic Test",
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature: 0.35,
+        max_tokens: 8000,
+      }),
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content?.trim();
+    if (!content) throw new Error("No response from AI");
+    return content;
+  };
+
+  let rawContent = "";
+  try {
+    rawContent = await callModel([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ]);
+
+    let parsed = parseAndValidateQuestions(rawContent, 20);
+    if (!parsed.length) throw new Error("No valid questions generated");
+
+    const normalized = normalizePlannerTopicQuestions(parsed).slice(0, 20);
+    topicQuestionCache.set(cacheKey, { createdAt: Date.now(), questions: normalized });
+    return { success: true, questions: normalized, count: normalized.length, cached: false };
+  } catch (firstErr) {
+    try {
+      const rawFixed = await callModel([
+        { role: "system", content: "Convert the following to strict valid JSON array only, no markdown, no text." },
+        {
+          role: "user",
+          content:
+            "Fix this AI output into the required schema with 20 questions. Keep meaning unchanged where possible.\n\n" +
+            String(rawContent || ""),
+        },
+      ]);
+      const parsed = parseAndValidateQuestions(rawFixed, 20);
+      const normalized = normalizePlannerTopicQuestions(parsed).slice(0, 20);
+      topicQuestionCache.set(cacheKey, { createdAt: Date.now(), questions: normalized });
+      return { success: true, questions: normalized, count: normalized.length, cached: false };
+    } catch (retryErr) {
+      return {
+        success: false,
+        error: retryErr.message || firstErr.message || "Failed to generate topic questions",
+        questions: [],
+      };
+    }
+  }
+};
+
+/**
+ * Generate UPSC Mains answer-writing questions for planner topic.
+ * Returns array: [{ question, marks, wordLimit, keyPoints[] }]
+ */
+export const generateMainsQuestionsForPlanner = async ({ subject, chapter, topic }) => {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+  if (!apiKey) {
+    return { success: false, error: "Missing OPENROUTER_API_KEY in environment variables", questions: [] };
+  }
+
+  const payload = {
+    subject: String(subject || "").trim(),
+    chapter: String(chapter || "").trim() || "General",
+    topic: String(topic || "").trim(),
+  };
+  if (!payload.subject || !payload.topic) {
+    return { success: false, error: "subject and topic are required", questions: [] };
+  }
+
+  const cacheKey = buildMainsCacheKey(payload);
+  const cached = topicQuestionCache.get(cacheKey);
+  if (cached && Date.now() - cached.createdAt < TOPIC_TEST_CACHE_TTL_MS) {
+    return { success: true, questions: cached.questions, count: cached.questions.length, cached: true };
+  }
+
+  const systemPrompt = `You are a UPSC Mains question setter.
+Return ONLY valid JSON array in this schema:
+[
+  {
+    "question": "string",
+    "marks": 10,
+    "wordLimit": 150,
+    "keyPoints": ["point 1", "point 2", "point 3", "point 4"]
+  }
+]
+Generate exactly 5 questions.`;
+
+  const callModel = async (messages) => {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+        "X-Title": "UPSC Mentor - Planner Topic Mains",
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        temperature: 0.35,
+        max_tokens: 4000,
+      }),
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+    }
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content?.trim();
+    if (!content) throw new Error("No response from AI");
+    return content;
+  };
+
+  const parseMains = (content) => {
+    let parsed = null;
+    try {
+      parsed = JSON.parse(content);
+    } catch (_) {
+      parsed = extractJsonFromContent(content);
+    }
+    if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.questions)) parsed = parsed.questions;
+    return normalizeMainsQuestions(parsed).slice(0, 5);
+  };
+
+  let rawContent = "";
+  try {
+    rawContent = await callModel([
+      { role: "system", content: systemPrompt },
+      { role: "user", content: buildMainsPrompt(payload) },
+    ]);
+    const normalized = parseMains(rawContent);
+    if (!normalized.length) throw new Error("No valid mains questions generated");
+    topicQuestionCache.set(cacheKey, { createdAt: Date.now(), questions: normalized });
+    return { success: true, questions: normalized, count: normalized.length, cached: false };
+  } catch (firstErr) {
+    try {
+      const rawFixed = await callModel([
+        { role: "system", content: "Convert the following into strict valid JSON array only, no markdown or extra text." },
+        { role: "user", content: String(rawContent || "") },
+      ]);
+      const normalized = parseMains(rawFixed);
+      if (!normalized.length) throw new Error("No valid mains questions generated");
+      topicQuestionCache.set(cacheKey, { createdAt: Date.now(), questions: normalized });
+      return { success: true, questions: normalized, count: normalized.length, cached: false };
+    } catch (retryErr) {
+      return {
+        success: false,
+        error: retryErr.message || firstErr.message || "Failed to generate mains questions",
+        questions: [],
+      };
+    }
+  }
+};
+
 /**
  * Generate UPSC Prelims MCQs using OpenRouter API.
  * @param {Object} params
@@ -1422,6 +1706,8 @@ export const generateTestQuestions = async ({
 
 export default {
   generateTestQuestions,
+  generateTopicQuestionsForPlanner,
+  generateMainsQuestionsForPlanner,
   generateFullMockTestQuestions,
   generateFullMockMixTestQuestions,
   generateFullMockPyoTestQuestions,

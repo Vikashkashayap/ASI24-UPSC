@@ -46,6 +46,10 @@ import {
   deleteOffer,
 } from "../controllers/offerController.js";
 import { requireAdmin } from "../middleware/adminMiddleware.js";
+import {
+  uploadSyllabusExcel,
+  listSyllabi,
+} from "../controllers/syllabusAdminController.js";
 
 const router = express.Router();
 
@@ -66,6 +70,21 @@ const pdfUpload = upload.fields([
   { name: "answerKeyPdf", maxCount: 1 },
 ]);
 
+const excelUpload = multer({
+  storage,
+  limits: { fileSize: 25 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const name = (file.originalname || "").toLowerCase();
+    const ok =
+      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+      file.mimetype === "application/vnd.ms-excel" ||
+      name.endsWith(".xlsx") ||
+      name.endsWith(".xls");
+    if (ok) cb(null, true);
+    else cb(new Error("Only Excel .xlsx / .xls files are allowed"), false);
+  },
+});
+
 // Debugging: Log all hits to admin routes
 router.use((req, res, next) => {
   console.log(`👤 Admin Route Hit: ${req.method} ${req.path}`);
@@ -74,6 +93,10 @@ router.use((req, res, next) => {
 
 // All admin routes require authentication + admin role
 router.use(requireAdmin);
+
+// UPSC syllabus (Excel: one sheet per subject, Topic / Subtopic columns)
+router.post("/syllabus/upload", excelUpload.single("file"), uploadSyllabusExcel);
+router.get("/syllabus", listSyllabi);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);

@@ -47,12 +47,10 @@ import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import CurrentAffairsPage from "./pages/CurrentAffairsPage";
 import CurrentAffairDetailPage from "./pages/CurrentAffairDetailPage";
 import AdminCurrentAffairsPage from "./pages/admin/AdminCurrentAffairsPage";
+import AdminSyllabusPage from "./pages/admin/AdminSyllabusPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
-import ComingSoon from "./components/ui/ComingSoon";
-
-
 function App() {
   return (
     <ThemeProvider>
@@ -92,8 +90,7 @@ function App() {
             <Route path="performance" element={<PerformanceDashboardPage />} />
             <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
-            <Route path="copy-evaluation" element={<ComingSoon />} />
-            {/* <Route path="copy-evaluation" element={<CopyEvaluationPage />} /> */}
+            <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />
@@ -127,6 +124,7 @@ function App() {
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
             <Route path="current-affairs" element={<AdminCurrentAffairsPage />} />
+            <Route path="syllabus" element={<AdminSyllabusPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>

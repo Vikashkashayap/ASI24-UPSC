@@ -126,6 +126,18 @@ export interface GenerateTestParams {
 export interface GenerateFullMockParams {
   subject: string; // One subject or comma-separated, e.g. "Polity" or "Polity, History, Geography"
 }
+export interface TopicQuestionItem {
+  question: string;
+  options: { A: string; B: string; C: string; D: string };
+  correctAnswer: "A" | "B" | "C" | "D";
+  explanation: string;
+}
+export interface TopicMainsQuestionItem {
+  question: string;
+  marks: number;
+  wordLimit: number;
+  keyPoints: string[];
+}
 export const testAPI = {
   generateTest: async (params: GenerateTestParams) => {
     return api.post("/api/tests/generate", params);
@@ -133,6 +145,24 @@ export const testAPI = {
 
   generateFullMockTest: async (params: GenerateFullMockParams) => {
     return api.post("/api/tests/generate-full-mock", params);
+  },
+
+  generateTopicQuestions: async (params: {
+    subject: string;
+    chapter?: string;
+    topic: string;
+    questionType?: "prelims" | "mains";
+  }) => {
+    return api.post<{
+      success: boolean;
+      data: TopicQuestionItem[] | TopicMainsQuestionItem[];
+      count: number;
+      cached?: boolean;
+      questionType?: "prelims" | "mains";
+    }>(
+      "/api/tests/generate-questions",
+      params
+    );
   },
 
   getTest: async (id: string) => {
@@ -340,23 +370,46 @@ export const mentorAPI = {
 };
 
 // Study Plan API (UPSC Study Planner: setup, tasks, progress, streak)
+export type StudyPlanTaskType =
+  | "subject_study"
+  | "current_affairs"
+  | "mcq_practice"
+  | "revision"
+  | "mock_test"
+  | "study"
+  | "test";
+
 export interface StudyPlanTask {
   _id: string;
   date: string;
   subject: string;
   topic: string;
-  taskType: "subject_study" | "current_affairs" | "mcq_practice" | "revision" | "mock_test";
+  subtopics?: string[];
+  taskType: StudyPlanTaskType;
   duration: number;
   startTime?: string | null;
   endTime?: string | null;
   completed: boolean;
   completedAt: string | null;
+  questions?: number | null;
+  plannerTestType?: string | null;
+  testAccuracy?: number | null;
+  testSkipped?: boolean;
+  revisionTopicSummaries?: string[];
+  linkedTopicKey?: string | null;
+  carriedOverFromDate?: string | null;
+  carriedCloneOf?: string | null;
 }
 
 export interface StudyPlanType {
   _id: string;
   userId: string;
   examDate: string;
+  planStartDate?: string | null;
+  planEndDate?: string | null;
+  plannerVersion?: "legacy" | "syllabus";
+  intensiveMode?: boolean;
+  syllabusId?: string | null;
   dailyHours: number;
   preparationLevel: "beginner" | "intermediate" | "advanced";
   subjects: string[];
@@ -368,6 +421,15 @@ export interface StudyPlanType {
   updatedAt?: string;
 }
 
+export interface PlannerDashboardSummary {
+  todayStr: string;
+  smartMessage: string;
+  todaysTarget: StudyPlanTask[];
+  pendingFromYesterday: StudyPlanTask[];
+  tomorrowPreview: StudyPlanTask[];
+  pendingYesterdayCount: number;
+}
+
 export interface StudyPlanProgress {
   date: string | null;
   daily: { total: number; completed: number; percent: number };
@@ -377,19 +439,92 @@ export interface StudyPlanProgress {
   daysRemaining?: number | null;
 }
 
+function localTodayYmd(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export const studyPlanAPI = {
-  setup: (data: { examDate: string; dailyHours?: number; preparationLevel?: string }) =>
-    api.post<{ plan: StudyPlanType; progress: StudyPlanProgress }>("/api/study-plan/setup", data),
-  get: () =>
-    api.get<{ plan: StudyPlanType | null; progress: StudyPlanProgress | null; daysRemaining?: number | null }>("/api/study-plan"),
+  setup: (data: {
+    examDate?: string;
+    startDate?: string;
+    endDate?: string;
+    dailyHours?: number;
+    preparationLevel?: string;
+    syllabusId?: string;
+    syllabusJson?: unknown;
+  }) =>
+    api.post<{
+      plan: StudyPlanType;
+      progress: StudyPlanProgress;
+      daysRemaining?: number | null;
+      dashboard?: PlannerDashboardSummary | null;
+    }>("/api/study-plan/setup", { ...data, clientToday: localTodayYmd() }),
+  get: (clientToday?: string) =>
+    api.get<{
+      plan: StudyPlanType | null;
+      progress: StudyPlanProgress | null;
+      daysRemaining?: number | null;
+      dashboard?: PlannerDashboardSummary | null;
+    }>("/api/study-plan", { params: { today: clientToday || localTodayYmd() } }),
   toggleTask: (taskId: string) =>
-    api.patch<{ plan: StudyPlanType; task: StudyPlanTask; progress: StudyPlanProgress }>(
-      `/api/study-plan/tasks/${taskId}/complete`
-    ),
+    api.patch<{
+      plan: StudyPlanType;
+      task: StudyPlanTask;
+      progress: StudyPlanProgress;
+      dashboard?: PlannerDashboardSummary | null;
+    }>(`/api/study-plan/tasks/${taskId}/complete`, {}, { params: { today: localTodayYmd() } }),
+  submitTestResult: (taskId: string, accuracy: number) =>
+    api.patch<{
+      plan: StudyPlanType;
+      progress: StudyPlanProgress;
+      dashboard?: PlannerDashboardSummary | null;
+    }>(`/api/study-plan/tasks/${taskId}/test-result`, { accuracy }, { params: { today: localTodayYmd() } }),
+  skipPlannerTest: (taskId: string) =>
+    api.post<{
+      plan: StudyPlanType;
+      progress: StudyPlanProgress;
+      dashboard?: PlannerDashboardSummary | null;
+    }>(`/api/study-plan/tasks/${taskId}/skip-test`, {}, { params: { today: localTodayYmd() } }),
+  explain: () =>
+    api.post<{ explanation: string; fallback?: boolean; error?: string }>("/api/study-plan/explain"),
   getProgress: (date?: string) =>
     api.get<{ progress: StudyPlanProgress }>("/api/study-plan/progress", {
       params: date ? { date } : undefined,
     }),
+};
+
+export const plannerAPI = {
+  generatePlan: (data: {
+    startDate: string;
+    endDate: string;
+    dailyHours?: number;
+    syllabusJson?: unknown;
+  }) =>
+    api.post<{
+      startDate: string;
+      endDate: string;
+      totalDays: number;
+      totalTopics: number;
+      intensiveMode: boolean;
+      usedFallbackSyllabus: boolean;
+      plan: StudyPlanTask[];
+    }>("/api/planner/generate-plan", data),
+};
+
+export const adminSyllabusAPI = {
+  upload: (file: File, label?: string) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    if (label) fd.append("label", label);
+    return api.post<{ success: boolean; syllabus: unknown; message?: string }>("/api/admin/syllabus/upload", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  list: () => api.get<{ success: boolean; data: unknown[] }>("/api/admin/syllabus"),
 };
 
 // Student Profiler API

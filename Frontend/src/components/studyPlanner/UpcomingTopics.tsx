@@ -44,7 +44,11 @@ export function UpcomingTopics({
     (t) =>
       t.date >= fromDate &&
       t.date <= cutoffStr &&
-      (t.taskType === "subject_study" || t.taskType === "mock_test")
+      (t.taskType === "subject_study" ||
+        t.taskType === "study" ||
+        t.taskType === "test" ||
+        t.taskType === "mcq_practice" ||
+        t.taskType === "mock_test")
   );
 
   const byDate: Record<string, { subject: string; topic: string; taskType: string }[]> = {};

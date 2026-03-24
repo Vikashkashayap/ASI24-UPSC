@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, Table } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/mentorsdaily.png";
@@ -43,6 +43,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
     '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
+    '/admin/syllabus': { title: 'UPSC Syllabus', icon: <Table className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -188,6 +189,10 @@ export const DashboardLayout = () => {
                   <Newspaper className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Current Affairs</span>}
                 </NavLink>
+                <NavLink to="/admin/syllabus" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="UPSC Syllabus Excel">
+                  <Table className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Syllabus (Excel)</span>}
+                </NavLink>
               </div>
 
               {/* Admin Tools Section */}
@@ -258,17 +263,8 @@ export const DashboardLayout = () => {
                   {!sidebarCollapsed && <span>Performance Dashboard</span>}
                 </NavLink>
                 <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <FileText className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>Copy Evaluation</span>}
-                    </div>
-                    {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
-                        Soon
-                      </span>
-                    )}
-                  </div>
+                  <FileText className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Copy Evaluation</span>}
                 </NavLink>
                 {/* <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
                   <History className="w-4 h-4 flex-shrink-0" />
@@ -741,7 +737,7 @@ export const DashboardLayout = () => {
                 ? "font-semibold"
                 : "font-normal"
               }`}>
-              Eval (Soon)
+              Copy Eval
             </span>
           </NavLink>
         </div>

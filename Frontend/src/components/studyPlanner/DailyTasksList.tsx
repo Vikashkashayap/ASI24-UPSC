@@ -1,20 +1,48 @@
-import { Check, Circle, Clock, BookOpen, FileText, Target, RotateCcw, ClipboardList, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import {
+  Check,
+  Circle,
+  Clock,
+  BookOpen,
+  FileText,
+  Target,
+  RotateCcw,
+  ClipboardList,
+  ExternalLink,
+  SkipForward,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTheme } from "../../hooks/useTheme";
 import { cn } from "../../utils/cn";
 import type { StudyPlanTask } from "../../services/api";
+import { SubjectBadge, TaskTypeTag } from "./subjectBadge";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { TopicTest } from "./TopicTest";
 
 export interface DailyTasksListProps {
   tasks: StudyPlanTask[];
   selectedDate: string;
   onToggleComplete: (taskId: string) => void;
   loadingTaskId: string | null;
+  onSubmitTestResult?: (taskId: string, accuracy: number) => Promise<void>;
+  onSkipTest?: (taskId: string) => Promise<void>;
+  testActionLoadingId?: string | null;
+}
+
+function displayTaskKind(taskType: string): "study" | "test" | "revision" | "other" {
+  if (taskType === "study" || taskType === "subject_study") return "study";
+  if (taskType === "test" || taskType === "mcq_practice") return "test";
+  if (taskType === "revision") return "revision";
+  return "other";
 }
 
 const taskTypeIcon: Record<string, React.ReactNode> = {
   subject_study: <BookOpen className="w-4 h-4" />,
+  study: <BookOpen className="w-4 h-4" />,
   current_affairs: <FileText className="w-4 h-4" />,
   mcq_practice: <Target className="w-4 h-4" />,
+  test: <Target className="w-4 h-4" />,
   revision: <RotateCcw className="w-4 h-4" />,
   mock_test: <ClipboardList className="w-4 h-4" />,
 };
@@ -24,8 +52,12 @@ export function DailyTasksList({
   selectedDate,
   onToggleComplete,
   loadingTaskId,
+  onSubmitTestResult,
+  onSkipTest,
+  testActionLoadingId,
 }: DailyTasksListProps) {
   const { theme } = useTheme();
+  const [accuracyDraft, setAccuracyDraft] = useState<Record<string, string>>({});
   const dayTasks = tasks.filter((t) => t.date === selectedDate);
 
   if (dayTasks.length === 0) {
@@ -46,10 +78,11 @@ export function DailyTasksList({
       {dayTasks.map((task) => {
         const isLoading = loadingTaskId === task._id;
         const timeSlot =
-          task.startTime && task.endTime
-            ? `${task.startTime}–${task.endTime}`
-            : null;
+          task.startTime && task.endTime ? `${task.startTime}–${task.endTime}` : null;
         const isCurrentAffairs = task.taskType === "current_affairs";
+        const kind = displayTaskKind(task.taskType);
+        const isPlannerTest = task.taskType === "test" && Boolean(onSubmitTestResult);
+        const testBusy = testActionLoadingId === task._id;
 
         const content = (
           <>
@@ -68,13 +101,19 @@ export function DailyTasksList({
               )}
               aria-label={task.completed ? "Mark incomplete" : "Mark complete"}
             >
-              {task.completed ? (
-                <Check className="w-5 h-5" />
-              ) : (
-                <Circle className="w-5 h-5" />
-              )}
+              {task.completed ? <Check className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
             </button>
             <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <SubjectBadge subject={task.subject} />
+                <TaskTypeTag type={kind} />
+                {task.testSkipped && (
+                  <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Skipped</span>
+                )}
+                {task.testAccuracy != null && (
+                  <span className="text-[10px] font-medium text-slate-500">Score: {task.testAccuracy}%</span>
+                )}
+              </div>
               {timeSlot && (
                 <p
                   className={cn(
@@ -97,7 +136,19 @@ export function DailyTasksList({
               >
                 {task.topic || task.subject}
               </p>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {(task.subtopics?.length ?? 0) > 0 && (
+                <ul className="mt-1 text-xs text-slate-500 dark:text-slate-400 list-disc list-inside">
+                  {task.subtopics!.map((st, i) => (
+                    <li key={i}>{st}</li>
+                  ))}
+                </ul>
+              )}
+              {task.revisionTopicSummaries && task.revisionTopicSummaries.length > 0 && kind === "revision" && (
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {task.revisionTopicSummaries.slice(0, 5).join(" · ")}
+                </p>
+              )}
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span
                   className={cn(
                     "inline-flex items-center gap-1 text-xs",
@@ -105,7 +156,6 @@ export function DailyTasksList({
                   )}
                 >
                   {taskTypeIcon[task.taskType] || <BookOpen className="w-4 h-4" />}
-                  {task.subject}
                 </span>
                 <span
                   className={cn(
@@ -115,6 +165,7 @@ export function DailyTasksList({
                 >
                   <Clock className="w-3.5 h-3.5" />
                   {task.duration} min
+                  {task.questions != null ? ` · ${task.questions} MCQs` : ""}
                 </span>
                 {isCurrentAffairs && (
                   <Link
@@ -130,6 +181,58 @@ export function DailyTasksList({
                   </Link>
                 )}
               </div>
+
+              {isPlannerTest && !task.completed && !task.testSkipped && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    placeholder="%"
+                    className={cn(
+                      "w-20 h-8 text-xs",
+                      theme === "dark" ? "bg-slate-900 border-slate-600" : ""
+                    )}
+                    value={accuracyDraft[task._id] ?? ""}
+                    onChange={(e) =>
+                      setAccuracyDraft((d) => ({ ...d, [task._id]: e.target.value }))
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="primary"
+                    disabled={testBusy}
+                    className="!min-h-0 h-8 py-1 text-xs"
+                    onClick={async () => {
+                      const v = Number(accuracyDraft[task._id]);
+                      if (Number.isNaN(v) || !onSubmitTestResult) return;
+                      await onSubmitTestResult(task._id, v);
+                    }}
+                  >
+                    Log score
+                  </Button>
+                  {onSkipTest && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={testBusy}
+                      className="!min-h-0 h-8 py-1 text-xs"
+                      onClick={() => onSkipTest(task._id)}
+                    >
+                      <SkipForward className="w-3.5 h-3.5 mr-1" />
+                      Skip test
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {isPlannerTest && !task.completed && !task.testSkipped && (
+                <TopicTest
+                  subject={task.subject}
+                  chapter={task.subtopics?.[0] || task.topic || "General"}
+                  topic={task.topic || task.subject}
+                />
+              )}
             </div>
           </>
         );
@@ -142,7 +245,9 @@ export function DailyTasksList({
               theme === "dark"
                 ? "border-slate-700/80 bg-slate-800/50 hover:border-slate-600"
                 : "border-slate-200 bg-white hover:border-slate-300",
-              task.completed && (theme === "dark" ? "opacity-75" : "opacity-85")
+              task.completed && (theme === "dark" ? "opacity-75" : "opacity-85"),
+              task.carriedOverFromDate &&
+                (theme === "dark" ? "ring-1 ring-amber-500/30" : "ring-1 ring-amber-400/40")
             )}
           >
             {content}

@@ -18,7 +18,8 @@ import {
   Zap,
   Newspaper
 } from "lucide-react";
-import { api, testAPI } from "../services/api";
+import { api, testAPI, studyPlanAPI } from "../services/api";
+import { StudyPlannerHomeSection } from "../components/studyPlanner/StudyPlannerHomeSection";
 
 export const HomePage = () => {
   const { theme } = useTheme();
@@ -33,6 +34,7 @@ export const HomePage = () => {
     averageAccuracy: 0,
     recentTests: [],
   });
+  const [plannerStreak, setPlannerStreak] = useState<number | null>(null);
 
   const isStudent = user?.role !== "admin";
   const isAdminCreated = user?.accountType === "admin-created";
@@ -41,8 +43,7 @@ export const HomePage = () => {
 
   useEffect(() => {
     if (isLockedStudent) {
-      // For unpaid students, we don't call premium analytics APIs;
-      // the dashboard will show an upgrade CTA instead.
+      setPlannerStreak(null);
       return;
     }
     const loadStats = async () => {
@@ -84,6 +85,18 @@ export const HomePage = () => {
       }
     };
     loadStats();
+
+    const loadPlannerStreak = async () => {
+      try {
+        const d = new Date();
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        const res = await studyPlanAPI.get(today);
+        setPlannerStreak(res.data.progress?.streak ?? null);
+      } catch {
+        setPlannerStreak(null);
+      }
+    };
+    loadPlannerStreak();
   }, [isLockedStudent]);
 
   const quickActions = [
@@ -235,6 +248,8 @@ export const HomePage = () => {
           </p>
         </div>
       </div>
+
+      {!isLockedStudent && <StudyPlannerHomeSection />}
 
       {/* Quick Stats - 2 cols mobile, touch-friendly */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
@@ -428,10 +443,10 @@ export const HomePage = () => {
                 ? "from-teal-300 to-teal-500 bg-clip-text text-transparent" 
                 : "from-teal-600 to-teal-800 bg-clip-text text-transparent"
             }`}>
-              {Math.floor(Math.random() * 7) + 1}
+              {plannerStreak != null ? plannerStreak : "—"}
             </div>
             <p className={`text-[9px] md:text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-              Days in a row
+              Days in a row{plannerStreak == null ? " (open planner)" : ""}
             </p>
           </CardContent>
         </Card>

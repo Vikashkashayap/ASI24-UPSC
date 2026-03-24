@@ -1,8 +1,9 @@
 import express from "express";
-import { getPlanner } from "../controllers/plannerController.js";
+import { generatePlan, getPlanner } from "../controllers/plannerController.js";
 
 const router = express.Router();
 
 router.get("/", getPlanner);
+router.post("/generate-plan", generatePlan);
 
 export default router;

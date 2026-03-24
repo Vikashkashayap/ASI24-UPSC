@@ -1,6 +1,7 @@
 import express from "express";
 import {
   generateTest,
+  generateTopicQuestions,
   generateFullMockTest,
   submitTest,
   getTest,
@@ -33,6 +34,7 @@ router.get("/test-connection", (req, res) => {
 
 // Generate new test
 router.post("/generate", generateTest);
+router.post("/generate-questions", generateTopicQuestions);
 
 // Generate full-length UPSC Prelims GS Paper 1 mock (100 questions); subject from admin/body
 router.post("/generate-full-mock", generateFullMockTest);
