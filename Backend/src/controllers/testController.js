@@ -1,4 +1,5 @@
 import Test from "../models/Test.js";
+import { User } from "../models/User.js";
 import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 
@@ -448,7 +449,7 @@ export const submitTest = async (req, res) => {
 export const getTest = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.id;
+    const userId = req.user?._id ?? req.user?.id;
     const userRole = req.user?.role;
 
     if (!userId) {
@@ -458,14 +459,37 @@ export const getTest = async (req, res) => {
       });
     }
 
-    // Admins can view any test; students can only view their own (or legacy tests without userId)
-    const testQuery =
-      userRole === "admin"
-        ? { _id: id }
-        : {
-            _id: id,
-            $or: [{ userId }, { userId: { $exists: false } }],
-          };
+    // Admins can view any test; mentors can view tests of assigned students; students only their own (or legacy without userId)
+    let testQuery;
+    if (userRole === "admin") {
+      testQuery = { _id: id };
+    } else if (userRole === "mentor") {
+      const probe = await Test.findById(id).select("userId").lean();
+      if (!probe?.userId) {
+        return res.status(404).json({
+          success: false,
+          message: "Test not found",
+        });
+      }
+      const stud = await User.findById(probe.userId).select("mentorId role").lean();
+      if (
+        !stud ||
+        stud.role !== "student" ||
+        !stud.mentorId ||
+        String(stud.mentorId) !== String(userId)
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied",
+        });
+      }
+      testQuery = { _id: id };
+    } else {
+      testQuery = {
+        _id: id,
+        $or: [{ userId }, { userId: { $exists: false } }],
+      };
+    }
 
     const test = await Test.findOne(testQuery);
 

@@ -25,7 +25,7 @@ export const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }
 
   // Check if user is admin
   if (user.role !== "admin") {
-    return <Navigate to="/home" replace />;
+    return <Navigate to={user.role === "mentor" ? "/mentor-dashboard" : "/home"} replace />;
   }
 
   return <>{children}</>;

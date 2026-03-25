@@ -16,6 +16,7 @@ import {
   getDashboardStats,
   searchUsers,
   deleteStudent,
+  getMentors,
 } from "../controllers/adminController.js";
 import {
   uploadTest,
@@ -108,6 +109,9 @@ router.delete("/offers/:id", deleteOffer);
 
 // User search
 router.get("/search", searchUsers);
+
+// Human mentors (admin UI)
+router.get("/mentors", getMentors);
 
 // Student management
 router.delete("/students/:id", (req, res, next) => {

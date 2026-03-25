@@ -18,9 +18,23 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Human mentors use the mentor dashboard, not the student shell (except shared pages).
+  if (user.role === "mentor") {
+    const allowed =
+      location.pathname.startsWith("/mentor-dashboard") ||
+      location.pathname.startsWith("/result/") ||
+      location.pathname.startsWith("/test/") ||
+      location.pathname === "/profile" ||
+      location.pathname === "/help-support" ||
+      location.pathname === "/change-password";
+    if (!allowed) {
+      return <Navigate to="/mentor-dashboard" replace />;
+    }
+  }
+
   // Subscription guard for self-registered users.
   // Admins and admin-created users bypass payment.
-  const isStudent = user.role !== "admin";
+  const isStudent = user.role !== "admin" && user.role !== "mentor";
   const isAdminCreated = user.accountType === "admin-created";
   const isActiveSubscription = user.subscriptionStatus === "active";
   // Routes that a new (unpaid) student can still see – they will see banners/CTAs,

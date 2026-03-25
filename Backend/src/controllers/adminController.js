@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import { Mentor } from "../models/Mentor.js";
 import { PricingPlan } from "../models/PricingPlan.js";
 import CopyEvaluation from "../models/CopyEvaluation.js";
 import Test from "../models/Test.js";
@@ -1089,6 +1090,43 @@ export const updateStudentStatus = async (req, res) => {
   }
 };
 
+/** GET /api/admin/mentors — list human mentors for assignment UI */
+export const getMentors = async (req, res) => {
+  try {
+    const mentors = await User.find({ role: "mentor" })
+      .select("name email createdAt")
+      .sort({ name: 1 })
+      .lean();
+
+    const withCounts = await Promise.all(
+      mentors.map(async (m) => {
+        const assignedStudentCount = await User.countDocuments({
+          mentorId: m._id,
+          role: "student",
+        });
+        return {
+          _id: m._id,
+          name: m.name,
+          email: m.email,
+          createdAt: m.createdAt,
+          assignedStudentCount,
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: { mentors: withCounts },
+    });
+  } catch (error) {
+    console.error("getMentors:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to list mentors",
+    });
+  }
+};
+
 export const createStudent = async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -1217,6 +1255,13 @@ export const deleteStudent = async (req, res) => {
         { $pull: { participants: { userId: id } } }
       )
     ]);
+
+    if (student.mentorId) {
+      await Mentor.updateOne(
+        { userId: student.mentorId },
+        { $pull: { assignedStudents: student._id } }
+      );
+    }
 
     // Finally delete the user
     await User.findByIdAndDelete(id);

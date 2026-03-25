@@ -10,8 +10,14 @@ const userSchema = new mongoose.Schema(
     // Authorization role used across the app (admin vs non-admin)
     role: {
       type: String,
-      enum: ["student", "agent", "admin"],
+      enum: ["student", "agent", "admin", "mentor"],
       default: "student",
+    },
+    /** Set for students assigned to a human mentor (User id with role mentor) */
+    mentorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
     // Subscription user type (spec: "role" for subscription) – controls access
     // - "admin-created": created from admin dashboard, full access without payment

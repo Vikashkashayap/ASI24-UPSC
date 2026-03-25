@@ -19,8 +19,8 @@ const subscriptionCheck = async (req, res, next) => {
     });
   }
 
-  // Admins and agents are never blocked by subscription checks
-  if (user.role === "admin" || user.role === "agent") {
+  // Admins, agents, and human mentors are never blocked by subscription checks
+  if (user.role === "admin" || user.role === "agent" || user.role === "mentor") {
     return next();
   }
 

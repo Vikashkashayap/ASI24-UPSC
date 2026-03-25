@@ -36,9 +36,17 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/mains-evaluation': { title: 'Mains Evaluation', icon: <FileText className="w-5 h-5" /> },
   };
 
+  const mentorRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
+    '/mentor-dashboard': { title: 'Mentor Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
+    '/mentor-dashboard/students': { title: 'Your Students', icon: <Users className="w-5 h-5" /> },
+    '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
+    '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
+  };
+
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/admin/mentors': { title: 'Mentors', icon: <Users className="w-5 h-5" /> },
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
@@ -47,9 +55,14 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
 
-  const routeMap = userRole === 'admin' ? adminRouteMap : studentRouteMap;
+  let routeMap = studentRouteMap;
+  if (userRole === 'admin') routeMap = adminRouteMap;
+  else if (userRole === 'mentor') routeMap = mentorRouteMap;
 
   // Handle dynamic routes
+  if (userRole === 'mentor' && pathname.startsWith('/mentor-dashboard/students/') && pathname !== '/mentor-dashboard/students') {
+    return { title: 'Student detail', icon: <User className="w-5 h-5" /> };
+  }
   if (pathname.startsWith('/copy-evaluation/')) {
     return { title: 'Copy Evaluation Details', icon: <FileText className="w-5 h-5" /> };
   }
@@ -91,9 +104,10 @@ export const DashboardLayout = () => {
   const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
   const pageInfo = getPageTitle(location.pathname, user?.role);
-  const isStudent = user?.role !== "admin";
+  const isStudent = user?.role !== "admin" && user?.role !== "mentor";
   const hasActiveSubscription =
     user?.role === "admin" ||
+    user?.role === "mentor" ||
     user?.accountType === "admin-created" ||
     user?.subscriptionStatus === "active";
 
@@ -168,6 +182,10 @@ export const DashboardLayout = () => {
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
                 </NavLink>
+                <NavLink to="/admin/mentors" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Mentors">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Mentors</span>}
+                </NavLink>
                 <NavLink to="/admin/pro-students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Pro Plan Students">
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Pro Students</span>}
@@ -195,6 +213,36 @@ export const DashboardLayout = () => {
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
                   <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Admin Tools
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Profile">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Profile</span>}
+                </NavLink>
+                <NavLink to="/help-support" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Help & Support">
+                  <HelpCircle className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Help & Support</span>}
+                </NavLink>
+              </div>
+            </>
+          ) : user?.role === "mentor" ? (
+            <>
+              <div className="space-y-1">
+                <NavLink to="/mentor-dashboard" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Mentor Dashboard" end>
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Dashboard</span>}
+                </NavLink>
+                <NavLink to="/mentor-dashboard/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Your Students">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Students</span>}
+                </NavLink>
+              </div>
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Account
                   </div>
                 </div>
               )}
@@ -581,7 +629,8 @@ export const DashboardLayout = () => {
         </main>
       </div>
 
-      {/* Bottom Navigation Bar - Mobile Only */}
+      {/* Bottom Navigation Bar - Mobile Only (students only; mentors use sidebar) */}
+      {user?.role !== "mentor" && user?.role !== "admin" && (
       <nav
         className={`fixed bottom-0 left-0 right-0 z-50 md:hidden border-t backdrop-blur-xl transition-all duration-300 shadow-lg ${theme === "dark"
             ? "border-blue-900/40 bg-[#020617]/98 shadow-blue-900/20"
@@ -746,6 +795,7 @@ export const DashboardLayout = () => {
           </NavLink>
         </div>
       </nav>
+      )}
 
       {/* DART form modal – student daily activity entry */}
       {isStudent && (

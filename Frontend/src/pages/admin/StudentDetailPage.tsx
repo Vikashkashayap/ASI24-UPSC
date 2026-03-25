@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { Badge } from "../../components/ui/badge";
-import { api, dartAPI } from "../../services/api";
+import { api } from "../../services/api";
 import { useTheme } from "../../hooks/useTheme";
 import {
   ArrowLeft,
@@ -171,7 +171,10 @@ interface EvaluationDetails {
 
 export const StudentDetailPage = () => {
   const { theme } = useTheme();
-  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const isMentorView = location.pathname.startsWith("/mentor-dashboard/students");
+  const routeParams = useParams<{ id?: string; studentId?: string }>();
+  const id = routeParams.id ?? routeParams.studentId;
   const navigate = useNavigate();
   const [student, setStudent] = useState<Student | null>(null);
   const [performanceSummary, setPerformanceSummary] = useState<PerformanceSummary | null>(null);
@@ -197,33 +200,42 @@ export const StudentDetailPage = () => {
   const [dartAnalytics, setDartAnalytics] = useState<any | null>(null);
   const [dartReportDownloading, setDartReportDownloading] = useState(false);
   const [resetPasswordResult, setResetPasswordResult] = useState<{ tempPassword: string } | null>(null);
+  const [mentorFeedbackMessage, setMentorFeedbackMessage] = useState("");
+  const [mentorFeedbackSending, setMentorFeedbackSending] = useState(false);
+  const [mentorFeedbackList, setMentorFeedbackList] = useState<Array<{ message: string; createdAt: string }>>([]);
 
   useEffect(() => {
     if (id) {
       fetchStudentData();
     }
-  }, [id, timeFilter]);
+  }, [id, timeFilter, isMentorView]);
 
   useEffect(() => {
     if (id && activeTab === "analytics") {
-      dartAPI.getStudentAnalytics(id, 30).then((res) => {
-        if (res.data?.success && res.data.data) setDartAnalytics(res.data.data);
-      }).catch(() => setDartAnalytics(null));
+      const base = isMentorView ? `/api/mentor/students/${id}` : `/api/admin/students/${id}`;
+      api
+        .get(`${base}/dart-analytics`, { params: { days: 30 } })
+        .then((res) => {
+          if (res.data?.success && res.data.data) setDartAnalytics(res.data.data);
+        })
+        .catch(() => setDartAnalytics(null));
     } else if (activeTab !== "analytics") {
       setDartAnalytics(null);
     }
-  }, [id, activeTab]);
+  }, [id, activeTab, isMentorView]);
 
   const fetchStudentData = async () => {
+    if (!id) return;
     try {
       setLoading(true);
       const params = timeFilter !== "all" ? { period: timeFilter } : {};
+      const base = isMentorView ? `/api/mentor/students/${id}` : `/api/admin/students/${id}`;
 
       const [studentRes, prelimsRes, mainsRes, activityRes] = await Promise.all([
-        api.get(`/api/admin/students/${id}`),
-        api.get(`/api/admin/students/${id}/prelims`, { params }),
-        api.get(`/api/admin/students/${id}/mains`, { params }),
-        api.get(`/api/admin/students/${id}/activity`, { params })
+        api.get(isMentorView ? `${base}/profile` : `${base}`),
+        api.get(`${base}/prelims`, { params }),
+        api.get(`${base}/mains`, { params }),
+        api.get(`${base}/activity`, { params }),
       ]);
 
       if (studentRes.data.success) {
@@ -242,11 +254,35 @@ export const StudentDetailPage = () => {
       if (activityRes.data.success) {
         setActivityData(activityRes.data.data);
       }
+
+      if (isMentorView) {
+        const sum = await api.get(`/api/mentor/students/${id}`);
+        if (sum.data?.success && Array.isArray(sum.data.data?.feedback)) {
+          setMentorFeedbackList(sum.data.data.feedback);
+        }
+      }
     } catch (err: any) {
       console.error("Error fetching student data:", err);
       setError(err?.response?.data?.message || "Failed to load student data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const submitMentorFeedback = async () => {
+    if (!id || !mentorFeedbackMessage.trim()) return;
+    setMentorFeedbackSending(true);
+    try {
+      await api.post("/api/mentor/feedback", { studentId: id, message: mentorFeedbackMessage.trim() });
+      setMentorFeedbackMessage("");
+      const sum = await api.get(`/api/mentor/students/${id}`);
+      if (sum.data?.success && Array.isArray(sum.data.data?.feedback)) {
+        setMentorFeedbackList(sum.data.data.feedback);
+      }
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setMentorFeedbackSending(false);
     }
   };
 
@@ -293,7 +329,8 @@ export const StudentDetailPage = () => {
     if (!id) return;
     setDartReportDownloading(true);
     try {
-      const res = await dartAPI.getStudentReport20Day(id);
+      const dartBase = isMentorView ? `/api/mentor/students/${id}` : `/api/admin/students/${id}`;
+      const res = await api.get(`${dartBase}/dart-report-20day`, { responseType: "blob" });
       const blob = new Blob([res.data], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -411,7 +448,7 @@ export const StudentDetailPage = () => {
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <Link to="/admin/students">
+          <Link to={isMentorView ? "/mentor-dashboard/students" : "/admin/students"}>
             <Button variant="outline" className={`${
               theme === "dark"
                 ? "border-slate-700 hover:bg-slate-800 text-slate-300"
@@ -468,6 +505,7 @@ export const StudentDetailPage = () => {
                   </div>
                 </div>
               </div>
+              {!isMentorView && (
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -498,6 +536,7 @@ export const StudentDetailPage = () => {
                   Reset Password
                 </Button>
               </div>
+              )}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -1172,7 +1211,13 @@ export const StudentDetailPage = () => {
                             ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
                             : "bg-slate-50 border-slate-200 hover:bg-slate-100/80"
                         }`}
-                        onClick={() => navigate(`/result/${test.id}?fromAdmin=1&studentId=${id}`)}
+                        onClick={() =>
+                          navigate(
+                            isMentorView
+                              ? `/result/${test.id}?fromMentor=1&studentId=${id}`
+                              : `/result/${test.id}?fromAdmin=1&studentId=${id}`
+                          )
+                        }
                       >
                         <div className="flex justify-between items-start gap-4">
                           <div className="flex-1 min-w-0">
@@ -1245,7 +1290,11 @@ export const StudentDetailPage = () => {
                               }`}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                navigate(`/result/${test.id}?fromAdmin=1&studentId=${id}`);
+                                navigate(
+                                  isMentorView
+                                    ? `/result/${test.id}?fromMentor=1&studentId=${id}`
+                                    : `/result/${test.id}?fromAdmin=1&studentId=${id}`
+                                );
                               }}
                             >
                               <Eye className="h-3.5 w-3.5" />
@@ -2117,6 +2166,63 @@ export const StudentDetailPage = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {isMentorView && id && (
+          <Card
+            className={`mt-8 mb-6 transition-colors duration-300 ${
+              theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200 shadow-sm"
+            }`}
+          >
+            <CardHeader>
+              <CardTitle className="text-lg">Mentor feedback</CardTitle>
+              <p className={`text-sm font-normal ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
+                Notes for this student (visible to you on this profile).
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <textarea
+                value={mentorFeedbackMessage}
+                onChange={(e) => setMentorFeedbackMessage(e.target.value)}
+                placeholder="Encouragement, focus areas, or next steps…"
+                rows={4}
+                className={`w-full rounded-lg border px-3 py-2 text-sm ${
+                  theme === "dark"
+                    ? "bg-slate-950 border-slate-700 text-white placeholder:text-slate-500"
+                    : "bg-white border-slate-200 text-slate-900"
+                }`}
+              />
+              <Button
+                type="button"
+                onClick={submitMentorFeedback}
+                disabled={mentorFeedbackSending || !mentorFeedbackMessage.trim()}
+              >
+                {mentorFeedbackSending ? "Sending…" : "Send feedback"}
+              </Button>
+              {mentorFeedbackList.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-slate-700/40">
+                  <p className={`text-xs font-semibold uppercase tracking-wide ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}>
+                    Earlier notes
+                  </p>
+                  <ul className="space-y-3">
+                    {mentorFeedbackList.map((f, i) => (
+                      <li
+                        key={i}
+                        className={`rounded-lg p-3 text-sm ${theme === "dark" ? "bg-slate-800/60 text-slate-200" : "bg-slate-50 text-slate-800"}`}
+                      >
+                        <p>{f.message}</p>
+                        {f.createdAt && (
+                          <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}>
+                            {new Date(f.createdAt).toLocaleString()}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

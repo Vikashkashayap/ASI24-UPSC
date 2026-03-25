@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "./hooks/useTheme";
 import { DashboardLayout } from "./layouts/DashboardLayout";
@@ -21,6 +21,10 @@ import ProfilePage from "./pages/ProfilePage";
 import { StudentProfilerPage } from "./pages/StudentProfilerPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
+import { MentorRoute } from "./components/MentorRoute";
+import { MentorDashboardPage } from "./pages/mentor/MentorDashboardPage";
+import { MentorStudentsPage } from "./pages/mentor/MentorStudentsPage";
+import { DefaultCaughtRoute } from "./components/DefaultCaughtRoute";
 import { LandingPage } from "./pages/LandingPage";
 import { FeaturesPage } from "./pages/landing/FeaturesPage";
 import { PricingPage } from "./pages/landing/PricingPage";
@@ -47,6 +51,7 @@ import { PrelimsMockPage } from "./pages/prelimsMock/PrelimsMockPage";
 import CurrentAffairsPage from "./pages/CurrentAffairsPage";
 import CurrentAffairDetailPage from "./pages/CurrentAffairDetailPage";
 import AdminCurrentAffairsPage from "./pages/admin/AdminCurrentAffairsPage";
+import { AdminMentorsPage } from "./pages/admin/AdminMentorsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
@@ -107,6 +112,18 @@ function App() {
             <Route path="student-profiler" element={<StudentProfilerPage />} />
             <Route path="current-affairs" element={<CurrentAffairsPage />} />
             <Route path="current-affairs/:slug" element={<CurrentAffairDetailPage />} />
+            <Route
+              path="mentor-dashboard"
+              element={
+                <MentorRoute>
+                  <Outlet />
+                </MentorRoute>
+              }
+            >
+              <Route index element={<MentorDashboardPage />} />
+              <Route path="students" element={<MentorStudentsPage />} />
+              <Route path="students/:studentId" element={<StudentDetailPage />} />
+            </Route>
           </Route>
           {/* Admin Routes */}
           <Route
@@ -126,9 +143,10 @@ function App() {
             <Route path="offer-manager" element={<AdminOfferManagerPage />} />
             <Route path="students" element={<StudentsListPage />} />
             <Route path="students/:id" element={<StudentDetailPage />} />
+            <Route path="mentors" element={<AdminMentorsPage />} />
             <Route path="current-affairs" element={<AdminCurrentAffairsPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<DefaultCaughtRoute />} />
         </Routes>
       </AuthProvider>
     </ThemeProvider>

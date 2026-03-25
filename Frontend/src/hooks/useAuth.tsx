@@ -6,7 +6,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  role?: "student" | "admin" | "agent";
+  role?: "student" | "admin" | "agent" | "mentor";
   mustChangePassword?: boolean;
   // Subscription / billing metadata (optional; provided by backend)
   accountType?: "admin-created" | "paid-user";
@@ -59,6 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Redirect based on user role and password change status
     if (nextUser.role === "admin") {
       navigate("/admin/dashboard", { replace: true });
+    } else if (nextUser.role === "mentor") {
+      navigate("/mentor-dashboard", { replace: true });
     } else if (nextUser.mustChangePassword) {
       navigate("/change-password", { replace: true });
     } else {

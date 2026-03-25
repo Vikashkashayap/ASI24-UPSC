@@ -230,6 +230,19 @@ export const adminAPI = {
   deleteStudent: async (id: string) => {
     return api.delete(`/api/admin/students/${id}`);
   },
+  getMentors: () => api.get("/api/admin/mentors"),
+};
+
+/** Human mentor (staff): roster, feedback, analytics — under /api/mentor (distinct from AI chat paths). */
+export const mentorStaffAPI = {
+  createMentor: (body: { name: string; email: string }) => api.post("/api/mentor/create", body),
+  assignStudents: (body: { mentorUserId: string; studentIds: string[] }) =>
+    api.post("/api/mentor/assign-students", body),
+  getStudents: () => api.get("/api/mentor/students"),
+  getStudentDetail: (studentId: string) => api.get(`/api/mentor/students/${studentId}`),
+  postFeedback: (body: { studentId: string; message: string }) =>
+    api.post("/api/mentor/feedback", body),
+  getAnalytics: () => api.get("/api/mentor/analytics"),
 };
 
 // Prelims Import API (PDF parsed → structured test, modern UI)

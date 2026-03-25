@@ -136,13 +136,24 @@ const TestResultPage: React.FC = () => {
   const maxScore = result.totalQuestions * 2;
   const scorePercentage = (result.score / maxScore) * 100;
   const fromAdmin = searchParams.get("fromAdmin") === "1";
+  const fromMentor = searchParams.get("fromMentor") === "1";
   const studentId = searchParams.get("studentId");
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-3 md:px-4 overflow-x-hidden">
       {/* Header Actions - Mobile-first */}
       <div className="flex items-center justify-between gap-2">
-        {fromAdmin && studentId ? (
+        {fromMentor && studentId ? (
+          <Button
+            onClick={() => navigate(`/mentor-dashboard/students/${studentId}`)}
+            variant="outline"
+            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden xs:inline">Back to Student</span>
+            <span className="xs:hidden">Back</span>
+          </Button>
+        ) : fromAdmin && studentId ? (
           <Button
             onClick={() => navigate(`/admin/students/${studentId}`)}
             variant="outline"
