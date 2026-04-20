@@ -1,0 +1,1745 @@
+{
+  "meta": {
+    "subject": "UPSC Ancient India History",
+    "version": "1.0",
+    "primary_books": [
+      "RS Sharma — Ancient India (Old NCERT) — Complete reference",
+      "NCERT Class 6 — Our Pasts I",
+      "NCERT Class 11 Old — Ancient India (RS Sharma)",
+      "NCERT Class 12 — Themes in Indian History Part I",
+      "Spectrum — A Brief History of Modern India (overlap topics)"
+    ],
+    "upsc_weightage": {
+      "prelims_questions_avg": "8-12 questions per year",
+      "mains_gs1_marks": "80-120 marks out of 250",
+      "importance": "very_high"
+    },
+    "total_estimated_hours": 140,
+    "reading_order": "NCERT Class 6 → RS Sharma Ancient India → NCERT Class 11 → NCERT Class 12 Themes → Spectrum overlap",
+    "mains_themes_gs1": [
+      "State formation in ancient India",
+      "Administrative structures and governance models",
+      "Economic systems: agriculture, trade, monetary systems",
+      "Religious movements and their social impact",
+      "Art, architecture, and cultural contributions",
+      "Social stratification and caste system evolution",
+      "Urban centres and settlement patterns",
+      "Military organization and warfare",
+      "Science and technology in ancient India",
+      "Art forms and their regional variations"
+    ]
+  },
+
+  "modules": [
+    {
+      "module_id": "hist_anc_m01",
+      "module_name": "Prehistoric India & Indus Valley Civilization",
+      "sequence": 1,
+      "estimated_days_standard": 8,
+      "estimated_hours": 20,
+      "importance": "critical",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t01",
+          "topic_name": "Prehistoric Period (Stone Age)",
+          "rs_sharma_reference": "Chapter 1 — The Palaeolithic and Mesolithic Periods",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 1: What, Where, How and When?",
+            "Class 6 — Chapter 2: On the Trail of the Earliest People"
+          ],
+          "key_concepts": [
+            "Old Stone Age (Palaeolithic) — tool making, hunting-gathering",
+            "Middle Stone Age (Mesolithic) — microlithic tools, domestication of animals",
+            "New Stone Age (Neolithic) — agriculture revolution, settled life, pottery",
+            "Palaeolithic tool types: choppers, hand axes, cleavers, scrapers",
+            "Mesolithic innovations: microliths, fishing equipment",
+            "Neolithic farming and animal domestication: wheat, barley, cattle, sheep",
+            "Fire-making and its significance in human evolution",
+            "Rock shelters and caves: Bhimbetka rock paintings, Sohan valley",
+            "Geographic distribution: Indus Valley, Deccan, Eastern India",
+            "Dating methods: radiocarbon dating, relative chronology",
+            "Daily life: hunting techniques, food gathering, shelter construction",
+            "Religious beliefs: burials and their significance"
+          ],
+          "important_facts": {
+            "dates": "Palaeolithic: 2.5 million — 10,000 BCE; Mesolithic: 10,000 — 4000 BCE; Neolithic: 4000 — 2500 BCE",
+            "sites": "Bhimbetka, Sohan Valley, Bagor, Chopani Mando",
+            "tool_innovations": "Hand axes, cleavers, microliths, bone tools"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "low",
+          "daily_target_hours": 2,
+          "map_work": ["Bhimbetka region (MP)", "Sohan Valley (Punjab)", "Indus Valley floor", "Deccan plateau sites"]
+        },
+        {
+          "topic_id": "hist_anc_t02",
+          "topic_name": "Indus Valley Civilization — Settlement & Society",
+          "rs_sharma_reference": "Chapter 2 — The Indus Valley Civilization",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 3: From Gathering to Growing Food",
+            "Class 11 — Ancient India (RS Sharma) — Chapter 2"
+          ],
+          "key_concepts": [
+            "Chronology: 3300-1300 BCE (mature phase 2600-1900 BCE)",
+            "Geographical extent: 1.3 million sq km from Sutkagen Dor to Mandi",
+            "Major cities: Harappa, Mohenjo-daro, Dholavira, Kalibangan, Lothal",
+            "Urban planning: grid pattern streets, standardized brick sizes, drainage systems",
+            "Architecture: citadels, residential quarters, granaries, workmen's quarters",
+            "Housing: multi-storied, courtyards, bathrooms, wells in every house",
+            "Population and settlement hierarchy: large, medium, small towns",
+            "Material culture: pottery, terracotta figurines, seals, jewellery",
+            "Agricultural base: wheat, barley, rice, cotton, peas",
+            "Animal husbandry: cattle, buffalo, sheep, goats, pigs",
+            "Crafts: metal-working, shell-working, bead-making, textile production",
+            "Social organization: no evidence of kings or priests, possibly merchant-based oligarchy",
+            "No clear evidence of temples or palaces",
+            "Absence of weapons suggests peaceful society"
+          ],
+          "important_facts": {
+            "dates": "Mature IVC: 2600-1900 BCE",
+            "major_sites": "Harappa (Punjab), Mohenjo-daro (Sindh), Dholavira (Gujarat), Kalibangan (Rajasthan), Lothal (Gujarat)",
+            "population_estimate": "40,000-80,000 in major cities",
+            "key_features": "Urban planning, standardized weights/measures, seals, drainage"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 3,
+          "map_work": ["Harappa location", "Mohenjo-daro location", "Dholavira", "Kalibangan", "Lothal", "Sutkagen Dor", "Banawali"]
+        },
+        {
+          "topic_id": "hist_anc_t03",
+          "topic_name": "Indus Valley Civilization — Economy & Trade",
+          "rs_sharma_reference": "Chapter 2 — Economic Organization",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 3"],
+          "key_concepts": [
+            "Standardized weights and measures: decimal system for weights",
+            "Trade routes: with Mesopotamia, Gulf, Central Asia",
+            "Exports: cotton, lapis lazuli beads, seals, finished goods",
+            "Imports: tin, copper, semi-precious stones",
+            "Merchant ships and maritime trade: evidence from Lothal dock",
+            "Internal trade networks: distribution of raw materials",
+            "Monetary system: possibly barter-based with standardized weights",
+            "Craft specialization: evidence from different quarters in cities",
+            "Agricultural surplus: enables non-farming population",
+            "Granaries: storage and redistribution systems",
+            "Raw material processing: copper smelting, shell-working centres",
+            "Standardized seals: possibly merchant/property marks"
+          ],
+          "important_facts": {
+            "trade_partners": "Mesopotamia, Oman, Afghanistan, Central Asia",
+            "key_exports": "Cotton textiles, carnelian beads, seals, terracotta figurines",
+            "measurement_system": "Decimal system, smallest unit 1.7 mm",
+            "maritime_center": "Lothal — oldest dock with sluice gates"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t04",
+          "topic_name": "Indus Valley Civilization — Writing & Culture",
+          "rs_sharma_reference": "Chapter 2 — Script and Religion",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 3"],
+          "key_concepts": [
+            "Undeciphered script: 400-600 distinct signs, proto-Dravidian hypothesis",
+            "Direction: written right to left or boustrophedon",
+            "Seals: square steatite seals with pictographic inscriptions and animal motifs",
+            "Famous seal: Pashupati seal with horned deity",
+            "Religious practices: Goddess worship, fertility cults, animal worship",
+            "Phallic symbols (lingams) and yoni symbols",
+            "Terracotta figurines: dancing girl, priest-king, various animals",
+            "Pottery: red ware, reserved slip ware, distinctive patterns",
+            "Art forms: seals, figurines, beads, bangles",
+            "Aesthetic sense: geometric designs, animal motifs, plant forms",
+            "Games: dice (gatta and chakri types), board games",
+            "Personal adornment: jewellery, cosmetics, bangles of terracotta and shell"
+          ],
+          "important_facts": {
+            "script": "Undeciphered, 400-600 signs, mostly on seals",
+            "famous_artifacts": "Dancing girl, Priest-king statue, Pashupati seal",
+            "pottery_styles": "Red ware, reserved slip ware",
+            "script_direction": "Right to left (mostly)"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t05",
+          "topic_name": "Decline of Indus Valley Civilization & Early Iron Age",
+          "rs_sharma_reference": "Chapter 2 — Decline; Chapter 3 — Later Harappan Culture",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 3"],
+          "key_concepts": [
+            "Theories of decline: floods, climate change, environmental degradation",
+            "Tectonic activity and earthquake hypothesis",
+            "Drying of rivers — evidence from geomorphological studies",
+            "Aryan invasion theory (outdated) vs migration theory",
+            "Post-Harappan culture: 1900-1300 BCE",
+            "Late Harappan settlement pattern: shift eastward",
+            "Cultural continuity: some elements persist into Vedic period",
+            "Painted Grey Ware (PGW): early Iron Age pottery",
+            "Iron working: gradual introduction from 1200 BCE",
+            "Settlement pattern change: from urban to rural",
+            "Economic simplification: loss of standardization",
+            "Regional variations in material culture"
+          ],
+          "important_facts": {
+            "decline_theories": "Environmental degradation, tectonic activity, Aryan migration",
+            "post_harappan": "1900-1300 BCE",
+            "pgw_period": "1200-600 BCE",
+            "key_sites": "Bahawalpur, Bet Dwarka, Banawali, Rakigarhi"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 45,
+        "duration_mins": 45,
+        "focus_areas": ["Prehistoric tool evolution", "IVC geography and major sites", "Urban planning features", "Trade networks", "Script and undeciphered nature", "Decline theories", "Archaeological evidence"]
+      },
+      "revision_day_tasks": ["Map all IVC sites", "Memorize major cities and their characteristics", "Compare prehistoric periods", "PYQs on IVC economy and society"]
+    },
+
+    {
+      "module_id": "hist_anc_m02",
+      "module_name": "Vedic Age & Later Vedic Period",
+      "sequence": 2,
+      "estimated_days_standard": 7,
+      "estimated_hours": 18,
+      "importance": "very_high",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t06",
+          "topic_name": "Early Vedic Period (1500-1000 BCE)",
+          "rs_sharma_reference": "Chapter 3 — The Vedic Period",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 4: Early Cities",
+            "Class 11 — Ancient India — Chapter 3"
+          ],
+          "key_concepts": [
+            "Vedic Sanskrit language: earliest literature, linguistic analysis",
+            "Four Vedas: Rigveda, Yajurveda, Samaveda, Atharvaveda",
+            "Rigveda: 10 mandalas, 1028 hymns, oldest (1500-1200 BCE)",
+            "Society: Aryan pastoral economy based on cattle and horses",
+            "Varna system: Brahmin, Kshatriya, Vaishya, Shudra (mentioned but not rigid)",
+            "Family structure: patrilineal, father as head, monogamy with exceptions",
+            "Food economy: cattle herding, some agriculture, hunting, gathering",
+            "Settlements: temporary camps, pastoral mobility",
+            "Political organization: tribal chiefdoms (Grama — village)",
+            "Raja (king): elected or hereditary, tribal council (Samiti, Sabha)",
+            "Religion: nature worship, Agni, Indra, Varuna, Surya",
+            "Rituals: Yajna (sacrifice) and its centrality to religion",
+            "No urban centres, no standing armies",
+            "Simple crafts: pottery, metalwork (copper), weaving"
+          ],
+          "important_facts": {
+            "period": "1500-1000 BCE",
+            "rigveda_date": "1500-1200 BCE (approx)",
+            "key_deities": "Indra, Agni, Varuna, Surya, Maruts",
+            "vedic_literature": "Samhitas, Brahmanas, Aranyakas, Upanishads",
+            "varna_order": "Brahmin, Kshatriya, Vaishya, Shudra"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t07",
+          "topic_name": "Later Vedic Period (1000-600 BCE)",
+          "rs_sharma_reference": "Chapter 3 — Later Vedic Period",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 4; Class 11 — Ancient India — Chapter 3"],
+          "key_concepts": [
+            "Literary evidence: Yajurveda, Samaveda, Atharvaveda, Brahmanas, Aranyakas",
+            "Transition to settled agriculture: shift from pastoralism",
+            "Expansion eastward: Indo-Gangetic plains",
+            "Settlement pattern: permanent villages, large settlements",
+            "Varna system: becomes more rigid, hereditary",
+            "Social hierarchy: Brahmin supremacy established",
+            "Rise of Kshatriyas: power of military class",
+            "Vaishya and Shudra roles: agriculture, crafts, service",
+            "Women status: restricted, earlier freedom diminished",
+            "Agriculture: wheat, barley, rice, pulses, cattle remains important",
+            "Crafts: advanced pottery, metalwork (copper, bronze), weaving, carpentry",
+            "Trade: emergence of exchange networks",
+            "Political organization: Janapada (tribal territory) formation",
+            "Raja power: centralization, territorial expansion",
+            "Religious development: Upanishads compose, philosophy emerges",
+            "Sacrificial system: elaborate rituals, priestly power increases",
+            "Kingdoms mentioned: Kurus, Panchalas, Yadavas, Turvashas"
+          ],
+          "important_facts": {
+            "period": "1000-600 BCE",
+            "vedic_literature": "Brahmanas and Upanishads",
+            "janapadas": "16 major ones identified",
+            "agricultural_advance": "Iron tools adoption",
+            "kingdoms": "Kuru-Panchala, Yadu-Turvashas"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Kuru kingdom location", "Panchala kingdom", "Yadava kingdom", "Indo-Gangetic plain expansion"]
+        },
+        {
+          "topic_id": "hist_anc_t08",
+          "topic_name": "Vedic Religion & Philosophy",
+          "rs_sharma_reference": "Chapter 3 — Religion and Thought",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 4; Class 11 — Ancient India"],
+          "key_concepts": [
+            "Rigvedic deities: Indra (king), Agni (fire), Varuna (cosmic order), Surya (sun), Maruts (storm)",
+            "Later Vedic deities: Prajapati, Rudra, Vishnu, Brahma emergence",
+            "Yajna (sacrifice): central to religion, performed by Brahmins",
+            "Vedic cosmology: three worlds (Rig, Vaj, Saman), creation myths",
+            "Upanishadic philosophy: transition from rituals to knowledge",
+            "Brahman concept: ultimate reality, Atman concept (self)",
+            "Karma and Samsara concepts in early form",
+            "Six systems of philosophy emerge (later — Samkhya, Yoga, Nyaya, Vaisheshika, Purva Mimansa, Uttara Mimansa/Vedanta)",
+            "Vedic ethics: Rta (cosmic order), moral duties",
+            "Caste in Rigveda: Purusha Sukta hymn explains origins",
+            "Women in Vedas: priestesses mentioned, later restricted",
+            "Asuras and Devas: cosmic conflict",
+            "Fire worship: Agni as messenger between humans and gods"
+          ],
+          "important_facts": {
+            "vedas": "4 Vedas, 1028 Rigvedic hymns",
+            "upanishads": "Aitareya, Kena, Katha, Isha, Taittiriya, Mundaka, Mandukya",
+            "key_concepts": "Brahman, Atman, Karma, Moksha",
+            "vedic_goal": "Moksha (liberation)"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t09",
+          "topic_name": "Vedic Literature & Sources",
+          "rs_sharma_reference": "Chapter 3 — Literary Sources",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 4"],
+          "key_concepts": [
+            "Vedic corpus: Shruti (revealed) — most important",
+            "Rigveda: oldest, 1028 hymns in 10 books (Mandalas)",
+            "Yajurveda: Black and White versions, sacrificial formulae",
+            "Samaveda: hymns for music, ritual",
+            "Atharvaveda: spells, charms, later addition",
+            "Vedangas: accessories to Vedas — Shiksha, Kalpa, Vyakarana, Nirukta, Chhanda, Jyotisha",
+            "Brahmanas: prose texts explaining rituals, social rules",
+            "Aranyakas: forest texts, philosophical treatises",
+            "Upanishads: philosophical discussions, Vedanta",
+            "Sutras: aphoristic texts on rituals and philosophy",
+            "Smriti literature: Dharmashastras, Itihasas (Mahabharata, Ramayana — later)",
+            "Dating: based on linguistic analysis, astronomical references",
+            "Oral tradition: memorization techniques, Shaka system"
+          ],
+          "important_facts": {
+            "vedic_literature": "Rigveda oldest, followed by other Vedas",
+            "brahmanas": "Explain rituals and social order",
+            "upanishads": "Philosophical texts on Brahman-Atman",
+            "key_upanishads": "Aitareya, Kena, Katha, Isha, Taittiriya, Mundaka, Mandukya, Svetasvatara"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Vedic society structure", "Varna system evolution", "Vedic gods", "Yajna system", "Upanishadic concepts", "Literary chronology", "Vedic economy"]
+      },
+      "revision_day_tasks": ["Memorize Vedic deities and their attributes", "Understand Upanishadic philosophy", "Track Varna evolution", "PYQs on Vedic society"]
+    },
+
+    {
+      "module_id": "hist_anc_m03",
+      "module_name": "Jainism, Buddhism & Mahajanapadas",
+      "sequence": 3,
+      "estimated_days_standard": 9,
+      "estimated_hours": 22,
+      "importance": "very_high",
+      "upsc_prelims_weightage": "3-4 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t10",
+          "topic_name": "Rise of Mahajanapadas (600-400 BCE)",
+          "rs_sharma_reference": "Chapter 4 — The Mahajanapadas",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 5: What the Buddha Taught",
+            "Class 11 — Ancient India — Chapter 4"
+          ],
+          "key_concepts": [
+            "16 Mahajanapadas identified: Anga, Magadha, Kashyapa, Kosala, Kuru, Panchala, Surasena, Assaka, Avanti, Matsya, Chedi, Vatsa, Kali, Malava, Yaudheya, Videha",
+            "Geographical expansion: entire Indo-Gangetic plain",
+            "Transition from tribal to territorial states",
+            "Iron technology: enables agricultural expansion",
+            "Urban centres: emergence of cities like Varanasi, Ujjain, Pataliputra, Rajagriha",
+            "Sanghas: republics in north and frontier regions",
+            "Monarchies: most prevalent form in fertile plains",
+            "Magadha rise: under Sisunaga and Nanda dynasties",
+            "Kosala emergence: rival to Magadha",
+            "Military developments: chariots, cavalry, infantry",
+            "Economic growth: agriculture surplus, trade networks",
+            "Social mobility: through wealth and political allegiance",
+            "Varna system: still flexible, occupation-based",
+            "Buddhist and Jain patronage begins"
+          ],
+          "important_facts": {
+            "period": "600-400 BCE",
+            "major_mahajanapadas": "Magadha, Kosala, Kuru, Panchala, Avanti, Vatsa",
+            "major_cities": "Rajagriha, Pataliputra, Varanasi, Ujjain, Mathura, Hastinapura",
+            "iron_technology": "enables population growth and urbanization"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2,
+          "map_work": ["All 16 Mahajanapadas locations", "Magadha expansion", "Kosala boundaries", "Major urban centres"]
+        },
+        {
+          "topic_id": "hist_anc_t11",
+          "topic_name": "Jainism — Origins, Doctrine & Development",
+          "rs_sharma_reference": "Chapter 5 — Jainism",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 5: What the Buddha Taught",
+            "Class 11 — Ancient India — Chapter 4"
+          ],
+          "key_concepts": [
+            "Mahavira (540-468 BCE approx): 24th Tirthankara",
+            "Vardhamana: before renunciation name",
+            "Ascetic life: extreme austerities, nudity (Digambara tradition)",
+            "Concept of Karma: physical substance, binding and liberation",
+            "Ahimsa (non-violence): supreme principle",
+            "Anekantavada: doctrine of many-sidedness",
+            "Syadvada: doctrine of relative assertion",
+            "Nirvana: souls become pure, omniscient",
+            "Atmans: infinite, eternal, indestructible",
+            "Loka (universe): eternal, no creator",
+            "18 Mahavratas (great vows) and 5 Anuvratas (minor vows)",
+            "Laymen organization: Shravaks and Shravikas",
+            "Digambara vs Svetambara: differences in monastic rules and philosophy",
+            "Role of women: Vardhamana's mother was widow, accepted female disciples",
+            "Patronage: Magadha kings, merchant classes",
+            "Texts: Agamas, oldest Jain scriptures",
+            "Significance: challenged Vedic orthodoxy, non-theistic"
+          ],
+          "important_facts": {
+            "mahavira": "540-468 BCE, 24th Tirthankara",
+            "key_teachings": "Ahimsa, Karma as physical substance, Anekantavada",
+            "triratna": "Right faith, Right knowledge, Right conduct",
+            "major_patrons": "Chandragupta Maurya (later), Samprati (Mauryan)"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t12",
+          "topic_name": "Buddhism — Origins, Life of Buddha & Sangha",
+          "rs_sharma_reference": "Chapter 5 — Buddhism",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 5: What the Buddha Taught",
+            "Class 11 — Ancient India — Chapter 4"
+          ],
+          "key_concepts": [
+            "Siddhartha Gautama (563-483 BCE): Buddha",
+            "Birth: Lumbini, Kapilavastu, Shakya clan",
+            "Early life: Yasodhara wife, Rahula son, sheltered palace",
+            "Four sights: old age, disease, death, ascetic",
+            "Renunciation: at 29 years, seeking Truth",
+            "Austerities: severe self-mortification",
+            "Bodhi tree: enlightenment at Gaya under Pipal tree",
+            "Buddha title: 'Awakened One'",
+            "First sermon: Sarnath (Benares), Four Noble Truths",
+            "45 years teaching: throughout Magadha, Kosala, North India",
+            "Death: Kushinagar, Mahaparinirvana",
+            "Sangha: monastic order, Bhikkhus and Bhikkhunis",
+            "Vinaya: rules for monks and nuns",
+            "Discipline and organization: democratic decision-making",
+            "Lay followers: Upasaka and Upasika",
+            "Role of women: Ananda's request, Mahapajapati Gotami first nun",
+            "Patronage: kings and merchants"
+          ],
+          "important_facts": {
+            "buddha": "563-483 BCE (traditional), alternative dates debated",
+            "birthplace": "Lumbini (Nepal)",
+            "enlightenment": "Bodhgaya, age 35",
+            "first_sermon": "Sarnath",
+            "death": "Kushinagar",
+            "teaching_span": "45 years"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Lumbini", "Kapilavastu", "Sarnath", "Kushinagar", "Bodhgaya", "Buddha's travel routes"]
+        },
+        {
+          "topic_id": "hist_anc_t13",
+          "topic_name": "Buddhist Doctrine & Philosophy",
+          "rs_sharma_reference": "Chapter 5 — Buddhist Thought",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 5"],
+          "key_concepts": [
+            "Four Noble Truths: Dukkha, Samudaya, Nirodha, Magga",
+            "Noble Eightfold Path: Right view, intention, speech, action, livelihood, effort, mindfulness, concentration",
+            "Dharma: cosmic order, teachings",
+            "Anicca (impermanence): nothing is permanent",
+            "Anatta (non-self): no eternal soul",
+            "Sunyata (emptiness): absence of inherent existence",
+            "Karma: actions and consequences",
+            "Rebirth cycle: Samsara, dependent origination",
+            "Nirvana: end of suffering, extinction of craving",
+            "Three poisons: greed, hatred, ignorance",
+            "Mudita and Metta: compassion and loving-kindness",
+            "Dharma-kaya: Buddha's ultimate body",
+            "Panchasila (five precepts): non-killing, non-stealing, non-lying, non-intoxication, sexual propriety",
+            "Meditation techniques: Vipassana, Shamatha",
+            "Theravada: Hinayana, emphasis on monastic path",
+            "Mahayana: Bodhisattva path, Buddha-nature in all",
+            "Vajrayana: tantric practices"
+          ],
+          "important_facts": {
+            "four_noble_truths": "Central doctrine",
+            "eightfold_path": "Middle way between indulgence and asceticism",
+            "key_concepts": "Dukkha, Anicca, Anatta, Nirvana",
+            "schools": "Theravada, Mahayana, Vajrayana"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t14",
+          "topic_name": "Comparison: Jainism, Buddhism & Vedic Traditions",
+          "rs_sharma_reference": "Chapter 5 — Comparison sections",
+          "ncert_reference": ["Class 6 — Our Pasts I — Chapter 5"],
+          "key_concepts": [
+            "Vedic tradition: theistic, ritualistic, Vedas authoritative",
+            "Buddhism: non-theistic, emphasis on personal effort, experiential",
+            "Jainism: non-theistic, eternal universe, strict vegetarianism",
+            "Ahimsa: central in both Buddhism and Jainism, minimal in Vedas",
+            "Caste system: all three rejected or limited",
+            "Women: Buddhism and Jainism more inclusive, Vedas restrictive (later)",
+            "Authority: Vedas vs Buddha's teachings vs Mahavira's teachings",
+            "Monastic vs household life: all three accommodated both",
+            "Cosmology: Buddhist and Jain different from Vedic",
+            "Social impact: challenged Brahmin supremacy",
+            "Economic implications: opposition to animal sacrifice, Vedic ritualism",
+            "Philosophical differences: Karma, soul, liberation concepts vary",
+            "Regional spread: Buddhism more universal, Jainism more concentrated"
+          ],
+          "important_facts": {
+            "common_feature": "Challenge to Vedic Brahmanism",
+            "key_difference": "Theistic vs non-theistic",
+            "caste_position": "All rejected or limited Varna rigidity"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.5
+        }
+      ],
+      "module_test": {
+        "questions": 50,
+        "duration_mins": 50,
+        "focus_areas": ["Mahajanapadas geography", "Mahavira life and teachings", "Buddha's life", "Four Noble Truths", "Eightfold Path", "Monastic organizations", "Comparison of three traditions"]
+      },
+      "revision_day_tasks": ["Map all Mahajanapadas", "Memorize Buddha and Mahavira dates", "Doctrinal differences chart", "PYQs on Jainism and Buddhism"]
+    },
+
+    {
+      "module_id": "hist_anc_m04",
+      "module_name": "Mauryan Empire",
+      "sequence": 4,
+      "estimated_days_standard": 9,
+      "estimated_hours": 22,
+      "importance": "very_high",
+      "upsc_prelims_weightage": "3-4 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t15",
+          "topic_name": "Rise of Magadha & Nanda Dynasty",
+          "rs_sharma_reference": "Chapter 6 — Magadha and the Mauryas (Part 1)",
+          "ncert_reference": [
+            "Class 11 — Ancient India — Chapter 5: The Mauryan Empire",
+            "Class 12 — Themes in Indian History Part I — Theme 1"
+          ],
+          "key_concepts": [
+            "Magadha: central Indo-Gangetic region, capital Rajagriha (later Pataliputra)",
+            "Geographical advantages: fertile soil, mineral wealth, timber, iron",
+            "Early rulers: Sisunaga dynasty (600-413 BCE)",
+            "Bimbisara (543-491 BCE): expanded Magadha, Buddhist patron",
+            "Ajatashatru (491-461 BCE): enlarged kingdom, killed Bimbisara, became Buddhist",
+            "Nanda dynasty (413-321 BCE): ruled Magadha",
+            "Mahapadma Nanda: first Shudra king, 'destroyer of Kshatriyas'",
+            "Administrative improvements: centralized state",
+            "Army: large standing army, navy, chariotry",
+            "Revenue system: taxation, trade duties",
+            "Espionage: intelligence network",
+            "Religious policy: tolerated all religions",
+            "Wealth accumulation: Nanda treasury legendary",
+            "Opposition: unpopular Sudra rulers, resentment among Kshatriyas"
+          ],
+          "important_facts": {
+            "bimbisara": "543-491 BCE, made Magadha powerful",
+            "nanda_dynasty": "413-321 BCE",
+            "capitals": "Rajagriha, then Pataliputra",
+            "mahapadma_nanda": "first Shudra-origin ruler"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t16",
+          "topic_name": "Chandragupta Maurya & Empire Establishment",
+          "rs_sharma_reference": "Chapter 6 — Chandragupta and the Mauryan State",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 5"],
+          "key_concepts": [
+            "Chandragupta Maurya (321-297 BCE): founder",
+            "Early life: possibly from Peacock tribe (Maurya)",
+            "Aided by Vishnugupta Chanakya (Kautilya)",
+            "Overthrow of Nanda dynasty: 321 BCE",
+            "Conquest of Magadha: establishment of capital Pataliputra",
+            "Expansion: northwest conquest from Greek invaders",
+            "Seleucus Nicator conflict: Greek general",
+            "Peace treaty: Chandragupta married Seleucus's daughter (alliance)",
+            "Megasthenes: Greek ambassador, detailed account of empire",
+            "Territorial extent: from Bay of Bengal to Arabian Sea, north to Hindu Kush",
+            "Administrative divisions: four provinces with Viceroy-princes",
+            "Capital Pataliputra: fortified city, administrative centre",
+            "Military organization: 600,000 infantry, 30,000 cavalry, 9,000 elephants, 8,000 chariots",
+            "Later life: abdication, conversion to Jainism under Bhadrabhahu",
+            "Death: Sravana Belgola, Karnataka"
+          ],
+          "important_facts": {
+            "reign": "321-297 BCE",
+            "founder": "Chandragupta Maurya",
+            "key_minister": "Chanakya (Vishnugupta, Kautilya)",
+            "empire_extent": "Kashmir to Odisha, Deccan plateau to Hindu Kush",
+            "capital": "Pataliputra",
+            "greek_contact": "Seleucus Nicator, Megasthenes"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Mauryan Empire boundaries", "Pataliputra location", "Seleucid Empire interactions", "Four provincial divisions"]
+        },
+        {
+          "topic_id": "hist_anc_t17",
+          "topic_name": "Mauryan Administration & Arthashastra",
+          "rs_sharma_reference": "Chapter 6 — Administration and Chanakya's Statecraft",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 5"],
+          "key_concepts": [
+            "Chanakya (Kautilya): author of Arthashastra, political theorist",
+            "Arthashastra: treatise on governance, economics, military strategy",
+            "State structure: Raja (king), Mantri (ministers), Purohita (priest)",
+            "Central authority: Raja at apex, hereditary succession preferred",
+            "Ministries: Maha-Amatya (great minister), Sandhivigrahaka (peace-war)",
+            "Taxation system: detailed tax collection mechanisms",
+            "Land tax: Bhaga (1/4 to 1/6 of produce) — highest",
+            "Trade duties: customs on internal and external trade",
+            "Mining: precious metals and stones state monopoly",
+            "Espionage: Spies (Spyamitra) — most extensive in ancient times",
+            "Spyamitra types: Sthita (stationary), Sanchara (mobile), Aniruddha (under cover)",
+            "Secret service: intelligence network at all levels",
+            "Mauryan bureaucracy: merit-based, professional",
+            "Local administration: village headman (Gramika) reports to higher authority",
+            "Revenue collection: efficient system with audits",
+            "Law enforcement: secret police, spies, informants",
+            "Danda (punishment): instrument of state control",
+            "Economic regulation: weights, measures, quality control"
+          ],
+          "important_facts": {
+            "arthashastra": "Political economy treatise",
+            "author": "Kautilya (Chanakya)",
+            "key_concepts": "Chakravarthi, Mandala theory, Saptanga (7 elements)",
+            "administration": "Centralized, efficient, merit-based"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t18",
+          "topic_name": "Ashoka the Great — Life & Reign",
+          "rs_sharma_reference": "Chapter 6 — Ashoka",
+          "ncert_reference": [
+            "Class 11 — Ancient India — Chapter 5",
+            "Class 12 — Themes in Indian History Part I — Theme 5"
+          ],
+          "key_concepts": [
+            "Ashoka (268-232 BCE): grandson of Chandragupta",
+            "Early life: possibly bloodthirsty, killed brothers for throne",
+            "Succession: after Bindusara (297-268 BCE)",
+            "Kalinga war (262 BCE): turning point",
+            "Kalinga conquest: immense casualties, moral crisis",
+            "Conversion to Buddhism: remorse and transformation",
+            "Dhamma policy: state ideology, moral rules for conduct",
+            "Dhamma principles: non-violence, truth, honesty, compassion, kindness",
+            "Edicts: rock edicts (14 major), pillar edicts (7), cave inscriptions",
+            "Edicts language: Prakrit, Greek, Aramaic",
+            "Rock edict locations: throughout empire as public announcements",
+            "Administrative reforms: emphasis on benevolent rule",
+            "Religious tolerance: supported all religions",
+            "Missionary activity: sent envoys to Hellenistic kingdoms, Sri Lanka",
+            "Maha-matta appointments: Dhamma officials to spread Dhamma",
+            "Infrastructure: roads, hospitals, water systems",
+            "Decline of later life: gradual loss of control, reduced Mauryan power"
+          ],
+          "important_facts": {
+            "reign": "268-232 BCE",
+            "kalinga_war": "262 BCE — turning point",
+            "key_policy": "Dhamma (righteous conduct)",
+            "edicts": "Rock edicts, pillar edicts, cave inscriptions",
+            "missionary": "Sent envoys to various countries"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Kalinga location", "Edict locations", "Missionary destinations", "Mauryan extent under Ashoka"]
+        },
+        {
+          "topic_id": "hist_anc_t19",
+          "topic_name": "Mauryan Economy, Society & Culture",
+          "rs_sharma_reference": "Chapter 6 — Economy and Society",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 5"],
+          "key_concepts": [
+            "Agriculture: rice, wheat, barley, pulses, cotton, sugar cane",
+            "Urban centres: Pataliputra, Tosali, Ujjain, Mathura — major cities",
+            "Trade networks: internal and external (China, Hellenistic world)",
+            "Merchants and guilds: organized, had monopolies on certain products",
+            "Coinage: punch-marked coins, standardized",
+            "Roads: artificial highways linking cities (Ashoka's achievement)",
+            "Port cities: maritime trade, harbours",
+            "Crafts: pottery, metal, textiles, glass, jewellery",
+            "Social structure: Four varnas still present, but less rigid",
+            "Shudras and Atishudras: occupied various roles",
+            "Women: could own property, engaged in commerce",
+            "Megasthenes account: societal descriptions",
+            "Slavery: present but limited (war captives, debt-bondage)",
+            "Caste system: becoming more structured, occupational basis",
+            "Religion: Buddhism and Jainism flourished, state patronage",
+            "Art: Mauryan sculpture (lion capitals, pillars), simple but elegant",
+            "Ashcan period: stone carving advanced"
+          ],
+          "important_facts": {
+            "trade": "With China, Hellenistic kingdoms, maritime routes",
+            "cities": "Pataliputra, Tosali, Ujjain major urban centres",
+            "coinage": "Punch-marked coins",
+            "economy": "Agricultural surplus-based, merchant class prospered"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t20",
+          "topic_name": "Decline of Mauryan Empire & Later Rulers",
+          "rs_sharma_reference": "Chapter 6 — Decline of the Mauryan Empire",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 5"],
+          "key_concepts": [
+            "Ashoka's later years: weakening control, religious focus over administration",
+            "Succession issues: weak rulers after Ashoka",
+            "Regional assertion: provinces becoming independent",
+            "Pushyamitra Shunga: general, overthrew last Mauryan emperor (185 BCE)",
+            "Brihadratha: last Mauryan emperor, murdered by Pushyamitra",
+            "Mauryan decline factors: excessive welfare spending, weak successors, loss of central authority",
+            "Invasions: Greek kingdoms, Satrap kingdoms on borders",
+            "Shunga dynasty (185-73 BCE): took over Magadha",
+            "Administrative deterioration: loss of Mauryan efficiency",
+            "Economic decline: reduced trade, internal strife",
+            "Religious shift: Brahmanism revived under Shungas",
+            "Legacy of Mauryas: administrative model, Ashoka's Dhamma, cultural influence"
+          ],
+          "important_facts": {
+            "decline_period": "After Ashoka's reign",
+            "pushyamitra_shunga": "185 BCE — overthrew Mauryans",
+            "last_emperor": "Brihadratha",
+            "successor_dynasty": "Shunga (185-73 BCE)"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5
+        }
+      ],
+      "module_test": {
+        "questions": 50,
+        "duration_mins": 50,
+        "focus_areas": ["Chandragupta rise", "Chanakya and Arthashastra", "Ashoka life and edicts", "Dhamma policy", "Mauryan administration", "Kalinga war", "Empire decline"]
+      },
+      "revision_day_tasks": ["Map Mauryan extent", "Memorize Ashoka's edicts", "Arthashastra key concepts", "Administrative structure chart", "PYQs on Ashoka and Mauryas"]
+    },
+
+    {
+      "module_id": "hist_anc_m05",
+      "module_name": "Post-Mauryan Period (200 BCE - 300 CE)",
+      "sequence": 5,
+      "estimated_days_standard": 8,
+      "estimated_hours": 20,
+      "importance": "high",
+      "upsc_prelims_weightage": "2 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t21",
+          "topic_name": "Shunga Dynasty & Brahmanical Revival",
+          "rs_sharma_reference": "Chapter 7 — Post-Mauryan Period (Shunga and Satavahana)",
+          "ncert_reference": [
+            "Class 11 — Ancient India — Chapter 6: The Mauryans and the Greeks",
+            "Class 12 — Themes in Indian History Part I"
+          ],
+          "key_concepts": [
+            "Pushyamitra Shunga (185-151 BCE): founder, military general",
+            "Shunga dynasty (185-73 BCE): based in Magadha, Madhya Pradesh",
+            "Brahmanical revival: patronized Vedic rituals, yajna",
+            "Ashvamedha yajna: performed by Pushyamitra to assert power",
+            "Decline of Buddhism: restricted royal patronage, persecution (possibly exaggerated)",
+            "Religious pluralism: eventually patronized multiple religions",
+            "Administration: less centralized than Mauryas",
+            "Territorial loss: loss of northwestern provinces to Greeks",
+            "Arts and literature: Malavikagnimitra play by Kalidasa (later, but indicative of period)",
+            "Architecture: Bharhut stupa, Sanchi stupa beginnings",
+            "Coinage: punch-marked coins continue",
+            "Weak successors: by end, Shunga power diminished"
+          ],
+          "important_facts": {
+            "founder": "Pushyamitra Shunga, 185 BCE",
+            "duration": "185-73 BCE",
+            "religious_policy": "Brahmanical patronage",
+            "key_achievement": "Ashvamedha yajna"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t22",
+          "topic_name": "Satavahana Dynasty & Deccan Power",
+          "rs_sharma_reference": "Chapter 7 — Satavahana Empire",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 6"],
+          "key_concepts": [
+            "Satavahana dynasty: ruled Deccan plateau, 60 BCE to 27 CE (traditional dating)",
+            "Foundation: emerged as Mauryan power waned in south",
+            "Simuka: founder, beginning of expansion",
+            "Gautamiputra Satakarni (106-130 CE): greatest ruler, expanded empire",
+            "Territorial extent: entire Deccan, parts of Malwa and Kathiawad",
+            "Capital: initially Pratishthana (Paithan), later Nashik",
+            "Administrative structure: four provinces (Chakra)",
+            "Revenue system: similar to Mauryan model",
+            "Trade and economy: crucial position controlling trade routes",
+            "Ports: Western coast ports, maritime trade importance",
+            "Coinage: extensive coinage, trade facilitation",
+            "Religious patronage: Buddhist, Jain, Hindu (Brahmanical)",
+            "Art and architecture: caves, stupas, pillars",
+            "Ajanta caves: early phase construction",
+            "Literature: Gathasaptashati (Hala) collection of verses",
+            "Social composition: diverse, trader-friendly policies",
+            "Decline: fragmentation into regional powers"
+          ],
+          "important_facts": {
+            "period": "60 BCE - 27 CE (traditional), some extend to 130 CE",
+            "gautamiputra": "Greatest Satavahana ruler (106-130 CE alternative dating)",
+            "capital": "Pratishthana, Nashik",
+            "territory": "Deccan plateau, parts of central and western India",
+            "trade": "Controls western coast routes"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t23",
+          "topic_name": "Hellenistic Kingdoms & Indo-Greeks",
+          "rs_sharma_reference": "Chapter 7 — Hellenistic and Parthian States",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 6: The Mauryans and the Greeks"],
+          "key_concepts": [
+            "Alexander invasion (326 BCE): reached Indus valley, withdrew",
+            "Greek kingdoms post-Alexander: Seleucid, Ptolemaic, Macedonian",
+            "Seleucid Empire: northwest India, treaty with Chandragupta",
+            "Indo-Greeks (Bactrian Greeks) (200-50 BCE): established kingdoms",
+            "Diodotus I: founder of Bactrian kingdom",
+            "Demetrius I: invaded India, Arachosia, Gedrosia",
+            "Menander (155-130 BCE): greatest Indo-Greek ruler",
+            "Territorial extent: Punjab, Sindh, Baluchistan",
+            "Capitals: Sagala (Sialkot), Taxila",
+            "Coinage: Greek and Indian symbols, bilingual inscriptions",
+            "Religious policy: respected Buddhism, some converted",
+            "Menander-Nagasena dialogues: Milindapanho text",
+            "Administration: Greek structure with Indian elements",
+            "Culture: Greek art and Indian elements synthesis",
+            "Decline: pressure from Central Asian peoples, fragmentation",
+            "Trade impact: enhanced maritime and overland routes"
+          ],
+          "important_facts": {
+            "indo_greeks": "200-50 BCE, ruled Punjab and Sindh",
+            "menander": "Greatest Indo-Greek ruler",
+            "capital": "Sagala (Sialkot)",
+            "religious_stance": "Respect for Buddhism, some conversions"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2,
+          "map_work": ["Indo-Greek territories", "Menander's kingdom", "Sagala location", "Trade routes"]
+        },
+        {
+          "topic_id": "hist_anc_t24",
+          "topic_name": "Parthian Empire & Central Asian Interactions",
+          "rs_sharma_reference": "Chapter 7 — Parthian States",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 6"],
+          "key_concepts": [
+            "Parthian Empire (247 BCE - 224 CE): Central Asian power",
+            "Mithridates II (124-87 BCE): powerful ruler, expanded westward",
+            "Control of Silk Road: crucial for trade between China and west",
+            "Interaction with India: diplomatic relations, trade",
+            "Vassal kingdoms: Indo-Parthian kings in northwest India",
+            "Gondophares (19-46 CE): Indo-Parthian ruler",
+            "Coinage: bilingual, Indian and Parthian elements",
+            "Religious toleration: patronized Buddhism, Zoroastrianism",
+            "Trade facilitation: control of caravan routes",
+            "Cultural transmission: helped spread Buddhism to Central Asia and China",
+            "Military: archer-cavalry, formidable power",
+            "Administrative structure: vassalage system"
+          ],
+          "important_facts": {
+            "empire": "247 BCE - 224 CE",
+            "mithridates_ii": "124-87 BCE, powerful ruler",
+            "gondophares": "Indo-Parthian, 19-46 CE",
+            "trade_role": "Controlled Silk Road routes"
+          },
+          "pyq_frequency": "low",
+          "prelims_importance": "low",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "hist_anc_t25",
+          "topic_name": "Post-Mauryan Economy, Trade & Urban Life",
+          "rs_sharma_reference": "Chapter 7 — Economic Conditions",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 6"],
+          "key_concepts": [
+            "Agriculture: primary economy, surplus supported urban centres",
+            "Urban centres: Pataliputra, Taxila, Ujjain, Mathura, Varanasi continue",
+            "Trade networks: internal and external expansion",
+            "Silk Road: beginning of major trade routes",
+            "Maritime trade: western coast, Arabian Sea commerce",
+            "Trade guilds: Sreni (guild) systems organized crafts",
+            "Merchant classes: prospered, political influence",
+            "Coinage: various kingdoms issued coins, trade facilitation",
+            "Banking: concepts of credit, loans, interest (Jainism criticized)",
+            "Caravans: organized long-distance trade expeditions",
+            "Craft production: pottery, metal, textiles in specialized centres",
+            "Markets: urban markets, trade fairs, seasonal markets",
+            "Price controls: some kingdoms regulated trade",
+            "Urban layout: continued from Mauryan period patterns",
+            "Housing: varied from palaces to commoner houses"
+          ],
+          "important_facts": {
+            "trade": "Expansion of Silk Road and maritime routes",
+            "cities": "Multiple independent cities, not empire-wide network",
+            "guilds": "Sreni system organized production"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Shunga dynasty", "Satavahana empire", "Indo-Greeks", "Menander", "Parthian Empire", "Post-Mauryan trade"]
+      },
+      "revision_day_tasks": ["Map all dynasties", "Memorize rulers and dates", "Trade networks diagram", "PYQs on post-Mauryan kingdoms"]
+    },
+
+    {
+      "module_id": "hist_anc_m06",
+      "module_name": "Gupta Empire & Post-Gupta Period",
+      "sequence": 6,
+      "estimated_days_standard": 10,
+      "estimated_hours": 24,
+      "importance": "very_high",
+      "upsc_prelims_weightage": "3-4 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t26",
+          "topic_name": "Early Gupta Dynasty & Consolidation (320-380 CE)",
+          "rs_sharma_reference": "Chapter 8 — The Gupta Empire",
+          "ncert_reference": [
+            "Class 12 — Themes in Indian History Part I — Theme 1: Bricks, Beads and Bones",
+            "Class 12 — Theme 5: Thakurs and Kings"
+          ],
+          "key_concepts": [
+            "Chandragupta I (320-330 CE): founder, established small kingdom in Magadha",
+            "Licchhavi marriage: married into Licchhavi clan, dynastic legitimacy",
+            "Samudragupta (330-380 CE): son, greatest early Gupta ruler",
+            "Territorial expansion: military campaigns, four directions (Chakravijayas)",
+            "Allahabad Pillar: Samudragupta's inscriptions by Harisena",
+            "Conquest of north: subjugated numerous kingdoms",
+            "Southern campaign: maintained indirect control through alliances",
+            "Administrative structure: central authority with feudatory kings",
+            "Gupta Samrat (Emperor) title: supreme authority",
+            "Capital: Pataliputra, administrative hub",
+            "Coinage: gold coins (dinar), silver, copper, extensive circulation",
+            "Cultural patronage: arts, literature, science flourished",
+            "Religious tolerance: Hindu and Buddhist patronage",
+            "Naval power: maritime trade expansion"
+          ],
+          "important_facts": {
+            "chandragupta_i": "320-330 CE, founder",
+            "samudragupta": "330-380 CE, greatest early ruler",
+            "period": "Gupta Age begins 320 CE",
+            "inscription": "Allahabad Pillar describes campaigns",
+            "capital": "Pataliputra"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Gupta Empire boundaries", "Samudragupta's campaign routes", "Allahabad location", "Major cities"]
+        },
+        {
+          "topic_id": "hist_anc_t27",
+          "topic_name": "Chandragupta II & Peak of Gupta Power",
+          "rs_sharma_reference": "Chapter 8 — Chandragupta II and the Golden Age",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Chandragupta II (380-412 CE): also called Vikramaditya",
+            "Succession: became ruler after Samudragupta",
+            "Western expansion: conquered Western Malwa and Gujarat",
+            "Shaka Satrap defeat: eliminated Greek rulers",
+            "Territorial extent: largest under his rule, north and central India",
+            "Golden age consolidation: peak of Gupta prosperity",
+            "Administrative efficiency: well-organized bureaucracy",
+            "Cultural golden age: literature, art, science, mathematics flourished",
+            "Nalanda university: patronage and development",
+            "Court scholars: Kalidasa, Aryabhata, Varahamihira, Bhartrihari",
+            "Sanskrit literature: drama, poetry, science texts composed",
+            "Foreign envoys: Chinese and other visitors described prosperity",
+            "Fa-xian: Chinese traveler, recorded observations",
+            "Religious patronage: Hindu temples and Buddhist monasteries",
+            "Coinage: continuity of Samudragupta's monetary system",
+            "Economic prosperity: trade flourished, urban growth"
+          ],
+          "important_facts": {
+            "reign": "380-412 CE",
+            "title": "Vikramaditya (Sun of Valour)",
+            "achievement": "Peak territorial extent and prosperity",
+            "court_scholars": "Kalidasa, Aryabhata, Varahamihira",
+            "foreign_visitor": "Fa-xian (Chinese traveler)"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t28",
+          "topic_name": "Gupta Administration, Legal & Governance System",
+          "rs_sharma_reference": "Chapter 8 — Administration and Governance",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I — Theme 5"],
+          "key_concepts": [
+            "Central authority: Raja supreme, hereditary succession",
+            "Administrative hierarchy: Mantri-parishad (council of ministers)",
+            "Chakradhikrita: viceroy governing large territories",
+            "Kutumbika: provincial governors",
+            "Adhyaksha: officials heading departments",
+            "Revenue system: Bhaga (tax on produce, 1/6)",
+            "Trade taxes: duties on internal and external trade",
+            "Mining: state monopoly on minerals",
+            "Currency: gold coins (Dinar), silver Rupyaka, copper coins",
+            "Legal system: based on Manusmriti and Arthashastra principles",
+            "Dandaniti (punishment): system of justice",
+            "Caste basis: justice varied by varna",
+            "Local administration: village headmen (Grama-pati), village councils",
+            "Sabhas: local assemblies, though power weakened from Mauryan times",
+            "Police: local officers for law and order",
+            "Espionage: intelligence system, less elaborate than Mauryan",
+            "Land grants: Agrahara (Brahmin villages granted tax-free)",
+            "Feudatory system: dependent kings owed allegiance and tribute"
+          ],
+          "important_facts": {
+            "administrative_structure": "Centralized with feudatory elements",
+            "revenue": "Bhaga (1/6 produce tax), trade duties",
+            "legal_basis": "Manusmriti, Arthashastra principles",
+            "local_governance": "Village councils, headmen"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t29",
+          "topic_name": "Gupta Age — Art, Architecture & Literature",
+          "rs_sharma_reference": "Chapter 8 — Culture and Art",
+          "ncert_reference": [
+            "Class 12 — Themes in Indian History Part I — Theme 2: Kings, Farmers and Towns",
+            "Theme 3: Kinship, Caste and Class"
+          ],
+          "key_concepts": [
+            "Sanskrit literature: golden age, refined and elaborate",
+            "Kalidasa: greatest poet-dramatist, authored Shakuntala, Meghaduta, Malvikagnimitra",
+            "Abhijnanashakuntalam: masterpiece drama",
+            "Other playwrights: Bhasa, Bhavabhuti (later)",
+            "Poetry: Kavya tradition, Subandhu, Mayura",
+            "Science and mathematics: Aryabhata (499 CE), mathematician-astronomer",
+            "Aryabhata contributions: zero concept, decimal system, pi calculation, astronomy",
+            "Varahamihira: astronomer, Pancha Siddhantika",
+            "Medical science: Sushruta Samhita, Charaka Samhita texts (earlier but Gupta period refined)",
+            "Architecture: temple construction, Gupta style emergence",
+            "Temple features: Shikhara (tower), Garbhagriha (sanctum sanctorum), Mandapa (hall)",
+            "Ajanta caves: Phase II construction and paintings",
+            "Ellora caves: beginning of rock-cut architecture",
+            "Sculpture: Budha and Hindu deity sculptures, fine quality",
+            "Painting: Ajanta paintings, naturalistic, varied colors",
+            "Pottery: Gupta ware, simple and elegant",
+            "Coinage design: artistic quality, gold coins with detailed portraits",
+            "Music and dance: classical forms developed, Natyashastra (Bharata) codification"
+          ],
+          "important_facts": {
+            "kalidasa": "Greatest poet-dramatist of Sanskrit literature",
+            "aryabhata": "Mathematician-astronomer, born 476 CE",
+            "contributions": "Zero, decimal system, pi value, heliocentric model ideas",
+            "architecture": "Temple style crystallized, Shikhara developed",
+            "art_centers": "Ajanta, Ellora, Mathura, Sarnath"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "hist_anc_t30",
+          "topic_name": "Gupta Society, Economy & Religion",
+          "rs_sharma_reference": "Chapter 8 — Society and Economy",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Social structure: Varna system operative, hereditary castes",
+            "Brahmins: highest status, priests, administrators, landowners",
+            "Kshatriyas: rulers, military, landholding",
+            "Vaishyas: merchants, traders, farmers",
+            "Shudras: agricultural laborers, craftspeople",
+            "Untouchables: outside varna system, pollution concept",
+            "Women status: prescribed duties (Pativrata ideal), inheritance limited",
+            "Family structure: patrilineal, joint families",
+            "Marriage: Brahmin ideals promoted monogamy, child marriage emerging",
+            "Guilds: Sreni system organized crafts, merchant guilds powerful",
+            "Agriculture: rice, wheat, barley, sugarcane, cotton cultivation",
+            "Land ownership: private, state, and institutional land",
+            "Agricultural techniques: improved, irrigation systems",
+            "Trade: internal and maritime, merchant ships",
+            "Ports: Western coast (Bharuch), Eastern coast (Tamralipti)",
+            "Commodities: textiles, spices, gems, metals, pottery export",
+            "Imports: precious stones, ivory, perfumes, wine",
+            "Urban centres: Pataliputra, Ujjain, Mathura, Varanasi, Kaushi",
+            "Religion: Hindu revival under Guptas, Brahmanism strengthened",
+            "Bhakti movement: early forms emerging",
+            "Buddhism: still patronized but declining royal support",
+            "Jainism: supported by various rulers",
+            "Temple donations: Agrahara grants to Brahmins"
+          ],
+          "important_facts": {
+            "varna_system": "Operative, hereditary castes",
+            "women": "Pativrata ideal, limited property rights",
+            "economy": "Agricultural surplus-based, merchant classes prospered",
+            "trade": "Extensive, maritime routes to SE Asia, Central Asia"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t31",
+          "topic_name": "Decline of Gupta Empire & Later Guptas",
+          "rs_sharma_reference": "Chapter 8 — Decline of the Gupta Empire",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Later rulers: weakening after Chandragupta II's reign",
+            "Kumaragupta I (412-455 CE): maintained stability, builder",
+            "Skandagupta (455-467 CE): fought Central Asian invasions (Hunas/Hephthalites)",
+            "Hunnic invasions: significant pressure on northwestern borders",
+            "Declining central authority: regional feudatories became independent",
+            "Economic strain: warfare expenses, reduced trade revenue",
+            "Administrative deterioration: loss of Gupta efficiency",
+            "Feudatory independence: Yadava, Kalachuri dynasties emerged",
+            "Regional fragmentation: north India divided among multiple powers",
+            "Gupta remnants: ruled until 550 CE, in limited territories",
+            "Cultural continuity: Sanskrit traditions continued",
+            "Religious changes: decline of imperial Buddhism patronage",
+            "Hindu supremacy: Brahmin power increased in feudal setup",
+            "Cause of decline: no single factor, combination of internal and external pressures"
+          ],
+          "important_facts": {
+            "decline_period": "After Chandragupta II (after 412 CE)",
+            "skandagupta": "455-467 CE, defended against Hunas",
+            "hunnic_invasions": "Central Asian pressure",
+            "end_of_gupta": "550 CE approximately"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "hist_anc_t32",
+          "topic_name": "Post-Gupta Period & Transition to Medieval India",
+          "rs_sharma_reference": "Chapter 8 — Post-Gupta Kingdoms",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Political fragmentation: no single empire post-Gupta",
+            "Regional kingdoms: Multiple powers in different regions",
+            "Harsha of Kannauj (606-647 CE): attempted reunification",
+            "Harsha's reign: brief revival of imperial power",
+            "Xuanzang visit: Chinese traveler's detailed account",
+            "Decline of northern unity: Harsha's death led to fragmentation",
+            "Rajput kingdoms: emerged in north, feudal structure",
+            "Deccan powers: Chalukya, Chola, Pallava dynasties strong",
+            "Maritime trade: Indian traders active in SE Asia",
+            "Cultural continuity: Sanskrit scholarship continued",
+            "Hindu temple construction: proliferated",
+            "Feudal system: consolidated with varna system interaction",
+            "Transition: bridge between ancient and medieval India"
+          ],
+          "important_facts": {
+            "harsha": "606-647 CE, emperor of Kannauj",
+            "xuanzang": "Chinese traveler, recorded observations",
+            "regional_powers": "Chalukya, Chola, Pallava, Rajputs",
+            "period": "Bridge between Gupta and medieval period"
+          },
+          "pyq_frequency": "low",
+          "prelims_importance": "low",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5
+        }
+      ],
+      "module_test": {
+        "questions": 55,
+        "duration_mins": 55,
+        "focus_areas": ["Chandragupta I & Samudragupta", "Chandragupta II achievements", "Golden age features", "Kalidasa and court scholars", "Aryabhata contributions", "Administrative system", "Society and economy", "Gupta decline", "Post-Gupta kingdoms"]
+      },
+      "revision_day_tasks": ["Map Gupta Empire extent", "Memorize Kalidasa's works", "Aryabhata contributions chart", "Administrative hierarchy diagram", "PYQs on Gupta Age and decline"]
+    },
+
+    {
+      "module_id": "hist_anc_m07",
+      "module_name": "South India — Sangam Age & Early Dynasties",
+      "sequence": 7,
+      "estimated_days_standard": 8,
+      "estimated_hours": 20,
+      "importance": "high",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t33",
+          "topic_name": "Sangam Age — Society, Economy & Literature",
+          "rs_sharma_reference": "Chapter 9 — South India Before the Mauryas",
+          "ncert_reference": [
+            "Class 6 — Our Pasts I — Chapter 6: Kingdoms, Kings and an Early Republic",
+            "Class 11 — Ancient India — Chapter 7: South India"
+          ],
+          "key_concepts": [
+            "Sangam period: 300 BCE - 300 CE (traditional dating varies)",
+            "Sangam literature: Three Sangams (literary academies) in Madurai",
+            "Three Sangams: 1st (Madurai), 2nd (Kapadapuram), 3rd (Madurai again)",
+            "Sangam texts: Akananuru, Purananuru, Silappatikaram, Manimekhalai",
+            "Society: Tamilakam (Tamil land) divided into three kingdoms",
+            "Cholas: agricultural economy, primarily paddy fields",
+            "Pandyas: maritime trade, pearls, spices",
+            "Cheras: Western Ghats region, spice trade",
+            "Rulers: Many minor chiefs, frequent conflicts for dominance",
+            "Sangam references: Kings and their activities mentioned extensively",
+            "Social structure: Brahmin, Kshatriya, Vaishya, Shudra present but differently named",
+            "Women: higher status than north, could own property, inherit titles",
+            "Occupations: farmers, weavers, potters, fishermen, hunters",
+            "Agriculture: rice primary crop, irrigation systems",
+            "Trade: maritime trade with Rome, SE Asia, China",
+            "Port cities: Muziris (pepper port), Barygaza, Kaveripatnam",
+            "Roman trade: extensive contact, gold and Roman coins found",
+            "Crafts: textile weaving advanced, pottery, pearl diving",
+            "Religion: Hinduism, Buddhism, Jainism all present",
+            "Sangam poets: Professional poets, court patronage",
+            "Poetry forms: Akam (inner/love poetry), Puram (outer/public poetry)"
+          ],
+          "important_facts": {
+            "period": "300 BCE - 300 CE (approx)",
+            "literary_works": "Akananuru, Purananuru, Silappatikaram, Manimekhalai",
+            "three_kingdoms": "Chola, Pandya, Chera",
+            "trade": "Roman contact, maritime routes"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "high",
+          "daily_target_hours": 2,
+          "map_work": ["Chola territory", "Pandya territory", "Chera territory", "Port cities Muziris, Barygaza"]
+        },
+        {
+          "topic_id": "hist_anc_t34",
+          "topic_name": "Chola Dynasty — Administration & Culture",
+          "rs_sharma_reference": "Chapter 9 — Early South Indian States",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 7"],
+          "key_concepts": [
+            "Early Cholas: powerful from Sangam period",
+            "Geographical base: Cauvery delta, fertile region",
+            "Early rulers: Karikala Chola, Peruveli Chozha",
+            "Karikala: famous for Varaham and Veli (embankments), army strength",
+            "Administration: kingdom divided into provinces",
+            "Agriculture: rice cultivation, irrigation, village organization",
+            "Village organization: Gramam (village assembly), local self-governance",
+            "Port cities: Poompuhar (Puhar), major trade port",
+            "Trade: maritime trade with Rome, SE Asia",
+            "Coinage: coins minted, trade facilitation",
+            "Religion: Hinduism dominant, Shaivism popular, Jainism also present",
+            "Art: early temple construction, bronze sculptures",
+            "Literature: Sangam poets patronage, literature flourished",
+            "Military: strong army, navy, chariots, elephants",
+            "Decline: reduced power in post-Sangam period, later revival"
+          ],
+          "important_facts": {
+            "geographical_base": "Cauvery delta",
+            "key_ruler": "Karikala Chola",
+            "capital": "Puhar (Poompuhar)",
+            "strength": "Naval and agricultural power"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "hist_anc_t35",
+          "topic_name": "Pandya & Chera Dynasties",
+          "rs_sharma_reference": "Chapter 9 — Early South Indian States",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 7"],
+          "key_concepts": [
+            "Pandyas: southern Tamil region, capital Madurai",
+            "Geographical base: southern Tamil Nadu, adjacent areas",
+            "Pandyan society: matrilineal elements, women's property rights higher",
+            "Pandyan rulers: referred to in Sangam literature",
+            "Pandyan economy: pearls, spices, maritime trade",
+            "Pearls: major commodity, Pandyan pearls famous globally",
+            "Roman trade: extensive contact with Roman empire",
+            "Religion: Meenakshi temple worship, Hinduism dominant",
+            "Madurai: cultural center, Sangam academy location",
+            "Cheras: Western Ghats region, modern Kerala area",
+            "Geographical base: Kerala, adjacent mountainous regions",
+            "Chera economy: spice trade, pepper, cardamom, ivory",
+            "Chera ports: port cities for trade",
+            "King titles: Perumal (supreme), Ceral (feudal lords)",
+            "Religion: Hinduism, but diversity of beliefs",
+            "Arts: music, dance, poetry patronage",
+            "Trade: land and maritime routes control",
+            "Decline: reduced power in post-Sangam period, regional politics",
+            "Literature: fewer Sangam references than Cholas, but present"
+          ],
+          "important_facts": {
+            "pandya_capital": "Madurai",
+            "pandya_trade": "Pearls, spices",
+            "chera_base": "Western Ghats, modern Kerala",
+            "chera_trade": "Pepper, cardamom, ivory",
+            "sangam_references": "All three kingdoms mentioned"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "medium",
+          "daily_target_hours": 1.5,
+          "map_work": ["Pandya kingdom", "Madurai location", "Chera territory", "Port cities"]
+        },
+        {
+          "topic_id": "hist_anc_t36",
+          "topic_name": "South Indian Religions & Philosophies",
+          "rs_sharma_reference": "Chapter 9 — Religious and Intellectual Life",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 7"],
+          "key_concepts": [
+            "Hinduism: dominant religion, diverse beliefs",
+            "Shaivism: Shiva worship, popular in south",
+            "Vaishnavism: Vishnu worship, developing cults",
+            "Bhakti movement: early southern forms, emotional devotion",
+            "Temple worship: Meenakshi, Vaidyanatha temples",
+            "Buddhism: presence in south, monastic establishments",
+            "Jainism: significant following, Digambara tradition strong",
+            "Jain Tirthankaras: Mahavira and Parsvanatha references",
+            "Ajivakas: heterodox sect, some followers",
+            "Vedic traditions: Brahmin communities, though different from north",
+            "Sangam religion: mixture of local and Vedic beliefs",
+            "Ancestor worship: important practice",
+            "Nature worship: tree, stone worship",
+            "Hero stones: memorial stones for warriors killed in battle",
+            "Philosophical schools: early development of logical schools",
+            "Religious tolerance: multiple religions coexist"
+          ],
+          "important_facts": {
+            "dominant_religion": "Hinduism with regional variations",
+            "key_movement": "Early Bhakti movement",
+            "temples": "Meenakshi, Vaidyanatha major temples",
+            "diversity": "Multiple religions coexist peacefully"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "high",
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "hist_anc_t37",
+          "topic_name": "Post-Sangam Period & Early Dynasties (300-600 CE)",
+          "rs_sharma_reference": "Chapter 9 — Later South Indian States",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 7"],
+          "key_concepts": [
+            "Pallava dynasty: emerged in north-central Deccan, 275-897 CE",
+            "Pallava origins: debated, possibly foreign origin",
+            "Simhavishnu (560-590 CE): early powerful Pallava ruler",
+            "Mahendravarman I (590-630 CE): extended Pallava power",
+            "Narasimhavarman I (630-668 CE): greatest Pallava ruler",
+            "Pallava capital: Kanchi (Kanchipuram), major cultural centre",
+            "Administrative system: decentralized, local assemblies",
+            "Land grants: Agrahara (tax-free villages) to Brahmins",
+            "Religion: Hindu patronage, temple construction, Sanskrit learning",
+            "Pallavas revival: Chola power waned, Pallavas emerged",
+            "Chalukya dynasty: western Deccan, 550-750 CE",
+            "Pulakeshin II (610-642 CE): greatest Chalukya ruler",
+            "Chalukya capital: Badami, Aihole, Pattadakal",
+            "Administration: feudatory system with central authority",
+            "Religion: Hindu patronage, cave temple construction",
+            "Pallava-Chalukya conflicts: border wars for dominance",
+            "Cultural flowering: temple architecture, sculpture, inscriptions",
+            "Decline factors: internal feuds, external invasions"
+          ],
+          "important_facts": {
+            "pallava_period": "275-897 CE",
+            "pallava_capital": "Kanchi",
+            "key_ruler": "Narasimhavarman I (630-668 CE)",
+            "chalukya_period": "550-750 CE (early)",
+            "chalukya_capital": "Badami, Aihole, Pattadakal"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2,
+          "map_work": ["Pallava territory", "Kanchi location", "Chalukya territory", "Badami, Aihole, Pattadakal"]
+        }
+      ],
+      "module_test": {
+        "questions": 45,
+        "duration_mins": 45,
+        "focus_areas": ["Sangam age literature and society", "Chola administration", "Pandya and Chera kingdoms", "Sangam poetry forms", "South Indian religions", "Pallava and Chalukya dynasties"]
+      },
+      "revision_day_tasks": ["Map all south Indian kingdoms", "Memorize Sangam literary works", "Sangam age features chart", "Compare dynasties", "PYQs on South India"]
+    },
+
+    {
+      "module_id": "hist_anc_m08",
+      "module_name": "Art, Architecture & Literature of Ancient India",
+      "sequence": 8,
+      "estimated_days_standard": 7,
+      "estimated_hours": 18,
+      "importance": "very_high",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "hist_anc_t38",
+          "topic_name": "Mauryan & Early Buddhist Architecture",
+          "rs_sharma_reference": "Chapter 10 — Art and Architecture",
+          "ncert_reference": [
+            "Class 12 — Themes in Indian History Part I — Theme 4: The History of the Book"
+          ],
+          "key_concepts": [
+            "Mauryan architecture: simple, monumental style",
+            "Stupas: hemispheric mounds, Buddhist religious structures",
+            "Sanchi stupa: built by Ashoka, expanded later, early example",
+            "Stupa parts: Garbha (mound), Medhi (platform), Harmika (railings), Chhatra (umbrellas)",
+            "Stupa symbolism: Buddha's body, cosmic axis representation",
+            "Railings (Vedika): stone railings with narrative carvings",
+            "Gateways (Torana): decorated entrances with religious scenes",
+            "Pillars: Ashoka's pillars, monolithic stone with capitals",
+            "Lion capitals: Sarnath lion capital, symbol of strength and dharma",
+            "Chakra: wheel symbol representing dharma",
+            "Architectural style: simple, elegant, high craftsmanship",
+            "Rock-cut structures: beginning of rock-cut architecture",
+            "Barabar caves: earliest Buddhist caves, Ashoka period",
+            "Cave features: Chaitanya halls, viharas (monasteries)",
+            "Sculpture: early Buddhist art, narrative scenes",
+            "Materials: stone (sandstone, granite), brick",
+            "Evolution: from simple to elaborate over centuries"
+          ],
+          "important_facts": {
+            "sanchi_stupa": "Earliest, expanded in phases",
+            "ashoka_pillars": "Monolithic, with lion capitals",
+            "sarnath_capital": "Famous lion capital symbol",
+            "architectural_innovation": "Stupa and pillar forms"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2,
+          "map_work": ["Sanchi location", "Sarnath location", "Barabar caves location"]
+        },
+        {
+          "topic_id": "hist_anc_t39",
+          "topic_name": "Gupta Period Art & Architecture",
+          "rs_sharma_reference": "Chapter 10 — Art and Architecture (continued)",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Gupta sculpture: finest Indian sculpture period",
+            "Buddha sculptures: serene, idealized form, meditation mudra",
+            "Hindu deity sculptures: Vishnu, Shiva, Devi representations",
+            "Standing Buddha: graceful, flowing robes, Mathura style",
+            "Relief sculptures: narrative scenes, episodes from mythology",
+            "Terracotta: small figurines, decorative pieces",
+            "Temple architecture: beginning of temple form crystallization",
+            "Shikhara: tower over sanctum sanctorum, develops during period",
+            "Garbhagriha: inner sanctum, focus of worship",
+            "Mandapa: pillared hall for assembly",
+            "Temple types: simple shrines, developing complexity",
+            "Ajanta caves: Phase II paintings and sculptures",
+            "Ajanta paintings: naturalistic, rich colors, diverse subjects",
+            "Ajanta techniques: fresco (tempera on wet plaster)",
+            "Painting subjects: Jataka tales, Buddha's life, royal scenes",
+            "Ellora caves: Kailashnath temple, rock-cut marvel",
+            "Kailashnath features: monolithic carving, complete temple from single rock",
+            "Pottery: elegant, simple designs, Gupta ware",
+            "Coinage design: artistic portraits, reverse designs",
+            "Aesthetic principles: grace, harmony, proportion"
+          ],
+          "important_facts": {
+            "gupta_sculpture": "Golden age of Indian sculpture",
+            "buddha_statues": "Mathura school, serene expression",
+            "ajanta_paintings": "Finest ancient Indian art",
+            "kailashnath": "Monolithic rock-cut temple",
+            "artistic_style": "Graceful, naturalistic, refined"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2.5,
+          "map_work": ["Ajanta caves location", "Ellora caves location", "Mathura location", "Gupta art centres"]
+        },
+        {
+          "topic_id": "hist_anc_t40",
+          "topic_name": "South Indian Art & Dravidian Architecture",
+          "rs_sharma_reference": "Chapter 10 — Southern Art and Architecture",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I"],
+          "key_concepts": [
+            "Dravidian architecture: distinct southern style",
+            "Pallava architecture: transitional between north and south",
+            "Pallava cave temples: Mahabalipuram, monolithic sculptures",
+            "Rathas: chariot-shaped temples, carved from single rock",
+            "Arjuna's Penance: famous Pallava rock relief",
+            "Shore Temple: early structural temple, Mahabalipuram",
+            "Chalukya architecture: early developments",
+            "Aihole temples: experimental phase, diverse styles",
+            "Durga temple Aihole: hybrid architecture",
+            "Pattadakal: later phase temples, coherent Dravidian features",
+            "Kailashnath temple Pattadakal: monumental, Dravidian style",
+            "Stupa evolution: Amaravati stupa, marble construction",
+            "Amaravati stupa: narrative sculptures, intricate carvings",
+            "Andhra sculpture: Buddha scenes, bodhisattva representations",
+            "Regional variations: distinct styles in different regions",
+            "Sculpture subjects: Religious and secular themes",
+            "Materials: stone (granite, marble), different regions use different types",
+            "Artistic motifs: floral, geometric, narrative scenes",
+            "Religious sculpture: Hindu and Buddhist both represented",
+            "Architectural evolution: gradual development towards medieval forms"
+          ],
+          "important_facts": {
+            "pallava_center": "Mahabalipuram",
+            "famous_sculptures": "Rathas, Arjuna's Penance, Shore Temple",
+            "chalukya_centers": "Aihole, Pattadakal",
+            "dravidian_features": "Gopuram, vimana, mandapa",
+            "sculptural_style": "Narrative, naturalistic, varied subjects"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2,
+          "map_work": ["Mahabalipuram location", "Aihole location", "Pattadakal location", "Amaravati stupa"]
+        },
+        {
+          "topic_id": "hist_anc_t41",
+          "topic_name": "Sanskrit Literature & Kavya Tradition",
+          "rs_sharma_reference": "Chapter 11 — Literature",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I — Theme 4"],
+          "key_concepts": [
+            "Vedic literature: Rigveda, Brahmanas, Upanishads (covered earlier)",
+            "Classical Sanskrit: developed refinement during Gupta age",
+            "Kalidasa: greatest Sanskrit dramatist and poet",
+            "Kalidasa works: Shakuntala, Meghaduta, Malvikagnimitra, Raghuvamsha, Kumarasambhava",
+            "Shakuntala: romantic drama, girl separated from lover, reunion",
+            "Meghaduta: lyric poem, lover sends message via cloud",
+            "Drama structure: acts (Anka), elaborate plots, romantic themes",
+            "Natashastra: Bharata's codification of dramatic arts",
+            "Rasa theory: emotional sentiments in art (Sringara, Vira, Hasya, etc.)",
+            "Other playwrights: Bhasa (earlier), Bhavabhuti, Vishnuvaradhan (later)",
+            "Poetry (Kavya): elaborate verse forms, elaborate imagery",
+            "Mahakavya: grand epic poems, Raghuvamsha, Kumarasambhava",
+            "Narrative works: Pancha Tantra, Hitopadesa stories",
+            "Prose literature: Bana's Harsha Charita, biographical prose",
+            "Subandhu, Mayura: poets of Gupta age",
+            "Ashvaghosa: earlier but influential, Buddha Charita",
+            "Grammar: Panini's Ashtadhyayi (earlier), further refinements",
+            "Sanskrit standardization: refined vocabulary, grammatical rules"
+          ],
+          "important_facts": {
+            "kalidasa": "Greatest Sanskrit writer",
+            "famous_works": "Shakuntala, Meghaduta, Raghuvamsha",
+            "literary_forms": "Drama, poetry, narrative prose",
+            "dramatic_principles": "Rasa theory, Natashastra"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t42",
+          "topic_name": "Regional Literature & Sangam Tamil Literature",
+          "rs_sharma_reference": "Chapter 11 — Regional Literature",
+          "ncert_reference": ["Class 11 — Ancient India — Chapter 7"],
+          "key_concepts": [
+            "Tamil literature: Sangam corpus, oldest vernacular literature",
+            "Sangam poetry: Akam (inner/love), Puram (outer/public)",
+            "Sangam poets: Pagan (female poets), Uvaiyar, Nakkirar",
+            "Sangam anthologies: Akananuru (400 akam poems), Purananuru (400 puram poems)",
+            "Literary forms: Sirupanattuppadi, Akapporul, Tolkappiyam",
+            "Sangam epics: Silappatikaram (The Anklet Story), Manimekhalai",
+            "Silappatikaram: story of Kannagi, tail of unfaithful husband, cities burning",
+            "Manimekhalai: daughter of Kovalan and Madhavi, Buddhist conversion",
+            "Tolkappiyam: grammar and poetics text, oldest Tamil literary work",
+            "Tamil grammatical tradition: detailed rules, classification",
+            "Themes: love, war, virtue, grief, generosity, justice",
+            "Society depicted: detailed social information, customs, occupations",
+            "Women poets: significant contributors, owned estates",
+            "Caste references: different naming in Tamil, but categories present",
+            "Geographical descriptions: detailed landscape references",
+            "Religious elements: Hindu, Buddhist, Jain references",
+            "Literary evolution: from oral tradition to written texts",
+            "Language: Old Tamil, distinct phonetics and grammar from Sanskrit"
+          ],
+          "important_facts": {
+            "sangam_texts": "Akananuru, Purananuru, Silappatikaram, Manimekhalai",
+            "literary_forms": "Akam, Puram, epic narratives",
+            "oldest_tamil": "Tolkappiyam grammar text",
+            "key_epics": "Silappatikaram and Manimekhalai"
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "hist_anc_t43",
+          "topic_name": "Science, Mathematics & Astronomy in Ancient India",
+          "rs_sharma_reference": "Chapter 11 — Scientific and Mathematical Achievements",
+          "ncert_reference": ["Class 12 — Themes in Indian History Part I — Theme 4"],
+          "key_concepts": [
+            "Aryabhata (476 CE): mathematician-astronomer, revolutionary concepts",
+            "Aryabhata works: Aryabhatiya, mathematical and astronomical treatise",
+            "Aryabhata contributions: zero concept, decimal system, pi calculation (3.1416)",
+            "Heliocentric model: Aryabhata suggested sun-centric model",
+            "Trigonometry: sine tables, astronomical calculations",
+            "Earth's rotation: Aryabhata proposed Earth's axial rotation",
+            "Astronomy: lunar and solar eclipse explanations",
+            "Mathematical concepts: algebra (bijganita), geometry (rekhaganita)",
+            "Brahmagupta (598 CE): mathematician, Brahmasphutasiddhanta",
+            "Negative numbers: Brahmagupta worked with negative quantities",
+            "Zero operations: rules for operations with zero",
+            "Algebra: quadratic equations solutions",
+            "Varahamihira (505 CE): astronomer, Pancha Siddhantika",
+            "Astrology and astronomy: observations recorded",
+            "Bhaskara I: later mathematician, Aryabhata commentary writer",
+            "Medical science: Charaka Samhita, Sushruta Samhita texts",
+            "Surgery: Sushruta's surgical techniques and instruments",
+            "Pharmacology: medicine preparation, drug properties",
+            "Anatomy: detailed anatomical descriptions",
+            "Metallurgy: iron pillars, rust-resistant constructions",
+            "Chemistry: dye-making, metal-working techniques",
+            "Agricultural science: irrigation, crop rotation practices"
+          ],
+          "important_facts": {
+            "aryabhata": "Born 476 CE, revolutionary astronomer-mathematician",
+            "key_discoveries": "Zero, decimal system, pi value, heliocentric ideas",
+            "brahmagupta": "Zero operations, negative numbers",
+            "medical_texts": "Charaka Samhita, Sushruta Samhita",
+            "surgical_advances": "Detailed surgical techniques and instruments"
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 45,
+        "duration_mins": 45,
+        "focus_areas": ["Mauryan architecture and sculpture", "Gupta art achievements", "South Indian temple architecture", "Kalidasa's works", "Sangam literature", "Aryabhata's contributions", "Ancient Indian science"]
+      },
+      "revision_day_tasks": ["Visit virtual museum sites (Ajanta, Sanchi)", "Timeline of architectural styles", "Kalidasa works summary", "Sangam poets and works", "Scientific discoveries chart", "PYQs on art and architecture"]
+    }
+  ],
+
+  "daily_study_schedule": {
+    "standard_track_weeks": 20,
+    "daily_hours": 3,
+    "week_1_2": "Module 1 — Prehistoric India & IVC (8 hours prep + 2 days revision)",
+    "week_3_4": "Module 2 — Vedic Age (7 hours prep + 2 days revision)",
+    "week_5_7": "Module 3 — Jainism, Buddhism & Mahajanapadas (9 hours prep + 2 days revision)",
+    "week_8_9": "Module 4 — Mauryan Empire (9 hours prep + 2 days revision)",
+    "week_10": "Module 5 — Post-Mauryan Period (8 hours prep + 1 day revision)",
+    "week_11_13": "Module 6 — Gupta Empire & Post-Gupta (10 hours prep + 2 days revision)",
+    "week_14_15": "Module 7 — South India (8 hours prep + 2 days revision)",
+    "week_16_17": "Module 8 — Art, Architecture & Literature (7 hours prep + 2 days revision)",
+    "week_18_19": "Complete revision — all modules, PYQ solving, weak areas focus",
+    "week_20": "Final revision, mock tests, last-minute important points"
+  },
+
+  "previous_year_questions_pattern": {
+    "2023": ["Ashoka's Dhamma concept", "Gupta art characteristics", "IVC urban planning"],
+    "2022": ["Vedic society structure", "Sangam literature", "Buddhist philosophy"],
+    "2021": ["Mauryan administration", "South Indian kingdoms", "Aryabhata's contributions"],
+    "2020": ["Indus Valley Civilization", "Mahajanapadas formation", "Gupta golden age"],
+    "recurring_topics": [
+      "Ashoka's edicts and Dhamma policy",
+      "Chandragupta II and Golden Age",
+      "Buddhist and Jain philosophies",
+      "South Indian dynasties and literature",
+      "Ancient Indian science and mathematics",
+      "Gupta period art and architecture",
+      "Sangam age and Tamil literature",
+      "Chanakya and Arthashastra",
+      "Aryabhata's mathematical discoveries",
+      "IVC urban centers and trade"
+    ]
+  },
+
+  "revision_checklist": {
+    "maps": "All module locations, city positions, empire boundaries, trade routes",
+    "dates": "All major rulers, dynasties, events with precise dates",
+    "key_concepts": "Varna system evolution, Dhamma, Rasa theory, Karma concept",
+    "rulers_dynasties": "Complete list with major achievements, patronage, timeline",
+    "monuments": "Major temples, stupas, caves with location and significance",
+    "literature": "Important works, authors, themes, major texts",
+    "comparisons": "Vedic vs Buddhist vs Jain, North vs South India developments",
+    "impact_analysis": "Religious, cultural, economic impacts of major movements"
+  }
+}

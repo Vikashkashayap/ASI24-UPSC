@@ -26,6 +26,10 @@ export const loginUser = async ({ email, password }) => {
   // First try to find user in database
   const user = await User.findOne({ email });
   if (user) {
+    if (!user.googleId && user.isEmailVerified === false) {
+      throw new Error("Please verify your email with OTP before login.");
+    }
+
     if (user.isActive === false || user.status === 'suspended') {
       throw new Error("Your account is deactivated. Please contact admin.");
     }
@@ -109,6 +113,7 @@ export const findOrCreateGoogleUser = async (profile) => {
       googleId,
       accountType: "paid-user",
       subscriptionStatus: "inactive",
+      isEmailVerified: true,
     });
   }
 

@@ -7,6 +7,18 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: false }, // optional for Google OAuth users
     googleId: { type: String, required: false, sparse: true }, // unique per Google user
+    phone: { type: String, default: "" },
+    city: { type: String, default: "" },
+    attempt: { type: String, default: "" },
+    targetYear: { type: String, default: "" },
+    prepStartDate: { type: String, default: "" },
+    dailyStudyHours: { type: String, default: "" },
+    educationBackground: { type: String, default: "" },
+    isEmailVerified: { type: Boolean, default: false },
+    otpCode: { type: String, default: null },
+    otpExpiresAt: { type: Date, default: null },
+    otpLastSentAt: { type: Date, default: null },
+    otpVerifyAttempts: { type: Number, default: 0 },
     // Authorization role used across the app (admin vs non-admin)
     role: {
       type: String,

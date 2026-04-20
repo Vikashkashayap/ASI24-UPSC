@@ -6,36 +6,79 @@ import Test from "../models/Test.js";
 import PrelimsMock from "../models/PrelimsMock.js";
 import { MeetingRoom } from "../models/MeetingRoom.js";
 import { MentorChat } from "../models/MentorChat.js";
+import { MentorFeedback } from "../models/MentorFeedback.js";
 import { getDartAnalytics, getDart20DayReport, build20DayReportPdf } from "../services/dartService.js";
 
 export const getAllStudents = async (req, res) => {
   try {
     const { search, page = 1, limit = 20 } = req.query;
+    const mentorPicker =
+      req.query.mentorPicker === "true" || req.query.mentorPicker === true;
 
     // Build query based on search parameter.
-    // This endpoint powers the \"free\" / admin-created students list.
-    let query = { role: 'student', accountType: { $ne: 'paid-user' } };
-    if (search && search.trim().length >= 2) {
-      const searchRegex = new RegExp(search.trim(), 'i');
-      query = {
-        role: 'student',
-        accountType: { $ne: 'paid-user' },
-        $or: [
-          { name: searchRegex },
-          { email: searchRegex }
-        ]
-      };
+    // Default: \"free\" / admin-created students list (excludes paid-user).
+    // mentorPicker: all registered students (any accountType) for mentor assignment UI.
+    let query;
+    if (mentorPicker) {
+      query = { role: "student" };
+      if (search && search.trim().length >= 2) {
+        const searchRegex = new RegExp(search.trim(), "i");
+        query = {
+          role: "student",
+          $or: [{ name: searchRegex }, { email: searchRegex }],
+        };
+      }
+    } else {
+      query = { role: "student", accountType: { $ne: "paid-user" } };
+      if (search && search.trim().length >= 2) {
+        const searchRegex = new RegExp(search.trim(), "i");
+        query = {
+          role: "student",
+          accountType: { $ne: "paid-user" },
+          $or: [{ name: searchRegex }, { email: searchRegex }],
+        };
+      }
     }
+
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = mentorPicker
+      ? Math.min(Math.max(parseInt(limit, 10) || 5000, 1), 10000)
+      : parseInt(limit, 10) || 20;
 
     // Get total count for pagination
     const totalStudents = await User.countDocuments(query);
 
     // Get students with pagination
     const students = await User.find(query)
-      .select('name email createdAt')
+      .select("name email createdAt")
       .sort({ createdAt: -1 })
-      .skip((parseInt(page) - 1) * parseInt(limit))
-      .limit(parseInt(limit));
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
+
+    // Mentor assign UI: all students, basic fields only (skip heavy per-student stats).
+    if (mentorPicker) {
+      const studentsBasic = students.map((s) => ({
+        _id: s._id,
+        name: s.name,
+        email: s.email,
+        createdAt: s.createdAt,
+      }));
+      const totalPages = Math.ceil(totalStudents / limitNum) || 1;
+      return res.json({
+        success: true,
+        data: {
+          students: studentsBasic,
+          pagination: {
+            currentPage: pageNum,
+            totalPages,
+            total: totalStudents,
+            hasNext: pageNum < totalPages,
+            hasPrev: pageNum > 1,
+            pages: totalPages,
+          },
+        },
+      });
+    }
 
     // Get evaluation + prelims test counts for each student
     const studentsWithStats = await Promise.all(
@@ -87,19 +130,18 @@ export const getAllStudents = async (req, res) => {
       })
     );
 
-    const totalPages = Math.ceil(totalStudents / parseInt(limit));
-    const currentPage = parseInt(page);
+    const totalPages = Math.ceil(totalStudents / limitNum) || 1;
 
     res.json({
       success: true,
       data: {
         students: studentsWithStats,
         pagination: {
-          currentPage,
+          currentPage: pageNum,
           totalPages,
           total: totalStudents,
-          hasNext: currentPage < totalPages,
-          hasPrev: currentPage > 1,
+          hasNext: pageNum < totalPages,
+          hasPrev: pageNum > 1,
           pages: totalPages
         }
       }
@@ -1098,31 +1140,119 @@ export const getMentors = async (req, res) => {
       .sort({ name: 1 })
       .lean();
 
-    const withCounts = await Promise.all(
-      mentors.map(async (m) => {
-        const assignedStudentCount = await User.countDocuments({
-          mentorId: m._id,
-          role: "student",
+    const mentorIds = mentors.map((m) => m._id);
+    const assignees =
+      mentorIds.length === 0
+        ? []
+        : await User.find({
+            role: "student",
+            mentorId: { $in: mentorIds },
+          })
+            .select("name email mentorId")
+            .sort({ name: 1 })
+            .lean();
+
+    const byMentor = new Map();
+    for (const id of mentorIds) {
+      byMentor.set(String(id), []);
+    }
+    for (const s of assignees) {
+      if (!s.mentorId) continue;
+      const key = String(s.mentorId);
+      const list = byMentor.get(key);
+      if (list) {
+        list.push({
+          _id: s._id,
+          name: s.name,
+          email: s.email,
         });
-        return {
-          _id: m._id,
-          name: m.name,
-          email: m.email,
-          createdAt: m.createdAt,
-          assignedStudentCount,
-        };
-      })
-    );
+      }
+    }
+
+    const withAssignments = mentors.map((m) => {
+      const assignedStudents = byMentor.get(String(m._id)) ?? [];
+      return {
+        _id: m._id,
+        name: m.name,
+        email: m.email,
+        createdAt: m.createdAt,
+        assignedStudentCount: assignedStudents.length,
+        assignedStudents,
+      };
+    });
 
     res.json({
       success: true,
-      data: { mentors: withCounts },
+      data: { mentors: withAssignments },
     });
   } catch (error) {
     console.error("getMentors:", error);
     res.status(500).json({
       success: false,
       message: "Failed to list mentors",
+    });
+  }
+};
+
+/** POST /api/admin/mentors/:id/reset-password — issue new temp password for mentor login */
+export const resetMentorPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user || user.role !== "mentor") {
+      return res.status(404).json({
+        success: false,
+        message: "Mentor not found",
+      });
+    }
+    const tempPassword =
+      Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    user.password = tempPassword;
+    user.mustChangePassword = true;
+    await user.save();
+    res.json({
+      success: true,
+      message: "Password reset successfully",
+      data: { tempPassword },
+    });
+  } catch (error) {
+    console.error("resetMentorPassword:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to reset mentor password",
+    });
+  }
+};
+
+/** DELETE /api/admin/mentors/:id — remove mentor account; unassigns their students */
+export const deleteMentor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const mentor = await User.findById(id);
+    if (!mentor || mentor.role !== "mentor") {
+      return res.status(404).json({
+        success: false,
+        message: "Mentor not found",
+      });
+    }
+
+    await User.updateMany(
+      { mentorId: id, role: "student" },
+      { $set: { mentorId: null } }
+    );
+    await MentorFeedback.deleteMany({ mentorUserId: id });
+    await Mentor.deleteOne({ userId: id });
+    await User.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "Mentor account removed. Assigned students are no longer linked to this mentor.",
+    });
+  } catch (error) {
+    console.error("deleteMentor:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to remove mentor account",
     });
   }
 };

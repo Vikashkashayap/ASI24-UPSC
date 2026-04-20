@@ -1,0 +1,1925 @@
+{
+  "metadata": {
+    "portal": "MentorsDaily UPSC",
+    "subject": "Physical Geography",
+    "examination": "UPSC Civil Services Examination",
+    "exam_sections": ["Prelims GS Paper I", "Mains GS Paper I"],
+    "version": "2026",
+    "created_date": "2026-04-16",
+    "upsc_weightage": {
+      "prelims_annual_questions": "10-12 questions",
+      "mains_word_limit": "250-1000 words",
+      "marks_mains": "12-15 marks per question",
+      "section": "GS Paper I - Indian and World Geography"
+    },
+    "total_modules": 5,
+    "total_topics": 47,
+    "estimated_study_hours": 180,
+    "estimated_days_standard": 90,
+    "preparation_timeline": "3 months (intensive), 6 months (standard)"
+  },
+  "reference_books": {
+    "primary": [
+      {
+        "id": "ps_1",
+        "author": "Savinder Singh",
+        "title": "Physical Geography",
+        "edition": "Latest",
+        "chapters_count": 15,
+        "coverage": "Complete - all 15 chapters mapped"
+      }
+    ],
+    "ncert": [
+      {
+        "id": "ncert_11_1",
+        "class": 11,
+        "subject": "Fundamentals of Physical Geography",
+        "units": 6,
+        "chapters": 16,
+        "coverage": "Complete - all chapters mapped"
+      },
+      {
+        "id": "ncert_11_2",
+        "class": 11,
+        "subject": "Practical Work in Geography Part I",
+        "focus": "Practical diagrams, map skills, field observations"
+      },
+      {
+        "id": "ncert_12_1",
+        "class": 12,
+        "subject": "Fundamentals of Human Geography",
+        "note": "For overlapping physical geography topics"
+      }
+    ],
+    "supplementary": [
+      {
+        "author": "D. R. Khullar",
+        "title": "India Geography",
+        "use": "Regional context and biodiversity"
+      },
+      {
+        "author": "G. C. Leong",
+        "title": "Certificate Physical and Human Geography",
+        "use": "Conceptual clarity and diagrams"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "module_id": "MOD_1",
+      "module_name": "Interior of Earth & Plate Tectonics",
+      "module_number": 1,
+      "estimated_hours": 35,
+      "estimated_days": 18,
+      "module_test": {
+        "type": "MCQ + Descriptive",
+        "duration_minutes": 60,
+        "questions": 25
+      },
+      "revision_tasks": {
+        "day_1": "Revise all diagrams of Earth's layers and seismic waves",
+        "day_2": "Plate boundaries - draw and label convergent, divergent, transform",
+        "day_3": "Full mock test - Earth's interior and plate tectonics"
+      },
+      "topics": [
+        {
+          "topic_id": "T1_1",
+          "topic_name": "Earth's Interior Structure & Composition",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 2",
+            "chapter_name": "Interior of the Earth"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit II",
+            "unit_name": "The Earth",
+            "chapter": 2,
+            "chapter_name": "Interior of the Earth"
+          },
+          "key_concepts": [
+            "Crust - continental crust (30-70 km), oceanic crust (5-7 km), composition (silicates, granite, basalt)",
+            "Mohorovicic Discontinuity (Moho) - boundary between crust and mantle at 35-70 km depth",
+            "Mantle - two layers: upper mantle (includes lithosphere and asthenosphere), lower mantle",
+            "Asthenosphere - zone of partial melting, plasticity allows plate movement",
+            "Outer core - liquid layer, predominantly iron and nickel, generates magnetic field",
+            "Inner core - solid layer due to immense pressure, temperature ~5,200°C",
+            "Temperature gradient - increases approximately 25-30°C per kilometer",
+            "Isostasy - concept of vertical equilibrium of crust, explains mountain elevation",
+            "Density variations - crust: 2.7-3.0 g/cm³, mantle: 3.3-5.5 g/cm³, core: 9-13 g/cm³",
+            "Mantle convection - drives plate movements, hot material rises, cool descends",
+            "Core composition evidence - meteorite analysis, seismic data, magnetic measurements",
+            "Geothermal gradient and Earth's internal heat source - radioactive elements (U, Th, K)",
+            "Pressure increase with depth and its effect on rock properties",
+            "Joules heating in the core and its role in maintaining Earth's magnetic field",
+            "Recent discoveries - inner core rotation, possible 5th layer"
+          ],
+          "important_diagrams": [
+            "Earth's internal layers (Crust, Mantle, Outer Core, Inner Core) - vertical cross-section",
+            "Mohorovicic Discontinuity and other discontinuities - labeled diagram",
+            "Temperature and pressure gradient graph with depth",
+            "Density variation diagram showing discontinuities",
+            "Composition of each layer - table format with percentages",
+            "Mantle convection cells - showing rising and sinking currents",
+            "Isostatic equilibrium - mountain vs oceanic crust comparison"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Not applicable for interior structure"
+        },
+        {
+          "topic_id": "T1_2",
+          "topic_name": "Seismic Waves & Evidence of Earth's Interior",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 2",
+            "chapter_name": "Interior of the Earth"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit II",
+            "unit_name": "The Earth",
+            "chapter": 2,
+            "chapter_name": "Interior of the Earth"
+          },
+          "key_concepts": [
+            "P-waves (Primary/Compressional) - fastest, travel through solids and liquids, speed 5.5-8.5 km/s",
+            "S-waves (Secondary/Shear) - slower, travel only through solids, speed 3.2-7.3 km/s",
+            "L-waves (Longitudinal/Surface) - slowest, cause maximum damage, confined to surface",
+            "Seismic shadow zones - P-wave shadow 103°-142°, S-wave shadow beyond 103°, proves liquid outer core",
+            "Body waves vs surface waves - difference in propagation and damage potential",
+            "Wave refraction and reflection at discontinuities - explains shadow zones",
+            "Richter Scale - measures amplitude of seismic waves, logarithmic, local magnitude (ML)",
+            "Moment Magnitude Scale (Mw) - better for large earthquakes, measures seismic moment",
+            "Seismograph - instrument to detect and record seismic waves, types (mechanical, electronic)",
+            "Seismic ray paths - straight in homogeneous medium, curved in heterogeneous medium",
+            "Critical angle and refraction of seismic waves - mathematical concept",
+            "Velocity discontinuities - cause of wave refraction, marks layer boundaries",
+            "Using seismic data to map interior - velocity changes at different depths",
+            "Velocity reversal at core-mantle boundary and liquid outer core",
+            "Modern seismic networks - global distribution for accurate earthquake location"
+          ],
+          "important_diagrams": [
+            "P-waves and S-waves travel paths through Earth - labeled diagram",
+            "Seismic shadow zones - showing P-wave and S-wave shadows on Earth cross-section",
+            "Seismograph recordings showing P, S, and L waves arrival times",
+            "Epicentre and hypocenter (focus) location diagram",
+            "Richter Scale magnitude chart with examples",
+            "Seismic wave velocity with depth graph",
+            "P-wave and S-wave velocity changes at major discontinuities"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2.5,
+          "map_work": "Not applicable for seismic waves"
+        },
+        {
+          "topic_id": "T1_3",
+          "topic_name": "Plate Tectonics Theory & Mechanisms",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 3",
+            "chapter_name": "Plate Tectonics"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 4,
+            "chapter_name": "Plate Tectonics"
+          },
+          "key_concepts": [
+            "Plate tectonics definition - theory explaining Earth's lithospheric structure and dynamics",
+            "Lithosphere - rigid outer layer comprising crust and upper mantle, 50-100 km thick",
+            "Asthenosphere - zone of partial melting beneath lithosphere, allows plate movement",
+            "Major tectonic plates - Pacific, North American, Eurasian, African, Antarctic, Indo-Australian, South American",
+            "Minor plates - Caribbean, Cocos, Nazca, Philippine, Scotia plates",
+            "Hotspot volcanism - mantle plumes, Hawaii-Emperor seamount chain, Yellowstone",
+            "Mantle plumes - hot rising columns of mantle material, stationary relative to mantle",
+            "Triple junctions - point where three plates meet, types: RRR, TRR, TTT",
+            "Plate boundaries - convergent, divergent, transform, classification and significance",
+            "Spreading rates - fast (>10 cm/yr), intermediate (5-10 cm/yr), slow (<5 cm/yr) ridges",
+            "Transform faults - tear faults connecting offset ridge segments, San Andreas example",
+            "Subduction zones - dipping plane 30-60°, B-B type (benioff zone)",
+            "Obduction - reverse of subduction, rare, ophiolite sequences",
+            "Slab pull vs ridge push - driving forces of plate movement",
+            "Plate motion velocities - measured by GPS, 2-20 cm/year relative motion"
+          ],
+          "important_diagrams": [
+            "Map of world's major and minor tectonic plates",
+            "Three types of plate boundaries - convergent, divergent, transform with cross-sections",
+            "Divergent boundary - mid-ocean ridge, rift valley formation",
+            "Convergent boundaries - three types (oceanic-oceanic, oceanic-continental, continental-continental)",
+            "Transform boundary - strike-slip fault diagram",
+            "Hotspot track diagram - Emperor seamounts and Hawaiian Islands",
+            "Mantle plume beneath hotspot - vertical cross-section",
+            "Triple junction types - RRR, TRR, TTT diagrams",
+            "Plate motion vectors - showing direction and speed of movement"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 3,
+          "map_work": "Mark all major and minor tectonic plates, divergent boundaries (mid-ocean ridges), convergent boundaries (subduction zones, collision zones), transform boundaries (San Andreas, Dead Sea), hotspot locations (Hawaii, Yellowstone, Iceland, Reunion)"
+        },
+        {
+          "topic_id": "T1_4",
+          "topic_name": "Continental Drift & Seafloor Spreading",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 3",
+            "chapter_name": "Plate Tectonics"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 4,
+            "chapter_name": "Plate Tectonics"
+          },
+          "key_concepts": [
+            "Continental drift theory - Wegener (1915), continents move horizontally over time",
+            "Evidence 1: Fit of continents - jigsaw puzzle fit of South America and Africa coastlines",
+            "Evidence 2: Rock and mineral similarities - identical rock types in matching continents",
+            "Evidence 3: Fossil evidence - Mesosaurus (freshwater), Lystrosaurus, Glossopteris distribution",
+            "Evidence 4: Paleomagnetic evidence - polar wandering curves, magnetic reversals, seafloor stripes",
+            "Evidence 5: Paleoclimatic evidence - glacial deposits in equatorial zones, coal deposits in Antarctica",
+            "Evidence 6: Structural similarities - mountain ranges alignment across continents (Appalachians-Caledonian)",
+            "Pangea - supercontinent 250 million years ago, fragmentation into Laurasia and Gondwana",
+            "Seafloor spreading - Hess (1962), plates separate at mid-ocean ridges, new crust forms",
+            "Magnetic anomalies - striped pattern of normal and reversed magnetism on seafloor",
+            "Pillow lava - extrusive igneous rock formed at mid-ocean ridges underwater",
+            "Age dating of oceanic crust - radiometric dating, oldest >180 million years, youngest at ridges",
+            "Paleomagnetic reversals - magnetic poles reverse 1-10 times per million years",
+            "Chronostratigraphic timescale - correlation of magnetic reversals with geological time periods",
+            "Sediment thickness variation - thicker away from ridges, supports spreading theory",
+            "Modern measurement - GPS/VLBI - directly measures continental drift (~2-10 cm/year)"
+          ],
+          "important_diagrams": [
+            "Pangea and fragmentation into continents through time - multiple snapshots (250, 200, 100 Ma)",
+            "Continental drift evidence summary - all six pieces of evidence illustrated",
+            "Matching coastlines and geological features across Atlantic",
+            "Fossil distribution maps - Mesosaurus, Lystrosaurus, Glossopteris",
+            "Paleomagnetic polar wandering curves for different continents",
+            "Seafloor spreading at mid-ocean ridge - vertical cross-section with new crust formation",
+            "Magnetic anomaly stripes on seafloor - showing normal and reversed patterns",
+            "Age of oceanic crust map - color-coded age progression from ridge",
+            "Comparison of continental and oceanic crust - age vs distance from ridge plot"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark Pangea position, Laurasia and Gondwana, modern continents, Atlantic Ocean mid-ocean ridge, distribution of fossils (Mesosaurus, Lystrosaurus, Glossopteris), glacial deposits in Southern Hemisphere"
+        },
+        {
+          "topic_id": "T1_5",
+          "topic_name": "Earthquakes: Causes, Classification & Measurement",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 5",
+            "chapter_name": "Earthquakes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 6,
+            "chapter_name": "Earthquakes"
+          },
+          "key_concepts": [
+            "Earthquake definition - sudden shaking of Earth's crust due to energy release",
+            "Elastic rebound theory - stress accumulation and sudden release in crustal rocks",
+            "Types of earthquakes: Tectonic (plate boundaries, 90%), Volcanic (near magma), Explosion (nuclear)",
+            "Focus/Hypocenter - exact location of energy release, depth measured from surface",
+            "Epicentre - point on surface directly above focus, where damage is maximum",
+            "Depth classification: Shallow (<70 km), Intermediate (70-300 km), Deep (>300 km)",
+            "Magnitude - measure of energy released, logarithmic scale (Richter, moment magnitude, others)",
+            "Richter Scale (Local Magnitude/ML) - amplitude of seismic waves, only for shallow earthquakes <600 km",
+            "Moment Magnitude Scale (Mw) - seismic moment = rigidity × area × slip, better for large earthquakes",
+            "Energy-magnitude relationship - increase of 1.0 on Richter ≈ 30 times more energy",
+            "Intensity - qualitative measure of earthquake effects (MMI Scale, I-XII), varies with location",
+            "Earthquake zones: Convergent plate boundaries (70%), Transform boundaries (20%), Intraplate (10%)",
+            "Foreshocks - small earthquakes preceding main shock, not always reliable",
+            "Aftershocks - earthquakes after main shock, decrease in frequency and magnitude over time",
+            "Earthquake swarms - multiple earthquakes in short period, often near volcanoes",
+            "Earthquake prediction - current limitations, warnings vs forecasting, historical patterns"
+          ],
+          "important_diagrams": [
+            "Focus and epicentre diagram with depth classification",
+            "Seismic wave arrival times and calculation of epicentre distance",
+            "Richter Scale magnitude chart with examples (1-9)",
+            "Moment Magnitude vs Richter Scale comparison",
+            "Modified Mercalli Intensity Scale (I-XII) with damage descriptions",
+            "Elastic rebound theory - before, during, after energy release",
+            "Global distribution of earthquakes - showing plate boundary concentration",
+            "Depth of earthquakes at different plate boundaries - Benioff zone diagram",
+            "Energy released vs magnitude logarithmic relationship graph"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark major earthquake zones: Ring of Fire, Mid-ocean ridges, Collision zones (Himalaya), Transform boundaries (San Andreas, Dead Sea), Intraplate zones (stable continental interiors)"
+        },
+        {
+          "topic_id": "T1_6",
+          "topic_name": "Volcanoes: Types, Distribution & Products",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 6",
+            "chapter_name": "Volcanoes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 5,
+            "chapter_name": "Volcanoes"
+          },
+          "key_concepts": [
+            "Volcano definition - vent or fissure in Earth's crust where magma erupts",
+            "Magma composition - basaltic (low silica, low viscosity), andesitic (intermediate), rhyolitic (high silica, high viscosity)",
+            "Shield volcano - gentle slopes (2-10°), low viscosity basaltic lava, Hawaiian type, example: Hawaii, Kilauea",
+            "Cinder cone - steep slopes (30-40°), ejecta-dominated, small height (100-400 m), example: Paricutin",
+            "Composite/Stratovolcano - alternating layers of lava and ejecta, steep slopes, explosive, example: Vesuvius, Mount Fuji",
+            "Caldera - large depression from collapse or explosion, >2 km diameter, example: Crater Lake, Yellowstone",
+            "Lava types: Aa (rough, blocky), Pahoehoe (smooth, ropy), Pillow (underwater)",
+            "Pyroclastic materials: Ash (<2 mm), Lapilli (2-64 mm), Bombs (>64 mm)",
+            "Volcanic gases: CO2, H2O, SO2, HCl, H2S, role in climate change",
+            "Hotspot volcanism - magma plumes, intraplate volcanism, Yellowstone, Hawaii-Emperor chain",
+            "Ring of Fire - circum-Pacific belt, 75% of active volcanoes, due to subduction zones",
+            "Rift zone volcanism - associated with divergent plate boundaries, Iceland, East African Rift",
+            "Collision zone volcanism - continental-continental collision, Cascade Range, Andes",
+            "Monogenetic vs polygenetic volcanoes - single eruption vs multiple eruptions",
+            "Volcanic hazards - lava flows, pyroclastic flows, lahars, volcanic bombs, ash fall, toxic gases"
+          ],
+          "important_diagrams": [
+            "Shield volcano cross-section and profile",
+            "Cinder cone cross-section and profile",
+            "Composite/Stratovolcano cross-section showing layers",
+            "Caldera formation sequence - subsidence diagram",
+            "Lava types comparison - Aa, Pahoehoe, Pillow",
+            "Pyroclastic flow diagram with temperature and velocity",
+            "Magma composition triangle - basaltic, andesitic, rhyolitic",
+            "Viscosity vs silica content graph",
+            "Global distribution of volcanoes - Ring of Fire and hotspots marked",
+            "Volcanic eruption types - Hawaiian, Strombolian, Vulcanian, Plinian",
+            "Lahar formation diagram - along river valleys"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Mark Ring of Fire, major active volcanoes (Mount Fuji, Vesuvius, Krakatoa, Mount Pinatubo, Eyjafjallajökull), hotspot volcanoes (Hawaii, Yellowstone), rift zone volcanoes (Iceland), collision zone volcanoes (Andes, Cascade Range), calderas (Crater Lake, Yellowstone)"
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_2",
+      "module_name": "Geomorphology & Landform Development",
+      "module_number": 2,
+      "estimated_hours": 40,
+      "estimated_days": 20,
+      "module_test": {
+        "type": "MCQ + Descriptive + Diagram Labeling",
+        "duration_minutes": 90,
+        "questions": 35
+      },
+      "revision_tasks": {
+        "day_1": "Draw and label all river landforms - V-valley, meander, oxbow lake, delta",
+        "day_2": "Glacial landforms - U-valley, cirque, horn, moraine types",
+        "day_3": "Wind and coastal landforms - dunes, spits, cliffs, caves",
+        "day_4": "Full mock test - comprehensive geomorphology"
+      },
+      "topics": [
+        {
+          "topic_id": "T2_1",
+          "topic_name": "Rocks & Rock Cycle",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 7",
+            "chapter_name": "Rocks and Rock Cycle"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 7,
+            "chapter_name": "Rocks and Minerals"
+          },
+          "key_concepts": [
+            "Mineral definition - naturally occurring, inorganic, crystalline solid with definite composition",
+            "Rock definition - natural aggregate of minerals, can be monomineralic or polymineralic",
+            "Igneous rocks - form from magma cooling, intrusive (plutonic) vs extrusive (volcanic)",
+            "Granite - coarse-grained igneous, formed from slow cooling underground, example of intrusive",
+            "Basalt - fine-grained igneous, formed from fast cooling at surface, example of extrusive",
+            "Rhyolite - acid igneous, high silica content, viscous lava, fast cooling",
+            "Sedimentary rocks - form from compaction and cementation of sediments, clastic and chemical",
+            "Sandstone - clastic sedimentary, medium-grained, quartz-rich, permeable",
+            "Limestone - chemical sedimentary, calcium carbonate, organic origin, soluble in acids",
+            "Shale - clastic sedimentary, finest grains, formed from mud, impermeable",
+            "Metamorphic rocks - form under heat and pressure, non-foliated and foliated types",
+            "Slate - foliated metamorphic, from shale, splits into thin sheets, used for roofing",
+            "Marble - non-foliated metamorphic, from limestone, used for sculpture and building",
+            "Schist - foliated metamorphic, medium-grade, parallel arrangement of minerals",
+            "Gneiss - foliated metamorphic, high-grade, banding of light and dark minerals"
+          ],
+          "important_diagrams": [
+            "Rock Cycle diagram - showing pathways between igneous, sedimentary, metamorphic rocks",
+            "Igneous rock identification chart - grain size vs silica content",
+            "Bowen's reaction series - crystallization sequence of minerals",
+            "Sedimentary rock classification - clastic (by grain size) and chemical types",
+            "Metamorphic rock facies diagram - temperature vs pressure conditions",
+            "Foliated vs non-foliated metamorphic rocks - comparison",
+            "Mineral crystal structures - basic crystal systems",
+            "Rock texture classification - phaneritic, aphanitic, porphyritic, glassy"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 6,
+          "mains_importance": 6,
+          "daily_target_hours": 1.5,
+          "map_work": "Not directly applicable, but identify rock types in regional geology"
+        },
+        {
+          "topic_id": "T2_2",
+          "topic_name": "Weathering & Mass Wasting",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 8",
+            "chapter_name": "Weathering and Soil Formation"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 7,
+            "chapter_name": "Rocks and Minerals"
+          },
+          "key_concepts": [
+            "Weathering definition - in-situ breakdown of rocks without transportation",
+            "Mechanical weathering - physical disintegration, no chemical change, rock reduces in size",
+            "Frost wedging/Freeze-thaw - water in cracks freezes, expands, breaks rock apart",
+            "Exfoliation - outer layers peel off due to pressure release, granite domes, onion-skin pattern",
+            "Salt weathering - crystallization of salts in pores, expansion breaks rock, common in arid regions",
+            "Abrasion - rocks rubbed together by wind, water, ice, creates rounded boulders",
+            "Thermal expansion - unequal heating causes stress, more in desert with day-night temperature difference",
+            "Chemical weathering - chemical reactions alter rock composition, rock dissolves or changes",
+            "Oxidation - combination with oxygen, iron minerals oxidize to rust (limonite)",
+            "Hydrolysis - reaction with water, feldspar converts to clay minerals",
+            "Carbonation - reaction with carbonic acid in water, limestone dissolves, karst formation",
+            "Biological weathering - organisms break down rocks, roots penetrate, lichen acids",
+            "Mass wasting definition - movement of rock/soil downslope under gravity",
+            "Types: Creep (slow, continuous), Landslide (fast, sudden), Slump (curved surface), Mudflow (wet)",
+            "Factors affecting mass wasting: Slope angle, rock type, weathering degree, water content, vegetation"
+          ],
+          "important_diagrams": [
+            "Types of mechanical weathering - frost wedging, exfoliation, salt weathering, abrasion",
+            "Chemical weathering processes - oxidation, hydrolysis, carbonation examples",
+            "Biological weathering agents - roots, lichen, burrowing animals",
+            "Mass wasting types - creep, slide, slump, mudflow, rockfall cross-sections",
+            "Landslide anatomy - scarp, toe, material on slope",
+            "Soil profile showing weathered material",
+            "Stability angle vs slope angle for mass wasting occurrence",
+            "Factors affecting slope stability - rainfall, earthquakes, human modification"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Identify areas prone to landslides, weathering patterns in different climates, erosion hotspots"
+        },
+        {
+          "topic_id": "T2_3",
+          "topic_name": "River Landforms & Fluvial Processes",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 9",
+            "chapter_name": "Rivers and River Landforms"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 9,
+            "chapter_name": "Landforms and their Evolution"
+          },
+          "key_concepts": [
+            "River systems - dendritic, trellis, rectangular, radial drainage patterns",
+            "Young/Youth stage - V-shaped valley, vertical erosion, high velocity, rapids, waterfalls",
+            "V-shaped valley - narrow steep-sided valley formed in resistant rocks",
+            "Waterfall - abrupt descent, plunge pool at base, headward retreat due to erosion",
+            "Gorge - deep narrow valley with vertical or near-vertical walls, resistant rock",
+            "Mature/Middle stage - meanders develop, lateral erosion exceeds vertical, meandering channels",
+            "Meander - sinuous curve in river course, amplitude increases downstream, radius of curvature",
+            "Oxbow lake - crescent-shaped lake formed from meander cutoff, oxbow development stages",
+            "Floodplain - broad flat area adjacent to channel, inundated during floods, fertile soil",
+            "Levees - natural embankments on floodplain, artificial levees for flood control",
+            "Terraces - remnants of old floodplains, evidence of river incision, paired and unpaired",
+            "Old/Senile stage - low gradient, wide floodplain, braided channels, deltas",
+            "Delta - triangular or fan-shaped depositional landform at river mouth, prograding shoreline",
+            "Types of deltas: Arcuate (Nile), Bird's foot (Mississippi), Fan/Cuspate (Ganges)",
+            "Alluvial fan - fan-shaped depositional landform at mountain front, piedmont zone"
+          ],
+          "important_diagrams": [
+            "Three stages of river erosion - youth, mature, old age with valley cross-sections",
+            "V-shaped valley cross-section and longitudinal profile",
+            "Waterfall and gorge formation sequence",
+            "Meander formation and migration - point bar and river cliff",
+            "Oxbow lake formation stages - meander development to cutoff",
+            "Floodplain and terrace cross-section - showing old and new channels",
+            "Delta types - Arcuate, Bird's foot, Cuspate, Fan-shaped",
+            "Alluvial fan cross-section at mountain front",
+            "Braided channel network in old age rivers",
+            "River competence and capacity curves with grain size",
+            "Drainage patterns - dendritic, trellis, rectangular, radial, annular"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 3,
+          "map_work": "Mark major river systems (Nile, Mississippi, Amazon, Ganges-Brahmaputra, Yangtze), deltas (Nile, Mississippi, Ganges, Mekong), river gorges (Grand Canyon, Yangtze Gorges), famous waterfalls (Niagara, Victoria, Angel), meandering sections, floodplains, terraces"
+        },
+        {
+          "topic_id": "T2_4",
+          "topic_name": "Glacial Landforms & Processes",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 10",
+            "chapter_name": "Glaciers and Glacial Landforms"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 9,
+            "chapter_name": "Landforms and their Evolution"
+          },
+          "key_concepts": [
+            "Glacier definition - slowly moving mass of ice on land, forms from accumulated snow",
+            "Snowline - altitude above which snow persists year-round, varies with latitude and local conditions",
+            "Equilibrium line - boundary between accumulation and ablation zones",
+            "Valley glacier/Alpine glacier - confined to mountains, flows downslope",
+            "Continental ice sheet - large area glacier, >50,000 km², covers plateau/continent",
+            "Glacial eroding power - abrasion (sandpaper effect), plucking (quarrying of rock)",
+            "U-shaped valley - characteristic glacial landform, vertical side walls, flat floor, wide opening",
+            "Cirque - amphitheater-shaped depression at glacier head, steep headwall, tarn lake",
+            "Arête - sharp ridge between adjacent cirques, knife-edge appearance",
+            "Horn - pyramidal peak where three or more cirques meet, Matterhorn example",
+            "Moraine - unsorted glacial deposit, types: lateral (valley sides), medial (where glaciers merge), terminal (glacier terminus)",
+            "Drumlin - elongated oval hill, streamlined in direction of glacier flow, length:width = 2-3:1",
+            "Esker - sinuous ridge of gravel/sand, former subglacial stream channel",
+            "Kame - irregular hill, deposited in ice-contact setting, material from meltwater",
+            "Outwash plain/Sandur - extensive flat plain of meltwater deposits, stratified material"
+          ],
+          "important_diagrams": [
+            "U-shaped vs V-shaped valley comparison - cross-section",
+            "Glacier cross-section showing accumulation and ablation zones",
+            "Cirque with backwall, floor, and tarn lake - 3D diagram",
+            "Arête formation between adjacent cirques",
+            "Horn formation - three cirques meeting",
+            "Moraine types - lateral, medial, terminal, ground moraine distribution",
+            "Drumlin orientation and shape - map view and profile",
+            "Esker and kame - subglacial vs ice-contact features",
+            "Outwash plain extent from glacier terminus",
+            "Glacial erosion features - striae, grooves, polish on bedrock",
+            "Hanging valley where tributary glacier meets main glacier valley"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark major glaciated regions (Alps, Rocky Mountains, Himalayas, Andes, Greenland, Antarctica), glacial lakes (Matterhorn area), drumlin fields (Ireland, Scotland), esker networks, outwash plains, moraines"
+        },
+        {
+          "topic_id": "T2_5",
+          "topic_name": "Aeolian (Wind) Landforms",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 11",
+            "chapter_name": "Desert Landforms"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 9,
+            "chapter_name": "Landforms and their Evolution"
+          },
+          "key_concepts": [
+            "Aeolian processes - wind erosion, transport, deposition in desert and coastal areas",
+            "Deflation - removal of fine particles by wind, forms deflation hollows",
+            "Abrasion - wind-blown sand acts as abrasive, creates ventifacts and desert varnish",
+            "Dune definition - accumulation of sand transported and deposited by wind",
+            "Barchan dune - crescent-shaped, horns pointing downwind, forms on hard surface",
+            "Seif dune - longitudinal dune, parallel to wind direction, extensive length",
+            "Star dune - multiple arms radiating from central peak, winds from multiple directions",
+            "Parabolic dune - U-shaped, horns point upwind, forms near coast or deflation hollow",
+            "Transverse dune - perpendicular to wind direction, forms where sand is abundant",
+            "Yardang - streamlined wind-eroded ridge, narrow parallel ridges separated by corridors",
+            "Pediment - gently sloping erosional surface at mountain base, covers bedrock",
+            "Inselberg - isolated rocky hill rising abruptly from pediment, residual hill",
+            "Reg/Hamada - gravel plains and rocky plateaus in desert, deflated surfaces",
+            "Ventifacts - pebbles shaped by wind abrasion, faceted appearance",
+            "Desert varnish - thin dark coating on rock surface, manganese and iron oxides"
+          ],
+          "important_diagrams": [
+            "Barchan dune shape and migration - plan view and cross-section",
+            "Seif dune - longitudinal pattern and cross-section",
+            "Star dune - radial arms pattern",
+            "Parabolic dune shape and relationship to deflation hollow",
+            "Transverse dune field arrangement",
+            "Yardang formation and alignment with wind direction",
+            "Pediment and inselberg relationship at mountain base",
+            "Ventifact faceting from wind abrasion",
+            "Desert landform association diagram - showing all features together",
+            "Sand transport - creep, saltation, suspension by wind"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 2,
+          "map_work": "Mark major deserts (Sahara, Arabian, Kalahari, Gobi, Simpson), dune field distributions, pediments, inselbergs (Ayers Rock), ergs, regs, yardang fields"
+        },
+        {
+          "topic_id": "T2_6",
+          "topic_name": "Coastal Landforms & Marine Processes",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 12",
+            "chapter_name": "Coastal Landforms"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 14,
+            "chapter_name": "Movements of Ocean Water"
+          },
+          "key_concepts": [
+            "Wave formation - wind-driven, friction creates waves, crest and trough terminology",
+            "Wave characteristics - wavelength, wave height, period, frequency",
+            "Wave refraction - waves bend in shallow water, focus on headlands, dissipate in bays",
+            "Wave breaking - breaker forms when depth = 1.3 × wave height",
+            "Wave-cut platform - erosional surface created by wave action at base of cliff",
+            "Sea cliff - steep coastal slope formed by wave erosion, undercuts and collapse",
+            "Sea cave - excavated by wave erosion in weak rock layers, may reach through rock",
+            "Sea arch - cave enlarged until roof collapses, creates tunnel through headland",
+            "Sea stack - isolated rock pillar, remnant of arch after roof collapse",
+            "Coastal deposition - sand and shingle transported and deposited in low-energy zones",
+            "Beach - accumulation of sediment (sand/shingle), active and inactive zones",
+            "Spit - curved ridge of sediment extending into sea/bay, formed by longshore drift",
+            "Bar - ridge of sediment connecting two headlands or island to mainland",
+            "Lagoon - body of water separated from sea by bar or barrier island",
+            "Delta - depositional landform at river mouth, prograding into sea/lake"
+          ],
+          "important_diagrams": [
+            "Wave anatomy - crest, trough, wavelength, wave height",
+            "Wave refraction around headland and bay",
+            "Wave-cut platform formation and cliff retreat",
+            "Sea cave, arch, and stack sequence - stages of development",
+            "Destructive vs constructive waves - swash and backwash",
+            "Beach profile - foreshore, backshore, berm, berms",
+            "Longshore drift - sediment transport along coast",
+            "Spit formation and growth sequence",
+            "Bar and lagoon formation",
+            "Coastal management - groyne, seawall, breakwater effectiveness",
+            "Tidal influence on coastal landforms"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Mark famous coastal features (White Cliffs of Dover, Twelve Apostles, Bay of Bengal delta), coral reefs, coastal spits and bars, lagoons, bays with wave-cut platforms, delta coasts"
+        },
+        {
+          "topic_id": "T2_7",
+          "topic_name": "Karst Landforms & Limestone Topography",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 13",
+            "chapter_name": "Karst Topography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit III",
+            "unit_name": "Landforms",
+            "chapter": 9,
+            "chapter_name": "Landforms and their Evolution"
+          },
+          "key_concepts": [
+            "Karst definition - landscape developed on limestone/dolomite through solution weathering",
+            "Karst development requirements - soluble rock, adequate rainfall, permeable cover",
+            "Carbonation process - CO2 + H2O forms weak carbonic acid, dissolves limestone",
+            "Sinkhole/Doline - funnel-shaped depression from roof collapse of underground cave",
+            "Dolines types - solution sinkholes, subsidence sinkholes, collapse sinkholes",
+            "Disappearing stream - stream sinks into ground through sinkhole, reappears elsewhere",
+            "Stalactite - ice-cream cone shaped, hangs from ceiling, forms from dripping water",
+            "Stalagmite - builds upward from floor, resembles inverted cone, thicker than stalactite",
+            "Columns - stalactite and stalagmite join together",
+            "Cave formation - elongated cavern enlarged by water erosion, often follows joint/fault",
+            "Flowstone - sheet-like deposits on cave floor or walls",
+            "Rimstone pools - deposits forming barriers along cave streams",
+            "Polje - large closed depression in limestone, flat floor, seasonal lake",
+            "Limestone pavement - fissured surface from dissolution along joints, clints and grykes",
+            "Travertine terraces - hot spring deposits forming stepped pools and barriers"
+          ],
+          "important_diagrams": [
+            "Karst landscape cross-section - sinkholes, caves, underground streams",
+            "Stalactite vs stalagmite formation from cave ceiling drips",
+            "Column formation - stalactite and stalagmite meeting",
+            "Sinkhole formation stages - solution, subsidence, collapse",
+            "Cave formation in limestone - joints, faults, solution pathways",
+            "Polje features - closed depression, flat floor, margins",
+            "Limestone pavement - clints and grykes pattern",
+            "Travertine terrace formation at hot springs",
+            "Karst valley development - losing stream to underground aquifer",
+            "Solution features at different depths - surface vs subsurface"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 1.5,
+          "map_work": "Mark major karst regions (Mediterranean, Southeast China, USA South, Vietnam), famous caves (Carlsbad, Ajanta), sinkholes, travertine deposits (Pamukkale), polje areas"
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_3",
+      "module_name": "Atmosphere, Insolation & Climatology",
+      "module_number": 3,
+      "estimated_hours": 45,
+      "estimated_days": 22,
+      "module_test": {
+        "type": "MCQ + Descriptive + Map-based",
+        "duration_minutes": 120,
+        "questions": 40
+      },
+      "revision_tasks": {
+        "day_1": "Atmospheric structure and composition - memorize altitude boundaries",
+        "day_2": "Pressure belts and wind systems - ITCZ, horse latitudes, wind patterns",
+        "day_3": "Humidity, precipitation types, cloud classification",
+        "day_4": "Koppen climate classification - all types with examples",
+        "day_5": "Full mock test - comprehensive atmosphere and climate"
+      },
+      "topics": [
+        {
+          "topic_id": "T3_1",
+          "topic_name": "Atmospheric Structure & Composition",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 1",
+            "chapter_name": "Atmosphere"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 8,
+            "chapter_name": "Composition and Structure of Atmosphere"
+          },
+          "key_concepts": [
+            "Atmosphere - envelope of air surrounding Earth, held by gravity, mass concentrated in lower layers",
+            "Composition - Nitrogen 78.08%, Oxygen 20.95%, Argon 0.93%, CO2 0.04%, Neon, Helium, other gases trace",
+            "Variable gases - Water vapor (0-4%), Dust/aerosols, Pollutants - affect weather and climate",
+            "Troposphere - lowest layer, 0-8-18 km altitude, temperature decreases with altitude, contains 75% mass",
+            "Lapse rate - rate of temperature decrease, average 6.5°C per km (environmental lapse rate)",
+            "Stratosphere - 8-50 km altitude, temperature increases with altitude due to ozone absorption",
+            "Ozone layer - concentrated at 15-35 km, absorbs UV radiation, protects life",
+            "Mesosphere - 50-80 km altitude, temperature decreases, coldest layer",
+            "Thermosphere - 80-500 km altitude, temperature increases, includes ionosphere",
+            "Exosphere - beyond 500 km altitude, transition to space, extremely thin",
+            "Atmospheric density - decreases exponentially with altitude, 50% mass below 5.5 km",
+            "Pressure - weight of air column above, decreases with altitude, measured in mb or Pa",
+            "Air masses - large bodies of air with uniform temperature and humidity",
+            "Jet streams - narrow high-speed wind belts at tropopause, subtropical and polar varieties",
+            "Atmospheric circulation cells - Hadley, Ferrel, Polar cells drive global wind patterns"
+          ],
+          "important_diagrams": [
+            "Atmospheric layers - altitude zones with temperature profiles",
+            "Composition of atmosphere - pie chart with percentages",
+            "Temperature profile with altitude showing inversion layers",
+            "Pressure decrease with altitude - exponential curve",
+            "Density variation with altitude",
+            "Ozone concentration with altitude",
+            "Atmospheric circulation cells - three-cell model",
+            "Jet stream locations - subtropical and polar jets",
+            "Air mass source regions - continental and maritime types"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Not directly applicable, but understand jet stream positions and air mass source regions"
+        },
+        {
+          "topic_id": "T3_2",
+          "topic_name": "Insolation & Heat Budget",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 2",
+            "chapter_name": "Insolation"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 9,
+            "chapter_name": "Insolation and Heat Balance"
+          },
+          "key_concepts": [
+            "Insolation - incoming solar radiation reaching Earth's surface",
+            "Solar constant - 1,370 W/m² at top of atmosphere, varies ±3% with solar activity",
+            "Factors affecting insolation: latitude (angle of incidence), season, time of day, atmosphere clarity",
+            "Angle of incidence - vertical rays equator, oblique rays poles, determines intensity",
+            "Atmospheric depletion - ozone absorption UV, scattering by gases/particles, clouds reflect/absorb",
+            "Albedo - fraction of incident radiation reflected, varies by surface (snow 80%, ocean 10%)",
+            "Heat absorption - dark surfaces absorb more (low albedo), light surfaces reflect more",
+            "Atmospheric window - shortwave radiation passes through, longwave absorbed by greenhouse gases",
+            "Earth radiation - longwave radiation emitted from Earth's surface and atmosphere",
+            "Greenhouse effect - greenhouse gases (CO2, CH4, H2O, N2O) trap longwave radiation, warm atmosphere",
+            "Heat budget - balance between incoming and outgoing radiation, near equilibrium globally",
+            "Radiation balance - tropics receive more than needed, poles receive less, poleward heat transport",
+            "Terrestrial radiation curve - peak in infrared region, shifts with temperature",
+            "Stefan-Boltzmann Law - relationship between temperature and radiation emitted",
+            "Radiative equilibrium - temperature where incoming = outgoing radiation"
+          ],
+          "important_diagrams": [
+            "Insolation distribution with latitude - showing maximum at equator",
+            "Solar radiation budget diagram - atmospheric absorption, reflection, transmission percentages",
+            "Earth's heat budget - incoming shortwave, outgoing longwave, albedo losses",
+            "Atmospheric window and greenhouse effect - radiation trapping diagram",
+            "Angle of solar incidence at different latitudes",
+            "Daily and seasonal insolation variation with latitude",
+            "Albedo values for different surfaces - comparison chart",
+            "Temperature vs radiation emitted - Stefan-Boltzmann curve",
+            "Atmospheric layers and radiation interaction"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2.5,
+          "map_work": "Understand insolation variation with latitude, seasonal changes, influence on climate zones"
+        },
+        {
+          "topic_id": "T3_3",
+          "topic_name": "Temperature & Thermal Patterns",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 3",
+            "chapter_name": "Temperature"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 10,
+            "chapter_name": "Atmospheric Circulation and Weather Systems"
+          },
+          "key_concepts": [
+            "Temperature - measure of average kinetic energy of molecules, measured in °C or K",
+            "Diurnal temperature range - difference between daily max and min, larger in clear, dry conditions",
+            "Annual temperature range - difference between warmest and coldest months, larger in continental climates",
+            "Lapse rate - rate of temperature change with altitude, varies with atmospheric conditions",
+            "Dry adiabatic lapse rate (DALR) - 9.8°C/km or 10°C/km, unsaturated air",
+            "Saturated adiabatic lapse rate (SALR) - 4-6°C/km, saturated air, latent heat release",
+            "Environmental lapse rate (ELR) - actual observed rate, averages 6.5°C/km",
+            "Temperature inversion - temperature increases with altitude, stable atmosphere, common in winter",
+            "Thermal inversion effects - traps pollutants, fog formation, stable conditions",
+            "Urban heat island - cities warmer than surrounding countryside, 2-5°C difference",
+            "Causes of UHI - reduced vegetation, dark surfaces, waste heat, reduced wind",
+            "Isothermal lines - connect places of equal temperature on maps",
+            "Kontinentality - temperature extremes in continental interiors, moderated on coasts",
+            "Thermal equator - line of highest mean temperature, shifts with seasons, not at geographic equator",
+            "Temperature anomalies - warmer or cooler than expected for latitude"
+          ],
+          "important_diagrams": [
+            "Lapse rate types - DALR, SALR, ELR comparison",
+            "Temperature inversion - temperature increasing with altitude",
+            "Diurnal temperature curve - max, min, mean variation",
+            "Annual temperature curve - seasonal variation",
+            "Urban heat island - temperature difference from city center to rural areas",
+            "Isothermal map of world - January and July patterns",
+            "Temperature gradient with latitude - annual mean",
+            "Thermal equator position - January vs July",
+            "Continentality index - temperature range vs latitude plot"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2,
+          "map_work": "Mark isothermal patterns (January and July), thermal equator shifts, cold currents (lower temperature), warm currents (higher temperature), major temperature anomalies"
+        },
+        {
+          "topic_id": "T3_4",
+          "topic_name": "Pressure & Wind Systems",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 4",
+            "chapter_name": "Pressure and Winds"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 10,
+            "chapter_name": "Atmospheric Circulation and Weather Systems"
+          },
+          "key_concepts": [
+            "Atmospheric pressure - weight of air column above, decreases with altitude exponentially",
+            "Pressure units - millibars (mb), hectopascals (hPa), 1 mb = 1 hPa, 1 atm = 1013.25 mb",
+            "Isobars - lines of equal pressure on maps, spacing indicates pressure gradient",
+            "Pressure gradient - pressure change per unit distance, drives wind movement",
+            "High pressure system - anticyclone, air sinks, clear skies, divergent winds",
+            "Low pressure system - cyclone, air rises, cloud formation, convergent winds",
+            "ITCZ (Intertropical Convergence Zone) - near equator, low pressure, converging trade winds",
+            "Horse latitudes - 30°N/S, high pressure belts, subsiding air, calm winds, deserts form here",
+            "Subpolar low-pressure belts - 60°N/S, low pressure, converging westerlies and polar easterlies",
+            "Polar high-pressure region - poles, descending air, clear skies, divergent polar easterlies",
+            "Trade winds - consistent winds from 30° to equator, NE in Northern Hemisphere, SE in Southern",
+            "Westerlies - winds from 30-60°, SW in Northern Hemisphere, NW in Southern Hemisphere",
+            "Polar easterlies - winds from poles to 60°, E direction at both poles",
+            "Jet streams - narrow high-speed wind bands at tropopause, subtropical (27-30°) and polar (60°) jets",
+            "Monsoon winds - seasonal wind reversal, driven by differential heating of land and ocean"
+          ],
+          "important_diagrams": [
+            "Pressure zones at different latitudes - ITCZ, horse latitudes, subpolar, polar",
+            "Wind belts - trade winds, westerlies, polar easterlies, isobars",
+            "High and low pressure systems - anticyclone and cyclone structures",
+            "Coriolis effect - deflection of winds, circular motion of pressure systems",
+            "Buys Ballot's Law - relationship between wind and pressure",
+            "Jet stream positions - subtropical and polar jets",
+            "Monsoon circulation - seasonal reversal pattern",
+            "Pressure gradient and wind relationship - isobar spacing",
+            "Upper-level and surface pressure patterns - differences"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 3,
+          "map_work": "Mark ITCZ position (January and July), pressure belts (high and low), trade wind and westerly wind zones, jet stream positions, monsoon directions, pressure systems"
+        },
+        {
+          "topic_id": "T3_5",
+          "topic_name": "Humidity, Condensation & Precipitation",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 5",
+            "chapter_name": "Humidity and Precipitation"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 11,
+            "chapter_name": "Water in the Atmosphere"
+          },
+          "key_concepts": [
+            "Water vapor - gaseous form of water, source of all precipitation, invisible",
+            "Humidity - amount of water vapor in air, measured as absolute or relative humidity",
+            "Absolute humidity - mass of water vapor per unit volume, g/m³, increases with temperature",
+            "Relative humidity - ratio of actual vapor pressure to saturation vapor pressure, expressed in %",
+            "Dew point - temperature at which air becomes saturated (RH = 100%), depends on moisture content",
+            "Saturation vapor pressure - maximum vapor pressure at given temperature, increases exponentially",
+            "Condensation - phase change from vapor to liquid when air cools below dew point",
+            "Hygroscopic nuclei - particles (dust, salt, smoke) on which condensation begins",
+            "Cloud formation - adiabatic cooling, orographic lifting, frontal lifting, convergence",
+            "Lapse rates and cloud formation - ELR vs SALR determines stability",
+            "Precipitation - water in liquid or solid form falling from clouds",
+            "Convectional precipitation - thunderstorms from surface heating, afternoon peak",
+            "Orographic precipitation - air forced upward by mountains, windward side wet, leeward dry",
+            "Cyclonic precipitation - frontal systems, warm and cold fronts",
+            "Precipitation types - rain, snow, sleet, hail, freezing rain",
+            "Acid rain - precipitation with pH <5.6, from SO2 and NOx pollution"
+          ],
+          "important_diagrams": [
+            "Humidity definitions - absolute, relative, saturation vapor pressure",
+            "Dew point and relative humidity relationship with temperature",
+            "Adiabatic cooling and cloud formation - DALR and SALR",
+            "Stability and instability - ELR vs lapse rates",
+            "Cloud types - cumulus, stratus, cirrus, cumulonimbus formations",
+            "Condensation process - nucleation and droplet growth",
+            "Convectional precipitation diagram - heating and updrafts",
+            "Orographic precipitation - windward and leeward slopes",
+            "Cyclonic/frontal precipitation - warm and cold front structures",
+            "Precipitation types - rain, snow, sleet, hail formation conditions",
+            "Annual precipitation world map - distribution patterns"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark wettest regions, arid regions, orographic precipitation areas (windward mountains), monsoon precipitation patterns, cyclone tracks, snowfall regions"
+        },
+        {
+          "topic_id": "T3_6",
+          "topic_name": "Cyclones, Anticyclones & Climate Anomalies",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 6",
+            "chapter_name": "Atmospheric Disturbances"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 10,
+            "chapter_name": "Atmospheric Circulation and Weather Systems"
+          },
+          "key_concepts": [
+            "Cyclone definition - low-pressure system, converging winds, rotating motion",
+            "Anticyclone definition - high-pressure system, diverging winds, clear weather",
+            "Temperate/mid-latitude cyclone - frontal system, 1000-2000 km diameter, 3-5 days duration",
+            "Cold front - boundary where cold air mass advances, clouds, precipitation",
+            "Warm front - boundary where warm air mass advances, gradual lifting, drizzle",
+            "Occluded front - overlap of cold and warm fronts in mature cyclone",
+            "Tropical cyclone - storm over warm tropical ocean, warm core, rotating thunderstorms",
+            "Tropical cyclone requirements - SST >26.5°C, Coriolis force, low wind shear, high humidity",
+            "Typhoon/Cyclone/Hurricane - same phenomenon, different regional names",
+            "Saffir-Simpson scale - hurricane wind speed and damage classification",
+            "Eye of hurricane - calm center, extreme pressure drop, surrounded by eyewall",
+            "El Niño - warm oceanic phase of ENSO, reduced upwelling, global climate impacts",
+            "La Niña - cold oceanic phase of ENSO, enhanced upwelling, opposite impacts",
+            "ENSO (El Niño Southern Oscillation) - Pacific oscillation affecting global weather",
+            "Indian Ocean Dipole (IOD) - Indian Ocean warm-cold dipole affecting monsoon"
+          ],
+          "important_diagrams": [
+            "Temperate cyclone structure - isobars, fronts, cloud bands, wind direction",
+            "Cold front symbol and associated weather",
+            "Warm front symbol and associated weather",
+            "Occluded front formation and weather",
+            "Tropical cyclone structure - eye, eyewall, spiral rain bands",
+            "Tropical cyclone formation requirements - SST, latitude, wind shear",
+            "Saffir-Simpson scale - wind speed categories",
+            "Hurricane track prediction - typical paths in Atlantic and Pacific",
+            "ENSO phases - warm, neutral, cold states and global impacts",
+            "IOD index - positive and negative phases",
+            "Climate anomaly maps - temperature and precipitation anomalies"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark tropical cyclone formation zones, typical tracks (Atlantic, Pacific, Indian Ocean), temperate cyclone tracks, ENSO-affected regions, IOD influence areas, climate anomaly hotspots"
+        },
+        {
+          "topic_id": "T3_7",
+          "topic_name": "Köppen Climate Classification",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 7",
+            "chapter_name": "Climate Classification"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 12,
+            "chapter_name": "World Climate and Weather"
+          },
+          "key_concepts": [
+            "Köppen classification - empirical climate classification using temperature and precipitation",
+            "Climate zones - 5 major types: A, B, C, D, E (tropical to polar)",
+            "A - Tropical: warm year-round, >18°C mean monthly, examples: Af (rain forest), Am (monsoon), Aw/As",
+            "Af - Tropical Rainforest: >60 mm rain every month, high humidity, Amazon, Congo",
+            "Am - Tropical Monsoon: short dry season, ITCZ influence, Southeast Asia",
+            "Aw/As - Tropical Savanna: distinct dry season, wet summer, Africa, Australia",
+            "B - Arid/Semi-arid: low precipitation, high evaporation, examples: BW (desert), BS (steppe)",
+            "BWh - Hot desert: rain <threshold, >18°C, Sahara, Arabian deserts",
+            "BWk - Cold desert: rain <threshold, <18°C, Gobi, Atacama",
+            "BS - Steppe: intermediate precipitation between desert and humid, transitional climate",
+            "C - Temperate: coldest month -3° to 18°C, examples: Csa (Mediterranean), Cfb (oceanic), Cw (dry winter)",
+            "Csa - Mediterranean: hot dry summer, mild wet winter, California, Mediterranean region",
+            "Cfb - Oceanic: temperate, no dry season, cool summers, marine influence, New Zealand, Scotland",
+            "D - Continental: coldest month <-3°C, examples: Dw (dry winter), Df (wet year-round)",
+            "Dfb - Humid continental: coldest <-3°C, warmest >10°C, 4+ months >10°C, Canada, Russia",
+            "E - Polar: all months <10°C, examples: ET (tundra), EF (ice cap)",
+            "ET - Tundra: 0-10°C warmest month, permafrost, Arctic, Siberia",
+            "EF - Ice cap: all months <0°C, permanent ice, Greenland, Antarctica"
+          ],
+          "important_diagrams": [
+            "Köppen climate zones - world map with all major zones colored",
+            "Climograph examples for each major climate type - temperature and precipitation curves",
+            "Climate classification criteria - temperature and precipitation thresholds",
+            "A zones - Af, Am, Aw distribution on map",
+            "B zones - BW and BS boundaries and distribution",
+            "C zones - Csa, Cfb, Cw distribution on map",
+            "D zones - Dfb and other continental distribution",
+            "E zones - ET and EF at poles",
+            "Vegetation-climate relationship - climate determines biome type",
+            "Altitudinal climate zones - mountain climate variations"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 3,
+          "map_work": "Mark all Köppen climate zones on world map, identify boundaries, major cities in each zone, climate transitions, examples of each type (Af-Amazon, BSk-steppes, Csa-Mediterranean, Dfb-continental, ET-tundra, EF-ice caps)"
+        },
+        {
+          "topic_id": "T3_8",
+          "topic_name": "Climate Change: Causes, Effects & Feedback",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 8",
+            "chapter_name": "Climate Change"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit IV",
+            "unit_name": "Climate",
+            "chapter": 12,
+            "chapter_name": "World Climate and Weather"
+          },
+          "key_concepts": [
+            "Climate change - long-term shift in mean temperature, precipitation, wind patterns",
+            "Natural causes - solar variations, orbital cycles, volcanic eruptions, ocean circulation",
+            "Anthropogenic causes - greenhouse gas emissions (CO2, CH4, N2O), deforestation, industrialization",
+            "CO2 sources - fossil fuel combustion (coal, oil, gas), cement production, deforestation",
+            "Greenhouse gas concentrations - CO2 rising from 280 ppm (pre-industrial) to 420+ ppm (2023)",
+            "Enhanced greenhouse effect - increased atmospheric CO2 traps more longwave radiation",
+            "Global warming - increase in mean global temperature, ~1.1°C above pre-industrial",
+            "Temperature projections - 1.5-4°C increase by 2100 depending on emissions scenario",
+            "Impacts on ice - melting glaciers, polar ice sheets, permafrost thaw, sea level rise",
+            "Sea level rise - thermal expansion of ocean water and ice sheet melting, 3-4 mm/year",
+            "Precipitation changes - altered patterns, intensity increases, monsoon modifications",
+            "Feedback mechanisms - positive (albedo, water vapor, carbon cycle) and negative feedbacks",
+            "Albedo feedback - less ice means lower albedo, more heat absorption, accelerates warming",
+            "Water vapor feedback - warmer air holds more vapor, increases greenhouse effect, positive feedback",
+            "Permafrost thaw - releases CO2 and CH4, accelerates warming, irreversible feedback"
+          ],
+          "important_diagrams": [
+            "Global temperature anomaly trend - showing recent rapid warming",
+            "CO2 concentration increase - ice core and direct measurements",
+            "Greenhouse gas sources - pie chart showing contributions",
+            "Temperature projections - IPCC scenarios for different emissions pathways",
+            "Sea level rise - historical and projected curves",
+            "Albedo feedback diagram - ice loss and surface heating",
+            "Carbon cycle perturbations - anthropogenic additions",
+            "Impacts of climate change - temperature, precipitation, ice sheets, biodiversity",
+            "Permafrost extent - current and projected loss",
+            "Feedback mechanisms - positive and negative loop diagrams"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark regions experiencing severe climate change effects (high mountain glaciers, Arctic, permafrost zones), sea level rise vulnerable coasts, climate-sensitive ecosystems, industrial emission hotspots"
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_4",
+      "module_name": "Oceanography & Water Systems",
+      "module_number": 4,
+      "estimated_hours": 30,
+      "estimated_days": 15,
+      "module_test": {
+        "type": "MCQ + Descriptive",
+        "duration_minutes": 90,
+        "questions": 30
+      },
+      "revision_tasks": {
+        "day_1": "Ocean relief features - continental shelf, slope, abyssal plain, trenches",
+        "day_2": "Ocean currents - warm and cold currents, major currents globally",
+        "day_3": "Tides, waves, coral reefs - formation and types",
+        "day_4": "Full mock test - oceanography"
+      },
+      "topics": [
+        {
+          "topic_id": "T4_1",
+          "topic_name": "Ocean Relief & Submarine Topography",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 14",
+            "chapter_name": "Oceanography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 13,
+            "chapter_name": "Water on Earth"
+          },
+          "key_concepts": [
+            "Ocean floor morphology - divided into continental margin, ocean basin, mid-ocean ridge",
+            "Continental shelf - gently sloping submerged margin of continent, 200 m depth, sediment accumulation",
+            "Shelf break - boundary between shelf and slope at ~200 m depth",
+            "Continental slope - steep descent from shelf to abyssal plain, 200-3000 m, sediment gravity flows",
+            "Continental rise - gentle slope at base of margin, coalesces slopes, submarine fan deposits",
+            "Abyssal plain - vast flat area at ~4000-5000 m depth, deepest ocean parts",
+            "Abyssal hills - low ridges on abyssal plain, sediment draped, few hundred meters high",
+            "Ocean trenches - deepest depressions, >6000 m, associated with subduction zones",
+            "Mariana Trench - deepest at ~11,000 m (Challenger Deep), western Pacific",
+            "Mid-ocean ridges - underwater mountain chains at divergent boundaries, 2500-3000 m depth",
+            "Ridge system length - 65,000 km globally, continuous underwater mountain range",
+            "Rift valley - depression along ridge axis, graben structure, seafloor spreading",
+            "Seamounts - isolated underwater mountains, volcanic origin, >1000 m elevation",
+            "Guyots - flat-topped seamounts, truncated by wave erosion, subsided below wave base",
+            "Hydrothermal vents - hot water and mineral discharge, 200-400°C, chemosynthetic ecosystem"
+          ],
+          "important_diagrams": [
+            "Ocean floor cross-section - continental margin to abyssal plain",
+            "Continental shelf, slope, and rise profile",
+            "Submarine canyon cross-section - cutting shelf and slope",
+            "Abyssal plain with abyssal hills - topographic features",
+            "Ocean trench - subduction zone association",
+            "Mid-ocean ridge anatomy - rift valley and volcanic features",
+            "Seamount and guyot compared",
+            "Black smoker hydrothermal vent structure",
+            "Ocean floor age map - seafloor spreading evidence",
+            "3D visualization of major submarine features"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 1.5,
+          "map_work": "Mark continental shelves (productive fishing areas), major ocean trenches (Mariana, Tonga, Kuril), mid-ocean ridge system, major seamounts and guyots, submarine canyons"
+        },
+        {
+          "topic_id": "T4_2",
+          "topic_name": "Ocean Temperature, Salinity & Density",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 14",
+            "chapter_name": "Oceanography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 13,
+            "chapter_name": "Water on Earth"
+          },
+          "key_concepts": [
+            "Ocean temperature - varies with depth, latitude, season, affects density and circulation",
+            "Surface temperature - maximum in tropics (>25°C), decreases toward poles (<0°C)",
+            "Thermocline - zone of rapid temperature change, typically 200-1000 m depth",
+            "Deep water - near 0°C in abyssal depths, formed in polar regions",
+            "Temperature profile - surface warm, thermocline transition, abyssal cold",
+            "Salinity - total dissolved salt content, average 35 ppt (practical salinity units)",
+            "Factors affecting salinity - evaporation (increases), precipitation (decreases), river inflow (decreases)",
+            "Regional salinity variation - high in evaporative regions (Red Sea >41 ppt), low near river mouths",
+            "Halocline - zone of rapid salinity change, typically coincides with thermocline",
+            "Deep-water salinity - relatively uniform 34-35 ppt, formed by water mass mixing",
+            "Density stratification - density increases with depth, stability prevents mixing",
+            "Thermocline depth variation - shallower in tropics, deeper in high latitudes",
+            "Water mass types - classified by T-S characteristics, NADW, AABW, etc.",
+            "Isopycnal - surface of equal density, controls water mass boundaries",
+            "Deep water formation - sinking in polar regions, density-driven conveyor"
+          ],
+          "important_diagrams": [
+            "Ocean temperature profile - surface warm to abyssal cold",
+            "Thermocline location and depth variation with latitude",
+            "Salinity profile - surface salinity layer, halocline, deep uniform salinity",
+            "T-S diagram - classification of water masses",
+            "Density profile - stratification in water column",
+            "Global surface temperature distribution - warmest equator, coldest poles",
+            "Global surface salinity distribution - high evaporative regions, river mouths",
+            "Vertical sections - temperature, salinity, density together",
+            "Seasonal temperature variation - thermocline depth changes"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 1.5,
+          "map_work": "Mark surface temperature distribution (January and July), high salinity regions, river mouths with low salinity, areas of deep water formation (Weddell Sea, Labrador Sea)"
+        },
+        {
+          "topic_id": "T4_3",
+          "topic_name": "Ocean Currents & Water Mass Movement",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 14",
+            "chapter_name": "Oceanography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 14,
+            "chapter_name": "Movements of Ocean Water"
+          },
+          "key_concepts": [
+            "Ocean current definition - continuous movement of water in definite direction",
+            "Warm currents - higher temperature, flow from equator toward poles",
+            "Cold currents - lower temperature, flow from poles toward equator",
+            "Surface currents - driven by wind, largest effect on upper 100-200 m",
+            "Deep currents - driven by density differences, thermohaline circulation",
+            "Ekman spiral - changing current direction with depth due to Coriolis effect",
+            "Gulf Stream - warm current, Florida to Newfoundland, part of Atlantic gyre",
+            "North Atlantic Drift - continuation of Gulf Stream, warms Western Europe",
+            "Labrador Current - cold Arctic water, moderates Eastern North American climate",
+            "Kuroshio Current - warm western boundary current, off Japan",
+            "Oyashio Current - cold current, off Russia, affects fishing",
+            "Humboldt/Peru Current - cold upwelling current, Peru-Chile coast, rich fishery, ENSO influence",
+            "Benguela Current - cold current, South Africa coast, upwelling support fishery",
+            "Agulhas Current - warm Indian Ocean current, circumpolar route",
+            "Antarctic Circumpolar Current - only current crossing ocean basins, no continental barrier",
+            "Thermohaline circulation - global conveyor, deep water formation and transport"
+          ],
+          "important_diagrams": [
+            "Surface ocean current map - global circulation patterns",
+            "Gyres - subtropical rotating systems in each ocean basin",
+            "Western boundary currents - Gulf Stream, Kuroshio, Brazil, Agulhas",
+            "Eastern boundary currents - cold upwelling currents",
+            "Ekman spiral - current direction rotation with depth",
+            "Thermohaline circulation - global conveyor belt path",
+            "Atlantic Meridional Overturning Circulation (AMOC) - north-south meridional flow",
+            "Upwelling areas - Peru, Benguela, California coasts",
+            "Temperature and salinity effects on density and circulation",
+            "Climate influence of ocean currents - Western Europe warming by North Atlantic Drift"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2.5,
+          "map_work": "Mark all major ocean currents (warm: Gulf Stream, Kuroshio, Agulhas, Brazil; cold: Labrador, Oyashio, Humboldt, Benguela, California), gyres, upwelling zones, divergences, Antarctic Circumpolar Current"
+        },
+        {
+          "topic_id": "T4_4",
+          "topic_name": "Waves, Tides & Tsunamis",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 14",
+            "chapter_name": "Oceanography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 14,
+            "chapter_name": "Movements of Ocean Water"
+          },
+          "key_concepts": [
+            "Waves - periodic oscillations of water surface, generated primarily by wind friction",
+            "Wave anatomy - crest, trough, wavelength, wave height, period, frequency",
+            "Wave velocity - speed of wave propagation, related to wavelength and period",
+            "Orbital motion - water particles move in circular paths, energy transfers, water doesn't move",
+            "Wave refraction - waves bend in shallow water due to bottom friction, focus on headlands",
+            "Wave breaking - occurs when depth = 1.3 × wave height, creates whitecap",
+            "Surf zone - area between breaker line and shore, turbulent water",
+            "Swash and backswash - water movement up and down beach, sediment transport",
+            "Swell - long-wavelength waves from distant storms, propagate far",
+            "Tsunamis - long-wavelength waves generated by earthquakes or landslides",
+            "Tsunami speed - 700+ km/hr in deep water, slows in shallow water",
+            "Tsunami characteristics - small in deep water, amplify in shallow water, destructive",
+            "Tides - regular rise and fall of sea level due to gravitational attraction of Moon and Sun",
+            "Tidal range - difference between high and low tide, spring tide (large), neap tide (small)",
+            "Semidiurnal tide - two high and low tides per lunar day (~24.8 hours)"
+          ],
+          "important_diagrams": [
+            "Wave anatomy - crest, trough, wavelength, wave height labeled",
+            "Wave refraction around headland and in bay",
+            "Orbital motion in deep and shallow water",
+            "Wave breaking sequence - shoaling, spilling, plunging",
+            "Tsunami propagation - shallow water amplification",
+            "Tidal forces - Moon and Sun gravitational pulls",
+            "Spring tide - Moon, Earth, Sun alignment",
+            "Neap tide - Moon, Earth, Sun at right angles",
+            "Semidiurnal vs diurnal tide patterns",
+            "Tidal current prediction - max current at mid-tide",
+            "Bore/tidal bore - upstream propagating tidal wave in rivers"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Mark major tsunami zones (Subduction zones), high tidal range areas (Bay of Fundy, Severn Estuary), tidal bore rivers (Amazon, Severn), wave-dominated coasts"
+        },
+        {
+          "topic_id": "T4_5",
+          "topic_name": "Coral Reefs: Formation, Types & Ecology",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 14",
+            "chapter_name": "Oceanography"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit V",
+            "unit_name": "Water",
+            "chapter": 13,
+            "chapter_name": "Water on Earth"
+          },
+          "key_concepts": [
+            "Coral reef definition - rocky structures built by coral polyps, limestone skeleton",
+            "Scleractinian corals - hard corals with calcium carbonate skeletons, reef builders",
+            "Zooxanthellae - symbiotic algae in coral tissue, provide energy through photosynthesis",
+            "Coral growth requirements - warm water (20-29°C optimal), shallow sunlit water, clear water, moderate salinity",
+            "Fringing reef - reef attached directly to shore, narrow shallow lagoon",
+            "Barrier reef - reef parallel to shore with deeper lagoon, separated from shore",
+            "Atoll - ring-shaped reef with central lagoon, formed in deep ocean, Darwin's subsidence theory",
+            "Reef zonation - forereef slope (deep), reef crest (shallowest), reef flat, lagoon",
+            "Reef biodiversity - thousands of species, fish, mollusks, crustaceans, algae",
+            "Coral bleaching - symbiont expulsion from stress, linked to temperature anomalies",
+            "Bleaching causes - high temperature, low salinity, pollution, disease",
+            "Reef distribution - limited to tropical shallow oceans, 20°N-20°S generally",
+            "Major reefs - Great Barrier Reef, Mesoamerican Reef, Coral Triangle",
+            "Reef threats - climate change, ocean acidification, pollution, overfishing",
+            "Conservation - marine protected areas, restoration, management practices"
+          ],
+          "important_diagrams": [
+            "Fringing reef cross-section - shore to deep water",
+            "Barrier reef cross-section - reef crest, lagoon, forereef slope",
+            "Atoll formation sequence - Darwin's subsidence theory three stages",
+            "Reef zonation - different zones and coral/organism distribution",
+            "Coral polyp anatomy - tentacles, mouth, zooxanthellae",
+            "Bleaching process - symbiont loss diagram",
+            "Global coral reef distribution map",
+            "Reef biodiversity - major organism groups",
+            "Reef ecosystem relationships - food web, competition, symbiosis"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 1.5,
+          "map_work": "Mark major coral reefs (Great Barrier Reef, Mesoamerican, Coral Triangle, Red Sea, Indian Ocean), coral bleaching hotspots, reef distribution boundaries, conservation areas"
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_5",
+      "module_name": "Soils, Biogeography & Biodiversity",
+      "module_number": 5,
+      "estimated_hours": 30,
+      "estimated_days": 15,
+      "module_test": {
+        "type": "MCQ + Descriptive",
+        "duration_minutes": 90,
+        "questions": 30
+      },
+      "revision_tasks": {
+        "day_1": "Soil formation factors - CLORPT, soil profile horizons",
+        "day_2": "Soil types - zonal, intrazonal, azonal with regional examples",
+        "day_3": "Biomes - tropical rainforest, savanna, desert, temperate, taiga, tundra",
+        "day_4": "Biodiversity hotspots and conservation",
+        "day_5": "Full mock test - soils and biogeography"
+      },
+      "topics": [
+        {
+          "topic_id": "T5_1",
+          "topic_name": "Soil Formation & Soil Profile",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 15",
+            "chapter_name": "Soils"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 15,
+            "chapter_name": "Life on the Earth"
+          },
+          "key_concepts": [
+            "Soil definition - mixture of weathered rock fragments, organic matter, water, air",
+            "CLORPT model - Cl (Climate), O (Organism), R (Relief), P (Parent material), T (Time)",
+            "Climate factor - temperature and precipitation control weathering and biological activity",
+            "Organism factor - vegetation, fauna, microorganisms contribute organic matter",
+            "Relief factor - slope angle affects drainage, water availability, erosion rate",
+            "Parent material - source rock type affects soil composition and properties",
+            "Time factor - soil develops over centuries to millennia, age affects maturity",
+            "Soil horizons - O, A, B, C, D layers with distinct characteristics",
+            "O horizon - organic layer, decomposing plant and animal material, surface layer",
+            "A horizon - topsoil, organic-rich, humus content, darker color, maximum biological activity",
+            "B horizon - subsoil, accumulation of clay and iron oxides, leached from A horizon",
+            "C horizon - weathered parent material, less altered than B, larger rock fragments",
+            "D horizon - unweathered bedrock, bottom of soil profile",
+            "Soil texture - proportion of sand, silt, clay, affects water retention and drainage",
+            "Soil structure - arrangement of soil particles into aggregates, crumbs, blocks, plates",
+            "Soil color - indicates composition and drainage, dark = organic rich, red = iron oxide"
+          ],
+          "important_diagrams": [
+            "CLORPT factors - soil formation controls",
+            "Soil profile - O, A, B, C, D horizons with transitions",
+            "Soil texture triangle - sand, silt, clay percentages",
+            "Soil structure types - granular, platy, blocky, prismatic shapes",
+            "Soil formation sequence - time series showing horizon development",
+            "Weathering rates - climate and parent material effects",
+            "Water infiltration and drainage in different soil types",
+            "Leaching process - water movement and ion transport downward",
+            "Soil color chart - Munsell system or visual reference"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Not directly applicable, but understand soil distribution with climate zones"
+        },
+        {
+          "topic_id": "T5_2",
+          "topic_name": "Soil Classification & Types",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 15",
+            "chapter_name": "Soils"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 15,
+            "chapter_name": "Life on the Earth"
+          },
+          "key_concepts": [
+            "Soil classification - zonal (climate-based), intrazonal (parent material-based), azonal (young)",
+            "Zonal soils - mature soils reflecting climatic conditions, regolith and soil together",
+            "Latosol/Laterite - tropical hot wet climate, highly weathered, iron and aluminum oxides, red color",
+            "Laterite formation - intense weathering, leaching of silica, iron/aluminum oxide concentration",
+            "Laterite characteristics - acidic, low fertility, hard when exposed to air, contains bauxite ore",
+            "Tropical red earth - similar to laterite but less extreme weathering, some nutrient retention",
+            "Chernozem/Black soil - temperate grassland climate, high humus content, dark color, CaCO3 at depth",
+            "Chernozem fertility - excellent fertility, moisture retention, agricultural potential",
+            "Podzol/Podsol - cool temperate forest climate, strong leaching, pale A horizon, iron-rich B horizon",
+            "Podzol characteristics - acidic, low fertility, bleached appearance, waterlogged areas",
+            "Brown earth/Brown forest soil - temperate deciduous forest, moderate weathering, brown color",
+            "Intrazonal soils - determined by local parent material or drainage, less climate-dependent",
+            "Alluvial soil - formed from river alluvium, young, developing soil, variable fertility",
+            "Hydromorphic soil - formed in waterlogged conditions, gley color, poor drainage",
+            "Azonal soils - very young, little weathering, parent material dominates, newborn landscapes"
+          ],
+          "important_diagrams": [
+            "Soil classification hierarchy - zonal, intrazonal, azonal categories",
+            "Latosol profile - leached surface, iron oxide accumulation",
+            "Chernozem profile - high organic matter, CaCO3 layer",
+            "Podzol profile - bleached A horizon, iron-rich B horizon",
+            "Soil distribution with climate zones - map and associations",
+            "Weathering intensity vs latitude - tropical most intense",
+            "Soil fertility by type - comparison chart",
+            "Hydromorphic soil - waterlogged conditions and gley formation",
+            "Alluvial soil - recent river deposits, stratification"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 2,
+          "map_work": "Mark major soil types (Latosol/Laterite - tropics, Chernozem - temperate grasslands, Podzol - cool temperate forests), alluvial soil distribution along major rivers, soil degradation hotspots"
+        },
+        {
+          "topic_id": "T5_3",
+          "topic_name": "Tropical Rainforest Biome",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 16",
+            "chapter_name": "Natural Vegetation and Biomes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 16,
+            "chapter_name": "Biodiversity and Conservation"
+          },
+          "key_concepts": [
+            "Tropical rainforest climate - equatorial location, Af in Köppen, >2000 mm annual rainfall",
+            "Rainforest seasonality - no dry season, constant warmth 25-27°C, high humidity",
+            "Tropical rainforest vegetation - broadleaf evergreen, high canopy, dense understory",
+            "Canopy structure - emergent layer, upper canopy, lower canopy, understory, forest floor",
+            "Biodiversity - highest on Earth, 50%+ of global species, high endemism",
+            "Nutrient cycling - rapid decomposition due to warmth, nutrients locked in vegetation",
+            "Soil characteristics - laterite and latosol, red color, low fertility, acidic, thin organic layer",
+            "Water cycle - high transpiration and precipitation, rapid cycling",
+            "Competition - intense for light, tall trees dominate, epiphytes common",
+            "Animal adaptations - arboreal, nocturnal, camouflage, bright colors warning toxins",
+            "Location - Amazon, Congo, Southeast Asia, Central America",
+            "Threats - deforestation for agriculture, logging, cattle ranching",
+            "Ecological importance - carbon storage, oxygen production, climate regulation",
+            "Indigenous peoples - depend on rainforest resources, traditional knowledge",
+            "Conservation - protected areas, sustainable forestry, REDD+ programs"
+          ],
+          "important_diagrams": [
+            "Tropical rainforest climate graph - evenly distributed high rainfall, warm year-round",
+            "Vertical structure - canopy layers and height distribution",
+            "Typical rainforest trees - examples with heights and canopy positions",
+            "Food web - energy flow from plants to carnivores",
+            "Nutrient cycling - rapid decomposition and plant uptake",
+            "Global distribution - equatorial belt showing rainforests",
+            "Deforestation trends - area loss over time",
+            "Carbon storage - biomass and soil carbon pools",
+            "Biodiversity hotspot - species richness per unit area"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "map_work": "Mark major rainforests (Amazon, Congo, Southeast Asia, Central America, Australia tropical, Madagascar), protected areas, deforestation hotspots, indigenous territories"
+        },
+        {
+          "topic_id": "T5_4",
+          "topic_name": "Savanna, Desert & Mediterranean Biomes",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 16",
+            "chapter_name": "Natural Vegetation and Biomes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 16,
+            "chapter_name": "Biodiversity and Conservation"
+          },
+          "key_concepts": [
+            "Savanna climate - tropical savanna (Aw/As Köppen), distinct wet and dry seasons, 500-1500 mm rainfall",
+            "Savanna vegetation - grassland with scattered trees, acacia common, fire-adapted species",
+            "Savanna characteristics - low rainfall, high evaporation, seasonal flooding, nutrient-poor soil",
+            "Savanna fauna - large herbivores (elephants, zebras, antelopes), predators (lions, leopards), termites",
+            "Savanna location - Africa Sahel, India monsoon region, South America cerrado, Australia outback",
+            "Desert climate - hot arid (BWh) or cold arid (BWk) Köppen, <500 mm annual rainfall, high evaporation",
+            "Desert vegetation - xerophytic adapted, sparse, deep-rooted shrubs, succulents, annuals",
+            "Desert fauna - nocturnal, water conservation, burrowing, heat tolerance",
+            "Desert types - hot desert (Sahara, Arabian), cold desert (Gobi, Atacama), coastal deserts",
+            "Desert soil - thin, low organic matter, high salinity, low water availability",
+            "Mediterranean climate - Csa Köppen, hot dry summer, mild wet winter, 500-1000 mm rainfall",
+            "Mediterranean vegetation - sclerophyll (hard-leaved), drought-resistant, fire-adapted, aromatic",
+            "Mediterranean fauna - similar to temperate regions, endemic species common",
+            "Mediterranean location - Mediterranean region, California, central Chile, South Africa, Australia",
+            "Human modification - agriculture, urbanization, overgrazing, desertification in marginal areas"
+          ],
+          "important_diagrams": [
+            "Savanna climate graph - wet and dry seasons",
+            "Savanna vegetation profile - scattered trees and grass",
+            "Acacia tree adaptations - thorns, shallow roots, small leaves",
+            "Large herbivore migration - seasonal movement patterns",
+            "Desert climate graph - low, erratic rainfall",
+            "Desert vegetation - yucca, saguaro, acacia, Welwitschia",
+            "Desert water storage - root depth, succulent water content",
+            "Desert fauna - adaptations for heat and water conservation",
+            "Mediterranean climate graph - hot dry summer, mild winter",
+            "Mediterranean vegetation - cork oak, maquis shrubland, grasses",
+            "Global distribution - all four biomes mapped"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2,
+          "map_work": "Mark major savannas (African Sahel, Indian monsoon, cerrado, outback), deserts (Sahara, Arabian, Gobi, Atacama, Namib, Kalahari), Mediterranean regions (Mediterranean basin, California, central Chile, South Africa, SW Australia)"
+        },
+        {
+          "topic_id": "T5_5",
+          "topic_name": "Temperate Grassland, Forest & Boreal/Taiga Biomes",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 16",
+            "chapter_name": "Natural Vegetation and Biomes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 16,
+            "chapter_name": "Biodiversity and Conservation"
+          },
+          "key_concepts": [
+            "Temperate grassland climate - Cfb or Cw Köppen, moderate rainfall 500-1000 mm, distinct seasons",
+            "Temperate grassland vegetation - herbaceous (grasses, forbs), no trees due to low moisture or fire",
+            "Temperate grassland fauna - large herbivores (bison, antelope), predators, prairie dogs, insects",
+            "Temperate grassland location - Great Plains USA, Pampas South America, Steppe central Asia, Veld South Africa",
+            "Temperate grassland soil - chernozem, high fertility, dark color, high humus",
+            "Temperate deciduous forest climate - Cfb Köppen, adequate rainfall 750-1500 mm, four distinct seasons",
+            "Deciduous forest vegetation - broadleaf deciduous trees (oak, maple, beech), shrub layer, herbaceous",
+            "Deciduous forest seasonality - deciduous in winter, green in summer, leaf litter decomposition",
+            "Deciduous forest fauna - squirrels, deer, bears, migratory birds, insects",
+            "Deciduous forest location - Eastern North America, Western Europe, Eastern Asia temperate regions",
+            "Temperate forest soil - brown earth, moderate humus, acidic, good fertility",
+            "Boreal/Taiga climate - Dfb or Dfc Köppen, cold winters <-10°C, short summer, 400-1000 mm rainfall",
+            "Boreal forest vegetation - coniferous evergreens (spruce, fir, pine), sparse deciduous birch, aspen",
+            "Boreal forest characteristics - low biodiversity, dense forest, permafrost in soils, acid litter",
+            "Boreal forest fauna - elk, moose, caribou, bears, migratory birds, insects in summer"
+          ],
+          "important_diagrams": [
+            "Temperate grassland climate graph - seasonal variation, moderate rainfall",
+            "Grassland vegetation - no trees due to drought/fire, herbaceous growth",
+            "Bison herds and predator-prey relationships",
+            "Temperate deciduous forest climate graph - four seasons, adequate rainfall",
+            "Forest canopy and understory structure",
+            "Seasonal changes - bare trees winter, full canopy summer",
+            "Deciduous forest fauna - hibernation, migration, adaptation strategies",
+            "Boreal taiga climate graph - cold winter, short summer",
+            "Coniferous forest - dense, tall trees, closed canopy",
+            "Permafrost and boreal soil characteristics",
+            "Global distribution - all three biomes mapped by latitude"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2,
+          "map_work": "Mark temperate grasslands (Great Plains, Pampas, Steppe, Veld), deciduous forests (Eastern North America, Europe, Asia), boreal forests/taiga (Canada, Scandinavia, Russia), permafrost zones"
+        },
+        {
+          "topic_id": "T5_6",
+          "topic_name": "Tundra Biome & Biodiversity Hotspots",
+          "primary_book": {
+            "author": "Savinder Singh",
+            "book_title": "Physical Geography",
+            "chapter": "Chapter 16",
+            "chapter_name": "Natural Vegetation and Biomes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Fundamentals of Physical Geography",
+            "unit": "Unit VI",
+            "unit_name": "Life on Earth",
+            "chapter": 16,
+            "chapter_name": "Biodiversity and Conservation"
+          },
+          "key_concepts": [
+            "Tundra climate - ET Köppen, all months <10°C, <300 mm annual precipitation, extreme cold",
+            "Tundra vegetation - dwarf plants, lichens, mosses, no trees, permafrost limitations",
+            "Permafrost - permanently frozen ground layer, active layer thaws seasonally, depth >300 m",
+            "Tundra characteristics - harsh conditions, short growing season 6-10 weeks, low biodiversity",
+            "Tundra fauna - reindeer/caribou, musk ox, bears, migratory birds, insects in summer, fish",
+            "Tundra location - Arctic polar regions (Arctic islands, northern Canada, Siberia, Greenland)",
+            "Alpine tundra - high mountain areas, similar climate but above tree line, isolated communities",
+            "Biodiversity hotspot - global regions with high endemism and species richness",
+            "Hotspot criteria - 1500+ endemic plant species, <2% intact habitat remaining",
+            "Major hotspots - Tropical Andes, Mesoamerica, Amazon, Atlantic Forest, Madagascar, Tropical Africa",
+            "Hotspot characteristics - biodiversity, high human pressure, urgent conservation need",
+            "Conservation hotspots - megadiverse countries, limited resources, prioritization essential",
+            "Ecosystem services - biodiversity provides food, medicine, climate regulation, flood control",
+            "Threats to biodiversity - habitat loss, climate change, pollution, overexploitation, invasive species",
+            "Conservation strategies - protected areas, sustainable use, restoration, education, enforcement"
+          ],
+          "important_diagrams": [
+            "Tundra climate graph - cold year-round, low precipitation",
+            "Permafrost diagram - permanently frozen layer, active layer thawing",
+            "Tundra vegetation - dwarf plants, lichens, mosses",
+            "Tundra food web - limited species, herbivores and carnivores",
+            "Global tundra distribution - polar regions and high mountains",
+            "Biodiversity hotspot map - global distribution of 35+ hotspots",
+            "Species richness gradient - highest tropics, lowest polar regions",
+            "Endemism patterns - isolated areas have unique species",
+            "Habitat loss trends - deforestation and land conversion",
+            "Conservation priority areas - hotspots with highest threat and value"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2,
+          "map_work": "Mark tundra regions (Arctic, permafrost zones), major biodiversity hotspots (Tropical Andes, Mesoamerica, Amazon, Atlantic Forest, Madagascar, Western Ghats-Sri Lanka, Sundaland, Philippines, Congo Basin), marine hotspots, protected areas"
+        }
+      ]
+    }
+  ],
+  "mains_essay_themes": {
+    "theme_1": "Plate tectonics and its role in shaping Earth's landscape - mountains, volcanoes, earthquakes",
+    "theme_2": "Climate change - causes, impacts, feedback mechanisms, mitigation strategies",
+    "theme_3": "Ocean currents and their influence on climate and fishing - global thermohaline circulation",
+    "theme_4": "Natural hazards and disaster management - earthquakes, volcanoes, cyclones, tsunamis",
+    "theme_5": "Biomes and biogeography - adaptation to climate, distribution patterns, human impact",
+    "theme_6": "Soil formation and degradation - fertility, erosion, desertification, conservation",
+    "theme_7": "Water scarcity and hydrological cycle - groundwater, surface water, monsoon patterns",
+    "theme_8": "Geomorphology and river systems - landform development, erosion cycles, delta formation",
+    "theme_9": "Tropical forests and biodiversity conservation - ecosystem services, deforestation threats",
+    "theme_10": "Coastal geomorphology and marine ecosystems - coral reefs, mangroves, sea-level rise"
+  },
+  "prelims_pyq_pattern": {
+    "frequency": "10-12 questions per year",
+    "difficulty": "Moderate to Difficult",
+    "common_topics": [
+      "Plate boundaries and earthquake distribution",
+      "Ocean currents and climate effects",
+      "Monsoon systems and ENSO",
+      "Tropical cyclones and weather systems",
+      "Biomes and vegetation distribution",
+      "Glacial and periglacial landforms",
+      "River systems and erosion cycles",
+      "Desert and aeolian landforms",
+      "Koppen climate classification",
+      "Biodiversity and endemic species"
+    ],
+    "question_types": [
+      "Map-based location identification",
+      "Multiple correct statements",
+      "Sequence/relationship questions",
+      "Cause-effect associations",
+      "Matching diagrams to processes",
+      "Climate pattern interpretation"
+    ]
+  },
+  "daily_study_schedule": {
+    "standard_preparation_6_months": {
+      "months_1_2": "Modules 1-2: Interior of Earth, Plate Tectonics, Geomorphology",
+      "months_3_4": "Module 3: Atmosphere, Insolation, Climate",
+      "months_5": "Module 4: Oceanography",
+      "month_6": "Module 5: Soils and Biogeography + Revision and Mock Tests"
+    },
+    "intensive_preparation_3_months": {
+      "month_1": "Modules 1-2 compressed + Module 3 beginning",
+      "month_2": "Module 3 completion + Module 4",
+      "month_3": "Module 5 + Comprehensive revision + 10 Mock Tests"
+    },
+    "daily_hours": {
+      "standard": "2.5-3 hours per day",
+      "intensive": "4-5 hours per day"
+    },
+    "weekly_breakdown": {
+      "monday_wednesday_friday": "Concept learning and detailed reading - 3 hours each day",
+      "tuesday_thursday": "Diagram practice and map work - 2.5 hours each day",
+      "saturday": "Module review and concept integration - 3 hours",
+      "sunday": "Weekly mock test or revision - 2-3 hours"
+    }
+  },
+  "study_tips": {
+    "tip_1": "Maps are crucial - practice marking all locations mentioned in every topic",
+    "tip_2": "Diagrams should be drawn from memory regularly - essential for mains and prelims",
+    "tip_3": "Link physical geography to current events - earthquakes, floods, droughts, climate news",
+    "tip_4": "Use NCERT extensively - Official standard for content accuracy and direct quotes",
+    "tip_5": "Practice previous year questions - identify patterns and frequently tested topics",
+    "tip_6": "Memorize key numbers - coordinates of major features, altitude ranges, temperature values",
+    "tip_7": "Understand cause-effect - Why mountains form, why deserts exist, why monsoonal rains",
+    "tip_8": "Relate topics - Plate tectonics → Mountains → Climate → Vegetation → Soil → Biodiversity",
+    "tip_9": "Use atlases extensively - Physical World Atlas, NCERT atlases, thematic maps",
+    "tip_10": "Group similar concepts - All landforms together, all wind patterns together for clarity"
+  },
+  "resources_needed": {
+    "textbooks": [
+      "Savinder Singh - Physical Geography (Main Reference)",
+      "NCERT Class 11 - Fundamentals of Physical Geography (Complete)",
+      "NCERT Class 11 - Practical Work in Geography Part I (Diagrams and Maps)",
+      "NCERT Class 12 - Fundamentals of Human Geography (Supplementary)"
+    ],
+    "atlases": [
+      "Oxford Student Atlas",
+      "NCERT Geography Atlas",
+      "Nelles Map collection for specific regions"
+    ],
+    "digital_tools": [
+      "Google Earth - Virtual exploration of landforms and locations",
+      "Global Maps - Satellite imagery and terrain visualization",
+      "Topographic maps of major regions",
+      "Climate and weather data from NOAA and WMO websites"
+    ],
+    "supplementary": [
+      "PYQ Collections from coaching centers",
+      "Mains answer writing practice (GS Paper I sample answers)",
+      "Magazine articles on current geographical issues",
+      "Documentary films on Earth science topics (BBC, Discovery, National Geographic)"
+    ]
+  }
+}

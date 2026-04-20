@@ -7,17 +7,97 @@ function hashQuestion(questionText) {
   return crypto.createHash("sha256").update(normalized).digest("hex").slice(0, 24);
 }
 
+/** Strip HTML tags for fingerprinting (LLMs often wrap stems in <p>, <b>, etc.). */
+function stripHtmlForFingerprint(html) {
+  return String(html || "").replace(/<[^>]+>/g, " ");
+}
+
 /**
- * Remove duplicate questions within array by questionId (or by hash if missing).
- * Ensures SELECT DISTINCT / shuffle without repetition at insert time.
+ * Normalize text so two visually identical stems (HTML vs plain, extra spaces) dedupe together.
  */
-function dedupeQuestions(questions) {
+function normalizeTextForFingerprint(raw) {
+  let s = stripHtmlForFingerprint(raw);
+  s = s.replace(/&nbsp;/gi, " ").replace(/&[a-z]+;/gi, " ");
+  try {
+    s = s.normalize("NFKC");
+  } catch (_) {}
+  return s.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * Stable key for "same MCQ" within one paper: stem + structured parts + all four options.
+ * Using options avoids collapsing different items that share an intro line only.
+ */
+export function canonicalDedupeKey(q) {
+  if (!q || typeof q !== "object") return "";
+  const stem = normalizeTextForFingerprint(q.question ?? q.questionText ?? "");
+  const ar = q.assertionReason;
+  let arKey = "";
+  if (ar && typeof ar === "object" && (ar.assertion || ar.reason)) {
+    arKey = `${normalizeTextForFingerprint(ar.assertion)}|${normalizeTextForFingerprint(ar.reason)}`;
+  }
+  let matchKey = "";
+  if (q.matchColumns && (q.matchColumns.columnA?.length || q.matchColumns.columnB?.length)) {
+    const a = (q.matchColumns.columnA || []).map((x) => normalizeTextForFingerprint(x)).join(";");
+    const b = (q.matchColumns.columnB || []).map((x) => normalizeTextForFingerprint(x)).join(";");
+    matchKey = `${a}||${b}`;
+  }
+  let tableKey = "";
+  if (q.tableData && (q.tableData.headers?.length || q.tableData.rows?.length)) {
+    const h = (q.tableData.headers || []).map((x) => normalizeTextForFingerprint(x)).join(";");
+    const r = (q.tableData.rows || [])
+      .map((row) => (Array.isArray(row) ? row.map((c) => normalizeTextForFingerprint(c)).join(",") : ""))
+      .join("|");
+    tableKey = `${h}##${r}`;
+  }
+  const opts = q.options || {};
+  const optKey = ["A", "B", "C", "D"].map((k) => normalizeTextForFingerprint(opts[k] ?? "")).join("|");
+  return [stem, arKey, matchKey, tableKey, optKey].filter(Boolean).join("##");
+}
+
+/**
+ * Remove duplicate questions within array by canonical stem+options fingerprint.
+ * Reassigns questionId from the canonical key so IDs stay aligned with dedupe logic.
+ */
+export function dedupeQuestions(questions) {
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
+  const seen = new Set();
+  return questions
+    .filter((q) => {
+      const key = canonicalDedupeKey(q);
+      if (!key) return false;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map((q) => ({
+      ...q,
+      questionId: hashQuestion(canonicalDedupeKey(q)),
+    }));
+}
+
+/**
+ * Stem-level key: catches near-repeat where same concept is asked again with option tweaks.
+ */
+function canonicalStemKey(q) {
+  if (!q || typeof q !== "object") return "";
+  const stem = normalizeTextForFingerprint(q.question ?? q.questionText ?? "");
+  const ar = q.assertionReason;
+  const arKey = ar && typeof ar === "object" ? `${normalizeTextForFingerprint(ar.assertion)}|${normalizeTextForFingerprint(ar.reason)}` : "";
+  return [stem, arKey].filter(Boolean).join("##");
+}
+
+/**
+ * Remove repeated stems in one paper (strictly one variant of same question idea).
+ */
+export function dedupeQuestionsByStem(questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
   const seen = new Set();
   return questions.filter((q) => {
-    const id = q.questionId || hashQuestion(q.question);
-    if (seen.has(id)) return false;
-    seen.add(id);
+    const key = canonicalStemKey(q);
+    if (!key) return false;
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 }
@@ -589,7 +669,7 @@ export const generateFullMockCsatTestQuestions = async () => {
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const deduped = dedupeQuestions(all);
+    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
     const finalQuestions = deduped.slice(0, CSAT_DISPLAY_COUNT);
 
     if (finalQuestions.length === 0) {
@@ -694,7 +774,7 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    const deduped = dedupeQuestions(all);
+    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
     const finalQuestions = deduped.slice(0, PYQ_DISPLAY_COUNT);
 
     if (finalQuestions.length === 0) {
@@ -825,6 +905,10 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
     let testName = isSectional ? "UPSC GS Sectional Mock (50 Q)" : "UPSC Real Prelims Mock";
 
     for (let b = 1; b <= batches; b++) {
+      const fromAll = dedupeQuestionsByStem(dedupeQuestions(all))
+        .map((q) => String(q.question || q.questionText || "").trim().slice(0, 120))
+        .filter(Boolean);
+      const rollingExclude = [...new Set([...excludeSnippets, ...fromAll])].slice(0, 40);
       console.log(`📝 Full mock MIX: generating batch ${b}/${batches} (${perBatch} questions, difficulty=${difficulty})...`);
       const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(
         apiKey,
@@ -832,7 +916,7 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
         perBatch,
         `Part ${b}`,
         difficulty,
-        excludeSnippets,
+        rollingExclude,
         displayCount,
         patternsToInclude
       );
@@ -840,13 +924,13 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
     }
 
-    let deduped = dedupeQuestions(all);
+    let deduped = dedupeQuestionsByStem(dedupeQuestions(all));
     let refill = 0;
     while (deduped.length < displayCount && refill < MIX_MAX_REFILL_BATCHES) {
       const fromDeduped = deduped
         .map((q) => String(q.question || q.questionText || "").trim().slice(0, 120))
         .filter(Boolean);
-      const snippetPool = [...new Set([...excludeSnippets, ...fromDeduped])].slice(0, 28);
+      const snippetPool = [...new Set([...excludeSnippets, ...fromDeduped])].slice(0, 40);
       console.log(
         `📝 Full mock MIX: refill ${refill + 1}/${MIX_MAX_REFILL_BATCHES} (unique so far ${deduped.length}/${displayCount}, need ${displayCount - deduped.length} more)...`
       );
@@ -862,7 +946,7 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
       );
       if (batchTestName) testName = batchTestName;
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
-      deduped = dedupeQuestions(all);
+      deduped = dedupeQuestionsByStem(dedupeQuestions(all));
       refill += 1;
     }
 
@@ -946,7 +1030,6 @@ function normalizeFullMockQuestions(questions) {
         : "moderate";
       const questionType = q.questionType || q.type || "direct";
       const base = {
-        questionId: hashQuestion(questionText),
         subject: q.subject != null && String(q.subject).trim() ? String(q.subject).trim() : undefined,
         difficulty,
         question: questionText,
@@ -970,6 +1053,7 @@ function normalizeFullMockQuestions(questions) {
       }
       if (q.eliminationLogic != null && String(q.eliminationLogic).trim()) base.eliminationLogic = String(q.eliminationLogic).trim();
       if (q.conceptualSource != null && String(q.conceptualSource).trim()) base.conceptualSource = String(q.conceptualSource).trim();
+      base.questionId = hashQuestion(canonicalDedupeKey(base));
       return base;
     })
     .filter(
@@ -1135,7 +1219,7 @@ export const generateFullMockTestQuestions = async ({ subject, patternsToInclude
       const batch = await generateFullMockBatch(apiKey, model, subject, `Part ${b}`, patterns);
       if (batch && batch.length) all.push(...batch);
     }
-    const deduped = dedupeQuestions(all);
+    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
     const questions = deduped.slice(0, SUBJECT_FULL_DISPLAY_COUNT);
 
     if (questions.length === 0) {
@@ -1293,12 +1377,11 @@ function parseAndValidateQuestions(aiContent, count) {
       correct = String(correct).toUpperCase().trim().charAt(0);
       if (["1", "2", "3", "4"].includes(correct)) correct = ["A", "B", "C", "D"][parseInt(correct, 10) - 1];
       if (!["A", "B", "C", "D"].includes(correct)) correct = null;
-      const questionText = String(q.question ?? "").trim();
+      const questionText = String(q.question ?? q.questionText ?? "").trim();
       const difficulty = ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
         ? String(q.difficulty).toLowerCase()
         : "moderate";
-      return {
-        questionId: hashQuestion(questionText),
+      const row = {
         difficulty,
         question: questionText,
         options: optionsObj,
@@ -1306,6 +1389,8 @@ function parseAndValidateQuestions(aiContent, count) {
         explanation: normalizeExplanation(q.explanation),
         patternType: q.pattern || "GENERAL",
       };
+      row.questionId = hashQuestion(canonicalDedupeKey(row));
+      return row;
     })
     .filter(
       (q) =>
@@ -1426,4 +1511,7 @@ export default {
   generateFullMockMixTestQuestions,
   generateFullMockPyoTestQuestions,
   generateFullMockCsatTestQuestions,
+  dedupeQuestions,
+  dedupeQuestionsByStem,
+  canonicalDedupeKey,
 };

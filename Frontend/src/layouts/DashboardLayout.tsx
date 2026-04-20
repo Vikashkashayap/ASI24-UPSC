@@ -388,6 +388,20 @@ export const DashboardLayout = () => {
                 </NavLink>
               </div>
 
+              {!sidebarCollapsed && (
+                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Account
+                  </div>
+                </div>
+              )}
+              <div className="space-y-1">
+                <NavLink to="/profile" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Profile">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Profile</span>}
+                </NavLink>
+              </div>
+
               {/* Communication Section */}
               {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">

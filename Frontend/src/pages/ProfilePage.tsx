@@ -1,295 +1,89 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { User, Mail, Calendar, Award, BookOpen, Target, TrendingUp, Edit2, Save, X } from "lucide-react";
+import { Mail, Phone, MapPin, Target, BookOpen, CalendarDays, Clock3, GraduationCap, User } from "lucide-react";
+
+const FieldRow = ({
+  icon,
+  label,
+  value,
+  theme,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+  theme: "light" | "dark";
+}) => (
+  <div
+    className={`flex items-start gap-3 rounded-lg border p-3 ${
+      theme === "dark" ? "border-slate-200/20 bg-slate-900/20" : "border-slate-200 bg-slate-50"
+    }`}
+  >
+    <div className="mt-0.5">{icon}</div>
+    <div>
+      <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>{label}</p>
+      <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}>
+        {value?.trim() ? value : "Not provided"}
+      </p>
+    </div>
+  </div>
+);
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const { theme } = useTheme();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(user?.name || "");
-
-  const handleSave = () => {
-    // TODO: Implement API call to update user profile
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditedName(user?.name || "");
-    setIsEditing(false);
-  };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4 md:space-y-8 pb-8 px-3 md:px-4 overflow-x-hidden">
-      {/* Enhanced Header - compact on mobile */}
-      <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 border-2 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-indigo-900/20 to-slate-900/90 border-indigo-500/20 shadow-xl shadow-indigo-500/10" 
-          : "bg-gradient-to-br from-white via-indigo-50/30 to-white border-indigo-200/50 shadow-xl shadow-indigo-100/30"
-      }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex items-center gap-2 md:gap-4">
-          <div className={`p-2 md:p-3 rounded-lg md:rounded-xl shrink-0 ${
-            theme === "dark" ? "bg-indigo-500/20" : "bg-indigo-100"
-          }`}>
-            <User className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
+    <div className="mx-auto max-w-5xl space-y-6">
+      <div
+        className={`rounded-2xl border p-6 ${
+          theme === "dark"
+            ? "border-blue-500/20 bg-gradient-to-r from-[#0b1a3b] to-[#0b1530]"
+            : "border-blue-200 bg-gradient-to-r from-white to-blue-50"
+        }`}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/20 text-xl font-bold text-blue-300">
+            {user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
-          <div className="flex flex-col gap-0.5 md:gap-2 min-w-0">
-            <h1 className={`text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-indigo-200 via-indigo-300 to-indigo-400 bg-clip-text text-transparent" 
-                : "from-indigo-600 via-indigo-700 to-indigo-800 bg-clip-text text-transparent"
-            }`}>
-              Profile
-            </h1>
-            <p className={`text-xs md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
-              Manage your account settings and view your progress
-            </p>
+          <div>
+            <h1 className="text-2xl font-bold">{user?.name || "Student Profile"}</h1>
+            <p className="text-sm text-slate-400">{user?.email}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Info Card */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-            theme === "dark" 
-              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-              : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
-          }`}>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
-            <CardHeader className="relative z-10 pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
-                  }`}>
-                    <User className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
-                  </div>
-                  <div>
-                    <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                      Personal Information
-                    </CardTitle>
-                    <CardDescription className="mt-1">Update your profile details</CardDescription>
-                  </div>
-                </div>
-                {!isEditing ? (
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 text-sm py-2 min-h-[44px] touch-manipulation"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                    Edit
-                  </Button>
-                ) : (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={handleSave}
-                      className="flex items-center gap-2 text-sm py-2 min-h-[44px] touch-manipulation"
-                    >
-                      <Save className="w-4 h-4" />
-                      Save
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={handleCancel}
-                      className="flex items-center gap-2 text-sm py-2 min-h-[44px] touch-manipulation"
-                    >
-                      <X className="w-4 h-4" />
-                      Cancel
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Avatar Section */}
-              <div className="flex items-center gap-6">
-                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold ${
-                  theme === "dark" 
-                    ? "bg-gradient-to-br from-purple-600 to-indigo-600 text-white" 
-                    : "bg-gradient-to-br from-purple-100 to-indigo-100 text-purple-700"
-                }`}>
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </div>
-                <div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedName}
-                      onChange={(e) => setEditedName(e.target.value)}
-                      className={`text-xl font-semibold px-3 py-2 rounded-lg border ${
-                        theme === "dark"
-                          ? "bg-slate-800 border-slate-700 text-slate-200"
-                          : "bg-white border-slate-300 text-slate-900"
-                      }`}
-                    />
-                  ) : (
-                    <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                      {user?.name}
-                    </h2>
-                  )}
-                  <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                    UPSC Aspirant
-                  </p>
-                </div>
-              </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className={theme === "dark" ? "border-blue-500/20 bg-[#09162f]" : ""}>
+          <CardHeader>
+            <CardTitle className="text-lg">Account Information</CardTitle>
+            <CardDescription>Basic details from your account</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <FieldRow icon={<User className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Full Name" value={user?.name} theme={theme} />
+            <FieldRow icon={<Mail className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Email" value={user?.email} theme={theme} />
+            <FieldRow icon={<Phone className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Phone" value={user?.phone} theme={theme} />
+            <FieldRow icon={<MapPin className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="City" value={user?.city} theme={theme} />
+          </CardContent>
+        </Card>
 
-              {/* User Details */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${
-                    theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"
-                  }`}>
-                    <Mail className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Email</p>
-                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                      {user?.email}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${
-                    theme === "dark" ? "bg-indigo-900/30" : "bg-indigo-100"
-                  }`}>
-                    <Calendar className={`w-5 h-5 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Member Since</p>
-                    <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                      {new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Study Preferences */}
-          <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-            theme === "dark" 
-              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-cyan-500/20 shadow-lg" 
-              : "bg-gradient-to-br from-white to-cyan-50/20 border-cyan-200/50 shadow-lg"
-          }`}>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
-            <CardHeader className="relative z-10 pb-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
-                  theme === "dark" ? "bg-cyan-500/20" : "bg-cyan-100"
-                }`}>
-                  <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
-                </div>
-                <div>
-                  <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                    Study Preferences
-                  </CardTitle>
-                  <CardDescription className="mt-1">Customize your learning experience</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                    Preferred Subjects
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {["Polity", "History", "Geography", "Economy"].map((subject) => (
-                      <span
-                        key={subject}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                          theme === "dark"
-                            ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
-                            : "bg-purple-100 text-purple-700 border border-purple-300"
-                        }`}
-                      >
-                        {subject}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Stats Sidebar */}
-        <div className="space-y-6">
-          <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full blur-2xl" />
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"
-                  }`}>
-                    <Award className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
-                  </div>
-                  <div>
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Evaluations</p>
-                    <p className={`text-lg font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>0</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-indigo-900/30" : "bg-indigo-100"
-                  }`}>
-                    <BookOpen className={`w-4 h-4 ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`} />
-                  </div>
-                  <div>
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Tests Taken</p>
-                    <p className={`text-lg font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>0</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-teal-900/30" : "bg-teal-100"
-                  }`}>
-                    <Target className={`w-4 h-4 ${theme === "dark" ? "text-teal-400" : "text-teal-600"}`} />
-                  </div>
-                  <div>
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Avg Score</p>
-                    <p className={`text-lg font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>0%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-cyan-900/30" : "bg-cyan-100"
-                  }`}>
-                    <TrendingUp className={`w-4 h-4 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
-                  </div>
-                  <div>
-                    <p className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Progress</p>
-                    <p className={`text-lg font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>0%</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className={theme === "dark" ? "border-blue-500/20 bg-[#09162f]" : ""}>
+          <CardHeader>
+            <CardTitle className="text-lg">UPSC Registration Details</CardTitle>
+            <CardDescription>Data captured during signup</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <FieldRow icon={<Target className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Attempt" value={user?.attempt} theme={theme} />
+            <FieldRow icon={<BookOpen className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Target Year" value={user?.targetYear} theme={theme} />
+            <FieldRow icon={<CalendarDays className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Prep Start Date" value={user?.prepStartDate} theme={theme} />
+            <FieldRow icon={<Clock3 className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Daily Study Hours" value={user?.dailyStudyHours} theme={theme} />
+            <FieldRow icon={<GraduationCap className={`h-4 w-4 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`} />} label="Education Background" value={user?.educationBackground} theme={theme} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
 export default ProfilePage;
-

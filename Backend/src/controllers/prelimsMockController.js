@@ -1,7 +1,14 @@
 import PrelimsMock from "../models/PrelimsMock.js";
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
-import { generateFullMockTestQuestions, generateFullMockMixTestQuestions, generateFullMockPyoTestQuestions, generateFullMockCsatTestQuestions } from "../services/testGenerationService.js";
+import {
+  generateFullMockTestQuestions,
+  generateFullMockMixTestQuestions,
+  generateFullMockPyoTestQuestions,
+  generateFullMockCsatTestQuestions,
+  dedupeQuestions,
+  dedupeQuestionsByStem,
+} from "../services/testGenerationService.js";
 
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
 
@@ -13,6 +20,14 @@ const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment",
 const FULL_LENGTH_MIX_SUBJECT = "Full Length GS Mix";
 const PYQ_MIN_YEAR = 2010;
 const PYQ_MAX_YEAR = 2025;
+
+/** Expected question count after generation (same paper must not contain duplicate MCQs). */
+function requiredPrelimsQuestionCount(mock) {
+  if (mock.isCsat) return 80;
+  const n = parseInt(mock.totalQuestions, 10);
+  if (n === 50 || n === 100) return n;
+  return 100;
+}
 
 const ALLOWED_PATTERNS = [
   "statement_based",
@@ -396,8 +411,19 @@ export const goLivePrelimsMock = async (req, res) => {
       });
     }
 
-    mock.questions = result.questions;
-    mock.totalQuestions = result.questions.length;
+    const needed = requiredPrelimsQuestionCount(mock);
+    const uniqueQuestions = dedupeQuestions(result.questions);
+    if (uniqueQuestions.length < needed) {
+      mock.status = "scheduled";
+      await mock.save();
+      return res.status(500).json({
+        success: false,
+        message: `Only ${uniqueQuestions.length} unique questions after deduplication (${needed} required). Please try again.`,
+      });
+    }
+
+    mock.questions = uniqueQuestions.slice(0, needed);
+    mock.totalQuestions = mock.questions.length;
     if (mock.totalQuestions === 50) {
       mock.durationMinutes = 60;
       mock.totalMarks = 100;
@@ -483,8 +509,16 @@ export const processScheduledPrelimsMocks = async () => {
             ? await generateFullMockMixTestQuestions(mixOpts)
             : await generateFullMockTestQuestions(subjectOpts);
       if (result.success && result.questions && result.questions.length > 0) {
-        mock.questions = result.questions;
-        mock.totalQuestions = result.questions.length;
+        const needed = requiredPrelimsQuestionCount(mock);
+        const uniqueQuestions = dedupeQuestions(result.questions);
+        if (uniqueQuestions.length < needed) {
+          mock.status = "scheduled";
+          await mock.save();
+          console.error(`❌ Prelims Mock ${mock._id}: only ${uniqueQuestions.length} unique questions (${needed} required)`);
+          continue;
+        }
+        mock.questions = uniqueQuestions.slice(0, needed);
+        mock.totalQuestions = mock.questions.length;
         if (mock.totalQuestions === 50) {
           mock.durationMinutes = 60;
           mock.totalMarks = 100;
@@ -658,8 +692,14 @@ export const startPrelimsMockAttempt = async (req, res) => {
     if (mock.status !== "live") {
       return res.status(400).json({ success: false, message: "This mock is not live" });
     }
-    if (!mock.questions || mock.questions.length === 0) {
+    const uniqueQuestions = dedupeQuestionsByStem(dedupeQuestions(mock.questions || []));
+    if (!uniqueQuestions || uniqueQuestions.length === 0) {
       return res.status(400).json({ success: false, message: "Mock has no questions" });
+    }
+    if (uniqueQuestions.length !== mock.questions.length) {
+      mock.questions = uniqueQuestions;
+      mock.totalQuestions = uniqueQuestions.length;
+      await mock.save();
     }
 
     const existing = await Test.findOne({ userId, prelimsMockId: mockId });
@@ -679,7 +719,7 @@ export const startPrelimsMockAttempt = async (req, res) => {
       difficulty: (mock.difficulty && String(mock.difficulty)[0].toUpperCase() + String(mock.difficulty).slice(1)) || "Moderate",
       prelimsMockId: mock._id,
       durationMinutes: mock.durationMinutes,
-      questions: mock.questions.map((q) => ({
+      questions: uniqueQuestions.map((q) => ({
         question: q.question,
         options: q.options,
         correctAnswer: q.correctAnswer,
@@ -693,7 +733,7 @@ export const startPrelimsMockAttempt = async (req, res) => {
         eliminationLogic: q.eliminationLogic,
         conceptualSource: q.conceptualSource,
       })),
-      totalQuestions: mock.questions.length,
+      totalQuestions: uniqueQuestions.length,
     });
     await test.save();
 

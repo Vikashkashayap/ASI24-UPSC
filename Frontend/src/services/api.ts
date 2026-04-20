@@ -166,6 +166,26 @@ export const authAPI = {
   login: async (credentials: any) => {
     return api.post("/api/auth/login", credentials);
   },
+  registerSendOtp: async (payload: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    city?: string;
+    attempt?: string;
+    targetYear?: string;
+    prepStartDate?: string;
+    dailyStudyHours?: string;
+    educationBackground?: string;
+  }) => {
+    return api.post("/api/auth/register/send-otp", payload);
+  },
+  verifyRegisterOtp: async (payload: { email: string; otp: string; password: string }) => {
+    return api.post("/api/auth/register/verify-otp", payload);
+  },
+  resendRegisterOtp: async (payload: { email: string }) => {
+    return api.post("/api/auth/register/resend-otp", payload);
+  },
   changePassword: async (newPassword: string) => {
     return api.post("/api/auth/change-password", { newPassword });
   },
@@ -231,6 +251,8 @@ export const adminAPI = {
     return api.delete(`/api/admin/students/${id}`);
   },
   getMentors: () => api.get("/api/admin/mentors"),
+  resetMentorPassword: (id: string) => api.post(`/api/admin/mentors/${id}/reset-password`),
+  deleteMentor: (id: string) => api.delete(`/api/admin/mentors/${id}`),
 };
 
 /** Human mentor (staff): roster, feedback, analytics — under /api/mentor (distinct from AI chat paths). */

@@ -1,0 +1,1438 @@
+{
+  "meta": {
+    "version": "1.1",
+    "last_updated": "2026-04",
+    "description": "Full UPSC CSE syllabus data structure for MentorsDaily portal — used for AI module generation, syllabus tracker, and standardised module templates.",
+    "pace_multipliers": {
+      "fast": 0.7,
+      "standard": 1.0,
+      "extended": 1.5
+    },
+    "difficulty_levels": ["easy", "medium", "hard", "very_hard"],
+    "importance_levels": ["low", "medium", "high", "critical"],
+    "revision_formula": "estimated_hours * 0.3 = revision_hours"
+  },
+
+  "prelims": {
+
+    "gs_paper_1": {
+      "id": "prelims_gs1",
+      "name": "General Studies Paper I",
+      "total_marks": 200,
+      "total_questions": 100,
+      "subjects": [
+
+        {
+          "id": "pre_history",
+          "name": "History",
+          "estimated_hours": 90,
+          "prelims_weightage_percent": 18,
+          "difficulty": "medium",
+          "importance": "critical",
+          "topics": [
+            {
+              "id": "pre_hist_ancient",
+              "name": "Ancient India",
+              "estimated_hours": 25,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_hist_anc_01", "name": "Prehistoric India — Stone Age, Paleolithic, Mesolithic, Neolithic", "hours": 2 },
+                { "id": "pre_hist_anc_02", "name": "Indus Valley Civilization — Sites, Features, Decline", "hours": 3 },
+                { "id": "pre_hist_anc_03", "name": "Vedic Age — Early & Later Vedic, Rig Veda, Upanishads", "hours": 3 },
+                { "id": "pre_hist_anc_04", "name": "Jainism & Buddhism — Doctrines, Councils, Spread", "hours": 3 },
+                { "id": "pre_hist_anc_05", "name": "Mauryan Empire — Chandragupta, Ashoka, Administration, Decline", "hours": 3 },
+                { "id": "pre_hist_anc_06", "name": "Post-Mauryan — Sungas, Kushanas, Satavahanas, Indo-Greeks", "hours": 2 },
+                { "id": "pre_hist_anc_07", "name": "Gupta Empire — Golden Age, Administration, Culture", "hours": 3 },
+                { "id": "pre_hist_anc_08", "name": "South India — Sangam Age, Cholas, Cheras, Pandyas", "hours": 2 },
+                { "id": "pre_hist_anc_09", "name": "Post-Gupta — Harshavardhana, Chalukyas, Pallavas", "hours": 2 },
+                { "id": "pre_hist_anc_10", "name": "Art, Architecture & Literature of Ancient India", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_hist_medieval",
+              "name": "Medieval India",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_hist_med_01", "name": "Early Medieval — Rajputs, Arab Invasion, Tripartite Struggle", "hours": 2 },
+                { "id": "pre_hist_med_02", "name": "Delhi Sultanate — Slave, Khilji, Tughlaq, Sayyid, Lodi Dynasties", "hours": 4 },
+                { "id": "pre_hist_med_03", "name": "Vijayanagara & Bahmani Kingdoms", "hours": 2 },
+                { "id": "pre_hist_med_04", "name": "Bhakti & Sufi Movements", "hours": 2 },
+                { "id": "pre_hist_med_05", "name": "Mughal Empire — Babur to Aurangzeb, Administration, Culture", "hours": 5 },
+                { "id": "pre_hist_med_06", "name": "Maratha Empire — Shivaji, Peshwas, Decline", "hours": 2 },
+                { "id": "pre_hist_med_07", "name": "Medieval Art, Architecture, Literature, Music", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_hist_modern",
+              "name": "Modern India",
+              "estimated_hours": 30,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_hist_mod_01", "name": "European Arrival — Portuguese, Dutch, British, French", "hours": 2 },
+                { "id": "pre_hist_mod_02", "name": "British Expansion — Battles, Subsidiary Alliance, Doctrine of Lapse", "hours": 3 },
+                { "id": "pre_hist_mod_03", "name": "Economic Impact of British Rule", "hours": 2 },
+                { "id": "pre_hist_mod_04", "name": "Revolt of 1857 — Causes, Course, Consequences", "hours": 2 },
+                { "id": "pre_hist_mod_05", "name": "Indian National Congress — Formation, Phases, Leaders", "hours": 3 },
+                { "id": "pre_hist_mod_06", "name": "Rise of Nationalism — Partition of Bengal, Swadeshi", "hours": 2 },
+                { "id": "pre_hist_mod_07", "name": "Gandhian Era — Non-Cooperation, Civil Disobedience, Quit India", "hours": 4 },
+                { "id": "pre_hist_mod_08", "name": "Revolutionary Movements — Bhagat Singh, Revolutionaries", "hours": 2 },
+                { "id": "pre_hist_mod_09", "name": "Constitutional Development — Acts 1773 to 1947", "hours": 3 },
+                { "id": "pre_hist_mod_10", "name": "Social Reform Movements — Ram Mohan Roy, Arya Samaj, etc.", "hours": 2 },
+                { "id": "pre_hist_mod_11", "name": "Partition, Independence & Integration of Princely States", "hours": 3 },
+                { "id": "pre_hist_mod_12", "name": "Press, Education, Peasant & Tribal Movements", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_hist_world",
+              "name": "World History",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "medium",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_hist_wld_01", "name": "Renaissance & Reformation", "hours": 1 },
+                { "id": "pre_hist_wld_02", "name": "Industrial Revolution", "hours": 2 },
+                { "id": "pre_hist_wld_03", "name": "French Revolution & Napoleon", "hours": 2 },
+                { "id": "pre_hist_wld_04", "name": "American Revolution & US History", "hours": 1 },
+                { "id": "pre_hist_wld_05", "name": "World War I — Causes, Events, Treaty of Versailles", "hours": 2 },
+                { "id": "pre_hist_wld_06", "name": "Russian Revolution & Rise of Communism", "hours": 2 },
+                { "id": "pre_hist_wld_07", "name": "World War II — Causes, Events, Aftermath", "hours": 2 },
+                { "id": "pre_hist_wld_08", "name": "Cold War & Decolonization", "hours": 2 },
+                { "id": "pre_hist_wld_09", "name": "Post-Cold War World Order", "hours": 1 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_geography",
+          "name": "Geography",
+          "estimated_hours": 85,
+          "prelims_weightage_percent": 14,
+          "difficulty": "medium",
+          "importance": "critical",
+          "topics": [
+            {
+              "id": "pre_geo_physical",
+              "name": "Physical Geography",
+              "estimated_hours": 25,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_geo_phy_01", "name": "Origin & Evolution of Earth, Solar System", "hours": 2 },
+                { "id": "pre_geo_phy_02", "name": "Interior of Earth — Layers, Seismic Waves", "hours": 2 },
+                { "id": "pre_geo_phy_03", "name": "Plate Tectonics — Theories, Boundaries, Earthquakes, Volcanoes", "hours": 3 },
+                { "id": "pre_geo_phy_04", "name": "Geomorphology — Landforms, Erosion, Deposition", "hours": 3 },
+                { "id": "pre_geo_phy_05", "name": "Atmosphere — Composition, Layers, Temperature, Pressure", "hours": 3 },
+                { "id": "pre_geo_phy_06", "name": "Winds, Cyclones, Anticyclones, Jet Streams", "hours": 2 },
+                { "id": "pre_geo_phy_07", "name": "Precipitation, Clouds, Humidity", "hours": 2 },
+                { "id": "pre_geo_phy_08", "name": "Climate Zones — Koppen Classification", "hours": 2 },
+                { "id": "pre_geo_phy_09", "name": "Oceanography — Currents, Tides, Waves, Salinity", "hours": 3 },
+                { "id": "pre_geo_phy_10", "name": "Soils — Types, Formation, Degradation", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_geo_india",
+              "name": "Indian Geography",
+              "estimated_hours": 30,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_geo_ind_01", "name": "Physical Divisions of India — Mountains, Plateaus, Plains, Islands", "hours": 4 },
+                { "id": "pre_geo_ind_02", "name": "Himalayan System — Formation, Ranges, Passes", "hours": 3 },
+                { "id": "pre_geo_ind_03", "name": "Indian Rivers — Himalayan & Peninsular, Drainage Patterns", "hours": 4 },
+                { "id": "pre_geo_ind_04", "name": "Indian Climate — Monsoon, Seasons, Rainfall Distribution", "hours": 4 },
+                { "id": "pre_geo_ind_05", "name": "Natural Vegetation & Forest Types", "hours": 2 },
+                { "id": "pre_geo_ind_06", "name": "Soils of India — Types, Distribution, Conservation", "hours": 2 },
+                { "id": "pre_geo_ind_07", "name": "Agriculture — Crops, Seasons (Kharif/Rabi/Zaid), Irrigation", "hours": 4 },
+                { "id": "pre_geo_ind_08", "name": "Minerals & Energy Resources — Distribution, Types", "hours": 3 },
+                { "id": "pre_geo_ind_09", "name": "Industries — Location, Types, Industrial Regions", "hours": 2 },
+                { "id": "pre_geo_ind_10", "name": "Transport & Communication — Roads, Railways, Ports, Airports", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_geo_world",
+              "name": "World Geography",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_geo_wld_01", "name": "Continents & Oceans — Physical Features", "hours": 2 },
+                { "id": "pre_geo_wld_02", "name": "World Climate Regions & Biomes", "hours": 3 },
+                { "id": "pre_geo_wld_03", "name": "Major Rivers, Lakes, Mountains of the World", "hours": 3 },
+                { "id": "pre_geo_wld_04", "name": "World Natural Resources — Minerals, Oil, Gas", "hours": 2 },
+                { "id": "pre_geo_wld_05", "name": "Population Distribution & Demographics", "hours": 2 },
+                { "id": "pre_geo_wld_06", "name": "Important Straits, Canals, Water Bodies", "hours": 2 },
+                { "id": "pre_geo_wld_07", "name": "Regional Geography — Africa, Europe, Americas, SE Asia", "hours": 4 },
+                { "id": "pre_geo_wld_08", "name": "Economic Geography — Trade Routes, Ports, SEZs", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_geo_mapping",
+              "name": "Map Work & Places in News",
+              "estimated_hours": 10,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_geo_map_01", "name": "Indian Map — States, Capitals, Districts, Rivers", "hours": 3 },
+                { "id": "pre_geo_map_02", "name": "World Map — Countries, Capitals, Borders", "hours": 3 },
+                { "id": "pre_geo_map_03", "name": "Current Affairs Map-Based Questions", "hours": 4 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_polity",
+          "name": "Indian Polity & Governance",
+          "estimated_hours": 80,
+          "prelims_weightage_percent": 16,
+          "difficulty": "medium",
+          "importance": "critical",
+          "topics": [
+            {
+              "id": "pre_pol_constitution",
+              "name": "Indian Constitution",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_pol_con_01", "name": "Making of Constitution — Constituent Assembly, Committees", "hours": 2 },
+                { "id": "pre_pol_con_02", "name": "Preamble — Features, Amendments (42nd, 44th)", "hours": 2 },
+                { "id": "pre_pol_con_03", "name": "Fundamental Rights — Articles 12-35, Exceptions, Case Laws", "hours": 4 },
+                { "id": "pre_pol_con_04", "name": "Directive Principles & Fundamental Duties", "hours": 2 },
+                { "id": "pre_pol_con_05", "name": "Constitutional Amendments — Procedure, Key Amendments", "hours": 2 },
+                { "id": "pre_pol_con_06", "name": "Schedules of Constitution — All 12 Schedules", "hours": 2 },
+                { "id": "pre_pol_con_07", "name": "Sources of Constitution — Borrowed Features", "hours": 2 },
+                { "id": "pre_pol_con_08", "name": "Key Features — Federal, Secular, Socialist, Democratic", "hours": 2 },
+                { "id": "pre_pol_con_09", "name": "Citizenship — Acquisition, Loss, NRI, OCI", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_pol_union",
+              "name": "Union Government",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_pol_uni_01", "name": "President — Powers, Election, Impeachment", "hours": 3 },
+                { "id": "pre_pol_uni_02", "name": "Vice President, Prime Minister, Council of Ministers", "hours": 3 },
+                { "id": "pre_pol_uni_03", "name": "Parliament — Rajya Sabha, Lok Sabha, Sessions, Bills", "hours": 5 },
+                { "id": "pre_pol_uni_04", "name": "Supreme Court — Jurisdiction, Judicial Review, PILs", "hours": 3 },
+                { "id": "pre_pol_uni_05", "name": "CAG, Attorney General, Solicitor General", "hours": 2 },
+                { "id": "pre_pol_uni_06", "name": "Election Commission — Powers, EVMs, Model Code", "hours": 2 },
+                { "id": "pre_pol_uni_07", "name": "Anti-Defection Law, Whip System", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_pol_state",
+              "name": "State Government & Federalism",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_pol_sta_01", "name": "Governor — Powers, Discretionary, Pocket Veto", "hours": 2 },
+                { "id": "pre_pol_sta_02", "name": "State Legislature — Unicameral, Bicameral, Powers", "hours": 2 },
+                { "id": "pre_pol_sta_03", "name": "High Courts, Subordinate Courts", "hours": 2 },
+                { "id": "pre_pol_sta_04", "name": "Centre-State Relations — Legislative, Administrative, Financial", "hours": 3 },
+                { "id": "pre_pol_sta_05", "name": "Emergency Provisions — National, President's Rule, Financial", "hours": 3 },
+                { "id": "pre_pol_sta_06", "name": "Panchayati Raj — 73rd Amendment, 3-tier Structure", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_pol_bodies",
+              "name": "Constitutional & Non-Constitutional Bodies",
+              "estimated_hours": 15,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_pol_bod_01", "name": "Constitutional Bodies — UPSC, Finance Commission, NCSC, NCST", "hours": 4 },
+                { "id": "pre_pol_bod_02", "name": "Statutory Bodies — CIC, CVC, CBI, NHRC, SEBI, RBI", "hours": 4 },
+                { "id": "pre_pol_bod_03", "name": "Executive Bodies — NITI Aayog, NDC, NEC, ISC", "hours": 4 },
+                { "id": "pre_pol_bod_04", "name": "Tribunals — NGT, SAT, TDSAT", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_pol_governance",
+              "name": "Governance & Social Justice",
+              "estimated_hours": 10,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 1,
+              "subtopics": [
+                { "id": "pre_pol_gov_01", "name": "e-Governance — Digital India, Aadhaar, DBT", "hours": 2 },
+                { "id": "pre_pol_gov_02", "name": "RTI Act, Right to Education, Food Security Act", "hours": 2 },
+                { "id": "pre_pol_gov_03", "name": "Government Schemes — Social Sector, Infrastructure", "hours": 3 },
+                { "id": "pre_pol_gov_04", "name": "Pressure Groups, NGOs, SHGs", "hours": 3 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_economy",
+          "name": "Indian Economy",
+          "estimated_hours": 90,
+          "prelims_weightage_percent": 16,
+          "difficulty": "hard",
+          "importance": "critical",
+          "topics": [
+            {
+              "id": "pre_eco_basics",
+              "name": "Economic Concepts & Basics",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_eco_bas_01", "name": "Micro vs Macro Economics — Demand, Supply, Elasticity", "hours": 3 },
+                { "id": "pre_eco_bas_02", "name": "National Income — GDP, GNP, NNP, NDP, Per Capita", "hours": 3 },
+                { "id": "pre_eco_bas_03", "name": "Economic Systems — Capitalist, Socialist, Mixed", "hours": 2 },
+                { "id": "pre_eco_bas_04", "name": "Poverty, Inequality — Measurements, Committees, Indices", "hours": 3 },
+                { "id": "pre_eco_bas_05", "name": "Unemployment — Types, NSSO, Measurement", "hours": 2 },
+                { "id": "pre_eco_bas_06", "name": "Inflation — Types, WPI, CPI, Control Measures", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_eco_planning",
+              "name": "Planning & Development",
+              "estimated_hours": 10,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 1,
+              "subtopics": [
+                { "id": "pre_eco_pla_01", "name": "Planning in India — Five Year Plans, NITI Aayog", "hours": 3 },
+                { "id": "pre_eco_pla_02", "name": "LPG Reforms 1991 — Liberalisation, Privatisation, Globalisation", "hours": 3 },
+                { "id": "pre_eco_pla_03", "name": "SDGs, Human Development Index, UNDP Reports", "hours": 2 },
+                { "id": "pre_eco_pla_04", "name": "Economic Survey Key Points & Budget Analysis", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_eco_banking",
+              "name": "Money, Banking & Finance",
+              "estimated_hours": 20,
+              "difficulty": "hard",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_eco_ban_01", "name": "RBI — Functions, Monetary Policy Committee, Tools", "hours": 4 },
+                { "id": "pre_eco_ban_02", "name": "Banking System — Commercial, Cooperative, NBFCs, Payments Banks", "hours": 3 },
+                { "id": "pre_eco_ban_03", "name": "Money Market & Capital Market", "hours": 3 },
+                { "id": "pre_eco_ban_04", "name": "SEBI, Stock Markets, Derivatives, Bonds", "hours": 3 },
+                { "id": "pre_eco_ban_05", "name": "Financial Inclusion — Jan Dhan, Mudra, SHG-Bank Linkage", "hours": 2 },
+                { "id": "pre_eco_ban_06", "name": "Cryptocurrency, Digital Currency, UPI, Fintech", "hours": 2 },
+                { "id": "pre_eco_ban_07", "name": "NPA, Bad Banks, IBC, SARFAESI Act", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_eco_fiscal",
+              "name": "Fiscal Policy & Budget",
+              "estimated_hours": 15,
+              "difficulty": "hard",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_eco_fis_01", "name": "Union Budget — Components, Revenue vs Capital", "hours": 3 },
+                { "id": "pre_eco_fis_02", "name": "Taxation — Direct (Income Tax, Corporate Tax), Indirect (GST)", "hours": 4 },
+                { "id": "pre_eco_fis_03", "name": "GST — Structure, Council, Rates, Impact", "hours": 3 },
+                { "id": "pre_eco_fis_04", "name": "Fiscal Deficit, Revenue Deficit, FRBM Act", "hours": 3 },
+                { "id": "pre_eco_fis_05", "name": "Finance Commission — Role, Recent Recommendations", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_eco_external",
+              "name": "External Sector & Trade",
+              "estimated_hours": 15,
+              "difficulty": "hard",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_eco_ext_01", "name": "Balance of Payments — Current, Capital Account", "hours": 3 },
+                { "id": "pre_eco_ext_02", "name": "Foreign Trade Policy — Exports, Imports, FTAs", "hours": 3 },
+                { "id": "pre_eco_ext_03", "name": "FDI, FII, ECBs — Routes, Limits, Sectors", "hours": 3 },
+                { "id": "pre_eco_ext_04", "name": "Exchange Rate — Fixed, Floating, Currency Convertibility", "hours": 2 },
+                { "id": "pre_eco_ext_05", "name": "WTO — Agreements, Dispute, India's Stand", "hours": 2 },
+                { "id": "pre_eco_ext_06", "name": "IMF, World Bank, ADB, AIIB — Functions, India", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_eco_agriculture",
+              "name": "Agriculture & Rural Economy",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_eco_agr_01", "name": "Green Revolution, White Revolution, Blue Revolution", "hours": 2 },
+                { "id": "pre_eco_agr_02", "name": "Agricultural Marketing — MSP, APMC, e-NAM, FPOs", "hours": 3 },
+                { "id": "pre_eco_agr_03", "name": "Land Reforms — Zamindari, Tenancy, Ceiling", "hours": 2 },
+                { "id": "pre_eco_agr_04", "name": "Irrigation — Types, Command Area, Watershed", "hours": 2 },
+                { "id": "pre_eco_agr_05", "name": "Food Security — PDS, NFSA, Buffer Stock", "hours": 3 },
+                { "id": "pre_eco_agr_06", "name": "Government Schemes — PM-KISAN, PMFBY, KCC", "hours": 3 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_environment",
+          "name": "Environment & Ecology",
+          "estimated_hours": 65,
+          "prelims_weightage_percent": 12,
+          "difficulty": "medium",
+          "importance": "critical",
+          "topics": [
+            {
+              "id": "pre_env_ecology",
+              "name": "Ecology Fundamentals",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_env_eco_01", "name": "Ecosystem — Components, Types, Functions, Food Chain", "hours": 3 },
+                { "id": "pre_env_eco_02", "name": "Biogeochemical Cycles — Carbon, Nitrogen, Phosphorus, Water", "hours": 3 },
+                { "id": "pre_env_eco_03", "name": "Population Ecology — Interactions, Succession", "hours": 2 },
+                { "id": "pre_env_eco_04", "name": "Biomes — Tropical, Temperate, Desert, Tundra", "hours": 2 },
+                { "id": "pre_env_eco_05", "name": "Wetlands — Types, Ramsar Sites, Importance", "hours": 2 },
+                { "id": "pre_env_eco_06", "name": "Coral Reefs, Mangroves, Estuaries", "hours": 3 }
+              ]
+            },
+            {
+              "id": "pre_env_biodiversity",
+              "name": "Biodiversity & Conservation",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_env_bio_01", "name": "Types of Biodiversity — Genetic, Species, Ecosystem", "hours": 2 },
+                { "id": "pre_env_bio_02", "name": "Hotspots — India's 4 Hotspots, Global Hotspots", "hours": 2 },
+                { "id": "pre_env_bio_03", "name": "Threatened Species — IUCN Red List, Schedule I-VI", "hours": 3 },
+                { "id": "pre_env_bio_04", "name": "Protected Areas — National Parks, WLS, Tiger Reserves, BRs", "hours": 4 },
+                { "id": "pre_env_bio_05", "name": "In-situ vs Ex-situ Conservation", "hours": 2 },
+                { "id": "pre_env_bio_06", "name": "CBD, CITES, CMS, Nagoya Protocol", "hours": 3 },
+                { "id": "pre_env_bio_07", "name": "Invasive Species, Extinction Crisis, Sixth Mass Extinction", "hours": 2 },
+                { "id": "pre_env_bio_08", "name": "Project Tiger, Project Elephant, Crocodile Project", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_env_climate",
+              "name": "Climate Change & Environmental Issues",
+              "estimated_hours": 20,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_env_cli_01", "name": "Greenhouse Effect, Global Warming, Climate Change", "hours": 3 },
+                { "id": "pre_env_cli_02", "name": "UNFCCC — Kyoto Protocol, Paris Agreement, NDCs", "hours": 3 },
+                { "id": "pre_env_cli_03", "name": "IPCC — Reports, Findings, India's Position", "hours": 2 },
+                { "id": "pre_env_cli_04", "name": "Air Pollution — AQI, Pollutants, Health Effects", "hours": 2 },
+                { "id": "pre_env_cli_05", "name": "Water Pollution — Sources, River Pollution, Treatment", "hours": 2 },
+                { "id": "pre_env_cli_06", "name": "Solid Waste, E-Waste, Plastic Pollution", "hours": 2 },
+                { "id": "pre_env_cli_07", "name": "Ozone Layer — Depletion, Montreal Protocol", "hours": 2 },
+                { "id": "pre_env_cli_08", "name": "Disaster Management — NDMA, Sendai Framework", "hours": 2 },
+                { "id": "pre_env_cli_09", "name": "Desertification, Land Degradation, UNCCD", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_env_laws",
+              "name": "Environmental Laws & Policies",
+              "estimated_hours": 10,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 1,
+              "subtopics": [
+                { "id": "pre_env_law_01", "name": "Environment Protection Act 1986, EIA Notification", "hours": 2 },
+                { "id": "pre_env_law_02", "name": "Wildlife Protection Act 1972 (Amended 2022)", "hours": 2 },
+                { "id": "pre_env_law_03", "name": "Forest Conservation Act, Forest Rights Act", "hours": 2 },
+                { "id": "pre_env_law_04", "name": "National Green Tribunal — Powers, Landmark Cases", "hours": 2 },
+                { "id": "pre_env_law_05", "name": "Coastal Regulation Zone, Wetland Rules", "hours": 2 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_science",
+          "name": "Science & Technology",
+          "estimated_hours": 60,
+          "prelims_weightage_percent": 10,
+          "difficulty": "medium",
+          "importance": "high",
+          "topics": [
+            {
+              "id": "pre_sci_general",
+              "name": "General Science",
+              "estimated_hours": 20,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_sci_gen_01", "name": "Physics — Motion, Waves, Light, Electricity, Magnetism", "hours": 5 },
+                { "id": "pre_sci_gen_02", "name": "Chemistry — Elements, Reactions, Acids, Bases, Polymers", "hours": 5 },
+                { "id": "pre_sci_gen_03", "name": "Biology — Cell, Genetics, Evolution, Photosynthesis", "hours": 5 },
+                { "id": "pre_sci_gen_04", "name": "Human Body — Systems, Diseases, Nutrition, Vitamins", "hours": 5 }
+              ]
+            },
+            {
+              "id": "pre_sci_space",
+              "name": "Space & Defence Technology",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_sci_spa_01", "name": "ISRO — Missions (Chandrayaan, Mangalyaan, Gaganyaan, Aditya-L1)", "hours": 4 },
+                { "id": "pre_sci_spa_02", "name": "Satellites — Types, Orbits, Applications", "hours": 3 },
+                { "id": "pre_sci_spa_03", "name": "Defence — DRDO, BrahMos, Missiles, INS, HAL", "hours": 4 },
+                { "id": "pre_sci_spa_04", "name": "Nuclear Technology — Reactors, Three Stage Programme", "hours": 2 },
+                { "id": "pre_sci_spa_05", "name": "International Space Organisations — NASA, ESA, SpaceX trends", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_sci_emerging",
+              "name": "Emerging Technologies",
+              "estimated_hours": 15,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_sci_eme_01", "name": "Artificial Intelligence, ML, Deep Learning basics", "hours": 2 },
+                { "id": "pre_sci_eme_02", "name": "Blockchain, Cryptocurrency, DeFi", "hours": 2 },
+                { "id": "pre_sci_eme_03", "name": "5G, Internet of Things (IoT), Smart Cities", "hours": 2 },
+                { "id": "pre_sci_eme_04", "name": "Biotechnology — GMO, CRISPR, Stem Cells, Vaccines", "hours": 3 },
+                { "id": "pre_sci_eme_05", "name": "Nanotechnology, Quantum Computing basics", "hours": 2 },
+                { "id": "pre_sci_eme_06", "name": "Cybersecurity — Threats, Data Protection, CERT-In", "hours": 2 },
+                { "id": "pre_sci_eme_07", "name": "Renewable Energy — Solar, Wind, Hydro, Green Hydrogen", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_sci_health",
+              "name": "Health & Disease",
+              "estimated_hours": 10,
+              "difficulty": "easy",
+              "importance": "medium",
+              "revision_sessions": 1,
+              "subtopics": [
+                { "id": "pre_sci_hea_01", "name": "Communicable Diseases — TB, Malaria, Dengue, COVID", "hours": 2 },
+                { "id": "pre_sci_hea_02", "name": "Non-Communicable Diseases — Diabetes, Cancer, CVD", "hours": 2 },
+                { "id": "pre_sci_hea_03", "name": "National Health Mission, Ayushman Bharat, AIIMS", "hours": 2 },
+                { "id": "pre_sci_hea_04", "name": "WHO, Pandemic Preparedness, Vaccine Policy", "hours": 2 },
+                { "id": "pre_sci_hea_05", "name": "Medical Ethics, Clinical Trials, Drug Regulation (CDSCO)", "hours": 2 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_current_affairs",
+          "name": "Current Affairs & Government Schemes",
+          "estimated_hours": 120,
+          "prelims_weightage_percent": 24,
+          "difficulty": "medium",
+          "importance": "critical",
+          "note": "Ongoing — must be updated monthly throughout preparation",
+          "topics": [
+            {
+              "id": "pre_ca_national",
+              "name": "National Affairs",
+              "estimated_hours": 30,
+              "difficulty": "easy",
+              "importance": "critical",
+              "revision_sessions": 4,
+              "subtopics": [
+                { "id": "pre_ca_nat_01", "name": "Parliament Sessions — Bills Passed, Key Debates", "hours": 5 },
+                { "id": "pre_ca_nat_02", "name": "Supreme Court Landmark Judgements", "hours": 5 },
+                { "id": "pre_ca_nat_03", "name": "Elections — State, By-elections, ECI Decisions", "hours": 5 },
+                { "id": "pre_ca_nat_04", "name": "Economic Decisions — RBI Policy, Budget, GDP Data", "hours": 5 },
+                { "id": "pre_ca_nat_05", "name": "Internal Security — Terrorism, Naxalism, Cyber", "hours": 5 },
+                { "id": "pre_ca_nat_06", "name": "Social Issues — Caste, Gender, Reservation, Education", "hours": 5 }
+              ]
+            },
+            {
+              "id": "pre_ca_international",
+              "name": "International Affairs",
+              "estimated_hours": 25,
+              "difficulty": "medium",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_ca_int_01", "name": "India's Foreign Policy — Bilateral Relations", "hours": 5 },
+                { "id": "pre_ca_int_02", "name": "Multilateral Organisations — G20, SCO, BRICS, Quad", "hours": 5 },
+                { "id": "pre_ca_int_03", "name": "Global Conflicts & Peace Processes", "hours": 5 },
+                { "id": "pre_ca_int_04", "name": "Trade Wars, Sanctions, Economic Diplomacy", "hours": 5 },
+                { "id": "pre_ca_int_05", "name": "UN System — General Assembly, Security Council, Agencies", "hours": 5 }
+              ]
+            },
+            {
+              "id": "pre_ca_schemes",
+              "name": "Government Schemes & Programmes",
+              "estimated_hours": 30,
+              "difficulty": "easy",
+              "importance": "critical",
+              "revision_sessions": 3,
+              "subtopics": [
+                { "id": "pre_ca_sch_01", "name": "Agriculture & Rural Schemes — PM-KISAN, MGNREGA, PMAY-G", "hours": 6 },
+                { "id": "pre_ca_sch_02", "name": "Urban & Infrastructure — Smart Cities, AMRUT, PM Gati Shakti", "hours": 5 },
+                { "id": "pre_ca_sch_03", "name": "Education Schemes — NEP 2020, Samagra Shiksha, DIKSHA", "hours": 5 },
+                { "id": "pre_ca_sch_04", "name": "Health Schemes — Ayushman Bharat, NHM, Poshan Abhiyan", "hours": 5 },
+                { "id": "pre_ca_sch_05", "name": "Financial Inclusion — Jan Dhan, MUDRA, Stand-Up India", "hours": 5 },
+                { "id": "pre_ca_sch_06", "name": "Women & Child — Beti Bachao, PMMVY, One Stop Centres", "hours": 4 }
+              ]
+            },
+            {
+              "id": "pre_ca_awards",
+              "name": "Awards, Reports, Indices & Summits",
+              "estimated_hours": 15,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_ca_awd_01", "name": "National Awards — Bharat Ratna, Padma, Gallantry, Nobel", "hours": 3 },
+                { "id": "pre_ca_awd_02", "name": "Global Reports — HDI, Press Freedom, EoDB, WEF Reports", "hours": 4 },
+                { "id": "pre_ca_awd_03", "name": "G20, G7, BRICS, SCO, SAARC Summits", "hours": 4 },
+                { "id": "pre_ca_awd_04", "name": "Sports — Olympics, CWG, India Medals, New Records", "hours": 2 },
+                { "id": "pre_ca_awd_05", "name": "Science & Research — New Discoveries, ISRO Milestones", "hours": 2 }
+              ]
+            },
+            {
+              "id": "pre_ca_art_culture",
+              "name": "Art, Culture & Heritage",
+              "estimated_hours": 20,
+              "difficulty": "easy",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_ca_art_01", "name": "Classical Dances — Bharatanatyam, Kathak, Odissi, Kuchipudi, etc.", "hours": 3 },
+                { "id": "pre_ca_art_02", "name": "Classical Music — Hindustani vs Carnatic, Instruments, Gharanas", "hours": 3 },
+                { "id": "pre_ca_art_03", "name": "Paintings — Miniature, Ajanta, Mughal, Rajput, Madhubani, Warli", "hours": 3 },
+                { "id": "pre_ca_art_04", "name": "Architecture — Temple Styles (Nagara, Dravidian), Cave Art, Stupas", "hours": 3 },
+                { "id": "pre_ca_art_05", "name": "UNESCO Heritage Sites in India", "hours": 2 },
+                { "id": "pre_ca_art_06", "name": "Intangible Cultural Heritage, GI Tags", "hours": 2 },
+                { "id": "pre_ca_art_07", "name": "Fairs, Festivals, Folk Arts of India", "hours": 2 },
+                { "id": "pre_ca_art_08", "name": "Languages — Scheduled Languages, Classical Language Status", "hours": 2 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    "csat": {
+      "id": "prelims_csat",
+      "name": "CSAT — Civil Services Aptitude Test (Paper II)",
+      "total_marks": 200,
+      "qualifying_marks": 66,
+      "note": "Qualifying paper only. Score not counted in merit.",
+      "total_hours": 60,
+      "topics": [
+        {
+          "id": "csat_comprehension",
+          "name": "Reading Comprehension",
+          "estimated_hours": 15,
+          "difficulty": "medium",
+          "importance": "critical",
+          "revision_sessions": 3,
+          "subtopics": [
+            { "id": "csat_comp_01", "name": "Passage Types — Factual, Philosophical, Scientific", "hours": 3 },
+            { "id": "csat_comp_02", "name": "Inference & Assumption Questions", "hours": 4 },
+            { "id": "csat_comp_03", "name": "Tone, Theme, Central Idea", "hours": 3 },
+            { "id": "csat_comp_04", "name": "Vocabulary in Context", "hours": 3 },
+            { "id": "csat_comp_05", "name": "Speed Reading Techniques", "hours": 2 }
+          ]
+        },
+        {
+          "id": "csat_reasoning",
+          "name": "Logical Reasoning & Analytical Ability",
+          "estimated_hours": 20,
+          "difficulty": "hard",
+          "importance": "critical",
+          "revision_sessions": 3,
+          "subtopics": [
+            { "id": "csat_rea_01", "name": "Series — Number, Letter, Figure", "hours": 2 },
+            { "id": "csat_rea_02", "name": "Coding-Decoding, Blood Relations, Direction", "hours": 3 },
+            { "id": "csat_rea_03", "name": "Syllogisms, Statement-Assumption, Conclusion", "hours": 4 },
+            { "id": "csat_rea_04", "name": "Puzzles — Seating Arrangement, Matrix, Floor", "hours": 4 },
+            { "id": "csat_rea_05", "name": "Critical Reasoning — Strengthen, Weaken, Flaw", "hours": 4 },
+            { "id": "csat_rea_06", "name": "Decision Making Scenarios", "hours": 3 }
+          ]
+        },
+        {
+          "id": "csat_maths",
+          "name": "Basic Numeracy & Data Interpretation",
+          "estimated_hours": 20,
+          "difficulty": "medium",
+          "importance": "critical",
+          "revision_sessions": 3,
+          "subtopics": [
+            { "id": "csat_mat_01", "name": "Number System — LCM, HCF, Fractions, BODMAS", "hours": 2 },
+            { "id": "csat_mat_02", "name": "Percentages, Profit & Loss, Simple & Compound Interest", "hours": 3 },
+            { "id": "csat_mat_03", "name": "Ratio, Proportion, Average, Mixture & Alligation", "hours": 3 },
+            { "id": "csat_mat_04", "name": "Time-Work, Time-Speed-Distance", "hours": 3 },
+            { "id": "csat_mat_05", "name": "Data Interpretation — Tables, Bar, Line, Pie Charts", "hours": 5 },
+            { "id": "csat_mat_06", "name": "Permutation & Combination, Probability (basics)", "hours": 2 },
+            { "id": "csat_mat_07", "name": "Geometry & Mensuration (basics)", "hours": 2 }
+          ]
+        },
+        {
+          "id": "csat_interpersonal",
+          "name": "Interpersonal Skills & Communication",
+          "estimated_hours": 5,
+          "difficulty": "easy",
+          "importance": "medium",
+          "revision_sessions": 1,
+          "subtopics": [
+            { "id": "csat_int_01", "name": "Communication Skills — Effective Communication, Barriers", "hours": 3 },
+            { "id": "csat_int_02", "name": "Interpersonal Skill Questions in Passages", "hours": 2 }
+          ]
+        }
+      ]
+    }
+  },
+
+  "mains": {
+
+    "gs_paper_1": {
+      "id": "mains_gs1",
+      "name": "GS Paper I — Indian Heritage, Culture, History, Society & Geography",
+      "total_marks": 250,
+      "word_limit_per_answer": 150,
+      "total_hours": 120,
+      "subjects": [
+        {
+          "id": "mai_gs1_culture",
+          "name": "Indian Heritage & Culture",
+          "estimated_hours": 30,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs1_cul_01", "name": "Indus Valley to Modern — Cultural Continuity", "hours": 5 },
+            { "id": "mai_gs1_cul_02", "name": "Salient aspects of Art Forms — Cave Paintings to Miniatures", "hours": 5 },
+            { "id": "mai_gs1_cul_03", "name": "Architecture — Temple, Mosque, Colonial, Modern", "hours": 5 },
+            { "id": "mai_gs1_cul_04", "name": "Literature — Sanskrit, Regional, Modern Indian Literature", "hours": 5 },
+            { "id": "mai_gs1_cul_05", "name": "Performing Arts — Music, Dance, Theatre", "hours": 5 },
+            { "id": "mai_gs1_cul_06", "name": "Contributions of Indian Diaspora to World Culture", "hours": 5 }
+          ]
+        },
+        {
+          "id": "mai_gs1_history",
+          "name": "Modern Indian History & World History",
+          "estimated_hours": 35,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs1_his_01", "name": "18th Century India — Decline of Mughal, Rise of Regional Powers", "hours": 5 },
+            { "id": "mai_gs1_his_02", "name": "British Expansion & Consolidation — Wars, Treaties", "hours": 5 },
+            { "id": "mai_gs1_his_03", "name": "Economic Impact of British Rule — Drain Theory, Deindustrialisation", "hours": 5 },
+            { "id": "mai_gs1_his_04", "name": "Freedom Struggle — Social Reforms, Mass Movements", "hours": 8 },
+            { "id": "mai_gs1_his_05", "name": "Post-Independence — Consolidation, Language Issues, Integration", "hours": 5 },
+            { "id": "mai_gs1_his_06", "name": "World History — Colonialism, Decolonisation, Cold War, Reunification", "hours": 7 }
+          ]
+        },
+        {
+          "id": "mai_gs1_society",
+          "name": "Indian Society",
+          "estimated_hours": 30,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs1_soc_01", "name": "Salient Features of Indian Society — Diversity, Unity", "hours": 4 },
+            { "id": "mai_gs1_soc_02", "name": "Role of Women — Status, Empowerment, Issues", "hours": 5 },
+            { "id": "mai_gs1_soc_03", "name": "Poverty & Developmental Issues — Urban-Rural Divide", "hours": 5 },
+            { "id": "mai_gs1_soc_04", "name": "Communalism, Regionalism, Secularism", "hours": 4 },
+            { "id": "mai_gs1_soc_05", "name": "Population & Urbanisation — Migration, Slums, Smart Cities", "hours": 5 },
+            { "id": "mai_gs1_soc_06", "name": "Globalisation Effects on Indian Society", "hours": 4 },
+            { "id": "mai_gs1_soc_07", "name": "Social Empowerment — ST, SC, OBC, Minorities", "hours": 3 }
+          ]
+        },
+        {
+          "id": "mai_gs1_geography",
+          "name": "World & Indian Geography",
+          "estimated_hours": 25,
+          "importance": "high",
+          "topics": [
+            { "id": "mai_gs1_geo_01", "name": "Physical Geography — Geomorphology, Climatology, Oceanography", "hours": 8 },
+            { "id": "mai_gs1_geo_02", "name": "Salient Features of World's Physical Geography", "hours": 5 },
+            { "id": "mai_gs1_geo_03", "name": "Indian Physical Geography — Resources, Distribution", "hours": 5 },
+            { "id": "mai_gs1_geo_04", "name": "Important Geophysical Phenomena — Earthquakes, Cyclones, Floods", "hours": 4 },
+            { "id": "mai_gs1_geo_05", "name": "Changes in Critical Geographical Features", "hours": 3 }
+          ]
+        }
+      ]
+    },
+
+    "gs_paper_2": {
+      "id": "mains_gs2",
+      "name": "GS Paper II — Polity, Governance, Constitution, Social Justice & IR",
+      "total_marks": 250,
+      "total_hours": 120,
+      "subjects": [
+        {
+          "id": "mai_gs2_polity",
+          "name": "Indian Constitution & Polity",
+          "estimated_hours": 40,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs2_pol_01", "name": "Constitutional Framework — Salient Features, Comparisons", "hours": 6 },
+            { "id": "mai_gs2_pol_02", "name": "Union & State Legislature — Powers, Functioning, Reforms", "hours": 6 },
+            { "id": "mai_gs2_pol_03", "name": "Executive — President, PM, Cabinet, Governor, CM", "hours": 6 },
+            { "id": "mai_gs2_pol_04", "name": "Judiciary — Independence, Appointments, Reforms", "hours": 6 },
+            { "id": "mai_gs2_pol_05", "name": "Centre-State Relations — Federalism Issues, Cooperative Federalism", "hours": 6 },
+            { "id": "mai_gs2_pol_06", "name": "Constitutional Bodies & Regulatory Authorities", "hours": 5 },
+            { "id": "mai_gs2_pol_07", "name": "Electoral System — Reforms, Electoral Bonds, Campaign Finance", "hours": 5 },
+            { "id": "mai_gs2_pol_08", "name": "Comparison of Indian Constitution with USA, UK, France, Canada, Australia, South Africa — Key Differences in Federal Structure, Rights, Judiciary, Executive", "hours": 6 },
+            { "id": "mai_gs2_pol_09", "name": "Separation of Powers & Checks and Balances — Indian Model vs World Models", "hours": 4 },
+            { "id": "mai_gs2_pol_10", "name": "Dispute Redressal Mechanisms — Tribunals, Lokpal, Ombudsman (India vs World)", "hours": 3 }
+          ]
+        },
+        {
+          "id": "mai_gs2_governance",
+          "name": "Governance & Social Justice",
+          "estimated_hours": 35,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs2_gov_01", "name": "Government Policies — Design, Implementation, Challenges", "hours": 6 },
+            { "id": "mai_gs2_gov_02", "name": "Welfare Schemes — Analysis, Impact Assessment", "hours": 6 },
+            { "id": "mai_gs2_gov_03", "name": "Issues in Governance — Corruption, Transparency, Accountability", "hours": 5 },
+            { "id": "mai_gs2_gov_04", "name": "Citizen Charters, RTI, Social Audit", "hours": 4 },
+            { "id": "mai_gs2_gov_05", "name": "Health, Education Policy — NEP, NHP", "hours": 5 },
+            { "id": "mai_gs2_gov_06", "name": "Vulnerable Sections — SC, ST, Women, Children, Elderly, Disabled", "hours": 5 },
+            { "id": "mai_gs2_gov_07", "name": "Minority Issues, Communal Harmony Mechanisms", "hours": 4 }
+          ]
+        },
+        {
+          "id": "mai_gs2_ir",
+          "name": "International Relations",
+          "estimated_hours": 35,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs2_ir_01", "name": "India's Foreign Policy — Principles, Evolution, Recent Shifts", "hours": 6 },
+            { "id": "mai_gs2_ir_02", "name": "India & Neighbourhood — Pakistan, China, Nepal, Sri Lanka, Bangladesh", "hours": 7 },
+            { "id": "mai_gs2_ir_03", "name": "India & Major Powers — USA, Russia, EU, Japan", "hours": 6 },
+            { "id": "mai_gs2_ir_04", "name": "UN & International Bodies — Reforms, India's Role", "hours": 5 },
+            { "id": "mai_gs2_ir_05", "name": "Multilateral Groupings — SCO, BRICS, G20, Quad, ASEAN", "hours": 5 },
+            { "id": "mai_gs2_ir_06", "name": "Diaspora Policy, Soft Power, Cultural Diplomacy", "hours": 3 },
+            { "id": "mai_gs2_ir_07", "name": "Effect of Foreign Policies on India's Interests", "hours": 3 }
+          ]
+        }
+      ]
+    },
+
+    "gs_paper_3": {
+      "id": "mains_gs3",
+      "name": "GS Paper III — Economy, Agriculture, Environment, S&T, Security",
+      "total_marks": 250,
+      "total_hours": 120,
+      "subjects": [
+        {
+          "id": "mai_gs3_economy",
+          "name": "Indian Economy & Development",
+          "estimated_hours": 45,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs3_eco_01", "name": "Planning, Growth, Development — Strategy, Issues", "hours": 6 },
+            { "id": "mai_gs3_eco_02", "name": "Mobilisation of Resources — Taxation, Disinvestment", "hours": 5 },
+            { "id": "mai_gs3_eco_03", "name": "Inclusive Growth, Poverty, Unemployment", "hours": 5 },
+            { "id": "mai_gs3_eco_04", "name": "Agriculture — Marketing, Reforms, Subsidies, Food Security", "hours": 8 },
+            { "id": "mai_gs3_eco_05", "name": "Infrastructure — Energy, Roads, Railways, Ports, Airports", "hours": 6 },
+            { "id": "mai_gs3_eco_06", "name": "Investment Models — PPP, GIFT City, Industrial Corridors", "hours": 5 },
+            { "id": "mai_gs3_eco_07", "name": "Indian Economy & Globalisation — WTO, Trade Policy", "hours": 5 },
+            { "id": "mai_gs3_eco_08", "name": "Science & Tech in Economy — Digital Economy, Startups", "hours": 5 }
+          ]
+        },
+        {
+          "id": "mai_gs3_science",
+          "name": "Science, Technology & Innovation",
+          "estimated_hours": 25,
+          "importance": "high",
+          "topics": [
+            { "id": "mai_gs3_sci_01", "name": "Science & Tech Developments in India — Achievements", "hours": 5 },
+            { "id": "mai_gs3_sci_02", "name": "Awareness of IT, Space, Biotech, Nano, IP", "hours": 6 },
+            { "id": "mai_gs3_sci_03", "name": "New Technologies — AI, ML, IoT, Blockchain in Governance", "hours": 5 },
+            { "id": "mai_gs3_sci_04", "name": "R&D, Technology Transfer, Innovation Ecosystem", "hours": 5 },
+            { "id": "mai_gs3_sci_05", "name": "Defence Technology — Make in India, DRDO, HAL", "hours": 4 }
+          ]
+        },
+        {
+          "id": "mai_gs3_environment",
+          "name": "Environment & Disaster Management",
+          "estimated_hours": 25,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs3_env_01", "name": "Conservation & Biodiversity — Challenges, Policies", "hours": 5 },
+            { "id": "mai_gs3_env_02", "name": "Pollution — Types, Effects, Control Measures", "hours": 5 },
+            { "id": "mai_gs3_env_03", "name": "Climate Change — Paris Agreement, NDCs, Carbon Markets", "hours": 6 },
+            { "id": "mai_gs3_env_04", "name": "Disaster Management — Types, NDMA, Early Warning Systems", "hours": 5 },
+            { "id": "mai_gs3_env_05", "name": "Linkages between Development & Spread of Extremism", "hours": 4 }
+          ]
+        },
+        {
+          "id": "mai_gs3_security",
+          "name": "Internal Security",
+          "estimated_hours": 25,
+          "importance": "high",
+          "topics": [
+            { "id": "mai_gs3_sec_01", "name": "Security Challenges — Terrorism, Insurgency, Naxalism", "hours": 5 },
+            { "id": "mai_gs3_sec_02", "name": "Internal Security & Role of External State Actors", "hours": 4 },
+            { "id": "mai_gs3_sec_03", "name": "Organised Crime — Nexus with Terrorism, Drug Trade", "hours": 4 },
+            { "id": "mai_gs3_sec_04", "name": "Cyber Security — Threats, CERT-In, National Cyber Policy", "hours": 5 },
+            { "id": "mai_gs3_sec_05", "name": "Security Forces — Structure, CAPF, Intelligence Agencies", "hours": 4 },
+            { "id": "mai_gs3_sec_06", "name": "Border Management — Challenges, Fencing, Cooperation", "hours": 3 }
+          ]
+        }
+      ]
+    },
+
+    "gs_paper_4": {
+      "id": "mains_gs4",
+      "name": "GS Paper IV — Ethics, Integrity & Aptitude",
+      "total_marks": 250,
+      "total_hours": 100,
+      "subjects": [
+        {
+          "id": "mai_gs4_theory",
+          "name": "Ethics Theory",
+          "estimated_hours": 30,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs4_the_01", "name": "Ethics — Nature, Determinants, Consequences", "hours": 5 },
+            { "id": "mai_gs4_the_02", "name": "Human Values — Lessons from Lives of Great Leaders", "hours": 4 },
+            { "id": "mai_gs4_the_03", "name": "Role of Family, Society, Educational Institutions in Values", "hours": 3 },
+            { "id": "mai_gs4_the_04", "name": "Attitude — Content, Structure, Function, Influence on Behaviour", "hours": 4 },
+            { "id": "mai_gs4_the_05", "name": "Moral & Political Attitudes, Social Influence", "hours": 3 },
+            { "id": "mai_gs4_the_06", "name": "Aptitude & Foundational Values for Civil Services", "hours": 4 },
+            { "id": "mai_gs4_the_07", "name": "Emotional Intelligence — Concepts, Utilities, Applications", "hours": 4 },
+            { "id": "mai_gs4_the_08", "name": "Contributions of Moral Thinkers — India & World", "hours": 3 }
+          ]
+        },
+        {
+          "id": "mai_gs4_applied",
+          "name": "Applied Ethics & Governance",
+          "estimated_hours": 30,
+          "importance": "critical",
+          "topics": [
+            { "id": "mai_gs4_app_01", "name": "Public Service Values — Integrity, Impartiality, Non-Partisanship", "hours": 4 },
+            { "id": "mai_gs4_app_02", "name": "Ethical Issues in Public Administration", "hours": 5 },
+            { "id": "mai_gs4_app_03", "name": "Probity in Governance — RTI, Code of Conduct, Citizen's Charter", "hours": 4 },
+            { "id": "mai_gs4_app_04", "name": "Corporate Governance, Whistle Blowing, Ethical Trade", "hours": 3 },
+            { "id": "mai_gs4_app_05", "name": "Ethics in International Relations & Funding", "hours": 3 },
+            { "id": "mai_gs4_app_06", "name": "Conflict of Interest, Abuse of Power, Accountability", "hours": 5 },
+            { "id": "mai_gs4_app_07", "name": "Case Studies Analysis — Practical Problem Solving", "hours": 6 }
+          ]
+        },
+        {
+          "id": "mai_gs4_casestudies",
+          "name": "Case Studies Practice",
+          "estimated_hours": 40,
+          "importance": "critical",
+          "note": "10 marks per case study in exam. Practice minimum 50 case studies.",
+          "topics": [
+            { "id": "mai_gs4_cas_01", "name": "Administrative Dilemmas — Transfer, Pressure, Corruption", "hours": 8 },
+            { "id": "mai_gs4_cas_02", "name": "Personal Ethical Conflicts — Family vs Duty", "hours": 8 },
+            { "id": "mai_gs4_cas_03", "name": "Disaster & Emergency Response Ethics", "hours": 6 },
+            { "id": "mai_gs4_cas_04", "name": "Policy Implementation Challenges", "hours": 6 },
+            { "id": "mai_gs4_cas_05", "name": "International & Corporate Ethics Scenarios", "hours": 6 },
+            { "id": "mai_gs4_cas_06", "name": "Mock Case Study Answer Writing", "hours": 6 }
+          ]
+        }
+      ]
+    },
+
+    "essay": {
+      "id": "mains_essay",
+      "name": "Essay Paper",
+      "total_marks": 250,
+      "total_hours": 60,
+      "note": "2 essays. 125 marks each. 1000–1200 words each.",
+      "topics": [
+        { "id": "essay_01", "name": "Essay Writing — Structure, Introduction, Body, Conclusion", "hours": 8 },
+        { "id": "essay_02", "name": "Section A Themes — Philosophic, Abstract, Life, Values", "hours": 10 },
+        { "id": "essay_03", "name": "Section B Themes — Social, Economic, Political, S&T, Environment", "hours": 10 },
+        { "id": "essay_04", "name": "Essay Bank Practice — 30 Essays Written", "hours": 30 },
+        { "id": "essay_05", "name": "Content Enrichment — Quotes, Data, Examples", "hours": 12 }
+      ]
+    }
+  },
+
+  "optionals": {
+    "note": "Student selects ONE optional (2 papers × 250 marks = 500 marks total). Top 10 optionals listed.",
+
+    "history": {
+      "id": "opt_history",
+      "name": "History Optional",
+      "total_marks": 500,
+      "total_hours": 300,
+      "papers": [
+        {
+          "id": "opt_hist_p1",
+          "name": "Paper I — Ancient & Medieval",
+          "estimated_hours": 150,
+          "topics": [
+            { "id": "opt_hist_p1_01", "name": "Sources of Ancient Indian History", "hours": 8 },
+            { "id": "opt_hist_p1_02", "name": "Pre-Historic India to Iron Age", "hours": 10 },
+            { "id": "opt_hist_p1_03", "name": "Vedic Period to 6th Century BC", "hours": 12 },
+            { "id": "opt_hist_p1_04", "name": "Mauryan Empire — Detail Study", "hours": 15 },
+            { "id": "opt_hist_p1_05", "name": "Post Mauryan to Gupta — Economy, Society, Culture", "hours": 15 },
+            { "id": "opt_hist_p1_06", "name": "Gupta Age — Politics, Culture, Decline", "hours": 12 },
+            { "id": "opt_hist_p1_07", "name": "South India — Sangam, Pallavas, Cholas (Deep)", "hours": 15 },
+            { "id": "opt_hist_p1_08", "name": "Early Medieval — North, Deccan, South", "hours": 10 },
+            { "id": "opt_hist_p1_09", "name": "Advent of Islam — Arab & Turkish Invasions", "hours": 10 },
+            { "id": "opt_hist_p1_10", "name": "Delhi Sultanate — Administration, Economy, Culture", "hours": 15 },
+            { "id": "opt_hist_p1_11", "name": "Mughal Empire — Detailed Political & Cultural History", "hours": 15 },
+            { "id": "opt_hist_p1_12", "name": "Vijayanagara, Bahmani, Maratha Empires", "hours": 13 }
+          ]
+        },
+        {
+          "id": "opt_hist_p2",
+          "name": "Paper II — Modern World & Modern India",
+          "estimated_hours": 150,
+          "topics": [
+            { "id": "opt_hist_p2_01", "name": "European History — Renaissance to Industrialisation", "hours": 15 },
+            { "id": "opt_hist_p2_02", "name": "Colonialism & Imperialism — Africa, Asia, Americas", "hours": 15 },
+            { "id": "opt_hist_p2_03", "name": "American & French Revolutions", "hours": 10 },
+            { "id": "opt_hist_p2_04", "name": "World War I & II — Deep Analysis", "hours": 20 },
+            { "id": "opt_hist_p2_05", "name": "Cold War, Decolonisation, Non-Alignment", "hours": 15 },
+            { "id": "opt_hist_p2_06", "name": "British India — Expansion, Administration, Social Policy", "hours": 20 },
+            { "id": "opt_hist_p2_07", "name": "Indian Freedom Struggle — Phases, Movements, Leaders", "hours": 25 },
+            { "id": "opt_hist_p2_08", "name": "Independent India — Constitution, Nation Building, Integration", "hours": 15 },
+            { "id": "opt_hist_p2_09", "name": "Historiography — Nationalist, Marxist, Subaltern", "hours": 15 }
+          ]
+        }
+      ]
+    },
+
+    "geography_optional": {
+      "id": "opt_geography",
+      "name": "Geography Optional",
+      "total_marks": 500,
+      "total_hours": 320,
+      "papers": [
+        {
+          "id": "opt_geo_p1",
+          "name": "Paper I — Physical & Human Geography (World)",
+          "estimated_hours": 160,
+          "topics": [
+            { "id": "opt_geo_p1_01", "name": "Geomorphology — Theories, Landforms, Processes", "hours": 25 },
+            { "id": "opt_geo_p1_02", "name": "Climatology — Atmospheric Circulation, Climate Change", "hours": 25 },
+            { "id": "opt_geo_p1_03", "name": "Oceanography — Waves, Tides, Ocean Circulation", "hours": 20 },
+            { "id": "opt_geo_p1_04", "name": "Biogeography — Ecosystems, Biomes, Soil Geography", "hours": 20 },
+            { "id": "opt_geo_p1_05", "name": "Environmental Geography — Human-Environment Interaction", "hours": 15 },
+            { "id": "opt_geo_p1_06", "name": "Human Geography — Theories, Population, Settlement", "hours": 25 },
+            { "id": "opt_geo_p1_07", "name": "Economic Geography — Agriculture, Industry, Trade", "hours": 20 },
+            { "id": "opt_geo_p1_08", "name": "Political Geography — Nation State, Boundaries, Geopolitics", "hours": 10 }
+          ]
+        },
+        {
+          "id": "opt_geo_p2",
+          "name": "Paper II — Indian Geography",
+          "estimated_hours": 160,
+          "topics": [
+            { "id": "opt_geo_p2_01", "name": "Physical Setting — Relief, Drainage, Climate, Soils", "hours": 30 },
+            { "id": "opt_geo_p2_02", "name": "Natural Resources — Land, Water, Minerals, Energy", "hours": 25 },
+            { "id": "opt_geo_p2_03", "name": "Agriculture — Land Use, Cropping Patterns, Irrigation", "hours": 25 },
+            { "id": "opt_geo_p2_04", "name": "Industry — Location, Factors, Industrial Regions", "hours": 20 },
+            { "id": "opt_geo_p2_05", "name": "Transport & Trade — Networks, Impact on Development", "hours": 15 },
+            { "id": "opt_geo_p2_06", "name": "Cultural Settings — Population, Tribes, Languages", "hours": 15 },
+            { "id": "opt_geo_p2_07", "name": "Settlements — Rural-Urban, Metropolitan Issues", "hours": 15 },
+            { "id": "opt_geo_p2_08", "name": "Regional Development — Planning Regions, Backward Area", "hours": 15 }
+          ]
+        }
+      ]
+    },
+
+    "public_administration": {
+      "id": "opt_pub_admin",
+      "name": "Public Administration Optional",
+      "total_marks": 500,
+      "total_hours": 280,
+      "papers": [
+        {
+          "id": "opt_pa_p1",
+          "name": "Paper I — Administrative Theory",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_pa_p1_01", "name": "Introduction — Meaning, Scope, Significance, New PA", "hours": 10 },
+            { "id": "opt_pa_p1_02", "name": "Scientific Management & Classical Theory", "hours": 12 },
+            { "id": "opt_pa_p1_03", "name": "Principles of Organisation — Hierarchy, Span, Unity", "hours": 12 },
+            { "id": "opt_pa_p1_04", "name": "Bureaucracy — Weberian Model, Criticisms, Neo-Weberian", "hours": 15 },
+            { "id": "opt_pa_p1_05", "name": "Human Relations, Behavioural Approach", "hours": 12 },
+            { "id": "opt_pa_p1_06", "name": "Decision Making — Simon's Model, Bounded Rationality", "hours": 12 },
+            { "id": "opt_pa_p1_07", "name": "Leadership & Motivation Theories", "hours": 12 },
+            { "id": "opt_pa_p1_08", "name": "Communication, Personnel Administration, Morale", "hours": 15 },
+            { "id": "opt_pa_p1_09", "name": "Financial Administration — Budget Cycle, Audit", "hours": 15 },
+            { "id": "opt_pa_p1_10", "name": "Accountability — Legislative, Executive, Judicial", "hours": 15 }
+          ]
+        },
+        {
+          "id": "opt_pa_p2",
+          "name": "Paper II — Indian Administration",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_pa_p2_01", "name": "Evolution of Indian Administration — British to Present", "hours": 15 },
+            { "id": "opt_pa_p2_02", "name": "Constitutional Framework for Administration", "hours": 15 },
+            { "id": "opt_pa_p2_03", "name": "Central Administration — Cabinet Secretariat, PMO, Ministries", "hours": 15 },
+            { "id": "opt_pa_p2_04", "name": "State Administration — Governor, CM, Secretariat, DM", "hours": 15 },
+            { "id": "opt_pa_p2_05", "name": "District Administration — DM's Role, Coordination", "hours": 12 },
+            { "id": "opt_pa_p2_06", "name": "Civil Services — Recruitment, Training, UPSC, Service Rules", "hours": 12 },
+            { "id": "opt_pa_p2_07", "name": "Citizen & Administration — Grievance, RTI, Lokpal", "hours": 12 },
+            { "id": "opt_pa_p2_08", "name": "Development Programmes — NREGA, IRDP, Rural Development", "hours": 12 },
+            { "id": "opt_pa_p2_09", "name": "Administrative Reforms Commissions — ARC Reports", "hours": 12 },
+            { "id": "opt_pa_p2_10", "name": "e-Governance & New Public Management in India", "hours": 10 }
+          ]
+        }
+      ]
+    },
+
+    "sociology": {
+      "id": "opt_sociology",
+      "name": "Sociology Optional",
+      "total_marks": 500,
+      "total_hours": 280,
+      "papers": [
+        {
+          "id": "opt_soc_p1",
+          "name": "Paper I — Fundamentals of Sociology",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_soc_p1_01", "name": "Sociology — Discipline, Nature, Relationship with other Sciences", "hours": 10 },
+            { "id": "opt_soc_p1_02", "name": "Sociology as Science — Scientific Method, Objectivity", "hours": 12 },
+            { "id": "opt_soc_p1_03", "name": "Research Methods — Survey, Interview, Observation, Case Study", "hours": 15 },
+            { "id": "opt_soc_p1_04", "name": "Sociological Thinkers — Marx, Durkheim, Weber, Parsons, Merton", "hours": 25 },
+            { "id": "opt_soc_p1_05", "name": "Stratification & Mobility — Class, Caste, Race, Gender", "hours": 20 },
+            { "id": "opt_soc_p1_06", "name": "Works & Economic Life — Division of Labour, Capitalism", "hours": 15 },
+            { "id": "opt_soc_p1_07", "name": "Politics & Society — Power, Authority, Democracy", "hours": 15 },
+            { "id": "opt_soc_p1_08", "name": "Religion & Society — Durkheim, Weber, Secularism", "hours": 15 },
+            { "id": "opt_soc_p1_09", "name": "Systems of Kinship — Types, Descent, Marriage", "hours": 13 }
+          ]
+        },
+        {
+          "id": "opt_soc_p2",
+          "name": "Paper II — Indian Society",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_soc_p2_01", "name": "Perspectives on Indian Society — Indology, Structural, Marxist", "hours": 12 },
+            { "id": "opt_soc_p2_02", "name": "Caste System — Features, Changes, Dominant Caste, Dalit Movement", "hours": 20 },
+            { "id": "opt_soc_p2_03", "name": "Tribal Communities — Issues, Forest Rights, Development", "hours": 15 },
+            { "id": "opt_soc_p2_04", "name": "Social Classes in India — Agrarian & Industrial", "hours": 12 },
+            { "id": "opt_soc_p2_05", "name": "Family, Kinship, Marriage in India", "hours": 12 },
+            { "id": "opt_soc_p2_06", "name": "Religion & Society in India — Communalism, Fundamentalism", "hours": 15 },
+            { "id": "opt_soc_p2_07", "name": "Social Change in Modern India — Colonialism, Nationalism", "hours": 15 },
+            { "id": "opt_soc_p2_08", "name": "Women in India — Patriarchy, Violence, Feminist Movement", "hours": 15 },
+            { "id": "opt_soc_p2_09", "name": "Globalisation & Social Transformation", "hours": 12 },
+            { "id": "opt_soc_p2_10", "name": "Vision of Society — Gandhi, Ambedkar, Tagore, Nehru", "hours": 12 }
+          ]
+        }
+      ]
+    },
+
+    "political_science": {
+      "id": "opt_polsci",
+      "name": "Political Science & International Relations Optional",
+      "total_marks": 500,
+      "total_hours": 300,
+      "papers": [
+        {
+          "id": "opt_ps_p1",
+          "name": "Paper I — Political Theory & Indian Politics",
+          "estimated_hours": 150,
+          "topics": [
+            { "id": "opt_ps_p1_01", "name": "Political Theory — Meaning, Approaches, Relevance", "hours": 10 },
+            { "id": "opt_ps_p1_02", "name": "Concepts — State, Sovereignty, Power, Authority, Legitimacy", "hours": 15 },
+            { "id": "opt_ps_p1_03", "name": "Political Ideologies — Liberalism, Marxism, Socialism, Fascism", "hours": 20 },
+            { "id": "opt_ps_p1_04", "name": "Indian Constitutional Framework — DR Ambedkar, Nehru", "hours": 15 },
+            { "id": "opt_ps_p1_05", "name": "Indian Party System — Evolution, Coalitions, Regional Parties", "hours": 15 },
+            { "id": "opt_ps_p1_06", "name": "Electoral System — FPTP, PR, Reforms", "hours": 12 },
+            { "id": "opt_ps_p1_07", "name": "Federalism in India — Cooperative, Competitive, Issues", "hours": 15 },
+            { "id": "opt_ps_p1_08", "name": "Local Self-Government — 73rd, 74th Amendments", "hours": 12 },
+            { "id": "opt_ps_p1_09", "name": "Pressure Groups, Social Movements, Civil Society", "hours": 15 },
+            { "id": "opt_ps_p1_10", "name": "National Integration — Challenges, Regionalism, Identity", "hours": 11 }
+          ]
+        },
+        {
+          "id": "opt_ps_p2",
+          "name": "Paper II — Comparative Politics & International Relations",
+          "estimated_hours": 150,
+          "topics": [
+            { "id": "opt_ps_p2_01", "name": "Comparative Politics — Approaches, Comparative Method", "hours": 12 },
+            { "id": "opt_ps_p2_02", "name": "State in Comparative Perspective — Democracy, Authoritarian", "hours": 15 },
+            { "id": "opt_ps_p2_03", "name": "Approaches to International Relations — Realism, Liberalism, Marxism", "hours": 15 },
+            { "id": "opt_ps_p2_04", "name": "Cold War & Post-Cold War World Order", "hours": 12 },
+            { "id": "opt_ps_p2_05", "name": "UN System — Organs, Agencies, Reforms, Effectiveness", "hours": 12 },
+            { "id": "opt_ps_p2_06", "name": "India's Foreign Policy — Determinants, Evolution", "hours": 15 },
+            { "id": "opt_ps_p2_07", "name": "India & Major Powers — USA, Russia, China, EU", "hours": 15 },
+            { "id": "opt_ps_p2_08", "name": "India & South Asia, SAARC, Neighbourhood Policy", "hours": 12 },
+            { "id": "opt_ps_p2_09", "name": "Nuclear Issue & Arms Control Regimes", "hours": 12 },
+            { "id": "opt_ps_p2_10", "name": "New Issues — Terrorism, Climate, Cyber, Human Security", "hours": 10 }
+          ]
+        }
+      ]
+    },
+
+    "economics_optional": {
+      "id": "opt_economics",
+      "name": "Economics Optional",
+      "total_marks": 500,
+      "total_hours": 350,
+      "papers": [
+        {
+          "id": "opt_eco_p1",
+          "name": "Paper I — Micro, Macro & Statistics",
+          "estimated_hours": 175,
+          "topics": [
+            { "id": "opt_eco_p1_01", "name": "Micro Economics — Demand, Supply, Market Structures", "hours": 30 },
+            { "id": "opt_eco_p1_02", "name": "Theory of Production, Costs, Revenue", "hours": 25 },
+            { "id": "opt_eco_p1_03", "name": "General Equilibrium & Welfare Economics", "hours": 20 },
+            { "id": "opt_eco_p1_04", "name": "Macro Economics — National Income, IS-LM Model", "hours": 30 },
+            { "id": "opt_eco_p1_05", "name": "Open Economy Macroeconomics — BOP, Exchange Rate", "hours": 20 },
+            { "id": "opt_eco_p1_06", "name": "Statistics for Economics — Regression, Sampling, Testing", "hours": 25 },
+            { "id": "opt_eco_p1_07", "name": "Growth Models — Harrod-Domar, Solow, Endogenous Growth", "hours": 25 }
+          ]
+        },
+        {
+          "id": "opt_eco_p2",
+          "name": "Paper II — Indian Economy",
+          "estimated_hours": 175,
+          "topics": [
+            { "id": "opt_eco_p2_01", "name": "Indian Economy — Structure, Features, Colonial Legacy", "hours": 20 },
+            { "id": "opt_eco_p2_02", "name": "Planning & Development Strategy — Five Year Plans, NITI", "hours": 20 },
+            { "id": "opt_eco_p2_03", "name": "Poverty, Inequality & Employment — Measurement, Policy", "hours": 20 },
+            { "id": "opt_eco_p2_04", "name": "Agriculture — Land Reforms, Commercialisation, WTO", "hours": 25 },
+            { "id": "opt_eco_p2_05", "name": "Industry & Services — Policy, SEZ, FDI, Start-ups", "hours": 20 },
+            { "id": "opt_eco_p2_06", "name": "Money, Banking & Inflation — RBI Policy, Tools", "hours": 20 },
+            { "id": "opt_eco_p2_07", "name": "Public Finance — Budget, Taxation, GST, Fiscal Deficit", "hours": 20 },
+            { "id": "opt_eco_p2_08", "name": "External Sector — Trade, BOP, FDI, WTO Issues", "hours": 20 },
+            { "id": "opt_eco_p2_09", "name": "Economic Reforms since 1991 — LPG, Outcomes, Debates", "hours": 15 },
+            { "id": "opt_eco_p2_10", "name": "Social Sector — Education, Health, HDI, SDG Progress", "hours": 15 }
+          ]
+        }
+      ]
+    },
+
+    "anthropology": {
+      "id": "opt_anthropology",
+      "name": "Anthropology Optional",
+      "total_marks": 500,
+      "total_hours": 280,
+      "note": "Most scoring optional. High success rate for science graduates.",
+      "papers": [
+        {
+          "id": "opt_anth_p1",
+          "name": "Paper I — General Anthropology",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_anth_p1_01", "name": "Meaning, Scope, Human Evolution", "hours": 15 },
+            { "id": "opt_anth_p1_02", "name": "Primate Behaviour & Social Organisation", "hours": 10 },
+            { "id": "opt_anth_p1_03", "name": "Homo Sapiens — Origin, Migration, Race", "hours": 15 },
+            { "id": "opt_anth_p1_04", "name": "Prehistoric Cultures — Palaeolithic to Iron Age", "hours": 15 },
+            { "id": "opt_anth_p1_05", "name": "Social Anthropology — Family, Marriage, Kinship, Religion", "hours": 25 },
+            { "id": "opt_anth_p1_06", "name": "Economic Anthropology, Political Organisation, Law", "hours": 20 },
+            { "id": "opt_anth_p1_07", "name": "Research Methods, Fieldwork Tradition", "hours": 15 },
+            { "id": "opt_anth_p1_08", "name": "Major Theoretical Perspectives — Evolutionism to Post-Modern", "hours": 25 }
+          ]
+        },
+        {
+          "id": "opt_anth_p2",
+          "name": "Paper II — Indian Anthropology",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_anth_p2_01", "name": "Prehistoric India — Archaeological Cultures", "hours": 15 },
+            { "id": "opt_anth_p2_02", "name": "Indian Civilisation — Unity in Diversity", "hours": 10 },
+            { "id": "opt_anth_p2_03", "name": "Caste System — Features, Critique, Jajmani System", "hours": 20 },
+            { "id": "opt_anth_p2_04", "name": "Tribal India — Distribution, Issues, Policy", "hours": 25 },
+            { "id": "opt_anth_p2_05", "name": "Social Change — Five Year Plans, Land Reform Impact", "hours": 15 },
+            { "id": "opt_anth_p2_06", "name": "Ethnographic Profiles — Major Tribes (Gond, Bhil, etc.)", "hours": 20 },
+            { "id": "opt_anth_p2_07", "name": "Applied Anthropology — Development, Welfare, Forensic", "hours": 15 },
+            { "id": "opt_anth_p2_08", "name": "Constitutional Safeguards for ST & SC", "hours": 10 },
+            { "id": "opt_anth_p2_09", "name": "Biological Anthropology — Genetics, Blood Groups, Forensic", "hours": 10 }
+          ]
+        }
+      ]
+    },
+
+    "philosophy": {
+      "id": "opt_philosophy",
+      "name": "Philosophy Optional",
+      "total_marks": 500,
+      "total_hours": 280,
+      "papers": [
+        {
+          "id": "opt_phil_p1",
+          "name": "Paper I — History & Problems of Philosophy",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_phil_p1_01", "name": "Plato, Aristotle — Idealism, Logic, Ethics", "hours": 15 },
+            { "id": "opt_phil_p1_02", "name": "Rationalism — Descartes, Spinoza, Leibniz", "hours": 15 },
+            { "id": "opt_phil_p1_03", "name": "Empiricism — Locke, Berkeley, Hume", "hours": 15 },
+            { "id": "opt_phil_p1_04", "name": "Kant's Critical Philosophy", "hours": 15 },
+            { "id": "opt_phil_p1_05", "name": "Post-Kantian — Hegel, Marx, Existentialism", "hours": 15 },
+            { "id": "opt_phil_p1_06", "name": "Indian Philosophy — Nyaya, Vaisheshika, Sankhya, Yoga", "hours": 20 },
+            { "id": "opt_phil_p1_07", "name": "Indian Philosophy — Mimamsa, Vedanta, Buddhism, Jainism", "hours": 20 },
+            { "id": "opt_phil_p1_08", "name": "Epistemology — Sources of Knowledge, Perception, Inference", "hours": 15 },
+            { "id": "opt_phil_p1_09", "name": "Metaphysics — Self, God, World, Causation", "hours": 10 }
+          ]
+        },
+        {
+          "id": "opt_phil_p2",
+          "name": "Paper II — Applied Ethics & Contemporary Issues",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_phil_p2_01", "name": "Ethics — Normative, Meta-Ethics, Normative Theories", "hours": 20 },
+            { "id": "opt_phil_p2_02", "name": "Applied Ethics — Bioethics, Environmental Ethics, Business", "hours": 20 },
+            { "id": "opt_phil_p2_03", "name": "Philosophy of Religion — God, Proofs, Evil, Liberation", "hours": 20 },
+            { "id": "opt_phil_p2_04", "name": "Social & Political Philosophy — Justice, Rights, Democracy", "hours": 20 },
+            { "id": "opt_phil_p2_05", "name": "Analytical Philosophy — Russell, Wittgenstein, Logical Positivism", "hours": 20 },
+            { "id": "opt_phil_p2_06", "name": "Philosophy of Mind — Mind-Body Problem, Consciousness, AI", "hours": 15 },
+            { "id": "opt_phil_p2_07", "name": "Contemporary Indian Thought — Vivekananda, Aurobindo, Gandhi, Ambedkar", "hours": 25 }
+          ]
+        }
+      ]
+    },
+
+    "psychology": {
+      "id": "opt_psychology",
+      "name": "Psychology Optional",
+      "total_marks": 500,
+      "total_hours": 280,
+      "papers": [
+        {
+          "id": "opt_psy_p1",
+          "name": "Paper I — Psychology Theory",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_psy_p1_01", "name": "Introduction — Definition, Scope, Research Methods", "hours": 10 },
+            { "id": "opt_psy_p1_02", "name": "Biological Basis of Behaviour — Brain, NS, Sensation", "hours": 15 },
+            { "id": "opt_psy_p1_03", "name": "Attention, Perception, States of Consciousness", "hours": 15 },
+            { "id": "opt_psy_p1_04", "name": "Learning — Classical, Operant, Cognitive, Observational", "hours": 15 },
+            { "id": "opt_psy_p1_05", "name": "Memory — Encoding, Storage, Retrieval, Forgetting", "hours": 12 },
+            { "id": "opt_psy_p1_06", "name": "Thinking, Reasoning, Problem Solving, Creativity", "hours": 15 },
+            { "id": "opt_psy_p1_07", "name": "Motivation & Emotion — Theories, Expression", "hours": 12 },
+            { "id": "opt_psy_p1_08", "name": "Intelligence — Theories, Tests, Giftedness, Disability", "hours": 12 },
+            { "id": "opt_psy_p1_09", "name": "Personality — Theories (Freud, Jung, Rogers, Trait)", "hours": 15 },
+            { "id": "opt_psy_p1_10", "name": "Attitudes — Formation, Change, Prejudice", "hours": 9 }
+          ]
+        },
+        {
+          "id": "opt_psy_p2",
+          "name": "Paper II — Applied Psychology",
+          "estimated_hours": 140,
+          "topics": [
+            { "id": "opt_psy_p2_01", "name": "Psychological Measurement — Tests, Standardisation, Ethics", "hours": 12 },
+            { "id": "opt_psy_p2_02", "name": "Abnormal Psychology — Anxiety, Mood, Psychotic Disorders", "hours": 18 },
+            { "id": "opt_psy_p2_03", "name": "Therapeutic Approaches — Psychodynamic, CBT, Humanistic", "hours": 18 },
+            { "id": "opt_psy_p2_04", "name": "Social Psychology — Group Dynamics, Conformity, Obedience", "hours": 15 },
+            { "id": "opt_psy_p2_05", "name": "Industrial/Organisational Psychology — Selection, Training, Motivation", "hours": 18 },
+            { "id": "opt_psy_p2_06", "name": "Health Psychology — Stress, Coping, Lifestyle Disorders", "hours": 15 },
+            { "id": "opt_psy_p2_07", "name": "Educational Psychology — Learning Disabilities, Inclusive Ed", "hours": 12 },
+            { "id": "opt_psy_p2_08", "name": "Psychology of Women, Disadvantaged Groups", "hours": 12 },
+            { "id": "opt_psy_p2_09", "name": "Application to Social Problems — Poverty, Crime, Violence", "hours": 10 },
+            { "id": "opt_psy_p2_10", "name": "Community & Environmental Psychology", "hours": 10 }
+          ]
+        }
+      ]
+    }
+  },
+
+  "module_templates": {
+    "description": "Standard module template for all students. Pace multiplier adjusts days. Content fixed.",
+    "standard_module_structure": {
+      "phase_1_introduction": {
+        "days_standard": 1,
+        "activities": ["Read overview", "Watch concept video", "Note key terms"]
+      },
+      "phase_2_deep_study": {
+        "days_standard": "topic_hours / 3",
+        "activities": ["Read NCERT/standard source", "Make notes", "Solve practice MCQs (20-30)"]
+      },
+      "phase_3_revision": {
+        "days_standard": 1,
+        "activities": ["Revise notes", "Flashcards review", "Solve previous year questions (15-20)"]
+      },
+      "phase_4_modular_test": {
+        "days_standard": 1,
+        "activities": ["Modular test (40 MCQs, 40 mins)", "Review answers", "Note weak areas"]
+      },
+      "phase_5_fault_analysis": {
+        "days_standard": 1,
+        "activities": ["Fault analysis session", "Error tagging", "Targeted re-study of weak subtopics"]
+      }
+    },
+    "pace_tracks": {
+      "fast_track": {
+        "multiplier": 0.7,
+        "total_months": 8,
+        "daily_hours": 10,
+        "suitable_for": "Students with prior UPSC knowledge or strong academic background"
+      },
+      "standard_track": {
+        "multiplier": 1.0,
+        "total_months": 12,
+        "daily_hours": 7,
+        "suitable_for": "First-time serious aspirants with good study habits"
+      },
+      "extended_track": {
+        "multiplier": 1.5,
+        "total_months": 16,
+        "daily_hours": 5,
+        "suitable_for": "Working professionals or students with limited daily study time"
+      }
+    },
+    "test_standardisation": {
+      "note": "Same question paper for all students on same module. Enables cross-student comparison.",
+      "modular_test": { "questions": 40, "duration_mins": 40, "marks": 40, "negative": 0.33 },
+      "subject_test": { "questions": 100, "duration_mins": 120, "marks": 200, "negative": 0.66 },
+      "full_length_prelims": { "questions": 100, "duration_mins": 120, "marks": 200, "negative": 0.66 },
+      "mains_practice": { "questions": 20, "type": "descriptive", "duration_mins": 180, "marks": 250 }
+    }
+  },
+
+  "ai_module_generator_schema": {
+    "description": "Schema AI reads to generate custom module plan for student",
+    "input_fields": {
+      "student_id": "string",
+      "available_hours_per_day": "number (1-16)",
+      "target_exam_date": "YYYY-MM-DD",
+      "pace_track": "fast | standard | extended",
+      "subjects_priority": ["array of subject IDs — high priority first"],
+      "already_covered_topics": ["array of subtopic IDs student marks as done"],
+      "weak_topics": ["array of subtopic IDs from past test data"],
+      "optional_subject": "opt_history | opt_geography | opt_pub_admin | opt_sociology | opt_polsci | opt_economics | opt_anthropology | opt_philosophy | opt_psychology"
+    },
+    "output_structure": {
+      "module_plan": [
+        {
+          "week": "number",
+          "module_id": "string",
+          "subject": "string",
+          "topic": "string",
+          "subtopics": ["array of subtopic IDs"],
+          "days_allocated": "number",
+          "start_date": "YYYY-MM-DD",
+          "end_date": "YYYY-MM-DD",
+          "daily_targets": ["array of daily task descriptions"],
+          "revision_day": "YYYY-MM-DD",
+          "test_date": "YYYY-MM-DD",
+          "fault_analysis_date": "YYYY-MM-DD",
+          "mentor_session_date": "YYYY-MM-DD or null"
+        }
+      ],
+      "total_weeks": "number",
+      "estimated_completion": "YYYY-MM-DD",
+      "prelims_readiness_date": "YYYY-MM-DD",
+      "mains_readiness_date": "YYYY-MM-DD",
+      "warnings": ["array of warnings if target date too tight"]
+    }
+  }
+}

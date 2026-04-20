@@ -1,0 +1,1267 @@
+{
+  "meta": {
+    "subject": "Indian Polity & Governance",
+    "version": "1.0",
+    "primary_book": "Indian Polity by M. Laxmikanth (6th Edition) — 80+ Chapters",
+    "ncert_books": [
+      "Class 9 — Democratic Politics I (Social Science)",
+      "Class 10 — Democratic Politics II (Social Science)",
+      "Class 11 — Indian Constitution at Work (Political Science Part I)",
+      "Class 11 — Political Theory (Political Science Part II)",
+      "Class 12 — Politics in India Since Independence (Political Science Part I)",
+      "Class 12 — Contemporary World Politics (Political Science Part II)"
+    ],
+    "supplementary": [
+      "DD Basu — Introduction to the Constitution of India",
+      "Subhash Kashyap — Our Parliament",
+      "Vision IAS Polity Notes (Current Affairs Integration)"
+    ],
+    "upsc_weightage": {
+      "prelims_questions_avg": "16-20 questions per year",
+      "mains_gs2_marks": "100-120 marks out of 250",
+      "importance": "critical"
+    },
+    "total_estimated_hours": 180,
+    "reading_order": "NCERT Class 9 → NCERT Class 10 → NCERT Class 11 Part I → Laxmikanth → NCERT Class 12 Part I → Current Affairs"
+  },
+
+  "modules": [
+
+    {
+      "module_id": "pol_m01",
+      "module_name": "Historical & Constitutional Background",
+      "sequence": 1,
+      "estimated_days_standard": 6,
+      "estimated_hours": 18,
+      "importance": "critical",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t01",
+          "topic_name": "Historical Background of Indian Constitution",
+          "laxmikanth_chapter": "Chapter 1 — Historical Background",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 2: Constitutional Design",
+            "Class 11 — Indian Constitution at Work — Chapter 1: Constitution — Why and How?"
+          ],
+          "key_concepts": [
+            "Government of India Act 1858 — transfer from Company to Crown",
+            "Indian Councils Act 1861, 1892, 1909 (Morley-Minto Reforms)",
+            "Government of India Act 1919 (Montague-Chelmsford Reforms) — Dyarchy",
+            "Government of India Act 1935 — Federation, Provincial Autonomy, Dyarchy at Centre",
+            "Indian Independence Act 1947 — Partition, Dominion Status",
+            "Regulating Act 1773 — first step of British Parliamentary control",
+            "Pitts India Act 1784",
+            "Charter Acts 1813, 1833, 1853"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t02",
+          "topic_name": "Making of the Indian Constitution",
+          "laxmikanth_chapter": "Chapter 2 — Making of the Constitution",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 2: Constitutional Design",
+            "Class 11 — Indian Constitution at Work — Chapter 1: Constitution — Why and How?"
+          ],
+          "key_concepts": [
+            "Constituent Assembly — formation, composition, 389 members",
+            "Demand for Constituent Assembly — M.N. Roy 1934, INC 1935, Cripps Mission 1942",
+            "Cabinet Mission Plan 1946 — elections to Constituent Assembly",
+            "Committees of Constituent Assembly — Drafting Committee (B.R. Ambedkar)",
+            "Sessions of Constituent Assembly — 11 sessions, 2 years 11 months 17 days",
+            "Enactment — Nov 26 1949 (adopted), Jan 26 1950 (enforced)",
+            "Key personalities — Rajendra Prasad (President), B.R. Ambedkar (Chairman Drafting)",
+            "Jawaharlal Nehru — Objectives Resolution Dec 1946"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t03",
+          "topic_name": "Salient Features of Indian Constitution",
+          "laxmikanth_chapter": "Chapter 3 — Salient Features",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 1"
+          ],
+          "key_concepts": [
+            "Lengthiest written constitution in the world — 395 articles (originally), 22 parts, 8 schedules",
+            "Current: 470+ articles, 25 parts, 12 schedules, 5 appendices",
+            "Drawn from various sources — borrowed features chart",
+            "Partly rigid, partly flexible",
+            "Federal with unitary bias",
+            "Parliamentary form of government",
+            "Integrated and independent judiciary",
+            "Fundamental Rights — justiciable",
+            "DPSP — non-justiciable",
+            "Secular state",
+            "Universal Adult Franchise",
+            "Single citizenship",
+            "Emergency provisions",
+            "Three-tier government (after 73rd & 74th Amendments)"
+          ],
+          "sources_borrowed": {
+            "UK": "Parliamentary system, Rule of Law, single citizenship, Cabinet system, prerogative writs, parliamentary privileges, bicameralism",
+            "USA": "Fundamental Rights, judicial review, independence of judiciary, removal of SC/HC judges, preamble, Vice-President's role",
+            "Ireland": "DPSP, method of election of President, nomination of members to Rajya Sabha",
+            "Canada": "Federal system with strong centre, residuary powers with centre, advisory jurisdiction of SC",
+            "Australia": "Concurrent List, trade/commerce/intercourse provisions, joint sitting of Parliament",
+            "Germany": "Suspension of FRs during emergency",
+            "South Africa": "Amendment procedure of Constitution, election of members of Rajya Sabha",
+            "USSR": "Fundamental Duties, ideal of justice (social, economic, political) in Preamble",
+            "Japan": "Procedure established by law",
+            "France": "Republic, Liberty, Equality, Fraternity in Preamble"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t04",
+          "topic_name": "Preamble of the Constitution",
+          "laxmikanth_chapter": "Chapter 4 — Preamble",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 1"
+          ],
+          "key_concepts": [
+            "Preamble text — memorise word for word",
+            "Preamble as key to Constitution — Berubari Case 1960",
+            "Preamble as part of Constitution — Kesavananda Bharati Case 1973",
+            "Nature of Indian State — Sovereign, Socialist, Secular, Democratic, Republic",
+            "Socialist added by 42nd Amendment 1976",
+            "Secular added by 42nd Amendment 1976",
+            "Objectives — Justice (social, economic, political), Liberty, Equality, Fraternity",
+            "Date of adoption — November 26, 1949"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t05",
+          "topic_name": "Union and its Territory",
+          "laxmikanth_chapter": "Chapter 5 — Union and its Territory",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Article 1 — India, that is Bharat, shall be a Union of States",
+            "Difference between Federation and Union",
+            "Articles 1-4 — Territory of India",
+            "Types of territories — States, UTs, other territories",
+            "Parliament's power to form new states, alter boundaries — Article 3",
+            "States Reorganisation Act 1956 — linguistic basis",
+            "Recent statehood — Telangana 2014, J&K bifurcation 2019",
+            "UTs — current list and how formed"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "low",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t06",
+          "topic_name": "Citizenship",
+          "laxmikanth_chapter": "Chapter 6 — Citizenship",
+          "ncert_reference": [
+            "Class 11 — Political Theory — Chapter 6: Citizenship"
+          ],
+          "key_concepts": [
+            "Citizenship Act 1955 — acquisition and termination",
+            "Citizenship by birth, descent, registration, naturalisation, incorporation of territory",
+            "Citizenship Amendment Act 2019 — Hindus, Sikhs, Jains, Buddhists, Parsis, Christians from Afghanistan, Bangladesh, Pakistan",
+            "Single citizenship in India",
+            "OCI — Overseas Citizenship of India (not dual citizenship)",
+            "PIO card vs OCI card",
+            "Articles 5-11 — Citizenship at commencement",
+            "Rights exclusive to citizens — FRs under Articles 15, 16, 19, 29, 30"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Acts from 1858-1947", "Constituent Assembly facts", "Borrowed features", "Preamble keywords", "Citizenship rules"]
+      },
+      "revision_day_tasks": ["Revise all 6 chapters notes", "Flashcards on borrowed features", "PYQ solving from 2015-2023 on this module"]
+    },
+
+    {
+      "module_id": "pol_m02",
+      "module_name": "Fundamental Rights",
+      "sequence": 2,
+      "estimated_days_standard": 8,
+      "estimated_hours": 24,
+      "importance": "critical",
+      "upsc_prelims_weightage": "3-4 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t07",
+          "topic_name": "Fundamental Rights — Overview & Right to Equality",
+          "laxmikanth_chapter": "Chapter 7 — Fundamental Rights (Part 1: Articles 12-18)",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 5: Democratic Rights",
+            "Class 11 — Indian Constitution at Work — Chapter 2: Rights in the Indian Constitution"
+          ],
+          "key_concepts": [
+            "Article 12 — Definition of State (includes government, Parliament, state legislature, local bodies, other authorities)",
+            "Article 13 — Laws inconsistent with FRs are void — basis of judicial review",
+            "Article 14 — Equality before law vs Equal protection of laws — difference",
+            "Article 15 — Prohibition of discrimination on grounds of religion, race, caste, sex, place of birth",
+            "Article 15(3) — special provision for women & children",
+            "Article 15(4),(5) — reservations for SC/ST/OBCs — added by amendments",
+            "Article 16 — Equality of opportunity in public employment",
+            "Article 16(4) — reservations for backward classes",
+            "Article 17 — Abolition of Untouchability — protected civil rights act 1955",
+            "Article 18 — Abolition of Titles — exceptions for military/academic",
+            "Doctrine of Reasonable Classification — intelligible differentia + nexus test"
+          ],
+          "important_cases": [
+            "State of West Bengal v. Anwar Ali Sarkar (1952) — Article 14",
+            "Indra Sawhney v. Union of India (1992) — Mandal Commission, 50% cap on reservations",
+            "EWS Reservation Case (2022) — 103rd Amendment upheld"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t08",
+          "topic_name": "Right to Freedom (Article 19-22)",
+          "laxmikanth_chapter": "Chapter 7 — Fundamental Rights (Part 2)",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 2"
+          ],
+          "key_concepts": [
+            "Article 19 — Six freedoms (originally 7, Article 19(1)(f) deleted by 44th Amendment)",
+            "19(1)(a) — Freedom of speech & expression + reasonable restrictions",
+            "19(1)(b) — Right to assemble peaceably without arms",
+            "19(1)(c) — Right to form associations/unions",
+            "19(1)(d) — Freedom of movement throughout territory of India",
+            "19(1)(e) — Right to reside and settle",
+            "19(1)(g) — Right to practise any profession/trade/business",
+            "Reasonable Restrictions under 19(2) to 19(6) — grounds listed",
+            "Article 20 — Protection in respect of conviction for offences (3 clauses)",
+            "Article 20(1) — No ex post facto law",
+            "Article 20(2) — No double jeopardy",
+            "Article 20(3) — No self-incrimination",
+            "Article 21 — Right to Life and Personal Liberty — most litigated article",
+            "Article 21A — Right to Education (86th Amendment, 2002) — 6-14 years",
+            "Article 22 — Protection against arrest and detention — 4 safeguards",
+            "Preventive detention — 3 months max without Advisory Board approval"
+          ],
+          "important_cases": [
+            "Maneka Gandhi v. Union of India (1978) — expanded Article 21",
+            "Shreya Singhal v. Union of India (2015) — Section 66A struck down",
+            "K.S. Puttaswamy v. Union of India (2017) — Right to Privacy under Article 21",
+            "Hussainara Khatoon (1979) — Right to speedy trial under Article 21"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t09",
+          "topic_name": "Right Against Exploitation, Religion, Culture & Education",
+          "laxmikanth_chapter": "Chapter 7 — Fundamental Rights (Part 3: Articles 23-30)",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 2"
+          ],
+          "key_concepts": [
+            "Article 23 — Prohibition of traffic in human beings and forced labour",
+            "Article 24 — Prohibition of employment of children below 14 in factories",
+            "Article 25 — Freedom of conscience and free profession of religion",
+            "Article 26 — Freedom to manage religious affairs",
+            "Article 27 — No taxes for promotion of religion",
+            "Article 28 — No religious instruction in state-funded institutions",
+            "Article 29 — Protection of interests of minorities (language, script, culture)",
+            "Article 30 — Right of minorities to establish & administer educational institutions",
+            "Article 30 vs Article 29 — difference",
+            "Triple Talaq judgment — Shayara Bano v. Union of India 2017"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t10",
+          "topic_name": "Right to Constitutional Remedies & Writs",
+          "laxmikanth_chapter": "Chapter 7 — Fundamental Rights (Part 4: Articles 32-35)",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 2"
+          ],
+          "key_concepts": [
+            "Article 32 — Right to move SC for enforcement of FRs — 'Heart and soul of Constitution' (Ambedkar)",
+            "Article 32 itself a Fundamental Right",
+            "Article 226 — High Courts also issue writs but wider jurisdiction than Article 32",
+            "Five Writs — Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto",
+            "Habeas Corpus — 'you shall have the body' — against illegal detention",
+            "Mandamus — 'we command' — to perform public duty",
+            "Prohibition — issued by higher court to lower court to stop proceedings",
+            "Certiorari — to quash order of lower court",
+            "Quo Warranto — 'by what authority' — against illegal holding of public office",
+            "Article 33 — Parliament's power to restrict FRs for armed forces",
+            "Article 34 — Restriction during Martial Law",
+            "Article 35 — Parliament's power to make laws on certain FRs"
+          ],
+          "important_cases": [
+            "ADM Jabalpur v. Shivkant Shukla (1976) — overruled by Puttaswamy 2017",
+            "Romesh Thappar v. State of Madras (1950) — FR cannot be abridged"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t11",
+          "topic_name": "Directive Principles of State Policy (DPSP)",
+          "laxmikanth_chapter": "Chapter 8 — Directive Principles",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 3: Election and Representation"
+          ],
+          "key_concepts": [
+            "Articles 36-51 — Part IV of Constitution",
+            "Non-justiciable — cannot be enforced in court",
+            "Borrowed from Irish Constitution",
+            "Classification — Socialistic, Gandhian, Liberal-Intellectual",
+            "Socialistic DPSPs — Articles 38, 39, 39A, 41, 42, 43, 43A, 47",
+            "Gandhian DPSPs — Articles 40, 43, 43B, 46, 47, 48",
+            "Liberal-Intellectual DPSPs — Articles 44, 45, 48A, 49, 50, 51",
+            "Key DPSPs — Article 44 (Uniform Civil Code), Article 45 (free education), Article 48A (environment)",
+            "FR vs DPSP conflict — Kesavananda Bharati (1973) — Harmonious Construction",
+            "42nd Amendment — DPSPs given precedence over Articles 14, 19 (later reversed)",
+            "Minerva Mills Case (1980) — balance between FR and DPSP must be maintained"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t12",
+          "topic_name": "Fundamental Duties",
+          "laxmikanth_chapter": "Chapter 9 — Fundamental Duties",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Article 51A — Part IVA of Constitution",
+            "Added by 42nd Amendment 1976 — Swaran Singh Committee recommendation",
+            "Original 10 duties + 11th added by 86th Amendment 2002",
+            "11th duty — parent/guardian to provide education to child 6-14 years",
+            "Non-justiciable — no legal sanction",
+            "Borrowed from erstwhile USSR Constitution",
+            "Verma Committee (1999) — recommended legal sanctions for violation",
+            "Relevance — courts can use FDs to determine constitutionality of laws"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t13",
+          "topic_name": "Amendment of the Constitution",
+          "laxmikanth_chapter": "Chapter 10 — Amendment of the Constitution",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 9: Constitution as a Living Document"
+          ],
+          "key_concepts": [
+            "Article 368 — Power of Parliament to amend",
+            "Three methods — Simple majority, Special majority, Special majority + State ratification",
+            "Simple majority — Articles outside Article 368 (e.g., new states, citizenship)",
+            "Special majority — 2/3rd of members present and voting + majority of total membership",
+            "Special majority + 50% states ratification — federal provisions (Article 368(2))",
+            "Key Amendments — 1st, 7th, 24th, 25th, 42nd, 44th, 52nd, 61st, 73rd, 74th, 86th, 91st, 97th, 99th, 100th, 101st (GST), 102nd, 103rd (EWS)",
+            "Basic Structure Doctrine — Kesavananda Bharati (1973) — Parliament cannot destroy basic structure",
+            "Elements of basic structure — supremacy of Constitution, rule of law, judicial review, secular character, etc."
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t14",
+          "topic_name": "Basic Structure Doctrine",
+          "laxmikanth_chapter": "Chapter 11 — Basic Structure of the Constitution",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Golak Nath Case 1967 — Parliament cannot amend FRs",
+            "24th Amendment 1971 — overruled Golak Nath — gave Parliament power to amend any part",
+            "Kesavananda Bharati v. State of Kerala 1973 — 13-judge bench, 7:6 majority",
+            "Basic Structure = Parliament can amend but cannot destroy/abrogate",
+            "Indira Gandhi v. Raj Narain 1975 — free and fair elections part of basic structure",
+            "Minerva Mills 1980 — Articles 14, 19 part of basic structure",
+            "S.R. Bommai 1994 — federalism part of basic structure",
+            "Elements of basic structure (not exhaustive) — supremacy of Constitution, sovereignty, democratic republic, secular state, separation of powers, judicial review, FR under Article 32, free & fair elections, rule of law, parliamentary system"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Article numbers", "FRs classification", "Landmark cases", "Writs", "Key amendments", "Basic Structure"]
+      }
+    },
+
+    {
+      "module_id": "pol_m03",
+      "module_name": "Parliamentary System & Government",
+      "sequence": 3,
+      "estimated_days_standard": 10,
+      "estimated_hours": 30,
+      "importance": "critical",
+      "upsc_prelims_weightage": "4-5 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t15",
+          "topic_name": "Parliamentary System in India",
+          "laxmikanth_chapter": "Chapter 12 — Parliamentary System",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 4: Working of Institutions",
+            "Class 11 — Indian Constitution at Work — Chapter 4: Executive"
+          ],
+          "key_concepts": [
+            "Parliamentary vs Presidential system — key differences",
+            "Features of Parliamentary system in India — nominal & real executive, majority party rule, collective responsibility, political homogeneity, double membership, leadership of PM, dissolution of lower house, no fixed tenure",
+            "Merits and demerits of Parliamentary system",
+            "Why India chose Parliamentary system — familiarity with Westminster model, heterogeneous society needs consensus"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t16",
+          "topic_name": "President of India",
+          "laxmikanth_chapter": "Chapter 17 — President",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 4: Executive"
+          ],
+          "key_concepts": [
+            "Articles 52-62, 71-73",
+            "Election — Electoral College (elected MPs + elected MLAs), single transferable vote, proportional representation",
+            "Qualifications — Article 58",
+            "Term — 5 years (Article 56), re-eligible",
+            "Impeachment — Article 61, both Houses, 2/3rd majority of total membership",
+            "Executive Powers — Article 53, 74, 75, 77, 78",
+            "Legislative Powers — summon/prorogue/dissolve, address, send messages, Table Bills, assent to Bills",
+            "Discretionary Powers — appointment of PM when no clear majority, dissolve Lok Sabha when PM loses confidence",
+            "Veto Powers — Absolute, Suspensive, Pocket Veto (no time limit for assent to ordinary bills)",
+            "Ordinance-making power — Article 123 (same force as Parliamentary law, when Parliament not in session)",
+            "Emergency Powers — National (352), President's Rule (356), Financial (360)",
+            "Pardoning Powers — Article 72 (Pardon, Reprieve, Respite, Remission, Commutation) — includes death sentence",
+            "President vs Governor — Article 72 vs Article 161 (Governor cannot pardon death sentence)"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t17",
+          "topic_name": "Vice President of India",
+          "laxmikanth_chapter": "Chapter 18 — Vice President",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Articles 63-71",
+            "Election — Electoral College (elected + nominated members of both Houses), no MLAs",
+            "Ex-officio Chairman of Rajya Sabha",
+            "Acts as President during vacancy — maximum 6 months",
+            "Removal — Rajya Sabha absolute majority + Lok Sabha concurrence",
+            "No specific grounds needed for removal — unlike President (impeachment)"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "low",
+          "daily_target_hours": 1
+        },
+        {
+          "topic_id": "pol_t18",
+          "topic_name": "Prime Minister & Council of Ministers",
+          "laxmikanth_chapter": "Chapters 19, 20 — PM & Council of Ministers",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 4: Executive"
+          ],
+          "key_concepts": [
+            "Article 74 — Council of Ministers to aid and advise President",
+            "Article 75 — PM appointed by President, other ministers on PM's advice",
+            "Collective responsibility — Article 75(3) — Council of Ministers responsible to Lok Sabha",
+            "Individual responsibility — Article 75(2) — minister holds office during President's pleasure",
+            "Cabinet, Council of Ministers, Cabinet Committees — distinctions",
+            "PM's role — leader of Cabinet, coordinate ministries, appoints ministers",
+            "PM's special powers — recommends dissolution of Lok Sabha to President",
+            "91st Amendment 2003 — 15% cap on size of Council of Ministers",
+            "Cabinet Committees — not mentioned in Constitution — extra-constitutional",
+            "Kitchen Cabinet / Inner Cabinet — informal concept"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t19",
+          "topic_name": "Parliament — Lok Sabha & Rajya Sabha",
+          "laxmikanth_chapter": "Chapter 22 — Parliament",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 4",
+            "Class 11 — Indian Constitution at Work — Chapter 5: Legislature"
+          ],
+          "key_concepts": [
+            "Lok Sabha — Article 81, max 552 members (530 states + 20 UTs + 2 Anglo-Indian — now omitted by 104th Amendment)",
+            "Current Lok Sabha — 543 seats",
+            "Rajya Sabha — Article 80, max 250 (238 elected + 12 nominated)",
+            "Current Rajya Sabha — 245",
+            "Rajya Sabha — permanent house, not subject to dissolution, 1/3rd retire every 2 years",
+            "Sessions — Budget, Monsoon, Winter",
+            "Summoning — President on advice of PM (Article 85)",
+            "Prorogation vs Dissolution vs Adjournment",
+            "Quorum — 1/10th of total membership",
+            "Presiding officers — Speaker (LS), Chairman (RS), Deputy Speaker, Deputy Chairman",
+            "Speaker removal — 14 days notice + absolute majority resolution",
+            "Speaker's casting vote in case of tie",
+            "Parliamentary procedures — Question Hour, Zero Hour, Calling Attention Motion",
+            "Bills — Ordinary, Money, Finance, Constitutional Amendment",
+            "Money Bill — Article 110, Speaker certifies, only Lok Sabha introduces, RS cannot amend only recommend, 14 days"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 5
+        },
+        {
+          "topic_id": "pol_t20",
+          "topic_name": "Parliamentary Procedures & Committees",
+          "laxmikanth_chapter": "Chapters 23, 24 — Parliamentary Committees & Forums",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 5"
+          ],
+          "key_concepts": [
+            "Standing Committees vs Ad Hoc Committees",
+            "Financial Committees — Public Accounts Committee (PAC), Estimates Committee, Committee on Public Undertakings",
+            "PAC — oldest committee, examines CAG report, chaired by Opposition leader",
+            "Departmentally Related Standing Committees (DRSCs) — 24 committees",
+            "Other Committees — Business Advisory, Rules, Privileges, Ethics",
+            "Joint Parliamentary Committee (JPC) — ad hoc, specific purpose",
+            "Parliamentary Forums — informal bodies for MPs",
+            "Motions — Censure vs No-Confidence (difference), Adjournment, Calling Attention, Cut Motion (Policy Cut, Economy Cut, Token Cut)",
+            "Whip — party whip, three-line whip, role in Anti-Defection Law",
+            "Privilege Motion — breach of parliamentary privilege",
+            "Points of Order — raised during proceedings"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t21",
+          "topic_name": "Supreme Court",
+          "laxmikanth_chapter": "Chapter 26 — Supreme Court",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 6: Judiciary"
+          ],
+          "key_concepts": [
+            "Articles 124-147",
+            "Composition — CJI + 33 judges (increased from original 7)",
+            "Appointment — collegium system (not in Constitution) — CJI + 4 senior-most judges",
+            "Second Judges Case 1993, Third Judges Case 1998 — collegium established",
+            "NJAC — 99th Amendment 2014 struck down by SC 2015 (Supreme Court Advocates on Record Association case)",
+            "Removal — Article 124(4) — impeachment, address of both Houses, special majority, proven misbehaviour/incapacity",
+            "Independence of SC — security of tenure, fixed service conditions, charged on Consolidated Fund, no practice after retirement",
+            "Jurisdiction — Original (Article 131), Appellate (Article 132-136), Advisory (Article 143), Writ (Article 32), Review",
+            "Original jurisdiction — disputes between states, between state and centre",
+            "Special Leave Petition (SLP) — Article 136 — SC can grant leave to appeal any judgment",
+            "Curative Petition — after review dismissed",
+            "Presidential Reference — Article 143 — advisory opinion, not binding",
+            "Judicial Review — Article 13, 32 — power to declare laws unconstitutional",
+            "Judicial Activism vs Judicial Overreach",
+            "PIL — Public Interest Litigation — Locus Standi relaxed"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t22",
+          "topic_name": "Anti-Defection Law",
+          "laxmikanth_chapter": "Chapter — Anti-Defection Law (10th Schedule)",
+          "ncert_reference": [],
+          "key_concepts": [
+            "10th Schedule — added by 52nd Amendment 1985",
+            "Defection — voluntarily giving up party membership OR voting against party direction",
+            "Exception — merger (2/3rd members agree)",
+            "Earlier exception of split (1/3rd) removed by 91st Amendment 2003",
+            "Decision by Speaker/Chairman — subject to judicial review (Kihoto Hollohan 1992)",
+            "Nabam Rebia Case 2016 — Speaker himself facing removal cannot decide defection",
+            "Criticism — goes against conscience voting, stifles dissent"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["President powers", "Parliament composition", "Bill types", "SC jurisdiction", "Collegium system", "Parliamentary procedures"]
+      }
+    },
+
+    {
+      "module_id": "pol_m04",
+      "module_name": "Federal System & Centre-State Relations",
+      "sequence": 4,
+      "estimated_days_standard": 7,
+      "estimated_hours": 21,
+      "importance": "critical",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t23",
+          "topic_name": "Federal System of India",
+          "laxmikanth_chapter": "Chapter 13 — Federal System",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 7: Federalism"
+          ],
+          "key_concepts": [
+            "India — 'Union of States' not 'Federation of States' (Article 1)",
+            "Features of federalism — dual government, written Constitution, supremacy of Constitution, rigidity, independent judiciary, bicameralism",
+            "Unitary bias features — strong centre, single Constitution, single citizenship, integrated judiciary, appointed governors, all-India services, emergency provisions",
+            "Quasi-federal — KC Wheare's description",
+            "Cooperative federalism vs Competitive federalism",
+            "Sarkaria Commission 1983 — Centre-State relations recommendations",
+            "Punchhi Commission 2007 — second commission on Centre-State relations",
+            "M.M. Punchhi Committee recommendations — Governor's role, Article 356"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t24",
+          "topic_name": "Centre-State Relations — Legislative, Administrative, Financial",
+          "laxmikanth_chapter": "Chapter 14 — Centre-State Relations",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 7"
+          ],
+          "key_concepts": [
+            "Three Lists — Union (List I — 100 subjects), State (List II — 61 subjects), Concurrent (List III — 52 subjects)",
+            "Residuary powers — with Centre (Article 248) — unlike USA where residuary with states",
+            "Parliament's power to legislate on State List — Articles 249, 250, 252, 253",
+            "Article 249 — RS passes resolution 2/3rd + state of national interest",
+            "Article 250 — during National Emergency",
+            "Article 252 — 2 or more states request Parliament",
+            "Article 253 — to implement international treaties",
+            "Administrative Relations — Articles 256-263",
+            "Article 256 — states must comply with Parliament laws",
+            "Article 257 — states not to impede Union executive power",
+            "All India Services — Article 312 — IAS, IPS, IFS (bridges administrative gap)",
+            "Financial Relations — Articles 268-293",
+            "Finance Commission — Article 280 — devolution of taxes",
+            "15th Finance Commission — 41% share to states (from 42%)",
+            "GST Council — Article 279A — 101st Amendment",
+            "Grants-in-aid — Articles 275, 282"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 5
+        },
+        {
+          "topic_id": "pol_t25",
+          "topic_name": "Interstate Relations",
+          "laxmikanth_chapter": "Chapter 15 — Interstate Relations",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Articles 261-263",
+            "Interstate Councils — Article 263 — coordinate between states (not same as Zonal Councils)",
+            "Zonal Councils — statutory bodies, 5 zones, set up under States Reorganisation Act 1956",
+            "Interstate Water Disputes — Article 262 — Parliament excludes SC jurisdiction",
+            "Full Faith and Credit Clause — Article 261",
+            "River Water Disputes Tribunals — Krishna, Cauvery, Godavari"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t26",
+          "topic_name": "Emergency Provisions",
+          "laxmikanth_chapter": "Chapter 16 — Emergency Provisions",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 8: Local Governments"
+          ],
+          "key_concepts": [
+            "Three Emergencies — National (352), President's Rule (356), Financial (360)",
+            "National Emergency — war, external aggression, armed rebellion (44th Amendment — 'internal disturbance' replaced)",
+            "Proclamation — Cabinet recommendation in writing, President proclaims",
+            "Approval — both Houses within 1 month, 2/3rd special majority",
+            "Duration — 6 months, renewable indefinitely with approval every 6 months",
+            "Effect — Centre can legislate on State List, executive power extends to states",
+            "FRs — Article 358 (19 suspended automatically), Article 359 (others suspended by President)",
+            "President's Rule — Article 356 — failure of constitutional machinery",
+            "S.R. Bommai v. Union of India 1994 — Floor test must be held before dismissal of state govt",
+            "44th Amendment — Article 356 approval required within 2 months, limit 3 years",
+            "Financial Emergency — Article 360 — never been proclaimed",
+            "44th Amendment 1978 — major safeguards against misuse of Article 352"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t27",
+          "topic_name": "Governor, State Government & State Legislature",
+          "laxmikanth_chapter": "Chapters 30-33 — Governor, CM, State CoM, State Legislature",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 4"
+          ],
+          "key_concepts": [
+            "Governor — Articles 153-162",
+            "Appointment — by President, not elected",
+            "Qualifications — Article 157 (citizen, 35+ years)",
+            "Term — 5 years (at pleasure of President)",
+            "Dual role — constitutional head of state + agent of Centre",
+            "Discretionary powers — appointment of CM (hung assembly), refusal of assent, reserving bills for President, dismissal of ministry",
+            "Pocket Veto — Governor unlike President has time limit (Article 200 — 'as soon as possible')",
+            "Chief Minister — Articles 163-167",
+            "State Council of Ministers — collective responsibility to State Legislature",
+            "State Legislature — unicameral (22 states) or bicameral (6 states — AP, Bihar, Karnataka, Maharashtra, Telangana, UP)",
+            "State Legislative Council (Vidhan Parishad) — 1/3rd elected by MLAs, 1/3rd local bodies, 1/12th teachers, 1/12th graduates, 1/6th nominated by Governor",
+            "Session, Quorum, State Bills procedure"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t28",
+          "topic_name": "High Courts & Subordinate Courts",
+          "laxmikanth_chapter": "Chapters 34, 35 — High Courts & Subordinate Courts",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 6"
+          ],
+          "key_concepts": [
+            "Articles 214-231 — High Courts",
+            "Appointment — collegium + Governor's consultation",
+            "Jurisdiction — Original, Appellate, Writ (Article 226 — broader than SC)",
+            "Article 226 — HC writ jurisdiction extends to enforcement of any legal right (not just FRs)",
+            "Transfer of HC judges — by President after consultation with CJI",
+            "District Courts — Sessions Judge = District Judge",
+            "Gram Nyayalayas Act 2008 — mobile courts at grassroots",
+            "Lok Adalat — Legal Services Authority Act 1987 — no court fee, binding award",
+            "Fast Track Courts, Family Courts, Consumer Forums"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Three Lists items", "Emergency provisions comparison", "Governor vs President powers", "Sarkaria Commission", "SR Bommai case"]
+      }
+    },
+
+    {
+      "module_id": "pol_m05",
+      "module_name": "Local Government — Panchayati Raj & Urban",
+      "sequence": 5,
+      "estimated_days_standard": 5,
+      "estimated_hours": 15,
+      "importance": "high",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t29",
+          "topic_name": "Panchayati Raj (73rd Amendment)",
+          "laxmikanth_chapter": "Chapter 36 — Panchayati Raj",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 8: Local Governments"
+          ],
+          "key_concepts": [
+            "73rd Constitutional Amendment Act 1992 — effective April 24, 1993",
+            "Part IX added — Articles 243-243O",
+            "11th Schedule — 29 subjects transferred to Panchayats",
+            "Three-tier structure — Gram Panchayat, Panchayat Samiti, Zila Parishad",
+            "Gram Sabha — foundation of PR system",
+            "Duration — 5 years, elections before expiry",
+            "Reservation — 1/3rd for women (some states 50%), SC/ST proportional to population",
+            "State Finance Commission — review of financial position of PRIs",
+            "District Planning Committee — Article 243ZD",
+            "Balwant Rai Mehta Committee 1957 — recommended 3-tier PR (first)",
+            "Ashok Mehta Committee 1977 — recommended 2-tier",
+            "GVK Rao Committee, LM Singhvi Committee"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "pol_t30",
+          "topic_name": "Municipalities (74th Amendment)",
+          "laxmikanth_chapter": "Chapter 37 — Municipalities",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 8"
+          ],
+          "key_concepts": [
+            "74th Constitutional Amendment Act 1992 — effective June 1, 1993",
+            "Part IX-A added — Articles 243P-243ZG",
+            "12th Schedule — 18 subjects transferred to Urban Local Bodies",
+            "Types of ULBs — Nagar Panchayat, Municipal Council, Municipal Corporation",
+            "Ward Committees for populations above 3 lakhs",
+            "Reservation — same as PRIs",
+            "Metropolitan Planning Committee — Article 243ZE",
+            "Smart Cities Mission — urban renewal"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t31",
+          "topic_name": "Union Territories & Special Areas",
+          "laxmikanth_chapter": "Chapters 38-42 — UTs, Scheduled Areas",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Article 239 — Administration of UTs by President through Administrator",
+            "Delhi — NCT — Article 239AA (69th Amendment) — special status, elected legislature, LG vs CM conflict",
+            "GNCT of Delhi Amendment Act 2021 — LG's opinion must be sought for certain matters",
+            "SC ruling 2023 — Delhi government has control over services (except police, land, public order)",
+            "Puducherry — elected legislature — Article 239A",
+            "J&K Reorganisation Act 2019 — J&K + Ladakh become UTs",
+            "Fifth Schedule — Scheduled Areas (tribal areas — non-northeast)",
+            "Sixth Schedule — Tribal areas of northeast (Assam, Meghalaya, Tripura, Mizoram) — Autonomous District Councils"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t32",
+          "topic_name": "Tribunals, Co-operative Societies & Special Provisions",
+          "laxmikanth_chapter": "Chapters 65, 62, 67",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Article 323A — Administrative Tribunals — Central Administrative Tribunal (CAT)",
+            "Article 323B — other tribunals (Income Tax, Armed Forces, etc.)",
+            "L Chandra Kumar Case 1997 — tribunal decisions subject to HC/SC jurisdiction",
+            "97th Amendment 2011 — Part IXB — Co-operative Societies (Amendments later struck down partially by SC)",
+            "Special Provisions — Article 371 to 371J — special status for various states",
+            "Article 371A — Nagaland (customary law protected)",
+            "Article 371G — Mizoram (customary law protected)"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["73rd vs 74th Amendment differences", "Schedules — 11th and 12th", "Committees on PR", "UT administration", "Special provisions for states"]
+      }
+    },
+
+    {
+      "module_id": "pol_m06",
+      "module_name": "Constitutional & Non-Constitutional Bodies",
+      "sequence": 6,
+      "estimated_days_standard": 8,
+      "estimated_hours": 24,
+      "importance": "critical",
+      "upsc_prelims_weightage": "3-4 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t33",
+          "topic_name": "Election Commission of India",
+          "laxmikanth_chapter": "Chapter 41 — Election Commission",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 3: Electoral Politics",
+            "Class 11 — Indian Constitution at Work — Chapter 3"
+          ],
+          "key_concepts": [
+            "Article 324 — ECI — superintendence, direction, control of elections",
+            "Composition — CEC + Election Commissioners (currently 3)",
+            "Appointment — by President",
+            "Removal — CEC removed like SC judge (Article 324(5)), ECs on CEC's recommendation",
+            "Election Laws Amendment Act 2023 — changed appointment (now committee of PM, Home Minister, Leader of Opposition)",
+            "Functions — schedule elections, model code of conduct, derecognise parties, EVM oversight",
+            "Model Code of Conduct — no legal backing, convention",
+            "NOTA — introduced 2013",
+            "Rajya Sabha elections — open ballot",
+            "Electoral Bond Scheme — struck down by SC 2024"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t34",
+          "topic_name": "UPSC & State PSCs",
+          "laxmikanth_chapter": "Chapters 42, 43 — UPSC & State PSCs",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Article 315-323 — UPSC",
+            "Composition — Chairman + 10 members (1/2 must have 10 years in govt service)",
+            "Appointment — by President, removal — by President after SC inquiry",
+            "UPSC functions — recruitment, promotions, transfers, disciplinary matters advice",
+            "UPSC not consulted for — emergency appointments, posts of Chairman of PSCs, SC/HC judges",
+            "Annual report — to President — laid before Parliament",
+            "State PSC — Article 315 — similar structure, appointment by Governor, removal by President"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t35",
+          "topic_name": "CAG, Finance Commission, Attorney General",
+          "laxmikanth_chapter": "Chapters 49, 44, 50",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 5"
+          ],
+          "key_concepts": [
+            "CAG — Article 148 — audit of Union and State accounts",
+            "CAG appointment — by President, removal like SC judge",
+            "CAG reports — laid before Parliament — examined by PAC",
+            "Finance Commission — Article 280 — quasi-judicial body",
+            "FC set up every 5 years — recommends tax devolution, grants",
+            "15th Finance Commission (2021-26) — 41% to states",
+            "Attorney General — Article 76 — first law officer of India",
+            "Appointment — by President, qualifications same as SC judge",
+            "AG can practice in courts, vote in Parliament (no right to vote)",
+            "Solicitor General, Additional Solicitor General — below AG, not constitutional"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t36",
+          "topic_name": "National Commissions — SC, ST, BC, Minorities",
+          "laxmikanth_chapter": "Chapters 45, 46, 47, 48",
+          "ncert_reference": [],
+          "key_concepts": [
+            "National Commission for SCs — Article 338 — constitutional body",
+            "National Commission for STs — Article 338A — constitutional (89th Amendment 2003 — separated from NCSC)",
+            "National Commission for BCs — Article 338B — added by 102nd Amendment 2018",
+            "National Commission for Minorities — statutory (not constitutional) — Minorities Commission Act 1992",
+            "6 notified minorities — Muslims, Christians, Sikhs, Buddhists, Parsis, Jains (added 2014)",
+            "Special Officer for Linguistic Minorities — Article 350B"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t37",
+          "topic_name": "NHRC, CIC, CVC, Lokpal",
+          "laxmikanth_chapter": "Chapters 53, 55, 57, 59",
+          "ncert_reference": [],
+          "key_concepts": [
+            "NHRC — Protection of Human Rights Act 1993 — statutory body",
+            "NHRC Chairperson — retired CJI (amended 2019 — any retired SC judge)",
+            "CIC — Central Information Commission — RTI Act 2005",
+            "CIC — Chief IC + 10 ICs — appointed by President on PM's committee recommendation",
+            "CVC — Central Vigilance Commission — statutory (CVC Act 2003)",
+            "CVC — single member body (CVC + 2 VCs)",
+            "CVC jurisdiction — Group A officers, PSU executives",
+            "Lokpal — Lokpal and Lokayuktas Act 2013 (effective 2019)",
+            "Lokpal — Chairman (retired CJI or SC judge) + 8 members (50% judicial, 50% non-judicial, 50% SC/ST/OBC/minorities/women)",
+            "Lokpal jurisdiction — PM (with safeguards), ministers, MPs, Group A-D officials",
+            "PM excluded from jurisdiction for — national security, public order, international relations"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": "critical",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t38",
+          "topic_name": "NITI Aayog, NIA, NDMA & Other Bodies",
+          "laxmikanth_chapter": "Chapters 52, 60, 61",
+          "ncert_reference": [],
+          "key_concepts": [
+            "NITI Aayog — replaced Planning Commission on Jan 1, 2015",
+            "NITI Aayog — Chairperson = PM, CEO appointed by PM, Governing Council = all CMs + LGs",
+            "Key differences — Planning Commission vs NITI Aayog (no fund allocation power)",
+            "NIA — National Investigation Agency — NIA Act 2008 (post 26/11)",
+            "NIA — federal agency, investigates scheduled offences, jurisdiction across states",
+            "NDMA — National Disaster Management Authority — DM Act 2005",
+            "NDMA Chairperson — PM",
+            "State Disaster Management Authority (SDMA) — CM is Chairperson",
+            "NDRF — National Disaster Response Force — under NDMA"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t39",
+          "topic_name": "Official Language, Public Services & Special Provisions",
+          "laxmikanth_chapter": "Chapters 63, 64, 67",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Official Language — Part XVII — Articles 343-351",
+            "Hindi in Devanagari script — Official language of Union",
+            "English continues — Official Languages Act 1963",
+            "8th Schedule — 22 languages (originally 14)",
+            "Classical language status — Sanskrit, Tamil, Telugu, Kannada, Malayalam, Odia",
+            "Article 351 — promote Hindi",
+            "Public Services — Article 308-314 — All India Services, Central Services",
+            "IAS, IPS, IFoS — All India Services (Article 312)",
+            "Article 311 — protection to civil servants (inquiry before dismissal)"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Constitutional vs Non-constitutional bodies", "Finance Commission role", "Lokpal composition", "NITI Aayog vs Planning Commission", "8th Schedule languages"]
+      }
+    },
+
+    {
+      "module_id": "pol_m07",
+      "module_name": "Political Dynamics & Governance",
+      "sequence": 7,
+      "estimated_days_standard": 6,
+      "estimated_hours": 18,
+      "importance": "high",
+      "upsc_prelims_weightage": "2-3 questions",
+      "topics": [
+        {
+          "topic_id": "pol_t40",
+          "topic_name": "Political Parties & Party System",
+          "laxmikanth_chapter": "Chapters 68, 69 — Political Parties & Regional Parties",
+          "ncert_reference": [
+            "Class 10 — Democratic Politics II — Chapter 6: Political Parties",
+            "Class 12 — Politics in India Since Independence — Chapter 9"
+          ],
+          "key_concepts": [
+            "Recognition of parties — national vs state parties",
+            "ECI criteria for recognition — vote share and seat criteria",
+            "National parties — 6 currently (BJP, INC, BSP, CPI, CPI(M), NPP + AAP recently)",
+            "Election Symbol — reserved vs free symbols",
+            "Functions of political parties",
+            "Rise of regional parties — causes and significance",
+            "Coalition politics — NDA, INDIA Alliance, Third Front",
+            "Role of regional parties — stabilising or destabilising?"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t41",
+          "topic_name": "Electoral System & Reforms",
+          "laxmikanth_chapter": "Chapter 74 — Electoral Politics",
+          "ncert_reference": [
+            "Class 9 — Democratic Politics I — Chapter 3: Electoral Politics",
+            "Class 10 — Democratic Politics II — Chapter 3: Democracy and Diversity"
+          ],
+          "key_concepts": [
+            "First Past the Post (FPTP) system — for Lok Sabha, Vidhan Sabha",
+            "Proportional Representation — for President, VP, Rajya Sabha, Vidhan Parishad",
+            "Delimitation — Delimitation Act, Delimitation Commission",
+            "Representation of People Act 1950, 1951",
+            "Model Code of Conduct — binding or advisory?",
+            "Electoral Reforms — Law Commission recommendations",
+            "EVM controversy — VVPAT",
+            "One Nation One Election — pros and cons",
+            "Electoral Bonds — struck down by SC (Association for Democratic Reforms case 2024)",
+            "Campaign finance — Declaration of criminal antecedents, asset disclosure",
+            "Paid news — ECI's stand",
+            "Voter Verifiable Paper Audit Trail (VVPAT)"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "critical",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t42",
+          "topic_name": "Pressure Groups, Civil Society & Social Movements",
+          "laxmikanth_chapter": "Chapter 72 — Pressure Groups",
+          "ncert_reference": [
+            "Class 10 — Democratic Politics II — Chapter 5: Popular Struggles and Movements"
+          ],
+          "key_concepts": [
+            "Pressure groups vs political parties — key difference (don't contest elections)",
+            "Types — business (FICCI, CII, ASSOCHAM), labour (INTUC, AITUC, BMS), agricultural, student",
+            "Techniques — lobbying, propaganda, demonstrations, strikes",
+            "Role in Indian democracy — positive and negative aspects",
+            "Social movements — Chipko, Narmada Bachao, Right to Information",
+            "RTI Movement — Aruna Roy, Mazdoor Kisan Shakti Sangathan (MKSS)"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "high",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "pol_t43",
+          "topic_name": "Governance — RTI, Citizen's Charter, e-Governance",
+          "laxmikanth_chapter": "Chapters 55-56 + Governance chapters",
+          "ncert_reference": [],
+          "key_concepts": [
+            "Right to Information Act 2005 — key provisions, exceptions",
+            "Public Information Officer, First Appellate Authority, CIC",
+            "RTI Amendment 2019 — CIC and ICs tenure and pay now determined by Central Govt",
+            "Citizen's Charter — concept, limitations",
+            "e-Governance — definition, types (G2C, G2B, G2G, G2E)",
+            "Digital India Mission — pillars",
+            "Good Governance Index — Ministry of Home Affairs",
+            "2nd ARC recommendations on e-governance",
+            "Social Audit — MGNREGA, PDS",
+            "Whistleblower Protection Act 2014"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t44",
+          "topic_name": "Comparison of Indian Constitution with Other Constitutions",
+          "laxmikanth_chapter": "Chapter — Comparison (Appendix/Last Chapters)",
+          "ncert_reference": [
+            "Class 11 — Indian Constitution at Work — Chapter 1"
+          ],
+          "key_concepts": [
+            "India vs USA — Presidential vs Parliamentary, judicial review origin, Bill of Rights vs FRs, written vs unwritten",
+            "India vs UK — India has written Constitution, India federal while UK unitary, India has judicial review UK lacks",
+            "India vs Canada — both federal but India stronger centre, Canada — residuary with provinces, India with Centre",
+            "India vs Australia — concurrent list borrowed from Australia",
+            "India vs South Africa — amendment procedure similarity, proportional representation for Rajya Sabha",
+            "India vs France — Preamble ideals (Liberty, Equality, Fraternity)",
+            "Separation of powers — India (partial) vs USA (strict)",
+            "Judicial Independence — India vs USA — appointment process comparison",
+            "Fundamental Rights — India vs USA Bill of Rights — key differences"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "critical",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "pol_t45",
+          "topic_name": "National Integration, Communalism & Secularism",
+          "laxmikanth_chapter": "Chapter 73 — National Integration",
+          "ncert_reference": [
+            "Class 10 — Democratic Politics II — Chapter 3 & 4",
+            "Class 11 — Political Theory — Chapter 8: Secularism"
+          ],
+          "key_concepts": [
+            "National integration challenges — communalism, casteism, regionalism, linguism",
+            "Secularism — Indian model vs Western model — Indian state can interfere in religion for reform",
+            "Communalism — causes, incidents, prevention",
+            "National Integration Council — set up 1961",
+            "National Foundation for Communal Harmony",
+            "Special provisions — inter-state council, zonal councils",
+            "Article 350A — instruction in mother tongue"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": "medium",
+          "mains_importance": "critical",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 40,
+        "duration_mins": 40,
+        "focus_areas": ["Party recognition criteria", "Electoral system types", "RTI provisions", "e-Governance types", "Borrowed features revision"]
+      }
+    }
+  ],
+
+  "full_subject_test": {
+    "questions": 100,
+    "duration_mins": 120,
+    "coverage": "All 7 modules — complete Polity",
+    "focus": "Integration of constitutional provisions, landmark cases, current affairs polity"
+  },
+
+  "mains_answer_writing_topics": [
+    "Federalism in India — cooperative vs competitive",
+    "Governor's discretionary powers — issues and reforms",
+    "Judicial appointments — collegium vs NJAC debate",
+    "Electoral reforms needed in India",
+    "Lokpal effectiveness — analysis",
+    "Parliamentary privileges vs freedom of press",
+    "Emergency provisions — safeguards and misuse",
+    "73rd Amendment — success and failures of Panchayati Raj",
+    "Comparison of Indian secularism with Western secularism",
+    "Basic Structure doctrine — significance"
+  ],
+
+  "previous_year_questions_pattern": {
+    "prelims_avg_per_year": "16-20 questions",
+    "hot_topics_last_5_years": [
+      "Constitutional amendments with article numbers",
+      "Writ jurisdiction differences",
+      "Parliamentary procedures and bills",
+      "Scheduled areas — 5th and 6th Schedule",
+      "Constitutional vs Statutory bodies",
+      "Emergency provisions conditions",
+      "SC judgements in current affairs"
+    ]
+  },
+
+  "daily_study_schedule_standard_track": {
+    "module_1": { "days": "Day 1-6", "hours_per_day": 3 },
+    "module_2": { "days": "Day 7-14", "hours_per_day": 3 },
+    "module_3": { "days": "Day 15-24", "hours_per_day": 3 },
+    "module_4": { "days": "Day 25-31", "hours_per_day": 3 },
+    "module_5": { "days": "Day 32-36", "hours_per_day": 3 },
+    "module_6": { "days": "Day 37-44", "hours_per_day": 3 },
+    "module_7": { "days": "Day 45-50", "hours_per_day": 3 },
+    "revision_week": { "days": "Day 51-55", "hours_per_day": 4 },
+    "full_subject_test": { "days": "Day 56", "hours": 3 },
+    "fault_analysis": { "days": "Day 57", "hours": 3 },
+    "total_days": 57,
+    "total_hours": 180
+  }
+}

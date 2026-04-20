@@ -1,0 +1,2405 @@
+{
+  "meta": {
+    "syllabus_name": "UPSC World History - Comprehensive Study Guide",
+    "preparation_portal": "MentorsDaily",
+    "total_modules": 12,
+    "total_study_hours": 200,
+    "exam_papers": ["UPSC Prelims GS Paper 1", "UPSC Mains GS Paper 1"],
+    "primary_references": {
+      "ncert_class_11": {
+        "title": "Themes in World History",
+        "chapters": 11,
+        "coverage": "100%"
+      },
+      "ncert_class_10": {
+        "title": "India and the Contemporary World II",
+        "chapters": "5,6,7,8"
+      },
+      "ncert_class_9": {
+        "title": "India and the Contemporary World I",
+        "chapters": "1,2,3"
+      },
+      "supplementary": "Mastering Modern World History by Norman Lowe"
+    }
+  },
+  "modules": [
+    {
+      "module_id": "M01",
+      "module_name": "Renaissance, Reformation & Age of Exploration",
+      "period": "15th-16th century",
+      "ncert_mapping": "Class 11 Theme 7: Changing Cultural Traditions",
+      "daily_target_hours": 18,
+      "topics": [
+        {
+          "topic_id": "T01_01",
+          "topic_name": "Italian Renaissance - Origins, Characteristics & Key Features",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 7: Changing Cultural Traditions",
+            "pages": "172-195",
+            "key_sections": ["Intellectual Changes", "Humanism", "Art & Architecture"]
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 7,
+            "chapter_name": "Changing Cultural Traditions"
+          },
+          "key_concepts": [
+            "Humanism as a philosophical movement - emphasis on individual potential",
+            "Petrarch as founder of humanism - focus on classical texts",
+            "Neoplatonism and its influence on Renaissance thinking",
+            "Patronage system - role of Medici family and wealthy merchants",
+            "Printing press invention by Gutenberg (1440) - revolutionary impact",
+            "Vernacular literature replacing Latin as primary language",
+            "Perspective and realism in art - Brunelleschi, Leonardo da Vinci",
+            "Role of city-states - Florence, Venice, Rome as cultural centers",
+            "Classical learning revival - Greek and Roman texts rediscovered",
+            "Women patrons and artists - Christine de Pizan, Caterina dei Vigri",
+            "Secularism vs religious art - gradual shift in themes",
+            "Banking and trade fueling cultural development",
+            "Migration of Byzantine scholars post-1453 Constantinople fall"
+          ],
+          "important_facts": {
+            "dates": [
+              "1440 - Printing press invention by Gutenberg",
+              "1347-1353 - Black Death impact on Europe",
+              "1453 - Fall of Constantinople, Byzantine scholars migrate",
+              "1504 - Michelangelo completes David sculpture",
+              "1509-1519 - Leonardo da Vinci's peak creative period"
+            ],
+            "personalities": [
+              "Dante Alighieri - poet, Divine Comedy author",
+              "Petrarch - founder of humanism",
+              "Boccaccio - novelist, Decameron author",
+              "Leonardo da Vinci - painter, scientist, engineer",
+              "Michelangelo - sculptor, painter, Sistine Chapel",
+              "Raphael - painter of Madonnas and Vatican frescoes",
+              "Machiavelli - political theorist, The Prince",
+              "Medici family - Florence patrons of arts"
+            ],
+            "key_works": [
+              "Divine Comedy by Dante",
+              "Decameron by Boccaccio",
+              "The Prince by Machiavelli",
+              "David sculpture by Michelangelo",
+              "Last Supper by Leonardo da Vinci"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Italy", "Florence", "Venice", "Rome", "Milan"],
+            "significance": "Birthplace of Renaissance movement, center of cultural transformation"
+          }
+        },
+        {
+          "topic_id": "T01_02",
+          "topic_name": "Protestant Reformation - Martin Luther & Religious Changes",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 7",
+            "pages": "180-190"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 7,
+            "chapter_name": "Changing Cultural Traditions"
+          },
+          "key_concepts": [
+            "Martin Luther's 95 Theses (1517) - critique of Church indulgences",
+            "Concept of justification by faith alone - theological core of Reformation",
+            "Role of printing press in spreading Reformation ideas rapidly",
+            "Criticism of Church corruption, papal authority, and clergy privileges",
+            "Bible translation into vernacular languages - accessibility to common people",
+            "Concept of priesthood of all believers - challenge to Church hierarchy",
+            "Political support for Reformation - German princes strategic backing",
+            "Peace of Augsburg (1555) - 'cuius regio, eius religio' principle",
+            "John Calvin and Calvinism - predestination theology",
+            "Counter-Reformation by Catholic Church - Council of Trent",
+            "Religious Wars - St. Bartholomew's Day Massacre (1572), Thirty Years War",
+            "Impact on family structure, education, and literacy",
+            "Economic implications - work ethic and capitalism development"
+          ],
+          "important_facts": {
+            "dates": [
+              "1517 - Martin Luther posts 95 Theses",
+              "1521 - Diet of Worms, Luther's excommunication",
+              "1534 - Act of Supremacy in England",
+              "1545-1563 - Council of Trent (Counter-Reformation)",
+              "1555 - Peace of Augsburg",
+              "1618-1648 - Thirty Years War"
+            ],
+            "personalities": [
+              "Martin Luther - founder of Lutheranism",
+              "John Calvin - founder of Calvinism",
+              "Henry VIII - English Reformation initiator",
+              "Ulrich Zwingli - Swiss reformer",
+              "Ignatius of Loyola - Counter-Reformation leader"
+            ],
+            "treaties": [
+              "Peace of Augsburg 1555 - religious settlement in Germany",
+              "Treaty of Westphalia 1648 - end of Thirty Years War"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 10,
+          "map_work": {
+            "regions": ["Germany", "Switzerland", "England", "France", "Scandinavia"],
+            "significance": "Centers of Reformation spread and religious conflict"
+          }
+        },
+        {
+          "topic_id": "T01_03",
+          "topic_name": "Age of Exploration & Discovery",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 8: Confrontation of Cultures",
+            "pages": "200-225"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 8,
+            "chapter_name": "Confrontation of Cultures"
+          },
+          "key_concepts": [
+            "Technological advances - caravel ship design, astrolabe, compass improvements",
+            "Economic motivation - spice trade, wealth accumulation, mercantilism",
+            "Religious motivation - Christian missionary zeal, conversion goals",
+            "Political competition - European nations rivalry for global dominance",
+            "Portuguese exploration - Prince Henry the Navigator's patronage",
+            "Spanish exploration - search for westward route to Indies",
+            "Columbus's 1492 voyage - accidental encounter with Americas",
+            "Impact on indigenous populations - disease, conquest, displacement",
+            "Columbian Exchange - biological, cultural, economic transformations",
+            "Development of triangular trade - Europe, Africa, Americas",
+            "Charter companies - trading monopolies granted by monarchs",
+            "Cartography revolution - improved maps and navigation",
+            "Environmental impact - introduction of new crops and animals"
+          ],
+          "important_facts": {
+            "dates": [
+              "1492 - Columbus reaches Americas",
+              "1498 - Vasco da Gama reaches India",
+              "1519-1521 - Magellan's circumnavigation (first worldwide voyage)",
+              "1521 - Cortés conquers Aztec Empire",
+              "1532 - Pizarro conquers Inca Empire"
+            ],
+            "personalities": [
+              "Prince Henry the Navigator - Portuguese exploration sponsor",
+              "Christopher Columbus - sailed 1492",
+              "Vasco da Gama - reached India via Cape of Good Hope",
+              "Ferdinand Magellan - first circumnavigation",
+              "Hernán Cortés - conquistador of Aztecs",
+              "Francisco Pizarro - conquistador of Incas"
+            ],
+            "voyages": [
+              "Portuguese route around Africa to India",
+              "Columbus westward voyage to Caribbean",
+              "Magellan's three-year circumnavigation"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "map_work": {
+            "routes": ["Portuguese coast-to-India route", "Columbus Atlantic crossing", "Magellan circumnavigation"],
+            "regions": ["Portugal", "Spain", "Americas", "Africa", "Asia"],
+            "significance": "Global exploration initiating worldwide colonial systems"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M02",
+      "module_name": "Industrial Revolution & Its Global Impact",
+      "period": "18th-19th century",
+      "ncert_mapping": "Class 11 Theme 9: The Industrial Revolution",
+      "daily_target_hours": 20,
+      "topics": [
+        {
+          "topic_id": "T02_01",
+          "topic_name": "Industrial Revolution - Causes, Stages & Technological Innovations",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 9: The Industrial Revolution",
+            "pages": "230-260"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 9,
+            "chapter_name": "The Industrial Revolution"
+          },
+          "key_concepts": [
+            "First Industrial Revolution (1760-1840) - Britain as epicenter",
+            "Agricultural Revolution prerequisite - increased food production",
+            "Coal availability and mining technology advancement",
+            "Steam engine development - Watt, Newcomen improvements",
+            "Textile industry transformation - flying shuttle, spinning jenny, water frame",
+            "Factory system emergence - centralized production, discipline, division of labor",
+            "Capital accumulation from colonial trade and mercantilism",
+            "Labor supply from rural-to-urban migration",
+            "Canal and railway infrastructure development",
+            "Iron and steel production advances - Bessemer process",
+            "Second Industrial Revolution (1870-1914) - chemicals, electricity, oil",
+            "Shift from water power to steam power to electricity",
+            "Urbanization and living condition changes",
+            "Impact on family structure and gender roles"
+          ],
+          "important_facts": {
+            "dates": [
+              "1733 - Flying shuttle invention",
+              "1764 - Spinning jenny patent by Hargreaves",
+              "1769 - Water frame by Richard Arkwright",
+              "1769 - Watt's steam engine improvement",
+              "1779 - Crompton's mule invented",
+              "1785 - Cartwright's power loom",
+              "1856 - Bessemer process for steel production",
+              "1879 - Edison's electric light bulb"
+            ],
+            "personalities": [
+              "James Watt - steam engine improvements",
+              "Richard Arkwright - water frame inventor",
+              "James Hargreaves - spinning jenny inventor",
+              "Samuel Crompton - mule inventor",
+              "Edmund Cartwright - power loom inventor",
+              "Henry Bessemer - steel production process",
+              "Thomas Edison - electric innovations"
+            ],
+            "innovations": [
+              "Steam engine - primary power source",
+              "Spinning jenny - textile thread production",
+              "Water frame - continuous thread spinning",
+              "Power loom - automatic weaving",
+              "Bessemer process - mass steel production"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Britain", "Lancashire", "Yorkshire", "Midlands"],
+            "significance": "Birthplace of Industrial Revolution, center of technological innovation"
+          }
+        },
+        {
+          "topic_id": "T02_02",
+          "topic_name": "Social & Economic Impact of Industrialization",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 9",
+            "pages": "250-275"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 9,
+            "chapter_name": "The Industrial Revolution"
+          },
+          "key_concepts": [
+            "Factory system working conditions - long hours, child labor, low wages",
+            "Urbanization consequences - overcrowding, disease, poverty",
+            "Class structure transformation - rise of industrial bourgeoisie",
+            "Working class formation - proletariat consciousness development",
+            "Trade unions emergence - resistance to exploitation",
+            "Chartist movement in Britain - workers' political demands",
+            "Luddite movement - machine-breaking by skilled workers",
+            "Women and children in factories - exploitation and gender discrimination",
+            "Consumption patterns change - mass production benefits",
+            "Environmental degradation - pollution, industrial waste",
+            "Middle class expansion - professionals, managers, merchants",
+            "Living standards paradox - technological progress but worker suffering",
+            "Education and literacy changes - industrial skills demand"
+          ],
+          "important_facts": {
+            "dates": [
+              "1819 - Factory Act limiting child labor",
+              "1824 - Trade unions legalized in Britain",
+              "1832-1848 - Chartist movement active",
+              "1842 - Mines Act - women and young children banned",
+              "1847 - Ten Hours Act - working hours limited",
+              "1891 - Pope Leo XIII's Rerum Novarum on labor"
+            ],
+            "events": [
+              "Manchester textile mills growth",
+              "Peterloo Massacre 1819",
+              "Chartist demonstrations 1838-1848",
+              "Luddite rebellion 1811-1817"
+            ],
+            "movements": [
+              "Trade Unionism",
+              "Chartism",
+              "Socialism emergence",
+              "Utopian socialism - Owen, Fourier, Saint-Simon"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Industrial Britain", "Manchester", "Cotton belt"],
+            "significance": "Centers of social upheaval and labor movements"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M03",
+      "module_name": "French Revolution & Rise of Nationalism in Europe",
+      "period": "1789-1848",
+      "ncert_mapping": "Class 10 Chapter 1 & Class 11 themes",
+      "daily_target_hours": 18,
+      "topics": [
+        {
+          "topic_id": "T03_01",
+          "topic_name": "French Revolution - Causes, Phases & Significance",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 1,
+            "chapter_name": "French Revolution",
+            "pages": "1-30"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 1,
+            "chapter_name": "French Revolution"
+          },
+          "key_concepts": [
+            "Ancien Régime - three estates structure and inequalities",
+            "Financial crisis - government debt from wars and extravagance",
+            "Enlightenment ideas - Rousseau, Voltaire, Montesquieu influence",
+            "Role of peasantry - rural unrest and crop failures",
+            "Bourgeoisie ambitions - political power despite wealth",
+            "Estates-General convocation 1789 - representation crisis",
+            "Tennis Court Oath - Third Estate solidarity declaration",
+            "Declaration of the Rights of Man and Citizen - fundamental principles",
+            "Storming of Bastille July 14, 1789 - symbolic moment",
+            "Abolition of feudalism - August 4 Decrees",
+            "Civil Constitution of Clergy - religious reforms",
+            "Constitutional phase (1791-1792) - limited monarchy",
+            "Radical phase - Jacobins, Robespierre, Terror period"
+          ],
+          "important_facts": {
+            "dates": [
+              "1789 May 5 - Estates-General convocation",
+              "1789 June 17 - Third Estate declares itself National Assembly",
+              "1789 June 20 - Tennis Court Oath",
+              "1789 July 14 - Storming of Bastille",
+              "1789 August 4 - Feudalism abolished",
+              "1791 June 20-21 - Royal family's flight to Varennes",
+              "1792 September - Massacres, monarchy abolished",
+              "1793 January 21 - Louis XVI execution",
+              "1793-1794 - Reign of Terror",
+              "1794 July 28 - Thermidorian Reaction, Robespierre executed"
+            ],
+            "personalities": [
+              "Louis XVI - last Bourbon king",
+              "Marie Antoinette - queen, symbol of excess",
+              "Maximilien Robespierre - Terror period leader",
+              "Georges Danton - revolutionary moderate",
+              "Jean-Paul Marat - radical journalist",
+              "Camille Desmoulins - revolutionary orator",
+              "Marquis de Lafayette - General, constitutional monarchist",
+              "Abbé Sieyès - ideologue, What is the Third Estate?"
+            ],
+            "key_documents": [
+              "Declaration of Rights of Man and Citizen",
+              "Declaration of the Rights of Woman",
+              "Constitution of 1791",
+              "Declaration of Pillnitz"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 10,
+          "mains_importance": 10,
+          "map_work": {
+            "regions": ["France", "Paris", "Versailles"],
+            "significance": "Center of revolutionary transformation affecting all Europe"
+          }
+        },
+        {
+          "topic_id": "T03_02",
+          "topic_name": "Napoleonic Wars & European Nationalism",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 2,
+            "chapter_name": "Nationalism in Europe",
+            "pages": "35-65"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 2,
+            "chapter_name": "Nationalism in Europe"
+          },
+          "key_concepts": [
+            "Napoleon's rise from military general to First Consul",
+            "Napoleonic Code - legal standardization across Europe",
+            "Meritocracy principle - ability over birth",
+            "Continental System - economic blockade against Britain",
+            "Napoleonic Wars across Europe 1803-1815",
+            "Nationalism awakening - response to French occupation",
+            "Spanish and Portuguese peninsula wars - guerrilla warfare",
+            "1812 Russian campaign - Grande Armée disaster",
+            "Waterloo defeat June 1815 - final defeat",
+            "Congress of Vienna - post-war European reorganization",
+            "Concert of Europe - conservative order maintenance",
+            "Metternich's influence - European balance of power",
+            "Suppression of nationalist movements - 1820s-1830s revolutions"
+          ],
+          "important_facts": {
+            "dates": [
+              "1799 November 9 - Napoleonic coup d'état",
+              "1804 December 2 - Napoleon crowned Emperor",
+              "1805 - Trafalgar naval victory for Britain",
+              "1805 - Austerlitz victory",
+              "1807 - Treaties of Tilsit",
+              "1812 - Russian campaign begins",
+              "1814 April - First abdication, Elba exile",
+              "1815 June 18 - Battle of Waterloo",
+              "1815 September - Congress of Vienna convenes"
+            ],
+            "battles": [
+              "Austerlitz 1805",
+              "Jena 1806",
+              "Eylau 1807",
+              "Borodino 1812",
+              "Waterloo 1815"
+            ],
+            "treaties": [
+              "Treaty of Amiens 1802",
+              "Treaties of Tilsit 1807",
+              "Treaty of Paris 1814",
+              "Treaty of Paris 1815"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["France", "Europe", "Italy", "Spain", "Russia"],
+            "campaigns": ["Italian campaign", "Egyptian campaign", "Russian campaign"],
+            "significance": "Napoleon's conquests spread nationalist sentiments across Europe"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M04",
+      "module_name": "American Independence & Rise of USA",
+      "period": "1775-1860",
+      "ncert_mapping": "Class 10 Chapter 3",
+      "daily_target_hours": 16,
+      "topics": [
+        {
+          "topic_id": "T04_01",
+          "topic_name": "American Revolution - Causes & Independence",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 3,
+            "chapter_name": "Nationalism in Europe",
+            "pages": "35-50"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 3,
+            "chapter_name": "Nationalism in Europe (American context)"
+          },
+          "key_concepts": [
+            "Colonial tensions with Britain - taxation without representation",
+            "Stamp Act 1765 - colonial resistance begins",
+            "Boston Massacre 1770 - tensions escalate",
+            "Boston Tea Party 1773 - symbolic protest",
+            "Coercive Acts (Intolerable Acts) 1774 - British reprisal",
+            "First Continental Congress 1774 - colonial coordination",
+            "Enlightenment ideas - Jefferson, Paine, natural rights",
+            "Declaration of Independence 1776 - ideological foundation",
+            "War of Independence 1775-1783 - military struggle",
+            "French and Spanish alliance support",
+            "Yorktown victory 1781 - turning point",
+            "Treaty of Paris 1783 - British recognition of independence",
+            "Articles of Confederation - first constitutional framework"
+          ],
+          "important_facts": {
+            "dates": [
+              "1765 - Stamp Act",
+              "1770 March 5 - Boston Massacre",
+              "1773 December 16 - Boston Tea Party",
+              "1774 September - First Continental Congress",
+              "1775 April 19 - Battles of Lexington and Concord",
+              "1776 July 4 - Declaration of Independence",
+              "1777 October - Saratoga victory",
+              "1781 October 19 - Yorktown surrender",
+              "1783 September 3 - Treaty of Paris"
+            ],
+            "personalities": [
+              "George Washington - military commander and first president",
+              "Thomas Jefferson - Declaration author",
+              "Benjamin Franklin - diplomat, founding father",
+              "John Adams - political theorist, diplomat",
+              "Samuel Adams - cousin, organized Boston Tea Party",
+              "Patrick Henry - 'Give me liberty or give me death'",
+              "Thomas Paine - Common Sense pamphlet author"
+            ],
+            "key_texts": [
+              "Declaration of Independence",
+              "Common Sense by Thomas Paine",
+              "Federalist Papers"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["Thirteen Colonies", "Boston", "Virginia", "New York"],
+            "battles": ["Lexington", "Concord", "Saratoga", "Yorktown"],
+            "significance": "First successful colonial rebellion against European power"
+          }
+        },
+        {
+          "topic_id": "T04_02",
+          "topic_name": "USA Constitution & Federal Republic Formation",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 3,
+            "pages": "50-65"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 3,
+            "chapter_name": "Nationalism in Europe"
+          },
+          "key_concepts": [
+            "Constitutional Convention 1787 - Philadelphia",
+            "Great Compromise - bicameral legislature structure",
+            "Three-fifths compromise - slavery representation",
+            "Separation of powers - executive, legislative, judicial",
+            "Checks and balances system",
+            "Federalism - state and national government powers",
+            "Bill of Rights 1791 - first ten amendments",
+            "Electoral college system - presidential election mechanism",
+            "Supreme Court role - judicial review",
+            "Slavery paradox - democratic ideals vs enslaved population",
+            "Westward expansion - Manifest Destiny ideology",
+            "Monroe Doctrine 1823 - hemispheric dominance",
+            "Industrial growth and economic development"
+          ],
+          "important_facts": {
+            "dates": [
+              "1787 May - Constitutional Convention begins",
+              "1787 September 17 - Constitution signed",
+              "1788 June 21 - Constitution ratified",
+              "1789 - Washington inaugurated as president",
+              "1791 - Bill of Rights ratified",
+              "1803 - Louisiana Purchase",
+              "1823 - Monroe Doctrine proclaimed"
+            ],
+            "personalities": [
+              "George Washington - first president",
+              "James Madison - 'Father of the Constitution'",
+              "James Hamilton - Federalist Papers author",
+              "Thomas Jefferson - third president, Democratic-Republican",
+              "John Marshall - Chief Justice, judicial review power"
+            ],
+            "documents": [
+              "Constitution of USA",
+              "Bill of Rights",
+              "Federalist Papers",
+              "Monroe Doctrine"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["USA", "Philadelphia", "Atlantic coast"],
+            "expansion": ["Louisiana Purchase territory", "Westward expansion routes"],
+            "significance": "Formation of federal republic model"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M05",
+      "module_name": "Imperialism & Colonialism",
+      "period": "19th-20th century",
+      "ncert_mapping": "Class 11 Theme 10: Displacing Indigenous Peoples",
+      "daily_target_hours": 22,
+      "topics": [
+        {
+          "topic_id": "T05_01",
+          "topic_name": "Imperialism - Motivations, Forms & Expansion",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 8: Confrontation of Cultures & Theme 10: Displacing Indigenous Peoples",
+            "pages": "200-225, 290-320"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": "8 and 10",
+            "chapter_name": "Confrontation of Cultures & Displacing Indigenous Peoples"
+          },
+          "key_concepts": [
+            "Economic imperialism - markets for industrial goods, raw materials extraction",
+            "Political imperialism - territorial control, geopolitical dominance",
+            "Cultural imperialism - 'civilizing mission', superiority ideology",
+            "Social Darwinism - justification for racial hierarchy",
+            "Technological superiority - weaponry advantage",
+            "Nationalism and competitive rivalry - Great Power competition",
+            "Informal imperialism - economic dependence without direct rule",
+            "Formal imperialism - direct political control and administration",
+            "Scramble for Africa 1880s-1900 - rapid colonization",
+            "Berlin Conference 1884-1885 - African partition rules",
+            "Spheres of influence - China carving up",
+            "Colonial administrative systems - direct vs indirect rule",
+            "Resistance movements - anti-colonial struggles"
+          ],
+          "important_facts": {
+            "dates": [
+              "1880-1900 - Scramble for Africa",
+              "1884-1885 - Berlin Conference on African Division",
+              "1898 - Spanish-American War",
+              "1898-1902 - Second Boer War",
+              "1904-1905 - Russo-Japanese War",
+              "1910-1920 - Mexican Revolution",
+              "1930s - Rise of anti-colonial movements"
+            ],
+            "conferences": [
+              "Berlin Conference 1884-1885 - African partition",
+              "Congo Conference - Leopold II's Congo Free State"
+            ],
+            "personalities": [
+              "Cecil Rhodes - British imperialist in Africa",
+              "King Leopold II - Belgium Congo colonizer",
+              "Lord Curzon - British India viceroy",
+              "Rudyard Kipling - imperialist ideology writer",
+              "Karl Pearson - Social Darwinist"
+            ],
+            "colonies": [
+              "British India - 'Crown Jewel'",
+              "French Indochina",
+              "British Africa - Cape to Cairo",
+              "German colonies in Africa and Pacific"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Africa", "Asia", "Americas", "Pacific"],
+            "colonial_powers": ["British", "French", "German", "Belgian", "Portuguese", "Dutch"],
+            "significance": "Global colonial system dividing world among European powers"
+          }
+        },
+        {
+          "topic_id": "T05_02",
+          "topic_name": "Colonialism in Asia & Africa - Impact on Indigenous Peoples",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 10: Displacing Indigenous Peoples",
+            "pages": "300-330"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 10,
+            "chapter_name": "Displacing Indigenous Peoples"
+          },
+          "key_concepts": [
+            "Land dispossession - indigenous lands for settler colonies",
+            "Disease impact - epidemics decimating populations",
+            "Cultural destruction - languages, traditions, religions suppressed",
+            "Economic exploitation - slavery, forced labor, resource extraction",
+            "Political subjugation - loss of sovereignty and self-governance",
+            "Administrative systems - bureaucratic control structures",
+            "Education and language policies - colonial imposition",
+            "Plantation economy - cash crops for export",
+            "Extraction of wealth - raw materials to industrial centers",
+            "Demographic changes - settler population growth",
+            "Indigenous resistance - rebellions and movements",
+            "Colonial society hierarchies - racial discrimination",
+            "Environmental transformation - deforestation, agriculture changes"
+          ],
+          "important_facts": {
+            "dates": [
+              "1757 - Battle of Plassey, British conquest of Bengal begins",
+              "1858 - British Raj replaces East India Company",
+              "1885 - Indian National Congress formation",
+              "1857-1858 - Indian Rebellion against British",
+              "1899-1902 - Boer Wars in South Africa",
+              "1906 - Zulu resistance in South Africa",
+              "1911 - Chinese Revolution, end of imperial rule",
+              "1917 - Balfour Declaration on Palestine"
+            ],
+            "rebellions": [
+              "1857 Indian Rebellion",
+              "Philippine-American War 1899-1902",
+              "Boxer Rebellion 1898-1901 in China"
+            ],
+            "personalities": [
+              "Sitting Bull - Lakota resistance leader",
+              "Geronimo - Apache resistance",
+              "Nelson Mandela - South African anti-apartheid",
+              "Keshab Chandra Sen - Indian reformer",
+              "Ramakrishna Paramahamsa - Indian spiritual leader"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["India", "Africa", "Southeast Asia", "Americas"],
+            "countries": ["India", "Kenya", "Nigeria", "Congo", "Vietnam", "Malaya"],
+            "significance": "Centers of colonial rule and indigenous resistance"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M06",
+      "module_name": "World War I - Causes, Events & Treaty of Versailles",
+      "period": "1914-1919",
+      "ncert_mapping": "Class 10 Chapter 4 & Class 9 Chapter 4",
+      "daily_target_hours": 18,
+      "topics": [
+        {
+          "topic_id": "T06_01",
+          "topic_name": "World War I - Causes, Alliances & Major Events",
+          "primary_book": {
+            "title": "India and the Contemporary World I",
+            "chapter": 4,
+            "chapter_name": "The Making of a Global World"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "India and the Contemporary World I",
+            "chapter": 4,
+            "chapter_name": "The Making of a Global World"
+          },
+          "key_concepts": [
+            "Militarism - arms race and military alliances",
+            "Nationalism - intense patriotism and ethnic tensions",
+            "Imperialism - colonial rivalries, African and Asian competition",
+            "Alliance system - Triple Alliance (Germany, Austria, Italy) vs Triple Entente (France, Russia, Britain)",
+            "Balkan tensions - 'powder keg of Europe', Serbian nationalism",
+            "Archduke Franz Ferdinand assassination - triggering event",
+            "Mobilization cascade - alliance obligations",
+            "Western Front - static trench warfare, stalemate",
+            "Eastern Front - mobile warfare, Russian losses",
+            "Gallipoli campaign - Ottoman involvement",
+            "New warfare technologies - poison gas, tanks, aircraft",
+            "Lusitania sinking - American outrage",
+            "1917 American entry - Central Powers' turning point"
+          ],
+          "important_facts": {
+            "dates": [
+              "1914 June 28 - Franz Ferdinand assassination",
+              "1914 July 1-30 - July Crisis, declarations of war",
+              "1914 August - Britain declares war on Germany",
+              "1914 September - Battle of Marne, German advance stopped",
+              "1915 April - Gallipoli campaign begins",
+              "1915 May 7 - Lusitania sinking",
+              "1916 May - Battle of Jutland naval engagement",
+              "1916 July-November - Battle of Somme, massive casualties",
+              "1917 February - German unrestricted submarine warfare",
+              "1917 April 6 - USA declares war",
+              "1917 November - Bolshevik seizure of power",
+              "1918 March - Brest-Litovsk Treaty, Russia exits war",
+              "1918 November 11 - Armistice signed"
+            ],
+            "battles": [
+              "Battle of Marne 1914",
+              "Gallipoli 1915-1916",
+              "Verdun 1916",
+              "Somme 1916",
+              "Passchendaele 1917",
+              "Brusilov Offensive 1916"
+            ],
+            "personalities": [
+              "Kaiser Wilhelm II - German Emperor",
+              "Archduke Franz Ferdinand - assassination victim",
+              "Field Marshal Haig - British commander",
+              "General Hindenburg - German commander",
+              "General Pershing - American commander"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Western Europe", "Eastern Europe", "Balkan Peninsula", "Middle East"],
+            "frontlines": ["Western Front - France/Belgium", "Eastern Front - Russia/Eastern Europe"],
+            "theaters": ["Gallipoli", "Mesopotamia", "East African campaigns"],
+            "significance": "First truly global industrial war affecting Europe, Asia, Africa"
+          }
+        },
+        {
+          "topic_id": "T06_02",
+          "topic_name": "Treaty of Versailles & Post-War World Order",
+          "primary_book": {
+            "title": "India and the Contemporary World I",
+            "chapter": 4,
+            "pages": "75-95"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "India and the Contemporary World I",
+            "chapter": 4,
+            "chapter_name": "The Making of a Global World"
+          },
+          "key_concepts": [
+            "Paris Peace Conference 1919 - victors' domination",
+            "Wilson's Fourteen Points - idealistic peace plan",
+            "Clemenceau's French desires - German punishment",
+            "European map redrawing - new nations formation",
+            "War reparations - Germany's crippling payment obligations",
+            "Military limitations - German armed forces restriction",
+            "Territorial losses - German territories to various powers",
+            "Mandate system - League of Nations trusteeships",
+            "League of Nations formation - first international organization",
+            "Self-determination principle - selective application",
+            "Fiume dispute - Yugoslavian-Italian tensions",
+            "Saar basin - international control period",
+            "Alsace-Lorraine restoration to France",
+            "Eastern European state formation - Poland, Czechoslovakia, Yugoslavia",
+            "Ottoman Empire dissolution - Turkish nationalist response"
+          ],
+          "important_facts": {
+            "dates": [
+              "1918 November 11 - Armistice",
+              "1919 January 18 - Paris Peace Conference opens",
+              "1919 May 7 - Treaty presented to Germany",
+              "1919 June 28 - Treaty of Versailles signed",
+              "1920 January - League of Nations established",
+              "1919-1920 - Turkish War of Independence"
+            ],
+            "treaties": [
+              "Treaty of Versailles 1919 - Germany",
+              "Treaty of Saint-Germain 1919 - Austria",
+              "Treaty of Neuilly 1919 - Bulgaria",
+              "Treaty of Trianon 1920 - Hungary",
+              "Treaty of Sèvres 1920 - Ottoman Empire"
+            ],
+            "personalities": [
+              "Woodrow Wilson - US President, Fourteen Points",
+              "Georges Clemenceau - French Premier, 'Tiger'",
+              "David Lloyd George - British PM",
+              "Vittorio Orlando - Italian PM"
+            ],
+            "new_nations": [
+              "Poland",
+              "Czechoslovakia",
+              "Yugoslavia",
+              "Finland",
+              "Lithuania",
+              "Latvia",
+              "Estonia"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 10,
+          "map_work": {
+            "regions": ["Europe", "Middle East"],
+            "territorial_changes": ["German losses", "Eastern European new states", "Ottoman succession states"],
+            "significance": "Post-war order that shaped 20th century European conflicts"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M07",
+      "module_name": "Russian Revolution & Rise of Communism",
+      "period": "1917-1924",
+      "ncert_mapping": "Class 11 Theme 11: Paths to Modernisation (Russian context)",
+      "daily_target_hours": 18,
+      "topics": [
+        {
+          "topic_id": "T07_01",
+          "topic_name": "Russian Revolution - February & October 1917",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 11: Paths to Modernisation",
+            "pages": "350-380"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 11,
+            "chapter_name": "Paths to Modernisation"
+          },
+          "key_concepts": [
+            "Tsarist autocracy - underdeveloped political system",
+            "Serfdom abolition 1861 - Emancipation Edict",
+            "Industrial development under Witte - railways, factories",
+            "Russo-Japanese War 1904-1905 impact - military defeat",
+            "Bloody Sunday 1905 - St. Petersburg massacre",
+            "1905 Revolution - strikes, mutinies, Soviet emergence",
+            "October Manifesto 1905 - Duma establishment",
+            "Duma limitations - authoritarian control remains",
+            "WWI involvement - military defeats, casualties",
+            "February Revolution 1917 - bread riots, mutineers",
+            "Petrograd Soviet - workers and soldiers council",
+            "Abdication of Nicholas II - Romanov dynasty ends",
+            "Dual power situation - Provisional Government vs Soviets",
+            "April Theses by Lenin - 'Peace, Land, Bread'",
+            "October Revolution 1917 - Bolshevik seizure",
+            "Lenin's leadership - revolutionary determination",
+            "Decree on Peace and Decree on Land - initial measures"
+          ],
+          "important_facts": {
+            "dates": [
+              "1905 January 22 - Bloody Sunday",
+              "1905 October 17 - October Manifesto",
+              "1914 - Russia enters WWI",
+              "1917 March 8-12 - February Revolution",
+              "1917 March 15 - Nicholas II abdicates",
+              "1917 April 16 - Lenin returns to Russia",
+              "1917 July - July Uprising suppressed",
+              "1917 November 7 - October Revolution (Bolshevik coup)",
+              "1917 December 3 - Armistice signed"
+            ],
+            "events": [
+              "Bloody Sunday 1905",
+              "1905 Revolution and Soviet formation",
+              "February Revolution - bread riots",
+              "July Uprising - suppressed",
+              "October Revolution - Bolshevik seizure"
+            ],
+            "personalities": [
+              "Vladimir Lenin - Bolshevik leader",
+              "Leon Trotsky - Revolutionary military leader",
+              "Joseph Stalin - Bolshevik organizer",
+              "Alexander Kerensky - Provisional Government leader",
+              "Grigori Rasputin - mystic influencing tsarina"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 10,
+          "mains_importance": 10,
+          "map_work": {
+            "regions": ["Russia", "Petrograd (St. Petersburg)", "Moscow"],
+            "significance": "First successful socialist revolution changing global politics"
+          }
+        },
+        {
+          "topic_id": "T07_02",
+          "topic_name": "Soviet Union Formation & Early Communist State",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 11",
+            "pages": "375-395"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 11,
+            "chapter_name": "Paths to Modernisation"
+          },
+          "key_concepts": [
+            "Treaty of Brest-Litovsk 1918 - harsh terms, peace with Germany",
+            "Dissolution of Constituent Assembly - Lenin's dictatorship",
+            "Civil War 1918-1922 - Reds vs Whites struggle",
+            "War Communism - economic emergency measures",
+            "Foreign intervention - Allied powers supporting Whites",
+            "Red Army creation - Trotsky's military organization",
+            "Bolshevik victory - Communist dominance established",
+            "Formation of USSR 1922 - Union of Soviet Socialist Republics",
+            "New Economic Policy (NEP) 1921-1928 - partial capitalist measures",
+            "Communist Party dictatorship - one-party state",
+            "Elimination of opposition - Left and Right Communist factions",
+            "Ideological battles - Lenin's leadership declining health",
+            "Stalin's rise - defeat of Trotsky and others"
+          ],
+          "important_facts": {
+            "dates": [
+              "1918 March 3 - Treaty of Brest-Litovsk",
+              "1918-1922 - Civil War period",
+              "1918 - Red Army formally established",
+              "1920 - Whites decisively defeated",
+              "1921 - Kronstadt rebellion suppressed",
+              "1921 - NEP adopted",
+              "1922 December 30 - USSR officially formed",
+              "1924 January 21 - Lenin dies",
+              "1924-1927 - Power struggle among Bolshevik leaders"
+            ],
+            "treaties": [
+              "Treaty of Brest-Litovsk 1918 - Russia loses territory to Germany"
+            ],
+            "personalities": [
+              "Vladimir Lenin - revolutionary leader until 1924",
+              "Leon Trotsky - Red Army creator, defeated",
+              "Joseph Stalin - successor to Lenin",
+              "Grigory Zinoviev - Left Opposition",
+              "Nikolai Bukharin - Right Opposition"
+            ],
+            "policies": [
+              "War Communism - immediate socialist measures",
+              "New Economic Policy (NEP) - pragmatic approach",
+              "One-party state ideology"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Soviet Union", "Russia", "Ukraine", "Caucasus", "Central Asia"],
+            "significance": "Formation of world's first communist state"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M08",
+      "module_name": "Inter-War Period - Rise of Fascism & Great Depression",
+      "period": "1919-1939",
+      "ncert_mapping": "Class 10 Chapter 5",
+      "daily_target_hours": 16,
+      "topics": [
+        {
+          "topic_id": "T08_01",
+          "topic_name": "Economic Crisis & Great Depression",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 5,
+            "chapter_name": "The Rise of Fascism"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 5,
+            "chapter_name": "The Rise of Fascism"
+          },
+          "key_concepts": [
+            "Post-WWI economic instability - reparations burden",
+            "American prosperity 1920s - 'Roaring Twenties'",
+            "Stock market speculation - irrational exuberance",
+            "October 1929 crash - Black Tuesday collapse",
+            "Bank failures - financial system collapse",
+            "Unemployment - reaching 25% in USA",
+            "Agricultural crisis - overproduction, falling prices",
+            "International economic interdependence - spread of crisis",
+            "Trade collapse - Smoot-Hawley tariffs",
+            "Homelessness and poverty - 'Hoovervilles'",
+            "Government responses - slow initially",
+            "New Deal programs - Roosevelt's recovery attempt",
+            "Social impacts - family breakdown, mental health crisis",
+            "Political radicalization - extremist movements gain",
+            "National recovery programs - USSR and Nazi Germany"
+          ],
+          "important_facts": {
+            "dates": [
+              "1927 May - US stock market peaks",
+              "1929 September 3 - Market peaks",
+              "1929 October 24 - Black Thursday",
+              "1929 October 29 - Black Tuesday crash",
+              "1929-1933 - Worst depression phase",
+              "1932 - US unemployment reaches 25%",
+              "1933 March 4 - Roosevelt inauguration",
+              "1933 - New Deal programs begin",
+              "1933-1939 - Partial recovery period"
+            ],
+            "events": [
+              "Stock market speculation bubble",
+              "Bank runs and failures",
+              "Agricultural price collapse",
+              "Industrial production decline",
+              "International economic collapse"
+            ],
+            "personalities": [
+              "Franklin D. Roosevelt - New Deal implementer",
+              "Herbert Hoover - reluctant intervener",
+              "John Maynard Keynes - economic theorist"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["USA", "Europe", "Asia"],
+            "significance": "Global economic crisis affecting all nations"
+          }
+        },
+        {
+          "topic_id": "T08_02",
+          "topic_name": "Rise of Fascism - Germany, Italy & Japan",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 5,
+            "pages": "90-125"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 5,
+            "chapter_name": "The Rise of Fascism"
+          },
+          "key_concepts": [
+            "Definition of fascism - authoritarianism, ultranationalism, militarism",
+            "Benito Mussolini in Italy - March on Rome 1922",
+            "Corporate state ideology - fascist economic model",
+            "Adolf Hitler in Germany - Führer principle",
+            "Nazi ideology - Aryan superiority, antisemitism",
+            "Treaty of Versailles resentment - German grievance",
+            "Hyperinflation 1923 - German economic crisis",
+            "Beer Hall Putsch 1923 - failed Nazi coup",
+            "Hitler's rise to power - 1933 Chancellorship",
+            "Enabling Act 1933 - dictatorship consolidation",
+            "Reichstag fire - Communist scapegoating",
+            "Rearmament - German military buildup",
+            "Anti-Jewish persecution - Nuremberg Laws",
+            "Japanese militarism - Meiji legacy continuation",
+            "Invasion of Manchuria 1931 - Japanese expansion",
+            "Anti-Comintern Pact 1936 - Axis cooperation"
+          ],
+          "important_facts": {
+            "dates": [
+              "1922 October 28 - Mussolini's March on Rome",
+              "1922 - Mussolini becomes Italian PM",
+              "1923 January - Ruhr occupation crisis",
+              "1923 August-November - German hyperinflation",
+              "1923 November 8-9 - Beer Hall Putsch",
+              "1929 - Great Depression begins",
+              "1931 September 18 - Japan invades Manchuria",
+              "1933 January 30 - Hitler becomes Chancellor",
+              "1933 February 27 - Reichstag fire",
+              "1933 March 23 - Enabling Act passed",
+              "1935 - German rearmament announced",
+              "1935 - Nuremberg Laws against Jews",
+              "1936 July - Spanish Civil War begins",
+              "1936 November - Anti-Comintern Pact signed"
+            ],
+            "laws": [
+              "Enabling Act 1933 - dictatorship power",
+              "Nuremberg Laws 1935 - Jewish persecution",
+              "Law for the Protection of German Blood 1935"
+            ],
+            "personalities": [
+              "Benito Mussolini - Italian fascist dictator",
+              "Adolf Hitler - German Nazi dictator",
+              "Emperor Hirohito - Japanese militarist figurehead",
+              "Joseph Goebbels - Nazi propaganda minister",
+              "Hermann Göring - Nazi military leader"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Germany", "Italy", "Japan", "Austria"],
+            "significance": "Rise of aggressive fascist states threatening peace"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M09",
+      "module_name": "World War II - Causes, Events, Aftermath & Holocaust",
+      "period": "1939-1945",
+      "ncert_mapping": "Class 10 Chapter 6",
+      "daily_target_hours": 20,
+      "topics": [
+        {
+          "topic_id": "T09_01",
+          "topic_name": "World War II - Causes, Early Axis Victories & American Entry",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 6,
+            "chapter_name": "The Rise of Nationalism in Europe"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 6,
+            "chapter_name": "The Rise of Nationalism in Europe"
+          },
+          "key_concepts": [
+            "Treaty of Versailles legacy - German resentment",
+            "Appeasement policy - British and French weakness",
+            "German rearmament - violation of Versailles",
+            "Rhineland remilitarization 1936 - Hitler's boldness",
+            "Anschluss 1938 - German-Austrian union",
+            "Sudetenland crisis - Munich Agreement capitulation",
+            "Czechoslovakia conquest 1939 - appeasement failure",
+            "Molotov-Ribbentrop Pact 1939 - Nazi-Soviet alliance",
+            "Poland invasion September 1939 - war declaration",
+            "Blitzkrieg tactics - rapid mechanized warfare",
+            "Fall of France 1940 - swift German victory",
+            "Battle of Britain 1940-1941 - aerial war",
+            "North African campaign - Rommel vs Montgomery",
+            "Operation Barbarossa 1941 - German invasion of USSR",
+            "Japanese Pearl Harbor attack 1941 - American entry",
+            "Lend-Lease Act - American material support"
+          ],
+          "important_facts": {
+            "dates": [
+              "1933 October - Germany leaves League of Nations",
+              "1935 - Rearmament announced",
+              "1936 March - Rhineland remilitarization",
+              "1936-1939 - Spanish Civil War",
+              "1938 March - Anschluss with Austria",
+              "1938 September - Munich Agreement",
+              "1939 March 15 - Czechoslovakia conquered",
+              "1939 August 23 - Molotov-Ribbentrop Pact",
+              "1939 September 1 - Poland invaded, war begins",
+              "1939 September 3 - Britain and France declare war",
+              "1940 May-June - Fall of France",
+              "1940 July-October - Battle of Britain",
+              "1941 June 22 - Operation Barbarossa begins",
+              "1941 December 7 - Pearl Harbor attack",
+              "1941 December 11 - USA and Germany declare war"
+            ],
+            "battles": [
+              "Invasion of Poland 1939",
+              "Battle of France 1940",
+              "Battle of Britain 1940-1941",
+              "Battle of the Atlantic 1940-1943",
+              "Operation Barbarossa 1941-1945",
+              "Battle of Stalingrad 1942-1943",
+              "Battle of Kursk 1943",
+              "D-Day Normandy Invasion 1944"
+            ],
+            "personalities": [
+              "Adolf Hitler - Nazi Germany leader",
+              "Winston Churchill - British wartime PM",
+              "Franklin D. Roosevelt - American president",
+              "Joseph Stalin - Soviet leader",
+              "Erwin Rommel - German general",
+              "Dwight D. Eisenhower - Allied Supreme Commander"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 10,
+          "mains_importance": 10,
+          "map_work": {
+            "regions": ["Europe", "North Africa", "Soviet Union"],
+            "theaters": ["Western European Theater", "North African Theater", "Eastern European Theater"],
+            "campaigns": ["Fall of France", "Battle of Britain", "Russian Campaign"],
+            "significance": "Global conflict affecting all continents"
+          }
+        },
+        {
+          "topic_id": "T09_02",
+          "topic_name": "Holocaust, War Crimes & Allied Victory",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 6,
+            "pages": "145-175"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 6,
+            "chapter_name": "The Rise of Nationalism in Europe"
+          },
+          "key_concepts": [
+            "Antisemitic ideology - Nazi racial ideology basis",
+            "Nuremberg Laws expansion - Jewish persecution escalation",
+            "Kristallnacht 1938 - organized violence against Jews",
+            "Ghetto system - forced segregation",
+            "Wannsee Conference 1942 - Final Solution planning",
+            "Extermination camps - Auschwitz, Treblinka",
+            "Gas chambers - industrial-scale murder",
+            "Six million Jewish victims - scope of Holocaust",
+            "Romani and disabled population - target groups",
+            "Soviet POW treatment - mass starvation",
+            "Warsaw Ghetto Uprising - Jewish resistance",
+            "Liberation of camps 1945 - Allied discovery",
+            "War crimes tribunals - Nuremberg and Tokyo trials",
+            "Persecution rationale - racial theories and ideology",
+            "Survivor testimonies - historical documentation"
+          ],
+          "important_facts": {
+            "dates": [
+              "1935 September 15 - Nuremberg Laws",
+              "1938 November 9-10 - Kristallnacht",
+              "1942 January 20 - Wannsee Conference",
+              "1942-1945 - Holocaust peak extermination",
+              "1943 April-May - Warsaw Ghetto Uprising",
+              "1944 October - Sonderkommando uprising",
+              "1945 January - Auschwitz liberation",
+              "1945 May 7-8 - Germany surrenders",
+              "1945 August - Japan surrenders",
+              "1945 November - Nuremberg trials begin"
+            ],
+            "camps": [
+              "Auschwitz-Birkenau",
+              "Treblinka",
+              "Sobibor",
+              "Belzec",
+              "Chelmno",
+              "Majdanek"
+            ],
+            "personalities": [
+              "Adolf Eichmann - Holocaust logistics",
+              "Josef Mengele - Auschwitz doctor",
+              "Rudolf Höss - Auschwitz commandant",
+              "Anne Frank - diary author",
+              "Oskar Schindler - savior of Jews"
+            ],
+            "statistics": [
+              "6 million Jews murdered",
+              "1.1 million at Auschwitz",
+              "5 million Soviet POWs killed",
+              "500,000+ Romani victims",
+              "70,000+ disabled victims"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Poland", "Eastern Europe", "Germany"],
+            "camps": ["Auschwitz", "Treblinka", "Warsaw Ghetto"],
+            "significance": "Sites of systematic genocide and Allied liberation"
+          }
+        },
+        {
+          "topic_id": "T09_03",
+          "topic_name": "War's End, Atomic Bomb & Post-War Settlement",
+          "primary_book": {
+            "title": "India and the Contemporary World II",
+            "chapter": 6,
+            "pages": "160-180"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "India and the Contemporary World II",
+            "chapter": 6,
+            "chapter_name": "The Rise of Nationalism in Europe"
+          },
+          "key_concepts": [
+            "Pacific War against Japan - island hopping",
+            "Atomic bomb development - Manhattan Project",
+            "Hiroshima bombing August 6, 1945 - civilian devastation",
+            "Nagasaki bombing August 9, 1945 - second bomb",
+            "Japan's surrender September 2, 1945 - war ends",
+            "Yalta Conference 1945 - Big Three agreement",
+            "Potsdam Conference 1945 - peace settlement",
+            "United Nations establishment - international organization",
+            "War crimes trials - accountability mechanisms",
+            "European reconstruction - Marshall Plan",
+            "Germany partition - occupation zones",
+            "Japan occupation - American administration",
+            "Decolonization impulse - colonial independence movements",
+            "Superpowers emergence - USA and USSR rivalry begins",
+            "Nuclear age beginning - atomic weapons threat"
+          ],
+          "important_facts": {
+            "dates": [
+              "1945 February 4-11 - Yalta Conference",
+              "1945 April 25 - United Nations Charter drafted",
+              "1945 April 30 - Hitler's suicide",
+              "1945 May 7 - Germany unconditional surrender",
+              "1945 June 26 - UN Charter signed",
+              "1945 July 16 - First atomic bomb test",
+              "1945 July 17-August 2 - Potsdam Conference",
+              "1945 August 6 - Hiroshima bombing",
+              "1945 August 9 - Nagasaki bombing",
+              "1945 September 2 - Japan's formal surrender",
+              "1945 November - Nuremberg trials start",
+              "1948 - Universal Declaration of Human Rights"
+            ],
+            "conferences": [
+              "Yalta Conference - Allied strategy agreement",
+              "Potsdam Conference - post-war settlement",
+              "San Francisco Conference - UN founding"
+            ],
+            "personalities": [
+              "Harry Truman - American president after Roosevelt",
+              "General MacArthur - Pacific commander, Japan occupier",
+              "Robert Oppenheimer - Manhattan Project director",
+              "J. Robert Oppenheimer - atomic physics leader"
+            ],
+            "statistics": [
+              "70-80 million total war deaths",
+              "Hiroshima: 70,000-80,000 immediate deaths",
+              "Nagasaki: 40,000 immediate deaths",
+              "Holocaust: 6 million Jewish victims",
+              "Genocides and war crimes: millions more"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Pacific Theater", "Japan", "Europe"],
+            "atomic_sites": ["Hiroshima", "Nagasaki"],
+            "significance": "War's end and nuclear age beginning"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M10",
+      "module_name": "Cold War - Phases, Events, Proxy Wars & End",
+      "period": "1945-1991",
+      "ncert_mapping": "Class 11 supplementary, international relations context",
+      "daily_target_hours": 20,
+      "topics": [
+        {
+          "topic_id": "T10_01",
+          "topic_name": "Cold War - Origins, Phases & Ideological Struggle",
+          "primary_book": {
+            "title": "Mastering Modern World History by Norman Lowe",
+            "chapter": "Post-war settlements and Cold War origins",
+            "pages": "Variable - comprehensive coverage"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": "11",
+            "chapter_name": "Paths to Modernisation (Soviet context)"
+          },
+          "key_concepts": [
+            "Wartime alliance deterioration - Stalin, Roosevelt, Churchill",
+            "Ideological incompatibility - capitalism vs communism",
+            "Spheres of influence division - Eastern vs Western Europe",
+            "Soviet expansion - Poland, Eastern Europe domination",
+            "Containment policy - Truman Doctrine response",
+            "Iron Curtain - Churchill's famous phrase",
+            "Berlin Blockade 1948-1949 - first major crisis",
+            "NATO formation 1949 - Western alliance",
+            "Warsaw Pact 1955 - Soviet alliance",
+            "Nuclear arms race - mutual deterrence",
+            "Cuban Missile Crisis 1962 - nuclear brink",
+            "Korean War 1950-1953 - proxy conflict",
+            "Vietnam War 1955-1975 - prolonged proxy war",
+            "Detente 1970s - temporary relaxation",
+            "Soviet invasion Afghanistan 1979 - Cold War renewal",
+            "Reagan era militarization - Star Wars program",
+            "Fall of Berlin Wall 1989 - Cold War ending"
+          ],
+          "important_facts": {
+            "dates": [
+              "1945 - Roosevelt dies, Truman becomes president",
+              "1945-1946 - Soviet takeover of Eastern Europe",
+              "1946 March 5 - Churchill's Iron Curtain speech",
+              "1947 March 12 - Truman Doctrine announced",
+              "1947 June 5 - Marshall Plan announced",
+              "1948 June-1949 May - Berlin Blockade and Airlift",
+              "1949 April 4 - NATO established",
+              "1949 August 29 - Soviet atomic bomb",
+              "1950 June 25 - Korean War begins",
+              "1953 July 27 - Korean War armistice",
+              "1955 May 14 - Warsaw Pact established",
+              "1956 October - Suez Crisis",
+              "1956 November - Hungarian Uprising suppressed",
+              "1961 August 13 - Berlin Wall built",
+              "1962 October 16-28 - Cuban Missile Crisis",
+              "1965-1973 - Vietnam War escalation and withdrawal",
+              "1968 August - Soviet invasion of Czechoslovakia",
+              "1972 February - Nixon visits China",
+              "1979 December - Soviet invasion Afghanistan",
+              "1985 March - Mikhail Gorbachev becomes Soviet leader",
+              "1987 December - Reagan-Gorbachev summit",
+              "1989 November 9 - Berlin Wall falls",
+              "1991 December 26 - Soviet Union dissolves"
+            ],
+            "crises": [
+              "Berlin Blockade 1948-1949",
+              "Korean War 1950-1953",
+              "Suez Crisis 1956",
+              "Hungarian Uprising 1956",
+              "Cuban Missile Crisis 1962",
+              "Vietnam War 1965-1973",
+              "Czechoslovakia invasion 1968",
+              "Afghanistan invasion 1979-1989"
+            ],
+            "personalities": [
+              "Harry Truman - American containment policy",
+              "Joseph Stalin - Soviet expansionism",
+              "John F. Kennedy - Cuban Missile Crisis",
+              "Nikita Khrushchev - Soviet de-Stalinization",
+              "Leonid Brezhnev - Soviet stagnation period",
+              "Ronald Reagan - Cold War renewal",
+              "Mikhail Gorbachev - Soviet reform and dissolution",
+              "Mao Zedong - Chinese communist leader"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["Europe", "Asia", "Americas"],
+            "divisions": ["NATO countries", "Warsaw Pact countries", "Non-aligned movement"],
+            "conflicts": ["Korean peninsula", "Vietnam", "Cuba", "Berlin", "Afghanistan"],
+            "significance": "Bipolar world order affecting global geopolitics"
+          }
+        },
+        {
+          "topic_id": "T10_02",
+          "topic_name": "Cold War Proxy Wars & Decolonisation Context",
+          "primary_book": {
+            "title": "Mastering Modern World History",
+            "chapter": "Cold War and Decolonisation intersection"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": "10-11",
+            "chapter_name": "Displacing Indigenous Peoples & Paths to Modernisation"
+          },
+          "key_concepts": [
+            "Proxy war definition - indirect conflicts through third parties",
+            "Korea - US-Soviet confrontation through Korean peninsula",
+            "Indochina - French colonial war becoming American-Soviet struggle",
+            "Vietnam - longest proxy conflict, major casualties",
+            "Middle East - Israel-Arab conflicts with superpower involvement",
+            "African liberation - Cold War intervention in decolonisation",
+            "Latin America - CIA interventions against communist movements",
+            "Cuban Revolution 1959 - Castro's communist state in Americas",
+            "Bay of Pigs 1961 - failed CIA invasion",
+            "Nicaragua - Sandinista revolution and Contra war",
+            "Angola - Soviet and Cuban support for MPLA",
+            "Afghanistan - Soviet invasion facing American mujahideen support",
+            "Domino Theory - justification for interventions",
+            "Non-Aligned Movement - alternative to bipolar division",
+            "Bandung Conference 1955 - Afro-Asian solidarity"
+          ],
+          "important_facts": {
+            "dates": [
+              "1950-1953 - Korean War",
+              "1954 - French defeat at Dien Bien Phu",
+              "1955 April 18-24 - Bandung Conference",
+              "1959 January - Cuban Revolution triumph",
+              "1961 April 17-19 - Bay of Pigs invasion",
+              "1964 August 2-4 - Gulf of Tonkin incident",
+              "1965 March 8 - US ground forces land in Vietnam",
+              "1968 January 30 - Tet Offensive",
+              "1973 January 27 - Vietnam ceasefire signed",
+              "1973 October 6-25 - Yom Kippur War",
+              "1974 April 25 - Portuguese Carnation Revolution, Lusitanian end",
+              "1975 April 30 - Vietnam War ends with Hanoi victory",
+              "1976 July 5 - Entebbe raid - Israeli counter-terror",
+              "1979 July - Sandinista revolution in Nicaragua",
+              "1979 December 25 - Soviet invasion Afghanistan",
+              "1988 April 14 - Soviet withdrawal from Afghanistan agreed"
+            ],
+            "conflicts": [
+              "Korean War 1950-1953",
+              "First Indochina War 1946-1954",
+              "Vietnam War 1955-1975",
+              "Yom Kippur War 1973",
+              "Soviet-Afghan War 1979-1989",
+              "Nicaraguan Civil War 1979-1990",
+              "Angolan Civil War 1975-2002"
+            ],
+            "personalities": [
+              "Ho Chi Minh - Vietnamese communist leader",
+              "Fidel Castro - Cuban revolutionary",
+              "Che Guevara - revolutionary icon",
+              "Anwar Sadat - Egyptian president",
+              "Gamal Abdel Nasser - Egyptian nationalist",
+              "Nikita Khrushchev - Soviet premier",
+              "Leonid Brezhnev - Soviet general secretary"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["Southeast Asia", "Middle East", "Africa", "Latin America"],
+            "conflicts": ["Vietnam", "Korea", "Middle East", "Afghanistan", "Angola"],
+            "significance": "Cold War battlegrounds in decolonising world"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M11",
+      "module_name": "Decolonisation - Asia & Africa Post WWII",
+      "period": "1947-1970s",
+      "ncert_mapping": "Class 11 Theme 10: Displacing Indigenous Peoples & Class 9 Chapter 4",
+      "daily_target_hours": 18,
+      "topics": [
+        {
+          "topic_id": "T11_01",
+          "topic_name": "Asian Decolonisation - India, Indonesia, Vietnam",
+          "primary_book": {
+            "title": "India and the Contemporary World I",
+            "chapter": 4,
+            "chapter_name": "The Making of a Global World"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "India and the Contemporary World I",
+            "chapter": 4,
+            "chapter_name": "The Making of a Global World"
+          },
+          "key_concepts": [
+            "Post-WWII decolonisation wave - European power decline",
+            "Indian independence 1947 - British withdrawal",
+            "Partition trauma - communal violence, refugee crisis",
+            "Non-Aligned Movement founding - Nehru's foreign policy",
+            "Indonesia independence 1945-1949 - four-year struggle",
+            "Vietnam independence struggle - thirty-year war",
+            "Indochina War phases - French and American involvement",
+            "Buddhist nationalism - Asian cultural resistance",
+            "Language question in independent states - cultural choice",
+            "China's revolution 1949 - communist Asia emergence",
+            "Korean peninsula division - Cold War legacy",
+            "Philippines independence 1946 - peaceful transition",
+            "Malaya independence 1957 - managed decolonisation",
+            "Land redistribution - peasant demands",
+            "Refugee crises - partition aftermath"
+          ],
+          "important_facts": {
+            "dates": [
+              "1945 August 17 - Indonesia declares independence",
+              "1945 September 2 - Ho Chi Minh declares Vietnamese independence",
+              "1946-1954 - Indochina War",
+              "1946 July 4 - Philippines independence",
+              "1947 August 15 - Indian independence",
+              "1947 August - Indian partition",
+              "1948 January 30 - Mahatma Gandhi assassination",
+              "1949 December 29 - Indonesia recognized independent",
+              "1950 January 26 - Indian Constitution adopted",
+              "1950 November - China enters Korean War",
+              "1954 May 7 - French surrender at Dien Bien Phu",
+              "1955 April 18-24 - Bandung Conference",
+              "1956 November 2 - Suez Crisis aftermath",
+              "1957 August 31 - Malaya independence",
+              "1965-1973 - American Vietnam War escalation"
+            ],
+            "leaders": [
+              "Mahatma Gandhi - Indian independence icon (assassinated 1948)",
+              "Jawaharlal Nehru - Indian first PM",
+              "Muhammad Ali Jinnah - Pakistan founder",
+              "Ho Chi Minh - Vietnamese independence leader",
+              "Sukarno - Indonesian president",
+              "Mao Zedong - Chinese communist leader",
+              "Josip Broz Tito - Yugoslav communist leader",
+              "Kwame Nkrumah - Ghanaian independence leader"
+            ],
+            "events": [
+              "Indian independence and partition",
+              "Assassination of Gandhi",
+              "Indonesia's four-year independence war",
+              "Indochina War and French defeat",
+              "Chinese revolution and communist victory",
+              "Bandung Conference of Afro-Asian nations",
+              "Suez Crisis 1956"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 10,
+          "mains_importance": 9,
+          "map_work": {
+            "regions": ["India", "Pakistan", "Indonesia", "Indochina", "China", "Korea"],
+            "conflicts": ["Indochina War", "Indian partition", "Korean War"],
+            "significance": "Largest decolonisation movements affecting billions"
+          }
+        },
+        {
+          "topic_id": "T11_02",
+          "topic_name": "African Decolonisation & Nation-Building",
+          "primary_book": {
+            "title": "Themes in World History",
+            "chapter": "Theme 10: Displacing Indigenous Peoples",
+            "pages": "305-330"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Themes in World History",
+            "chapter": 10,
+            "chapter_name": "Displacing Indigenous Peoples"
+          },
+          "key_concepts": [
+            "Pan-Africanism - continental unity movement",
+            "Late African colonisation - still colonized by 1950s",
+            "Ghana independence 1957 - first sub-Saharan colony",
+            "Wave of African independence 1960s - 'Year of Africa'",
+            "Algerian War 1954-1962 - brutal decolonisation",
+            "Kenya Mau Mau Uprising - anti-colonial rebellion",
+            "Apartheid system - South African racial segregation",
+            "Rhodesia situation - white minority rule",
+            "Resource curse - minerals and colonial extraction",
+            "Tribalism challenges - colonial borders superseding ethnic groups",
+            "Language diversity - colonial languages retained",
+            "Debt burdens - post-colonial economic struggles",
+            "Cold War intervention - superpower competition",
+            "Pan-African Conferences - unity attempts",
+            "African Union formation - continental organization",
+            "Neocolonialism - economic dependence continuing"
+          ],
+          "important_facts": {
+            "dates": [
+              "1957 March 6 - Ghana independence",
+              "1958 December - All-African Peoples Conference",
+              "1960 January-December - 'Year of Africa' independence surge",
+              "1960 June 30 - Congo independence and immediate crisis",
+              "1961 April 25 - Portuguese Carnation Revolution begins decolonisation",
+              "1962 July 5 - Algeria independence after brutal war",
+              "1963 May 25 - Organization of African Unity founded",
+              "1964 December 12 - Kenya independence",
+              "1965 November 11 - Rhodesia's UDI (Unilateral Declaration of Independence)",
+              "1966 - Ghana coup, instability begins",
+              "1967-1970 - Nigerian Civil War (Biafra)",
+              "1974 April 25 - Portuguese Carnation Revolution",
+              "1975 November 11 - Angola independence and civil war begins",
+              "1980 April 18 - Zimbabwe independence from Rhodesia",
+              "1994 April-July - Rwandan genocide"
+            ],
+            "independence_waves": [
+              "1957 - Ghana first",
+              "1960 - 14 African nations gain independence (Year of Africa)",
+              "1960s - Most African colonies gain independence",
+              "1970s-1980s - Portuguese colonies independence",
+              "1990s - Namibia, South Africa apartheid ends"
+            ],
+            "personalities": [
+              "Kwame Nkrumah - Ghana's independence leader",
+              "Patrice Lumumba - Congo independence leader (assassinated)",
+              "Nelson Mandela - South African anti-apartheid leader",
+              "Julius Nyerere - Tanzanian president",
+              "Haile Selassie - Ethiopian emperor",
+              "Frantz Fanon - postcolonial theorist",
+              "Jomo Kenyatta - Kenyan independence leader"
+            ],
+            "events": [
+              "Pan-African conferences and movements",
+              "Mau Mau Uprising in Kenya",
+              "Algerian War of Independence",
+              "Congo Crisis",
+              "Nigerian Civil War",
+              "Portuguese decolonisation",
+              "Apartheid system in South Africa",
+              "Rwandan genocide"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["Africa", "North Africa", "Sub-Saharan Africa", "Southern Africa"],
+            "countries": ["Ghana", "Congo", "Algeria", "Kenya", "Nigeria", "South Africa", "Angola"],
+            "significance": "Rapid African liberation and nation-building transformation"
+          }
+        }
+      ]
+    },
+    {
+      "module_id": "M12",
+      "module_name": "Post Cold War - New World Order & Globalisation",
+      "period": "1989-2000s",
+      "ncert_mapping": "Contemporary world affairs context",
+      "daily_target_hours": 16,
+      "topics": [
+        {
+          "topic_id": "T12_01",
+          "topic_name": "End of Cold War & Soviet Collapse",
+          "primary_book": {
+            "title": "Mastering Modern World History",
+            "chapter": "Soviet Collapse and New World Order"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Contemporary context",
+            "chapter": "None specified"
+          },
+          "key_concepts": [
+            "Gorbachev's reforms - glasnost and perestroika",
+            "Accelerated reform process - failed transformations",
+            "Nationalist movements - Soviet republics independence demands",
+            "Economic collapse - hyperinflation and shortages",
+            "Nuclear crisis - command and control breakdown",
+            "Berlin Wall fall November 1989 - symbolic end",
+            "German unification 1990 - Cold War conclusion symbol",
+            "Yeltsin's role - Russian independence movement",
+            "Russian coup attempt August 1991 - failed hardline restore",
+            "Soviet dissolution December 1991 - official end",
+            "Commonwealth of Independent States - Soviet successor arrangement",
+            "Transition pains - economic shock therapy",
+            "NATO expansion eastward - conflict with Russia",
+            "Nuclear weapon inheritance - Russian nuclear arsenal",
+            "Regional conflicts - Yugoslavia, Caucasus, Central Asia"
+          ],
+          "important_facts": {
+            "dates": [
+              "1985 March - Gorbachev becomes Soviet leader",
+              "1986 April 26 - Chernobyl nuclear disaster",
+              "1989 March - Soviet republics elections",
+              "1989 June - Tiananmen Square crackdown in China",
+              "1989 August 23 - Baltic states coordinate independence",
+              "1989 November 9 - Berlin Wall falls",
+              "1989 December 3 - Malta Summit ends Cold War",
+              "1990 March 11 - Lithuania declares independence",
+              "1990 May 4 - Latvia declares independence",
+              "1990 August 20 - Estonia declares independence",
+              "1990 October 3 - German unification",
+              "1991 January - Gulf War (post-Cold War event)",
+              "1991 August 19-21 - Coup attempt fails",
+              "1991 August 24 - Ukraine declares independence",
+              "1991 December 25 - Gorbachev resigns",
+              "1991 December 26 - Soviet Union officially dissolved",
+              "1992 January - Recognition of Soviet successor states"
+            ],
+            "personalities": [
+              "Mikhail Gorbachev - Soviet reformer",
+              "Boris Yeltsin - Russian president, dissolution leader",
+              "Ronald Reagan - American Cold War president",
+              "George H.W. Bush - American president during Soviet collapse",
+              "George H.W. Bush - American president during Soviet collapse",
+              "Lech Walęsa - Polish Solidarity movement leader"
+            ],
+            "events": [
+              "Glasnost and perestroika reforms",
+              "Chernobyl nuclear disaster",
+              "Berlin Wall fall",
+              "German unification",
+              "Soviet coup attempt failure",
+              "Soviet Union dissolution"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["Soviet Union", "Eastern Europe", "Russia"],
+            "countries": ["Soviet republics becoming independent", "Eastern European states"],
+            "significance": "End of bipolar world order"
+          }
+        },
+        {
+          "topic_id": "T12_02",
+          "topic_name": "New World Order, Globalisation & Contemporary Issues",
+          "primary_book": {
+            "title": "Mastering Modern World History",
+            "chapter": "Globalisation and Post-Cold War World"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Contemporary context",
+            "chapter": "None specified"
+          },
+          "key_concepts": [
+            "Unipolar moment - American superpower dominance",
+            "First Gulf War 1990-1991 - American military superiority display",
+            "NATO expansion eastward - Russian security concerns",
+            "Yugoslavia dissolution - ethnic nationalism eruption",
+            "Globalisation - trade liberalisation and interconnection",
+            "IMF and World Bank influence - structural adjustment programs",
+            "WTO formation 1995 - trade dispute resolution",
+            "NAFTA agreement 1994 - regional trade bloc",
+            "EU expansion - European integration deepening",
+            "Internet revolution - information technology spread",
+            "Outsourcing and offshoring - economic restructuring",
+            "Environmental consciousness - climate change, Rio Summit",
+            "Human rights focus - International Criminal Court",
+            "Humanitarian intervention doctrine - responsibility to protect",
+            "9/11 attacks 2001 - terrorism and security paradigm shift",
+            "War on Terror - American military interventions",
+            "Chinese economic rise - manufacturing powerhouse",
+            "Indian IT revolution - outsourcing destination",
+            "Emerging markets - BRICS rise"
+          ],
+          "important_facts": {
+            "dates": [
+              "1990 August 2 - Iraqi invasion Kuwait",
+              "1991 January 17-February 28 - Gulf War",
+              "1992-1995 - Bosnian War",
+              "1994 January 1 - NAFTA takes effect",
+              "1995 January 1 - WTO established",
+              "1995 - Amazon, eBay founded (e-commerce start)",
+              "1997-1998 - Asian financial crisis",
+              "1999 - Kosovo War",
+              "2001 September 11 - Al-Qaeda attacks USA",
+              "2001 October - War in Afghanistan begins",
+              "2003 March - Iraq War begins",
+              "2004 Indian Ocean tsunami - humanitarian crisis",
+              "2008 - Global financial crisis (Lehman Brothers collapse)",
+              "2010s - Rise of social media platforms",
+              "2011 - Arab Spring uprisings"
+            ],
+            "events": [
+              "Gulf War 1990-1991",
+              "Yugoslav Wars 1992-2001",
+              "Asian financial crisis 1997-1998",
+              "Kosovo War 1999",
+              "September 11 attacks 2001",
+              "War on Terror and Afghanistan invasion",
+              "Iraq War 2003-2011",
+              "Global financial crisis 2008"
+            ],
+            "organizations": [
+              "United Nations (reformed role)",
+              "World Trade Organization (WTO)",
+              "International Criminal Court (ICC)",
+              "North Atlantic Treaty Organization (NATO)",
+              "European Union (EU)",
+              "ASEAN, MERCOSUR, OPEC (regional organizations)"
+            ],
+            "personalities": [
+              "George H.W. Bush - Gulf War president",
+              "Bill Clinton - post-Cold War American president",
+              "George W. Bush - War on Terror president",
+              "Tony Blair - British supporter of interventionism",
+              "Kofi Annan - UN Secretary-General",
+              "Deng Xiaoping - Chinese economic reformer"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "map_work": {
+            "regions": ["Global", "Middle East", "Balkans", "Central Asia"],
+            "conflicts": ["Gulf War", "Balkans", "Afghanistan", "Iraq"],
+            "significance": "Transition to unipolar American-led world order"
+          }
+        }
+      ]
+    }
+  ],
+  "comparison_tables": {
+    "world_war_comparison": {
+      "title": "World War I vs World War II - Comparative Analysis",
+      "dimensions": {
+        "causes": {
+          "wwi": ["Militarism and arms race", "Alliances system", "Colonial rivalries", "Balkan tensions", "Nationalism"],
+          "wwii": ["Treaty of Versailles resentment", "Rise of fascism", "Appeasement failures", "Economic depression", "Ideological conflict"]
+        },
+        "scale": {
+          "wwi": ["European focused", "10 million deaths", "Industrial but static war", "Trench warfare"],
+          "wwii": ["Global conflict", "70-80 million deaths", "Mechanized mobile war", "Aerial and naval warfare"]
+        },
+        "technology": {
+          "wwi": ["Poison gas", "Tanks introduced", "Aircraft emerging", "Machine guns"],
+          "wwii": ["Atomic bomb", "Radar", "Jet aircraft", "Blitzkrieg tactics", "Submarines"]
+        },
+        "outcome": {
+          "wwi": ["Central Powers defeat", "German humiliation", "League of Nations (failed)", "New nations created"],
+          "wwii": ["Axis defeat", "United Nations (more robust)", "Bipolar Cold War", "Decolonisation triggered"]
+        }
+      }
+    },
+    "european_revolutions_comparison": {
+      "title": "French Revolution vs Russian Revolution",
+      "dimensions": {
+        "causes": {
+          "french": ["Financial crisis", "Enlightenment ideas", "Crop failures", "Class tensions", "Absolute monarchy"],
+          "russian": ["Peasant unrest", "Industrial capitalism", "WWI defeats", "Autocracy rejection", "Marxist ideology"]
+        },
+        "phases": {
+          "french": ["Constitutional phase", "Radical phase", "Terror", "Directory", "Napoleonic"],
+          "russian": ["1905 Revolution failed", "February Revolution", "October coup", "Civil War", "Soviet state"]
+        },
+        "ideology": {
+          "french": ["Liberty, Equality, Fraternity", "Liberalism", "Nationalism", "Rights of man"],
+          "russian": ["Communism", "Marxist-Leninism", "Proletarian revolution", "Class struggle"]
+        },
+        "international_impact": {
+          "french": ["Napoleonic Wars", "European nationalism rise", "Liberal ideals spread"],
+          "russian": ["Communist challenge", "Cold War origins", "Third World revolutions"]
+        }
+      }
+    }
+  },
+  "major_treaties": {
+    "treaty_of_westphalia_1648": {
+      "year": 1648,
+      "conflict": "Thirty Years War",
+      "parties": ["Holy Roman Empire", "France", "Sweden", "Netherlands", "Spain"],
+      "key_terms": [
+        "Recognition of Dutch independence",
+        "French territorial gains",
+        "German principalities gain autonomy",
+        "Religion - Cuius regio, eius religio principle",
+        "International law foundation - sovereign states"
+      ],
+      "significance": "End of religious wars, birth of modern state system"
+    },
+    "treaty_of_paris_1783": {
+      "year": 1783,
+      "conflict": "American War of Independence",
+      "parties": ["British Empire", "USA", "France", "Spain", "Netherlands"],
+      "key_terms": [
+        "American independence recognition",
+        "USA territorial extent to Mississippi River",
+        "French gains in Caribbean",
+        "Spanish gains Florida",
+        "British retains Canada"
+      ],
+      "significance": "First colonial independence from European power"
+    },
+    "treaty_of_versailles_1919": {
+      "year": 1919,
+      "conflict": "World War I",
+      "parties": ["Allied Powers", "Germany"],
+      "key_terms": [
+        "German war guilt clause",
+        "Heavy reparations - 132 billion gold marks",
+        "Territorial losses - Alsace-Lorraine, Polish corridor",
+        "Military limitations - 100,000 soldiers maximum",
+        "League of Nations establishment",
+        "Mandate system for German colonies",
+        "Rhineland demilitarization"
+      ],
+      "significance": "Punitive peace creating resentment, seeds of WWII"
+    },
+    "molotov_ribbentrop_pact_1939": {
+      "year": 1939,
+      "conflict": "Pre-World War II",
+      "parties": ["Nazi Germany", "Soviet Union"],
+      "key_terms": [
+        "Non-aggression pact",
+        "Secret protocols - spheres of influence",
+        "Poland partition agreement",
+        "Baltic states to Soviet influence",
+        "Finland to Soviet sphere"
+      ],
+      "significance": "Shocked world, enabled Hitler's Poland invasion"
+    },
+    "potsdam_declaration_1945": {
+      "year": 1945,
+      "conflict": "World War II",
+      "parties": ["USA", "Soviet Union", "Britain", "China"],
+      "key_terms": [
+        "German unconditional surrender",
+        "German reparations",
+        "European territorial changes",
+        "Japan ultimatum - surrender or destruction",
+        "Occupation zones in Germany"
+      ],
+      "significance": "Post-WWII world order establishment"
+    },
+    "north_atlantic_treaty_1949": {
+      "year": 1949,
+      "organization": "NATO formation",
+      "parties": ["12 founding members (Belgium, Canada, Denmark, France, Iceland, Italy, Luxembourg, Netherlands, Norway, Portugal, UK, USA)"],
+      "key_terms": [
+        "Collective defense - Article 5",
+        "Containment of Soviet Union",
+        "Democratic and free market values",
+        "Mutual defense alliance",
+        "NATO expansion possibilities"
+      ],
+      "significance": "Western military alliance for Cold War"
+    },
+    "warsaw_pact_1955": {
+      "year": 1955,
+      "organization": "Soviet military alliance",
+      "parties": ["Soviet Union", "Eastern European satellites", "Poland", "Czechoslovakia", "East Germany", "Hungary", "Romania", "Bulgaria"],
+      "key_terms": [
+        "Mutual defense alliance",
+        "Soviet domination of Eastern Europe",
+        "Collective security against NATO",
+        "Soviet leadership of bloc"
+      ],
+      "significance": "Counter to NATO, Cold War division formalization"
+    }
+  },
+  "key_organizations_formed": {
+    "league_of_nations": {
+      "established": 1920,
+      "purpose": "Maintain international peace post-WWI",
+      "members": "50+ nations at peak",
+      "headquarters": "Geneva",
+      "outcomes": [
+        "Failed to prevent WWII",
+        "No enforcement mechanisms",
+        "USA never joined (Senate rejection)",
+        "USSR late joiner, quickly expelled",
+        "Ineffectual in 1930s crises"
+      ],
+      "dissolution": 1946,
+      "legacy": "Lessons for UN formation"
+    },
+    "united_nations": {
+      "established": 1945,
+      "purpose": "International peace and cooperation post-WWII",
+      "members": "193 UN member states",
+      "headquarters": "New York",
+      "key_bodies": [
+        "General Assembly - all nations equal",
+        "Security Council - 5 permanent powers with veto",
+        "Secretariat - international bureaucracy",
+        "ECOSOC - economic and social work",
+        "International Court of Justice"
+      ],
+      "outcomes": [
+        "More robust than League",
+        "Cold War limited effectiveness",
+        "Post-Cold War activism increased",
+        "Humanitarian operations expanded",
+        "Remaining relevant institution"
+      ]
+    },
+    "world_bank": {
+      "established": 1944,
+      "purpose": "Economic development financing",
+      "role": "Development loans, structural adjustment",
+      "influence": "Significant on developing nations",
+      "criticism": "Neocolonial policies, structural adjustment harm"
+    },
+    "international_monetary_fund": {
+      "established": 1944,
+      "purpose": "International monetary cooperation",
+      "role": "Currency stability, balance of payments crisis",
+      "influence": "Exchange rate and monetary policy leverage",
+      "criticism": "Structural adjustment conditions, neocolonialism"
+    },
+    "world_trade_organization": {
+      "established": 1995,
+      "successor_to": "GATT (General Agreement on Tariffs and Trade)",
+      "purpose": "Trade dispute resolution, liberalisation",
+      "members": "170+ nations",
+      "outcomes": [
+        "Trade expansion facilitation",
+        "Dispute resolution mechanism",
+        "Most Favored Nation principle",
+        "Developing nations voices often unheard"
+      ]
+    },
+    "european_union": {
+      "established": 1993,
+      "predecessor": "European Coal and Steel Community (1951), European Economic Community (1957)",
+      "members": "27 states (2024)",
+      "purpose": "Political and economic union",
+      "achievements": [
+        "Single market creation",
+        "Schengen area (open borders)",
+        "Euro currency (19 nations)",
+        "Democratic peace in Europe"
+      ]
+    }
+  },
+  "daily_study_schedule": {
+    "standard_track": {
+      "total_duration_months": 4,
+      "weeks_per_module": 2,
+      "daily_hours": 3,
+      "breakdown": {
+        "week_1_of_module": [
+          "Monday: Historical context and causes (1 hour)",
+          "Tuesday: Key personalities and ideologies (1 hour)",
+          "Wednesday: Major events timeline (1 hour)",
+          "Thursday: Revision and case study analysis (1 hour)",
+          "Friday: Quiz and concept mapping (1 hour)"
+        ],
+        "week_2_of_module": [
+          "Monday: Treaties and agreements analysis (1 hour)",
+          "Tuesday: Geographical mapping and regional impacts (1 hour)",
+          "Wednesday: Comparative analysis with other periods (1 hour)",
+          "Thursday: India relevance and connections (1 hour)",
+          "Friday: Mock questions and answer writing practice (1.5 hours)"
+        ]
+      },
+      "monthly_targets": {
+        "month_1": "Modules 1-3: Renaissance to French Revolution",
+        "month_2": "Modules 4-6: American Independence to WWI",
+        "month_3": "Modules 7-9: Russian Revolution to WWII",
+        "month_4": "Modules 10-12: Cold War to Contemporary World"
+      }
+    },
+    "intensive_track": {
+      "total_duration_months": 2,
+      "daily_hours": 6,
+      "approach": "2 modules per week, 3 hours per module"
+    },
+    "revision_strategy": {
+      "week_before_exam": [
+        "Monday: Module 1-3 quick revision (2 hours)",
+        "Tuesday: Module 4-6 quick revision (2 hours)",
+        "Wednesday: Module 7-9 quick revision (2 hours)",
+        "Thursday: Module 10-12 quick revision (2 hours)",
+        "Friday: Full-length mock test (3 hours)"
+      ]
+    }
+  },
+  "previous_year_questions_pattern": {
+    "upsc_prelims": {
+      "average_questions_per_exam": 8,
+      "difficulty_level": "Medium to High",
+      "recurring_topics": [
+        "French Revolution - 2-3 questions annually",
+        "Industrial Revolution - 1-2 questions",
+        "WWI and Versailles - 2 questions",
+        "Russian Revolution - 1-2 questions",
+        "WWII causes and events - 2 questions",
+        "Cold War - 1-2 questions",
+        "Decolonisation - 1-2 questions",
+        "Renaissance and Reformation - 1 question"
+      ],
+      "question_types": [
+        "Chronological ordering",
+        "Match personalities with events",
+        "Treaty-related facts",
+        "Cause-effect relationships",
+        "Map-based location questions"
+      ]
+    },
+    "upsc_mains": {
+      "paper": "GS Paper 1 - World History, Culture",
+      "average_questions": 2,
+      "question_length": "250-300 words expected",
+      "recurring_themes": [
+        "Revolutions - French, Russian, American",
+        "World Wars - causes, impacts, consequences",
+        "Imperialism and colonialism effects",
+        "Nation formation and nationalism",
+        "Cold War and decolonisation",
+        "International relations and treaties"
+      ],
+      "answer_approach": [
+        "Structured introduction with context",
+        "Historical analysis of causes/effects",
+        "Specific examples and dates",
+        "India relevance angle if applicable",
+        "Balanced conclusion"
+      ]
+    }
+  },
+  "mains_themes_gs_paper_1": [
+    {
+      "theme": "Revolutions and Social Transformation",
+      "subtopics": [
+        "French Revolution impact on Europe",
+        "Russian Revolution and communism",
+        "American Revolution and democracy",
+        "Industrial Revolution and society"
+      ],
+      "example_questions": [
+        "Trace the impact of French Revolution on European political thought",
+        "How did the Industrial Revolution transform European society?",
+        "Compare the outcomes of French and Russian Revolutions"
+      ]
+    },
+    {
+      "theme": "Wars and International Relations",
+      "subtopics": [
+        "World Wars - causes and consequences",
+        "Cold War and bipolarity",
+        "Regional conflicts and superpower involvement"
+      ],
+      "example_questions": [
+        "Discuss the Treaty of Versailles' role in causing WWII",
+        "How did Cold War proxy wars affect decolonisation?",
+        "Analyse the rise and fall of the bipolar world order"
+      ]
+    },
+    {
+      "theme": "Imperialism and Colonialism",
+      "subtopics": [
+        "European imperialism in Asia and Africa",
+        "Colonial resistance movements",
+        "Decolonisation and its aftermath"
+      ],
+      "example_questions": [
+        "Explain the motivations behind 19th-century European imperialism",
+        "How did colonialism shape modern nation-states?",
+        "Discuss the impact of decolonisation on Cold War"
+      ]
+    },
+    {
+      "theme": "Nationalism and Modernity",
+      "subtopics": [
+        "Rise of nationalism in Europe",
+        "Asian and African nationalism",
+        "Nation-state concept evolution"
+      ],
+      "example_questions": [
+        "Trace the evolution of nationalism from 18th to 20th century",
+        "How did nationalism manifest differently in Europe vs Asia?",
+        "What role did nationalism play in decolonisation?"
+      ]
+    },
+    {
+      "theme": "Cultural and Intellectual Movements",
+      "subtopics": [
+        "Renaissance and humanism",
+        "Enlightenment ideas",
+        "Romantic movement"
+      ],
+      "example_questions": [
+        "How did Renaissance values influence modern political thought?",
+        "Discuss Enlightenment philosophers' impact on revolutions",
+        "Analyse the cultural impact of colonialism on colonised societies"
+      ]
+    }
+  ],
+  "study_tips": {
+    "prelims_specific": [
+      "Create timeline charts for each module's major events",
+      "Memorise key dates and personalities with mnemonics",
+      "Practice map-based questions regularly",
+      "Solve previous 15 years' prelims questions",
+      "Group related events chronologically",
+      "Create personality cards with key roles and achievements"
+    ],
+    "mains_specific": [
+      "Practice structured 250-word answers minimum",
+      "Connect world history with India's development",
+      "Develop cause-effect analysis for major events",
+      "Create comparison matrices between events/periods",
+      "Write answers under timed conditions",
+      "Read model answers from successful UPSC candidates"
+    ],
+    "general_strategy": [
+      "Read NCERT Class 11 'Themes in World History' thoroughly first",
+      "Supplement with Norman Lowe for deeper understanding",
+      "Make comprehensive notes with diagrams and timelines",
+      "Join study groups for discussion and clarity",
+      "Watch documentaries on major events for visual learning",
+      "Relate global events to Indian history context",
+      "Monthly revision schedule to retain information",
+      "Mock tests every 2 weeks after completing modules"
+    ]
+  },
+  "critical_statistics": {
+    "world_wars": {
+      "wwi": {
+        "total_deaths": "17 million",
+        "military_deaths": "9 million soldiers",
+        "civilian_deaths": "8 million",
+        "duration": "1914-1918 (4 years 3 months)",
+        "nations_involved": "32+ nations"
+      },
+      "wwii": {
+        "total_deaths": "70-85 million",
+        "military_deaths": "25 million",
+        "civilian_deaths": "45-60 million",
+        "jewish_holocaust": "6 million murdered",
+        "duration": "1939-1945 (5 years 8 months)",
+        "nations_involved": "100+ nations"
+      }
+    },
+    "cold_war": {
+      "duration": "1945-1991 (46 years)",
+      "proxy_wars": "10+ major conflicts",
+      "nuclear_weapons_soviet": "45,000 warheads peak",
+      "nuclear_weapons_us": "43,000 warheads peak",
+      "death_toll_proxy_wars": "5-10 million estimates"
+    },
+    "decolonisation": {
+      "total_independence_movements": "100+ regions",
+      "major_independence_waves": "1940s-1960s",
+      "african_independence": "54 nations since 1950",
+      "asian_independence": "30+ nations since 1945",
+      "populations_liberated": "1+ billion people"
+    }
+  },
+  "india_connection": {
+    "imperial_context": {
+      "british_raj": "1858-1947: 89 years direct rule",
+      "colonial_exploitation": "Resource extraction, cash crop focus",
+      "indian_nationalism": "Indian National Congress, freedom struggle",
+      "non_aligned_movement": "Nehru's post-independence foreign policy"
+    },
+    "french_revolution_impact": "Enlightenment ideas influenced Indian reformers",
+    "industrial_revolution_impact": "British industrialisation used Indian cotton, created markets",
+    "ww1_impact": "Indian participation, Home Rule movement growth",
+    "ww2_impact": "Quit India Movement 1942, independence in 1947",
+    "cold_war_impact": "Non-alignment policy, India-Pakistan wars, China conflict",
+    "decolonisation_context": "India's independence sparked Asian decolonisation wave"
+  }
+}
