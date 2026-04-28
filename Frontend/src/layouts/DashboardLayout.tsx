@@ -10,11 +10,14 @@ import logoImg from "../LOGO/mentorsdaily.png";
 // Mobile-first nav link: minimum 44px height for touch targets
 const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
   `flex items-center ${collapsed ? "justify-center" : "gap-2 md:gap-3"} ${collapsed ? "px-2" : "px-2 md:px-3"} py-2.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 min-h-[44px] touch-manipulation relative ${theme === "dark"
-    ? `hover:bg-slate-800/80 active:scale-95 ${isActive ? "bg-blue-500/20 text-blue-200 shadow-sm shadow-blue-500/10" : "text-slate-300"
+    ? `hover:bg-white/[0.06] active:scale-95 ${isActive ? "bg-[#1e3a8a]/55 text-white shadow-sm" : "text-[#D1D5DB]"
     }`
     : `hover:bg-slate-100 active:scale-95 ${isActive ? "bg-blue-100 text-blue-700 shadow-sm shadow-blue-200/50" : "text-slate-700"
     }`
   }`;
+
+const sidebarSectionLabelClass = (theme: "dark" | "light") =>
+  `px-2 md:px-3 text-[10px] md:text-xs font-semibold uppercase tracking-wider ${theme === "dark" ? "text-[#475569]" : "text-slate-500"}`;
 
 
 const getPageTitle = (pathname: string, userRole?: string): { title: string; icon: React.ReactNode } => {
@@ -133,13 +136,13 @@ export const DashboardLayout = () => {
 
       {/* Fixed Sidebar - Mobile-first: hidden by default, shown on desktop */}
       <aside
-        className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[280px] md:w-64"} flex flex-col border-r backdrop-blur-xl fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 shadow-lg ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[270px]"} flex flex-col border-r fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 shadow-lg ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${theme === "dark"
-            ? "border-blue-900/50 bg-[#020617]/95 shadow-blue-900/10"
-            : "border-slate-200 bg-white/95 shadow-slate-200/50"
+            ? "border-slate-800/80 bg-[#0F172A] shadow-black/25"
+            : "border-slate-200 bg-white/95 backdrop-blur-xl shadow-slate-200/50"
           }`}
       >
-        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-slate-800/80" : "border-slate-200"}`}>
           {!sidebarCollapsed && (
             <div className="flex items-center gap-1.5 min-w-0 shrink-0">
               <img src={logoImg} alt="MentorsDaily" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
@@ -152,7 +155,7 @@ export const DashboardLayout = () => {
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className={`hidden md:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${theme === "dark"
-                  ? "hover:bg-slate-800 text-slate-200"
+                  ? "hover:bg-white/[0.06] text-[#D1D5DB]"
                   : "hover:bg-slate-100 text-slate-700"
                 }`}
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -161,14 +164,14 @@ export const DashboardLayout = () => {
             </button>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-slate-800 touch-manipulation text-slate-200"
+              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-white/[0.06] touch-manipulation text-[#D1D5DB]"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
-        <nav className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 space-y-1 md:space-y-2 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
+        <nav className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-6"} py-3 md:py-4 space-y-1 md:space-y-2 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
 
           {user?.role === 'admin' ? (
             // Admin Navigation
@@ -211,7 +214,7 @@ export const DashboardLayout = () => {
               {/* Admin Tools Section */}
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Admin Tools
                   </div>
                 </div>
@@ -241,7 +244,7 @@ export const DashboardLayout = () => {
               </div>
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Account
                   </div>
                 </div>
@@ -264,22 +267,20 @@ export const DashboardLayout = () => {
               {!sidebarCollapsed && (
                 <div className="mb-2 px-2">
                   {hasActiveSubscription ? (
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${
-                      theme === "dark" ? "bg-emerald-500/10 border-emerald-500/40" : "bg-emerald-50 border-emerald-200"
-                    }`}>
-                      <Lightbulb className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-full font-bold text-white bg-[#4B70F5]">
+                      <Lightbulb className="w-3.5 h-3.5 text-white flex-shrink-0 opacity-95" />
+                      <span className="text-[10px] truncate tracking-tight">
                         {user?.subscriptionPlan?.name || "Pro"} • Active
                       </span>
                     </div>
                   ) : (
                     <NavLink
                       to="/pricing"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-blue-500/40 bg-blue-500/5 hover:bg-blue-500/10 transition-colors"
+                      className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-bold text-white transition-colors bg-[#3B82F6] hover:bg-[#2563eb]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Lightbulb className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                      <span className="text-[10px] font-semibold text-blue-600">Subscribe to Pro</span>
+                      <Lightbulb className="w-3.5 h-3.5 text-white flex-shrink-0 opacity-95" />
+                      <span className="text-[10px]">Subscribe to Pro</span>
                     </NavLink>
                   )}
                 </div>
@@ -295,7 +296,7 @@ export const DashboardLayout = () => {
               {/* Performance & Analytics Section */}
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Performance & Analytics
                   </div>
                 </div>
@@ -327,7 +328,7 @@ export const DashboardLayout = () => {
               {/* Practice & Tests Section */}
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Practice & Tests
                   </div>
                 </div>
@@ -363,7 +364,7 @@ export const DashboardLayout = () => {
               {/* Study Tools Section */}
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Study Tools
                   </div>
                 </div>
@@ -390,7 +391,7 @@ export const DashboardLayout = () => {
 
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Account
                   </div>
                 </div>
@@ -405,7 +406,7 @@ export const DashboardLayout = () => {
               {/* Communication Section */}
               {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Communication
                   </div>
                 </div>
@@ -420,7 +421,7 @@ export const DashboardLayout = () => {
               {/* Profile & Settings Section */}
               {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Account
                   </div>
                 </div>
@@ -450,7 +451,7 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* Bottom Actions Section */}
-        <div className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 border-t flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-6"} py-3 md:py-4 border-t flex-shrink-0 ${theme === "dark" ? "border-slate-800/80" : "border-slate-200"}`}>
           <div className="space-y-1">
             <NavLink
               to="/profile"
@@ -473,7 +474,7 @@ export const DashboardLayout = () => {
             <button
               onClick={logout}
               className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-2 md:gap-3"} ${sidebarCollapsed ? "px-2" : "px-2 md:px-3"} py-2.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors min-h-[44px] touch-manipulation ${theme === "dark"
-                  ? "hover:bg-slate-800 text-slate-300"
+                  ? "hover:bg-white/[0.06] text-[#D1D5DB]"
                   : "hover:bg-slate-100 text-slate-700"
                 }`}
               title="Logout"
@@ -486,7 +487,7 @@ export const DashboardLayout = () => {
       </aside>
 
       {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
-      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[280px] lg:ml-64"}`}>
+      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[270px]"}`}>
         {/* Fixed Header - equal alignment, better UI */}
         <header
           className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"

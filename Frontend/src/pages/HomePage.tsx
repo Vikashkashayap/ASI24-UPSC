@@ -5,12 +5,37 @@ import { MentorChatPage } from "./MentorChatPage";
 import { useAuth } from "../hooks/useAuth";
 import "./homePage.css";
 
+function getGreetingByHour(hour: number) {
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+  return "Good Night";
+}
+
+function parseDailyHours(value?: string) {
+  if (!value) return 3;
+  const normalized = value.toLowerCase();
+  const numbers = normalized.match(/\d+/g)?.map(Number) ?? [];
+  if (normalized.includes("<")) return 2;
+  if (normalized.includes("+") && numbers.length) return numbers[0];
+  if (numbers.length >= 2) return (numbers[0] + numbers[1]) / 2;
+  if (numbers.length === 1) return numbers[0];
+  return 3;
+}
+
+function getPreparationPhase(daysLeft: number) {
+  if (daysLeft <= 120) return "revision";
+  if (daysLeft <= 240) return "balanced";
+  return "foundation";
+}
+
 export const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [countdown, setCountdown] = useState({ days: "000", hours: "00", mins: "00", secs: "00", progress: 0 });
   const [isDartSubmitted, setIsDartSubmitted] = useState(false);
   const [showMentorModal, setShowMentorModal] = useState(false);
+  const [currentHour, setCurrentHour] = useState(new Date().getHours());
 
   const targetYear = Number(user?.targetYear) || new Date().getFullYear() + 1;
   const examDate = useMemo(() => new Date(`${targetYear}-05-25T09:00:00`), [targetYear]);
@@ -22,6 +47,9 @@ export const HomePage = () => {
   });
   const studentName = user?.name || "Student";
   const daysSinceJoin = Math.max(1, Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const dailyHours = parseDailyHours(user?.dailyStudyHours);
+  const daysLeftForPrelims = Number(countdown.days) || 0;
+  const preparationPhase = getPreparationPhase(daysLeftForPrelims);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -63,11 +91,48 @@ export const HomePage = () => {
     };
   }, [showMentorModal]);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => setCurrentHour(new Date().getHours()), 60000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const greeting = getGreetingByHour(currentHour);
+  const upcomingSession = useMemo(() => {
+    const background = (user?.educationBackground || "General Studies").trim();
+    const subjectLabel = background === "Arts" ? "History" : background;
+    const isFastTrack = dailyHours >= 6;
+    const duration = isFastTrack ? 120 : dailyHours >= 4 ? 90 : 60;
+    const phaseTopicMap: Record<string, string> = {
+      revision: `${subjectLabel} Revision + PYQ Drill`,
+      balanced: `${subjectLabel} Concept + MCQ Practice`,
+      foundation: `${subjectLabel} Basics Deep Dive`,
+    };
+
+    const now = new Date();
+    const sessionDate = new Date(now);
+    sessionDate.setDate(now.getDate() + 1);
+    sessionDate.setHours(isFastTrack ? 6 : 19, 0, 0, 0);
+
+    const dayText = new Intl.DateTimeFormat("en-IN", { weekday: "long" }).format(sessionDate);
+    const timeText = new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).format(sessionDate);
+
+    return {
+      title: phaseTopicMap[preparationPhase],
+      meta: `${dayText} • ${timeText} • ${duration} mins`,
+      phaseLabel:
+        preparationPhase === "revision"
+          ? "Revision Phase"
+          : preparationPhase === "balanced"
+            ? "Balanced Phase"
+            : "Foundation Phase",
+    };
+  }, [dailyHours, preparationPhase, user?.educationBackground]);
+
   return (
     <div className="student-dashboard-page">
       <div className="sd-hero-row">
         <div className="sd-hero-text">
-          <h1>Good Evening, {studentName.split(" ")[0]}</h1>
+          <h1>{greeting}, {studentName.split(" ")[0]}</h1>
           <p>You joined {daysSinceJoin} days ago. Target UPSC CSE {targetYear}.</p>
         </div>
         <div className="sd-countdown-card">
@@ -99,7 +164,15 @@ export const HomePage = () => {
 
       <div className="sd-grid">
         <div className="sd-card sd-syllabus-card">
-          <SyllabusTargetsPanel todayLabel={todayLabel} />
+          <SyllabusTargetsPanel
+            todayLabel={todayLabel}
+            studentProfile={{
+              targetYear: user?.targetYear,
+              prepStartDate: user?.prepStartDate,
+              dailyStudyHours: user?.dailyStudyHours,
+              educationBackground: user?.educationBackground,
+            }}
+          />
         </div>
 
         <div className="sd-right">
@@ -119,8 +192,9 @@ export const HomePage = () => {
           </div>
           <div className="sd-card session">
             <h3>Upcoming Session</h3>
-            <p>GS III Agriculture Deep Dive</p>
-            <small>Tomorrow • 7:00 PM • 90 mins</small>
+            <p>{upcomingSession.title}</p>
+            <small>{upcomingSession.meta}</small>
+            <small>{upcomingSession.phaseLabel}</small>
           </div>
         </div>
       </div>

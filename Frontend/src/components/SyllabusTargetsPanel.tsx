@@ -94,6 +94,49 @@ type Segment =
   | "geography_physical"
   | "geography_india";
 
+type StudentProfile = {
+  targetYear?: string;
+  prepStartDate?: string;
+  dailyStudyHours?: string;
+  educationBackground?: string;
+};
+
+function estimatePrelimsDate(targetYear?: string) {
+  const numericYear = Number(targetYear);
+  const year = Number.isFinite(numericYear) && numericYear > 2000 ? numericYear : new Date().getFullYear() + 1;
+  const d = new Date(year, 4, 31);
+  while (d.getDay() !== 0) d.setDate(d.getDate() - 1);
+  return d;
+}
+
+function parseDailyHours(value?: string) {
+  if (!value) return 3;
+  const normalized = value.toLowerCase();
+  const numbers = normalized.match(/\d+/g)?.map(Number) ?? [];
+  if (normalized.includes("<")) return 2;
+  if (normalized.includes("+") && numbers.length) return numbers[0];
+  if (numbers.length >= 2) return (numbers[0] + numbers[1]) / 2;
+  if (numbers.length === 1) return numbers[0];
+  return 3;
+}
+
+function recommendedSegmentByBackground(background?: string): Segment {
+  const normalized = (background || "").toLowerCase();
+  if (normalized.includes("arts")) return "modern_history";
+  if (normalized.includes("engineering")) return "polity";
+  if (normalized.includes("science")) return "geography_physical";
+  if (normalized.includes("medical")) return "geography_india";
+  if (normalized.includes("commerce")) return "prelims";
+  if (normalized.includes("law")) return "mains";
+  return "prelims";
+}
+
+function daysUntil(date: Date) {
+  const now = new Date();
+  const diff = date.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / 86400000));
+}
+
 function TaskRow(props: { title: string; subtitle: string; showActions?: boolean }) {
   const navigate = useNavigate();
   const { title, subtitle, showActions = true } = props;
@@ -478,8 +521,8 @@ function GeographyIndiaSection() {
 
 type Props = { todayLabel: string };
 
-export function SyllabusTargetsPanel({ todayLabel }: Props) {
-  const [segment, setSegment] = useState<Segment>("prelims");
+export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { studentProfile?: StudentProfile }) {
+  const [segment, setSegment] = useState<Segment>(recommendedSegmentByBackground(studentProfile?.educationBackground));
   const meta = syllabusData.meta as { description?: string; last_updated?: string; version?: string };
   const polityMeta = polityData.meta as { version?: string };
   const ancientMeta = ancientHistoryData.meta as { version?: string };
@@ -488,6 +531,11 @@ export function SyllabusTargetsPanel({ todayLabel }: Props) {
   const worldMeta = worldHistoryData.meta as { version?: string };
   const geographyPhysicalMeta = geographyPhysicalData.metadata as { version?: string; created_date?: string };
   const geographyIndiaMeta = geographyIndiaData.metadata as { created_date?: string };
+  const dailyHours = parseDailyHours(studentProfile?.dailyStudyHours);
+  const prelimsDate = estimatePrelimsDate(studentProfile?.targetYear);
+  const daysLeft = daysUntil(prelimsDate);
+  const preparationMode = daysLeft <= 120 ? "revision-heavy" : daysLeft <= 240 ? "balanced coverage" : "foundation-heavy";
+  const dailyTargetsCount = Math.max(2, Math.min(6, Math.round(dailyHours)));
 
   const subtitle = useMemo(() => {
     if (segment === "prelims") return "Prelims — GS Paper I & CSAT (full topic tree)";
@@ -502,12 +550,17 @@ export function SyllabusTargetsPanel({ todayLabel }: Props) {
     return "Popular optionals — Paper I & II outlines";
   }, [segment]);
 
+  const planHint = useMemo(() => {
+    return `Plan: ${dailyTargetsCount} focus targets/day (${dailyHours.toFixed(1)}h) • ${preparationMode}`;
+  }, [dailyTargetsCount, dailyHours, preparationMode]);
+
   return (
     <>
       <div className="sd-card-hd">
         <div>
           <h3>Today&apos;s Targets</h3>
           <p className="sd-syll-deck">{subtitle}</p>
+          <p className="sd-syll-deck">{planHint}</p>
         </div>
         <small>{todayLabel}</small>
       </div>
@@ -529,6 +582,11 @@ export function SyllabusTargetsPanel({ todayLabel }: Props) {
                       : segment === "geography_india"
                         ? `Indian Geography v1.x${geographyIndiaMeta.created_date ? ` · ${geographyIndiaMeta.created_date}` : ""}`
                     : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
+        </span>
+        <span>
+          {" "}• UPSC Prelims {studentProfile?.targetYear || new Date().getFullYear() + 1}:{" "}
+          {prelimsDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+          {" "}({daysLeft} days left)
         </span>
       </div>
 
