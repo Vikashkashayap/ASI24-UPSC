@@ -13,6 +13,8 @@ import copyEvaluationRoutes from "./src/routes/copyEvaluationRoutes.js";
 import meetingRoutes from "./src/routes/meetingRoutes.js";
 import testRoutes from "./src/routes/testRoutes.js";
 import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
+import currentAffairsRoutes from "./src/routes/currentAffairsRoutes.js";
+import offersRoutes from "./src/routes/offersRoutes.js";
 
 import adminRoutes from "./src/routes/adminRoutes.js";
 import prelimsMockRoutes from "./src/routes/prelimsMockRoutes.js";
@@ -74,10 +76,14 @@ console.log("🔗 Mounting test routes at /api/tests");
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/current-affairs", currentAffairsRoutes);
+app.use("/api/offers", offersRoutes);
 // Explicit GET so student list always matches (avoids 404 when router base path is ambiguous)
 app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
 app.use("/api/prelims-mock", prelimsMockRoutes);
 console.log("🔗 Mounting prelims-mock routes at /api/prelims-mock");
+console.log("🔗 Mounting current-affairs routes at /api/current-affairs");
+console.log("🔗 Mounting offers routes at /api/offers");
 
 const CRON_INTERVAL_MS = 60 * 1000;
 setInterval(() => {
@@ -92,8 +98,32 @@ const server = http.createServer(app);
 // Initialize Socket.io
 const io = initializeSocketIO(server);
 
+function logRegisteredRoutes(expressApp) {
+  console.log("Routes loaded:");
+  const stack = expressApp?._router?.stack || [];
+
+  const printStack = (layers, prefix = "") => {
+    for (const layer of layers) {
+      if (layer.route?.path) {
+        const methods = Object.keys(layer.route.methods || {})
+          .filter((method) => layer.route.methods[method])
+          .map((method) => method.toUpperCase())
+          .join(", ");
+        console.log(`  ${methods} ${prefix}${layer.route.path}`);
+      } else if (layer.name === "router" && layer.handle?.stack) {
+        const match = layer.regexp?.toString().match(/^\/\^\\\/(.+?)\\\/\?\(\?=\\\/\|\$\)\/i$/);
+        const mount = match ? `/${match[1].replace(/\\\//g, "/")}` : "";
+        printStack(layer.handle.stack, `${prefix}${mount}`);
+      }
+    }
+  };
+
+  printStack(stack);
+}
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Socket.io initialized for real-time communication`);
+  logRegisteredRoutes(app);
 });
 
