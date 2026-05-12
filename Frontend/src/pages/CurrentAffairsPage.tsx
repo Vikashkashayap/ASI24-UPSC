@@ -51,8 +51,8 @@ export default function CurrentAffairsPage() {
     } catch (e: unknown) {
       const msg = e && typeof e === "object" && "response" in e
         ? (e as { response?: { data?: { message?: string } } }).response?.data?.message
-        : "Failed to load current affairs";
-      setError(String(msg));
+        : undefined;
+      setError(typeof msg === "string" && msg.trim() ? msg : "Failed to load current affairs");
       setItems([]);
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
 import { FormEvent, useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { api, apiBaseURL } from "../../services/api";
+import { api } from "../../services/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { LandingNavbar } from "../../components/landing/Navbar";
@@ -55,6 +55,7 @@ export const LoginPage = () => {
           </CardHeader>
           <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+              {/* Google OAuth — disabled for now
               <a
                 href={`${apiBaseURL}/api/auth/google`}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 min-h-[44px] transition-colors"
@@ -71,6 +72,7 @@ export const LoginPage = () => {
                 <span className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-200" /></span>
                 <span className="relative flex justify-center text-xs text-slate-500 bg-white px-2">Or sign in with email</span>
               </div>
+              */}
               <div className="space-y-1.5">
                 <label className="text-sm md:text-base text-slate-700 block">Email</label>
                 <input

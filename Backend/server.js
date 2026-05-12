@@ -20,6 +20,11 @@ import prelimsMockRoutes from "./src/routes/prelimsMockRoutes.js";
 
 /* REAL ROUTES */
 import pricingRoutes from "./src/routes/pricingRoutes.js";
+import paymentRoutes from "./src/routes/paymentRoutes.js";
+import offersRoutes from "./src/routes/offersRoutes.js";
+import currentAffairsRoutes, {
+  currentAffairsAdminRouter,
+} from "./src/routes/currentAffairsRoutes.js";
 
 import {
   processScheduledPrelimsMocks,
@@ -110,11 +115,18 @@ app.use(
   studentProfilerRoutes
 );
 
+// Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
+app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/offers", offersRoutes);
+app.use("/api/current-affairs", currentAffairsRoutes);
 
 /* -------------------- REAL PRICING API -------------------- */
 
 app.use("/api/pricing", pricingRoutes);
+
+app.use("/api/payment", paymentRoutes);
 
 /* -------------------- PRELIMS MOCK -------------------- */
 

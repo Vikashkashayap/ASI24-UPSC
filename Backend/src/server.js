@@ -5,26 +5,32 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 
-import { connectDB } from "./src/config/db.js";
+import { connectDB } from "./config/db.js";
 
-import authRoutes from "./src/routes/authRoutes.js";
-import performanceRoutes from "./src/routes/performanceRoutes.js";
-import plannerRoutes from "./src/routes/plannerRoutes.js";
-import mentorRoutes from "./src/routes/mentorRoutes.js";
-import copyEvaluationRoutes from "./src/routes/copyEvaluationRoutes.js";
-import meetingRoutes from "./src/routes/meetingRoutes.js";
-import testRoutes from "./src/routes/testRoutes.js";
-import studentProfilerRoutes from "./src/routes/studentProfilerRoutes.js";
-import adminRoutes from "./src/routes/adminRoutes.js";
-import prelimsMockRoutes from "./src/routes/prelimsMockRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import performanceRoutes from "./routes/performanceRoutes.js";
+import plannerRoutes from "./routes/plannerRoutes.js";
+import mentorRoutes from "./routes/mentorRoutes.js";
+import copyEvaluationRoutes from "./routes/copyEvaluationRoutes.js";
+import meetingRoutes from "./routes/meetingRoutes.js";
+import testRoutes from "./routes/testRoutes.js";
+import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
+import pricingRoutes from "./routes/pricingRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import offersRoutes from "./routes/offersRoutes.js";
+import currentAffairsRoutes, {
+  currentAffairsAdminRouter,
+} from "./routes/currentAffairsRoutes.js";
 
 import {
   processScheduledPrelimsMocks,
   listLivePrelimsMocks,
-} from "./src/controllers/prelimsMockController.js";
+} from "./controllers/prelimsMockController.js";
 
-import { authMiddleware } from "./src/middleware/authMiddleware.js";
-import { initializeSocketIO } from "./src/services/socketService.js";
+import { authMiddleware } from "./middleware/authMiddleware.js";
+import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
 
@@ -74,7 +80,16 @@ app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
+
+// Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
+app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/offers", offersRoutes);
+app.use("/api/current-affairs", currentAffairsRoutes);
+
+app.use("/api/pricing", pricingRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
 app.use("/api/prelims-mock", prelimsMockRoutes);

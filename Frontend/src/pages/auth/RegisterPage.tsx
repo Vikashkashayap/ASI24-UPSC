@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { api, apiBaseURL } from "../../services/api";
+import { api } from "../../services/api";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 
@@ -50,6 +50,7 @@ export const RegisterPage = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
+            {/* Google OAuth — disabled for now
             <a
               href={`${apiBaseURL}/api/auth/google`}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 min-h-[44px] transition-colors"
@@ -66,6 +67,7 @@ export const RegisterPage = () => {
               <span className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-200" /></span>
               <span className="relative flex justify-center text-xs text-slate-500 bg-white px-2">Or register with email</span>
             </div>
+            */}
             <div className="space-y-1.5">
               <label className="text-sm text-slate-700 block">Name</label>
               <input
