@@ -2,59 +2,84 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { findOrCreateGoogleUser } from "../services/authService.js";
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
-const CLIENT_ORIGIN =
-  process.env.CLIENT_ORIGIN || "http://localhost:5173";
-
 const CALLBACK_PATH = "/api/auth/google/callback";
+let googleStrategyRegistered = false;
 
-// Backend URL
-function getBackendBaseUrl(req) {
+function getGoogleCredentials() {
+  return {
+    clientID: (process.env.GOOGLE_CLIENT_ID || "").trim(),
+    clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "").trim(),
+  };
+}
+
+export function isGoogleOAuthConfigured() {
+  const { clientID, clientSecret } = getGoogleCredentials();
+  return Boolean(clientID && clientSecret);
+}
+
+/** Backend public URL (no trailing slash). */
+export function getBackendBaseUrl(req) {
   const fromEnv = (
     process.env.BASE_URL ||
     process.env.BACKEND_URL ||
     ""
-  ).replace(/\/$/, "");
+  )
+    .trim()
+    .replace(/\/$/, "");
 
   if (fromEnv) return fromEnv;
 
-  if (req && req.protocol && req.get("host")) {
+  if (req?.protocol && req.get?.("host")) {
     return `${req.protocol}://${req.get("host")}`;
   }
 
   return "http://localhost:5000";
 }
 
-// Callback URL
-function getCallbackUrl(req) {
+/** OAuth redirect URI — must match Google Cloud Console exactly. */
+export function getCallbackUrl(req) {
+  const explicit = (process.env.GOOGLE_CALLBACK_URL || "").trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+
   return `${getBackendBaseUrl(req)}${CALLBACK_PATH}`;
 }
 
-// Default callback
-const DEFAULT_BASE_URL = (
-  process.env.BASE_URL ||
-  process.env.BACKEND_URL ||
-  "http://localhost:5000"
-).replace(/\/$/, "");
+function getFrontendOrigin(req) {
+  const fromEnv = (process.env.CLIENT_ORIGIN || "").trim().replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
 
-const CALLBACK_URL = `${DEFAULT_BASE_URL}${CALLBACK_PATH}`;
+  const base = getBackendBaseUrl(req);
+  if (base && base !== "http://localhost:5000") {
+    return base;
+  }
 
-// Google Strategy
-if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
+  return "http://localhost:5173";
+}
+
+/**
+ * Register the Google strategy once env vars are available.
+ * Safe to call on every OAuth request (no-op after first registration).
+ */
+export function ensureGoogleStrategy(req) {
+  if (googleStrategyRegistered) return true;
+
+  const { clientID, clientSecret } = getGoogleCredentials();
+  if (!clientID || !clientSecret) {
+    return false;
+  }
+
+  const callbackURL = getCallbackUrl(req);
+
   passport.use(
     new GoogleStrategy(
       {
-        clientID: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: CALLBACK_URL,
+        clientID,
+        clientSecret,
+        callbackURL,
       },
-      async (accessToken, refreshToken, profile, done) => {
+      async (_accessToken, _refreshToken, profile, done) => {
         try {
-          const { user, token } =
-            await findOrCreateGoogleUser(profile);
-
+          const { user, token } = await findOrCreateGoogleUser(profile);
           return done(null, { user, token });
         } catch (err) {
           return done(err, null);
@@ -62,11 +87,20 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
       }
     )
   );
+
+  googleStrategyRegistered = true;
+  console.log("✅ Google OAuth strategy registered, callback:", callbackURL);
+  return true;
 }
 
-// Google Login Start
 export const googleAuth = (req, res, next) => {
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
+  if (!isGoogleOAuthConfigured()) {
+    return res
+      .status(503)
+      .json({ message: "Google login is not configured" });
+  }
+
+  if (!ensureGoogleStrategy(req)) {
     return res
       .status(503)
       .json({ message: "Google login is not configured" });
@@ -81,23 +115,14 @@ export const googleAuth = (req, res, next) => {
   })(req, res, next);
 };
 
-// Frontend URL
-function getFrontendOrigin(req) {
-  if (process.env.CLIENT_ORIGIN) {
-    return process.env.CLIENT_ORIGIN.replace(/\/$/, "");
-  }
-
-  const base = getBackendBaseUrl(req);
-
-  if (base && base !== "http://localhost:5000") {
-    return base;
-  }
-
-  return CLIENT_ORIGIN;
-}
-
-// Google Callback
 export const googleAuthCallback = (req, res, next) => {
+  if (!isGoogleOAuthConfigured() || !ensureGoogleStrategy(req)) {
+    const origin = getFrontendOrigin(req);
+    return res.redirect(
+      `${origin}/login?error=${encodeURIComponent("Google login is not configured")}`
+    );
+  }
+
   const callbackURL = getCallbackUrl(req);
 
   passport.authenticate(
@@ -113,22 +138,15 @@ export const googleAuthCallback = (req, res, next) => {
         const message = encodeURIComponent(
           err.message || "Google sign-in failed"
         );
-
-        return res.redirect(
-          `${origin}/login?error=${message}`
-        );
+        return res.redirect(`${origin}/login?error=${message}`);
       }
 
-      if (!result || !result.token) {
-        return res.redirect(
-          `${origin}/login?error=no_token`
-        );
+      if (!result?.token) {
+        return res.redirect(`${origin}/login?error=no_token`);
       }
 
       return res.redirect(
-        `${origin}/auth/callback?token=${encodeURIComponent(
-          result.token
-        )}`
+        `${origin}/auth/callback?token=${encodeURIComponent(result.token)}`
       );
     }
   )(req, res, next);

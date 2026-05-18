@@ -57,7 +57,10 @@ export const HomePage = () => {
 
   const targetYear = Number(user?.targetYear) || new Date().getFullYear() + 1;
   const examDate = useMemo(() => new Date(`${targetYear}-05-25T09:00:00`), [targetYear]);
-  const joinDate = user?.createdAt ? new Date(user.createdAt) : new Date();
+  const joinDate = useMemo(
+    () => (user?.createdAt ? new Date(user.createdAt) : new Date()),
+    [user?.createdAt],
+  );
   const todayLabel = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
     day: "numeric",

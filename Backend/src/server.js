@@ -5,6 +5,7 @@ import cors from "cors";
 import http from "http";
 
 import { connectDB } from "./config/db.js";
+import { isGoogleOAuthConfigured } from "./config/passport.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import performanceRoutes from "./routes/performanceRoutes.js";
@@ -23,15 +24,15 @@ import currentAffairsRoutes, {
   currentAffairsAdminRouter,
 } from "./routes/currentAffairsRoutes.js";
 
-import {
-  processScheduledPrelimsMocks,
-  listLivePrelimsMocks,
-} from "./controllers/prelimsMockController.js";
+import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
+
+// Nginx / reverse proxy: correct req.protocol (https) for OAuth callback URLs
+app.set("trust proxy", 1);
 
 /* -------------------- CORS -------------------- */
 
@@ -54,6 +55,14 @@ app.use(express.json());
 /* -------------------- DB -------------------- */
 
 connectDB();
+
+if (isGoogleOAuthConfigured()) {
+  console.log("✅ Google OAuth credentials loaded (strategy registers on first login)");
+} else {
+  console.warn(
+    "⚠️  Google OAuth disabled — set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Backend/.env"
+  );
+}
 
 /* -------------------- BASIC ROUTES -------------------- */
 
@@ -90,8 +99,7 @@ app.use("/api/current-affairs", currentAffairsRoutes);
 app.use("/api/pricing", pricingRoutes);
 app.use("/api/payment", paymentRoutes);
 
-app.get("/api/prelims-mock", authMiddleware, listLivePrelimsMocks);
-app.use("/api/prelims-mock", prelimsMockRoutes);
+app.use("/api/prelims-mock", authMiddleware, prelimsMockRoutes);
 
 /* -------------------- CRON -------------------- */
 
