@@ -2,6 +2,8 @@ import { FormEvent, useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { api, apiBaseURL } from "../../services/api";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { LandingNavbar } from "../../components/landing/Navbar";
 
 export const LoginPage = () => {
@@ -46,31 +48,14 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-50">
       <LandingNavbar />
-      <div className="mx-auto max-w-6xl px-4 py-24">
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-blue-400/20 bg-[#07142e] shadow-2xl lg:grid-cols-[1.05fr_1.35fr]">
-          <div className="hidden border-r border-blue-400/20 bg-gradient-to-b from-[#0b1f45] to-[#081631] p-8 lg:block">
-            <h2 className="mb-4 text-4xl font-extrabold leading-tight">Welcome Back, Aspirant</h2>
-            <p className="mb-8 text-sm text-slate-300">
-              Sign in to continue your UPSC preparation with AI-powered planning and mentor support.
-            </p>
-            <ul className="space-y-3 text-sm text-slate-200">
-              <li>• Personalized Study Plan</li>
-              <li>• Full Performance Analytics</li>
-              <li>• Dedicated Mentor</li>
-              <li>• 30,000+ Practice Questions</li>
-            </ul>
-          </div>
-
-          <div className="p-5 sm:p-8">
-            <h1 className="text-2xl font-bold">Sign In to Your Account</h1>
-            <p className="mt-1 text-sm text-slate-300">
-              Don&apos;t have an account?{" "}
-              <Link to="/register" className="font-semibold text-blue-400 hover:underline">
-                Sign up here
-              </Link>
-            </p>
-
-            <div className="mt-6 rounded-xl border border-blue-400/20 bg-[#0b1a3b] p-4 sm:p-5">
+      <div className="flex items-center justify-center px-3 md:px-4 py-6 md:py-8 min-h-[calc(100vh-60px)] md:min-h-[calc(100vh-80px)] pt-20 md:pt-24">
+        <Card className="w-full max-w-md mx-auto bg-white border border-slate-200 rounded-2xl shadow-xl">
+          <CardHeader className="pb-3 md:pb-4 px-4 md:px-6 pt-4 md:pt-6">
+            <CardTitle className="text-base md:text-lg text-slate-900">Welcome back, aspirant</CardTitle>
+            <CardDescription className="text-xs md:text-sm mt-1 text-slate-600">Sign in to your AI-powered MentorsDaily workspace.</CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 md:px-6 pb-4 md:pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               <a
                 href={`${apiBaseURL}/api/auth/google`}
                 className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-[#111827] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1f2937]"
@@ -102,8 +87,8 @@ export const LoginPage = () => {
                 <span>or sign in with email</span>
                 <div className="h-px flex-1 bg-blue-200/25" />
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-sm md:text-base text-slate-700 block">Email</label>
                 <input
                   type="email"
                   required
