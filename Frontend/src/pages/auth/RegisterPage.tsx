@@ -197,7 +197,7 @@ export const RegisterPage = () => {
               </a>
               <div className="mb-4 flex items-center gap-3 text-xs text-slate-300">
                 <div className="h-px flex-1 bg-blue-200/25" />
-                <span>or sign in with email</span>
+                <span>or register with email</span>
                 <div className="h-px flex-1 bg-blue-200/25" />
               </div>
 

@@ -19,6 +19,9 @@ export const LandingNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
+  const authCtaTo = isLoginPage ? "/register" : "/login";
+  const authCtaLabel = isLoginPage ? "Sign up" : "Sign in";
+  const authCtaVariant = isLoginPage ? "outline" : "primary";
 
   return (
     <>
@@ -107,9 +110,9 @@ export const LandingNavbar = () => {
               </button>
 
               {/* Auth CTA: Sign up on login page, Sign in elsewhere */}
-              <Link to={isLoginPage ? "/register" : "/login"} className="hidden md:block">
-                <Button className="rounded-lg px-6" variant={isLoginPage ? "outline" : "primary"}>
-                  {isLoginPage ? "Sign up" : "Sign in"}
+              <Link to={authCtaTo} className="hidden md:block">
+                <Button className="rounded-lg px-6" variant={authCtaVariant}>
+                  {authCtaLabel}
                 </Button>
               </Link>
 
@@ -193,12 +196,12 @@ export const LandingNavbar = () => {
                 )}
               </nav>
               <Link
-                to={isLoginPage ? "/register" : "/login"}
+                to={authCtaTo}
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-6"
               >
-                <Button className="w-full rounded-lg px-6" variant={isLoginPage ? "outline" : "primary"}>
-                  {isLoginPage ? "Sign up" : "Sign in"}
+                <Button className="w-full rounded-lg px-6" variant={authCtaVariant}>
+                  {authCtaLabel}
                 </Button>
               </Link>
             </div>
