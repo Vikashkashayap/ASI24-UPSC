@@ -1,9 +1,33 @@
 import PrelimsMock from "../models/PrelimsMock.js";
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
-import { generateFullMockTestQuestions, generateFullMockMixTestQuestions, generateFullMockPyoTestQuestions, generateFullMockCsatTestQuestions } from "../services/testGenerationService.js";
+import {
+  generateFullMockTestQuestions,
+  generateFullMockMixTestQuestions,
+  generateFullMockPyoTestQuestions,
+  generateFullMockCsatTestQuestions,
+  dedupeQuestions,
+  dedupeQuestionsByStem,
+} from "../services/testGenerationService.js";
+import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
+
+/** Mongoose subdocs do not spread reliably; normalize before dedupe / copy. */
+function toPlainPrelimsQuestion(q) {
+  if (q == null) return q;
+  if (typeof q.toObject === "function") {
+    try {
+      return q.toObject({ depopulate: true });
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  if (typeof q === "object" && q._doc && typeof q._doc === "object") {
+    return { ...q._doc };
+  }
+  return { ...q };
+}
 
 /**
  * Admin: Create a scheduled Prelims Mock
@@ -13,6 +37,14 @@ const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment",
 const FULL_LENGTH_MIX_SUBJECT = "Full Length GS Mix";
 const PYQ_MIN_YEAR = 2010;
 const PYQ_MAX_YEAR = 2025;
+
+/** Expected question count after generation (same paper must not contain duplicate MCQs). */
+function requiredPrelimsQuestionCount(mock) {
+  if (mock.isCsat) return 80;
+  const n = parseInt(mock.totalQuestions, 10);
+  if (n === 50 || n === 100) return n;
+  return 100;
+}
 
 const ALLOWED_PATTERNS = [
   "statement_based",
@@ -396,8 +428,19 @@ export const goLivePrelimsMock = async (req, res) => {
       });
     }
 
-    mock.questions = result.questions;
-    mock.totalQuestions = result.questions.length;
+    const needed = requiredPrelimsQuestionCount(mock);
+    const uniqueQuestions = dedupeQuestions(result.questions);
+    if (uniqueQuestions.length < needed) {
+      mock.status = "scheduled";
+      await mock.save();
+      return res.status(500).json({
+        success: false,
+        message: `Only ${uniqueQuestions.length} unique questions after deduplication (${needed} required). Please try again.`,
+      });
+    }
+
+    mock.questions = uniqueQuestions.slice(0, needed);
+    mock.totalQuestions = mock.questions.length;
     if (mock.totalQuestions === 50) {
       mock.durationMinutes = 60;
       mock.totalMarks = 100;
@@ -483,8 +526,16 @@ export const processScheduledPrelimsMocks = async () => {
             ? await generateFullMockMixTestQuestions(mixOpts)
             : await generateFullMockTestQuestions(subjectOpts);
       if (result.success && result.questions && result.questions.length > 0) {
-        mock.questions = result.questions;
-        mock.totalQuestions = result.questions.length;
+        const needed = requiredPrelimsQuestionCount(mock);
+        const uniqueQuestions = dedupeQuestions(result.questions);
+        if (uniqueQuestions.length < needed) {
+          mock.status = "scheduled";
+          await mock.save();
+          console.error(`❌ Prelims Mock ${mock._id}: only ${uniqueQuestions.length} unique questions (${needed} required)`);
+          continue;
+        }
+        mock.questions = uniqueQuestions.slice(0, needed);
+        mock.totalQuestions = mock.questions.length;
         if (mock.totalQuestions === 50) {
           mock.durationMinutes = 60;
           mock.totalMarks = 100;
@@ -645,7 +696,7 @@ export const getMockResults = async (req, res) => {
  */
 export const startPrelimsMockAttempt = async (req, res) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id ?? req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Not authenticated" });
     }
@@ -656,10 +707,38 @@ export const startPrelimsMockAttempt = async (req, res) => {
       return res.status(404).json({ success: false, message: "Prelims Mock not found" });
     }
     if (mock.status !== "live") {
-      return res.status(400).json({ success: false, message: "This mock is not live" });
+      return res.status(400).json({
+        success: false,
+        code: "MOCK_NOT_LIVE",
+        message: "This mock is not live anymore. Refresh the list — it may have ended or been rescheduled.",
+      });
     }
-    if (!mock.questions || mock.questions.length === 0) {
-      return res.status(400).json({ success: false, message: "Mock has no questions" });
+
+    const rawPlain = (mock.questions || []).map(toPlainPrelimsQuestion);
+    let uniqueQuestions = dedupeQuestionsByStem(dedupeQuestions(rawPlain));
+
+    if (!uniqueQuestions?.length && rawPlain.length) {
+      console.warn(
+        `startPrelimsMockAttempt: stem dedupe removed all ${rawPlain.length} questions for mock ${mockId}; retrying with fingerprint dedupe only`
+      );
+      uniqueQuestions = dedupeQuestions(rawPlain);
+    }
+    if (!uniqueQuestions?.length && rawPlain.length) {
+      console.warn(`startPrelimsMockAttempt: dedupe still empty for mock ${mockId}; using raw questions (no dedupe)`);
+      uniqueQuestions = rawPlain;
+    }
+
+    if (!uniqueQuestions || uniqueQuestions.length === 0) {
+      return res.status(400).json({
+        success: false,
+        code: "MOCK_NO_QUESTIONS",
+        message: "This mock has no questions in the database. Ask an admin to re-generate (Go Live) the mock.",
+      });
+    }
+    if (uniqueQuestions.length !== mock.questions.length) {
+      mock.questions = uniqueQuestions;
+      mock.totalQuestions = uniqueQuestions.length;
+      await mock.save();
     }
 
     const existing = await Test.findOne({ userId, prelimsMockId: mockId });
@@ -679,21 +758,14 @@ export const startPrelimsMockAttempt = async (req, res) => {
       difficulty: (mock.difficulty && String(mock.difficulty)[0].toUpperCase() + String(mock.difficulty).slice(1)) || "Moderate",
       prelimsMockId: mock._id,
       durationMinutes: mock.durationMinutes,
-      questions: mock.questions.map((q) => ({
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        explanation: q.explanation,
-        userAnswer: null,
-        timeSpent: 0,
-        questionType: q.questionType,
-        tableData: q.tableData,
-        matchColumns: q.matchColumns,
-        assertionReason: q.assertionReason,
-        eliminationLogic: q.eliminationLogic,
-        conceptualSource: q.conceptualSource,
-      })),
-      totalQuestions: mock.questions.length,
+      questions: uniqueQuestions.map((q) =>
+        pickBilingualQuestionFields({
+          ...q,
+          userAnswer: null,
+          timeSpent: 0,
+        })
+      ),
+      totalQuestions: uniqueQuestions.length,
     });
     await test.save();
 

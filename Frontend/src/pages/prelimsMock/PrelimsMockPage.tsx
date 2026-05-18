@@ -59,8 +59,12 @@ export const PrelimsMockPage: React.FC = () => {
       }
       setError(res.data.message || "Could not start test");
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: { message?: string } } };
+      const ax = err as { response?: { data?: { message?: string; code?: string } } };
+      const code = ax.response?.data?.code;
       setError(ax.response?.data?.message || "Could not start test");
+      if (code === "MOCK_NOT_LIVE") {
+        void load();
+      }
     } finally {
       setStartingId(null);
     }

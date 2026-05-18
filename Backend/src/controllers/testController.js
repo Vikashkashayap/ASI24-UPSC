@@ -2,9 +2,61 @@ import Test from "../models/Test.js";
 import { User } from "../models/User.js";
 import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
+import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
+
+function mapQuestionForClient(q, { includeAnswers = false, includeMeta = false } = {}) {
+  const base = {
+    _id: q._id,
+    question: q.question,
+    question_en: q.question_en || q.question,
+    question_hi: q.question_hi || "",
+    options: q.options,
+    options_en: q.options_en || q.options,
+    options_hi: q.options_hi || { A: "", B: "", C: "", D: "" },
+    userAnswer: q.userAnswer ?? null,
+    questionType: q.questionType,
+    tableData: q.tableData ?? null,
+    matchColumns: q.matchColumns ?? null,
+    assertionReason: q.assertionReason ?? null,
+  };
+
+  if (!includeAnswers) return base;
+
+  return {
+    ...base,
+    correctAnswer: q.correctAnswer,
+    explanation: q.explanation,
+    explanation_en: q.explanation_en || q.explanation,
+    explanation_hi: q.explanation_hi,
+    isCorrect: q.userAnswer === q.correctAnswer,
+    timeSpent: q.timeSpent ?? 0,
+    ...(includeMeta
+      ? {
+          eliminationLogic: q.eliminationLogic,
+          conceptualSource: q.conceptualSource,
+        }
+      : {}),
+  };
+}
+
+function mapQuestionForStart(q) {
+  return {
+    _id: q._id,
+    question: q.question,
+    question_en: q.question_en || q.question,
+    question_hi: q.question_hi || "",
+    options: q.options,
+    options_en: q.options_en || q.options,
+    options_hi: q.options_hi || { A: "", B: "", C: "", D: "" },
+    questionType: q.questionType,
+    tableData: q.tableData ?? null,
+    matchColumns: q.matchColumns ?? null,
+    assertionReason: q.assertionReason ?? null,
+  };
+}
 
 /**
  * Generate a FULL-LENGTH UPSC Prelims GS Paper 1 Mock (100 questions).
@@ -78,11 +130,7 @@ export const generateFullMockTest = async (req, res) => {
       topic: test.topic,
       difficulty: test.difficulty,
       totalQuestions: test.totalQuestions,
-      questions: test.questions.map((q) => ({
-        _id: q._id,
-        question: q.question,
-        options: q.options,
-      })),
+      questions: test.questions.map((q) => mapQuestionForStart(q)),
       createdAt: test.createdAt,
     };
 
@@ -185,13 +233,10 @@ export const generateTest = async (req, res) => {
           examType: "GS",
           topic,
           difficulty,
-          questions: shuffledQuestions.map((q) => ({
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            explanation: q.explanation,
-            userAnswer: null,
-          })),
+          questions: shuffledQuestions.map((q) => {
+            const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
+            return pickBilingualQuestionFields({ ...plain, userAnswer: null });
+          }),
           totalQuestions: existingTest.totalQuestions,
         });
 
@@ -204,11 +249,7 @@ export const generateTest = async (req, res) => {
           topic: newTest.topic,
           difficulty: newTest.difficulty,
           totalQuestions: newTest.totalQuestions,
-          questions: newTest.questions.map((q) => ({
-            _id: q._id,
-            question: q.question,
-            options: q.options,
-          })),
+          questions: newTest.questions.map((q) => mapQuestionForStart(q)),
           createdAt: newTest.createdAt,
         };
 
@@ -285,11 +326,7 @@ export const generateTest = async (req, res) => {
       topic: test.topic,
       difficulty: test.difficulty,
       totalQuestions: test.totalQuestions,
-      questions: test.questions.map((q) => ({
-        _id: q._id,
-        question: q.question,
-        options: q.options,
-      })),
+      questions: test.questions.map((q) => mapQuestionForStart(q)),
       createdAt: test.createdAt,
     };
 
@@ -419,16 +456,7 @@ export const submitTest = async (req, res) => {
         correctAnswers: test.correctAnswers,
         wrongAnswers: test.wrongAnswers,
         accuracy: test.accuracy,
-        questions: test.questions.map((q) => ({
-          _id: q._id,
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-          userAnswer: q.userAnswer,
-          explanation: q.explanation,
-          isCorrect: q.userAnswer === q.correctAnswer,
-          timeSpent: q.timeSpent ?? 0,
-        })),
+        questions: test.questions.map((q) => mapQuestionForClient(q, { includeAnswers: true })),
         createdAt: test.createdAt,
         submittedAt: test.updatedAt,
       },
@@ -517,20 +545,7 @@ export const getTest = async (req, res) => {
           wrongAnswers: test.wrongAnswers,
           accuracy: test.accuracy,
           isSubmitted: true,
-          questions: test.questions.map((q) => ({
-            _id: q._id,
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            userAnswer: q.userAnswer,
-            explanation: q.explanation,
-            isCorrect: q.userAnswer === q.correctAnswer,
-            timeSpent: q.timeSpent ?? 0,
-            questionType: q.questionType,
-            tableData: q.tableData ?? null,
-            matchColumns: q.matchColumns ?? null,
-            assertionReason: q.assertionReason ?? null,
-          })),
+          questions: test.questions.map((q) => mapQuestionForClient(q, { includeAnswers: true, includeMeta: true })),
           createdAt: test.createdAt,
           submittedAt: test.updatedAt,
         },
@@ -548,16 +563,7 @@ export const getTest = async (req, res) => {
         difficulty: test.difficulty,
         totalQuestions: test.totalQuestions,
         durationMinutes: test.durationMinutes,
-        questions: test.questions.map((q) => ({
-          _id: q._id,
-          question: q.question,
-          options: q.options,
-          userAnswer: q.userAnswer || null,
-          questionType: q.questionType,
-          tableData: q.tableData ?? null,
-          matchColumns: q.matchColumns ?? null,
-          assertionReason: q.assertionReason ?? null,
-        })),
+        questions: test.questions.map((q) => mapQuestionForClient(q)),
         createdAt: test.createdAt,
         isSubmitted: false,
       },

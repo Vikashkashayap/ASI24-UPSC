@@ -1,0 +1,1984 @@
+{
+  "meta": {
+    "portal": "MentorsDaily",
+    "subject": "UPSC Medieval History",
+    "difficulty_level": "Advanced",
+    "total_modules": 9,
+    "standard_track_days": 120,
+    "standard_track_hours": 360,
+    "last_updated": "2026-04-16",
+    "coverage": "700 AD to 1850 AD",
+    "primary_reference": "Satish Chandra - Medieval India: From Sultanate to the Mughals",
+    "ncert_references": ["NCERT Class 7 - Our Pasts II & III", "NCERT Class 12 - Themes in Indian History Part II"]
+  },
+  "daily_study_schedule_standard_track": {
+    "hours_per_day": 3,
+    "days_per_week": 6,
+    "study_pattern": "Theory (2 hours) + Map Work + PYQ Practice (1 hour)",
+    "revision_strategy": "Weekly topic revision, Fortnightly module tests",
+    "prelims_focus": "Dates, rulers, administrative terms, geography",
+    "mains_focus": "Socio-economic changes, cultural developments, administrative evolution"
+  },
+  "modules": [
+    {
+      "module_id": "M1",
+      "module_name": "Early Medieval Period & Arab Invasions (700-1200 AD)",
+      "estimated_days_standard": 14,
+      "estimated_hours": 42,
+      "module_overview": "Transition from ancient to medieval India, Arab invasions, early sultanates, Tripartite struggle",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M1T1",
+          "topic_name": "Transition from Ancient to Medieval India & Administrative Breakdown",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 1: The Transition from Ancient to Medieval India"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Opening chapters on political fragmentation"
+          },
+          "key_concepts": [
+            "Decline of centralized Gupta administration",
+            "Rise of feudalism and regional kingdoms",
+            "Weakening of trade routes and economy",
+            "Invasions by Hunas and Central Asians",
+            "Evolution of varna system in medieval context",
+            "Development of feudal landholding systems",
+            "Temple as center of economic and political power",
+            "Proliferation of regional scripts and languages",
+            "Military feudalism and cavalry importance",
+            "Brahmanical revival and Puranic religion",
+            "Decline of Buddhist institutions",
+            "Rise of Jainism in Gujarat and Rajasthan",
+            "Water systems and irrigation administration changes",
+            "Tax collection mechanisms transformation"
+          ],
+          "important_facts": {
+            "end_of_ancient_period": "650 AD",
+            "beginning_of_medieval_period": "700 AD",
+            "key_developments": [
+              "Fragmentation into Tripartite powers - Palas, Rashtrakutas, Gurjara-Pratiharas",
+              "Economic shift from trade to agriculture-based economy",
+              "Rise of local chiefs and feudatory lords",
+              "Brahmanical land grants replacing Buddhist patronage"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.5,
+          "map_work": [
+            "Extent of major early medieval kingdoms by 800 AD",
+            "Trade route changes between 700-1000 AD",
+            "Spread of feudalism in North and South India"
+          ]
+        },
+        {
+          "topic_id": "M1T2",
+          "topic_name": "Arab Invasions & Establishment of Islamic Rule",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 2: Arab Invasions and the Sultanate"
+          },
+          "ncert_reference": {
+            "class": 7,
+            "book": "Our Pasts II",
+            "chapters": "Chapter on Sultanate and Arab invasions"
+          },
+          "key_concepts": [
+            "Muhammad bin Qasim's invasion and Sindh conquest (712 AD)",
+            "Establishment of Arab rule in Sindh",
+            "Trading contacts between Arab world and India",
+            "Role of Arab merchants in India",
+            "Islamic administrative systems introduction",
+            "Tax policies under Arab rule - Jizya and Kharaj",
+            "Coinage and monetary systems changes",
+            "Urban centers development under Arab rule",
+            "Religious tolerance policies",
+            "Continued Hindu and Buddhist institution functioning",
+            "Cultural exchanges through Arab rule",
+            "Impact on local administration and military",
+            "Slave trade and military organization",
+            "Impact on Indian Ocean trade networks"
+          ],
+          "important_facts": {
+            "key_invasion": "Muhammad bin Qasim's invasion of Sindh - 712 AD",
+            "capital_established": "Al-Mansura and Multan",
+            "duration_of_arab_rule": "200 years approximately",
+            "decline": "Collapse due to internal strife and rise of local powers",
+            "rulers": ["Muhammad bin Qasim", "Al-Junaid", "Tamim ibn Amr"]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "very_high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.5,
+          "map_work": [
+            "Muhammad bin Qasim's invasion route",
+            "Extent of Arab rule in Sindh and Punjab",
+            "Arab trading posts on coasts"
+          ]
+        },
+        {
+          "topic_id": "M1T3",
+          "topic_name": "Tripartite Struggle - Palas, Rashtrakutas & Gurjara-Pratiharas",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 3: The Tripartite Struggle"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Sections on regional powers and conflicts"
+          },
+          "key_concepts": [
+            "Strategic importance of Kannauj - symbolic center",
+            "Pala dynasty patronage of Buddhism",
+            "Rashtrakuta dominance in Deccan",
+            "Gurjara-Pratihara control of North India",
+            "Military innovations - cavalry and elephants",
+            "Naval power development under different rulers",
+            "Administrative systems of each dynasty",
+            "Revenue collection methods - Bhaga and Bhogi",
+            "Temple economy and land grants",
+            "Urban centers and trade networks",
+            "Religious policies and cultural patronage",
+            "Decline of Palas and rise of regional powers",
+            "Military expeditions and territorial expansion",
+            "Diplomatic relations and matrimonial alliances"
+          ],
+          "important_facts": {
+            "pala_dynasty": {
+              "founder": "Gopala I (c. 750 AD)",
+              "greatest_ruler": "Dharmapala and Devapala",
+              "capital": "Nalanda (and later Odantapuri)",
+              "period": "750-1161 AD",
+              "key_achievement": "Patronage of Nalanda University"
+            },
+            "rashtrakuta_dynasty": {
+              "founder": "Dantidurga (c. 735 AD)",
+              "greatest_ruler": "Amoghavarsha I (814-880 AD)",
+              "capital": "Manyakheta",
+              "period": "735-982 AD",
+              "key_battles": ["Battle of Talikota (1565 AD - note: later period)"]
+            },
+            "gurjara_pratihara_dynasty": {
+              "founder": "Nagabhata I (c. 700 AD)",
+              "greatest_ruler": "Mihir Bhoja (836-890 AD)",
+              "capital": "Kannauj",
+              "period": "650-1036 AD",
+              "key_achievement": "Defense against Arab invasions"
+            },
+            "major_battles": [
+              "Battle of Talikota - Rashtrakutas vs Palas",
+              "Deccan wars - Rashtrakutas vs Chalukyas",
+              "Kannanj struggles - Multiple wars"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Territorial extent of Palas (750-1161 AD)",
+            "Rashtrakuta empire extent under Amoghavarsha",
+            "Gurjara-Pratihara domain at peak power",
+            "Kannauj and surrounding regions",
+            "Major cities and trade routes"
+          ]
+        },
+        {
+          "topic_id": "M1T4",
+          "topic_name": "Chalukyas & Early Deccan Powers",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter on Regional Kingdoms - Deccan Powers"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Sections on Deccan and South Indian kingdoms"
+          },
+          "key_concepts": [
+            "Western Chalukyas - Manyakheta importance",
+            "Eastern Chalukyas - Vengi kingdom",
+            "Administrative structure - local governance",
+            "Military innovations - fortress architecture",
+            "Temple patronage and religious policies",
+            "Trade and commerce development",
+            "Land revenue systems",
+            "Social organization and caste hierarchies",
+            "Conflicts with Rashtrakutas",
+            "Relations with Cholas",
+            "Merchant guilds and craft organization",
+            "Irrigation systems and agriculture",
+            "Art and architectural styles",
+            "Decline and fragmentation"
+          ],
+          "important_facts": {
+            "western_chalukyas": {
+              "period": "550-1210 AD",
+              "key_rulers": ["Pulakeshin I", "Pulakeshin II"],
+              "capital": "Vatapi (later Badami)"
+            },
+            "eastern_chalukyas": {
+              "period": "624-1075 AD",
+              "capital": "Vengi",
+              "key_ruler": "Rajahari"
+            }
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 0.5,
+          "map_work": [
+            "Chalukyan territorial extent",
+            "Manyakheta and Vatapi locations",
+            "Vengi and Eastern Chalukya region",
+            "Trade routes through Deccan"
+          ]
+        },
+        {
+          "topic_id": "M1T5",
+          "topic_name": "Cholas & South Indian Prosperity",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter on Chola Dynasty"
+          },
+          "ncert_reference": {
+            "class": 7,
+            "book": "Our Pasts II & III",
+            "chapters": "Chola Empire and administration"
+          },
+          "key_concepts": [
+            "Administrative system - districts and local governance",
+            "Village assemblies (Sabha and Ur)",
+            "Land revenue collection and Bhaga system",
+            "Naval power and maritime trade",
+            "Expansion under Rajaraja and Rajendra",
+            "Temple as economic center",
+            "Agricultural prosperity and irrigation",
+            "Bronze sculpture and art development",
+            "Literature and learning patronage",
+            "Religious policies and temple construction",
+            "Trade with Southeast Asia and China",
+            "Urban centers and commerce",
+            "Decline and fragmentaton",
+            "Social organization and economic structure"
+          ],
+          "important_facts": {
+            "period": "850-1279 AD",
+            "greatest_ruler": "Rajaraja I (985-1014 AD)",
+            "successor": "Rajendra I (1014-1044 AD)",
+            "capital": "Tanjore",
+            "major_temples": ["Brihadeesvarar Temple Tanjore - built by Rajaraja"],
+            "key_expeditions": [
+              "Rajaraja's naval campaigns to Sri Lanka and Maldives",
+              "Rajendra's Gangaikonda Cholapuram expedition"
+            ],
+            "important_terms": ["Sabha - village assembly", "Ur - merchant guild", "Bhaga - tax", "Bali - offering"]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Chola empire territorial extent at peak",
+            "Naval expeditions routes",
+            "Trade routes to Southeast Asia",
+            "Major cities and ports",
+            "Temple locations - especially Tanjore"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M2",
+      "module_name": "Delhi Sultanate — Slave & Khilji Dynasties (1200-1320 AD)",
+      "estimated_days_standard": 14,
+      "estimated_hours": 42,
+      "module_overview": "Establishment of Delhi Sultanate, Slave dynasty rule, Khilji expansion and consolidation",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M2T1",
+          "topic_name": "Muhammad of Ghor & Early Delhi Sultanate",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 4: Delhi Sultanate - Origins and Early Period"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Early Delhi Sultanate establishment"
+          },
+          "key_concepts": [
+            "Muhammad of Ghor's campaigns in India",
+            "Battle of Tarain (1191 and 1192 AD)",
+            "Defeat of Prithviraj Chauhan",
+            "Establishment of Islamic rule in North India",
+            "Role of Turkish slave generals",
+            "Administrative restructuring",
+            "Introduction of Islamic law and Sharia",
+            "Jizya tax on non-Muslims",
+            "Temple destruction and Hindu religious policies",
+            "Urban administration and taxation",
+            "Military organization and Turkish slave soldiers",
+            "Delhi as capital establishment",
+            "Currency and economic policies",
+            "Transition from tribal to centralized rule"
+          ],
+          "important_facts": {
+            "key_ruler": "Muhammad of Ghor",
+            "period_of_rule": "1173-1206 AD",
+            "key_battles": [
+              "Battle of Tarain I - 1191 AD - Prithviraj Chauhan defeated Muhammad",
+              "Battle of Tarain II - 1192 AD - Muhammad defeated Prithviraj"
+            ],
+            "significant_date": "1206 AD - Delhi Sultanate established",
+            "capital": "Delhi",
+            "generals": ["Muhammad of Ghor", "Qutb-ud-din Aibak"]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Muhammad of Ghor's invasion routes",
+            "Battle of Tarain locations",
+            "Extent of early sultanate control",
+            "Delhi and surrounding territories"
+          ]
+        },
+        {
+          "topic_id": "M2T2",
+          "topic_name": "Slave Dynasty (1206-1290 AD) - Qutb-ud-din to Balban",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 5: Slave Dynasty Administration and Expansion"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Slave Dynasty period"
+          },
+          "key_concepts": [
+            "Qutb-ud-din Aibak as founder",
+            "Administrative stability establishment",
+            "Iltutmish's consolidation and reforms",
+            "Raziyya Sultan - female ruler anomaly",
+            "Balban's administrative centralization",
+            "Spies and police system (Daroga)",
+            "Court protocol and hierarchy",
+            "Jizya and revenue collection",
+            "Expansion to Malwa and Gujarat",
+            "Bengal conquest and administration",
+            "Slave soldier system formalization",
+            "Mongol invasions resistance",
+            "Decline and succession struggles",
+            "Administrative terminology - Muqtis and Iqtadars"
+          ],
+          "important_facts": {
+            "dynasty_period": "1206-1290 AD",
+            "key_rulers": [
+              "Qutb-ud-din Aibak (1206-1210 AD)",
+              "Iltutmish (1211-1236 AD)",
+              "Raziyya (1236-1240 AD)",
+              "Balban (1266-1287 AD)"
+            ],
+            "important_monuments": [
+              "Qutb Minar - built by Qutb-ud-din and completed by Iltutmish",
+              "Quwwat-ul-Islam Mosque"
+            ],
+            "key_battles": [
+              "Conquest of Benares",
+              "Conquest of Bengal - 1230 AD",
+              "Mongol invasions - Battle of Talikota region"
+            ],
+            "administrative_terms": [
+              "Muqti - feudal lord",
+              "Iqta - feudal estate",
+              "Daroga - police chief",
+              "Amir - noble/general",
+              "Jagir - feudal grant"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Slave Dynasty territorial extent",
+            "Major city conquests",
+            "Bengal and eastern expansion",
+            "Delhi and regional capitals",
+            "Mongol invasion routes and resistance points"
+          ]
+        },
+        {
+          "topic_id": "M2T3",
+          "topic_name": "Khilji Dynasty - Alauddin & Expansion (1290-1320 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 6: Khilji Dynasty - Military Campaigns and Administration"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Khilji period and Alauddin's reign"
+          },
+          "key_concepts": [
+            "Jalal-ud-din Khilji - founder",
+            "Alauddin Khilji - greatest expansion period",
+            "Conquests of Gujarat, Malwa, Rajasthan",
+            "Deccan invasion - 1296-1306 AD campaigns",
+            "Mongol invasions and defenses",
+            "Administrative reforms and centralization",
+            "Revenue reforms - Zabt system introduction",
+            "Price control and market regulation",
+            "Military organization and standing army",
+            "Slavery system refinement",
+            "Market regulations and trade control",
+            "Espionage and surveillance system",
+            "Religious policies and temple treatment",
+            "Architectural developments"
+          ],
+          "important_facts": {
+            "dynasty_period": "1290-1320 AD",
+            "key_rulers": [
+              "Jalal-ud-din Khilji (1290-1296 AD)",
+              "Alauddin Khilji (1296-1316 AD)"
+            ],
+            "major_conquests": [
+              "Gujarat conquest - 1299 AD",
+              "Malwa conquest - 1305 AD",
+              "Chittor conquest - 1303 AD",
+              "Deccan campaigns - 1296-1306 AD",
+              "Mongol defeats - multiple invasions repelled"
+            ],
+            "key_generals": ["Malik Kafur - Deccan campaigns"],
+            "important_monuments": [
+              "Alai Darwaza - Qutb Minar complex",
+              "Alauddin Madrasa"
+            ],
+            "administrative_terms": [
+              "Zabt - direct cultivation and tax assessment",
+              "Muhr - royal seal",
+              "Dagh - horse branding system",
+              "Huliya - physical description of soldiers"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Alauddin's conquests - visual extent",
+            "Deccan campaign routes",
+            "Mongol invasion routes and defenses",
+            "Major cities conquered",
+            "Trade routes under Khilji control"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M3",
+      "module_name": "Delhi Sultanate — Tughlaq, Sayyid & Lodi Dynasties (1320-1526 AD)",
+      "estimated_days_standard": 14,
+      "estimated_hours": 42,
+      "module_overview": "Political instability, administrative experiments, and decline of Delhi Sultanate",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M3T1",
+          "topic_name": "Tughlaq Dynasty - Muhammad bin Tughlaq & Firoz Shah",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 7: Tughlaq Dynasty - Reforms and Decline"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Tughlaq period administration"
+          },
+          "key_concepts": [
+            "Muhammad bin Tughlaq - ambitious reforms",
+            "Capital shift to Daulatabad - 1327 AD",
+            "Token currency experiment - failure",
+            "Agricultural taxation - Zabt modifications",
+            "Administrative centralization attempts",
+            "Religious policies and innovations",
+            "Deccan independence movements",
+            "Mongol and invasion threats",
+            "Firoz Shah - stabilization period",
+            "Land grants (Jagir) system rationalization",
+            "Irrigation development and water systems",
+            "Building programs and architecture",
+            "Revenue administration improvements",
+            "Decline and fragmentation",
+            "Provincial autonomy increase"
+          ],
+          "important_facts": {
+            "dynasty_period": "1320-1413 AD",
+            "key_rulers": [
+              "Ghias-ud-din Tughlaq (1320-1325 AD)",
+              "Muhammad bin Tughlaq (1325-1351 AD)",
+              "Firoz Shah Tughlaq (1351-1388 AD)"
+            ],
+            "major_initiatives": [
+              "Capital shift to Daulatabad - 1327 AD (reversed later)",
+              "Token currency experiment - 1330s AD",
+              "Agricultural reforms and Zabt system",
+              "Jagir rationalization"
+            ],
+            "important_monuments": [
+              "Firoz Shah Kotla Fort - Delhi",
+              "Hauz Khas - water system",
+              "Feroz Shah's Madrasa"
+            ],
+            "major_rebellions": [
+              "Deccan independence",
+              "Bengal independence",
+              "Gujarat rebellion",
+              "Arcot rebellion"
+            ],
+            "administrative_terms": [
+              "Jagir - feudal grant rationalized",
+              "Tankhwah - salary for soldiers",
+              "Wazirat - vizier office"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Muhammad bin Tughlaq territorial control",
+            "Daulatabad and Delhi locations",
+            "Rebellious kingdoms - Bengal, Deccan, Gujarat",
+            "Firoz Shah's consolidated territory"
+          ]
+        },
+        {
+          "topic_id": "M3T2",
+          "topic_name": "Sayyid & Lodi Dynasties - Decline of Delhi Sultanate",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 8: Late Sultanate - Sayyid and Lodi Dynasties"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Late sultanate period"
+          },
+          "key_concepts": [
+            "Sayyid Dynasty origins and claims",
+            "Political instability and noble factions",
+            "Administrative decentralization",
+            "Provincial kingdoms emergence",
+            "Lodi Dynasty establishment",
+            "Bahlol Lodi's reorganization",
+            "Sikandar Lodi's reforms",
+            "Ibrahim Lodi's misrule",
+            "Jagirdar system refinement",
+            "Military organization changes",
+            "Revenue system modifications",
+            "Religious policies - orthodoxy increase",
+            "Nobility conflicts and factionalism",
+            "External threats - Gujarat, Malwa, Bengal",
+            "Decline and culmination with Babur's invasion"
+          ],
+          "important_facts": {
+            "sayyid_dynasty_period": "1414-1451 AD",
+            "lodi_dynasty_period": "1451-1526 AD",
+            "key_rulers": [
+              "Khizr Khan (1414-1421 AD) - Sayyid",
+              "Bahlol Lodi (1451-1489 AD)",
+              "Sikandar Lodi (1489-1517 AD)",
+              "Ibrahim Lodi (1517-1526 AD)"
+            ],
+            "significant_events": [
+              "Bahlol's consolidation and nobility organization",
+              "Sikandar's centralization attempts",
+              "Ibrahim Lodi's repression of nobles",
+              "Rana Sanga vs Ibrahim conflicts",
+              "Babur's invasion - 1526 AD"
+            ],
+            "important_battles": [
+              "Battle of Panipat (1526 AD) - Babur vs Ibrahim Lodi"
+            ],
+            "administrative_terms": [
+              "Jagirdar - feudal estate holder",
+              "Mansabdar - later used for rank holders",
+              "Tankhwah - fixed salary"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "medium",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Sayyid Dynasty territorial extent",
+            "Lodi Dynasty at peak extent",
+            "Provincial kingdoms - Gujarat, Malwa, Bengal regions",
+            "Panipat battlefield location"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M4",
+      "module_name": "Vijayanagara & Bahmani Kingdoms (1336-1565 AD)",
+      "estimated_days_standard": 14,
+      "estimated_hours": 42,
+      "module_overview": "Southern Hindu kingdom prosperity, Deccan sultanate power, administration and culture",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M4T1",
+          "topic_name": "Vijayanagara Empire - Foundation & Glory (1336-1505 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 9: Vijayanagara Empire"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Vijayanagara Kingdom section"
+          },
+          "key_concepts": [
+            "Harihara and Bukka - founders",
+            "Hindu revival and temple patronage",
+            "Administrative structure - provincial governors",
+            "Sangama Dynasty period",
+            "Saluva Dynasty - succession and reforms",
+            "Tuluva Dynasty - military expansion",
+            "Krishnadevaraya - greatest ruler",
+            "Military organization - feudal cavalry system",
+            "Naval power and maritime trade",
+            "Agriculture and irrigation development",
+            "Urban centers and trade networks",
+            "Temple as economic and social center",
+            "Art and architectural achievements",
+            "Literature and learning patronage",
+            "Religious policies and temple construction",
+            "Revenue administration - Vetti and Keri systems",
+            "Decline after Battle of Talikota"
+          ],
+          "important_facts": {
+            "period": "1336-1565 AD",
+            "key_rulers": [
+              "Harihara I (1336-1356 AD) - founder",
+              "Bukka I (1356-1377 AD) - expansion",
+              "Devendra (Deva Raya) II (1426-1446 AD)",
+              "Mallikarjuna (1446-1465 AD)",
+              "Krishnadevaraya (1509-1529 AD) - greatest ruler"
+            ],
+            "capital": "Vijayanagara (Hampi)",
+            "major_monuments": [
+              "Virupaksha Temple - main religious center",
+              "Krishnadesvara Temple - Krishnadevaraya",
+              "Hazara Rama Temple",
+              "Lotus Mahal",
+              "Krishna Temple",
+              "Stone chariot - famous symbol"
+            ],
+            "important_battles": [
+              "Battles against Bahmani sultanate",
+              "Battle of Talikota - 1565 AD (against Deccan sultanates)"
+            ],
+            "military_system": [
+              "Feudal cavalry organization",
+              "War elephants importance",
+              "Fortification system",
+              "Naval expeditions"
+            ],
+            "administrative_terms": [
+              "Nayak - military chief/governor",
+              "Vetti - unpaid corvee labor",
+              "Keri - forced sale at low prices"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Vijayanagara empire territorial extent at peak",
+            "Hampi city layout and major structures",
+            "Battle sites against Bahmani",
+            "Battle of Talikota location",
+            "Trade routes and ports"
+          ]
+        },
+        {
+          "topic_id": "M4T2",
+          "topic_name": "Bahmani Kingdom - Deccan Sultanate Power (1347-1518 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I",
+            "chapters": "Chapter 10: Bahmani Kingdom and Deccan Sultanates"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Medieval India - Satish Chandra",
+            "chapters": "Bahmani and regional sultanates"
+          },
+          "key_concepts": [
+            "Alauddin Bahman Shah - founder",
+            "Administrative organization - decentralization",
+            "Deccani culture emergence",
+            "Nobility - Amirs and military officers",
+            "Revenue system - Zabt and land grants",
+            "Military innovations - use of cannons and firearms",
+            "Naval warfare development",
+            "Religious policies - Hindu-Muslim synthesis",
+            "Conflicts with Vijayanagara",
+            "Internal rebellions and fragmentations",
+            "Sufism and cultural development",
+            "Architecture and monuments",
+            "Literature in Deccani language",
+            "Trade and commerce networks",
+            "Final decline and successor sultanates"
+          ],
+          "important_facts": {
+            "period": "1347-1518 AD",
+            "founder": "Alauddin Bahman Shah (Hasan Gangu)",
+            "key_rulers": [
+              "Alauddin Bahman Shah (1347-1358 AD)",
+              "Muhammad Shah I (1358-1375 AD)",
+              "Tajuddin Firoz Shah (1397-1422 AD)",
+              "Ahmad Shah (1422-1436 AD)",
+              "Mahmud Gawan (Prime Minister) - 1463-1481 AD"
+            ],
+            "capital": "Gulbarga (later Bijapur)",
+            "important_monuments": [
+              "Gulbarga Fort",
+              "Mahmud Gawan Madrasa",
+              "Jami Masjid"
+            ],
+            "important_conflicts": [
+              "Battles with Vijayanagara",
+              "Internal nobility conflicts",
+              "Regional fragmentation - late 15th century"
+            ],
+            "successor_sultanates": [
+              "Bahmani breakup into 5 sultanates - late 15th century",
+              "Bijapur, Golconda, Ahmad Nagar, Bidar, Berar"
+            ],
+            "administrative_terms": [
+              "Amir - noble/officer",
+              "Taraf - administrative division",
+              "Zabt - land revenue system",
+              "Jagir - feudal grant"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Bahmani empire extent at peak",
+            "Gulbarga and major cities",
+            "Battle sites with Vijayanagara",
+            "Deccan sultanates territory after fragmentation"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M5",
+      "module_name": "Bhakti & Sufi Movements (1200-1700 AD)",
+      "estimated_days_standard": 10,
+      "estimated_hours": 30,
+      "module_overview": "Religious and social reform movements, devotional practices, cultural synthesis",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 75,
+        "questions": 25,
+        "breakdown": "MCQs: 18, Short Answer: 5, Descriptive: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M5T1",
+          "topic_name": "Bhakti Movement - Development & Key Saints",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter on Bhakti Movement"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Bhakti-Sufi Movements section"
+          },
+          "key_concepts": [
+            "Bhakti philosophy and development",
+            "Devotion to personal god concept",
+            "Rejection of caste system by Bhakti",
+            "Vernacular language literature emergence",
+            "Regional variations - North and South",
+            "Ramanuja and Vishishtadvaita philosophy",
+            "Madhva and dualism",
+            "Guru Nanak and Sikhism origins",
+            "Kabir - saint-poet and social reformer",
+            "Mirabai - female Bhakti poet",
+            "Tulsidas and Ramcharitmanas",
+            "South Indian Bhakti saints - Alvars and Nayanars",
+            "Emotional devotion and ecstatic practices",
+            "Social reform and caste critique",
+            "Literary contributions in regional languages"
+          ],
+          "important_facts": {
+            "key_saints_and_dates": [
+              "Ramanuja (11th century) - philosopher",
+              "Kabir (1440-1518 AD) - reformer poet",
+              "Guru Nanak (1469-1539 AD) - Sikhism founder",
+              "Mirabai (1498-1547 AD) - devotional poet",
+              "Tulsidas (1532-1623 AD) - Ramcharitmanas author",
+              "Chaitanya (1486-1534 AD) - Bengal Vaishnavism"
+            ],
+            "major_texts": [
+              "Ramcharitmanas - Tulsidas",
+              "Bhagavad Gita interpretations",
+              "Bhakti poetry collections"
+            ],
+            "philosophical_concepts": [
+              "Bhakti Yoga - path of devotion",
+              "Surrender to god - Saranagati",
+              "Nama Samkirtan - singing divine names",
+              "Leela concept - divine play"
+            ],
+            "social_impacts": [
+              "Caste system critique",
+              "Women's participation increase",
+              "Vernacular language promotion",
+              "Temple democratization"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Bhakti movement regional centers",
+            "Saint birthplaces and activities",
+            "Pilgrimage sites importance"
+          ]
+        },
+        {
+          "topic_id": "M5T2",
+          "topic_name": "Sufi Movement - Orders & Influential Saints",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter on Sufi Movement and Orders"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Bhakti-Sufi Movements section"
+          },
+          "key_concepts": [
+            "Sufism - Islamic mysticism development",
+            "Mystical path - Tariqa concept",
+            "Four paths to God - knowledge, love, action, annihilation",
+            "Sufi orders - Naqshbandi, Chishti, Qadiri, Suhrawardi",
+            "Silsila - chain of spiritual succession",
+            "Pir and Mureed - guru-disciple relationship",
+            "Khanqah - spiritual center importance",
+            "Sama - ecstatic music and poetry",
+            "Qawwali - devotional music form",
+            "Zikr - remembrance of God practices",
+            "Syncretism with Hindu traditions",
+            "Hindi-Urdu language emergence",
+            "Hindu-Muslim synthesis in culture",
+            "Langar - free community kitchen",
+            "Social service and welfare"
+          ],
+          "important_facts": {
+            "key_saints_and_dates": [
+              "Moinuddin Chishti (1141-1236 AD) - Ajmer dargah",
+              "Nizamuddin Auliya (1244-1325 AD) - Delhi",
+              "Amir Khusrau (1253-1325 AD) - poet musician",
+              "Muhammad Safeullah Gisu Daraz (1321-1422 AD)",
+              "Kabir (1440-1518 AD) - Bhakti-Sufi synthesis"
+            ],
+            "major_sufi_orders_in_india": [
+              "Chishti order - most influential",
+              "Naqshbandi order",
+              "Qadiri order",
+              "Suhrawardi order"
+            ],
+            "important_locations": [
+              "Ajmer - Moinuddin Chishti dargah",
+              "Delhi - Nizamuddin dargah",
+              "Chishti silsila - North India centers"
+            ],
+            "cultural_contributions": [
+              "Qawwali music development",
+              "Sufi poetry in Persian and Hindi",
+              "Architectural style - Dargah structures",
+              "Vernacular literature promotion"
+            ],
+            "administrative_relationship": [
+              "Sufi saints' influence on rulers",
+              "Dargah as cultural centers",
+              "Religious tolerance promotion"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Sufi order centers and dargahs",
+            "Chishti silsila network",
+            "Major pilgrimage sites"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M6",
+      "module_name": "Mughal Empire Part I — Babur to Akbar (1526-1605 AD)",
+      "estimated_days_standard": 16,
+      "estimated_hours": 48,
+      "module_overview": "Foundation of Mughal empire, consolidation under Akbar, administrative systems",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M6T1",
+          "topic_name": "Babur - Founder & Consolidation (1526-1530 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter 1: Babur and Foundation of Mughal Empire"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Mughal Empire section"
+          },
+          "key_concepts": [
+            "Babur's background - Timurid heritage",
+            "Multiple invasions of India",
+            "Battle of Panipat (1526) - Ibrahim Lodi defeat",
+            "Consolidation campaigns",
+            "Battle of Khanwa (1527) - Rana Sanga defeat",
+            "Administrative organization - Mansabdar system foundation",
+            "Military innovations - artillery use",
+            "Financial reforms and revenue collection",
+            "Jagir system introduction",
+            "Religious policies - tolerance approach",
+            "Baburnama - autobiographical account",
+            "Architectural beginnings",
+            "Nobility appointment and control",
+            "Succession planning and Humayun designation"
+          ],
+          "important_facts": {
+            "period_rule": "1526-1530 AD",
+            "key_battles": [
+              "Battle of Panipat (1526 AD) - defeated Ibrahim Lodi",
+              "Battle of Khanwa (1527 AD) - defeated Rana Sanga",
+              "Battle of Ghagra (1529 AD) - defeated Afghans"
+            ],
+            "major_conquests": [
+              "Delhi and Agra",
+              "North Indian plains",
+              "Consolidation of northern territories"
+            ],
+            "important_term": "Panch Payan - Five battles critical to establishment",
+            "administrative_innovations": [
+              "Mansabdar system foundation",
+              "Jagir distribution system",
+              "Central authority strengthening"
+            ],
+            "literary_work": "Baburnama - memoir in Chagatai Turkish"
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Babur's invasion routes",
+            "Battle of Panipat location",
+            "Battle of Khanwa site",
+            "Mughal empire extent by 1530 AD"
+          ]
+        },
+        {
+          "topic_id": "M6T2",
+          "topic_name": "Humayun & Interrupted Rule (1530-1556 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter 2: Humayun - Struggle and Exile"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Mughal Empire early period"
+          },
+          "key_concepts": [
+            "Afghan rebellion under Sher Shah Suri",
+            "Battle of Chausa (1539) - defeat",
+            "Battle of Kannauj (1540) - decisive defeat",
+            "Exile to Persia period",
+            "Return and reconquest campaigns",
+            "Battle of Sirhind (1555) - victory",
+            "Administrative attempts and failures",
+            "Military organization under Sher Shah",
+            "Revenue reforms introduction - Sher Shah reforms",
+            "Fort construction and road development",
+            "Posthumous reputation and administrative legacy",
+            "Humayun's illness and final years",
+            "Accidental death and succession"
+          ],
+          "important_facts": {
+            "period_rule": "1530-1556 AD (interrupted)",
+            "key_rulers": [
+              "Humayun (1530-1540 AD, 1555-1556 AD)",
+              "Sher Shah Suri (1540-1545 AD)"
+            ],
+            "critical_battles": [
+              "Battle of Chausa (1539 AD) - first defeat",
+              "Battle of Kannauj (1540 AD) - lost throne",
+              "Battle of Sirhind (1555 AD) - reconquest"
+            ],
+            "sher_shah_achievements": [
+              "Revenue administration - Zabt system perfection",
+              "Grand Trunk Road construction",
+              "Fort constructions",
+              "Coinage and monetary system",
+              "Administrative reforms"
+            ],
+            "administrative_terms": [
+              "Zabt - direct cultivation assessment",
+              "Pargana - administrative division",
+              "Chakla - larger territorial unit",
+              "Akbari Gaz - measurement standard"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "very_high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Humayun's flight routes to Persia",
+            "Sher Shah's empire extent",
+            "Battle locations - Chausa, Kannauj, Sirhind",
+            "Return invasion routes"
+          ]
+        },
+        {
+          "topic_id": "M6T3",
+          "topic_name": "Akbar - Greatest Mughal Consolidation & Expansion (1556-1605 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapters 3-4: Akbar - Conquest, Administration and Policies"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Akbar's reign comprehensive coverage"
+          },
+          "key_concepts": [
+            "Regency under Bairam Khan",
+            "Battle of Panipat II (1556) - Hemu defeat",
+            "Consolidation of empire",
+            "Conquest of Rajput kingdoms",
+            "Gujarat and Bengal conquests",
+            "Deccan campaigns and limitations",
+            "Mansabdar system refinement",
+            "Jagir and Tankhwah system",
+            "Zabt revenue system perfection",
+            "Dahsala assessment methodology",
+            "Administrative divisions - Subah organization",
+            "Military organization and standing army",
+            "Nobility control and appointment",
+            "Din-i-Ilahi - syncretistic religion attempt",
+            "Religious policies - tolerance approach",
+            "Tax policies - Jizya abolition",
+            "Sulh-i-Kul - policy of peace with all",
+            "Architectural achievements - Fatehpur Sikri",
+            "Arts and culture patronage",
+            "Legal system and justice administration"
+          ],
+          "important_facts": {
+            "period_rule": "1556-1605 AD",
+            "key_period": "Regency (1556-1560 AD) followed by personal rule",
+            "major_battles": [
+              "Second Battle of Panipat (1556 AD) - Hemu defeated",
+              "Battle of Haldighati (1576 AD) - Rana Pratap vs Akbar",
+              "Deccan campaigns - multiple (1599-1600 AD)"
+            ],
+            "major_conquests": [
+              "Rajput kingdoms - Mewar, Marwar, Amber, Bikaner",
+              "Gujarat (1572 AD)",
+              "Bengal (1576 AD)",
+              "Orissa (1576 AD)",
+              "Sind (1591 AD)",
+              "Baluchistan (1595 AD)",
+              "Deccan expansion (1599-1600 AD)"
+            ],
+            "administrative_officials": [
+              "Bairam Khan - regent and military commander",
+              "Birbal - closest advisor",
+              "Todar Mal - financial administrator",
+              "Raja Bhagwan Das - Rajput alliance",
+              "Raja Man Singh - military commander"
+            ],
+            "important_innovations": [
+              "Mansabdar system perfection",
+              "Jagir rationalization",
+              "Dahsala - revenue assessment by production",
+              "Subah system - provincial administration",
+              "Central bureaucracy strengthening"
+            ],
+            "administrative_structure": [
+              "Dewan-i-Kul - chief minister (Todar Mal)",
+              "Dewan-i-Vizarat - finance ministry",
+              "Dewan-i-Ariz - military affairs",
+              "Dewan-i-Istakhraj - revenue collection",
+              "Dewan-i-Barid - intelligence and post"
+            ],
+            "important_monuments": [
+              "Fatehpur Sikri - capital city (1571-1585 AD)",
+              "Buland Darwaza - Gate of Magnificence",
+              "Panch Mahal - five-story palace",
+              "Jami Masjid at Fatehpur Sikri",
+              "Tomb of Akbar at Sikandara"
+            ],
+            "religious_policies": [
+              "Jizya tax abolished - 1564 AD",
+              "Din-i-Ilahi - syncretistic faith",
+              "Sulh-i-Kul - universal peace policy",
+              "Temple patronage alongside mosques",
+              "Rajput alliances and matrimonial relations"
+            ],
+            "revenue_system_terms": [
+              "Zabt - direct cultivation assessment",
+              "Dahsala - revenue measurement",
+              "Jagir - feudal estate",
+              "Tankhwah - fixed salary in cash",
+              "Jama - revenue assessment",
+              "Hasil - actual revenue collection"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.25,
+          "map_work": [
+            "Akbar's empire extent at peak",
+            "Major conquest locations",
+            "Rajput kingdom locations and alliances",
+            "Fatehpur Sikri location and layout",
+            "Deccan frontier and campaigns",
+            "Subah boundaries in empire",
+            "Trade routes and major cities"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M7",
+      "module_name": "Mughal Empire Part II — Jehangir to Aurangzeb & Decline (1605-1707 AD)",
+      "estimated_days_standard": 16,
+      "estimated_hours": 48,
+      "module_overview": "Mughal apex and decline, administrative changes, cultural developments, eventual fragmentation",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 90,
+        "questions": 30,
+        "breakdown": "MCQs: 20, Short Answer: 8, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M7T1",
+          "topic_name": "Jehangir & Shah Jahan - Mughal Zenith (1605-1658 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapters 5-6: Jehangir and Shah Jahan Reign"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Jehangir and Shah Jahan period"
+          },
+          "key_concepts": [
+            "Nur Jahan's influence and political role",
+            "Administrative stability maintenance",
+            "Nur Jahan Junta - noble faction",
+            "Deccan policy continuation",
+            "Rajput relations consolidation",
+            "Sikh conflicts - Guru Hargobind",
+            "Persian-Indian cultural synthesis",
+            "Art and miniature painting development",
+            "Mughal architecture flourishing",
+            "Garden design - Charbagh concept",
+            "Court culture and etiquette",
+            "Revenue administration continuity",
+            "Shah Jahan - architectural focus",
+            "Taj Mahal - monument construction",
+            "Delhi-Agra cultural centers",
+            "Military campaigns and Deccan focus",
+            "Administrative reorganization",
+            "Aurangzeb's rise and conflict with Dara Shikoh"
+          ],
+          "important_facts": {
+            "jehangir_period": "1605-1627 AD",
+            "shah_jahan_period": "1627-1658 AD",
+            "key_nobles": [
+              "Nur Jahan - Empress influence",
+              "Asaf Khan - Prime Minister",
+              "Mir Jumla - Commander",
+              "Dara Shikoh - Shah Jahan's successor preference",
+              "Aurangzeb - younger son"
+            ],
+            "major_monuments": [
+              "Taj Mahal (1632-1653 AD) - Shah Jahan",
+              "Red Fort (Lal Qila) - Delhi - Shah Jahan",
+              "Jami Masjid - Delhi (largest in India) - Shah Jahan",
+              "Shalimar Gardens - Agra",
+              "Nur Jahan's Tomb at Lahore",
+              "Nur Jahan's Gardens"
+            ],
+            "architectural_innovations": [
+              "Perfect symmetry in design",
+              "Intricate marble inlay work",
+              "Pietra dura technique",
+              "Garden-mosque-mausoleum integration",
+              "Calligraphy and Islamic design"
+            ],
+            "important_conflicts": [
+              "Sikh Guru Hargobind conflict",
+              "Shah Shuja rebellion",
+              "Aurangzeb vs Dara Shikoh civil war (1658-1659 AD)",
+              "Deccan campaigns ongoing"
+            ],
+            "cultural_achievements": [
+              "Mughal miniature paintings peak",
+              "Persian literary influence",
+              "Music and dance patronage",
+              "Craft guilds support",
+              "Learning institutions"
+            ],
+            "administrative_terms": [
+              "Mansabdar - rank and salary holder",
+              "Jagir - feudal estate",
+              "Tankhwah - cash salary",
+              "Jagirdar - feudal lord",
+              "Dewan - minister"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Jehangir and Shah Jahan empire extent",
+            "Taj Mahal location - Agra",
+            "Red Fort location - Delhi",
+            "Fatehpur Sikri and new capitals",
+            "Deccan frontier and campaigns",
+            "Garden locations - Shalimar",
+            "Trade route significance"
+          ]
+        },
+        {
+          "topic_id": "M7T2",
+          "topic_name": "Aurangzeb & Mughal Decline (1658-1707 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter 7: Aurangzeb - Expansionist Policies and Decline"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Aurangzeb period and Mughal decline"
+          },
+          "key_concepts": [
+            "Aurangzeb's religious orthodoxy",
+            "Reversal of Akbar's tolerance policies",
+            "Jizya tax reimposition",
+            "Temple destruction policies",
+            "Deccan expansion campaigns",
+            "Shivaji resistance and conflict",
+            "Maratha emergence as power",
+            "Afghan invasions - Abdali",
+            "Sikh persecution and resistance",
+            "Long Deccan wars - economic drain",
+            "Administrative reorganization and centralization",
+            "Military reforms and Mansabdar system changes",
+            "Religious extremism impact on stability",
+            "Succession struggles after death",
+            "Empire fragmentation into subahs",
+            "Rise of provincial governors independence",
+            "Economic decline and revenue problems",
+            "Mansabdar dissatisfaction and rebellions"
+          ],
+          "important_facts": {
+            "period_rule": "1658-1707 AD",
+            "length_of_reign": "49 years - longest Mughal reign",
+            "major_conflicts": [
+              "War with Dara Shikoh (1658-1659 AD) - victory",
+              "Shivaji conflicts (1660s-1680 AD)",
+              "Maratha wars - expansion and decline",
+              "Sikh persecution under Guru Tegh Bahadur",
+              "Jat rebellions",
+              "Rajput dissatisfaction"
+            ],
+            "major_campaigns": [
+              "Deccan conquest attempts (1681-1705 AD)",
+              "Bijapur conquest (1686 AD)",
+              "Golconda conquest (1687 AD)",
+              "Maratha territories (ongoing struggles)",
+              "Assam campaigns"
+            ],
+            "key_generals": [
+              "Mir Jumla II - Deccan",
+              "Asad Khan - military",
+              "Zainul Abidin Tanavur"
+            ],
+            "important_events": [
+              "Jizya reimposition - 1679 AD",
+              "Temple destruction - Varanasi, Mathura",
+              "Guru Tegh Bahadur execution - 1675 AD",
+              "Sambhaji capture and execution - 1689 AD",
+              "Economic crisis and inflation",
+              "Revenue decline and military unpaid"
+            ],
+            "administrative_changes": [
+              "Centralization attempt",
+              "Jagirdar autonomy increase despite intent",
+              "Provincial governors emergence",
+              "Mansabdar system weakening",
+              "Military organization strain"
+            ],
+            "religious_policies": [
+              "Orthodox Islamic positions",
+              "Jizya tax on non-Muslims (1679 AD)",
+              "Temple destruction orders",
+              "Sikh persecution policies",
+              "Christian community restrictions",
+              "Hindu-Muslim relations deterioration"
+            ],
+            "decline_factors": [
+              "Religious policies causing unrest",
+              "Long costly Deccan wars",
+              "Economic strain and inflation",
+              "Succession disputes after death",
+              "Mansabdar and nobility discontent",
+              "Regional governors gaining independence",
+              "Maratha rise as alternative power",
+              "Afghan invasions from northwest",
+              "East India Company expansion"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 1.0,
+          "map_work": [
+            "Aurangzeb's empire at peak extent",
+            "Deccan conquest routes and campaigns",
+            "Maratha territories and conflicts",
+            "Bijapur and Golconda locations",
+            "Sikh regions and persecution centers",
+            "Jat rebellion areas",
+            "Trade route changes"
+          ]
+        }
+      ]
+    }
+  ,
+    {
+      "module_id": "M8",
+      "module_name": "Maratha Empire — Shivaji to Peshwas (1674-1818 AD)",
+      "estimated_days_standard": 12,
+      "estimated_hours": 36,
+      "module_overview": "Maratha rise, Shivaji's kingdom, expansion under Peshwas, administration and decline",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 75,
+        "questions": 25,
+        "breakdown": "MCQs: 18, Short Answer: 5, Map-based: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M8T1",
+          "topic_name": "Shivaji & Maratha Kingdom Foundation (1674-1680 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter 8: Shivaji and Maratha Rise"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Maratha Empire section"
+          },
+          "key_concepts": [
+            "Shahaji background and early Maratha power",
+            "Shivaji's military innovations - Guerrilla warfare",
+            "Forts and fortification strategy",
+            "Naval power development",
+            "Administrative organization - Ashtapradhan council",
+            "Revenue system - Chauth and Sardeshmukhi",
+            "Jagir and military organization",
+            "Relations with Mughal empire",
+            "Conflicts with Bijapur and Golconda",
+            "Coronation and sovereignty claim (1674 AD)",
+            "Deccan resistance organization",
+            "Swaraj concept - self-rule",
+            "Hindu kingdom re-establishment",
+            "Cultural and religious policies",
+            "Expansion campaigns and consolidation"
+          ],
+          "important_facts": {
+            "period": "1674-1680 AD (Shivaji's independent reign)",
+            "birth": "1627 AD",
+            "death": "1680 AD",
+            "capital": "Raigad",
+            "major_events": [
+              "Coronation at Raigad - 1674 AD",
+              "Declaration of Swaraj - 1674 AD",
+              "Conflicts with Aurangzeb",
+              "Capture of Surat - 1664 AD",
+              "Treaty with Mughal (1665 AD) - Purandhar"
+            ],
+            "key_forts": [
+              "Raigad - capital",
+              "Singhgarh",
+              "Kondana",
+              "Raigarh"
+            ],
+            "administrative_system": [
+              "Ashtapradhan - council of 8 ministers",
+              "Dewan - prime minister",
+              "Senapati - military commander",
+              "Sachiv - chancellor",
+              "Sumant - revenue minister",
+              "Panditrao - religious affairs",
+              "Majumdar - accountant",
+              "Nyaydhish - justice"
+            ],
+            "revenue_terms": [
+              "Chauth - tribute (25% revenue) from neighboring territories",
+              "Sardeshmukhi - tax for protection and governance",
+              "Ryoti - peasant landholding"
+            ],
+            "military_innovations": [
+              "Guerrilla warfare tactics",
+              "Fort network strategy",
+              "Navy establishment",
+              "Fast-moving cavalry units",
+              "Indigenous weapons manufacturing"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Maratha territories under Shivaji",
+            "Fort locations and network",
+            "Expansion routes and battles",
+            "Deccan region control"
+          ]
+        },
+        {
+          "topic_id": "M8T2",
+          "topic_name": "Peshwas & Maratha Expansion (1707-1818 AD)",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part II",
+            "chapters": "Chapter 9: Peshwas and Maratha Dominance"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Peshwa period Maratha expansion"
+          },
+          "key_concepts": [
+            "Post-Shivaji succession struggles",
+            "Sambhaji's reign and capture",
+            "Rajaram and Tarabai period",
+            "Balaji Viswanath - first Peshwa influence",
+            "Peshwa office institutionalization",
+            "Baji Rao I - expansionist campaigns",
+            "Pan-Indian ambitions",
+            "Administrative innovations",
+            "Nizam relations and conflicts",
+            "British interactions beginning",
+            "Decline after 1761 Battle of Panipat",
+            "Madhav Rao I - reorganization",
+            "Succession disputes and factionalism",
+            "Peshwa autonomy increase",
+            "Fall to British (1818 AD)"
+          ],
+          "important_facts": {
+            "key_peshwas": [
+              "Balaji Viswanath (1713-1720 AD) - founder Peshwa system",
+              "Baji Rao I (1720-1740 AD) - greatest expansionist",
+              "Balaji Baji Rao (1740-1761 AD)",
+              "Madhav Rao I (1761-1772 AD) - reorganizer",
+              "Narayan Rao (1772-1774 AD)",
+              "Raghunath Rao (1774-1783 AD)",
+              "Madhav Rao II (1783-1818 AD) - last Peshwa"
+            ],
+            "major_battles": [
+              "Battle of Panipat III (1761 AD) - Maratha defeat by Ahmad Shah Abdali",
+              "Battle of Talikota (1565 AD) - earlier Maratha rise",
+              "Battle of Bhopal (1737 AD) - Baji Rao expansion",
+              "Battle of Diu-Daman (1737 AD) - Portuguese conflict"
+            ],
+            "territorial_extent": [
+              "After Baji Rao: North to Delhi, West to Kathiyawad, East to Bengal borders",
+              "Pan-Indian power challenge to Mughal authority"
+            ],
+            "administrative_terms": [
+              "Peshwa - prime minister/chief administrator",
+              "Chauth - tribute collection",
+              "Sardeshmukhi - protection tax",
+              "Jagirdar - feudal estate holder",
+              "Daftar - administrative office"
+            ],
+            "important_events": [
+              "Battle of Panipat III (1761 AD) - Major defeat",
+              "Wadyar alliance - Karnataka",
+              "Nizam conflicts - Deccan",
+              "British East India Company expansion",
+              "Anglo-Maratha Wars (1775-1818 AD) - three wars",
+              "Fall of Peshwa (1818 AD) - British victory"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "very_high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Maratha empire at peak extent under Baji Rao",
+            "Battle of Panipat III location",
+            "Peshwa territory shrinkage after 1761",
+            "British expansion zones",
+            "Major cities and forts"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "M9",
+      "module_name": "Medieval Art, Architecture, Literature & Music (700-1850 AD)",
+      "estimated_days_standard": 12,
+      "estimated_hours": 36,
+      "module_overview": "Cultural developments, architectural styles, literary traditions, music evolution",
+      "module_test": {
+        "type": "Combination",
+        "duration_minutes": 75,
+        "questions": 25,
+        "breakdown": "MCQs: 15, Short Answer: 8, Descriptive: 2"
+      },
+      "topics": [
+        {
+          "topic_id": "M9T1",
+          "topic_name": "Medieval Architecture - Sultanate & Mughal Styles",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I & II",
+            "chapters": "Architecture sections throughout"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Art and Architecture section"
+          },
+          "key_concepts": [
+            "Indo-Islamic architectural fusion",
+            "Arch and vault technology introduction",
+            "Dome construction innovations",
+            "Minarets and towers significance",
+            "Mosque architecture evolution",
+            "Fort and fortification design",
+            "Palace architecture development",
+            "Garden design - Charbagh concept",
+            "Mausoleum architecture",
+            "Decorative techniques - tile work, calligraphy",
+            "Regional architectural styles",
+            "Building materials - marble, stone, brick",
+            "Urban planning",
+            "Hindu-Islamic synthesis in design",
+            "Architectural terminology and features"
+          ],
+          "important_facts": {
+            "sultanate_period_monuments": [
+              "Qutb Minar Complex - Delhi (1206-1368 AD)",
+              "Quwwat-ul-Islam Mosque - Delhi",
+              "Alai Darwaza - Qutb complex (1311 AD)",
+              "Ala-ud-din Khilji Madrasa - Delhi",
+              "Firoz Shah Kotla - Delhi",
+              "Hauz Khas complex - Delhi",
+              "Tomb of Iltutmish - Delhi",
+              "Tomb of Muhammad bin Tughlaq"
+            ],
+            "mughal_period_monuments": [
+              "Taj Mahal (1632-1653 AD) - Shah Jahan - apex of Indo-Islamic",
+              "Red Fort (Lal Qila) - Delhi - Shah Jahan",
+              "Jami Masjid - Delhi - largest mosque in India",
+              "Fatehpur Sikri complex - Akbar",
+              "Buland Darwaza - Fatehpur Sikri",
+              "Panch Mahal - Fatehpur Sikri",
+              "Mausoleum of Akbar - Sikandara",
+              "Shalimar Gardens - Agra",
+              "Noor Jahan's Tomb - Lahore",
+              "Lahori Gate - Delhi"
+            ],
+            "architectural_features": [
+              "Arch - horseshoe, pointed, four-centered",
+              "Dome - hemispherical, bulbous",
+              "Minaret - tower for call to prayer",
+              "Jali - latticed screen",
+              "Pietra dura - marble inlay work",
+              "Calligraphy - Quranic inscriptions",
+              "Chhajja - sloping sunshade",
+              "Iwan - vaulted passage"
+            ],
+            "architectural_styles": [
+              "Early Sultanate - Hindu structural, Islamic decoration",
+              "Khilji - massive fortifications, decorative calligraphy",
+              "Tughlaq - harsh, geometric, robust",
+              "Mughal - refinement, symmetry, elegance, gardens"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": "very_high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.75,
+          "map_work": [
+            "Monument locations - Delhi, Agra, Fatehpur Sikri",
+            "Regional architectural variations",
+            "Trade route influence on architecture"
+          ]
+        },
+        {
+          "topic_id": "M9T2",
+          "topic_name": "Medieval Literature - Sanskrit, Persian, Regional Languages",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I & II",
+            "chapters": "Literature and learning sections"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Literature and learning traditions"
+          },
+          "key_concepts": [
+            "Sanskrit literature continuation",
+            "Persian literature introduction and dominance",
+            "Hindi and regional language emergence",
+            "Bhakti poetry development",
+            "Sufi poetry and mysticism",
+            "Chronicles and historical writings",
+            "Qawwali and devotional songs",
+            "Court poetry patronage",
+            "Vernacular language promotion",
+            "Hindi-Urdu synthesis",
+            "Learning institutions - Madrasas, temples",
+            "Knowledge transmission methods",
+            "Religious literature growth",
+            "Administrative manuals - Ain-i-Akbari",
+            "Travel accounts and observations"
+          ],
+          "important_facts": {
+            "key_authors_works": [
+              "Abul Fazl - Akbar Nama, Ain-i-Akbari (administrative code)",
+              "Al-Biruni - Historical writings on India",
+              "Amir Khusrau - Persian poet, musician, cultural synthesizer",
+              "Kabir - Hindi Bhakti poetry, social critique",
+              "Tulsidas - Ramcharitmanas (1574 AD) - Hindi epic",
+              "Mirabai - Devotional poetry, bhajans",
+              "Chaitanya - Bengali Vaishnavism texts",
+              "Malik Muhammad Jayasi - Padmavat (1540 AD) - Hindi epic",
+              "Guru Nanak - Guru Granth Sahib composition"
+            ],
+            "literary_languages": [
+              "Persian - court language dominance",
+              "Sanskrit - continued but declining",
+              "Hindi - emerging regional dominance",
+              "Urdu - developing synthesis of Persian-Hindi",
+              "Bengali - regional literature growth",
+              "Tamil - Chola and continued tradition",
+              "Telugu - regional development",
+              "Marathi - Maratha period growth"
+            ],
+            "important_works": [
+              "Ramcharitmanas - vernacular Ramayana",
+              "Padmavat - love epic with historical setting",
+              "Akbar Nama - historical chronicle",
+              "Ain-i-Akbari - administrative manual",
+              "Babur Nama - autobiography",
+              "Tuzuk-i-Jahangiri - memoir"
+            ],
+            "literary_themes": [
+              "Devotional poetry - Bhakti focus",
+              "Mystical poetry - Sufi traditions",
+              "Romantic epics - Padmavat model",
+              "Historical chronicles - Mughal records",
+              "Administrative guidelines - state theory",
+              "Philosophical treatises - religious debates"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "very_high",
+          "daily_target_hours": 0.5,
+          "map_work": [
+            "Literary centers - courts and monasteries",
+            "Regional language development zones"
+          ]
+        },
+        {
+          "topic_id": "M9T3",
+          "topic_name": "Medieval Music & Performing Arts",
+          "primary_book_reference": {
+            "book": "Satish Chandra - Medieval India Part I & II",
+            "chapters": "Music and culture sections"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Themes in Indian History Part II",
+            "chapters": "Arts and culture section"
+          },
+          "key_concepts": [
+            "Hindustani classical music development",
+            "Persian musical influence",
+            "Raga system refinement",
+            "Taal and rhythm structures",
+            "Sufi musical traditions - Qawwali",
+            "Court music and patronage",
+            "Instrumental innovation",
+            "Dance forms evolution",
+            "Kathak dance tradition emergence",
+            "Bhakti musical expressions",
+            "Temple music traditions",
+            "Mughal court musicians",
+            "Musical notation and theory",
+            "Fusion of Indian and Persian styles",
+            "Cultural synthesis through music"
+          ],
+          "important_facts": {
+            "key_musicians": [
+              "Amir Khusrau - Qawwali and music innovator",
+              "Tansen - Mughal court musician under Akbar",
+              "Baiju Bawra - legendary raag singer",
+              "Kalidas - classical musician",
+              "Chand Khan - court musician"
+            ],
+            "musical_forms": [
+              "Qawwali - Sufi devotional music",
+              "Khayal - Hindustani vocal form",
+              "Khyal development in Mughal court",
+              "Raga performance expansion",
+              "Thumri - folk-classical form",
+              "Ghazal - Urdu-Persian poetic form"
+            ],
+            "instruments": [
+              "Sitar - development during Mughal period",
+              "Sarod - form development",
+              "Tabla - development and standardization",
+              "Sarangi - bowed string instrument",
+              "Rudra Veena - classical string",
+              "Bansuri - Krishna flute tradition",
+              "Sarod - Afghan-influenced development"
+            ],
+            "performance_venues": [
+              "Royal courts - Mughal patronage",
+              "Temples - devotional music",
+              "Dargahs - Sufi music centers",
+              "Public gatherings - festival music",
+              "Pilgrimages - musical performances"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": "high",
+          "mains_importance": "high",
+          "daily_target_hours": 0.5,
+          "map_work": [
+            "Musical tradition centers",
+            "Court locations of patronage"
+          ]
+        }
+      ]
+    }
+  ],
+  "previous_year_questions_pattern": {
+    "prelims_patterns": {
+      "direct_factual": "30-40% - Ruler dates, battles, monuments, administrative terms",
+      "chronological_sequence": "15-20% - Arrange events in order, timeline questions",
+      "map_based": "15-20% - Locate kingdoms, battle sites, architectural sites, trade routes",
+      "paired_options": "10-15% - Match rulers with achievements, monuments with builders",
+      "administrative_terminology": "10-15% - Zabt, Jagir, Mansabdar, Chauth definitions and usage"
+    },
+    "mains_patterns": {
+      "administrative_evolution": "15-20% - How did administrative systems evolve through periods",
+      "socio_economic_changes": "15-20% - Impact of various rulers on society and economy",
+      "cultural_synthesis": "15-20% - Hindu-Muslim cultural interaction and synthesis",
+      "military_strategy": "10-15% - Military innovations, tactics, organizational changes",
+      "religious_policies": "10-15% - Comparison of religious policies and their impacts",
+      "architectural_achievements": "10% - Significance of major monuments and styles",
+      "comparative_analysis": "10-15% - Compare different dynasties or periods"
+    },
+    "high_frequency_topics_prelims": [
+      "Muhammad of Ghor invasions",
+      "Tripartite struggle - Palas, Rashtrakutas, Gurjaras",
+      "Khilji dynasty conquests and Alauddin reforms",
+      "Vijayanagara architecture and administration",
+      "Akbar's administration and policies",
+      "Taj Mahal and Mughal architecture",
+      "Shivaji and Maratha rise",
+      "Bhakti and Sufi movements",
+      "Administrative terms - Mansabdar, Jagir, Zabt",
+      "Battle dates and locations"
+    ],
+    "high_frequency_topics_mains": [
+      "Akbar's religious policies vs Aurangzeb's orthodoxy",
+      "Administrative innovations and centralization attempts",
+      "Revenue systems evolution - Zabt to Mansabdar",
+      "Maratha rise and challenge to Mughal authority",
+      "Hindu-Muslim cultural synthesis in art, architecture, literature",
+      "Bhakti movement's social impact on caste system",
+      "Causes of Mughal decline and factors in British rise",
+      "Temple economy vs state economy in different periods",
+      "Urban growth and trade in medieval period",
+      "Role of feudalism in medieval Indian history"
+    ]
+  },
+  "mains_themes_gs_paper_1": {
+    "theme_1_administrative_evolution": {
+      "topic": "Evolution of Administrative Systems from Sultanate to Mughal",
+      "subtopics": [
+        "Sultanate administrative structure vs Mughal centralization",
+        "Iltutmish's administrative innovations vs Akbar's Mansabdar perfection",
+        "Revenue assessment methods - Zabt system refinement",
+        "Jagir system evolution and its economic implications",
+        "Comparison of despotic (Tughlaq) vs efficient (Akbar) administration",
+        "Decline of central authority - Aurangzeb's legacy",
+        "Peshwa administrative innovations in Maratha empire"
+      ],
+      "important_aspects": [
+        "Transition from feudal fragmentation to centralized administration",
+        "Impact of administrative efficiency on empire stability",
+        "Succession systems and impact on governance",
+        "Nobility control mechanisms - espionage, salary systems",
+        "Provincial governance and autonomy balance"
+      ]
+    },
+    "theme_2_socio_economic_transformation": {
+      "topic": "Medieval Indian Society and Economic Organization",
+      "subtopics": [
+        "Feudalization of land and emergence of agricultural surplus",
+        "Chola administrative organization vs Sultanate disruption of social structure",
+        "Temple economy in South India vs Islamic state economy in North",
+        "Urban centers development - Delhi, Agra, Golconda",
+        "Craft guilds and merchant communities under different regimes",
+        "Revenue collection impact on peasant classes",
+        "Emergence of new merchant classes under Mughal stability",
+        "Maratha military organization and social restructuring"
+      ],
+      "important_aspects": [
+        "Land revenue systems and peasant conditions",
+        "Urban growth and commercial development",
+        "Trade networks and merchant communities",
+        "Labour organization and craft production",
+        "Agrarian change and agricultural improvements under Akbar",
+        "Economic crisis under late Mughals and Maratha resistance"
+      ]
+    },
+    "theme_3_religious_cultural_synthesis": {
+      "topic": "Hindu-Muslim Cultural Synthesis and Religious Movements",
+      "subtopics": [
+        "Bhakti movement's challenge to caste system and Brahmanical supremacy",
+        "Sufi mysticism and popular Islam - syncretism with local traditions",
+        "Akbar's Din-i-Ilahi vs Aurangzeb's orthodoxy - ideological divergence",
+        "Architecture as cultural synthesis - Indo-Islamic styles",
+        "Literature emergence in vernacular languages - Bhakti and Sufi poetry",
+        "Qawwali and musical synthesis",
+        "Temple economy accommodation under Islamic rulers",
+        "Communal harmony under Akbar vs religious tension under Aurangzeb"
+      ],
+      "important_aspects": [
+        "Extent of cultural synthesis in different regions and periods",
+        "Role of individuals (Kabir, Amir Khusrau) in bridging traditions",
+        "Architectural monuments as symbols of cultural fusion",
+        "Impact of religious policies on cultural developments",
+        "Continuation of Hindu traditions despite Islamic rule",
+        "Emergence of Indo-Persian culture at courts"
+      ]
+    },
+    "theme_4_military_strategy_and_state_formation": {
+      "topic": "Military Innovations and State Consolidation",
+      "subtopics": [
+        "Turkish military technology and cavalry tactics introduction",
+        "Artillery and gunpowder weapons impact on fortifications",
+        "Mansabdar system - military organization and control mechanism",
+        "Fort strategy under Shivaji - guerrilla warfare innovation",
+        "Naval power development under different rulers",
+        "Army composition - infantry, cavalry, elephants evolution",
+        "Military-feudal nexus and land distribution",
+        "Standing armies vs feudal levies"
+      ],
+      "important_aspects": [
+        "Technology transfer and adoption from Central Asia",
+        "Impact of military organization on political stability",
+        "Fortification networks and territorial control",
+        "Sea power and trade route control",
+        "Cost of military maintenance and economic strain",
+        "Military careers and social mobility"
+      ]
+    },
+    "theme_5_political_decline_and_transition": {
+      "topic": "Mughal Decline and Emergence of Regional Powers",
+      "subtopics": [
+        "Aurangzeb's policies and long-term destabilization",
+        "Religious orthodoxy and loss of Hindu support",
+        "Mansabdar dissatisfaction and rebellion patterns",
+        "Jagirdar autonomy increase in provinces",
+        "Maratha rise as legitimate challenge to Mughal authority",
+        "Decentralization and regional sultanate emergence",
+        "Economic crisis - currency debasement and inflation",
+        "British expansion in power vacuum period",
+        "Administrative breakdown in 18th century"
+      ],
+      "important_aspects": [
+        "Causes of imperial decline - internal vs external factors",
+        "Role of succession disputes in weakening authority",
+        "Economic crisis and military unpaid consequences",
+        "Regional powers' legitimacy challenges to central authority",
+        "Transition from medieval to early modern India",
+        "Role of European trading companies in power shift"
+      ]
+    }
+  }
+}

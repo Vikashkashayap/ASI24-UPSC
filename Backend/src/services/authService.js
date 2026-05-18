@@ -17,6 +17,7 @@ export const registerUser = async ({ name, email, password }) => {
     password,
     accountType: "paid-user",
     subscriptionStatus: "inactive",
+    isEmailVerified: true,
   });
   const token = createToken(user);
   return { user, token };
@@ -109,6 +110,7 @@ export const findOrCreateGoogleUser = async (profile) => {
       googleId,
       accountType: "paid-user",
       subscriptionStatus: "inactive",
+      isEmailVerified: true,
     });
   }
 

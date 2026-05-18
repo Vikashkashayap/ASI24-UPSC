@@ -8,13 +8,90 @@ import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar
 import logoImg from "../LOGO/mentorsdaily.png";
 
 // Mobile-first nav link: minimum 44px height for touch targets
-const navLinkClass = ({ isActive, theme, collapsed }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean }) =>
-  `flex items-center ${collapsed ? "justify-center" : "gap-2 md:gap-3"} ${collapsed ? "px-2" : "px-2 md:px-3"} py-2.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 min-h-[44px] touch-manipulation relative ${theme === "dark"
-    ? `hover:bg-slate-800/80 active:scale-95 ${isActive ? "bg-blue-500/20 text-blue-200 shadow-sm shadow-blue-500/10" : "text-slate-300"
+const navLinkClass = ({ isActive, theme, collapsed, muted }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean; muted?: boolean }) =>
+  `flex items-center ${collapsed ? "justify-center" : "gap-3"} ${collapsed ? "px-2" : "px-3"} py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 min-h-[42px] touch-manipulation relative group ${theme === "dark"
+    ? `hover:bg-white/[0.06] active:scale-[0.98] ${isActive
+      ? "bg-blue-600/20 text-white shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-5 before:w-[3px] before:rounded-r-full before:bg-blue-400"
+      : muted
+        ? "text-slate-500 hover:text-slate-300"
+        : "text-slate-300"
     }`
-    : `hover:bg-slate-100 active:scale-95 ${isActive ? "bg-blue-100 text-blue-700 shadow-sm shadow-blue-200/50" : "text-slate-700"
+    : `hover:bg-slate-100/90 active:scale-[0.98] ${isActive
+      ? "bg-blue-50 text-blue-700 font-semibold shadow-sm shadow-blue-100/80 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-5 before:w-[3px] before:rounded-r-full before:bg-blue-600"
+      : muted
+        ? "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+        : "text-slate-600"
     }`
   }`;
+
+const sidebarSectionLabelClass = (theme: "dark" | "light") =>
+  `px-3 mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`;
+
+const sidebarNavIconClass = (isActive: boolean, theme: "dark" | "light") =>
+  `w-[18px] h-[18px] flex-shrink-0 stroke-[2] ${isActive
+    ? theme === "dark" ? "text-blue-300" : "text-blue-600"
+    : theme === "dark" ? "text-slate-400 group-hover:text-slate-200" : "text-slate-500 group-hover:text-slate-700"
+  }`;
+
+type SidebarBadgeVariant = "soon" | "trial";
+
+const SidebarBadge = ({ variant, theme }: { variant: SidebarBadgeVariant; theme: "dark" | "light" }) => {
+  const styles =
+    variant === "soon"
+      ? theme === "dark"
+        ? "bg-blue-500/15 text-blue-300 ring-blue-500/25"
+        : "bg-blue-50 text-blue-600 ring-blue-200/80"
+      : theme === "dark"
+        ? "bg-emerald-500/15 text-emerald-300 ring-emerald-500/25"
+        : "bg-emerald-50 text-emerald-700 ring-emerald-200/80";
+
+  return (
+    <span className={`ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ring-1 ${styles}`}>
+      {variant === "soon" ? "Soon" : "Trial"}
+    </span>
+  );
+};
+
+const SidebarNavItem = ({
+  to,
+  title,
+  icon: Icon,
+  label,
+  theme,
+  collapsed,
+  badge,
+  muted,
+  onNavigate,
+}: {
+  to: string;
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  theme: "dark" | "light";
+  collapsed: boolean;
+  badge?: SidebarBadgeVariant;
+  muted?: boolean;
+  onNavigate?: () => void;
+}) => (
+  <NavLink
+    to={to}
+    title={title}
+    onClick={onNavigate}
+    className={(props) => navLinkClass({ ...props, theme, collapsed, muted })}
+  >
+    {({ isActive }) => (
+      <>
+        <Icon className={sidebarNavIconClass(isActive, theme)} />
+        {!collapsed && (
+          <>
+            <span className="truncate flex-1 min-w-0">{label}</span>
+            {badge && <SidebarBadge variant={badge} theme={theme} />}
+          </>
+        )}
+      </>
+    )}
+  </NavLink>
+);
 
 
 const getPageTitle = (pathname: string, userRole?: string): { title: string; icon: React.ReactNode } => {
@@ -133,13 +210,13 @@ export const DashboardLayout = () => {
 
       {/* Fixed Sidebar - Mobile-first: hidden by default, shown on desktop */}
       <aside
-        className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[280px] md:w-64"} flex flex-col border-r backdrop-blur-xl fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 shadow-lg ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[260px]"} flex flex-col border-r fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${theme === "dark"
-            ? "border-blue-900/50 bg-[#020617]/95 shadow-blue-900/10"
-            : "border-slate-200 bg-white/95 shadow-slate-200/50"
+            ? "border-slate-800/80 bg-[#0F172A] shadow-xl shadow-black/20"
+            : "border-slate-200/80 bg-white shadow-xl shadow-slate-200/40"
           }`}
       >
-        <div className={`${sidebarCollapsed ? "px-2 md:px-3" : "px-4 md:px-6"} h-14 md:h-[72px] border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-1.5 flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
+        <div className={`${sidebarCollapsed ? "px-2" : "px-4"} h-14 md:h-16 border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-2 flex-shrink-0 ${theme === "dark" ? "border-slate-800/80" : "border-slate-200"}`}>
           {!sidebarCollapsed && (
             <div className="flex items-center gap-1.5 min-w-0 shrink-0">
               <img src={logoImg} alt="MentorsDaily" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
@@ -152,7 +229,7 @@ export const DashboardLayout = () => {
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className={`hidden md:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${theme === "dark"
-                  ? "hover:bg-slate-800 text-slate-200"
+                  ? "hover:bg-white/[0.06] text-[#D1D5DB]"
                   : "hover:bg-slate-100 text-slate-700"
                 }`}
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -161,14 +238,14 @@ export const DashboardLayout = () => {
             </button>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-slate-800 touch-manipulation text-slate-200"
+              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-white/[0.06] touch-manipulation text-[#D1D5DB]"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
-        <nav className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 space-y-1 md:space-y-2 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
+        <nav className={`${sidebarCollapsed ? "px-2" : "px-3"} py-4 space-y-0.5 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`} onClick={() => setMobileMenuOpen(false)}>
 
           {user?.role === 'admin' ? (
             // Admin Navigation
@@ -211,7 +288,7 @@ export const DashboardLayout = () => {
               {/* Admin Tools Section */}
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Admin Tools
                   </div>
                 </div>
@@ -241,7 +318,7 @@ export const DashboardLayout = () => {
               </div>
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Account
                   </div>
                 </div>
@@ -262,62 +339,72 @@ export const DashboardLayout = () => {
             <>
               {/* Subscription badge in sidebar */}
               {!sidebarCollapsed && (
-                <div className="mb-2 px-2">
+                <div className="mb-3 px-0.5">
                   {hasActiveSubscription ? (
-                    <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border ${
-                      theme === "dark" ? "bg-emerald-500/10 border-emerald-500/40" : "bg-emerald-50 border-emerald-200"
-                    }`}>
-                      <Lightbulb className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
-                      <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
-                        {user?.subscriptionPlan?.name || "Pro"} • Active
+                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
+                        <Lightbulb className="w-3.5 h-3.5 text-white" />
+                      </span>
+                      <span className="text-xs truncate">
+                        {user?.subscriptionPlan?.name || "Pro"} · Active
                       </span>
                     </div>
                   ) : (
                     <NavLink
                       to="/pricing"
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-blue-500/40 bg-blue-500/5 hover:bg-blue-500/10 transition-colors"
+                      className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-white transition-all bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30 active:scale-[0.98]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Lightbulb className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
-                      <span className="text-[10px] font-semibold text-blue-600">Subscribe to Pro</span>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
+                        <Lightbulb className="w-3.5 h-3.5 text-white" />
+                      </span>
+                      <span>Subscribe to Pro</span>
                     </NavLink>
                   )}
                 </div>
               )}
               {/* Main Section */}
-              <div className="space-y-1">
-                <NavLink to="/home" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Home">
-                  <Home className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Home</span>}
-                </NavLink>
+              <div className="space-y-0.5">
+                <SidebarNavItem
+                  to="/home"
+                  title="Home"
+                  icon={Home}
+                  label="Home"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
               </div>
 
               {/* Performance & Analytics Section */}
               {!sidebarCollapsed && (
-                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <div className="pt-5 pb-2">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Performance & Analytics
                   </div>
                 </div>
               )}
-              <div className="space-y-1">
-                <NavLink to="/performance" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Performance Dashboard">
-                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Performance Dashboard</span>}
-                </NavLink>
-                <NavLink to="/copy-evaluation" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Copy Evaluation">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <FileText className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>Copy Evaluation</span>}
-                    </div>
-                    {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
-                        Soon
-                      </span>
-                    )}
-                  </div>
-                </NavLink>
+              <div className="space-y-0.5">
+                <SidebarNavItem
+                  to="/performance"
+                  title="Performance Dashboard"
+                  icon={BarChart3}
+                  label="Performance Dashboard"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/copy-evaluation"
+                  title="Copy Evaluation"
+                  icon={FileText}
+                  label="Copy Evaluation"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  badge="soon"
+                  muted
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
                 {/* <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
                   <History className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Evaluation History</span>}
@@ -326,34 +413,41 @@ export const DashboardLayout = () => {
 
               {/* Practice & Tests Section */}
               {!sidebarCollapsed && (
-                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <div className="pt-5 pb-2">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Practice & Tests
                   </div>
                 </div>
               )}
-              <div className="space-y-1">
-                <NavLink to="/prelims-test" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Test">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <ClipboardList className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>Prelims Test</span>}
-                    </div>
-                    {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
-                        Trial
-                      </span>
-                    )}
-                  </div>
-                </NavLink>
-                <NavLink to="/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Scheduled tests">
-                  <Target className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Prelims Mock</span>}
-                </NavLink>
-                <NavLink to="/current-affairs" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Daily Current Affairs">
-                  <Newspaper className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Daily Current Affairs</span>}
-                </NavLink>
+              <div className="space-y-0.5">
+                <SidebarNavItem
+                  to="/prelims-test"
+                  title="Prelims Test"
+                  icon={ClipboardList}
+                  label="Prelims Test"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  badge="trial"
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/prelims-mock"
+                  title="Prelims Mock - Scheduled tests"
+                  icon={Target}
+                  label="Prelims Mock"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/current-affairs"
+                  title="Daily Current Affairs"
+                  icon={Newspaper}
+                  label="Daily Current Affairs"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
                 {/* <NavLink to="/test-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Test History">
                   <History className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Test History</span>}
@@ -362,36 +456,55 @@ export const DashboardLayout = () => {
 
               {/* Study Tools Section */}
               {!sidebarCollapsed && (
-                <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <div className="pt-5 pb-2">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Study Tools
                   </div>
                 </div>
               )}
-              <div className="space-y-1">
-                <NavLink to="/planner" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Study Planner">
-                  <CalendarClock className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Study Planner</span>}
-                </NavLink>
-                <NavLink to="/mentor" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Mentor">
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <MessageCircle className="w-4 h-4 flex-shrink-0" />
-                      {!sidebarCollapsed && <span>AI Mentor</span>}
-                    </div>
-                    {!sidebarCollapsed && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-2 whitespace-nowrap uppercase tracking-tighter">
-                        Trial
-                      </span>
-                    )}
-                  </div>
-                </NavLink>
+              <div className="space-y-0.5">
+                <SidebarNavItem
+                  to="/planner"
+                  title="Study Planner"
+                  icon={CalendarClock}
+                  label="Study Planner"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/mentor"
+                  title="AI Mentor"
+                  icon={MessageCircle}
+                  label="AI Mentor"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  badge="trial"
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+              </div>
+
+              {!sidebarCollapsed && (
+                <div className="pt-5 pb-2">
+                  <div className={sidebarSectionLabelClass(theme)}>Account</div>
+                </div>
+              )}
+              <div className="space-y-0.5">
+                <SidebarNavItem
+                  to="/profile"
+                  title="Profile"
+                  icon={User}
+                  label="Profile"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
               </div>
 
               {/* Communication Section */}
               {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Communication
                   </div>
                 </div>
@@ -406,7 +519,7 @@ export const DashboardLayout = () => {
               {/* Profile & Settings Section */}
               {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
-                  <div className="px-2 md:px-3 text-[10px] md:text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <div className={sidebarSectionLabelClass(theme)}>
                     Account
                   </div>
                 </div>
@@ -436,35 +549,35 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* Bottom Actions Section */}
-        <div className={`${sidebarCollapsed ? "px-2" : "px-2 md:px-4"} py-3 md:py-4 border-t flex-shrink-0 ${theme === "dark" ? "border-blue-900/50" : "border-slate-200"}`}>
-          <div className="space-y-1">
-            <NavLink
+        <div className={`${sidebarCollapsed ? "px-2" : "px-3"} py-3 border-t flex-shrink-0 ${theme === "dark" ? "border-slate-800/80 bg-slate-900/30" : "border-slate-200 bg-slate-50/50"}`}>
+          <div className="space-y-0.5">
+            <SidebarNavItem
               to="/profile"
-              className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })}
-              onClick={() => setMobileMenuOpen(false)}
               title="Settings"
-            >
-              <Settings className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Settings</span>}
-            </NavLink>
-            <NavLink
+              icon={Settings}
+              label="Settings"
+              theme={theme}
+              collapsed={sidebarCollapsed}
+              onNavigate={() => setMobileMenuOpen(false)}
+            />
+            <SidebarNavItem
               to="/help-support"
-              className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })}
-              onClick={() => setMobileMenuOpen(false)}
               title="Help & Support"
-            >
-              <HelpCircle className="w-4 h-4 flex-shrink-0" />
-              {!sidebarCollapsed && <span>Help & Support</span>}
-            </NavLink>
+              icon={HelpCircle}
+              label="Help & Support"
+              theme={theme}
+              collapsed={sidebarCollapsed}
+              onNavigate={() => setMobileMenuOpen(false)}
+            />
             <button
               onClick={logout}
-              className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-2 md:gap-3"} ${sidebarCollapsed ? "px-2" : "px-2 md:px-3"} py-2.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors min-h-[44px] touch-manipulation ${theme === "dark"
-                  ? "hover:bg-slate-800 text-slate-300"
-                  : "hover:bg-slate-100 text-slate-700"
+              className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} ${sidebarCollapsed ? "px-2" : "px-3"} py-2.5 rounded-xl text-[13px] font-medium transition-all min-h-[42px] touch-manipulation group ${theme === "dark"
+                  ? "hover:bg-white/[0.06] text-slate-300"
+                  : "hover:bg-slate-100 text-slate-600"
                 }`}
               title="Logout"
             >
-              <LogOut className="w-4 h-4 flex-shrink-0" />
+              <LogOut className={`${sidebarNavIconClass(false, theme)}`} />
               {!sidebarCollapsed && <span>Logout</span>}
             </button>
           </div>
@@ -472,7 +585,7 @@ export const DashboardLayout = () => {
       </aside>
 
       {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
-      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[280px] lg:ml-64"}`}>
+      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[260px]"}`}>
         {/* Fixed Header - equal alignment, better UI */}
         <header
           className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"

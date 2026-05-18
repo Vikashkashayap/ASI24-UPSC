@@ -1,0 +1,1718 @@
+{
+  "meta": {
+    "course_name": "UPSC Modern History",
+    "target_exam": "UPSC Civil Services Examination",
+    "papers_covered": ["Prelims GS Paper 1", "Mains GS Paper 1"],
+    "total_modules": 12,
+    "estimated_total_hours": 180,
+    "estimated_total_days_standard_track": 60,
+    "created_date": "2026-04-16",
+    "last_updated": "2026-04-16",
+    "version": "1.0",
+    "portal_name": "MentorsDaily",
+    "previous_year_questions_pattern": {
+      "prelims_questions_per_paper": "5-7 questions",
+      "mains_word_limit": "1000-1200 words",
+      "common_topics": [
+        "Freedom Struggle & Independence",
+        "Constitutional Development",
+        "Social Reform Movements",
+        "Nationalist Leaders & Contributions",
+        "British Policies & Economic Impact",
+        "Acts and Legislative Measures"
+      ],
+      "question_types": [
+        "Chronological sequence",
+        "Matching personalities with contributions",
+        "Identify statements about reforms",
+        "Map-based questions on regions",
+        "Data interpretation on economic policies"
+      ]
+    },
+    "daily_study_schedule_standard_track": {
+      "week_1_2": "Module 1: European Arrival & British Expansion",
+      "week_3_4": "Module 2: British Consolidation & Module 3: Economic Impact",
+      "week_5_6": "Module 4: Revolt of 1857",
+      "week_7_8": "Module 5: Social & Religious Reform",
+      "week_9_10": "Module 6: Rise of Nationalism",
+      "week_11_12": "Module 7: Extremism & Swadeshi",
+      "week_13_14": "Module 8: Gandhian Era",
+      "week_15_16": "Module 9: Revolutionary Movements",
+      "week_17_18": "Module 10: Quit India & Independence",
+      "week_19_20": "Module 11: Constitutional Development",
+      "week_21": "Module 12: Princely States Integration",
+      "week_22_24": "Revision & Practice Tests"
+    },
+    "mains_themes_gs_paper_1": [
+      "Evolution of Indian polity from colonial to independent state",
+      "Role of freedom struggle in nation-building",
+      "Social reform movements and their impact on society",
+      "Economic policies and their consequences",
+      "Constitutional making and governance",
+      "Cultural and intellectual movements",
+      "Regional variations in nationalist movements"
+    ],
+    "important_freedom_fighter_quotes": [
+      {
+        "fighter": "Mahatma Gandhi",
+        "quote": "In a gentle way, you can shake the world.",
+        "context": "On non-violent resistance"
+      },
+      {
+        "fighter": "Jawaharlal Nehru",
+        "quote": "A moment comes, which comes but rarely in history, when we step out from the old to the new.",
+        "context": "Independence Day speech, 1947"
+      },
+      {
+        "fighter": "Subhas Chandra Bose",
+        "quote": "Give me blood and I will give you freedom.",
+        "context": "Revolutionary movement"
+      },
+      {
+        "fighter": "Bal Gangadhar Tilak",
+        "quote": "Swaraj is my birthright, and I shall have it.",
+        "context": "Nationalist movement"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "module_id": 1,
+      "module_name": "European Arrival & British Expansion (1600-1757)",
+      "estimated_days_standard": 10,
+      "estimated_hours": 15,
+      "key_focus_areas": [
+        "Early European trading companies",
+        "East India Company establishment",
+        "British consolidation strategy",
+        "Regional powers and decline"
+      ],
+      "module_test": {
+        "type": "Mock test",
+        "duration_minutes": 90,
+        "total_questions": 40,
+        "prelims_questions": 30,
+        "mains_essay_1": "Analyze the factors that enabled British expansion in India from 1600-1757",
+        "passing_criteria_percent": 60
+      },
+      "topics": [
+        {
+          "topic_id": "1.1",
+          "topic_name": "Early European Trading Companies & Portuguese Rule",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 1,
+            "chapter_name": "European Expansion in Asia and the Beginning of European Rule in India"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 2,
+              "chapter_name": "From Trade to Territory"
+            },
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 1,
+              "chapter_name": "The Rise of Nationalism in Europe"
+            }
+          ],
+          "key_concepts": [
+            "Vasco da Gama arrival (1498) and circumnavigation of Africa",
+            "Portuguese dominance in Indian Ocean trade (1498-1740s)",
+            "Albuquerque's strategy: control of naval routes and fortified posts",
+            "Portuguese settlements: Goa (capital), Diu, Daman, and Cochin",
+            "Trade monopoly system and Portuguese economic policies",
+            "Spice trade significance for European economy",
+            "Decline of Portuguese due to competition from other European powers",
+            "Factors in Portuguese weakness: overextended territories, weak naval presence",
+            "Impact on Indian economy: drain of precious metals, disruption of existing trade",
+            "Portuguese cultural and religious influence in India",
+            "Arab and Venetian traders' role before European arrival",
+            "Monsoon winds and maritime geography importance",
+            "Religious missions and evangelization under Portuguese rule"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1498: Vasco da Gama reaches Calicut",
+              "1505-1509: Albuquerque becomes Portuguese Governor",
+              "1510: Portuguese capture Goa",
+              "1515: Portuguese capture Diu",
+              "1600s: Portuguese power begins declining",
+              "1740: Portuguese influence wanes significantly"
+            ],
+            "key_personalities": [
+              "Vasco da Gama: Portuguese explorer, first European sea route to India",
+              "Alfonso de Albuquerque: Portuguese Governor, strategist",
+              "King Manuel I: Portuguese monarch, patron of exploration",
+              "Zamorin of Calicut: Indian ruler resisting Portuguese monopoly"
+            ],
+            "key_terms": [
+              "Carreira da India: Portuguese spice fleet route",
+              "Cartaz system: Portuguese trading permit system",
+              "Feitorias: Portuguese trading posts",
+              "Monsoon winds: Seasonal weather patterns enabling sea travel"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 6,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "1.2",
+          "topic_name": "East India Company Establishment & Early Settlements",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 1,
+            "chapter_name": "European Expansion in Asia and the Beginning of European Rule in India"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 2,
+              "chapter_name": "From Trade to Territory"
+            }
+          ],
+          "key_concepts": [
+            "British East India Company charter (1600) by Queen Elizabeth I",
+            "Company structure: Joint-stock company model, governance by Court of Directors",
+            "Early factors and trading posts: Surat (1608), Bombay, Madras, Calcutta",
+            "Comparison with Dutch, French, and Portuguese companies",
+            "Company's initial trading objectives: textiles, spices, indigo, cotton",
+            "Diplomatic relations with Mughal Empire and regional rulers",
+            "Company policies on local trade and indigenous merchants",
+            "Factory system: fortified trading settlements with warehouses",
+            "Evolution from merchant activity to military expansion",
+            "Conflict with existing Portuguese and Dutch traders",
+            "Administrative structure in settlements",
+            "Banking and financial systems development",
+            "Impact on local economy and merchant classes"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1600: East India Company chartered",
+              "1608: First British factory at Surat established",
+              "1639: Madras settlement founded (Fort St. George)",
+              "1661: Bombay received as dowry from Portugal",
+              "1690: Calcutta established by Job Charnock",
+              "1698: East India Company purchased Calcutta from Nawab"
+            ],
+            "key_personalities": [
+              "Queen Elizabeth I: Granted charter to EIC",
+              "Sir Thomas Roe: First British ambassador to Mughal court (1615-1619)",
+              "Job Charnock: Founder of Calcutta",
+              "Sir Josiah Child: Governor of EIC (1681-1690)",
+              "Emperor Shah Jahan: Mughal ruler during early EIC expansion"
+            ],
+            "key_settlements": [
+              "Surat: First major trading post (1608)",
+              "Bombay: Strategic location on west coast (1661)",
+              "Madras: Trading settlement on east coast (1639)",
+              "Calcutta: Major settlement in Bengal (1690)"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "1.3",
+          "topic_name": "British Expansion Strategy & Regional Powers",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 2,
+            "chapter_name": "British Expansion in India"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 2,
+              "chapter_name": "From Trade to Territory"
+            },
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 5,
+              "chapter_name": "The Age of Industrialization"
+            }
+          ],
+          "key_concepts": [
+            "Subordinate isolation policy: dividing Indian powers",
+            "Subsidiary alliances: military arrangements forcing dependence",
+            "Doctrine of Lapse: annexation of lapsed princely states (introduced 1848)",
+            "Strategic locations and geopolitical importance",
+            "Anglo-Maratha Wars (1775-1818): three decisive conflicts",
+            "Battle of Plassey (1757): Robert Clive's victory, Bengal acquisition",
+            "Battle of Buxar (1764): consolidation in Bengal and Bihar",
+            "Mysore Wars (1767-1799): Tipu Sultan and British expansion",
+            "Anglo-Sikh Wars (1845-1849): Punjab conquest",
+            "Decline of Mughal Empire: fragmentation and weakness",
+            "Regional powers: Marathas, Mysore, Sikhs, Bengal nawabs",
+            "Use of native troops: sepoys and recruitment policies",
+            "Political divisions exploited by British",
+            "Technology advantage: artillery and naval superiority",
+            "Treaty-making as expansion tool"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1757: Battle of Plassey (Robert Clive defeats Siraj-ud-Daulah)",
+              "1764: Battle of Buxar (British victory in Bihar)",
+              "1775-1782: First Anglo-Maratha War",
+              "1780-1784: Second Anglo-Mysore War",
+              "1798-1805: Fourth Mysore War (Tipu Sultan's defeat)",
+              "1845-1846: First Anglo-Sikh War",
+              "1848-1849: Second Anglo-Sikh War",
+              "1757-1818: Period of territorial consolidation"
+            ],
+            "key_battles": [
+              "Plassey (1757): Bengal conquest",
+              "Buxar (1764): Bihar and Orissa acquisition",
+              "Mysore Wars: Tip Sultan defeated (1792, 1799)",
+              "Assaye (1803): Maratha defeat",
+              "Bharatpur (1825): Rajput state conquered"
+            ],
+            "key_personalities": [
+              "Robert Clive: Founder of British rule in India",
+              "Warren Hastings: First Governor-General",
+              "Siraj-ud-Daulah: Bengal nawab defeated at Plassey",
+              "Tipu Sultan: Mysore ruler, resistance to British",
+              "Ranjit Singh: Sikh kingdom builder, resisted British",
+              "Baji Rao II: Maratha leader",
+              "Lord Cornwallis: Governor-General, administrative reforms"
+            ],
+            "key_terms": [
+              "Subsidiary Alliance: military-political arrangement",
+              "Jagir system: feudal land grants disrupted",
+              "Zamindari: landlord system consolidated under British"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "1.4",
+          "topic_name": "Mughal Decline & European Competition",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 1,
+            "chapter_name": "European Expansion in Asia and the Beginning of European Rule in India"
+          },
+          "ncert_reference": [
+            {
+              "class": 12,
+              "book_name": "Themes in Indian History Part III",
+              "chapter_number": 1,
+              "chapter_name": "Bricks, Beads and Bones"
+            }
+          ],
+          "key_concepts": [
+            "Mughal Empire structure and administration under later emperors",
+            "Aurangzeb's reign and subsequent decline (post-1707)",
+            "Regional fragmentation and power vacuum creation",
+            "Rise of Marathas, Sikhs, Rajputs as independent powers",
+            "Bengal nawabs' increasing autonomy",
+            "Decline of centralized control mechanisms",
+            "Trade monopolies and economic disruption",
+            "Environmental and agricultural challenges",
+            "Competition between European powers: British, French, Dutch, Portuguese",
+            "French involvement in India: colonies and alliances",
+            "Anglo-French rivalry globally affecting India",
+            "Carnatic Wars: territorial conflicts between British and French",
+            "Naval supremacy's importance in Indian Ocean",
+            "Institutional weakness of Mughal state",
+            "Succession disputes and administrative corruption"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1707: Death of Aurangzeb (Mughal decline begins)",
+              "1740-1748: War of Austrian Succession (Anglo-French wars)",
+              "1756-1763: Seven Years' War (global British-French conflict)",
+              "1746-1748: First Carnatic War",
+              "1749-1754: Second Carnatic War",
+              "1757-1763: Third Carnatic War",
+              "1764: Battle of Buxar (British dominance confirmed)"
+            ],
+            "key_personalities": [
+              "Muhammad Shah Rangila: Mughal emperor, weak ruler",
+              "Nizam of Hyderabad: Founder of autonomous state",
+              "Marquis of Dupleix: French administrator in India",
+              "Robert Clive: British military strategist",
+              "Joseph Francois Dupleix: French governor-general"
+            ],
+            "territorial_changes": [
+              "Bengal: British control after Plassey",
+              "Madras (Carnatic): British expansion",
+              "Bombay: Strategic acquisition (1661)",
+              "Calcutta: British administrative center"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 2,
+      "module_name": "British Consolidation & Resistance (1757-1857)",
+      "estimated_days_standard": 12,
+      "estimated_hours": 18,
+      "key_focus_areas": [
+        "Administrative reorganization",
+        "Resistance movements and uprisings",
+        "Land revenue systems",
+        "Judicial and legal reforms",
+        "Educational policies"
+      ],
+      "module_test": {
+        "type": "Full-length mock test",
+        "duration_minutes": 120,
+        "total_questions": 50,
+        "prelims_questions": 35,
+        "mains_essay_1": "Critically examine the administrative policies adopted by the British to consolidate their rule in India between 1757-1857",
+        "mains_essay_2": "Analyze the nature and extent of resistance to British rule during the 100-year period before the Revolt of 1857",
+        "passing_criteria_percent": 60
+      },
+      "topics": [
+        {
+          "topic_id": "2.1",
+          "topic_name": "Administrative Organization & Governance Structures",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 3,
+            "chapter_name": "British Administration and its Effects"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 3,
+              "chapter_name": "The Mughal Empire"
+            }
+          ],
+          "key_concepts": [
+            "Three-presidency system: Bengal, Bombay, Madras under separate governors",
+            "Governor-General establishment: supreme authority over presidencies",
+            "Warren Hastings: first effective governor-general (1772-1785)",
+            "Subsidiary alliances: subordinating Indian princes",
+            "Zamindari system consolidation under Permanent Settlement",
+            "District administration: collectors as key officials",
+            "Hierarchical civil service structure: British officers controlling Indians",
+            "Police and revenue administration separation",
+            "District courts and judicial hierarchy",
+            "Cantonment system: military-civil segregation",
+            "Administrative centralization from local to provincial levels",
+            "Record-keeping and survey systems",
+            "Indian Civil Service (ICS): recruitment of educated Indians",
+            "Administrative efficiency vs. traditional governance",
+            "Cost of administration and extractive policies"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1773: Regulating Act (first major constitutional framework)",
+              "1784: Pitt's India Act (strengthened imperial control)",
+              "1786-1793: Cornwallis Reforms",
+              "1792: Permanent Settlement in Bengal",
+              "1813: East India Company's monopoly reduced",
+              "1833: Government of India Act (unified administration)"
+            ],
+            "key_acts": [
+              "1773: Regulating Act - British Parliament's control over Company",
+              "1784: Pitt's India Act - Dual control (Crown and Company)",
+              "1793: Cornwallis Code - Judicial and civil service reforms",
+              "1833: Government of India Act - Governor-General supreme authority"
+            ],
+            "key_personalities": [
+              "Warren Hastings: Governor-General (1772-1785), administrative reforms",
+              "Lord Cornwallis: Judicial and revenue reforms (1786-1793)",
+              "Henry Vansittart: Revenue administration",
+              "Colin Macaulay: Educational policies"
+            ],
+            "administrative_divisions": [
+              "Bengal Presidency: East and West",
+              "Bombay Presidency: Western coast",
+              "Madras Presidency: Southern territories",
+              "Later: North-Western Provinces, Punjab, Assam"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "2.2",
+          "topic_name": "Land Revenue & Zamindari System",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 3,
+            "chapter_name": "British Administration and its Effects"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 3,
+              "chapter_name": "Rulers and Kingdoms"
+            },
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 4,
+              "chapter_name": "India in the Age of Decline"
+            }
+          ],
+          "key_concepts": [
+            "Permanent Settlement of Bengal (1793): Cornwallis's revenue policy",
+            "Zamindars recognized as landlords with hereditary rights",
+            "Ryotwari system: direct relations with peasant farmers",
+            "Mahalwari system: village-level revenue collection",
+            "Revenue amount fixed at extreme rates",
+            "Loss of peasant proprietary rights",
+            "Zamindari exploitation: sub-letting at higher rates",
+            "Debt and indebtedness of cultivators",
+            "Loss of traditional village economy",
+            "Agricultural productivity and changes in land use",
+            "Moneylenders' role in rural economy",
+            "Revenue surveys: measurement of land and assessment",
+            "Comparison of revenue systems across regions",
+            "Economic drain: revenue extracted as surplus",
+            "Land alienation and concentration of ownership"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1793: Permanent Settlement (Bengal) by Cornwallis",
+              "1820-1830: Ryotwari survey in Madras by Munro and Read",
+              "1833: Mahalwari system in North-Western Provinces",
+              "1855: Revenue survey of Punjab",
+              "1857-1900: Various regional land reforms"
+            ],
+            "key_systems": [
+              "Permanent Settlement: Fixed revenue, hereditary zamindars",
+              "Ryotwari: Direct peasant-state relations, flexible revenue",
+              "Mahalwari: Village communities as revenue units",
+              "Raiyatwari: Peasant proprietorship (South India)"
+            ],
+            "key_concepts": [
+              "Permanent Settlement (1793): Bengal, Bihar, Orissa",
+              "Revenue extraction: 50-80% of produce",
+              "Zamindars as intermediaries and landlords",
+              "Peasant landlessness and tenant status",
+              "Moneylender dominance in rural credit"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "2.3",
+          "topic_name": "Early Resistance & Uprisings (1757-1857)",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 1,
+            "chapter_name": "The Spread of British Rule in India"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 8,
+              "chapter_name": "Weavers, Iron Smelters and Factory Owners"
+            }
+          ],
+          "key_concepts": [
+            "Peasant movements and agrarian unrest",
+            "Landlord-peasant conflicts over revenue",
+            "Rebellion in Bengal: Sannyasi Revolt, Chuar Rebellion",
+            "Rangpur Dhing (1783): Bengali peasant uprising",
+            "Indigo cultivation rebellion (1860s): Blue Mutiny",
+            "Kol Rebellion (1831-1832): tribal uprising",
+            "Munda Rebellion: tribal resistance movements",
+            "Sepoy discontent: pay, conditions, caste issues",
+            "Narikhad Rebellion (1817-1820): South Indian resistance",
+            "Waghera Rebellion: Gujarat resistance",
+            "Paik Rebellion (1817): Orissa uprising",
+            "Amerindian revolts: tribal forest conflicts",
+            "Peasant consciousness and organization",
+            "Traditional leaders' role in uprisings",
+            "Causes: taxation, land loss, caste/religious issues"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1763-1800: Sannyasi Revolt (Bengal)",
+              "1783: Rangpur Dhing (Bengal)",
+              "1785: Chuar Rebellion (Bengal)",
+              "1810-1820: Paik Rebellion (Orissa)",
+              "1817-1820: Narikhad Rebellion (South India)",
+              "1820-1823: Waghera Rebellion (Gujarat)",
+              "1831-1832: Kol Rebellion (Bengal/Jharkhand)",
+              "1852-1854: Munda Rebellion (Jharkhand)",
+              "1859-1862: Indigo Rebellion (Bengal)"
+            ],
+            "key_uprisings": [
+              "Sannyasi Revolt: religiously motivated resistance",
+              "Paik Rebellion: traditional warrior class displacing",
+              "Kol and Munda: tribal land dispossession",
+              "Indigo Rebellion: peasant against cash-crop exploitation",
+              "Chuar Rebellion: forest dweller resistance"
+            ],
+            "key_leaders": [
+              "Tipu Sultan: Initial resistance (1757-1799)",
+              "Raja Ram Mohan Roy: Intellectual resistance",
+              "Nataraj Singh: Paik Rebellion leader",
+              "Birsa Munda: Tribal uprising leader"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "2.4",
+          "topic_name": "Judicial & Legal System Reforms",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 3,
+            "chapter_name": "British Administration and its Effects"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 5,
+              "chapter_name": "The Age of Industrialization"
+            }
+          ],
+          "key_concepts": [
+            "Cornwallis's judicial reforms: separation of revenue and justice",
+            "Introduction of English common law principles",
+            "Establishment of courts: District courts, Circuit courts, Supreme Court",
+            "Civil and criminal law codes",
+            "Penal Code 1860: unified criminal law",
+            "Code of Civil Procedure: standardized civil proceedings",
+            "Impact on traditional legal systems: elimination of indigenous courts",
+            "Role of British judges and Indian subordinates",
+            "Translation of Indian law into English concepts",
+            "Appeal system and hierarchical court structure",
+            "Replacement of qazi and pandit systems",
+            "Adversarial vs. traditional dispute resolution",
+            "Zamindari courts abolished",
+            "Village panchayat system marginalized",
+            "English as language of law"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1781: Supreme Court established in Calcutta",
+              "1793: Cornwallis's judicial reforms",
+              "1861: Penal Code enacted",
+              "1882: Code of Civil Procedure",
+              "1872: Indian Evidence Act",
+              "1882-1898: Various procedural laws enacted"
+            ],
+            "key_acts": [
+              "1793: Cornwallis Code - Judicial structure",
+              "1860: Indian Penal Code - Criminal law",
+              "1872: Indian Evidence Act - Standards of proof",
+              "1882: Code of Civil Procedure - Civil law",
+              "1898: Criminal Procedure Code"
+            ],
+            "key_reforms": [
+              "Separation of executive and judicial functions",
+              "Hierarchy of courts: District Court, Circuit Court, Supreme Court",
+              "Introduction of English law principles",
+              "Standardization of legal procedures",
+              "Replacement of personal law with codified law"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 6,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "2.5",
+          "topic_name": "Educational Policies & Anglicization",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 4,
+            "chapter_name": "Social and Cultural Effects of British Rule"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 5,
+              "chapter_name": "Bhakti-Sufi Tradition"
+            }
+          ],
+          "key_concepts": [
+            "Macaulay's Minute on Education (1835): English language emphasis",
+            "Downward filtration theory: elites to masses education",
+            "English-medium schools establishment",
+            "Decline of Sanskrit and Persian education",
+            "University of Calcutta (1857): first Indian university",
+            "Teacher training and educational infrastructure",
+            "Curriculum: English literature, science, classics",
+            "Exclusion of indigenous knowledge systems",
+            "Impact on Indian intellectual tradition",
+            "Creation of English-educated middle class",
+            "Gender and education: limited female education",
+            "Industrial training and technical education",
+            "Religious education policies: secular vs. Christian influence",
+            "Higher education restricted to few",
+            "Literacy rates and social impact"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1813: East India Company Act - education provision",
+              "1823: School Book Society established",
+              "1835: Macaulay's Minute on Education",
+              "1844: Educational emphasis on English",
+              "1857: University of Calcutta, Bombay, Madras founded",
+              "1882: Hunter Education Commission",
+              "1902: Curzon's education reforms"
+            ],
+            "key_policies": [
+              "Macaulay Minute (1835): English as language of education",
+              "1844 Resolution: English education priority",
+              "1855-1857: University establishment",
+              "1882 Hunter Commission: school education reforms",
+              "1902 Curzon Reforms: higher education restructuring"
+            ],
+            "key_personalities": [
+              "Thomas Babington Macaulay: Educational policy framer",
+              "Ram Mohan Roy: Advocate for English education",
+              "Ishwar Chandra Vidyasagar: Educational reformer",
+              "Debendranath Tagore: Education advocate"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 3,
+      "module_name": "Economic Impact of British Rule",
+      "estimated_days_standard": 8,
+      "estimated_hours": 12,
+      "key_focus_areas": [
+        "Deindustrialization of India",
+        "Trade and commerce changes",
+        "Infrastructure development",
+        "Fiscal policies and taxation",
+        "Agricultural transformation"
+      ],
+      "module_test": {
+        "type": "Sectional test",
+        "duration_minutes": 60,
+        "total_questions": 30,
+        "prelims_questions": 25,
+        "mains_essay": "Analyze the economic policies of British rule and their consequences for Indian economy and society",
+        "passing_criteria_percent": 60
+      },
+      "topics": [
+        {
+          "topic_id": "3.1",
+          "topic_name": "Deindustrialization & Trade Monopolies",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 3,
+            "chapter_name": "British Administration and its Effects"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 2,
+              "chapter_name": "The Rise of Nationalism in Europe"
+            }
+          ],
+          "key_concepts": [
+            "Indian textile industry decline: competition from British mills",
+            "Prohibition of Indian textile exports to Britain",
+            "Tariffs favoring British goods over Indian products",
+            "Collapse of craft industries: weavers, artisans unemployment",
+            "Shift from manufacturing to agricultural economy",
+            "British industrial goods dumping in India",
+            "Trade monopolies of East India Company",
+            "Destruction of traditional industries: indigo, silk, cotton",
+            "Loss of technical knowledge and skills transmission",
+            "Capital flight: profits exported to Britain",
+            "Currency manipulation and fiscal policies",
+            "Economic subordination to British industry",
+            "Commodity price fixing by Britain",
+            "Impact on middle-class artisans and manufacturers",
+            "Long-term structural changes in Indian economy"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1700s: Indian textiles dominant in world trade",
+              "1800-1850: Rapid deindustrialization begins",
+              "1813: East India Company monopoly partially ended",
+              "1833: Company monopoly completely abolished",
+              "1850-1900: Indian manufacturing collapses",
+              "1850: Indian share of world GDP drops from 23% to 4%"
+            ],
+            "key_statistics": [
+              "Indian textile exports: 40% of world trade (1750s) to near zero (1850s)",
+              "British textile exports to India: multiplied 100x in 50 years",
+              "Indian manufacturing share: 25% of world (1800) to 2% (1900)",
+              "Unemployment in traditional industries: millions of artisans"
+            ],
+            "key_industries_affected": [
+              "Cotton textiles: Indian artisans destroyed",
+              "Silk and wool: production declined drastically",
+              "Indigo: production controlled by British",
+              "Steel and iron: traditional production ceased",
+              "Ship-building: industry eliminated"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "3.2",
+          "topic_name": "Infrastructure Development & Railways",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 5,
+            "chapter_name": "Economic and Social Effects of British Rule"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 4,
+              "chapter_name": "Print Culture and the Modern World"
+            }
+          ],
+          "key_concepts": [
+            "Railway development: first line 1853 (Bombay to Thane)",
+            "Railways as tool for resource extraction",
+            "British investment in railways: profit-oriented",
+            "Impact on internal trade and markets",
+            "Coal, iron, and mining development",
+            "Telegraph and communication expansion",
+            "Port development: Bombay, Calcutta, Madras modernization",
+            "Road construction: Grand Trunk Road expansion",
+            "Irrigation systems: dams and canals",
+            "Infrastructure benefits and costs analysis",
+            "Railway employment: limited Indian opportunities",
+            "Technology transfer and Indian participation",
+            "Transportation of goods and military control",
+            "Integration of regional economies",
+            "Environmental impact: deforestation for railway sleepers"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1853: First railway opened (Bombay-Thane, 34 km)",
+              "1873: Railway network reaches 10,000 miles",
+              "1900: Railway network extends 40,000 miles",
+              "1851: Telegraph system introduced",
+              "1870: Suez Canal opens (reduces shipping time to Britain)"
+            ],
+            "key_projects": [
+              "Eastern Indian Railway: Calcutta to Delhi",
+              "Western Indian Railway: Bombay to Madras",
+              "Grand Trunk Road: expansion and modernization",
+              "Godavari River Dam: irrigation project",
+              "Suez Canal: strategic advantage to Britain"
+            ],
+            "key_statistics": [
+              "Railway employees (1900): 500,000",
+              "Capital invested in railways: £2 billion (British)",
+              "Guaranteed returns: 5% guaranteed to British investors",
+              "Indian railway employees: mostly low-skilled positions"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "3.3",
+          "topic_name": "Agricultural Policies & Famines",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 5,
+            "chapter_name": "Economic and Social Effects of British Rule"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 3,
+              "chapter_name": "Nationalism in India"
+            }
+          ],
+          "key_concepts": [
+            "Shift to cash crops: indigo, opium, jute cultivation",
+            "Food crop production decline: famines increase",
+            "Agricultural revenue focus: subsistence farming neglected",
+            "Famines of 1770, 1838-1839, 1860s, 1876-1878, 1899-1900",
+            "Bengal Famine (1770): 10 million deaths",
+            "Great Famine (1876-1878): Indian response to British apathy",
+            "Famine Commission Reports (1880s): causes and relief",
+            "Agricultural indebtedness: moneylender's role",
+            "Tenant farmer exploitation: rising rents",
+            "Zamindari revenue burden on cultivation",
+            "Agricultural productivity decline",
+            "Food imports from Australia and Burma",
+            "Irrigation systems: limited peasant access",
+            "Drought and locust control: inadequate measures",
+            "Famine relief: inadequate and delayed response"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1770: Bengal Famine (10 million deaths)",
+              "1838-1839: Northern India famine",
+              "1860-1861: Orissa and central India famine",
+              "1876-1878: Great Famine (5-10 million deaths)",
+              "1899-1900: India-wide famine",
+              "1880: Famine Commission Report (Lytton)"
+            ],
+            "key_statistics": [
+              "Bengal Famine (1770): 10 million deaths out of 30 million population",
+              "Great Famine (1876-1878): 5-10 million deaths",
+              "Famines (1770-1900): 20-30 million deaths estimated",
+              "Agricultural productivity: declined 30-40% under British rule"
+            ],
+            "key_policies": [
+              "Opium cultivation priority: forced cultivation",
+              "Export orientation: food crops replaced by cash crops",
+              "Revenue maximization: food security neglected",
+              "Famine relief: inadequate grain storage"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "3.4",
+          "topic_name": "Taxation & Fiscal Policies",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "History of Modern India",
+            "chapter_number": 5,
+            "chapter_name": "Economic and Social Effects of British Rule"
+          },
+          "ncert_reference": [
+            {
+              "class": 12,
+              "book_name": "Themes in Indian History Part III",
+              "chapter_number": 5,
+              "chapter_name": "Colonial State and Commodity Production"
+            }
+          ],
+          "key_concepts": [
+            "Land revenue as primary taxation source",
+            "Permanent Settlement impact: fixed rates favoring landlords",
+            "Revenue farming and contractor system",
+            "Direct and indirect taxation expansion",
+            "Customs duties: protecting British interests",
+            "Opium monopoly: excise taxation on opium",
+            "Salt tax: monopoly control and revenue extraction",
+            "Alcohol taxation and state monopolies",
+            "Income tax introduction (1860s)",
+            "Capital flight through taxation policies",
+            "Fiscal deficit and British compensations",
+            "Tax burden inequalities: landowners vs. peasants",
+            "Revenue collection methods: coercion and confiscation",
+            "Default and land alienation from unpaid taxes",
+            "Impact on peasant indebtedness"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1793: Permanent Settlement (revenue fixed)",
+              "1800-1857: Revenue rates increase despite fixed settlement",
+              "1860: Income tax introduced",
+              "1882: Salt monopoly strengthened",
+              "1894: Cotton duties imposed against Indian interests"
+            ],
+            "key_taxes": [
+              "Land revenue: 50-80% of land produce",
+              "Opium tax: government monopoly and revenue",
+              "Salt tax: essential commodity taxation",
+              "Alcohol tax: excise duties",
+              "Customs duties: protection of British goods"
+            ],
+            "key_statistics": [
+              "Land revenue collection: £30-40 million annually (1850s)",
+              "Per capita taxation: increased 300% under British rule",
+              "Revenue burden: 70-80% of peasant output"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 4,
+      "module_name": "Revolt of 1857 — First War of Independence",
+      "estimated_days_standard": 10,
+      "estimated_hours": 15,
+      "key_focus_areas": [
+        "Causes and triggers of the Revolt",
+        "Spread and leadership of the Revolt",
+        "Military campaigns and battles",
+        "British repression and aftermath",
+        "Historical significance and legacy"
+      ],
+      "module_test": {
+        "type": "Comprehensive test",
+        "duration_minutes": 90,
+        "total_questions": 40,
+        "prelims_questions": 30,
+        "mains_essay_1": "Examine the causes of the Revolt of 1857 and critically evaluate the extent to which it was a 'War of Independence'",
+        "mains_essay_2": "Analyze the regional variations in the Revolt of 1857 and explain why it failed despite widespread participation",
+        "passing_criteria_percent": 60
+      },
+      "topics": [
+        {
+          "topic_id": "4.1",
+          "topic_name": "Causes & Contributing Factors",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 2,
+            "chapter_name": "The Revolt of 1857"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 7,
+              "chapter_name": "Weavers, Iron Smelters and Factory Owners"
+            },
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 5,
+              "chapter_name": "The Age of Industrialization"
+            }
+          ],
+          "key_concepts": [
+            "Long-term causes: economic exploitation and deindustrialization",
+            "Peasant grievances: land loss and taxation",
+            "Sepoy grievances: low pay, racial discrimination, caste issues",
+            "Religious sentiments: Christian missionary activities",
+            "Greased cartridges controversy: Enfield rifle ammunition issue",
+            "Cow and pig fat in cartridges: Hindu and Muslim sensibilities",
+            "Doctrine of Lapse: annexation of princely states",
+            "General Service Enlistment Act: overseas service compulsion",
+            "Regional administration changes: Awadh annexation",
+            "Intellectual ferment and nationalist ideas spreading",
+            "Press and communication of grievances",
+            "Local rulers' loss of power and prestige",
+            "Zamindars' anxiety over Permanent Settlement revision",
+            "Military cantonment locations and concentration",
+            "Immediate trigger: Enfield cartridge controversy (January 1857)"
+          ],
+          "important_facts": {
+            "key_dates": [
+              "1856: Enfield rifle introduction and cartridge controversy",
+              "January 1857: Barrackpore mutiny (Mangal Pandey)",
+              "May 10, 1857: Meerut uprising and Delhi march",
+              "May 11, 1857: Delhi captured by rebels",
+              "May 30, 1857: Kanpur uprising",
+              "June 1857: Lucknow uprising",
+              "December 1857: Lucknow recaptured by British"
+            ],
+            "key_triggers": [
+              "Greased cartridge issue: Hindu-Muslim unity",
+              "Caste regulations: social discrimination against sepoys",
+              "Religious conversions: Christian missionary pressure",
+              "Lapse Doctrine: annexation of Satara, Nagpur, Jhansi",
+              "Awadh annexation (1856): personal resentment"
+            ],
+            "key_personalities": [
+              "Mangal Pandey: Barrackpore revolt leader",
+              "Rani Lakshmibai: Jhansi resistance leader",
+              "Nana Sahib: Kanpur revolt leader",
+              "Kunwar Singh: Bihar revolt leader",
+              "Bahadur Shah Zafar: Delhi uprising figurehead"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "4.2",
+          "topic_name": "Spread & Regional Variations",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 2,
+            "chapter_name": "The Revolt of 1857"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 9,
+              "chapter_name": "The Revolt of 1857"
+            }
+          ],
+          "key_concepts": [
+            "North India: primary center of revolt activity",
+            "Delhi: initial capture and symbolic importance",
+            "Kanpur: major revolt center under Nana Sahib",
+            "Lucknow: protracted siege and resistance",
+            "Jhansi: Rani Lakshmibai's heroic resistance",
+            "Bihar: Kunwar Singh's eastern campaign",
+            "Awadh: widespread peasant participation",
+            "Central India: Bundelkhand resistance",
+            "Southern India: limited participation (Madras, Bombay)",
+            "Bengal: mixed participation, landlord hesitation",
+            "Punjab: British recruitment of Sikhs against rebels",
+            "North-Western Frontier: strategic importance",
+            "Urban vs. rural participation variations",
+            "Class variations: peasants, soldiers, zamindars, townspeople",
+            "Caste and community involvement differences"
+          ],
+          "important_facts": {
+            "key_battles_locations": [
+              "Delhi: Bahadur Shah Zafar proclaimed emperor",
+              "Kanpur: Nana Sahib's administration",
+              "Lucknow: Siege lasting 87 days",
+              "Jhansi: Rani Lakshmibai's kingdom defense",
+              "Gwalior: Battle (1858) where Rani Lakshmibai died",
+              "Agrha: Central India resistance"
+            ],
+            "participation_levels": [
+              "Soldiers: 70% of Company sepoys participated",
+              "Peasants: widespread in North-Western Provinces, Awadh",
+              "Zamindars: mixed participation based on interests",
+              "Urban merchants: limited involvement except Kanpur",
+              "Women: Rani Lakshmibai, Begum Hazrat Mahal participation"
+            ],
+            "key_regions": [
+              "North-Central India: Core revolt area",
+              "Awadh: Peasant and soldier uprising",
+              "Kanpur-Lucknow: Major centers",
+              "Jhansi-Gwalior: Western rebellion",
+              "Bihar-Bengal: Eastern uprising",
+              "Delhi: Political and symbolic center"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "4.3",
+          "topic_name": "Key Leaders & Leadership",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 2,
+            "chapter_name": "The Revolt of 1857"
+          },
+          "ncert_reference": [
+            {
+              "class": 8,
+              "book_name": "Our Pasts III",
+              "chapter_number": 9,
+              "chapter_name": "The Revolt of 1857"
+            }
+          ],
+          "key_concepts": [
+            "Military leadership: sepoy commanders and generals",
+            "Traditional rulers: erstwhile kings and nawabs",
+            "Bahadur Shah Zafar: last Mughal emperor's role",
+            "Rani Lakshmibai: woman warrior and symbol of resistance",
+            "Nana Sahib: Kanpur revolt organizer",
+            "Kunwar Singh: Bihar rebellion leader",
+            "Begum Hazrat Mahal: Lucknow revolt leader",
+            "Azimullah Khan: Nana Sahib's strategist",
+            "Maulvi Liaquat Ali: religious revolt leader",
+            "Tatya Tope: military strategist and general",
+            "Leadership composition: soldiers, nobles, religious leaders",
+            "Authority establishment: administrative structures",
+            "Command systems and coordination",
+            "Ideological motivations: restoration vs. modernization",
+            "Differences in vision: Hindu vs. Muslim leadership"
+          ],
+          "important_facts": {
+            "key_leaders": [
+              "Bahadur Shah Zafar II: proclaimed emperor in Delhi (1857)",
+              "Rani Lakshmibai: Jhansi queen, died at Gwalior (1858)",
+              "Nana Sahib: Kanpur leader, escaped after British capture",
+              "Kunwar Singh: Bihar leader, died from wounds (1858)",
+              "Begum Hazrat Mahal: Lucknow leader, escaped to Nepal",
+              "Tatya Tope: military general, executed (1859)",
+              "Mangal Pandey: sepoy mutiny initiator, hanged (1857)"
+            ],
+            "leadership_roles": [
+              "Political leaders: Bahadur Shah Zafar, Nana Sahib",
+              "Military strategists: Tatya Tope, Kunwar Singh",
+              "Religious leaders: Maulvi Liaquat Ali, Ahmadullah",
+              "Women leaders: Rani Lakshmibai, Begum Hazrat Mahal"
+            ],
+            "biographical_details": [
+              "Rani Lakshmibai: born 1828, widow childless, fought for Jhansi",
+              "Nana Sahib: Maratha chief, lost title and income",
+              "Kunwar Singh: Zamindar of Jagdispur, elderly leader",
+              "Bahadur Shah Zafar: 82-year-old emperor, exiled to Burma"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "4.4",
+          "topic_name": "British Suppression & Aftermath",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 2,
+            "chapter_name": "The Revolt of 1857"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 5,
+              "chapter_name": "The Age of Industrialization"
+            }
+          ],
+          "key_concepts": [
+            "British military strategy: three-pronged approach",
+            "General Henry Havelock: Delhi recovery operations",
+            "General Colin Campbell: Lucknow relief and siege",
+            "Recruitment strategy: Sikhs, Gurkhas, loyalist sepoys",
+            "Brutal suppression: indiscriminate killings",
+            "Massacre at Bibighar: Kanpur atrocities",
+            "British counter-massacres and revenge",
+            "Widespread executions: rebels and suspected participants",
+            "Destruction of villages and crops",
+            "Forced migrations and population displacements",
+            "Mutiny in 1859: formal declaration of suppression",
+            "Transfer of power: East India Company to Crown",
+            "Institutional reforms: army reorganization",
+            "Sepoy recruitment policy changes",
+            "Administrative centralization and control strengthening"
+          ],
+          "important_facts": {
+            "key_military_operations": [
+              "May 1857: British mobilization in North-Western Provinces",
+              "June 1857: Delhi siege begins (3 months)",
+              "September 20, 1857: Delhi recaptured",
+              "September-November 1857: Lucknow campaigns",
+              "November 1857: Kanpur recaptured",
+              "1858: Central India campaigns",
+              "May 1859: Formal suppression declared"
+            ],
+            "suppression_statistics": [
+              "Total deaths: 500,000-1 million (estimates vary)",
+              "British forces deployed: 50,000-100,000",
+              "Indian soldiers recruited by British: 150,000",
+              "Executions: 40,000+ (including mass executions)",
+              "Villages destroyed: thousands"
+            ],
+            "key_British_commanders": [
+              "Henry Havelock: Delhi and Cawnpore operations",
+              "Colin Campbell: Lucknow relief and campaign",
+              "Hugh Rose: Central India campaign",
+              "John Nicholson: Delhi siege commander",
+              "Charles Napier: strategic advisor"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "4.5",
+          "topic_name": "Significance & Historical Impact",
+          "primary_book": {
+            "author": "Bipin Chandra",
+            "book_title": "India's Struggle for Independence",
+            "chapter_number": 3,
+            "chapter_name": "The Nationalist Movement and Congress"
+          },
+          "ncert_reference": [
+            {
+              "class": 10,
+              "book_name": "India and the Contemporary World II",
+              "chapter_number": 5,
+              "chapter_name": "Nationalism in India"
+            }
+          ],
+          "key_concepts": [
+            "First organized resistance to British rule",
+            "War of Independence vs. Sepoy Mutiny debate",
+            "Religious and patriotic dimensions combined",
+            "Peasant, soldier, and noble participation",
+            "Transformation of British governance: Company to Crown",
+            "Impact on British-Indian relations and policies",
+            "Indian national consciousness development",
+            "Sepoy recruitment policy changes: caste and region consideration",
+            "Administrative changes: Indian Civil Service expansion",
+            "Educational opportunities expansion for Indians",
+            "Constitutional changes: Government of India Act 1858",
+            "Viceregal system establishment",
+            "End of Doctrine of Lapse policy",
+            "Recognition of Indian princes' rights",
+            "Foundation for later nationalist movements"
+          ],
+          "important_facts": {
+            "key_structural_changes": [
+              "1858: Government of India Act - Crown takes direct control",
+              "1858: East India Company dissolved",
+              "1858: Viceroy appointed instead of Governor-General",
+              "1861: Indian Councils Act - Indian representation",
+              "1870s: Indian Civil Service examinations in India (reduced 1879)"
+            ],
+            "policy_changes": [
+              "Doctrine of Lapse abandoned (1859)",
+              "Recognition of princely states' rights",
+              "Careful sepoy recruitment: caste and loyalty consideration",
+              "Regional military distribution: garrison system",
+              "English education expansion"
+            ],
+            "long_term_impacts": [
+              "Inspired future nationalist movements",
+              "Brought Indians from all backgrounds together",
+              "Demonstrated capacity for organized resistance",
+              "Led to British policy reassessment"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        }
+      ]
+    }
+  ],
+  "important_acts_chronology": [
+    {
+      "year": 1773,
+      "act_name": "Regulating Act",
+      "provisions": [
+        "Established Governor-General of India",
+        "Created Supreme Court in Calcutta",
+        "Stipulated East India Company's accountability to British Parliament",
+        "First regulatory act by British Parliament",
+        "Warren Hastings became first Governor-General"
+      ],
+      "significance": "First constitutional framework for British India"
+    },
+    {
+      "year": 1784,
+      "act_name": "Pitt's India Act",
+      "provisions": [
+        "Dual control system: Crown and East India Company",
+        "Board of Control created under Crown supervision",
+        "Strengthened Parliament's control over Company",
+        "Subordinated Company to Crown authority",
+        "Established Secretary of State for India position"
+      ],
+      "significance": "Enhanced British governmental control over India"
+    },
+    {
+      "year": 1793,
+      "act_name": "Cornwallis Code (Charter Act amendment)",
+      "provisions": [
+        "Separation of executive and judicial functions",
+        "Permanent Settlement of Bengal established",
+        "District collectors appointed as chief administrators",
+        "Civil service regulations and hierarchy",
+        "Criminal law procedures codified"
+      ],
+      "significance": "Foundation of British administrative structure"
+    },
+    {
+      "year": 1813,
+      "act_name": "Charter Act of 1813",
+      "provisions": [
+        "Opened India to British merchants (ended Company monopoly)",
+        "Allowed missionary activities in India",
+        "1 lakh rupees for Indian education allocation",
+        "Strengthened Parliament's control over Company",
+        "Extended Company's charter for 20 years"
+      ],
+      "significance": "First official provision for education in India"
+    },
+    {
+      "year": 1833,
+      "act_name": "Charter Act of 1833",
+      "provisions": [
+        "Centralized British administration under Governor-General",
+        "Governor-General became supreme authority",
+        "Company's commercial functions abolished",
+        "Indian Civil Service established for British officers",
+        "Abolished monopolies on various commodities"
+      ],
+      "significance": "Transformed Company into administrative entity"
+    },
+    {
+      "year": 1853,
+      "act_name": "Charter Act of 1853",
+      "provisions": [
+        "Extended Company's charter indefinitely",
+        "Legislative functions separated from executive",
+        "Legislative Council expanded with Indian members",
+        "Indian Civil Service opened to competitive examinations",
+        "Government of India modernized"
+      ],
+      "significance": "Beginning of Indian participation in governance"
+    },
+    {
+      "year": 1858,
+      "act_name": "Government of India Act 1858",
+      "provisions": [
+        "Dissolved East India Company",
+        "Crown took direct control of India",
+        "Viceroy appointed as chief executive",
+        "Secretary of State for India created",
+        "Crown declared sovereign of India"
+      ],
+      "significance": "Formally established British Crown rule in India"
+    },
+    {
+      "year": 1861,
+      "act_name": "Indian Councils Act 1861",
+      "provisions": [
+        "Expanded Legislative Council with Indian members",
+        "Indians appointed non-official members",
+        "Local councils established in provinces",
+        "Foundation for later representative institutions",
+        "Limited Indian voice in administration"
+      ],
+      "significance": "First official Indian participation in governance"
+    },
+    {
+      "year": 1872,
+      "act_name": "Indian Evidence Act",
+      "provisions": [
+        "Standardized rules of evidence",
+        "Established burden of proof",
+        "Defined witness testimony rules",
+        "British legal concepts applied",
+        "Codified evidentiary procedures"
+      ],
+      "significance": "Unified evidence law across India"
+    },
+    {
+      "year": 1860,
+      "act_name": "Indian Penal Code",
+      "provisions": [
+        "Unified criminal law for entire India",
+        "Replaced local criminal codes",
+        "British legal principles applied",
+        "Sections 121-137: covering sedition and treason",
+        "Applicable to all Indians equally"
+      ],
+      "significance": "First comprehensive uniform law in India"
+    },
+    {
+      "year": 1876,
+      "act_name": "Queen Victoria Title Change",
+      "provisions": [
+        "Victoria proclaimed Empress of India",
+        "Enhanced imperial status of Crown rule",
+        "Symbolic assertion of British sovereignty",
+        "Changed relationship terminology with India"
+      ],
+      "significance": "Formal imperial consolidation"
+    },
+    {
+      "year": 1882,
+      "act_name": "Local Self-Government Act",
+      "provisions": [
+        "Established local councils",
+        "Indian participation in local administration",
+        "Municipal and district boards created",
+        "Limited Indian voice in governance",
+        "Foundation for representative institutions"
+      ],
+      "significance": "First meaningful Indian participation in local governance"
+    }
+  ],
+  "governor_generals_and_viceroys": [
+    {
+      "name": "Warren Hastings",
+      "period": "1772-1785",
+      "title": "Governor-General",
+      "key_achievements": [
+        "First effective Governor-General",
+        "Consolidated British territorial control",
+        "Administrative reforms and reorganization",
+        "Established revenue collection systems",
+        "Regulated trade and monopolies"
+      ],
+      "controversies": [
+        "Impeached by British Parliament (acquitted)",
+        "Extractive revenue policies",
+        "Questioned for despotic governance"
+      ]
+    },
+    {
+      "name": "Lord Cornwallis",
+      "period": "1786-1793",
+      "title": "Governor-General",
+      "key_achievements": [
+        "Judicial and civil service reforms",
+        "Permanent Settlement of Bengal (1793)",
+        "Separated executive and judicial functions",
+        "Improved administration and transparency",
+        "Created bureaucratic structure"
+      ],
+      "controversies": [
+        "Permanent Settlement locked peasants into exploitation",
+        "Zamindari strengthening harmed peasants"
+      ]
+    },
+    {
+      "name": "Lord William Bentinck",
+      "period": "1828-1835",
+      "title": "Governor-General",
+      "key_achievements": [
+        "Abolished Sati (widow-burning) in 1829",
+        "Social reform initiatives",
+        "Reduced military expenditure",
+        "Educational reforms under Macaulay",
+        "Administrative efficiency improvements"
+      ],
+      "significance": "Key social reformer among viceroys"
+    },
+    {
+      "name": "Lord Dalhousie",
+      "period": "1848-1856",
+      "title": "Governor-General",
+      "key_achievements": [
+        "Doctrine of Lapse: annexed princely states",
+        "Infrastructure development: railways, telegraphs",
+        "Administrative centralization",
+        "Educational expansion",
+        "Military reorganization"
+      ],
+      "controversies": [
+        "Doctrine of Lapse angered Indian princes",
+        "Major cause of 1857 Revolt",
+        "Annexation of Awadh (1856)"
+      ]
+    },
+    {
+      "name": "Lord Canning",
+      "period": "1856-1862",
+      "title": "Governor-General/Viceroy",
+      "key_achievements": [
+        "Suppressed Revolt of 1857",
+        "Transferred Crown rule from Company",
+        "Reconciliation policies after revolt",
+        "Administrative reorganization",
+        "Military restructuring"
+      ],
+      "significance": "Transition from Company to Crown rule"
+    },
+    {
+      "name": "Lord Curzon",
+      "period": "1898-1905",
+      "title": "Viceroy",
+      "key_achievements": [
+        "Partition of Bengal (1905)",
+        "Administrative reorganization",
+        "Educational reforms",
+        "Archaeological reforms",
+        "Infrastructure expansion"
+      ],
+      "controversies": [
+        "Bengal Partition sparked nationalist movement",
+        "Swadeshi and Boycott movements",
+        "Autocratic administrative style"
+      ]
+    }
+  ],
+  "major_sessions_of_indian_national_congress": [
+    {
+      "year": 1885,
+      "session": "First Session",
+      "location": "Bombay",
+      "president": "Womesh Chandra Banerjee",
+      "significance": "Establishment of Indian National Congress",
+      "key_features": [
+        "72 delegates from across India",
+        "Foundation of organized nationalism",
+        "Moderate approach to British rule",
+        "Constitutional methods endorsed"
+      ]
+    },
+    {
+      "year": 1905,
+      "session": "Session (Varanasi/Benares)",
+      "location": "Varanasi",
+      "president": "Gopal Krishna Gokhale",
+      "significance": "Peak of moderate politics, transition to extremism",
+      "key_features": [
+        "Extremists gaining influence",
+        "Debate over tactics",
+        "Support for national education",
+        "Swadeshi movement advocacy"
+      ]
+    },
+    {
+      "year": 1906,
+      "session": "Session (Calcutta)",
+      "location": "Calcutta",
+      "president": "Dadabhai Naoroji",
+      "significance": "Swaraj (self-government) resolution passed",
+      "key_features": [
+        "Swaraj declared as political goal",
+        "Complete independence envisioned",
+        "Split between moderates and extremists",
+        "Vigorous debate on methods"
+      ]
+    },
+    {
+      "year": 1920,
+      "session": "Calcutta Session",
+      "location": "Calcutta",
+      "president": "Lala Lajpat Rai",
+      "significance": "Gandhi's non-cooperation resolution passed",
+      "key_features": [
+        "Non-Cooperation Movement endorsed",
+        "Mass participation approved",
+        "Boycott of British goods",
+        "Civil Disobedience approach adopted"
+      ]
+    },
+    {
+      "year": 1931,
+      "session": "Karachi Session",
+      "location": "Karachi",
+      "president": "Sardar Vallabhbhai Patel",
+      "significance": "Fundamental Rights and National Economic Policy adopted",
+      "key_features": [
+        "Social and economic provisions",
+        "Minority rights protection",
+        "Fundamental duties outlined",
+        "Blueprint for future constitution"
+      ]
+    }
+  ],
+  "press_acts_and_education_policies": [
+    {
+      "act_name": "Vernacular Press Act (1878)",
+      "details": {
+        "year": 1878,
+        "governor_general": "Lord Lytton",
+        "purpose": "Control native language press",
+        "provisions": [
+          "Vernacular newspapers required security deposit",
+          "Seditious content prohibition",
+          "Confiscation powers on offending publications",
+          "Criminal prosecution for editors",
+          "Strict censorship powers"
+        ],
+        "impact": "Led to nationalist outcry and Press Act repeal in 1882",
+        "significance": "Symbol of British press suppression"
+      }
+    },
+    {
+      "act_name": "Seditious Meetings Act (1907)",
+      "details": {
+        "year": 1907,
+        "purpose": "Control political meetings and assemblies",
+        "provisions": [
+          "Meetings deemed seditious could be prohibited",
+          "Police power to disperse assemblies",
+          "Permits required for public meetings",
+          "Criminal prosecution for organizers"
+        ],
+        "impact": "Suppressed nationalist activities and gatherings"
+      }
+    },
+    {
+      "act_name": "Macaulay's Minute on Education (1835)",
+      "details": {
+        "year": 1835,
+        "purpose": "Defined educational policy",
+        "provisions": [
+          "English as medium of instruction",
+          "Downward filtration theory",
+          "Emphasis on Western knowledge",
+          "Creation of English-educated class"
+        ],
+        "impact": "Transformed Indian education system",
+        "long_term_effects": "Created English-educated Indian elite"
+      }
+    },
+    {
+      "act_name": "Hunter Education Commission (1882)",
+      "details": {
+        "year": 1882,
+        "purpose": "Assess and improve school education",
+        "recommendations": [
+          "Decentralized control of schools",
+          "Increased local participation",
+          "Female education expansion",
+          "Vernacular language use",
+          "Practical subjects inclusion"
+        ]
+      }
+    }
+  ],
+  "next_modules_preview": {
+    "module_5": "Social & Religious Reform Movements (1800-1900)",
+    "module_6": "Rise of Indian Nationalism & INC Formation (1870-1885)",
+    "module_7": "Extremism, Partition of Bengal & Swadeshi Movement (1905-1911)",
+    "module_8": "Gandhian Era — Non-Cooperation & Civil Disobedience (1920-1934)",
+    "module_9": "Revolutionary Movements & Other Strands (1900-1947)",
+    "module_10": "Quit India, Final Phase & Independence (1942-1947)",
+    "module_11": "Constitutional Development — Acts 1773-1947",
+    "module_12": "Post-Independence — Integration of Princely States (1947-1950)"
+  },
+  "study_tips_for_modern_history": {
+    "chronological_mapping": "Create timeline of events (1600-1947) with major turning points",
+    "connections": "Link causes of 1857 to rise of nationalism and independence struggle",
+    "personalities": "Associate leaders with their contributions and time periods",
+    "act_memorization": "Remember acts with years, provisions, and significance",
+    "regional_focus": "Understand regional variations in revolt and nationalist movements",
+    "economic_impact": "Connect economic policies to peasant grievances and movements",
+    "quote_retention": "Remember key quotes from leaders for mains answers",
+    "map_practice": "Practice identifying regions of different movements and battles"
+  }
+}

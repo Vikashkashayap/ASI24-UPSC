@@ -4,8 +4,17 @@ import { authAPI } from "../services/api";
 
 export type User = {
   id: string;
+  createdAt?: string;
   name: string;
   email: string;
+  phone?: string;
+  city?: string;
+  attempt?: string;
+  targetYear?: string;
+  prepStartDate?: string;
+  dailyStudyHours?: string;
+  educationBackground?: string;
+  isEmailVerified?: boolean;
   role?: "student" | "admin" | "agent" | "mentor";
   mustChangePassword?: boolean;
   // Subscription / billing metadata (optional; provided by backend)
