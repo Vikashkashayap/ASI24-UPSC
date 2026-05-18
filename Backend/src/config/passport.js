@@ -31,6 +31,7 @@ export function ensureGoogleStrategy(req) {
 
   const callbackURL = getGoogleCallbackUrl(req);
 
+  
   passport.use(
     new GoogleStrategy(
       {
