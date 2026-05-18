@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 import { enrichQuestionsWithHindi } from "./questionTranslationService.js";
 
 /** Apply Hindi translations after English generation (non-blocking fallback on failure). */
@@ -612,7 +613,7 @@ async function generateFullMockCsatBatch(apiKey, model, batchSize, batchLabel) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "UPSC Mentor - CSAT Mock Generator",
     },
     body: JSON.stringify({
@@ -718,7 +719,7 @@ async function generateFullMockPyoBatch(apiKey, model, batchSize, batchLabel, ye
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "UPSC Mentor - PYQ Mock Generator",
     },
     body: JSON.stringify({
@@ -841,7 +842,7 @@ Return ONLY valid JSON with "examTitle" or "test_name", "questions" array. Each 
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "UPSC Mentor - Full Mock Mix Generator",
     },
     body: JSON.stringify({
@@ -1177,7 +1178,7 @@ Example: [{"question":"...","options":["opt A","opt B","opt C","opt D"],"answer"
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "UPSC Mentor - Full Mock Generator",
     },
     body: JSON.stringify({
@@ -1473,7 +1474,7 @@ export const generateTestQuestions = async ({
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+        "HTTP-Referer": getFrontendOrigin(),
         "X-Title": "UPSC Mentor - Prelims Test Generator",
       },
       body: JSON.stringify({

@@ -1,5 +1,6 @@
 import CurrentAffair from "../models/CurrentAffair.js";
 import { runCurrentAffairsPipeline } from "../services/currentAffairsPipeline.js";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 
 /**
  * GET /api/current-affairs
@@ -194,7 +195,7 @@ Return ONLY the JSON array, no other text.`;
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.CLIENT_ORIGIN || "http://localhost:5173",
+        "HTTP-Referer": getFrontendOrigin(),
         "X-Title": "MentorsDaily - Current Affairs MCQs",
       },
       body: JSON.stringify({

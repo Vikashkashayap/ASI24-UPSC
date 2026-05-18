@@ -1,3 +1,5 @@
+import { getFrontendOrigin } from "../config/urlConfig.js";
+
 /**
  * AI Service – OpenRouter (OpenAI GPT-4o mini) for UPSC current affairs structured output
  * Uses strict JSON prompt; validates with schema expectations.
@@ -69,7 +71,7 @@ export async function isUpscRelevant(article) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "MentorsDaily - UPSC Relevance",
     },
     body: JSON.stringify({
@@ -153,7 +155,7 @@ export async function generateCurrentAffairFromNews(article, sourceUrl = null) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      "HTTP-Referer": getFrontendOrigin(),
       "X-Title": "MentorsDaily - Current Affairs",
     },
     body: JSON.stringify({

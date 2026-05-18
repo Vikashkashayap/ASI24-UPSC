@@ -1,5 +1,6 @@
 import { RunnableLambda } from "@langchain/core/runnables";
 import fetch from "node-fetch";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 
 /**
  * Translator Agent for real-time speech-to-speech translation
@@ -62,7 +63,7 @@ Do not add explanations or notes, only provide the translated text.`;
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+          "HTTP-Referer": getFrontendOrigin(),
           "X-Title": "Meeting Translator",
         },
         body: JSON.stringify({

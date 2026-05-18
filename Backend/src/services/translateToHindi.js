@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 
 const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
 
@@ -28,7 +29,7 @@ export async function translateToHindi(text) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.FRONTEND_URL || "http://localhost:5173",
+        "HTTP-Referer": getFrontendOrigin(),
         "X-Title": "UPSC Mentor - Hindi Translation",
       },
       body: JSON.stringify({

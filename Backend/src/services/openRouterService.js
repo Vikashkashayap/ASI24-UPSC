@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 
 /**
  * OpenRouter API Service
@@ -43,17 +44,17 @@ export const callOpenRouterAPI = async ({
     console.log("🌐 Base URL:", OPENROUTER_BASE_URL);
 
     // OpenRouter requires HTTP-Referer and X-Title headers (exact values as per requirements)
-    // Use API key directly without trimming, same as working agents
+    const frontendOrigin = getFrontendOrigin();
     const headers = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
-      "HTTP-Referer": "http://localhost:5173",
+      "HTTP-Referer": frontendOrigin,
       "X-Title": "UPSC Mentor - Prelims Test Generator",
     };
 
     console.log("📤 Request headers:");
     console.log("   Authorization:", `Bearer ${apiKey.substring(0, 15)}...`);
-    console.log("   HTTP-Referer:", "http://localhost:5173");
+    console.log("   HTTP-Referer:", frontendOrigin);
     console.log("   X-Title:", "UPSC Mentor - Prelims Test Generator");
 
     const requestBody = {

@@ -1,8 +1,8 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { findOrCreateGoogleUser } from "../services/authService.js";
+import { getFrontendOrigin, getGoogleCallbackUrl } from "./urlConfig.js";
 
-const CALLBACK_PATH = "/api/auth/google/callback";
 let googleStrategyRegistered = false;
 
 function getGoogleCredentials() {
@@ -17,45 +17,6 @@ export function isGoogleOAuthConfigured() {
   return Boolean(clientID && clientSecret);
 }
 
-/** Backend public URL (no trailing slash). */
-export function getBackendBaseUrl(req) {
-  const fromEnv = (
-    process.env.BASE_URL ||
-    process.env.BACKEND_URL ||
-    ""
-  )
-    .trim()
-    .replace(/\/$/, "");
-
-  if (fromEnv) return fromEnv;
-
-  if (req?.protocol && req.get?.("host")) {
-    return `${req.protocol}://${req.get("host")}`;
-  }
-
-  return "http://localhost:5000";
-}
-
-/** OAuth redirect URI — must match Google Cloud Console exactly. */
-export function getCallbackUrl(req) {
-  const explicit = (process.env.GOOGLE_CALLBACK_URL || "").trim();
-  if (explicit) return explicit.replace(/\/$/, "");
-
-  return `${getBackendBaseUrl(req)}${CALLBACK_PATH}`;
-}
-
-function getFrontendOrigin(req) {
-  const fromEnv = (process.env.CLIENT_ORIGIN || "").trim().replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
-
-  const base = getBackendBaseUrl(req);
-  if (base && base !== "http://localhost:5000") {
-    return base;
-  }
-
-  return "http://localhost:5173";
-}
-
 /**
  * Register the Google strategy once env vars are available.
  * Safe to call on every OAuth request (no-op after first registration).
@@ -68,7 +29,7 @@ export function ensureGoogleStrategy(req) {
     return false;
   }
 
-  const callbackURL = getCallbackUrl(req);
+  const callbackURL = getGoogleCallbackUrl(req);
 
   passport.use(
     new GoogleStrategy(
@@ -106,7 +67,7 @@ export const googleAuth = (req, res, next) => {
       .json({ message: "Google login is not configured" });
   }
 
-  const callbackURL = getCallbackUrl(req);
+  const callbackURL = getGoogleCallbackUrl(req);
 
   passport.authenticate("google", {
     scope: ["profile", "email"],
@@ -123,7 +84,7 @@ export const googleAuthCallback = (req, res, next) => {
     );
   }
 
-  const callbackURL = getCallbackUrl(req);
+  const callbackURL = getGoogleCallbackUrl(req);
 
   passport.authenticate(
     "google",

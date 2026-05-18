@@ -3,22 +3,25 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 import { joinMeetingRoom, leaveMeetingRoom, getRoomParticipants } from "./meetingService.js";
 import { translatorAgent } from "../agents/translatorAgent.js";
+import { getFrontendOrigin } from "../config/urlConfig.js";
 
 /**
  * Socket.io service for WebRTC signaling and real-time translation
  */
 export const initializeSocketIO = (server) => {
-  // CORS configuration to allow both common Vite dev ports
-  const defaultOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-  const allowedOrigins = [
-    defaultOrigin,
-    "http://localhost:5173",
-    "http://localhost:5174"
-  ].filter((origin, index, self) => self.indexOf(origin) === index); // Remove duplicates
+  const defaultOrigin = getFrontendOrigin();
+  const allowedOrigins = [defaultOrigin, "https://studentportal.mentorsdaily.com"]
+    .filter(Boolean)
+    .map((origin) => origin.replace(/\/$/, ""));
+
+  if (process.env.NODE_ENV !== "production") {
+    allowedOrigins.push("http://localhost:5173", "http://localhost:5174");
+  }
+  const uniqueOrigins = [...new Set(allowedOrigins)];
 
   const io = new Server(server, {
     cors: {
-      origin: allowedOrigins,
+      origin: uniqueOrigins,
       credentials: true,
     },
   });

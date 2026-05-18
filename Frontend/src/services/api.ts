@@ -1,10 +1,13 @@
 import axios from "axios";
 
 // VITE_API_URL can be:
-//   - "http://localhost:5000" (local) → base = origin, paths /api/auth/login
+//   - "http://localhost:5000" (local) → base = localhost backend
 //   - "/api" (production same-origin) → base = "" so /api/auth/login goes to same host
-//   - "https://example.com/api" → we strip /api so base = https://example.com
-const raw = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/$/, "");
+//   - "https://studentportal.mentorsdaily.com/api" (production explicit) → base = https://studentportal.mentorsdaily.com
+const defaultApiUrl =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.MODE === "development" ? "http://localhost:5000" : "/api");
+const raw = defaultApiUrl.replace(/\/$/, "");
 const stripped = raw.replace(/\/api$/i, "").trim();
 let baseURL: string;
 if (stripped === "" && raw === "/api") {

@@ -37,11 +37,17 @@ app.set("trust proxy", 1);
 /* -------------------- CORS -------------------- */
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://15.207.108.185",
+  process.env.CLIENT_ORIGIN,
+  process.env.CLIENT_URL,
+  process.env.FRONTEND_URL,
   "https://studentportal.mentorsdaily.com",
-];
+]
+  .filter(Boolean)
+  .map((origin) => origin.replace(/\/$/, ""));
+
+if (process.env.NODE_ENV !== "production") {
+  allowedOrigins.push("http://localhost:5173", "http://localhost:5174");
+}
 
 app.use(
   cors({
