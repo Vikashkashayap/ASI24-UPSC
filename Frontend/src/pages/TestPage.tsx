@@ -4,14 +4,28 @@ import { ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle } from "luci
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { ConfirmationDialog } from "../components/ui/dialog";
-import { SafeQuestionHtml } from "../components/SafeQuestionHtml";
+import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
 interface Question {
   _id: string;
   question: string;
+  question_en?: string;
+  question_hi?: string;
   options: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  options_en?: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  options_hi?: {
     A: string;
     B: string;
     C: string;
@@ -282,19 +296,7 @@ const TestPage: React.FC = () => {
                 {/* Match the following: show question/statement at TOP above the lists */}
                 {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && currentQuestion.question?.trim() && (
                   <div className="mb-3">
-                    {currentQuestion.question.includes("<table") ? (
-                      <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                    ) : (
-                      currentQuestion.question.split("\n").map((line, lineIdx) => {
-                        const trimmedLine = line.trim();
-                        if (!trimmedLine) return null;
-                        return (
-                          <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                            {trimmedLine}
-                          </div>
-                        );
-                      })
-                    )}
+                    <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml stemOnly />
                   </div>
                 )}
                 {/* Assertion–Reason block (do not repeat assertion in question text below) */}
@@ -358,79 +360,52 @@ const TestPage: React.FC = () => {
                   (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason)
                 ) &&
                   !(currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0) && (
-                  <>
-                    {currentQuestion.question.includes("<table") ? (
-                      <SafeQuestionHtml html={currentQuestion.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                    ) : (
-                      currentQuestion.question.split("\n").map((line, lineIdx) => {
-                        const trimmedLine = line.trim();
-                        if (!trimmedLine) return null;
-                        const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                        if (numberedMatch) {
-                          return (
-                            <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                              <span className="font-bold mr-1">{numberedMatch[1]}.</span>
-                              <span>{numberedMatch[2]}</span>
-                            </div>
-                          );
-                        }
-                        if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
-                          return (
-                            <div key={lineIdx} className={`mt-3 mb-2 font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
-                              {trimmedLine}
-                            </div>
-                          );
-                        }
-                        return (
-                          <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                            {trimmedLine}
-                          </div>
-                        );
-                      }).filter(Boolean)
-                    )}
-                  </>
+                  <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml />
                 )}
               </div>
             </div>
 
-            {/* Options - touch-friendly, tap again to unselect */}
-            <div className="space-y-2 sm:space-y-3">
-              {(["A", "B", "C", "D"] as const).map((option) => {
-                const optionText = currentQuestion.options[option];
-                const isSelected = answers[currentQuestion._id] === option;
+            {currentQuestion.matchColumns?.columnA?.length != null &&
+              currentQuestion.matchColumns.columnA.length > 0 && (
+              <UpscPaperQuestionBlock
+                question={currentQuestion}
+                theme={theme}
+                allowHtml
+                showQuestion={false}
+              />
+            )}
 
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => handleAnswerSelect(currentQuestion._id, option)}
-                    className={`w-full text-left p-3 sm:p-4 min-h-[48px] sm:min-h-[56px] rounded-xl border-2 transition-all active:scale-[0.99] touch-manipulation ${
-                      isSelected
-                        ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20"
-                        : theme === "dark"
-                        ? "border-slate-700 bg-slate-800 hover:border-slate-600 active:border-slate-500"
-                        : "border-slate-300 bg-white hover:border-slate-400 active:border-slate-500"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`flex-shrink-0 w-7 h-7 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center text-sm font-semibold ${
-                          isSelected
-                            ? "border-purple-600 bg-purple-600 text-white"
-                            : theme === "dark"
-                            ? "border-slate-600 text-slate-400"
-                            : "border-slate-400 text-slate-600"
-                        }`}
-                      >
-                        {isSelected ? <CheckCircle className="w-4 h-4" /> : option}
-                      </div>
-                      <span className={`flex-1 text-sm sm:text-base break-words ${theme === "dark" ? "text-slate-200" : "text-slate-700"}`}>
-                        {optionText}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+            {currentQuestion.assertionReason?.assertion != null &&
+            (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
+              <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml showQuestion={false} />
+            )}
+
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <p className={`text-xs font-medium uppercase tracking-wide mb-3 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                Select your answer
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                {(["A", "B", "C", "D"] as const).map((option) => {
+                  const isSelected = answers[currentQuestion._id] === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => handleAnswerSelect(currentQuestion._id, option)}
+                      className={`flex items-center justify-center gap-2 p-3 sm:p-4 min-h-[52px] rounded-xl border-2 transition-all active:scale-[0.99] touch-manipulation font-semibold text-base sm:text-lg ${
+                        isSelected
+                          ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
+                          : theme === "dark"
+                          ? "border-slate-700 bg-slate-800 hover:border-slate-600 text-slate-200"
+                          : "border-slate-300 bg-white hover:border-slate-400 text-slate-800"
+                      }`}
+                    >
+                      {isSelected ? <CheckCircle className="w-5 h-5" /> : null}
+                      <span>({option.toLowerCase()})</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -535,4 +510,5 @@ const TestPage: React.FC = () => {
 };
 
 export default TestPage;
+
 

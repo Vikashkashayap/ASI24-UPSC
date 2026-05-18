@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { useTheme } from "../hooks/useTheme";
 import { CalendarClock, Target, RefreshCw, CalendarDays } from "lucide-react";
 import { StudyPlanSetupForm } from "../components/studyPlanner/StudyPlanSetupForm";
+import { Dialog, DialogContent } from "../components/ui/dialog";
 import { DailyTasksList } from "../components/studyPlanner/DailyTasksList";
 import { ProgressBar } from "../components/studyPlanner/ProgressBar";
 import { CalendarView } from "../components/studyPlanner/CalendarView";
@@ -28,6 +29,7 @@ export const PlannerPage = () => {
   const [loadingTaskId, setLoadingTaskId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(toDateString(new Date()));
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showRegenerateForm, setShowRegenerateForm] = useState(false);
 
   const fetchPlan = useCallback(async () => {
     try {
@@ -66,17 +68,17 @@ export const PlannerPage = () => {
     }
   };
 
-  const handleRegenerate = async () => {
-    if (!plan) return;
+  const handleRegenerate = async (data: {
+    examDate: string;
+    dailyHours: number;
+    preparationLevel: string;
+  }) => {
     setSetupLoading(true);
     try {
-      const res = await studyPlanAPI.setup({
-        examDate: plan.examDate,
-        dailyHours: plan.dailyHours,
-        preparationLevel: plan.preparationLevel,
-      });
+      const res = await studyPlanAPI.setup(data);
       setPlan(res.data.plan);
       setProgress(res.data.progress);
+      setShowRegenerateForm(false);
     } finally {
       setSetupLoading(false);
     }
@@ -178,7 +180,7 @@ export const PlannerPage = () => {
           <Button
             variant="primary"
             type="button"
-            onClick={handleRegenerate}
+            onClick={() => setShowRegenerateForm(true)}
             disabled={setupLoading}
             className="!bg-emerald-600 hover:!bg-emerald-700 !text-white border-0 shrink-0"
           >
@@ -298,6 +300,24 @@ export const PlannerPage = () => {
           </Card>
         </div>
       </div>
+
+      <Dialog open={showRegenerateForm} onOpenChange={setShowRegenerateForm}>
+        <DialogContent className="max-w-2xl p-0">
+          <StudyPlanSetupForm
+            key={showRegenerateForm ? "regenerate-open" : "regenerate-closed"}
+            initialValues={{
+              examDate: plan.examDate,
+              dailyHours: plan.dailyHours,
+              preparationLevel: plan.preparationLevel,
+            }}
+            onSubmit={handleRegenerate}
+            isLoading={setupLoading}
+            title="Regenerate your study plan"
+            description="Update your exam date, daily hours, or preparation level. We'll rebuild your plan from scratch based on your weak areas."
+            submitLabel="Regenerate plan"
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Weekly goals card (static summary) */}
       <Card className={theme === "dark" ? "bg-slate-800/90 border-cyan-500/20" : "bg-white border-cyan-200/50"}>

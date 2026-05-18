@@ -5,9 +5,24 @@ import { Input } from "../ui/input";
 import { useTheme } from "../../hooks/useTheme";
 import { CalendarClock, Loader2 } from "lucide-react";
 
+export interface StudyPlanSetupValues {
+  examDate: string;
+  dailyHours: number;
+  preparationLevel: string;
+}
+
 export interface StudyPlanSetupFormProps {
-  onSubmit: (data: { examDate: string; dailyHours: number; preparationLevel: string }) => Promise<void>;
+  onSubmit: (data: StudyPlanSetupValues) => Promise<void>;
   isLoading?: boolean;
+  initialValues?: StudyPlanSetupValues;
+  title?: string;
+  description?: string;
+  submitLabel?: string;
+}
+
+function toInputDate(value: string): string {
+  if (!value) return "";
+  return value.includes("T") ? value.split("T")[0] : value.slice(0, 10);
 }
 
 const PREP_LEVELS = [
@@ -16,11 +31,20 @@ const PREP_LEVELS = [
   { value: "advanced", label: "Advanced" },
 ] as const;
 
-export function StudyPlanSetupForm({ onSubmit, isLoading = false }: StudyPlanSetupFormProps) {
+export function StudyPlanSetupForm({
+  onSubmit,
+  isLoading = false,
+  initialValues,
+  title = "Set up your study plan",
+  description = "Set your exam target (e.g. UPSC Prelims 2026), daily study hours, and level. We'll generate a rotation plan with daily tasks and 1-3-7 revision.",
+  submitLabel = "Generate study plan",
+}: StudyPlanSetupFormProps) {
   const { theme } = useTheme();
-  const [examDate, setExamDate] = useState("");
-  const [dailyHours, setDailyHours] = useState(6);
-  const [preparationLevel, setPreparationLevel] = useState("intermediate");
+  const [examDate, setExamDate] = useState(() => toInputDate(initialValues?.examDate ?? ""));
+  const [dailyHours, setDailyHours] = useState(initialValues?.dailyHours ?? 6);
+  const [preparationLevel, setPreparationLevel] = useState(
+    initialValues?.preparationLevel ?? "intermediate"
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,10 +82,10 @@ export function StudyPlanSetupForm({ onSubmit, isLoading = false }: StudyPlanSet
           </div>
           <div>
             <CardTitle className={theme === "dark" ? "text-slate-50" : "text-slate-900"}>
-              Set up your study plan
+              {title}
             </CardTitle>
             <CardDescription className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>
-              Set your exam target (e.g. UPSC Prelims 2026), daily study hours, and level. We'll generate a rotation plan with daily tasks and 1-3-7 revision.
+              {description}
             </CardDescription>
           </div>
         </div>
@@ -154,7 +178,7 @@ export function StudyPlanSetupForm({ onSubmit, isLoading = false }: StudyPlanSet
                 Generating plan…
               </>
             ) : (
-              "Generate study plan"
+              submitLabel
             )}
           </Button>
         </form>

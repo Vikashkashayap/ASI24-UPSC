@@ -1285,6 +1285,7 @@ export const createStudent = async (req, res) => {
       password: tempPassword,
       role: "student",
       isActive: true,
+      isEmailVerified: true,
       mustChangePassword: true,
       createdBy: req.user?._id,
       // Admin-created users should have active subscriptions by default

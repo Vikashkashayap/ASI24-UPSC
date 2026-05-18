@@ -1,5 +1,16 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
+import { enrichQuestionsWithHindi } from "./questionTranslationService.js";
+
+/** Apply Hindi translations after English generation (non-blocking fallback on failure). */
+async function finalizeGeneratedQuestions(questions) {
+  try {
+    return await enrichQuestionsWithHindi(questions, 4);
+  } catch (error) {
+    console.error("finalizeGeneratedQuestions:", error.message);
+    return questions;
+  }
+}
 
 /** Generate unique question ID for deduplication (hash of normalized question text). */
 function hashQuestion(questionText) {
@@ -678,10 +689,12 @@ export const generateFullMockCsatTestQuestions = async () => {
 
     console.log(`✅ Full mock CSAT: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
+    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+
     return {
       success: true,
-      questions: finalQuestions,
-      count: finalQuestions.length,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
       testName: testName || "Prelims Mock - CSAT Paper 2",
     };
   } catch (error) {
@@ -783,10 +796,12 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
 
     console.log(`✅ Full mock PYQ: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
+    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+
     return {
       success: true,
-      questions: finalQuestions,
-      count: finalQuestions.length,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
       testName: testName || `Prelims Mock - PYQ ${yearFrom}-${yearTo}`,
     };
   } catch (error) {
@@ -963,10 +978,12 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
 
     console.log(`✅ Full mock MIX: ${deduped.length} unique generated, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
+    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+
     return {
       success: true,
-      questions: finalQuestions,
-      count: finalQuestions.length,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
       testName: testName || (isSectional ? "Prelims Mock - Sectional 50" : "Prelims Mock - Full Length GS Mix"),
     };
   } catch (error) {
@@ -1228,10 +1245,12 @@ export const generateFullMockTestQuestions = async ({ subject, patternsToInclude
 
     console.log(`✅ Full mock: generated ${deduped.length}, showing ${questions.length} questions (no duplicates in paper)`);
 
+    const translatedQuestions = await finalizeGeneratedQuestions(questions);
+
     return {
       success: true,
-      questions,
-      count: questions.length,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
       testName: `Prelims Mock - ${subject}`,
     };
   } catch (error) {
@@ -1490,10 +1509,12 @@ export const generateTestQuestions = async ({
 
     console.log(`✅ Generated ${validatedQuestions.length} ${examType} questions`);
 
+    const translatedQuestions = await finalizeGeneratedQuestions(validatedQuestions);
+
     return {
       success: true,
-      questions: validatedQuestions,
-      count: validatedQuestions.length,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
     };
   } catch (error) {
     console.error("Error generating test questions:", error);

@@ -17,6 +17,7 @@ export const registerUser = async ({ name, email, password }) => {
     password,
     accountType: "paid-user",
     subscriptionStatus: "inactive",
+    isEmailVerified: true,
   });
   const token = createToken(user);
   return { user, token };
@@ -26,10 +27,6 @@ export const loginUser = async ({ email, password }) => {
   // First try to find user in database
   const user = await User.findOne({ email });
   if (user) {
-    if (!user.googleId && user.isEmailVerified === false) {
-      throw new Error("Please verify your email with OTP before login.");
-    }
-
     if (user.isActive === false || user.status === 'suspended') {
       throw new Error("Your account is deactivated. Please contact admin.");
     }

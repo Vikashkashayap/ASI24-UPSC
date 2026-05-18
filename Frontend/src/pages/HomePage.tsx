@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  CalendarClock,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Flame,
+  MessageCircle,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { SyllabusTargetsPanel } from "../components/SyllabusTargetsPanel";
 import { MentorChatPage } from "./MentorChatPage";
 import { useAuth } from "../hooks/useAuth";
@@ -29,6 +41,12 @@ function getPreparationPhase(daysLeft: number) {
   return "foundation";
 }
 
+const phaseLabels: Record<string, { label: string; tone: string }> = {
+  revision: { label: "Revision Phase", tone: "sd-phase-revision" },
+  balanced: { label: "Balanced Phase", tone: "sd-phase-balanced" },
+  foundation: { label: "Foundation Phase", tone: "sd-phase-foundation" },
+};
+
 export const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -46,10 +64,15 @@ export const HomePage = () => {
     month: "short",
   });
   const studentName = user?.name || "Student";
+  const firstName = studentName.split(" ")[0];
   const daysSinceJoin = Math.max(1, Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24)));
   const dailyHours = parseDailyHours(user?.dailyStudyHours);
+  const dailyGoal = Math.max(4, Math.round(dailyHours));
+  const todayHoursDone = 3.5;
+  const hoursProgress = Math.min(100, Math.round((todayHoursDone / dailyGoal) * 100));
   const daysLeftForPrelims = Number(countdown.days) || 0;
   const preparationPhase = getPreparationPhase(daysLeftForPrelims);
+  const phaseMeta = phaseLabels[preparationPhase];
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -118,51 +141,91 @@ export const HomePage = () => {
 
     return {
       title: phaseTopicMap[preparationPhase],
-      meta: `${dayText} • ${timeText} • ${duration} mins`,
-      phaseLabel:
-        preparationPhase === "revision"
-          ? "Revision Phase"
-          : preparationPhase === "balanced"
-            ? "Balanced Phase"
-            : "Foundation Phase",
+      meta: `${dayText} · ${timeText} · ${duration} mins`,
     };
   }, [dailyHours, preparationPhase, user?.educationBackground]);
 
   return (
     <div className="student-dashboard-page">
-      <div className="sd-hero-row">
+      <section className="sd-hero-row">
         <div className="sd-hero-text">
-          <h1>{greeting}, {studentName.split(" ")[0]}</h1>
-          <p>You joined {daysSinceJoin} days ago. Target UPSC CSE {targetYear}.</p>
+          <span className={`sd-phase-badge ${phaseMeta.tone}`}>{phaseMeta.label}</span>
+          <h1>
+            {greeting},{" "}
+            <span className="sd-name-highlight">{firstName}</span>
+          </h1>
+          <p>
+            Day {daysSinceJoin} of your journey · Target UPSC CSE {targetYear}
+          </p>
         </div>
+
         <div className="sd-countdown-card">
-          <div className="sd-eyebrow">Exam Countdown</div>
-          <div className="sd-exam-label">UPSC Prelims {targetYear} • 25 May {targetYear}</div>
+          <div className="sd-countdown-top">
+            <div>
+              <div className="sd-eyebrow">Exam Countdown</div>
+              <div className="sd-exam-label">UPSC Prelims {targetYear}</div>
+              <div className="sd-exam-date">25 May {targetYear}</div>
+            </div>
+            <div className="sd-countdown-ring" style={{ "--sd-progress": countdown.progress } as React.CSSProperties}>
+              <span>{Math.round(countdown.progress)}%</span>
+            </div>
+          </div>
           <div className="sd-countdown-grid">
             <div><strong>{countdown.days}</strong><span>Days</span></div>
             <div><strong>{countdown.hours}</strong><span>Hrs</span></div>
             <div><strong>{countdown.mins}</strong><span>Mins</span></div>
             <div><strong>{countdown.secs}</strong><span>Secs</span></div>
           </div>
-          <div className="sd-progress"><div style={{ width: `${countdown.progress}%` }} /></div>
-          <p>{Math.round(countdown.progress)}% elapsed • {countdown.days} days left</p>
+          <div className="sd-progress">
+            <div style={{ width: `${countdown.progress}%` }} />
+          </div>
+          <p>{Math.round(countdown.progress)}% elapsed · {Number(countdown.days)} days left</p>
         </div>
-      </div>
+      </section>
 
-      <div className="sd-strip">
-        <div className="sd-strip-item"><span>🔥</span><div><b>Study Streak</b><p>14 days</p></div></div>
-        <div className="sd-strip-item"><span>⏱️</span><div><b>Today's Hours</b><p>3.5 / 6 hrs</p></div></div>
-        <div className="sd-strip-item"><span>📆</span><div><b>Today</b><p>{todayLabel}</p></div></div>
-        <div className="sd-strip-item">
+      <section className="sd-stats-grid">
+        <article className="sd-stat-card sd-stat-streak">
+          <div className="sd-stat-icon"><Flame className="sd-stat-svg" /></div>
+          <div>
+            <span className="sd-stat-label">Study Streak</span>
+            <strong className="sd-stat-value">14 days</strong>
+          </div>
+        </article>
+
+        <article className="sd-stat-card sd-stat-hours">
+          <div className="sd-stat-icon"><Clock className="sd-stat-svg" /></div>
+          <div className="sd-stat-body">
+            <span className="sd-stat-label">Today&apos;s Hours</span>
+            <strong className="sd-stat-value">{todayHoursDone} / {dailyGoal} hrs</strong>
+            <div className="sd-stat-bar"><div style={{ width: `${hoursProgress}%` }} /></div>
+          </div>
+        </article>
+
+        <article className="sd-stat-card sd-stat-date">
+          <div className="sd-stat-icon"><CalendarDays className="sd-stat-svg" /></div>
+          <div>
+            <span className="sd-stat-label">Today</span>
+            <strong className="sd-stat-value">{todayLabel}</strong>
+          </div>
+        </article>
+
+        <article className="sd-stat-card sd-stat-dart">
           {!isDartSubmitted ? (
-            <button onClick={() => setIsDartSubmitted(true)}>Fill Today&apos;s DART</button>
+            <button type="button" className="sd-dart-btn" onClick={() => setIsDartSubmitted(true)}>
+              <Target className="sd-stat-svg" />
+              <span>Fill Today&apos;s DART</span>
+              <ArrowRight className="sd-dart-arrow" />
+            </button>
           ) : (
-            <span className="sd-done">DART Submitted</span>
+            <div className="sd-dart-done">
+              <CheckCircle2 className="sd-stat-svg" />
+              <span>DART Submitted</span>
+            </div>
           )}
-        </div>
-      </div>
+        </article>
+      </section>
 
-      <div className="sd-grid">
+      <section className="sd-grid">
         <div className="sd-card sd-syllabus-card">
           <SyllabusTargetsPanel
             todayLabel={todayLabel}
@@ -175,29 +238,71 @@ export const HomePage = () => {
           />
         </div>
 
-        <div className="sd-right">
-          <div className="sd-card">
-            <div className="sd-card-hd"><h3>AI Mentor</h3><small>AI Live</small></div>
-            <div className="sd-chat">
-              <div className="ai">Want a quick revision on Repo vs Reverse Repo?</div>
-              <div className="me">Yes, explain inflation impact.</div>
+        <aside className="sd-right">
+          <div className="sd-card sd-mentor-card">
+            <div className="sd-card-hd">
+              <div className="sd-card-title-wrap">
+                <span className="sd-card-icon sd-card-icon-ai"><Sparkles className="sd-card-svg" /></span>
+                <div>
+                  <h3>AI Mentor</h3>
+                  <small>Ask doubts anytime</small>
+                </div>
+              </div>
+              <span className="sd-live-badge">Live</span>
             </div>
-            <button className="full" onClick={() => setShowMentorModal(true)}>Open Mentor Chat</button>
+            <div className="sd-chat">
+              <div className="ai">
+                <MessageCircle className="sd-chat-icon" />
+                <span>Want a quick revision on Repo vs Reverse Repo?</span>
+              </div>
+              <div className="me">
+                <span>Yes, explain inflation impact.</span>
+              </div>
+            </div>
+            <button type="button" className="full sd-mentor-btn" onClick={() => setShowMentorModal(true)}>
+              Open Mentor Chat
+            </button>
           </div>
-          <div className="sd-card">
-            <div className="sd-card-hd"><h3>Mains Evaluation</h3></div>
-            <p>Ethics Case Study — Evaluated 12.5 / 25</p>
-            <p>IR Indo-Pacific — In Review</p>
-            <button className="full" onClick={() => navigate("/evaluation-history")}>View All</button>
+
+          <div className="sd-card sd-eval-card">
+            <div className="sd-card-hd">
+              <div className="sd-card-title-wrap">
+                <span className="sd-card-icon sd-card-icon-eval"><FileText className="sd-card-svg" /></span>
+                <div>
+                  <h3>Mains Evaluation</h3>
+                  <small>Recent submissions</small>
+                </div>
+              </div>
+            </div>
+            <ul className="sd-eval-list">
+              <li>
+                <div>
+                  <strong>Ethics Case Study</strong>
+                  <span>Evaluated</span>
+                </div>
+                <b>12.5 / 25</b>
+              </li>
+              <li>
+                <div>
+                  <strong>IR Indo-Pacific</strong>
+                  <span className="pending">In Review</span>
+                </div>
+              </li>
+            </ul>
+            <button type="button" className="full sd-outline-btn" onClick={() => navigate("/evaluation-history")}>
+              View All
+            </button>
           </div>
+
           <div className="sd-card session">
-            <h3>Upcoming Session</h3>
-            <p>{upcomingSession.title}</p>
-            <small>{upcomingSession.meta}</small>
-            <small>{upcomingSession.phaseLabel}</small>
+            <div className="sd-session-icon"><CalendarClock className="sd-card-svg" /></div>
+            <span className="sd-session-label">Upcoming Session</span>
+            <h3>{upcomingSession.title}</h3>
+            <p>{upcomingSession.meta}</p>
+            <span className={`sd-phase-badge ${phaseMeta.tone} sd-phase-badge-light`}>{phaseMeta.label}</span>
           </div>
-        </div>
-      </div>
+        </aside>
+      </section>
 
       {showMentorModal ? (
         <div className="sd-mentor-overlay" role="dialog" aria-modal="true" aria-label="AI Mentor Chat">
@@ -217,4 +322,3 @@ export const HomePage = () => {
     </div>
   );
 };
-

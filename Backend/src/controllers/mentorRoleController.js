@@ -54,6 +54,7 @@ export const createMentorAccount = async (req, res) => {
       password: tempPassword,
       role: "mentor",
       isActive: true,
+      isEmailVerified: true,
       mustChangePassword: true,
       createdBy: req.user?._id,
       accountType: "admin-created",

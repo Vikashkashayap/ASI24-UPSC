@@ -3,14 +3,28 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle, Clock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { SafeQuestionHtml } from "../components/SafeQuestionHtml";
+import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
 interface QuestionResult {
   _id: string;
   question: string;
+  question_en?: string;
+  question_hi?: string;
   options: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  options_en?: {
+    A: string;
+    B: string;
+    C: string;
+    D: string;
+  };
+  options_hi?: {
     A: string;
     B: string;
     C: string;
@@ -19,6 +33,8 @@ interface QuestionResult {
   correctAnswer: string;
   userAnswer: string | null;
   explanation: string | { A?: string; B?: string; C?: string; D?: string };
+  explanation_en?: string | { A?: string; B?: string; C?: string; D?: string };
+  explanation_hi?: { A?: string; B?: string; C?: string; D?: string };
   isCorrect: boolean;
   timeSpent?: number;
   questionType?: string;
@@ -298,19 +314,7 @@ const TestResultPage: React.FC = () => {
                               {/* Match the following: show question/statement at TOP above the lists */}
                               {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && question.question?.trim() && (
                                 <div className="mb-2">
-                                  {question.question.includes("<table") ? (
-                                    <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                                  ) : (
-                                    question.question.split("\n").map((line, lineIdx) => {
-                                      const trimmedLine = line.trim();
-                                      if (!trimmedLine) return null;
-                                      return (
-                                        <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-1"}>
-                                          {trimmedLine}
-                                        </div>
-                                      );
-                                    })
-                                  )}
+                                  <UpscPaperQuestionBlock question={question} theme={theme} allowHtml stemOnly />
                                 </div>
                               )}
                               {/* Assertion–Reason block (no repeat of assertion in question text below) */}
@@ -368,36 +372,9 @@ const TestResultPage: React.FC = () => {
                                 question.assertionReason?.assertion != null &&
                                 (question.assertionReason.assertion || question.assertionReason.reason)
                               ) &&
-                                !(question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0) &&
-                                (question.question.includes("<table") ? (
-                                  <SafeQuestionHtml html={question.question} className={theme === "dark" ? "text-slate-200" : "text-slate-900"} />
-                                ) : (
-                                  question.question.split("\n").map((line, lineIdx) => {
-                                    const trimmedLine = line.trim();
-                                    if (!trimmedLine) return null;
-                                    const numberedMatch = trimmedLine.match(/^(\d+)\.\s*(.+)$/);
-                                    if (numberedMatch) {
-                                      return (
-                                        <div key={lineIdx} className="ml-4 mt-2 first:mt-1">
-                                          <span className="font-semibold mr-1">{numberedMatch[1]}.</span>
-                                          <span>{numberedMatch[2]}</span>
-                                        </div>
-                                      );
-                                    }
-                                    if (trimmedLine.match(/^(List-I|List-II|Match List-I|Assertion|Reason):?$/i)) {
-                                      return (
-                                        <div key={lineIdx} className={`mt-3 mb-2 font-semibold ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
-                                          {trimmedLine}
-                                        </div>
-                                      );
-                                    }
-                                    return (
-                                      <div key={lineIdx} className={lineIdx === 0 ? "" : "mt-2"}>
-                                        {trimmedLine}
-                                      </div>
-                                    );
-                                  })
-                                ))}
+                                !(question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0) && (
+                                <UpscPaperQuestionBlock question={question} theme={theme} allowHtml />
+                              )}
                             </div>
                           </div>
                         </div>
@@ -425,50 +402,36 @@ const TestResultPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Options - Mobile-first */}
-                      <div className="space-y-1.5 md:space-y-2 mb-2 md:mb-3">
+                      {question.matchColumns?.columnA?.length != null &&
+                        question.matchColumns.columnA.length > 0 && (
+                        <UpscPaperQuestionBlock
+                          question={question}
+                          theme={theme}
+                          allowHtml
+                          showQuestion={false}
+                        />
+                      )}
+
+                      <div className="grid grid-cols-4 gap-1.5 md:gap-2 mb-2 md:mb-3">
                         {(["A", "B", "C", "D"] as const).map((option) => {
-                          const optionText = question.options[option];
                           const isCorrect = option === question.correctAnswer;
                           const isUserAnswer = option === question.userAnswer;
-
                           return (
                             <div
                               key={option}
-                              className={`p-2 md:p-3 rounded-lg border-2 ${
+                              className={`flex flex-col items-center justify-center p-2 rounded-lg border-2 text-xs md:text-sm font-semibold ${
                                 isCorrect
-                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
                                   : isUserAnswer && !isCorrect
-                                  ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                                  ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
                                   : theme === "dark"
-                                  ? "border-slate-700 bg-slate-800"
-                                  : "border-slate-300 bg-white"
+                                  ? "border-slate-700 bg-slate-800 text-slate-400"
+                                  : "border-slate-300 bg-white text-slate-600"
                               }`}
                             >
-                              <div className="flex items-center gap-1.5 md:gap-2">
-                                <span
-                                  className={`font-semibold text-xs md:text-sm flex-shrink-0 ${
-                                    isCorrect
-                                      ? "text-green-700 dark:text-green-400"
-                                      : isUserAnswer && !isCorrect
-                                      ? "text-red-700 dark:text-red-400"
-                                      : theme === "dark"
-                                      ? "text-slate-400"
-                                      : "text-slate-600"
-                                  }`}
-                                >
-                                  {option}.
-                                </span>
-                                <span className={`text-xs md:text-sm break-words ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                                  {optionText}
-                                </span>
-                                {isCorrect && (
-                                  <CheckCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600 ml-auto flex-shrink-0" />
-                                )}
-                                {isUserAnswer && !isCorrect && (
-                                  <XCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-red-600 ml-auto flex-shrink-0" />
-                                )}
-                              </div>
+                              <span>({option.toLowerCase()})</span>
+                              {isCorrect && <CheckCircle className="w-3.5 h-3.5 mt-0.5 text-green-600" />}
+                              {isUserAnswer && !isCorrect && <XCircle className="w-3.5 h-3.5 mt-0.5 text-red-600" />}
                             </div>
                           );
                         })}

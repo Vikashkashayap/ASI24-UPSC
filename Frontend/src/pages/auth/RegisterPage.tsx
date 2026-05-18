@@ -124,7 +124,7 @@ export const RegisterPage = () => {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-blue-200/30 bg-[#0a1838] px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/70 focus:border-[#3b82f6]";
+    "w-full rounded-lg border border-blue-200/30 bg-[#0a1838] px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/70 focus:border-[#3b82f6] autofill:shadow-[inset_0_0_0px_1000px_#0a1838] autofill:[-webkit-text-fill-color:#f1f5f9]";
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-50">

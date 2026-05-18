@@ -41,11 +41,25 @@ const testSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        question_en: { type: String, required: false },
+        question_hi: { type: String, required: false },
         options: {
           A: { type: String, required: true },
           B: { type: String, required: true },
           C: { type: String, required: true },
           D: { type: String, required: true },
+        },
+        options_en: {
+          A: { type: String, required: false },
+          B: { type: String, required: false },
+          C: { type: String, required: false },
+          D: { type: String, required: false },
+        },
+        options_hi: {
+          A: { type: String, required: false },
+          B: { type: String, required: false },
+          C: { type: String, required: false },
+          D: { type: String, required: false },
         },
         correctAnswer: {
           type: String,
@@ -57,6 +71,8 @@ const testSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.Mixed,
           required: true,
         },
+        explanation_en: { type: mongoose.Schema.Types.Mixed, required: false },
+        explanation_hi: { type: mongoose.Schema.Types.Mixed, required: false },
         userAnswer: {
           type: String,
           enum: ["A", "B", "C", "D", null],
