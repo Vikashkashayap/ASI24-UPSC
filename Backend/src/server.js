@@ -15,6 +15,7 @@ import copyEvaluationRoutes from "./routes/copyEvaluationRoutes.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
+import studyPlanRoutes from "./routes/studyPlanRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
 import pricingRoutes from "./routes/pricingRoutes.js";
@@ -25,6 +26,7 @@ import currentAffairsRoutes, {
 } from "./routes/currentAffairsRoutes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
+import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
@@ -94,6 +96,7 @@ app.use("/api/copy-evaluation", copyEvaluationRoutes);
 app.use("/api/meeting", meetingRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
+app.use("/api/study-plan", authMiddleware, studyPlanRoutes);
 
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
@@ -114,6 +117,9 @@ setInterval(() => {
     console.error("Prelims Mock cron:", err)
   );
 }, 60 * 1000);
+
+// Start current affairs daily pipeline (6 AM Asia/Kolkata)
+startCurrentAffairsCron();
 
 /* -------------------- SERVER -------------------- */
 
