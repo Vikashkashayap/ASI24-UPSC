@@ -1,41 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, FileText, X, ChevronLeft, ChevronRight, Sparkles, BookOpen, Award, History } from 'lucide-react';
+import {
+  Upload,
+  FileText,
+  X,
+  Sparkles,
+  History,
+  Image as ImageIcon,
+  Download,
+} from 'lucide-react';
+import { downloadCopyEvaluationReport } from '../utils/downloadCopyEvaluation';
 import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CopyEvaluationLoading } from '../components/copy-evaluation/CopyEvaluationLoading';
+import {
+  CopyEvaluationResultView,
+  VisionEvaluationResult,
+} from '../components/copy-evaluation/CopyEvaluationResultView';
 import { QuestionEvaluationView } from '../components/QuestionEvaluationView';
 
-
-interface EvaluationResult {
-  evaluationId: string;
-  finalSummary: {
-    overallScore: {
-      obtained: number;
-      maximum: number;
-      percentage: number;
-      grade: string;
-    };
-    strengths: string[];
-    weaknesses: string[];
-    improvementPlan: string[];
-    upscRange: string;
-    sectionWisePerformance: {
-      introduction: number;
-      body: number;
-      conclusion: number;
-      diagram: number;
-      presentation: number;
-    };
-    diagramStats: {
-      total: number;
-      withDiagram: number;
-      avgDiagramMarks: number;
-    };
-  };
-  totalQuestions: number;
-}
+const ACCEPTED_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+];
 
 interface FullEvaluation {
   _id: string;
@@ -43,9 +35,14 @@ interface FullEvaluation {
   paper: string;
   year: number;
   pdfFileName: string;
-  totalPages: number;
-  evaluations: any[];
-  finalSummary: any;
+  fileName?: string;
+  fileType?: string;
+  evaluationMode?: string;
+  visionResult?: VisionEvaluationResult;
+  storedPages?: { pageNumber: number; fileName: string }[];
+  evaluations?: unknown[];
+  finalSummary?: unknown;
+  status: string;
   createdAt: string;
 }
 
@@ -58,16 +55,14 @@ const CopyEvaluationPage: React.FC = () => {
   const [paper, setPaper] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
   const [isUploading, setIsUploading] = useState(false);
-  const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
   const [fullEvaluation, setFullEvaluation] = useState<FullEvaluation | null>(null);
+  const [visionResult, setVisionResult] = useState<VisionEvaluationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
-  const [streamingModalOpen, setStreamingModalOpen] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load evaluation from URL parameter
   useEffect(() => {
     const evaluationId = searchParams.get('id');
     if (evaluationId) {
@@ -81,35 +76,34 @@ const CopyEvaluationPage: React.FC = () => {
     }
   }, [selectedEvaluationId]);
 
-
   const loadEvaluation = async (id: string) => {
     try {
       const response = await copyEvaluationAPI.getEvaluationById(id);
       if (response.data.success) {
-        setFullEvaluation(response.data.data);
-        setEvaluationResult({
-          evaluationId: response.data.data._id,
-          finalSummary: response.data.data.finalSummary,
-          totalQuestions: response.data.data.evaluations.length,
-        });
-        setSelectedQuestionIndex(0); // Reset to first question
+        const data = response.data.data as FullEvaluation;
+        setFullEvaluation(data);
+        if (data.visionResult) {
+          setVisionResult(data.visionResult);
+        } else {
+          setVisionResult(null);
+        }
         setError(null);
       }
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Failed to load evaluation');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr.response?.data?.message || 'Failed to load evaluation');
     }
   };
-
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.type !== 'application/pdf') {
-        setError('Please select a PDF file');
+      if (!ACCEPTED_TYPES.includes(file.type)) {
+        setError('Please select a PDF or image file (JPEG, PNG, WebP)');
         return;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        setError('File size must be less than 10MB');
+      if (file.size > 15 * 1024 * 1024) {
+        setError('File size must be less than 15MB');
         return;
       }
       setSelectedFile(file);
@@ -125,424 +119,433 @@ const CopyEvaluationPage: React.FC = () => {
 
     setIsUploading(true);
     setError(null);
-    setEvaluationResult(null);
+    setVisionResult(null);
     setFullEvaluation(null);
 
     try {
-      // Step 1: Upload PDF and get evaluationId
-      const uploadResponse = await copyEvaluationAPI.uploadAndEvaluate(selectedFile, {
+      const response = await copyEvaluationAPI.uploadAndEvaluate(selectedFile, {
         subject,
         paper,
         year,
       });
 
-      if (!uploadResponse.data.success) {
-        throw new Error(uploadResponse.data.message || 'Upload failed');
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Upload failed');
       }
 
-      const evaluationId = uploadResponse.data.data.evaluationId;
-      const rawText = uploadResponse.data.data.rawText;
-      const confidenceScore = uploadResponse.data.data.confidenceScore;
+      const { evaluationId, visionResult: result } = response.data.data;
 
-      console.log('✅ PDF uploaded successfully. Evaluation ID:', evaluationId);
-      console.log('📊 Confidence Score:', confidenceScore);
-
-      // Step 2: Check confidence score
-      if (confidenceScore < 0.7) {
-        const shouldContinue = window.confirm(
-          `Low text extraction confidence (${(confidenceScore * 100).toFixed(1)}%). ` +
-          `The PDF may be scanned or have poor text quality. Continue with evaluation?`
-        );
-        if (!shouldContinue) {
-          setIsUploading(false);
-          return;
-        }
-      }
-
-
-      // Step 4: Trigger AI evaluation
-      console.log('🤖 Starting AI evaluation...');
-      const processResponse = await copyEvaluationAPI.processEvaluation(evaluationId);
-
-      if (processResponse.data.success) {
-        setEvaluationResult(processResponse.data.data);
+      if (result) {
+        setVisionResult(result);
         setSelectedEvaluationId(evaluationId);
+        setFullEvaluation({
+          _id: evaluationId,
+          subject,
+          paper,
+          year,
+          pdfFileName: selectedFile.name,
+          fileName: selectedFile.name,
+          fileType: selectedFile.type.startsWith('image/') ? 'image' : 'pdf',
+          evaluationMode: 'vision',
+          visionResult: result,
+          storedPages: response.data.data.storedPages,
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+        });
         setSelectedFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        // Dispatch event to refresh sidebar history
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setShowUploadModal(false);
+        navigate(`/copy-evaluation?id=${evaluationId}`, { replace: true });
         window.dispatchEvent(new Event('evaluation-complete'));
-        console.log('✅ AI evaluation completed successfully');
       } else {
-        throw new Error(processResponse.data.message || 'AI evaluation failed');
+        throw new Error('No evaluation result returned from server');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Failed to evaluate copy');
-      console.error('Upload/Evaluation error:', err);
+    } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: { data?: { message?: string; error?: string } };
+        message?: string;
+      };
+      setError(
+        axiosErr.response?.data?.error ||
+          axiosErr.response?.data?.message ||
+          axiosErr.message ||
+          'Failed to evaluate copy'
+      );
     } finally {
       setIsUploading(false);
     }
   };
 
-  const startNewEvaluation = () => {
-    setSelectedFile(null);
-    setEvaluationResult(null);
-    setFullEvaluation(null);
-    setSelectedEvaluationId(null);
-    setSelectedQuestionIndex(0);
-    setError(null);
-    setSubject('General Studies');
-    setPaper('');
-    setYear(new Date().getFullYear());
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    // Clear URL parameter
-    navigate('/copy-evaluation', { replace: true });
-  };
-
-
-  // Render tabs component
-
+  const hasResult = Boolean(visionResult || (fullEvaluation?.evaluations?.length ?? 0) > 0);
+  const isLegacyResult =
+    fullEvaluation?.evaluations &&
+    fullEvaluation.evaluations.length > 0 &&
+    !visionResult;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 xs:space-y-4 sm:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
-      {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-4 xs:p-5 sm:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${theme === "dark"
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10"
-          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
-        }`}>
+    <div className="max-w-7xl mx-auto space-y-4 xs:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
+      {/* Header */}
+      <div
+        className={`relative overflow-hidden rounded-2xl p-4 xs:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${
+          theme === 'dark'
+            ? 'bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10'
+            : 'bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30'
+        }`}
+      >
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col gap-2 xs:gap-2.5 sm:gap-3">
+        <div className="relative z-10 flex flex-col gap-2">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3 xs:gap-3.5 sm:gap-4">
-              <div className={`p-2.5 xs:p-3 sm:p-3 rounded-xl ${theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
-                }`}>
-                <FileText className={`w-5 h-5 xs:w-6 xs:h-6 sm:w-6 sm:h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"
-                  }`} />
+            <div className="flex items-center gap-3">
+              <div
+                className={`p-2.5 rounded-xl ${
+                  theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                }`}
+              >
+                <FileText
+                  className={`w-6 h-6 ${
+                    theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                  }`}
+                />
               </div>
               <div>
-                <h1 className={`text-xl xs:text-2xl sm:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${theme === "dark"
-                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent"
-                    : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
-                  }`}>
+                <h1
+                  className={`text-xl xs:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
+                    theme === 'dark'
+                      ? 'from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent'
+                      : 'from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent'
+                  }`}
+                >
                   Copy Evaluation
                 </h1>
-                <p className={`text-[10px] xs:text-xs sm:text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                  Upload your UPSC answer copy PDF for AI-powered evaluation with examiner-style feedback
+                <p
+                  className={`text-xs md:text-sm mt-0.5 ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  }`}
+                >
+                  Upload handwritten answer copy (PDF or image) for AI vision evaluation
                 </p>
               </div>
             </div>
-            {!selectedEvaluationId && !evaluationResult && (
+            {!hasResult && (
               <Button
                 onClick={() => navigate('/evaluation-history')}
-                className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
+                className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white"
               >
                 <History className="w-4 h-4 mr-2" />
-                <span className="hidden xs:inline">Evaluation History</span>
-                <span className="xs:hidden">History</span>
+                History
               </Button>
             )}
           </div>
         </div>
       </div>
 
-
-      {/* Main Content - Full width in Full Copy Evaluation mode */}
-      <div className="h-[calc(100vh-10rem)] xs:h-[calc(100vh-11rem)] sm:h-[calc(100vh-12rem)] md:h-[calc(100vh-14rem)]">
-        {/* Main Content Area */}
-        <div className="w-full h-full overflow-hidden">
-          {!selectedEvaluationId || !evaluationResult ? (
-            <Card className={`h-full ${theme === "dark" ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50" : "bg-white border-slate-200"} shadow-xl`}>
-              <CardContent className="p-6 xs:p-8 text-center flex items-center justify-center h-full">
-                <div className="max-w-md">
-                  <div className={`p-4 xs:p-5 sm:p-6 rounded-full mx-auto mb-4 xs:mb-5 sm:mb-6 w-fit ${theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
-                    }`}>
-                    <FileText className={`w-8 h-8 xs:w-12 xs:h-12 sm:w-16 sm:h-16 mx-auto ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                      }`} />
-                  </div>
-                  <h2 className={`text-lg xs:text-xl sm:text-xl md:text-2xl font-bold mb-2 xs:mb-3 ${theme === "dark" ? "text-slate-200" : "text-slate-800"
-                    }`}>
-                    No Answer Copy Evaluated Yet
-                  </h2>
-                  <p className={`text-xs xs:text-sm sm:text-sm mb-6 xs:mb-7 sm:mb-8 ${theme === "dark" ? "text-slate-400" : "text-slate-600"
-                    }`}>
-                    Upload your full answer copy PDF to get comprehensive evaluation with examiner-style feedback
-                  </p>
-                  <Button
-                    onClick={() => setShowUploadModal(true)}
-                    className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload New Answer Copy
-                  </Button>
+      <div className="min-h-[calc(100vh-14rem)]">
+        {isUploading ? (
+          <CopyEvaluationLoading fileName={selectedFile?.name} />
+        ) : !hasResult ? (
+          <Card
+            className={`h-full min-h-[400px] ${
+              theme === 'dark'
+                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50'
+                : 'bg-white border-slate-200'
+            } shadow-xl`}
+          >
+            <CardContent className="p-8 text-center flex items-center justify-center h-full min-h-[400px]">
+              <div className="max-w-md">
+                <div
+                  className={`p-6 rounded-full mx-auto mb-6 w-fit ${
+                    theme === 'dark' ? 'bg-fuchsia-500/10' : 'bg-purple-100'
+                  }`}
+                >
+                  <FileText
+                    className={`w-16 h-16 mx-auto ${
+                      theme === 'dark' ? 'text-fuchsia-400' : 'text-purple-600'
+                    }`}
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className={`h-full flex flex-col shadow-xl ${theme === "dark"
-                ? "bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50"
-                : "bg-white border-slate-200"
-              }`}>
-              <CardHeader className="pb-3 xs:pb-3.5 sm:pb-4 border-b flex-shrink-0">
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                  <div className="flex items-center gap-2 xs:gap-2.5">
-                    <Award className={`w-5 h-5 xs:w-6 xs:h-6 ${theme === "dark" ? "text-fuchsia-300" : "text-purple-600"
-                      }`} />
-                    <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"
-                      }`}>
-                      Your Answer Evaluation
-                    </h2>
-                  </div>
+                <h2
+                  className={`text-xl font-bold mb-2 ${
+                    theme === 'dark' ? 'text-slate-200' : 'text-slate-800'
+                  }`}
+                >
+                  No Answer Copy Evaluated Yet
+                </h2>
+                <p
+                  className={`text-sm mb-8 ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+                  }`}
+                >
+                  Upload your handwritten UPSC answer copy as PDF or photo for examiner-style AI feedback
+                </p>
+                <Button
+                  onClick={() => setShowUploadModal(true)}
+                  className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Answer Copy
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card
+            className={`shadow-xl ${
+              theme === 'dark'
+                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50'
+                : 'bg-white border-slate-200'
+            }`}
+          >
+            <CardHeader className="border-b flex-shrink-0">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <CardTitle
+                  className={theme === 'dark' ? 'text-slate-200' : 'text-slate-800'}
+                >
+                  Your Evaluation Result
+                </CardTitle>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={() => navigate('/evaluation-history')}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <History className="w-4 h-4 mr-1.5" />
+                    History
+                  </Button>
+                  {visionResult && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        downloadCopyEvaluationReport({
+                          result: visionResult,
+                          fileName: fullEvaluation?.fileName || fullEvaluation?.pdfFileName,
+                          subject: fullEvaluation?.subject,
+                          paper: fullEvaluation?.paper,
+                          createdAt: fullEvaluation?.createdAt,
+                        })
+                      }
+                    >
+                      <Download className="w-4 h-4 mr-1.5" />
+                      Download
+                    </Button>
+                  )}
                   <Button
                     onClick={() => setShowUploadModal(true)}
                     variant="outline"
-                    className="text-xs xs:text-sm"
+                    size="sm"
                   >
-                    <Upload className="w-3.5 h-3.5 xs:w-4 xs:h-4 mr-1.5" />
-                    <span className="hidden xs:inline">Upload New Answer</span>
-                    <span className="xs:hidden">New</span>
+                    <Upload className="w-4 h-4 mr-1.5" />
+                    New Upload
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="flex-1 overflow-y-auto pr-1 xs:pr-1.5 sm:pr-2 custom-scrollbar">
-                {/* Results Display - Question by Question */}
-                {fullEvaluation && fullEvaluation.evaluations && fullEvaluation.evaluations.length > 0 ? (
-                  <div className="space-y-4 xs:space-y-5 sm:space-y-6">
-                    {/* Enhanced Question Navigation */}
-                    <div className={`flex items-center justify-between p-3 xs:p-3.5 sm:p-4 rounded-xl ${theme === "dark" ? "bg-slate-800/50 border border-slate-700/50" : "bg-slate-50 border border-slate-200"
-                      }`}>
-                      <div className="flex items-center gap-2 xs:gap-2.5">
-                        <BookOpen className={`w-4 h-4 xs:w-5 xs:h-5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`} />
-                        <span className={`text-xs xs:text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"
-                          }`}>
-                          Question {selectedQuestionIndex + 1} of {fullEvaluation.evaluations.length}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 xs:gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 xs:h-9 w-8 xs:w-9 p-0"
-                          onClick={() => setSelectedQuestionIndex(Math.max(0, selectedQuestionIndex - 1))}
-                          disabled={selectedQuestionIndex === 0}
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 xs:h-9 w-8 xs:w-9 p-0"
-                          onClick={() => setSelectedQuestionIndex(Math.min(fullEvaluation.evaluations.length - 1, selectedQuestionIndex + 1))}
-                          disabled={selectedQuestionIndex === fullEvaluation.evaluations.length - 1}
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Question Evaluation View */}
-                    <QuestionEvaluationView
-                      question={fullEvaluation.evaluations[selectedQuestionIndex]}
-                      paper={fullEvaluation.paper || 'GS'}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>No evaluation data available</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 xs:p-6 overflow-y-auto max-h-[calc(100vh-16rem)] custom-scrollbar">
+              {visionResult ? (
+                <CopyEvaluationResultView
+                  result={visionResult}
+                  evaluationId={fullEvaluation?._id || selectedEvaluationId || undefined}
+                  storedPages={fullEvaluation?.storedPages}
+                  subject={fullEvaluation?.subject}
+                  paper={fullEvaluation?.paper}
+                  fileName={fullEvaluation?.fileName || fullEvaluation?.pdfFileName}
+                />
+              ) : isLegacyResult && fullEvaluation?.evaluations ? (
+                <QuestionEvaluationView
+                  question={
+                    (fullEvaluation.evaluations as Record<string, unknown>[])[
+                      selectedQuestionIndex
+                    ]
+                  }
+                  paper={fullEvaluation.paper || 'GS'}
+                />
+              ) : (
+                <p className={theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}>
+                  No evaluation data available
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Enhanced Upload Modal */}
+      {/* Upload Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 xs:p-4">
-          <Card className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${theme === "dark"
-              ? "bg-gradient-to-br from-slate-950/95 via-slate-900/95 to-slate-950/95 border-purple-900/50"
-              : "bg-white border-slate-200"
-            }`}>
-            <CardContent className="p-4 xs:p-5 sm:p-6">
-              <div className="flex items-center justify-between mb-4 xs:mb-5 sm:mb-6">
-                <div className="flex items-center gap-2 xs:gap-2.5">
-                  <div className={`p-2 rounded-xl bg-gradient-to-br from-fuchsia-500/20 to-emerald-400/20 border ${theme === "dark" ? "border-fuchsia-500/30" : "border-purple-300/50"
-                    }`}>
-                    <Upload className={`w-4 h-4 xs:w-5 xs:h-5 ${theme === "dark" ? "text-fuchsia-300" : "text-fuchsia-600"
-                      }`} />
-                  </div>
-                  <h2 className={`text-lg xs:text-xl sm:text-xl font-bold ${theme === "dark" ? "text-slate-200" : "text-slate-800"
-                    }`}>
-                    Upload Answer Copy
-                  </h2>
-                </div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card
+            className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${
+              theme === 'dark'
+                ? 'bg-gradient-to-br from-slate-950/95 to-slate-900/95 border-purple-900/50'
+                : 'bg-white border-slate-200'
+            }`}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2
+                  className={`text-xl font-bold ${
+                    theme === 'dark' ? 'text-slate-200' : 'text-slate-800'
+                  }`}
+                >
+                  Upload Answer Copy
+                </h2>
                 <button
                   onClick={() => {
                     setShowUploadModal(false);
                     setError(null);
                   }}
-                  className={`p-1.5 xs:p-2 rounded-lg transition-colors ${theme === "dark"
-                      ? "hover:bg-slate-800 text-slate-400 hover:text-slate-200"
-                      : "hover:bg-slate-100 text-slate-500 hover:text-slate-700"
-                    }`}
+                  className={`p-2 rounded-lg ${
+                    theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100'
+                  }`}
                 >
-                  <X className="w-4 h-4 xs:w-5 xs:h-5" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-6">
-                {/* File Upload */}
                 <div>
-                  <label className={`block font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                    Answer Copy (PDF)
+                  <label
+                    className={`block font-medium mb-2 ${
+                      theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                    }`}
+                  >
+                    Answer Copy (PDF or Image)
                   </label>
                   {selectedFile ? (
-                    <div className={`p-3 xs:p-4 rounded-xl border flex items-center justify-between ${theme === "dark"
-                        ? "bg-slate-800/80 border-slate-700/50"
-                        : "bg-slate-50 border-slate-200"
-                      }`}>
-                      <div className="flex items-center gap-2 xs:gap-3 flex-1 min-w-0">
-                        <FileText className={`w-5 h-5 xs:w-6 xs:h-6 flex-shrink-0 ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                          }`} />
-                        <span className={`text-xs xs:text-sm truncate ${theme === "dark" ? "text-slate-300" : "text-slate-700"
-                          }`}>
+                    <div
+                      className={`p-4 rounded-xl border flex items-center justify-between ${
+                        theme === 'dark'
+                          ? 'bg-slate-800/80 border-slate-700/50'
+                          : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {selectedFile.type.startsWith('image/') ? (
+                          <ImageIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0" />
+                        ) : (
+                          <FileText className="w-6 h-6 text-purple-600 flex-shrink-0" />
+                        )}
+                        <span
+                          className={`text-sm truncate ${
+                            theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                          }`}
+                        >
                           {selectedFile.name}
                         </span>
                       </div>
                       <button
                         onClick={() => {
                           setSelectedFile(null);
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = '';
-                          }
+                          if (fileInputRef.current) fileInputRef.current.value = '';
                         }}
-                        className={`p-1.5 xs:p-2 rounded-lg transition-colors flex-shrink-0 ${theme === "dark"
-                            ? "hover:bg-slate-700 text-slate-400 hover:text-slate-200"
-                            : "hover:bg-slate-200 text-slate-500 hover:text-slate-700"
-                          }`}
+                        className="p-2 rounded-lg hover:bg-slate-700/50"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
-                    <div className={`border-2 border-dashed rounded-xl xs:rounded-2xl p-6 xs:p-8 text-center transition-colors ${theme === "dark"
-                        ? "border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50"
-                        : "border-slate-300 bg-slate-50/50 hover:border-purple-400"
-                      }`}>
+                    <div
+                      className={`border-2 border-dashed rounded-xl p-8 text-center ${
+                        theme === 'dark'
+                          ? 'border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50'
+                          : 'border-slate-300 bg-slate-50/50 hover:border-purple-400'
+                      }`}
+                    >
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="application/pdf"
+                        accept="application/pdf,image/jpeg,image/png,image/webp"
                         onChange={handleFileSelect}
                         className="hidden"
-                        id="pdf-upload-full"
+                        id="copy-upload-input"
                       />
-                      <label htmlFor="pdf-upload-full" className="cursor-pointer block">
-                        <div className={`p-4 xs:p-5 rounded-full mx-auto mb-3 xs:mb-4 w-fit ${theme === "dark" ? "bg-fuchsia-500/10" : "bg-purple-100"
-                          }`}>
-                          <Upload className={`w-6 h-6 xs:w-8 xs:h-8 mx-auto ${theme === "dark" ? "text-fuchsia-400" : "text-purple-600"
-                            }`} />
-                        </div>
-                        <p className={`text-xs xs:text-sm font-medium mb-1 ${theme === "dark" ? "text-slate-300" : "text-slate-700"
-                          }`}>
-                          Click to upload PDF or drag and drop
+                      <label htmlFor="copy-upload-input" className="cursor-pointer block">
+                        <Upload
+                          className={`w-8 h-8 mx-auto mb-3 ${
+                            theme === 'dark' ? 'text-fuchsia-400' : 'text-purple-600'
+                          }`}
+                        />
+                        <p
+                          className={`text-sm font-medium ${
+                            theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                          }`}
+                        >
+                          PDF or photo of handwritten answer
                         </p>
-                        <p className={`text-[10px] xs:text-xs ${theme === "dark" ? "text-slate-500" : "text-slate-500"
-                          }`}>
-                          Maximum file size: 10MB
-                        </p>
+                        <p className="text-xs text-slate-500 mt-1">Max 15MB · JPEG, PNG, WebP, PDF</p>
                       </label>
                     </div>
                   )}
                 </div>
 
-                {/* Metadata */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className={`block font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                      Subject
-                    </label>
+                    <label className="block font-medium mb-2 text-sm">Subject</label>
                     <select
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
-                          ? "bg-slate-800 border-slate-700 text-slate-200"
-                          : "bg-white border-slate-300"
-                        }`}
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-slate-800 border-slate-700 text-slate-200'
+                          : 'bg-white border-slate-300'
+                      }`}
                     >
                       <option>General Studies</option>
                       <option>Essay</option>
                       <option>Optional Subject</option>
                     </select>
                   </div>
-
                   <div>
-                    <label className={`block font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                      Paper (Optional)
-                    </label>
+                    <label className="block font-medium mb-2 text-sm">Paper</label>
                     <input
                       type="text"
                       value={paper}
                       onChange={(e) => setPaper(e.target.value)}
-                      placeholder="e.g., GS Paper 1"
-                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
-                          ? "bg-slate-800 border-slate-700 text-slate-200"
-                          : "bg-white border-slate-300"
-                        }`}
+                      placeholder="e.g., GS Paper 2"
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-slate-800 border-slate-700 text-slate-200'
+                          : 'bg-white border-slate-300'
+                      }`}
                     />
                   </div>
-
                   <div>
-                    <label className={`block font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                      Year
-                    </label>
+                    <label className="block font-medium mb-2 text-sm">Year</label>
                     <input
                       type="number"
                       value={year}
-                      onChange={(e) => setYear(parseInt(e.target.value))}
-                      className={`w-full px-4 py-2 rounded-lg border ${theme === "dark"
-                          ? "bg-slate-800 border-slate-700 text-slate-200"
-                          : "bg-white border-slate-300"
-                        }`}
+                      onChange={(e) => setYear(parseInt(e.target.value, 10))}
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        theme === 'dark'
+                          ? 'bg-slate-800 border-slate-700 text-slate-200'
+                          : 'bg-white border-slate-300'
+                      }`}
                     />
                   </div>
                 </div>
 
-                {/* Enhanced Error Message */}
                 {error && (
-                  <div className={`p-3 xs:p-3.5 rounded-xl border flex items-start gap-2 xs:gap-2.5 ${theme === "dark"
-                      ? "bg-red-900/20 border-red-700/50 text-red-300"
-                      : "bg-red-50 border-red-200 text-red-800"
-                    }`}>
-                    <X className="w-4 h-4 xs:w-5 xs:h-5 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs xs:text-sm">{error}</p>
+                  <div
+                    className={`p-3 rounded-xl border text-sm ${
+                      theme === 'dark'
+                        ? 'bg-red-900/20 border-red-700/50 text-red-300'
+                        : 'bg-red-50 border-red-200 text-red-800'
+                    }`}
+                  >
+                    {error}
                   </div>
                 )}
 
-                {/* Enhanced Submit Button */}
                 <Button
-                  onClick={async () => {
-                    await handleUpload();
-                    if (!error && selectedFile) {
-                      setShowUploadModal(false);
-                    }
-                  }}
+                  onClick={handleUpload}
                   disabled={!selectedFile || isUploading}
-                  className="w-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-white disabled:opacity-50"
                 >
                   {isUploading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 xs:h-5 xs:w-5 border-b-2 border-white mr-2"></div>
-                      <span className="text-xs xs:text-sm">Evaluating... This may take 1-2 minutes</span>
-                    </>
+                    <>Evaluating...</>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 xs:w-5 xs:h-5 mr-2" />
-                      <span className="text-xs xs:text-sm font-medium">Start Evaluation</span>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Start AI Evaluation
                     </>
                   )}
                 </Button>
@@ -551,7 +554,6 @@ const CopyEvaluationPage: React.FC = () => {
           </Card>
         </div>
       )}
-
     </div>
   );
 };

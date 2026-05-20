@@ -104,6 +104,34 @@ const diagramStatsSchema = new mongoose.Schema({
   avgDiagramMarks: { type: Number, default: 0 }
 }, { _id: false });
 
+const visionAnswerItemSchema = new mongoose.Schema({
+  questionNumber: { type: String, default: '1' },
+  questionText: { type: String, default: '' },
+  answerText: { type: String, default: '' },
+}, { _id: false });
+
+const storedPageSchema = new mongoose.Schema({
+  pageNumber: { type: Number, required: true },
+  fileName: { type: String, required: true },
+}, { _id: false });
+
+const visionEvaluationResultSchema = new mongoose.Schema({
+  questionText: { type: String, default: '' },
+  extractedAnswerText: { type: String, default: '' },
+  answers: [visionAnswerItemSchema],
+  overallMarks: { type: Number, required: true },
+  maxMarks: { type: Number, default: 15 },
+  summary: { type: String, default: '' },
+  strengths: [{ type: String }],
+  weaknesses: [{ type: String }],
+  missingDimensions: [{ type: String }],
+  presentationFeedback: { type: String, default: '' },
+  contentFeedback: { type: String, default: '' },
+  suggestions: [{ type: String }],
+  improvedConclusion: { type: String, default: '' },
+  examinerFeedback: { type: String, default: '' },
+}, { _id: false });
+
 const finalSummarySchema = new mongoose.Schema({
   overallScore: overallScoreSchema,
   strengths: [{ type: String }],
@@ -128,6 +156,15 @@ const copyEvaluationSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  fileName: {
+    type: String,
+    default: ''
+  },
+  fileType: {
+    type: String,
+    enum: ['pdf', 'image', ''],
+    default: ''
+  },
   pdfFileName: {
     type: String,
     required: true
@@ -135,6 +172,17 @@ const copyEvaluationSchema = new mongoose.Schema({
   pdfFileSize: {
     type: Number,
     required: true
+  },
+  evaluationMode: {
+    type: String,
+    enum: ['vision', 'legacy'],
+    default: 'vision'
+  },
+  visionResult: visionEvaluationResultSchema,
+  storedPages: [storedPageSchema],
+  aiModel: {
+    type: String,
+    default: null
   },
   subject: {
     type: String,
@@ -219,7 +267,7 @@ copyEvaluationSchema.statics.getUserHistory = async function(userId, limit = 10)
   return this.find({ userId, status: 'completed' })
     .sort({ createdAt: -1 })
     .limit(limit)
-    .select('subject paper year finalSummary.overallScore createdAt pdfFileName');
+    .select('subject paper year finalSummary.overallScore visionResult.overallMarks visionResult.maxMarks evaluationMode createdAt pdfFileName fileName status');
 };
 
 // Static method to get analytics

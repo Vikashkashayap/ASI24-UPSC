@@ -205,6 +205,103 @@ export const parseJSONFromResponse = (content) => {
  * @param {string} params.userPrompt - User prompt with question and answer
  * @returns {Promise<Object>} - Parsed evaluation result
  */
+/**
+ * Call OpenRouter API with vision (multimodal) messages
+ * @param {Object} params
+ * @param {string} params.apiKey
+ * @param {string} params.model - Vision-capable model (e.g. google/gemini-2.5-flash)
+ * @param {string} params.systemPrompt
+ * @param {string} params.userPrompt
+ * @param {Array<{type: string, image_url: {url: string}}>} params.images
+ */
+export const callOpenRouterVisionAPI = async ({
+  apiKey,
+  model,
+  systemPrompt,
+  userPrompt,
+  images = [],
+  temperature = 0.2,
+  maxTokens = 4096,
+}) => {
+  try {
+    if (!apiKey || apiKey === "") {
+      throw new Error(
+        "OpenRouter API key is required. Please set OPENROUTER_API_KEY in .env"
+      );
+    }
+    if (!model) {
+      throw new Error("Model name is required");
+    }
+    if (!images.length) {
+      throw new Error("At least one image is required for vision evaluation");
+    }
+
+    const frontendOrigin = getFrontendOrigin();
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": frontendOrigin,
+      "X-Title": "UPSC Mentor - Copy Evaluation",
+    };
+
+    const userContent = [
+      { type: "text", text: userPrompt },
+      ...images,
+    ];
+
+    const requestBody = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      temperature,
+      max_tokens: maxTokens,
+    };
+
+    console.log(`🖼️ Vision API: ${images.length} image(s), model: ${model}`);
+
+    const response = await fetch(OPENROUTER_BASE_URL, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = `OpenRouter API error: ${response.status}`;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage =
+          errorData.error?.message || errorData.message || errorMessage;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error("Invalid response format from OpenRouter vision API");
+    }
+
+    return {
+      success: true,
+      content: data.choices[0].message.content || "",
+      model: data.model || model,
+      usage: data.usage || {},
+    };
+  } catch (error) {
+    console.error("❌ OpenRouter Vision API failed:", error.message);
+    return {
+      success: false,
+      error: error.message || "OpenRouter vision API call failed",
+      content: "",
+    };
+  }
+};
+
 export const evaluateAnswerWithOpenRouter = async ({
   apiKey,
   model,
@@ -250,6 +347,7 @@ export const evaluateAnswerWithOpenRouter = async ({
 
 export default {
   callOpenRouterAPI,
+  callOpenRouterVisionAPI,
   parseJSONFromResponse,
   evaluateAnswerWithOpenRouter,
 };

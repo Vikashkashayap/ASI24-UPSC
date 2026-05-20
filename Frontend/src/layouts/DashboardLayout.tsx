@@ -401,8 +401,6 @@ export const DashboardLayout = () => {
                   label="Copy Evaluation"
                   theme={theme}
                   collapsed={sidebarCollapsed}
-                  badge="soon"
-                  muted
                   onNavigate={() => setMobileMenuOpen(false)}
                 />
                 {/* <NavLink to="/evaluation-history" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Evaluation History">
@@ -903,7 +901,7 @@ export const DashboardLayout = () => {
                 ? "font-semibold"
                 : "font-normal"
               }`}>
-              Eval (Soon)
+              Eval
             </span>
           </NavLink>
         </div>

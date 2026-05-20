@@ -55,7 +55,6 @@ import { AdminMentorsPage } from "./pages/admin/AdminMentorsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
-import ComingSoon from "./components/ui/ComingSoon";
 
 
 function App() {
@@ -97,8 +96,7 @@ function App() {
             <Route path="performance" element={<PerformanceDashboardPage />} />
             <Route path="planner" element={<PlannerPage />} />
             <Route path="mentor" element={<MentorChatPage />} />
-            <Route path="copy-evaluation" element={<ComingSoon />} />
-            {/* <Route path="copy-evaluation" element={<CopyEvaluationPage />} /> */}
+            <Route path="copy-evaluation" element={<CopyEvaluationPage />} />
             <Route path="copy-evaluation/:id" element={<CopyEvaluationDetailPage />} />
             <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
             <Route path="meeting" element={<MeetingPage />} />

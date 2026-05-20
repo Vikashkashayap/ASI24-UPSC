@@ -57,19 +57,24 @@ api.interceptors.response.use(
   }
 );
 
-// Copy Evaluation API
+// Copy Evaluation API (vision-based — PDF or image upload)
 export const copyEvaluationAPI = {
-  uploadAndEvaluate: async (file: File, metadata: { subject?: string; paper?: string; year?: number }) => {
+  uploadAndEvaluate: async (
+    file: File,
+    metadata: { subject?: string; paper?: string; year?: number; maxMarks?: number }
+  ) => {
     const formData = new FormData();
-    formData.append('pdf', file);
+    formData.append('file', file);
     if (metadata.subject) formData.append('subject', metadata.subject);
     if (metadata.paper) formData.append('paper', metadata.paper);
     if (metadata.year) formData.append('year', metadata.year.toString());
+    if (metadata.maxMarks) formData.append('maxMarks', metadata.maxMarks.toString());
 
     return api.post('/api/copy-evaluation/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      timeout: 300000,
     });
   },
 
@@ -79,7 +84,7 @@ export const copyEvaluationAPI = {
   },
 
   getHistory: (page = 1, limit = 10) => {
-    return api.get('/api/copy-evaluation/history/list', {
+    return api.get('/api/copy-evaluation/history', {
       params: { page, limit },
     });
   },

@@ -11,9 +11,13 @@ import { Pagination } from '../components/ui/pagination';
 interface EvaluationHistory {
   _id: string;
   pdfFileName: string;
+  fileName?: string;
   subject: string;
   paper: string;
   year: number;
+  overallMarks?: number;
+  maxMarks?: number;
+  percentage?: number;
   finalSummary?: {
     overallScore: {
       obtained: number;
@@ -25,6 +29,23 @@ interface EvaluationHistory {
   status: string;
   createdAt: string;
 }
+
+const getEvaluationScore = (evaluation: EvaluationHistory) => {
+  if (evaluation.overallMarks != null && evaluation.maxMarks) {
+    const pct =
+      evaluation.percentage ??
+      Math.round((evaluation.overallMarks / evaluation.maxMarks) * 100);
+    return {
+      obtained: evaluation.overallMarks,
+      maximum: evaluation.maxMarks,
+      percentage: pct,
+    };
+  }
+  if (evaluation.finalSummary?.overallScore) {
+    return evaluation.finalSummary.overallScore;
+  }
+  return null;
+};
 
 interface PaginationData {
   total: number;
@@ -80,7 +101,7 @@ const EvaluationHistoryPage: React.FC = () => {
       const query = searchQuery.toLowerCase();
       const filtered = history.filter((evaluation) => {
         return (
-          evaluation.pdfFileName.toLowerCase().includes(query) ||
+          (evaluation.fileName || evaluation.pdfFileName).toLowerCase().includes(query) ||
           evaluation.subject.toLowerCase().includes(query) ||
           evaluation.paper.toLowerCase().includes(query) ||
           evaluation.year.toString().includes(query)
@@ -278,7 +299,7 @@ const EvaluationHistoryPage: React.FC = () => {
                       <CardTitle className={`text-sm font-semibold mb-1 truncate ${
                         theme === "dark" ? "text-white" : "text-slate-900"
                       }`}>
-                        {evaluation.pdfFileName}
+                        {evaluation.fileName || evaluation.pdfFileName}
                       </CardTitle>
                       <div className={`flex items-center gap-2 text-xs ${
                         theme === "dark" ? "text-slate-400" : "text-slate-600"
@@ -314,7 +335,9 @@ const EvaluationHistoryPage: React.FC = () => {
                       <span>{evaluation.paper}</span>
                     </div>
                   )}
-                  {evaluation.finalSummary?.overallScore && (
+                  {getEvaluationScore(evaluation) && (() => {
+                    const score = getEvaluationScore(evaluation)!;
+                    return (
                     <div className={`mt-3 pt-3 border-t ${
                       theme === "dark" ? "border-slate-700" : "border-slate-200"
                     }`}>
@@ -324,28 +347,22 @@ const EvaluationHistoryPage: React.FC = () => {
                         }`}>
                           Score
                         </span>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-lg font-bold ${
-                            evaluation.finalSummary.overallScore.percentage >= 70 ? 'text-green-500' :
-                            evaluation.finalSummary.overallScore.percentage >= 50 ? 'text-orange-500' : 'text-red-500'
-                          }`}>
-                            {evaluation.finalSummary.overallScore.percentage}%
-                          </span>
-                          <span className={`text-xs px-2 py-0.5 rounded ${
-                            theme === "dark" ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-700"
-                          }`}>
-                            Grade {evaluation.finalSummary.overallScore.grade}
-                          </span>
-                        </div>
+                        <span className={`text-lg font-bold ${
+                          score.percentage >= 70 ? 'text-green-500' :
+                          score.percentage >= 50 ? 'text-orange-500' : 'text-red-500'
+                        }`}>
+                          {score.percentage}%
+                        </span>
                       </div>
                       <div className={`text-xs mt-1 ${
                         theme === "dark" ? "text-slate-500" : "text-slate-500"
                       }`}>
-                        {evaluation.finalSummary.overallScore.obtained} / {evaluation.finalSummary.overallScore.maximum} marks
+                        {score.obtained} / {score.maximum} marks
                       </div>
                     </div>
-                  )}
-                  {!evaluation.finalSummary?.overallScore && (
+                    );
+                  })()}
+                  {!getEvaluationScore(evaluation) && (
                     <div className={`mt-3 pt-3 border-t ${
                       theme === "dark" ? "border-slate-700" : "border-slate-200"
                     }`}>
@@ -389,7 +406,7 @@ const EvaluationHistoryPage: React.FC = () => {
                 <div className={`text-2xl font-bold ${
                   theme === "dark" ? "text-white" : "text-slate-900"
                 }`}>
-                  {history.filter(e => e.finalSummary?.overallScore).length}
+                  {history.filter(e => getEvaluationScore(e)).length}
                 </div>
                 <div className={`text-sm ${
                   theme === "dark" ? "text-slate-400" : "text-slate-600"
@@ -401,7 +418,7 @@ const EvaluationHistoryPage: React.FC = () => {
                 <div className={`text-2xl font-bold ${
                   theme === "dark" ? "text-white" : "text-slate-900"
                 }`}>
-                  {history.filter(e => e.finalSummary?.overallScore && e.finalSummary.overallScore.percentage >= 70).length}
+                  {history.filter(e => { const s = getEvaluationScore(e); return s && s.percentage >= 70; }).length}
                 </div>
                 <div className={`text-sm ${
                   theme === "dark" ? "text-slate-400" : "text-slate-600"
@@ -411,20 +428,20 @@ const EvaluationHistoryPage: React.FC = () => {
               </div>
               <div>
                 <div className={`text-2xl font-bold ${
-                  history.length > 0 && history.filter(e => e.finalSummary?.overallScore).length > 0
+                  history.length > 0 && history.filter(e => getEvaluationScore(e)).length > 0
                     ? (() => {
-                        const completed = history.filter(e => e.finalSummary?.overallScore);
-                        const avg = completed.reduce((sum, e) => sum + (e.finalSummary?.overallScore?.percentage || 0), 0) / completed.length;
+                        const completed = history.filter(e => getEvaluationScore(e));
+                        const avg = completed.reduce((sum, e) => sum + (getEvaluationScore(e)?.percentage || 0), 0) / completed.length;
                         return avg >= 70 ? 'text-green-500' : avg >= 50 ? 'text-orange-500' : 'text-red-500';
                       })()
                     : theme === "dark" ? "text-white" : "text-slate-900"
                 }`}>
-                  {history.length > 0 && history.filter(e => e.finalSummary?.overallScore).length > 0
+                  {history.length > 0 && history.filter(e => getEvaluationScore(e)).length > 0
                     ? Math.round(
                         history
-                          .filter(e => e.finalSummary?.overallScore)
-                          .reduce((sum, e) => sum + (e.finalSummary?.overallScore?.percentage || 0), 0) /
-                        history.filter(e => e.finalSummary?.overallScore).length
+                          .filter(e => getEvaluationScore(e))
+                          .reduce((sum, e) => sum + (getEvaluationScore(e)?.percentage || 0), 0) /
+                        history.filter(e => getEvaluationScore(e)).length
                       )
                     : 0}%
                 </div>
