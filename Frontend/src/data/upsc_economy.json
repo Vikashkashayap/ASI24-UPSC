@@ -1,0 +1,2070 @@
+{
+  "metadata": {
+    "portal": "MentorsDaily UPSC",
+    "subject": "Indian Economy",
+    "total_modules": 10,
+    "standard_track_days": 70,
+    "upsc_prelims_avg_questions": "14-18 per year",
+    "upsc_mains_weightage": "High (GS Paper 3)",
+    "last_updated": "2026-05-20",
+    "primary_sources": {
+      "books": [
+        {
+          "author": "Ramesh Singh",
+          "title": "Indian Economy",
+          "publisher": "McGraw Hill",
+          "scope": "All chapters (comprehensive)"
+        },
+        {
+          "class": 9,
+          "title": "Economics",
+          "scope": "All 4 chapters"
+        },
+        {
+          "class": 10,
+          "title": "Understanding Economic Development",
+          "scope": "All 5 chapters"
+        },
+        {
+          "class": 11,
+          "title": "Indian Economic Development",
+          "scope": "All 10 chapters"
+        },
+        {
+          "class": 12,
+          "title": "Introductory Macroeconomics",
+          "scope": "All 6 chapters"
+        },
+        {
+          "class": 12,
+          "title": "Introductory Microeconomics",
+          "scope": "All 6 chapters"
+        }
+      ],
+      "other_sources": [
+        "Economic Survey (latest)",
+        "Union Budget documents",
+        "RBI Monetary Policy reports"
+      ]
+    }
+  },
+  "modules": [
+    {
+      "module_id": "M1",
+      "module_name": "Basic Economic Concepts",
+      "module_duration_days": 7,
+      "topics": [
+        {
+          "topic_id": "M1.1",
+          "topic_name": "Micro vs Macroeconomics Fundamentals",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 1",
+            "chapter_name": "Introduction to Economics"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "Economics",
+            "chapter": "Chapter 1",
+            "chapter_name": "The Story of Village Palampur"
+          },
+          "key_concepts": [
+            "Microeconomics: Study of individual agents (consumers, firms, workers) and their behaviour",
+            "Macroeconomics: Study of aggregate economic activity, income, employment, price level",
+            "Consumer surplus: Difference between price willing to pay vs actual price paid",
+            "Producer surplus: Difference between price received vs minimum price willing to accept",
+            "Pareto Efficiency: Condition where no one can be made better off without making someone worse off",
+            "Ceteris Paribus: 'All other things equal' assumption in economic analysis",
+            "Opportunity cost: Cost of foregone alternative when choosing one option",
+            "Law of diminishing returns: Marginal product declines as more variable input is added",
+            "Economies of scale: Long-run average costs fall as firm expands output",
+            "Diseconomies of scale: Long-run average costs rise as firm expands output",
+            "Externalities: Costs/benefits affecting third parties not reflected in market price",
+            "Positive externality: Benefits spill over to third parties (education, vaccination)",
+            "Negative externality: Costs imposed on third parties (pollution, noise)",
+            "Public goods: Non-excludable, non-rivalrous (national defence, lighthouse)"
+          ],
+          "important_terms": {
+            "terms": [
+              "Microeconomics",
+              "Macroeconomics",
+              "Economic agents",
+              "Rational behavior",
+              "Utility",
+              "Scarcity",
+              "Opportunity cost",
+              "Ceteris paribus",
+              "Positive externality",
+              "Negative externality"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 1,
+          "current_affairs_connect": "Understanding micro-macro linkages essential for analyzing GST impact, inflation dynamics, employment data releases"
+        },
+        {
+          "topic_id": "M1.2",
+          "topic_name": "Demand, Supply & Elasticity",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 2",
+            "chapter_name": "Demand and Supply"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Microeconomics",
+            "chapter": "Chapter 2",
+            "chapter_name": "Theory of Consumer Behaviour"
+          },
+          "key_concepts": [
+            "Demand: Quantity of goods/services consumers willing and able to buy at various prices",
+            "Law of Demand: Inverse relationship between price and quantity demanded (ceteris paribus)",
+            "Demand curve shifts: Change in non-price determinants (income, preferences, substitute prices)",
+            "Supply: Quantity of goods/services producers willing to sell at various prices",
+            "Law of Supply: Positive relationship between price and quantity supplied",
+            "Supply curve shifts: Changes in production costs, technology, taxes, subsidies",
+            "Market equilibrium: Point where quantity demanded equals quantity supplied",
+            "Price elasticity of demand (PED): Responsiveness of quantity demanded to price change; PED = % ΔQd / % ΔP",
+            "Classification of PED: Elastic (|PED| > 1), Inelastic (|PED| < 1), Unit elastic (|PED| = 1)",
+            "Income elasticity of demand: Responsiveness to income changes; normal goods (positive), inferior goods (negative)",
+            "Cross elasticity of demand: Responsiveness to price changes of related goods; substitutes (positive), complements (negative)",
+            "Price elasticity of supply: Responsiveness of quantity supplied to price changes; PES = % ΔQs / % ΔP",
+            "Determinants of PED: Availability of substitutes, necessity vs luxury, proportion of income spent, time period",
+            "Deadweight loss: Loss of economic efficiency when supply/demand not in equilibrium; occurs due to taxes, price controls"
+          ],
+          "important_terms": {
+            "terms": [
+              "Demand",
+              "Supply",
+              "Equilibrium price",
+              "Equilibrium quantity",
+              "Price elasticity of demand",
+              "Income elasticity",
+              "Cross elasticity",
+              "Substitutes",
+              "Complements",
+              "Shortage",
+              "Surplus",
+              "Deadweight loss"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Agricultural price support (MSP) related to supply response; food inflation and demand-supply dynamics; fuel prices and elasticity impact on consumer behaviour"
+        },
+        {
+          "topic_id": "M1.3",
+          "topic_name": "Market Structures & Competition",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 4",
+            "chapter_name": "Market Structure and Competition"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Microeconomics",
+            "chapter": "Chapter 6",
+            "chapter_name": "Non-Competitive Markets"
+          },
+          "key_concepts": [
+            "Perfect Competition: Many firms, homogeneous products, free entry/exit, perfect information; P = AR = MR at equilibrium",
+            "Short-run equilibrium in perfect competition: Firm produces where MR = MC; may earn supernormal, normal, or negative profits",
+            "Long-run equilibrium in perfect competition: Free entry drives supernormal profits to zero; all firms earn normal profit",
+            "Monopoly: Single firm, unique product, high barriers to entry; creates deadweight loss by restricting output",
+            "Monopoly power sources: Natural monopoly (declining AC), patent/copyright, government licence, control of key input",
+            "Monopolistic Competition: Many firms, differentiated products, easy entry/exit; firms have some price-setting power",
+            "Oligopoly: Few large firms dominate, homogeneous/differentiated products, barriers to entry; interdependence of firms",
+            "Oligopoly examples in India: Telecom (Jio, Airtel, Vodafone), cement (Ambuja, Ultratech), aviation (IndiGo, Spicejet)",
+            "Cartel: Group of firms collude on price/output; OPEC example; often unstable due to cheating incentives",
+            "Monopolistic competition equilibrium: P > AR = MR; firms earn zero economic profit in long run; excess capacity remains",
+            "Barriers to entry: Economies of scale, brand loyalty, switching costs, network effects, regulatory barriers",
+            "Market concentration measures: Herfindahl-Hirschman Index (HHI), concentration ratio (CR4, CR8)",
+            "Competition policy in India: Competition Act 2002, CCI (Competition Commission of India), focus on anti-competitive practices",
+            "Predatory pricing, exclusive dealing, tie-in sales: Anticompetitive practices regulated by CCI"
+          ],
+          "important_terms": {
+            "terms": [
+              "Perfect competition",
+              "Monopoly",
+              "Monopolistic competition",
+              "Oligopoly",
+              "Cartel",
+              "Differentiation",
+              "Barriers to entry",
+              "Market power",
+              "Deadweight loss",
+              "Price discrimination",
+              "Natural monopoly",
+              "CCI"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "CCI investigations into Big Tech companies, competition in telecom/pharma sectors; cab aggregators (Uber/Ola) regulations; FDI in retail and impact on competition"
+        },
+        {
+          "topic_id": "M1.4",
+          "topic_name": "National Income Concepts & Measurement",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 3",
+            "chapter_name": "National Income"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 1",
+            "chapter_name": "Development Experience during 1947-90: An Introduction"
+          },
+          "key_concepts": [
+            "Gross Domestic Product (GDP): Total monetary value of all final goods/services produced within domestic territory in one year",
+            "GDP = C + I + G + (X - M) where C=consumption, I=investment, G=government spending, X-M=net exports",
+            "Gross National Product (GNP): GDP + Net Factor Income from Abroad (NFIA); measures income earned by nationals",
+            "GNP = GDP + NFIA; NFIA = Income of nationals from abroad - Income of foreigners from domestic territory",
+            "Net National Product (NNP): GNP - Depreciation (consumption of fixed capital); represents sustainable income",
+            "NNP = GNP - CFC (Capital Consumption); also called National Income at factor cost",
+            "Net Domestic Product (NDP): GDP - Depreciation; NDP = GDP - CFC",
+            "Gross Value Added (GVA): Difference between total output and intermediate consumption; GVA = GDP - product taxes + subsidies",
+            "GVA at factor cost vs GVA at basic prices vs GVA at market prices: Different treatment of taxes and subsidies",
+            "Per Capita Income: Total National Income / Total Population; adjusted for inflation gives Real Per Capita Income",
+            "Purchasing Power Parity (PPP): Exchange rate adjusted for price level differences between countries; better reflects living standards",
+            "GDP at constant prices (Real GDP): Adjusted for inflation using base year prices; shows true growth",
+            "GDP at current prices (Nominal GDP): Measured at prices of the year; inflated by price increases",
+            "GDP Deflator: Ratio of Nominal GDP to Real GDP × 100; measures inflation in GDP"
+          ],
+          "important_terms": {
+            "terms": [
+              "GDP",
+              "GNP",
+              "NNP",
+              "NDP",
+              "GVA",
+              "NFIA",
+              "Per capita income",
+              "PPP",
+              "Nominal vs Real",
+              "GDP deflator",
+              "Depreciation",
+              "Final goods",
+              "Intermediate goods"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "India's recent GDP growth revisions (2021-22 data); sectoral GVA contributions (agriculture vs services); impact of inflation on real GDP; comparison with other BRICS nations"
+        },
+        {
+          "topic_id": "M1.5",
+          "topic_name": "Real vs Nominal GDP & Per Capita Income",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 3",
+            "chapter_name": "National Income - Continued"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 1",
+            "chapter_name": "Introduction to Macroeconomics and its Concepts"
+          },
+          "key_concepts": [
+            "Real GDP (Constant Price): Adjusted for inflation; shows growth in actual output; comparable across time periods",
+            "Nominal GDP (Current Price): Measured at prices of current year; includes inflation effect",
+            "Real GDP = Nominal GDP / GDP Deflator × 100; more accurate reflection of economic growth",
+            "GDP deflator: Weighted average of price changes across all goods/services in economy",
+            "Base year: Reference year used for calculating real GDP; India uses 2011-12 as base year for current series",
+            "Example: If nominal GDP grows 10% but inflation is 5%, real GDP growth = approx 4.76%",
+            "Per Capita Income (PCI): Total National Income / Total Population; indicates average income per person",
+            "India's PCI in nominal terms: Approximately 187,000-192,000 INR (2024-25); in USD terms approx 2,500-2,700",
+            "Purchasing Power Parity (PPP) adjusted PCI: Accounts for price differences; India's PPP-PCI much higher than nominal",
+            "PPP adjustment: Indian rupee undervalued vs USD; prices lower in India for same basket of goods",
+            "World Bank methodology: PPP conversion factors used to make cross-country income comparisons meaningful",
+            "India's global ranking: 5th largest economy nominal GDP, 3rd largest by PPP GDP (post-2023)",
+            "Sectoral GDP contribution: Agriculture 18%, Industry 24%, Services 58% (2023-24 approx); changing composition",
+            "Structural change: Shift from agricultural to service economy as development occurs"
+          ],
+          "important_terms": {
+            "terms": [
+              "Real GDP",
+              "Nominal GDP",
+              "GDP deflator",
+              "Base year",
+              "Inflation",
+              "Per capita income",
+              "PPP",
+              "Sectoral GDP",
+              "Deflation",
+              "Revaluation"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "India reaching $3 trillion nominal GDP milestone (March 2024); growth rate comparisons with other economies; impact of inflation on real growth numbers; sectoral shifts post-pandemic"
+        },
+        {
+          "topic_id": "M1.6",
+          "topic_name": "Economic Systems & Sectors Classification",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 5",
+            "chapter_name": "Economic Systems and Development"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "Economics",
+            "chapter": "Chapter 1",
+            "chapter_name": "The Story of Village Palampur"
+          },
+          "key_concepts": [
+            "Capitalist economy: Private ownership, market forces determine allocation, profit motive, competition, minimal state intervention",
+            "Socialist economy: State ownership, central planning, equitable distribution, no profit motive, elimination of class differences",
+            "Mixed economy: Combination of private and public sector, both market and planning, India's system (Article 39 of Constitution)",
+            "Command economy: Central authority decides production, distribution; examples: North Korea, former USSR",
+            "Market economy: Price mechanism allocates resources; consumer choices drive production; examples: USA, UK (historically)",
+            "Primary sector: Agriculture, forestry, fishing, mining; extraction of natural resources; 18% of Indian GDP, 42% employment",
+            "Secondary sector: Manufacturing, construction, utilities; processing raw materials; 24% of Indian GDP, 24% employment",
+            "Tertiary sector: Services - trade, transport, communication, finance, education, health; 58% of Indian GDP, 34% employment",
+            "Quaternary sector: Knowledge-based services - IT, research, education; growing importance in modern economies",
+            "Sectoral interdependence: Backward linkage (primary to secondary), forward linkage (secondary to tertiary)",
+            "Structural change in India: Decline in agriculture's share, rise in services (tertiary-led growth); incomplete industrialization",
+            "India's structural composition: Service-led growth model (vs East Asian manufacturing-led); FDI mainly in services",
+            "Informal vs formal sectors: Informal sector 90% employment (agriculture, unregistered); formal sector 10% (organized)",
+            "Transition dynamics: Young population provides demographic dividend; need for job creation in formal sector"
+          ],
+          "important_terms": {
+            "terms": [
+              "Capitalism",
+              "Socialism",
+              "Mixed economy",
+              "Market mechanism",
+              "Central planning",
+              "Primary sector",
+              "Secondary sector",
+              "Tertiary sector",
+              "Quaternary sector",
+              "Structural change",
+              "Informal economy",
+              "Formal economy"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1,
+          "current_affairs_connect": "India's sectoral composition changes post-pandemic; formalization of informal sector (E-Shram portal); service sector dominance debate; agriculture distress and structural unemployment"
+        }
+      ]
+    },
+    {
+      "module_id": "M2",
+      "module_name": "Poverty, Inequality & Employment",
+      "module_duration_days": 7,
+      "topics": [
+        {
+          "topic_id": "M2.1",
+          "topic_name": "Poverty: Definitions, Measurement & Committees",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 8",
+            "chapter_name": "Poverty and Inequality"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "Economics",
+            "chapter": "Chapter 2",
+            "chapter_name": "People as a Resource"
+          },
+          "key_concepts": [
+            "Absolute poverty: Inability to meet basic needs (food, shelter, clothing, health, education); fixed standard",
+            "Relative poverty: Having less compared to others in society; depends on societal income distribution",
+            "Poverty line: Minimum expenditure required to meet basic needs; varies by committee estimates",
+            "Lakdawala Committee (1993): Used calorie-based approach; set poverty line at Rs. 328 (urban), Rs. 231 (rural) per capita/month",
+            "Tendulkar Committee (2009): Adopted Mixed Reference Period (MRP) approach; raised poverty line significantly",
+            "Tendulkar line estimates (2009-10): Rs. 672 (urban), Rs. 446 (rural) per month; estimated 32% population below line",
+            "Rangarajan Committee (2014): Further raised poverty line (most liberal estimate); Rs. 1,000 (urban), Rs. 816 (rural) for 2011-12",
+            "Rangarajan line (2011-12): Poverty at 41% national level; called poverty 'rediscovery'; faced criticism for being too generous",
+            "Multidimensional Poverty Index (MPI): Measures deprivation across multiple dimensions (health, education, living standards)",
+            "MPI dimensions: Education, health, living standards; 10 indicators total; NITI Aayog calculates for India",
+            "Below Poverty Line (BPL) vs Above Poverty Line (APL): Census data tracks BPL households; used for targeted welfare",
+            "SECC 2011 (Socio-Economic Caste Census): Basis for BPL determination; identifies excluded/included households; not yet fully released",
+            "Headcount ratio: % population below poverty line; declines from ~45% (1993-94) to ~22% (2019-20)",
+            "Poverty gap: Measures intensity of poverty (depth); poverty severity index measures inequality among poor"
+          ],
+          "important_terms": {
+            "terms": [
+              "Absolute poverty",
+              "Relative poverty",
+              "Poverty line",
+              "Headcount ratio",
+              "Poverty gap",
+              "Tendulkar Committee",
+              "Rangarajan Committee",
+              "Lakdawala Committee",
+              "MPI",
+              "BPL",
+              "APL",
+              "SECC"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "SECC 2011 delayed release and controversies; NITI Aayog's MPI reports; poverty reduction targets under SDGs; pandemic impact on poverty; state-wise variations in poverty rates"
+        },
+        {
+          "topic_id": "M2.2",
+          "topic_name": "Inequality Measurement & Distribution",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 8",
+            "chapter_name": "Poverty and Inequality - Continued"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 6",
+            "chapter_name": "Rural Development"
+          },
+          "key_concepts": [
+            "Inequality: Unequal distribution of income/wealth across population; measured using various indices",
+            "Gini Coefficient: Ranges 0-1 (or 0-100%); 0 = perfect equality, 1 = perfect inequality",
+            "Gini formula: G = Σ(2i - n - 1)×yi / (n × Σyi) where i=rank, yi=income; higher Gini = more inequality",
+            "Lorenz Curve: Cumulative income distribution curve; 45° diagonal = perfect equality; curve below diagonal = inequality",
+            "Lorenz curve interpretation: Distance from diagonal = extent of inequality; convexity shows income concentration",
+            "Palma Ratio: Richest 10% income / poorest 40% income; newer measure gaining prominence",
+            "Decile share analysis: Income share of top 10%, next 10%, etc.; shows concentration patterns",
+            "Quintile analysis: 5 income groups; common in policy analysis (e.g., richest quintile's income share)",
+            "India's inequality: Gini coefficient approx 0.31-0.35 (2019-20 NFHS); rising trend post-liberalization",
+            "Rural vs urban inequality: Urban areas show higher inequality (Gini ~0.38) vs rural (~0.30)",
+            "Inter-state inequality: Significant variations; wealthier states (Delhi, Maharashtra) vs poor states (Bihar, Odisha)",
+            "Wealth inequality: More severe than income inequality; top 10% owns 65-70% wealth",
+            "Intergenerational mobility: Poor to rich transition probability in India: ~15-20%; sticky poverty",
+            "Consumption inequality vs income inequality: Consumption smoother; consumption inequality < income inequality"
+          ],
+          "important_terms": {
+            "terms": [
+              "Gini coefficient",
+              "Lorenz curve",
+              "Inequality index",
+              "Income distribution",
+              "Wealth distribution",
+              "Palma ratio",
+              "Decile",
+              "Quintile",
+              "Intergenerational mobility",
+              "Consumption inequality",
+              "Redistribution"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Rising inequality post-pandemic; WEF Global Inequality Report; wealth concentration among top 1%; gender wealth gap; caste-based economic disparities; inequality in access to digital resources"
+        },
+        {
+          "topic_id": "M2.3",
+          "topic_name": "Unemployment: Types & Measurement",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 9",
+            "chapter_name": "Employment and Unemployment"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 2",
+            "chapter_name": "National Income and Related Aggregates"
+          },
+          "key_concepts": [
+            "Unemployment: Percentage of labour force (willing and able to work) unable to find jobs despite searching",
+            "Labour force: Working age population (15-59 years typically) able and willing to work; includes employed + unemployed",
+            "Unemployment rate (U-rate): Unemployed / Labour force × 100; formula: U = U / (E + U) × 100",
+            "Frictional unemployment: Short-term, due to job transition; inevitable in dynamic economy; normal friction",
+            "Structural unemployment: Long-term, mismatch between skills required and available; technological change impact",
+            "Cyclical unemployment: Due to economic downturns; occurs during recessions; inverse to business cycle",
+            "Seasonal unemployment: Due to seasonal demand variations; agriculture, tourism sectors; temporary nature",
+            "Disguised unemployment: Person employed but productivity very low; redundant worker; common in agriculture",
+            "Open unemployment: Person actively seeking work but unable to find; visible unemployment",
+            "NSSO (National Sample Survey Organization): Conducts PLFS (Periodic Labour Force Survey); measures unemployment; quarterly data",
+            "PLFS methodology: Sample of 45,000+ households; definition: without work, seeking work, available for work in past week",
+            "Natural rate of unemployment: Unemployment when economy at full capacity; structural + frictional; India's approx 4-5%",
+            "Youth unemployment: Higher than overall; problem for 15-24 age group in India ~12-15% (PLFS data)",
+            "Graduate unemployment: Educated unemployment rising; mismatch between education and job requirements"
+          ],
+          "important_terms": {
+            "terms": [
+              "Unemployment rate",
+              "Labour force",
+              "Frictional unemployment",
+              "Structural unemployment",
+              "Cyclical unemployment",
+              "Seasonal unemployment",
+              "Disguised unemployment",
+              "Open unemployment",
+              "NSSO",
+              "PLFS",
+              "Natural rate",
+              "Underemployment"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "India's unemployment rising to 6.5%+ post-pandemic; PLFS quarterly releases showing trends; youth unemployment crisis; skill gap in IT sector vs other sectors; impact of automation on employment"
+        },
+        {
+          "topic_id": "M2.4",
+          "topic_name": "MGNREGA & Labour Reforms",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 10",
+            "chapter_name": "Government Spending and Employment Schemes"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 7",
+            "chapter_name": "Employment: Growth, Informalisation and Other Issues"
+          },
+          "key_concepts": [
+            "MGNREGA (Mahatma Gandhi National Rural Employment Guarantee Act 2005): Right to 100 days paid work/year; launched nationally 2008",
+            "MGNREGA objectives: Provide livelihood security, generate productive assets, social protection, women empowerment",
+            "MGNREGA wage: Linked to state minimum wages; approx Rs. 300-400/day in most states (2024); 33% must be women",
+            "MGNREGA employment: FY 2023-24: 300+ crore person-days; approx 80 lakh households; budget allocation ~Rs. 74,000 crore",
+            "MGNREGA work types: Road construction, water conservation, afforestation, land development, rural sanitation",
+            "MGNREGA outcomes: Created 5000+ km roads, 3 crore+ hectares treated land, 2 lakh+ water harvesting structures",
+            "MGNREGA issues: Delay in wage payment, low asset quality, low female participation (despite 33% mandate), displacement",
+            "Criticism: Opportunity cost (migration to cities better), inefficient asset creation, political misuse",
+            "Labour Code 2020: Consolidated 29 old laws into 4 codes (wages, IR, social security, occupational safety)",
+            "Code on Wages 2019: Defines minimum wage, wages structure, gratuity; floor to wages ensuring living standards",
+            "Industrial Relations Code 2020: Regulates employer-employee relations, strikes, dispute resolution; controversial provisions",
+            "Occupational Safety Code 2020: Covers occupational health, safety standards, workplace hazards",
+            "Social Security Code 2020: Covers workers' compensation, disability, unemployment benefits, maternity, old age pensions",
+            "Labour reforms debate: Ease of hiring/firing vs worker protection; state-wise variations in implementation"
+          ],
+          "important_terms": {
+            "terms": [
+              "MGNREGA",
+              "Guaranteed employment",
+              "Person-days",
+              "Productive assets",
+              "Labour code",
+              "Minimum wage",
+              "Social security",
+              "Informal employment",
+              "Dispute resolution",
+              "Worker protection"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "MGNREGA spike during pandemic/lockdowns; asset quality debates; farm labour distress; labour code implementation challenges; debate on universal basic income as alternative; migrant worker issues"
+        }
+      ]
+    },
+    {
+      "module_id": "M3",
+      "module_name": "Planning & Development",
+      "module_duration_days": 7,
+      "topics": [
+        {
+          "topic_id": "M3.1",
+          "topic_name": "Economic Planning in India & Five Year Plans",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 6",
+            "chapter_name": "Economic Planning"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 2",
+            "chapter_name": "Sectors of the Indian Economy"
+          },
+          "key_concepts": [
+            "Economic planning: Centralized decision-making on resource allocation toward development goals",
+            "Planning Commission (1950-2014): Established by Dr. Rajendra Prasad; Jawaharlal Nehru as Chairman; drafted FYPs",
+            "Five Year Plans: Periodical 5-year development targets; 15 FYPs completed (1951-2016); now abandoned",
+            "1st FYP (1951-56): Mahalanobis model focus; agriculture priority; capital accumulation; growth rate 3.2%",
+            "2nd FYP (1956-61): Heavy industry focus; steel plants, dams; foundation of industrial base; 4.2% growth",
+            "3rd FYP (1961-66): Self-reliance goal; agricultural focus; wars disrupted; 2.8% growth (lowest)",
+            "4th FYP (1969-74): Poverty alleviation focus; green revolution impact; growth 5.7% (high); inflation crisis ended",
+            "5th FYP (1974-78): Equity focus; employment emphasis; implemented by JP-led government in 1977; growth 4.3%",
+            "6th FYP (1980-85): Growth & equity; technology emphasis; economic stabilization; growth 5.7%",
+            "7th FYP (1985-90): Human development focus; liberalization hints; growth 6.8% (fast growth period)",
+            "8th FYP (1992-97): Post-LPG reforms; integration into world economy; growth 6.5%; structural changes",
+            "9th FYP (1997-02): Social development priority; education, health; growth 5.5%; poverty focus",
+            "10th FYP (2002-07): Inclusive growth concept; infrastructure investment; growth 7.7%; fast growth begins",
+            "11th FYP (2007-12): Inclusive growth; social sectors; agriculture & rural development; growth 7.9%",
+            "12th FYP (2012-16): Inclusive, sustainable, faster growth; skill development; growth 6.7% (slowdown period)",
+            "Mahalanobis model: Capital-intensive heavy industry focus; capital accumulation path; influenced 2nd-4th FYPs"
+          ],
+          "important_terms": {
+            "terms": [
+              "Economic planning",
+              "Planning Commission",
+              "Five Year Plan",
+              "Mahalanobis model",
+              "Self-reliance",
+              "Inclusive growth",
+              "Plan outlay",
+              "Plan allocation",
+              "Centralized planning",
+              "Market-oriented planning"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "NITI Aayog replaced Planning Commission (2015); shift from planning to aspirational India; centralized planning waning; revival of plan/strategy discussion; long-term vision documents (2047 agenda)"
+        },
+        {
+          "topic_id": "M3.2",
+          "topic_name": "NITI Aayog & Post-1991 Liberalization",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 7",
+            "chapter_name": "Liberalization and Reforms"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 4",
+            "chapter_name": "The Responsibility of Government and Market"
+          },
+          "key_concepts": [
+            "NITI Aayog (National Institution for Transforming India): Established 2015; replaces Planning Commission",
+            "NITI structure: PM as Chairperson, CM of states as members, sector experts, special invitees; think-tank model",
+            "NITI functions: Advising government on policy, research, cooperative federalism, SDG alignment, aspirational districts",
+            "Difference from Planning Commission: Non-binding recommendations vs binding allocations; advisory vs directive role",
+            "LPG Reforms 1991: Liberalization, Privatization, Globalization; triggered by BoP crisis, high inflation",
+            "1991 crisis: Foreign exchange crisis, inflation 13%, external debt crisis; IMF intervention",
+            "Liberalization: Removal of license raj, reduction in controls, ease of doing business, increased competition",
+            "Privatization: Private sector entry in previously reserved sectors (airlines, telecom, ports, insurance)",
+            "Globalization: Integration into world economy, FDI inflows, export promotion, reduced tariffs, capital account opening",
+            "Delicensing: Removal of industrial licensing requirement; except defence, nuclear, hazardous chemicals",
+            "Automatic route FDI: FDI up to certain % allowed automatically without government approval in many sectors",
+            "Reduction in tariffs: Effective rate from 80-90% (pre-1991) to 11% (2020s); WTO compliance",
+            "Capital account convertibility: Partial convertibility achieved 1994; full convertibility still pending (restrictions remain)",
+            "Washington Consensus: Market-oriented reforms pushed by IMF/World Bank; criticized for social impact",
+            "Post-Washington Consensus: Greater emphasis on social protection, inequality, environmental sustainability; evolved approach"
+          ],
+          "important_terms": {
+            "terms": [
+              "NITI Aayog",
+              "Liberalization",
+              "License raj",
+              "Privatization",
+              "Globalization",
+              "LPG",
+              "FDI",
+              "Delicensing",
+              "Washington Consensus",
+              "Capital account convertibility",
+              "Disinvestment"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Atmanirbhar Bharat vs globalization debate; Make in India vs imports; RCEP rejection; sector-wise FDI trends; recent foreign policy economic dimension; new industrial policy frameworks"
+        },
+        {
+          "topic_id": "M3.3",
+          "topic_name": "Inclusive Growth & Human Development",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 11",
+            "chapter_name": "Inclusive Growth and Development"
+          },
+          "ncert_reference": {
+            "class": 10,
+            "book": "Understanding Economic Development",
+            "chapter": "Chapter 1",
+            "chapter_name": "Development"
+          },
+          "key_concepts": [
+            "Inclusive growth: Economic growth benefiting all sections; poverty, inequality, employment focus; broad-based growth",
+            "Inclusive growth dimensions: Income growth for poor, job creation, social service access, equity",
+            "Vs exclusive growth: Growth concentrated among few; inequality rising; social exclusion persisting",
+            "Human Development Index (HDI): Composite of life expectancy, education, income; 0-1 scale; UN develops",
+            "HDI components: Life expectancy at birth (health), mean/expected schooling (education), GNI per capita (income)",
+            "India's HDI: Ranked 134 globally (2022 UNDP report); 0.633 value; south Asian average 0.671",
+            "Gender Development Index (GDI): HDI adjusted for gender parity; India's GDI lower than HDI (gender gap)",
+            "Gender Inequality Index (GII): Focuses on reproductive health, empowerment, labour participation; India ranked 108 (2022)",
+            "Multidimensional Poverty (MPI): 3 dimensions, 10 indicators; NITI Aayog calculates; latest 2021-22",
+            "India's MPI (2021-22): 24.82% population multidimensionally poor (down from 31.9% in 2015-16); rural 35%, urban 6%",
+            "State variations in HDI: Kerala (0.784), Delhi (0.757) vs Bihar (0.555), Jharkhand (0.569)",
+            "Sustainable Development Goals (SDGs): 17 goals adopted 2015; India signatory to 2030 agenda",
+            "India's SDG performance: Mixed; good on poverty, weak on inequality/environment; SDG Index score 65-66 (mid-range)",
+            "Indicators of inclusive growth: Gini decline, poverty headcount reduction, HDI improvement, unemployment decline"
+          ],
+          "important_terms": {
+            "terms": [
+              "Inclusive growth",
+              "Human Development Index",
+              "GDI",
+              "GII",
+              "Multidimensional poverty",
+              "SDGs",
+              "Social indicators",
+              "Economic growth",
+              "Equity",
+              "Development"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "India's HDI improvements; gender gap in education/employment; SDG targets progress; pandemic impact on HDI; state rankings variation; skill development under PMKVY; health sector expansion (Ayushman Bharat)"
+        }
+      ]
+    },
+    {
+      "module_id": "M4",
+      "module_name": "Money, Banking & Financial System",
+      "module_duration_days": 9,
+      "topics": [
+        {
+          "topic_id": "M4.1",
+          "topic_name": "Money Supply, RBI Functions & Monetary Policy",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 12",
+            "chapter_name": "Money and Banking"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 4",
+            "chapter_name": "Money and Banking"
+          },
+          "key_concepts": [
+            "Money: Medium of exchange, store of value, unit of account; reduces transaction costs",
+            "M0 (Monetary Base): Currency in circulation + RBI deposits; central bank money; ~15-18% of M3",
+            "M1: Currency in circulation + demand deposits; narrow money; ~22-25% of M3",
+            "M2: M1 + savings deposits with post office; ~35-40% of M3",
+            "M3 (Broad Money): M2 + term deposits of banks; most comprehensive; used for policy purposes",
+            "M4: M3 + other deposits; less used; includes post office deposits",
+            "Multiplier effect: One unit of base money creates multiple units of broad money through credit creation",
+            "Credit multiplier: M3/M0 ratio; India's typically 4-5 times; bank lending expansion effect",
+            "RBI (Reserve Bank of India): Established 1935; nationalized 1947; central bank of India",
+            "RBI functions: Monetary policy, banking regulation, payment system management, forex management, debt management",
+            "Monetary Policy Committee (MPC): 6 members (3 RBI, 2 external, 1 govt); mandate: inflation 4% ± 2%",
+            "MPC decision: Repo rate setting; quarterly review (reviewed 6 times/year); transparent inflation targeting",
+            "Repo rate: Rate at which RBI lends to banks against securities; primary policy instrument; currently 6.50% (as of May 2024)",
+            "Reverse repo: Rate RBI pays banks on deposits; typically 50-100 bps below repo; 5.50% (as of May 2024)",
+            "CRR (Cash Reserve Ratio): % of deposits banks must keep with RBI; currently 4.50%; no interest on CRR",
+            "SLR (Statutory Liquidity Ratio): % of deposits in government securities; currently 18.00%; safe asset requirement",
+            "Open Market Operations (OMO): RBI buys/sells government securities to inject/absorb liquidity",
+            "Liquidity Adjustment Facility (LAF): Corridor between repo and reverse repo; corridor width 100 bps"
+          ],
+          "important_terms": {
+            "terms": [
+              "Money",
+              "M0, M1, M2, M3, M4",
+              "Central bank",
+              "Monetary policy",
+              "Inflation targeting",
+              "Repo rate",
+              "Reverse repo",
+              "CRR",
+              "SLR",
+              "OMO",
+              "LAF",
+              "MPC"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "RBI's inflation control challenges; repo rate trajectory; liquidity management post-pandemic; credit growth trends; monetary policy effectiveness debates; inflation vs growth trade-off"
+        },
+        {
+          "topic_id": "M4.2",
+          "topic_name": "Banking System & Financial Institutions",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 13",
+            "chapter_name": "Banking and Financial Institutions"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 4",
+            "chapter_name": "Money and Banking - Continued"
+          },
+          "key_concepts": [
+            "Commercial banks: Deposit-taking institutions providing credit; 12 public sector banks, 22+ private banks (2024)",
+            "Public sector banks: Government ownership >50%; largest share of banking; SBI, Bank of Baroda, Bank of India, etc.",
+            "Private sector banks: Private ownership; ICICI Bank, HDFC Bank, Axis Bank, Kotak Bank, IndusInd Bank",
+            "Payment banks: Limited banking licenses; 11-15 licensees (Paytm, Amazon Pay, Google Pay, etc.); deposit limits, no credit",
+            "Small Finance Banks: Focus on MSME lending; 12 licensees approved; deposit insurance like regular banks",
+            "Cooperative banks: Member-owned; district/state-level structure; recent Yes Bank, PMC Bank crises",
+            "NBFC (Non-Banking Financial Company): Deposit-taking/lending without bank license; ~9,000 NBFCs; less regulated",
+            "NBFC categories: Deposit-taking, non-deposit taking; NBFC-D and NBFC-ND",
+            "IL&FS crisis (2018): NBFC default triggered; cascading defaults in bond market; systemic risk exposed",
+            "Credit rating agencies: CRISIL, ICRA, CARE, India Ratings; rate corporate bonds; conflict of interest concerns",
+            "Deposits insurance: DICGC covers deposits up to Rs. 5 lakh per bank/depositor; introduced 1993; raised to 5L in 2020",
+            "Priority Sector Lending: Banks lend 40% (SLBs 32%) advances to agriculture, MSMEs, education, housing; PSL norms",
+            "Khazana Banking: Government account management; RBI manages government cash balances; important for liquidity",
+            "NPA crisis: Gross NPA peaked 11.5% (2017); declined to 3.8% (2023); stressed asset resolution focus"
+          ],
+          "important_terms": {
+            "terms": [
+              "Commercial bank",
+              "Public sector bank",
+              "Private bank",
+              "Payment bank",
+              "Small Finance Bank",
+              "Cooperative bank",
+              "NBFC",
+              "Credit rating",
+              "Deposit insurance",
+              "Priority Sector Lending",
+              "NPA",
+              "Asset reconstruction"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Banking sector NPAs improving; merger of banks (Union Bank-BOB-IOB); fintech disruption; digital banking expansion; rural banking challenges; small bank performance"
+        },
+        {
+          "topic_id": "M4.3",
+          "topic_name": "NPA, IBC & Asset Resolution",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 14",
+            "chapter_name": "Asset Management and Distressed Assets"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 5",
+            "chapter_name": "Government Budget and the Economy"
+          },
+          "key_concepts": [
+            "NPA (Non-Performing Asset): Loan where principal/interest unpaid >90 days; definition changed 2015 (Asset Classification norms)",
+            "Gross NPA: Total NPAs including recoveries; measures asset quality deterioration",
+            "Net NPA: Gross NPA minus provisions and recoveries; reflects actual bank capital impact",
+            "NPA classification: Sub-standard (90d-1yr), doubtful (<3yr or >3yr), loss assets (unrecoverable); 2015 norm tightened",
+            "Gross NPA ratio: Gross NPA / Total advances; peak 11.5% (2017); declined 3.8% (2023); PSBs vs PVT banks gap narrowing",
+            "NPA cycle: Borrower financial stress → missed payment → NPA → recovery efforts → write-off",
+            "Stressed assets: NPAs + restructured advances; broader measure of credit stress",
+            "IBC (Insolvency and Bankruptcy Code 2016): Consolidated 4 laws; 90-day resolution timeline; creditor-friendly recovery",
+            "IBC process: Insolvency → Corporate Insolvency Resolution Process (CIRP) → liquidation if unresolved",
+            "Insolvency Regulator: IBBI (Insolvency and Bankruptcy Board of India); insolvency professionals, resolution professionals",
+            "CIRP success rate: Approx 40-50% resolution (plan approval); recovery ~40-60% of claim value; improvement from earlier",
+            "Liquidation: Last resort if CIRP fails; assets sold piecemeal; lower recovery ~20-30%",
+            "SARFAESI Act 2002: Secured Asset Recovery; enables banks to seize collateral without court intervention; accelerates recovery",
+            "Asset Reconstruction Companies (ARCs): Specialized entities buying NPAs; restructure and recover; 28+ ARCs operating",
+            "NARCL (National Asset Reconstruction Company Ltd.): Bad bank established 2021; acquires government bank NPAs; 2.5T+ Rs. AUM"
+          ],
+          "important_terms": {
+            "terms": [
+              "NPA",
+              "Gross NPA",
+              "Net NPA",
+              "Stressed asset",
+              "IBC",
+              "Insolvency",
+              "CIRP",
+              "Liquidation",
+              "SARFAESI",
+              "ARC",
+              "Asset recovery",
+              "NARCL"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "NPA decline trajectory; IBC resolution outcomes; NARCL operations expansion; stressed asset management; fraud cases (IL&FS, DHFL, Yes Bank); large borrower defaults"
+        },
+        {
+          "topic_id": "M4.4",
+          "topic_name": "Digital Payments & Financial Inclusion",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 15",
+            "chapter_name": "Digital Economy and Financial Technology"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 10",
+            "chapter_name": "Liberalization and the Indian Economy"
+          },
+          "key_concepts": [
+            "NEFT (National Electronic Funds Transfer): Batch settlement, 30-min to multiple hours; used for high-value transfers; Rs. 0 charges",
+            "RTGS (Real Time Gross Settlement): Real-time settlement; Rs. 2-25L range typically; faster than NEFT; fees charged",
+            "IMPS (Immediate Payment Service): Instant settlement 24/7; mobile-based; Rs. 1L limit typically; fee Rs. 5-15",
+            "UPI (Unified Payments Interface): Revolutionized digital payments; NPCI developed; instant, bank-agnostic, mobile-first",
+            "UPI architecture: Interoperable, two-factor authentication (PIN + biometric); enables P2P, P2B, B2B transfers",
+            "UPI statistics (2024): 15B+ transactions monthly; value ~Rs. 12-15L crore/month; fastest growing payment instrument",
+            "Digital Wallets: Prepaid instruments; Paytm, PhonePe, Google Pay, Amazon Pay; e-commerce focus",
+            "Card payments: Debit/credit cards; declining share vs UPI; RuPay card government push",
+            "Mobile banking: USSD, app-based; enables unbanked access; declining as UPI scales",
+            "BHIM App: Government's UPI app; promoted for digital inclusion; merged with UPI ecosystem",
+            "Jan Dhan Yojana (PMJDY): Account opening scheme; 460+ million accounts (2024); RuPay cards issued; zero balance",
+            "PMJDY linkage: Insurance (Pradhan Mantri Jeevan Bima Yojana), pension (APY), accident cover; holistic financial inclusion",
+            "Aadhaar integration: e-KYC reduces account opening friction; biometric authentication; privacy concerns",
+            "Financial literacy: RBI, govt initiatives; critical for financial inclusion success; still low in rural areas"
+          ],
+          "important_terms": {
+            "terms": [
+              "NEFT",
+              "RTGS",
+              "IMPS",
+              "UPI",
+              "Digital wallet",
+              "Fintech",
+              "Digital payment",
+              "Financial inclusion",
+              "Jan Dhan",
+              "RuPay",
+              "Aadhaar",
+              "Cashless economy"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "UPI dominance in digital payments; fintech regulation challenges; CBDC (digital rupee) rollout; cryptocurrency regulation; cybersecurity in payments; financial inclusion gaps remaining"
+        }
+      ]
+    },
+    {
+      "module_id": "M5",
+      "module_name": "Capital Markets & Securities",
+      "module_duration_days": 7,
+      "topics": [
+        {
+          "topic_id": "M5.1",
+          "topic_name": "Money Market vs Capital Market & SEBI Regulation",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 16",
+            "chapter_name": "Securities Markets and Stock Exchange"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 6",
+            "chapter_name": "Open Economy Macroeconomics"
+          },
+          "key_concepts": [
+            "Money Market: Short-term, high liquidity instruments; T-bills, commercial paper, call money; maturity <1 year",
+            "Capital Market: Long-term instruments; stocks, bonds, debentures; maturity >1 year; for raising permanent capital",
+            "Primary market: Companies issue new securities; IPOs, bonds; capital raising function",
+            "Secondary market: Trading of existing securities; stock exchanges; price discovery, liquidity provision",
+            "Over-the-counter (OTC) market: Direct trading between parties; bonds, forex; less regulated than exchange",
+            "SEBI (Securities and Exchange Board of India): Regulatory body; established 1988; statutory 1992",
+            "SEBI mandate: Investor protection, market development, efficient regulation; powers to make rules, issue directions",
+            "SEBI powers: Issue securities regulations, ban unfair practices, impose penalties, oversee market conduct",
+            "Stock exchanges: BSE (Bombay Stock Exchange, 1875), NSE (National Stock Exchange, 1994); self-regulatory organizations",
+            "SENSEX: BSE 30-stock index; base 1978-79 = 100; major blue-chip companies; market barometer",
+            "NIFTY: NSE 50-stock index; base Nov 1995 = 1000; benchmark for mutual funds",
+            "Circuit breaker: Trading halt when index moves >10%, >15%, >20%; prevents panic selling; 10-min halt rules",
+            "Listing norms: SEBI regulations on IPO disclosures, delisting, promoter holding; Revised norms 2015, 2018",
+            "Insider trading: Trading on non-public information; prohibited under Securities Act; SEBI enforcement focus"
+          ],
+          "important_terms": {
+            "terms": [
+              "Money market",
+              "Capital market",
+              "Primary market",
+              "Secondary market",
+              "SEBI",
+              "Stock exchange",
+              "Securities",
+              "IPO",
+              "Index",
+              "Trading halt",
+              "Insider trading",
+              "Delisting"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Market volatility episodes; regulatory changes (SEBI orders); Adani controversy regulatory response; IPO market trends; corporate governance focus; foreign investment flows impact"
+        },
+        {
+          "topic_id": "M5.2",
+          "topic_name": "FDI, FII & Foreign Investment Routes",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 17",
+            "chapter_name": "Foreign Investment in India"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 10",
+            "chapter_name": "Liberalization and the Indian Economy"
+          },
+          "key_concepts": [
+            "FDI (Foreign Direct Investment): Investment with management control; minimum 10% equity stake; long-term nature",
+            "FII (Foreign Institutional Investors): Portfolio investments; traded on stock exchange; volatile short-term money",
+            "FPI (Foreign Portfolio Investment): Broader term replacing FII; includes all portfolio investments",
+            "Automatic route FDI: FDI up to specified % in specified sectors allowed without government approval",
+            "Government route FDI: Sectors like multi-brand retail, insurance, aviation require FIPB/government approval",
+            "Conditional FDI: FDI with conditions (local sourcing, technology transfer, export requirements)",
+            "Sectoral FDI restrictions: Defence, nuclear, railways, insurance (limited), telecom, media (limited), e-commerce",
+            "FDI inflows to India: ~$85 billion (2022), ~$72 billion (2023); trend declining post-pandemic peak",
+            "FDI sources: Singapore, Mauritius, US, Japan, Netherlands; tax treaty considerations",
+            "Sectoral FDI composition: Services 60%, manufacturing 20%, infrastructure 10%, others 10%",
+            "ECB (External Commercial Borrowing): Foreign currency borrowing for capex; relaxed norms for green projects",
+            "ADR (American Depository Receipt): US trading certificate representing Indian shares; facilitates US investment",
+            "GDR (Global Depository Receipt): Global trading certificate; Indian companies raise capital internationally",
+            "Portfolio volatility: FII flows cause stock market swings; 2013 taper tantrum, 2022 rate hike concerns"
+          ],
+          "important_terms": {
+            "terms": [
+              "FDI",
+              "FII",
+              "FPI",
+              "Automatic route",
+              "Government route",
+              "Sectoral restrictions",
+              "ECB",
+              "ADR",
+              "GDR",
+              "Foreign investment",
+              "Capital flows"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "FDI slowdown concerns; Make in India push; FII volatility episodes; Mauritius treaty abuse concerns; ECB norms for renewable energy; ADR/GDR market trends; foreign investor sentiment"
+        },
+        {
+          "topic_id": "M5.3",
+          "topic_name": "Bonds, Mutual Funds & Insurance",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 18",
+            "chapter_name": "Debt Markets and Insurance"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 4",
+            "chapter_name": "Money and Banking - Debt"
+          },
+          "key_concepts": [
+            "Government Securities (G-secs): Issued by RBI on behalf of government; backed by sovereign guarantee; risk-free",
+            "T-bills (Treasury bills): Short-term G-secs; maturity 91/182/364 days; zero-coupon, issued at discount",
+            "SDL (State Development Loans): State government securities; slightly higher yield than G-secs; state credit risk",
+            "Corporate bonds/debentures: Issued by companies; higher risk/return than G-secs; credit rating determines spread",
+            "Bond ratings: CRISIL, ICRA, CARE; AAA (highest) to D (default); rating affects coupon rates",
+            "Yield Curve: Graphical relationship between bond maturity and yield; normally upward sloping; reflects term premium",
+            "Bond duration: Weighted average time to receive cash flows; measures interest rate sensitivity; longer duration = higher sensitivity",
+            "Mutual Funds: Pooled investment vehicle; professional management; diversification benefit; lower transaction costs",
+            "Mutual Fund types: Equity funds, debt funds, balanced funds, liquid funds, sectoral funds, index funds",
+            "NAV (Net Asset Value): Value per unit of mutual fund; NAV = Total Assets - Liabilities / Number of Units",
+            "AMFI (Association of Mutual Funds in India): Self-regulatory; mutual fund industry body; promotes investor awareness",
+            "Mutual fund statistics: Rs. 50L crore+ AUM (2024); 2500+ schemes; SIP contributions growing",
+            "Insurance: Transfer of risk; IRDAI (Insurance Regulatory Authority) regulates; life and non-life insurance",
+            "Insurance products: Term insurance (pure coverage), endowment (savings+insurance), ULIP (market-linked)"
+          ],
+          "important_terms": {
+            "terms": [
+              "Government security",
+              "T-bill",
+              "Bond",
+              "Debenture",
+              "Yield",
+              "Duration",
+              "Mutual fund",
+              "NAV",
+              "AMFI",
+              "Insurance",
+              "Rating",
+              "IRDAI"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Yield curve dynamics; corporate bond defaults; mutual fund inflows acceleration; insurance sector growth; regulatory changes (SEBI, IRDAI); ESG investing trends; credit events tracking"
+        },
+        {
+          "topic_id": "M5.4",
+          "topic_name": "Pension Systems & Cryptocurrency Regulation",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 19",
+            "chapter_name": "Retirement Security and Digital Currencies"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 9",
+            "chapter_name": "Environment and Sustainable Development"
+          },
+          "key_concepts": [
+            "NPS (National Pension System): Voluntary contributory scheme; introduced 2004; PFRDA regulates; portable across employers",
+            "NPS Tier I: Main retirement account; investment options (equity, bonds, government securities, cash)",
+            "NPS Tier II: Additional voluntary savings; more flexible; no mandatory lockup; can withdraw anytime",
+            "NPS vesting: Mandatory annuity 40% (Tier I); remaining 60% can be lump sum; full withdrawal after 60 years",
+            "PFRDA (Pension Fund Regulatory Authority): Regulatory body; investment limits, fund management oversight",
+            "APY (Atal Pension Yojana): Government co-contribution scheme; 18-40 age group; guaranteed pension Rs. 1000-5000/month",
+            "APY subscribers: 3+ crore members; Rs. 1000 investment yields Rs. 1000 pension monthly (example)",
+            "Employee Provident Fund (EPF): Mandatory for organized sector; EPFO manages; 13% employee + 12% employer contribution",
+            "EPF features: Interest accrual (7-8% p.a.), tax-free, portable, withdrawal rules (retirement/emergency)",
+            "Old Pension Scheme (OPS) vs NPS: OPS unfunded government liability; NPS individual account funded; NPS now favored",
+            "Cryptocurrency in India: Bitcoin, Ethereum; volatile, speculative; multiple regulatory approaches tried",
+            "Cryptocurrency ban debate: 2021 bill to ban private cryptos; currently banned for banks; individuals can hold (legally gray)",
+            "Digital Rupee (CBDC): RBI's central bank digital currency; pilot launched 2023; aimed at payments, not cryptocurrency",
+            "CBDC advantages: Financial inclusion, payment system efficiency, reduced cash management costs, monetary policy tool"
+          ],
+          "important_terms": {
+            "terms": [
+              "NPS",
+              "PFRDA",
+              "APY",
+              "EPF",
+              "OPS",
+              "Pension",
+              "Annuity",
+              "Cryptocurrency",
+              "CBDC",
+              "Digital rupee",
+              "Bitcoin",
+              "Blockchain"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "NPS subscriber growth; pension adequacy debate; reversions to OPS by some states; crypto regulation clarity pending; digital rupee rollout timeline; financial security for elderly; gig worker pension coverage"
+        }
+      ]
+    },
+    {
+      "module_id": "M6",
+      "module_name": "Fiscal Policy & Public Finance",
+      "module_duration_days": 8,
+      "topics": [
+        {
+          "topic_id": "M6.1",
+          "topic_name": "Union Budget Structure & Components",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 20",
+            "chapter_name": "Government Budget and Fiscal Policy"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 5",
+            "chapter_name": "Government Budget and the Economy"
+          },
+          "key_concepts": [
+            "Union Budget: Annual government financial statement; revenue + capital budgets; presented Feb (now Jan 31)",
+            "Budget calendar: Interim budget (if elections), full budget, debates, passage, implementation",
+            "Revenue Budget: Revenue receipts & revenue expenditure; no asset creation; current account",
+            "Capital Budget: Capital receipts & capital expenditure; creates assets; long-term nature",
+            "Revenue receipts: Tax revenue (60% of total) + non-tax revenue (customs, excise, GST, direct taxes); recurring",
+            "Capital receipts: Borrowings (domestic/external), disinvestment; non-recurring; create liabilities",
+            "Revenue expenditure: Salaries, interest, subsidies, grants; no asset creation; ~85% of total expenditure",
+            "Capital expenditure: Infrastructure, building, roads, hospitals; asset creation; multiplier effects; ~15% of expenditure",
+            "Transfer payments: Social security, pensions; not included in expenditure for national income; fiscal transfer",
+            "Budget balance (overall deficit): Total receipts - Total expenditure; reported as % of GDP",
+            "Budget size (FY 2024-25): ~Rs. 44.6 lakh crore; increased from Rs. 1.25 lakh crore (1991-92)",
+            "Allocation structure: Agriculture 2%, Defence 2.6%, Interest 3.2%, others bulk",
+            "Union Budget vs Economic Survey: Budget is action, Survey is analysis of past year; both released together",
+            "Annexure to budget: Accounts (A, B, C, D schedules), statement of liability, contingent liability"
+          ],
+          "important_terms": {
+            "terms": [
+              "Union Budget",
+              "Revenue budget",
+              "Capital budget",
+              "Revenue receipts",
+              "Capital receipts",
+              "Revenue expenditure",
+              "Capital expenditure",
+              "Budget deficit",
+              "Transfer payment",
+              "Fiscal policy",
+              "Allocation"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "Annual budget announcements; tax policy changes; subsidy schemes; public sector investment trends; fiscal stimulus debates; revenue vs expenditure pressure; budget credibility tracking"
+        },
+        {
+          "topic_id": "M6.2",
+          "topic_name": "Taxes: Direct vs Indirect & GST",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 21",
+            "chapter_name": "Taxation and Its Impact"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 5",
+            "chapter_name": "Government Budget and Taxation"
+          },
+          "key_concepts": [
+            "Direct taxes: Paid directly to government; cannot shift burden; Income Tax, Corporate Tax, Wealth Tax (abolished 1992)",
+            "Indirect taxes: Burden can be shifted; Consumer pays; Excise, Customs, Sales Tax, Service Tax, now GST",
+            "Income Tax: On individual/HUF income; slabs: 0% (<2.5L), 5%, 20%, 30%; effective rate due to exemptions; 11% of revenue",
+            "Corporate Tax: On company profits; base rate 21.55% (including surcharge); lower rate 15.15% for manufacturing (2023 onwards)",
+            "MAT (Minimum Alternate Tax): Min tax if calculated tax <MAT; prevents zero-tax positions; 15% on book profit",
+            "Tax deductions: Standard deduction, LIC, NPS, medical insurance, education; reduce taxable income",
+            "GST (Goods and Services Tax): Implemented July 2017; unified indirect tax; 101st Amendment introduced",
+            "GST structure: CGST (Central), SGST/UTGST (State/UT), IGST (Interstate); tax on supply of goods/services",
+            "GST rates: 0% (essentials), 5%, 12%, 18%, 28% (luxury); 28% has +cess for autos, tobacco",
+            "GST exemptions: Agricultural products, education, healthcare, banking services; supply-side exemptions",
+            "GST Council: GST decision-making body; minister from each state + FM; unanimous for major decisions",
+            "GST impact: Cascading tax eliminated, input credit mechanism, simplified compliance, but transition challenges",
+            "GST revenue: FY 2023-24: Rs. 22.38 lakh crore (~10% of GDP); stable post-implementation volatility",
+            "Tax buoyancy: Ratio of change in tax revenue to change in GDP; >1 = elastic, <1 = inelastic; India's typically >1"
+          ],
+          "important_terms": {
+            "terms": [
+              "Direct tax",
+              "Indirect tax",
+              "Income tax",
+              "Corporate tax",
+              "Excise",
+              "Customs",
+              "GST",
+              "CGST",
+              "SGST",
+              "IGST",
+              "Tax rate",
+              "Tax buoyancy"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "GST rate changes; corporate tax cuts (2019); personal income tax changes; GST Council decisions; tax compliance technology (e-invoicing, e-way bills); black money concerns; tax transparency push"
+        },
+        {
+          "topic_id": "M6.3",
+          "topic_name": "Fiscal Deficit & FRBM Framework",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 22",
+            "chapter_name": "Fiscal Imbalance and Deficit Reduction"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 5",
+            "chapter_name": "Government Budget Deficit"
+          },
+          "key_concepts": [
+            "Fiscal deficit: Total expenditure - Total receipts (excluding borrowings); measure of borrowing requirement",
+            "Revenue deficit: Revenue expenditure - Revenue receipts; indicates structural imbalance; more concerning",
+            "Primary deficit: Fiscal deficit - Interest payments; excludes debt servicing; true deficit measure",
+            "Effective Revenue Deficit (ERD): Revenue deficit - Capital grants given; new measure; accounts for productive capex",
+            "Fiscal deficit formula: FD = [Rev Exp + Cap Exp] - [Rev Rec + Cap Rec (excluding borrowing)]",
+            "India's fiscal deficit: ~6.4% of GDP (2024-25 budget estimate); target <6% long-term",
+            "Deficit implications: Interest on debt grows, crowding out of private investment, inflation risk, external vulnerability",
+            "FRBM (Fiscal Responsibility and Budget Management Act 2003): Framework for fiscal discipline; 3% deficit target",
+            "FRBM targets: Fiscal deficit 3% (earlier target), current flexible target due to COVID; revenue deficit 1.5%",
+            "FRBM amendments (NK Singh Committee 2017): Revised targets, moved to 5-year rolling average, crisis clause added",
+            "Medium-term Expenditure Framework (MTEF): 3-year rolling budget; facilitates planning; better fiscal sustainability",
+            "Finance Commission role: Distributes revenue between Centre-States; recommendations every 5 years",
+            "15th Finance Commission (2021-26): Revenue sharing 41:59 (Centre:States), grants for disaster resilience"
+          ],
+          "important_terms": {
+            "terms": [
+              "Fiscal deficit",
+              "Revenue deficit",
+              "Primary deficit",
+              "ERD",
+              "FRBM",
+              "Fiscal discipline",
+              "Deficit target",
+              "Borrowing",
+              "Finance Commission",
+              "Resource transfer",
+              "Fiscal federalism"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "India's deficit management challenges; FRBM compliance status; pandemic-related fiscal relaxation; interest payment burden growth; revenue deficit concerns; Centre-State fiscal balance issues; borrowing pressures"
+        },
+        {
+          "topic_id": "M6.4",
+          "topic_name": "Disinvestment & Fiscal Federalism",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 23",
+            "chapter_name": "Public Sector and Disinvestment"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 8",
+            "chapter_name": "Infrastructure"
+          },
+          "key_concepts": [
+            "Disinvestment: Sale of public sector equity; either strategic or financial; raises capital receipt",
+            "Strategic disinvestment: Selling management control; goal is privatization or efficiency; usually to dedicated buyer",
+            "Financial disinvestment: Partial stake sale; government retains control; raises revenue for fiscal needs; primary motive",
+            "DIPAM (Department of Investment and Public Asset Management): Cabinet body managing disinvestment; strategic decisions",
+            "Disinvestment proceeds: FY 2023-24: Rs. 13,117 crore (target Rs. 65,000 crore missed); budget receipts helpful",
+            "Strategic disinvestment companies: SAIL, NTPC, HAL, BHEL, Shipping; controversial privatizations opposed by unions",
+            "Reasons for disinvestment: Fiscal deficit reduction, operational efficiency, strategic focus on core activities, privatization ideology",
+            "Criticism of disinvestment: Loss of government income, asset undervaluation, employment concerns, strategic loss",
+            "Fiscal federalism: Financial relations between Centre and States; revenue sharing, grants, borrowing rights",
+            "Revenue sharing mechanism: Direct taxes (50%), GST (split by Council), Customs (100% to Centre), Excise (50%)",
+            "Centre vs State taxation: Centre has income, customs, excise; States have agriculture, land, trade; GST concurrent",
+            "Grants-in-aid: Transfer payments for specific purposes; plan grants vs non-plan grants; 15th FC added tied/untied",
+            "State finances: Many states run deficits; debt levels rising; interest payment burden growing; fiscal stress evident"
+          ],
+          "important_terms": {
+            "terms": [
+              "Disinvestment",
+              "Strategic disinvestment",
+              "Financial disinvestment",
+              "DIPAM",
+              "Privatization",
+              "Fiscal federalism",
+              "Revenue sharing",
+              "Grants",
+              "Centre-State",
+              "State debt",
+              "Public sector"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Recent disinvestment announcements; OFS (Offer for Sale) events; state fiscal stress issues; Centre-State revenue disputes; GST compensation debate; state debt sustainability concerns; pension liability issues"
+        }
+      ]
+    },
+    {
+      "module_id": "M7",
+      "module_name": "External Sector & International Trade",
+      "module_duration_days": 7,
+      "topics": [
+        {
+          "topic_id": "M7.1",
+          "topic_name": "Balance of Payments & Exchange Rate",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 24",
+            "chapter_name": "External Sector and Balance of Payments"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 6",
+            "chapter_name": "Open Economy Macroeconomics"
+          },
+          "key_concepts": [
+            "Balance of Payments (BoP): Record of all economic transactions with rest of world; current + capital/financial accounts",
+            "Current Account: Exports/imports of goods, services, income flows, unilateral transfers; goods + services balance",
+            "Capital Account: Asset transfers, debt forgiveness, capital transfers; small component; distinct from Financial Account",
+            "Financial Account: Investment flows (FDI, FII/FPI, ECB); capital movements; largest BoP component",
+            "Current Account Deficit (CAD): Imports > Exports; needs financing through capital inflows; sustainability concerns",
+            "India's CAD: Peak 4.8% of GDP (2012-13); improved 1.2% (2021-22); oil price sensitive; depends on remittances",
+            "BoP identity: Current Account + Capital Account + Financial Account + Errors/Omissions = 0 (ex post)",
+            "BOP surplus/deficit: BoP not exactly balanced; RBI intervenes forex market, official reserve transactions",
+            "Foreign Exchange Reserves: Liquid assets held by RBI; includes currency, gold, SDR, IMF position; insurance",
+            "Forex reserve components: ~$600+ billion (2024); US dollars 85%, gold 10%, SDRs/others 5%",
+            "Reserve adequacy: Measured by months of imports; India maintains 8-10 months of imports; adequate cushion",
+            "Exchange rate: Price of domestic currency in foreign currency; affects competitiveness, investment flows",
+            "Fixed exchange rate: Government maintains constant rate; requires intervention, controls; inflexible",
+            "Floating exchange rate: Market determines; efficient price discovery; volatile; RBI maintains managed float in India"
+          ],
+          "important_terms": {
+            "terms": [
+              "Balance of Payments",
+              "Current Account",
+              "Capital Account",
+              "Financial Account",
+              "CAD",
+              "BOP surplus",
+              "Exchange rate",
+              "Forex reserves",
+              "Managed float",
+              "Revaluation",
+              "Trade deficit",
+              "Remittances"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2,
+          "current_affairs_connect": "India's CAD dynamics; oil price impact; rupee volatility trends; forex reserve management; external debt monitoring; capital flow reversals; trade deficit concerns"
+        },
+        {
+          "topic_id": "M7.2",
+          "topic_name": "WTO Agreements & India's Trade Policy",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 25",
+            "chapter_name": "WTO and International Trade Agreements"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 10",
+            "chapter_name": "Liberalization and the Indian Economy"
+          },
+          "key_concepts": [
+            "WTO (World Trade Organization): Established 1995; 164 member nations; promotes free trade, dispute resolution",
+            "GATT (General Agreement on Tariffs and Trade): WTO predecessor; framework for trade rules; non-discrimination principle",
+            "MFN (Most Favored Nation): Trade concession granted to one country extended to all WTO members; core principle",
+            "National Treatment: Imported goods treated same as domestic goods; non-discriminatory principle",
+            "TRIPS (Trade Related Intellectual Property Rights): Patent protection, copyright; 20-year patents; developing country concerns",
+            "TRIMS (Trade Related Investment Measures): Restricts investment requirements (local content, performance); trade liberalizing",
+            "GATS (General Agreement on Trade in Services): Services trade liberalization; includes finance, telecom, transport",
+            "Agriculture agreement: Reduced tariffs, domestic support limits, export subsidies reduction; developing country demands",
+            "Doha Round: Ongoing negotiations since 2001; agriculture liberalization focus; stalled due to disagreements",
+            "India's negotiation stance: Seeks carve-outs for agriculture, MSME protection, technology transfer, differentiated treatment",
+            "FTA (Free Trade Agreement): Bilateral/regional trade with zero/low tariffs; India has 20+ FTAs; strategic partners",
+            "ASEAN FTA: Implemented 2009; goods, services, investment liberalization; important for manufacturing link",
+            "India-UAE CEPA: Comprehensive Economic Partnership; 2022 agreement; investment and services focus",
+            "RCEP (Regional Comprehensive Economic Partnership): 10 ASEAN + 5 (China, Japan, Korea, Australia, NZ); India opted out (2019)"
+          ],
+          "important_terms": {
+            "terms": [
+              "WTO",
+              "GATT",
+              "MFN",
+              "National treatment",
+              "TRIPS",
+              "TRIMS",
+              "GATS",
+              "FTA",
+              "CEPA",
+              "RCEP",
+              "ASEAN",
+              "Tariff"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "RCEP India exclusion debate; India-UAE CEPA ratification; FTA negotiations (UK, EU); WTO dispute cases (India's cases); intellectual property controversies (medicines, technology); protectionism debates"
+        },
+        {
+          "topic_id": "M7.3",
+          "topic_name": "SEZs & India's Foreign Trade Profile",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 26",
+            "chapter_name": "Special Economic Zones and Trade Profile"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 4",
+            "chapter_name": "The Responsibility of Government and Market"
+          },
+          "key_concepts": [
+            "SEZ (Special Economic Zone): Geographically demarcated area; special economic incentives; investment & employment focus",
+            "SEZ benefits: Tax holidays (initial 5 years + extension), capital goods import duty waiver, tax exemption on income",
+            "SEZ locations: Coastal regions preferred; major SEZs in Maharashtra, Gujarat, Chennai, Cochin, Visakhapatnam",
+            "SEZ performance: 350+ SEZs (2024); employment 37+ lakh; exports 40% of total; manufacturing focus declining",
+            "SEZ criticism: Limited local employment, capital intensity, transfer pricing concerns, land use issues, underperformance",
+            "FTP (Foreign Trade Policy): Government framework for exports/imports; incentive schemes; periodic updates",
+            "Export incentive schemes: MEIS (phased out), RODTEP (Remission of Duties and Taxes on Exported Products), RoSCTL",
+            "India's exports: FY 2023-24: $422 billion; merchandise 50%, services 40%, gems 10%; growth from $200B (2008-09)",
+            "Export composition: Textiles, chemicals, minerals, engineering goods, pharmaceuticals, IT services, gems",
+            "India's imports: ~$620 billion (2023-24); crude oil 35%, machinery 20%, chemicals 10%, metals 10%, others",
+            "Trade balance: Deficit $200+ billion (2023-24); high import of raw materials; service exports surplus ~$100B",
+            "Trading partners: China, US, UAE, Saudi Arabia, Singapore, Germany, Belgium; import/export asymmetry",
+            "Merchandise exports: Declining due to global slowdown; services surge (IT, consultancy, financial services)"
+          ],
+          "important_terms": {
+            "terms": [
+              "SEZ",
+              "Special incentive",
+              "FTP",
+              "Export",
+              "Import",
+              "Trade balance",
+              "Trade deficit",
+              "Merchandise trade",
+              "Services trade",
+              "Trading partner",
+              "Competitiveness"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "SEZ reform debate; new SEZ policy proposals; export slowdown concerns; import vulnerability (oil, semiconductors); trade tensions with major partners; Make in India export push; global supply chain repositioning"
+        }
+      ]
+    },
+    {
+      "module_id": "M8",
+      "module_name": "Infrastructure & Industry",
+      "module_duration_days": 8,
+      "topics": [
+        {
+          "topic_id": "M8.1",
+          "topic_name": "National Infrastructure & Gati Shakti",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 27",
+            "chapter_name": "Infrastructure Development"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 8",
+            "chapter_name": "Infrastructure"
+          },
+          "key_concepts": [
+            "Infrastructure: Backbone services - transport, energy, water, communication; enables production, living standards",
+            "Infrastructure categories: Roads, railways, ports, airports, power, water supply, sanitation, telecom",
+            "NIP (National Infrastructure Pipeline): Rs. 111 lakh crore investment plan (2019-2025); transport 37%, energy 30%",
+            "Gati Shakti (PM Gati Shakti National Master Plan): Integrated infrastructure planning; 2021 launch; Rs. 100+ lakh crore target",
+            "Gati Shakti features: Multimodal connectivity, last-mile connectivity, real-time tracking, cost optimization",
+            "Road infrastructure: 63+ lakh km total roads (2024); NHAI maintains 28,000 km national highways; Bharatmala expansion",
+            "Bharatmala: Phase 1 (2015-20) completed; 34,800 km of highways; cost Rs. 5.35 lakh crore; improved logistics",
+            "Highway investment returns: Toll collections growing; travel time reduction; accident decline; economic activity boost",
+            "Railways: 68,000+ km network; 3rd largest; electrification 50%, dedicated freight corridor plans, bullet train (Mumbai-Ahmedabad)",
+            "Railway Finance: Separate ministry budget; freight subsidy pressure; passenger fares political issue; debt concerns",
+            "Ports: 13 major ports, 150+ minor ports; Sagarmala project - port modernization, coastal shipping; capacity 2400M tonnage",
+            "Airports: 150+ operational; UDAN scheme connects tier 2/3 cities; low traffic viability; subsidies needed",
+            "Power sector: 430+ GW capacity; renewable 60+ GW; transmission losses 14%; distribution losses 21-25%; massive investment need",
+            "Water infrastructure: Jal Jeevan Mission (rural water), urban water supply gaps; groundwater depletion; wastewater treatment"
+          ],
+          "important_terms": {
+            "terms": [
+              "Infrastructure",
+              "NIP",
+              "Gati Shakti",
+              "Bharatmala",
+              "Sagarmala",
+              "UDAN",
+              "National highways",
+              "Ports",
+              "Railways",
+              "Airports",
+              "PPP",
+              "Investment"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Infrastructure investment gap assessment; project implementation tracking; toll collections data; bullet train progress; port efficiency improvements; rural connectivity expansion; climate resilience in infrastructure"
+        },
+        {
+          "topic_id": "M8.2",
+          "topic_name": "Industrial Policy & Make in India",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 28",
+            "chapter_name": "Industrial Policy and Manufacturing"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 3",
+            "chapter_name": "Liberalization and Indian Economy"
+          },
+          "key_concepts": [
+            "Industrial policy: Government strategy for industrial development; protective vs liberalized phases",
+            "Import substitution industrialization (ISI): Protected domestic industry from competition; 1950s-1990s approach",
+            "Export-led industrialization: Focus on manufacturing exports; East Asian model; shifted post-1991",
+            "Make in India: Launched 2014; incentivize manufacturing in India, FDI attraction, job creation, skill development",
+            "Make in India sectors: 25 focus sectors; automobiles, aerospace, pharma, defense, electronics, textiles, leather",
+            "PLI (Production Linked Incentive): Launched 2021; 13 schemes; incentive on incremental sales; Samsung, Apple participation",
+            "PLI impact: Target 5-6% of GDP from manufacturing by 2025; incentive ~15% of incremental sales; outlay Rs. 1.97 lakh crore",
+            "Atmanirbhar Bharat: Post-2020 self-reliance push; reduced imports focus; supply chain resilience",
+            "Defence production: Defense manufacturing incentive, offset requirements, technology partnerships; strategic emphasis",
+            "Green manufacturing: Climate-aligned production; renewable energy use; emission standards; growing importance",
+            "Industrial corridors: Dedicated manufacturing zones; DMIDC (Delhi-Mumbai), Bengaluru-Chennai; infrastructure-focused",
+            "Technology transfer: Government incentive for Indian companies to acquire foreign technology; capability building",
+            "Labor-intensive vs capital-intensive: India's skill deficit drives capital intensity; unemployment concerns"
+          ],
+          "important_terms": {
+            "terms": [
+              "Industrial policy",
+              "Make in India",
+              "PLI",
+              "ISI",
+              "Export promotion",
+              "Manufacturing",
+              "FDI attraction",
+              "Skill development",
+              "Industrial corridor",
+              "Technology transfer",
+              "Atmanirbhar"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Make in India progress assessment; PLI scheme performance; FDI in manufacturing growth; semiconductor push; electric vehicle manufacturing; textile sector revival; global supply chain shifts (China+1 strategy)"
+        },
+        {
+          "topic_id": "M8.3",
+          "topic_name": "MSMEs, Startups & Public Sector",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 29",
+            "chapter_name": "Small and Medium Enterprises and Startups"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 5",
+            "chapter_name": "Economic Reforms and Openness"
+          },
+          "key_concepts": [
+            "MSME (Micro, Small, Medium Enterprise): Revised definition (2020) - investment in plant/machinery: Micro <25L, Small 25-250L, Medium 250L-50Cr",
+            "MSME contribution: 30% of GDP, 110+ million employment, 48% of exports; backbone of manufacturing sector",
+            "MSME finance: MUDRA scheme loans (Rs. 1-10 lakh); collateral-free; 4 crore+ beneficiaries; focus on women, SC/ST",
+            "PM SVANidhi: Street vendor credit scheme; loans up to Rs. 10,000; 50+ lakh beneficiaries; post-COVID recovery support",
+            "MSME technology: Government initiatives for skill, incubation, market linkage; capacity building programs; GST compliance",
+            "Startup India: Policy launched 2016; tax benefits, angel tax exemption, simplified compliance, fund of funds",
+            "Startup recognition: DPIIT recognizes startups; 90K+ recognized (2024); definitions: <10 years, innovation focus, <100 Cr turnover",
+            "Startup funding: Government fund of funds (Rs. 10,000 crore); angel investors; VC interest; mega-round valuations",
+            "Public sector enterprises: CPSEs (Central Public Sector Enterprises), PSUs; 450+ central enterprises",
+            "Navratna companies: 9 highest-performing PSEs; ONGC, NTPC, Coal India, SAIL, IOC, Bank of Baroda, BHEL, HAL, Maruti",
+            "Maharatna (merged into Navratna): 5 companies with highest authority; largest by revenue/assets",
+            "Miniratna: Other high-performing PSEs; category shifted with 2018 restructuring",
+            "PSU privatization debate: Efficiency vs strategic ownership; government move toward disinvestment; union opposition"
+          ],
+          "important_terms": {
+            "terms": [
+              "MSME",
+              "Micro enterprise",
+              "MUDRA",
+              "Startup",
+              "DPIIT",
+              "Public sector",
+              "CPSE",
+              "Navratna",
+              "Maharatna",
+              "Fund of funds",
+              "Angel investor",
+              "Disinvestment"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "MSME credit access challenges; MUDRA scheme loan quality concerns; Startup valuations in reality check; PSU consolidation announcements; PSU pension liabilities; sector-wise CPSE performance; privatization debates (NTPC, Coal India)"
+        }
+      ]
+    },
+    {
+      "module_id": "M9",
+      "module_name": "Agriculture & Rural Economy",
+      "module_duration_days": 5,
+      "topics": [
+        {
+          "topic_id": "M9.1",
+          "topic_name": "Agricultural Finance & Price Support System",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 30",
+            "chapter_name": "Agriculture and Food Security"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "Economics",
+            "chapter": "Chapter 4",
+            "chapter_name": "Food Security in India"
+          },
+          "key_concepts": [
+            "Agriculture's share: 18% of GDP (2023-24), 42% employment; declining share with development",
+            "Agricultural credit: KCC (Kisan Credit Card) essential; interest subvention 2-4%; agricultural ministry credit push",
+            "NABARD (National Bank for Agriculture and Rural Development): Refinance institution; ~Rs. 19 lakh crore outstanding (2024)",
+            "KCC scheme: Collateral-free, flexible limits; 5+ crore farmers covered; digital push ongoing; interest rate 4% after subvention",
+            "MSP (Minimum Support Price): Floor price announced pre-harvest; procured by FCI, state agencies; 23 commodities",
+            "MSP procurement: Rice 20 MT, wheat 30 MT, coarse cereals 3 MT (2023 levels); procurement cost ~Rs. 3.5 lakh crore",
+            "MSP controversies: Farm laws 2020 (now repealed) would have threatened MSP; farmer protests, government backing down",
+            "Agricultural subsidies: Fertilizer 35%, power 25%, irrigation 15%, seeds 5%; Rs. 1.5+ lakh crore implicit + explicit",
+            "Green Revolution: High-yield varieties, chemical fertilizer, mechanization; transformed food security; environmental costs",
+            "Crop insurance: PM Fasal Bima Yojana; indemnity for crop failure; Rs. 14,000 crore+ premium; claims ratio ~85%",
+            "Food security: India net exporter; self-sufficient rice, wheat; deficit in pulses, vegetable oils; imports via reserves",
+            "Food inflation: Key inflation driver; 45%+ in CPI basket; agricultural supply seasonality matters",
+            "Agricultural trade: Exports rice (2nd largest), sugar, spices; protectionist measures (rice export restrictions)"
+          ],
+          "important_terms": {
+            "terms": [
+              "Agriculture",
+              "MSP",
+              "KCC",
+              "NABARD",
+              "Procurement",
+              "FCI",
+              "Food security",
+              "Crop insurance",
+              "Green Revolution",
+              "Agricultural subsidy",
+              "Food inflation"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "MSP determination annual controversy; farm laws repeal aftermath; food inflation management; agricultural exports ban/restrictions; farmer income support schemes; climate impact on agriculture; crop loan waivers"
+        },
+        {
+          "topic_id": "M9.2",
+          "topic_name": "Food Security & NFSA 2013",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 31",
+            "chapter_name": "Food Security and Public Distribution"
+          },
+          "ncert_reference": {
+            "class": 9,
+            "book": "Economics",
+            "chapter": "Chapter 4",
+            "chapter_name": "Food Security in India"
+          },
+          "key_concepts": [
+            "NFSA (National Food Security Act 2013): Legal right to food; covers 81 crore persons (67% population); transformative",
+            "NFSA entitlements: Cereals 5kg/person/month at Rs. 2-3/kg subsidized; eligibility: 75% rural, 50% urban",
+            "TPDS (Targeted Public Distribution System): Delivers NFSA entitlements; 1.5 lakh+ fair price shops",
+            "AAY (Antyodaya Anna Yojana): Most vulnerable 2.5 crore households; 35kg grains/month; heavily subsidized",
+            "NFSA cost: Procurement (~2.8 lakh crore) + distribution + storage (~3.5+ lakh crore total); major fiscal burden",
+            "Food subsidy: Explicit (government pays), implicit (FCI losses); peaked Rs. 3 lakh crore; fiscal pressure",
+            "TPDS leakage: Earlier 40%+ loss (diversion); improved to 15-20% with digitization; better but still significant",
+            "AADHAR integration: Unique ID for ration eligibility; exclusion/inclusion errors reduced; privacy concerns remain",
+            "National Portability: NFSA allows ration card portability across states; benefits following person; implementation varied",
+            "Nutritional security: Scheme focus on quantity; quality (micronutrients) gaps remain; malnutrition rates high",
+            "PMPOSHAN: School meal program; 11+ crore children; nutrition & attendance improvement; rural reach improving",
+            "ICDS (Integrated Child Development Services): NFSA nutrition component; supplementary nutrition for vulnerable groups"
+          ],
+          "important_terms": {
+            "terms": [
+              "NFSA",
+              "Food security",
+              "TPDS",
+              "AAY",
+              "Fair price shop",
+              "Ration card",
+              "Food subsidy",
+              "Portability",
+              "PMPOSHAN",
+              "ICDS",
+              "Procurement",
+              "FCI"
+            ]
+          },
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1,
+          "current_affairs_connect": "NFSA implementation issues; food subsidy burden debates; TPDS digitization progress; ration card portability rollout; PMPOSHAN expansion; malnutrition management debate; inflation impact on food security"
+        }
+      ]
+    },
+    {
+      "module_id": "M10",
+      "module_name": "Current Economic Issues & Indices",
+      "module_duration_days": 6,
+      "topics": [
+        {
+          "topic_id": "M10.1",
+          "topic_name": "Inflation, Growth & Key Economic Indices",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 32",
+            "chapter_name": "Inflation, Growth and Development Indices"
+          },
+          "ncert_reference": {
+            "class": 12,
+            "book": "Introductory Macroeconomics",
+            "chapter": "Chapter 2",
+            "chapter_name": "National Income and Related Aggregates - Inflation"
+          },
+          "key_concepts": [
+            "Inflation: Rate of increase in general price level; measured by CPI/WPI; erodes purchasing power; target 4% ± 2%",
+            "CPI (Consumer Price Index): Retail prices of basket of goods; weight: food 46%, fuel 8%, others 46%; urban/rural separate",
+            "WPI (Wholesale Price Index): Wholesale prices; input inflation indicator; precedes CPI by 2-3 months",
+            "Core inflation: Excludes volatile food/fuel; structural inflation indicator; typically lower than headline",
+            "Food inflation: 45%+ of CPI; volatile; supply-driven (monsoon, production); key inflation concern",
+            "CPI base year: 2012=100; revised from 2004-05 base; lower readings due to base effect; controversy on accuracy",
+            "Inflation volatility: RBI faces trade-off (growth vs inflation); Transitory vs persistent debate",
+            "GDP growth: Real GDP growth 7.2% (FY 2023-24); long-term trend 6-7%; volatility from demand/supply shocks",
+            "Growth slowdown 2019-2020: Pre-pandemic 4.2% (FY 2019-20); then -6.2% (2020-21); recovery 8.7% (2021-22)",
+            "Economic Survey: Annual document analyzing economy; key themes highlight policy priorities; released with budget",
+            "Global competitiveness indices: WEF GCI (India ranked ~80), IMD WCY (ranked ~50), others; India mid-pack positioning",
+            "Human development metrics: HDI (India 134th), inequality index, gender indices; UNDP annual reports",
+            "Ease of doing business: World Bank index; India improved dramatically (post-2016); now suspended (2020)",
+            "Logistics Performance Index: World Bank; India ~42/160 countries; infrastructure quality & efficiency measure"
+          ],
+          "important_terms": {
+            "terms": [
+              "Inflation",
+              "CPI",
+              "WPI",
+              "Core inflation",
+              "Headline inflation",
+              "Food inflation",
+              "GDP growth",
+              "Deflator",
+              "Index",
+              "Price stability",
+              "Monetary target"
+            ]
+          },
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5,
+          "current_affairs_connect": "Inflation trajectory post-pandemic; RBI rate hikes/pauses; growth estimates revision; inflation-growth trade-off debates; commodity prices impact (oil, metals); global inflation spillover concerns"
+        },
+        {
+          "topic_id": "M10.2",
+          "topic_name": "Global Indices & India's Rankings",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 33",
+            "chapter_name": "Global Economic Indices and Rankings"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 1",
+            "chapter_name": "Introduction to Indian Economy"
+          },
+          "key_concepts": [
+            "Corruption Perception Index (CPI - TI): Transparency International; India ranked 93-95 globally; 41-43/100 score (mid-range corruption)",
+            "Global Innovation Index: WIPO measure; India ~42nd globally; software/IT innovation concentrated; manufacturing weak",
+            "Global Hunger Index: Welthungry; India ~108th out of 125; food security despite policy; malnutrition concerns",
+            "Global Gender Gap Index: WEF measure; India 127th globally; weak in economic participation, health, education metrics",
+            "Environmental Performance Index: Yale/Columbia; India 180th+ (poor); air quality, forest coverage weak; climate vulnerable",
+            "GFCI (Global Financial Centres Index): London, Hong Kong, NYC lead; Mumbai/Delhi emerging centres; ~20-30th rank combined",
+            "World Bank Ease of Doing Business: Discontinued 2020; India improved 100+ positions (2015-2019); ranking ~63rd final year",
+            "IMD World Competitiveness Yearbook: India 43-50 ranked; infrastructure, digitalization, skills areas of concern",
+            "Human Development Report: India 134th; life expectancy 72 years, GNI pc $6,600 (PPP); inequality widening",
+            "SDG Index (Sustainable Development Goals): India ranked ~112/166; lagging on inequality, environmental goals",
+            "Economic Complexity Index (Harvard Growth Lab): Measures productive capability; India ranked ~40-45; growing",
+            "Global Competitiveness Index: WEF measures; India ~80th; institutions, infrastructure weak; innovation moderate"
+          ],
+          "important_terms": {
+            "terms": [
+              "Global indices",
+              "Ranking",
+              "Competitiveness",
+              "Human development",
+              "Innovation",
+              "Governance",
+              "Sustainability",
+              "Benchmarking",
+              "Performance metrics"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1,
+          "current_affairs_connect": "India's ranking improvements tracking; corruption concerns; climate performance pressure; gender gap debates; innovation capacity building; competitiveness agenda; global positioning strategy"
+        },
+        {
+          "topic_id": "M10.3",
+          "topic_name": "G20 Presidency & BRICS Expansion",
+          "primary_book": {
+            "author": "Ramesh Singh",
+            "title": "Indian Economy",
+            "chapter": "Chapter 34",
+            "chapter_name": "International Economic Cooperation"
+          },
+          "ncert_reference": {
+            "class": 11,
+            "book": "Indian Economic Development",
+            "chapter": "Chapter 10",
+            "chapter_name": "Liberalization and the Indian Economy"
+          },
+          "key_concepts": [
+            "G20: 19 countries + EU; represents 80%+ global GDP; forum for economic policy coordination; consensus-based",
+            "India's G20 presidency (2023-24): Themes: global south concerns, climate finance, development agenda, LDC focus",
+            "G20 outcomes: New Delhi Declaration, African Union inclusion (permanent membership), climate/finance commitments",
+            "G20 structure: Leaders, Finance Ministers/Central Bank Governors, working groups; India chaired, hosted summits",
+            "Global South voice: India emphasized development concerns, debt relief, technology transfer, financial architecture reform",
+            "BRICS: Brazil, Russia, India, China, South Africa; emerging economies forum; established 2009; NDB, CRA facilities",
+            "BRICS expansion (2023-24): Saudi Arabia, Iran, UAE, Egypt, Ethiopia added; membership now 10; geopolitical realignment",
+            "New Development Bank (NDB): BRICS multilateral development bank; alternative to World Bank; Rs. 100K+ loan portfolio",
+            "BRICS Contingent Reserve Arrangement (CRA): Self-insurance mechanism; currency swap facility; Rs. 2+ trillion capacity",
+            "BRICS currency: De-dollarization discussions; rupee-yuan-real-rand trade possible; limited progress",
+            "Shanghai Cooperation Organization (SCO): Regional security/economic organization; India member; 23 observer/dialogue countries",
+            "SCO economic dimension: Trade, investment, infrastructure; BIMSTEC alternative (Bangladesh, India, Myanmar, Sri Lanka, Thailand)",
+            "Multilateralism vs US hegemony: BRICS/G20 forums balance Western-dominated institutions; developing country leverage"
+          ],
+          "important_terms": {
+            "terms": [
+              "G20",
+              "BRICS",
+              "Presidency",
+              "NDB",
+              "CRA",
+              "De-dollarization",
+              "Multilateralism",
+              "Global south",
+              "Economic cooperation",
+              "SCO",
+              "Development finance"
+            ]
+          },
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1,
+          "current_affairs_connect": "G20 India presidency outcomes tracking; BRICS expansion geopolitical implications; de-dollarization progress; NDB lending trends; SCO economic development; global south coalition building; alternative to Western institutions"
+        }
+      ]
+    }
+  ],
+  "study_guide": {
+    "standard_track_schedule": {
+      "total_days": 70,
+      "modules_per_day": 1,
+      "daily_hours": 3,
+      "weekly_revision": 1,
+      "monthly_mock_test": 1
+    },
+    "exam_pattern": {
+      "prelims": {
+        "questions_per_year": "14-18",
+        "difficulty": "moderate",
+        "topics_covered": "All 10 modules",
+        "time_per_question": "2-3 minutes"
+      },
+      "mains": {
+        "questions_in_gs3": "8-10 questions",
+        "essay_length": "15-18 marks each",
+        "difficulty": "high",
+        "time_required": "75-90 minutes"
+      }
+    },
+    "resource_strategy": {
+      "primary_reading": "Ramesh Singh (All chapters), NCERT (Class 9-12)",
+      "supplementary": "Economic Survey, Budget analysis, RBI reports",
+      "current_affairs": "Monthly current affairs magazine, news analysis",
+      "practice": "Previous year papers, mock tests, case studies"
+    },
+    "key_focus_areas": [
+      "National Income concepts & measurement (very high frequency)",
+      "Fiscal deficit & FRBM framework (very high frequency)",
+      "Monetary policy & RBI functions (very high frequency)",
+      "Inflation & growth dynamics (very high frequency)",
+      "Poverty & inequality measurement (high frequency)",
+      "Tax systems (direct & indirect, GST) (very high frequency)",
+      "Balance of Payments & CAD (very high frequency)",
+      "Planning & liberalization phases (high frequency)",
+      "Banking & NPA issues (high frequency)",
+      "Employment & MGNREGA (high frequency)"
+    ]
+  },
+  "exam_strategy": {
+    "prelims_approach": [
+      "Master concept definitions (GEP, GDP formulas, ratios)",
+      "Understand indexing (inflation, growth, inequality measures)",
+      "Track annual policy changes (budget, monetary policy)",
+      "Memorize key statistics (current growth rates, deficit targets)",
+      "Practice previous year questions (PYQ patterns essential)"
+    ],
+    "mains_approach": [
+      "Link concepts to current events (MSP, GST, inflation)",
+      "Prepare case studies (Indian economic crises, reforms)",
+      "Develop policy analysis skills (trade-offs, implementation)",
+      "Write structured answers (theory → India application → conclusion)",
+      "Track Economic Survey themes (annual focus areas)",
+      "Analyze inter-module connections (fiscal impact on inflation, etc.)"
+    ]
+  },
+  "notes": {
+    "curriculum_coverage": "100% UPSC CSAT coverage for Indian Economy paper",
+    "update_frequency": "Annual (post-budget, Economic Survey release)",
+    "prs_reference": "Each topic tags book chapters, NCERT references for quick lookup",
+    "current_affairs_link": "Every topic includes news hook for CA integration",
+    "estimated_completion": "70 days (7 days/module), 6 hours daily (intensive)"
+  }
+}

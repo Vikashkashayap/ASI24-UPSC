@@ -16,6 +16,7 @@ import meetingRoutes from "./routes/meetingRoutes.js";
 import testRoutes from "./routes/testRoutes.js";
 import studentProfilerRoutes from "./routes/studentProfilerRoutes.js";
 import studyPlanRoutes from "./routes/studyPlanRoutes.js";
+import advancedStudyPlannerRoutes from "./routes/advancedStudyPlannerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
 import pricingRoutes from "./routes/pricingRoutes.js";
@@ -97,6 +98,7 @@ app.use("/api/meeting", meetingRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/study-plan", authMiddleware, studyPlanRoutes);
+app.use("/api/study-planner", authMiddleware, advancedStudyPlannerRoutes);
 
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);

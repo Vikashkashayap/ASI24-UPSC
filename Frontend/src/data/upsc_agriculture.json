@@ -1,0 +1,1858 @@
+{
+  "meta": {
+    "portal": "MentorsDaily UPSC",
+    "exam": "UPSC Civil Services",
+    "paper": "General Studies 3",
+    "subject": "Agriculture",
+    "level": "Mains Only",
+    "focus": "Depth over Breadth",
+    "weightage_marks": "30-40 marks per year",
+    "annual_questions": "2-3 questions",
+    "important_committees": [
+      "Swaminathan Committee - MSP formula",
+      "Ashok Dalwai Committee - Doubling Farmers' Income",
+      "Shanta Kumar Committee - PDS leakages",
+      "MS Ahluwalia Committee - Food subsidy"
+    ],
+    "creation_date": "2026-05-20",
+    "version": "1.0"
+  },
+  "modules": [
+    {
+      "module_id": "MOD_001",
+      "module_name": "Indian Agriculture — Overview & Significance",
+      "topics": [
+        {
+          "topic_id": "TOP_001_001",
+          "topic_name": "Agriculture's Role in Indian Economy & Employment",
+          "primary_book": "Economic Survey (Agriculture Chapter) 2024-25",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture; Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Agriculture contributes 17-18% to GDP (as of 2024-25), down from 45% in 1990s due to structural transformation",
+            "Agricultural sector employs approximately 45% of total workforce (270+ million people), though productivity is low",
+            "Dual role of agriculture: subsistence for rural population and commercial enterprise for national economy",
+            "Agriculture-allied sector (animal husbandry, fisheries, forestry) contributes additional 5-6% to GDP",
+            "Agro-climatic variations across 15 distinct zones determine crop suitability and regional specialization",
+            "India is 2nd largest producer of agricultural commodities globally after China",
+            "Land utilization pattern: Net Sown Area (NSA) ~157 million hectares (51% of total area)",
+            "Agricultural exports valued at ~$40-45 billion annually, facing competition from developed nations",
+            "Rural income heavily dependent on agriculture - rural poverty reduction directly linked to farm productivity",
+            "Climate vulnerability - agriculture remains highly sensitive to monsoon, temperature variations",
+            "Cropping intensity averaging 130-140%, indicating sustainable land use but with degradation risks",
+            "Agricultural productivity gap between India and developed nations - yields need 40-50% improvement",
+            "Food security pillar - agriculture must feed 1.4+ billion population with nutritional sufficiency",
+            "Export competitiveness - India's agricultural share in global trade 1.5-2%, room for growth"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "PM Krishi Samman Nidhi",
+              "year_launched": 2019,
+              "objective": "Direct income support to agricultural households",
+              "key_features": "Rs 6000 annual support in 3 instalments, 120+ million farmers covered, DBT-based",
+              "current_status": "Active, universal coverage phase"
+            },
+            {
+              "scheme_name": "Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)",
+              "year_launched": 2015,
+              "objective": "Improve irrigation infrastructure and water use efficiency",
+              "key_features": "Integrated scheme with AIBP, WDC, PDMC, Per Drop More Crop components",
+              "current_status": "Extended till 2026"
+            },
+            {
+              "scheme_name": "Soil Health Card Scheme",
+              "year_launched": 2015,
+              "objective": "Improve soil fertility through scientific soil testing",
+              "key_features": "Free soil testing, recommendations for fertilizer use, 80+ million cards distributed",
+              "current_status": "Active - periodic retesting ongoing"
+            }
+          ],
+          "issues_and_challenges": [
+            "Fragmentation of holdings - average farm size declining from 2.3 hectares to 1.1 hectares",
+            "Low capital formation and investment capacity of farmers",
+            "High input costs relative to output prices, eroding profitability",
+            "Dependence on public investment - private sector participation inadequate",
+            "Infrastructure gaps - cold chains, storage, market access in rural areas",
+            "Technology adoption barriers - illiteracy, awareness, capital constraints",
+            "Climate change increasing uncertainty and risk for farmers"
+          ],
+          "way_forward": [
+            "Promote contract farming models to reduce intermediaries and improve bargaining power",
+            "Strengthen Farmer Producer Organisations (FPOs) to achieve economies of scale",
+            "Increase private investment in agricultural infrastructure through PPP models",
+            "Invest in agricultural education and capacity building of farming community",
+            "Digitalize agriculture supply chain for better price discovery and market access",
+            "Develop climate-resilient crop varieties adapted to regional conditions",
+            "Implement land consolidation schemes to reverse fragmentation",
+            "Strengthen agricultural research and extension services"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Foundational - sets context for all agricultural discussion",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Agriculture's declining share and employment transition challenges",
+            "Structural transformation and move towards commercial farming",
+            "Export potential and competitiveness in global markets",
+            "Food security implications of agricultural changes",
+            "Regional agricultural diversity and specialization"
+          ]
+        },
+        {
+          "topic_id": "TOP_001_002",
+          "topic_name": "Types of Farming & Cropping Patterns",
+          "primary_book": "NCERT Class 10 Contemporary India II",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "Subsistence farming - farmer produces for own consumption, low marketable surplus, prevalent in rainfed areas",
+            "Commercial farming - focus on cash crops for market, capital-intensive, organized farming",
+            "Intensive farming - high input use per unit area, multiple cropping, Green Revolution model",
+            "Extensive farming - low input use, large land area, low productivity per hectare",
+            "Plantation farming - large-scale mono-culture (tea, coffee, rubber), commercial focus, capital intensive",
+            "Mixed farming - integration of crops and animal husbandry on same holding",
+            "Dry farming - rainfed agriculture in semi-arid regions, low water availability, crop selection critical",
+            "Wet farming - irrigated agriculture, monsoon-dependent areas with supplement irrigation",
+            "Organic farming - no synthetic inputs, soil health focus, increasing popularity (Sikkim 100% organic)",
+            "Natural farming - minimal external inputs, on-farm input production, zero budget farming",
+            "Precision agriculture - technology-driven farming (drones, sensors, AI, IoT), emerging trend",
+            "Horticulture - fruits, vegetables, floriculture, high-value crops, faster returns",
+            "Kharif season - June-September, southwest monsoon-dependent crops (rice, maize, cotton, groundnut, sugarcane)",
+            "Rabi season - October-March, winter crops in rainfed areas with residual moisture (wheat, gram, mustard, barley)",
+            "Zaid season - April-May, summer crops in irrigated areas (vegetables, melons, cucumbers, fruits)",
+            "Crop rotation - systematic variation of crops to maintain soil health and reduce pest cycles"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Paramparagat Krishi Vikas Yojana (PKVY)",
+              "year_launched": 2015,
+              "objective": "Promote organic farming through cluster approach",
+              "key_features": "2.5 hectare clusters, organic certification support, premium for organic produce, 500+ clusters operational",
+              "current_status": "Active with expansion plans"
+            },
+            {
+              "scheme_name": "Zero Budget Natural Farming (ZBNF)",
+              "year_launched": 2016,
+              "objective": "Promote natural farming reducing input costs",
+              "key_features": "Andhra Pradesh model, on-farm input production, subsidy support, microbes and biofertilizers",
+              "current_status": "Active - being scaled nationally"
+            },
+            {
+              "scheme_name": "Rashtriya Krishi Vikas Yojana (RKVY)",
+              "year_launched": 2007,
+              "objective": "Agricultural development at state/district level",
+              "key_features": "State-led approach, infrastructure development, production enhancement",
+              "current_status": "Active - focus on allied sectors"
+            }
+          ],
+          "issues_and_challenges": [
+            "Shift from subsistence to commercial farming creates market dependency and price risks",
+            "Intensive farming depletes soil health and groundwater reserves rapidly",
+            "Monoculture reduces biodiversity and increases pest vulnerability",
+            "Transition to organic farming reduces initial yields before stabilization (3-4 years)",
+            "Precision agriculture requires capital investment beyond small farmer reach",
+            "Climate change disrupting traditional cropping patterns and seasonal cycles"
+          ],
+          "way_forward": [
+            "Incentivize crop diversification to reduce farmer vulnerability and improve nutrition security",
+            "Develop region-specific farming models aligned with agro-climatic zones",
+            "Promote mixed and integrated farming for resilience and income diversification",
+            "Facilitate technology transfer for precision agriculture through farmer groups",
+            "Support transition costs for sustainable farming methods",
+            "Strengthen market linkages for high-value crops like horticulture"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Direct relevance to agricultural diversity, sustainability",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "Cropping pattern changes and food security implications",
+            "Sustainability of intensive farming models in long term",
+            "Regional variations in farming types and crop suitability",
+            "Organic and natural farming viability for Indian farmers",
+            "Technology adoption in different farming models"
+          ]
+        },
+        {
+          "topic_id": "TOP_001_003",
+          "topic_name": "Agro-Climatic Zones & Green Revolution",
+          "primary_book": "Economic Survey Agriculture Chapter",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "15 agro-climatic zones defined by rainfall, temperature, soil type, topography - Eastern Himalayan, Western Himalayan, Indo-Gangetic Plains, Desert, Central Plateau, Deccan Plateau, Eastern Plateau, Eastern Coastal, Western Coastal, Island zones",
+            "Zone-specific crop suitability - rice in Eastern regions, wheat in Indo-Gangetic Plains, cotton in Deccan",
+            "Green Revolution (1960s-70s) - introduction of HYV seeds (dwarf wheat, rice), chemical fertilizers, improved irrigation",
+            "Green Revolution causes: population pressure, food shortage (1960s), availability of HYV seeds, government support through MSP and subsidies",
+            "Impact of Green Revolution: food self-sufficiency by 1980s, production increase 5x, infrastructure development",
+            "Negative consequences of Green Revolution: soil degradation, groundwater depletion, pesticide residues, dependency on external inputs, income inequality",
+            "Geographic concentration: success in Punjab, Haryana, western UP; failure in Eastern India despite similar soils",
+            "Second Green Revolution needed: productivity still 30-50% below developed nations, sustainability crisis",
+            "Crop-wise variations: wheat and rice show saturation, need shift to pulses and oilseeds",
+            "Ever Green Revolution concept: sustainable productivity increase without environmental compromise",
+            "Technology options for improvement: improved varieties, drip irrigation, organic-inorganic mix, precision agriculture",
+            "Investment requirements: Rs 50,000+ crore annually for agricultural research and infrastructure"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Mission for Integrated Development of Horticulture (MIDH)",
+              "year_launched": 2014,
+              "objective": "Promote horticulture beyond Green Revolution cereals",
+              "key_features": "High-value crops, nursery development, crop diversification, 2,000+ crore allocation",
+              "current_status": "Active - expanded to all states"
+            },
+            {
+              "scheme_name": "National Mission for Sustainable Agriculture",
+              "year_launched": 2014,
+              "objective": "Sustainable agricultural practices in changing climate",
+              "key_features": "Soil health, water conservation, crop-livestock integration, rainfed area focus",
+              "current_status": "Active integration with other missions"
+            },
+            {
+              "scheme_name": "ICAR-Sponsored Research Network Program",
+              "year_launched": "Ongoing",
+              "objective": "Crop improvement and productivity enhancement",
+              "key_features": "Multi-location trials, indigenous crop development, climate adaptation research",
+              "current_status": "Active with 50+ research institutes"
+            }
+          ],
+          "issues_and_challenges": [
+            "Resource degradation from intensive Green Revolution practices now limiting further growth",
+            "Groundwater depletion at 2-3% annually in wheat and rice zones",
+            "Soil health decline affecting long-term productivity sustainability",
+            "Uneven geographic distribution of Green Revolution benefits",
+            "Difficulty in replicating success in Eastern India and hilly regions",
+            "Climate change increasing unpredictability in traditional zone crop production"
+          ],
+          "way_forward": [
+            "Develop and promote location-specific agricultural packages for each zone",
+            "Shift from cereals to pulses, oilseeds, and horticulture for diversification",
+            "Integrate conservation agriculture with productivity enhancement",
+            "Strengthen agro-advisory services using digital platforms",
+            "Scale climate-smart agriculture practices for resilience",
+            "Invest in agricultural research with focus on sustainability"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Fundamental to understanding India's agricultural transformation",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Green Revolution causes and consequences - balanced analysis",
+            "Geographic variations in agricultural productivity and policy",
+            "Sustainability challenges of intensive agriculture",
+            "Need for second green revolution - options and feasibility",
+            "Regional agricultural planning aligned with agro-climatic zones"
+          ]
+        },
+        {
+          "topic_id": "TOP_001_004",
+          "topic_name": "Revolutions in Agriculture Sector",
+          "primary_book": "Economic Survey & Ministry of Agriculture Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Green Revolution (1960s onwards): cereals production; wheat and rice focus; productivity from 800-900 kg/ha to 2000-2500 kg/ha",
+            "White Revolution/Operation Flood (1970-1996): milk production and dairy; NDDB role; production from 21 million tonnes to 88 million tonnes; 3-pronged model",
+            "Blue Revolution (1990s onwards): fisheries and aquaculture; production from 3 million tonnes to 10+ million tonnes; inland and marine fisheries",
+            "Yellow Revolution (1985 onwards): oilseeds production; technology mission approach; self-sufficiency in vegetable oils",
+            "Pink Revolution (2000s onwards): meat and poultry sector growth; broiler production increasing; India 5th largest meat producer",
+            "Silver Revolution (2000s onwards): horticulture (fruits, vegetables, spices); high-value crops; production tripled",
+            "Red Revolution: tomato production; India world's 2nd largest tomato producer",
+            "Brown Revolution: cocoa, coffee, tea production; specialty crops focus",
+            "Golden Fibre Revolution: jute and cotton production; value addition focus",
+            "Each revolution's success model: government support, technology, institution building, market linkages",
+            "Implementation agencies: NDDB for dairy, MPEDA for fisheries, Spice Board, Coffee Board, Tea Board for commodities",
+            "Sectoral contribution: dairy 5%, fisheries 1%, horticulture 2-3% to agriculture GDP"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "PM Matsya Sampada Yojana",
+              "year_launched": 2020,
+              "objective": "Blue Revolution - fisheries and aquaculture development",
+              "key_features": "Rs 20,000 crore outlay, 19,000 hectares pond creation, fish landing centers, 10,000 SHGs, FPOs",
+              "current_status": "Active - major expansion phase"
+            },
+            {
+              "scheme_name": "National Program on Dairy Development",
+              "year_launched": "Ongoing",
+              "objective": "White Revolution continuation - dairy infrastructure",
+              "key_features": "Cold chain infrastructure, chilling centers, cooperative structure, rural milk centers",
+              "current_status": "Active with state-level implementation"
+            },
+            {
+              "scheme_name": "Mission for Integrated Development of Horticulture (MIDH)",
+              "year_launched": 2014,
+              "objective": "Silver Revolution - horticulture and allied production",
+              "key_features": "High-value crops, nursery, protected cultivation, post-harvest management",
+              "current_status": "Active with expanded coverage"
+            }
+          ],
+          "issues_and_challenges": [
+            "Uneven spatial distribution of revolution benefits - some regions better supported than others",
+            "Sustainability concerns in all sectors due to resource use intensity",
+            "Market volatility affecting viability of different commodity sectors",
+            "Value addition infrastructure lagging behind production growth",
+            "Allied sector workers facing low wages and poor working conditions",
+            "Trade barriers in global markets for Indian agricultural commodities"
+          ],
+          "way_forward": [
+            "Strengthen post-harvest infrastructure for value addition across all sectors",
+            "Develop market linkages and brand building for agricultural commodities",
+            "Invest in allied sector worker welfare and training",
+            "Expand insurance coverage to all agricultural sectors beyond crops",
+            "Facilitate export promotion through quality standards and certifications",
+            "Integrate allied sectors with main agriculture for farmer income diversification"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Direct UPSC focus - comprehensive knowledge essential",
+          "daily_target_hours": 2.0,
+          "mains_answer_angles": [
+            "Comparative analysis of different revolutions - successes and challenges",
+            "White Revolution model and operation flood - organizational aspects",
+            "Blue Revolution potential and marine vs inland development",
+            "Horticulture sector growth and relevance to food security",
+            "Integration of allied sectors with main agriculture for sustainability"
+          ]
+        },
+        {
+          "topic_id": "TOP_001_005",
+          "topic_name": "Agricultural Exports & Global Competitiveness",
+          "primary_book": "Economic Survey & APEDA Reports",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "India's agricultural exports valued at $40-45 billion annually (2023-24), 2% of global agricultural trade",
+            "Top export commodities: basmati rice, spices, meat and meat products, cotton, sugar, tea, coffee, fish",
+            "Major export destinations: Middle East, Southeast Asia, EU, USA, Bangladesh, UAE",
+            "Basmati rice export dominant - world's largest exporter with 70% market share",
+            "Spice exports worth $3-4 billion annually - turmeric, pepper, chili, cumin leading",
+            "Fish and seafood exports $7-8 billion annually, 80% to developed nations",
+            "Marine products including shrimp - significant export with quality certifications required",
+            "Cotton exports competitive - major supplier to global textile industry",
+            "Sugar exports fluctuate based on domestic consumption and production",
+            "Challenges: quality standards, phytosanitary requirements, food safety certifications",
+            "APEDA's role: agricultural produce promotion, geographical indication protection, standardization",
+            "Export support schemes: Interest equalization, transport subsidies, market development assistance",
+            "Non-tariff barriers: technical regulations, SPS measures affecting market access",
+            "Potential for growth: food processing, value-added products, organic and specialty products"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Agricultural Infrastructure Development Fund (AIDF)",
+              "year_launched": 2020,
+              "objective": "Export infrastructure development - cold chains, processing units",
+              "key_features": "Rs 1 lakh crore fund, post-harvest infrastructure, Rs 2 crore per project",
+              "current_status": "Active - 900+ projects funded"
+            },
+            {
+              "scheme_name": "Scheme for Agricultural Development through Clusters (SADC)",
+              "year_launched": 2016,
+              "objective": "Cluster development for export products",
+              "key_features": "Common facility centers, export-oriented production, market linkages",
+              "current_status": "Active in select states"
+            },
+            {
+              "scheme_name": "Pradhan Mantri Kisan Sampada Yojana",
+              "year_launched": 2016,
+              "objective": "Agro-processing for value addition and exports",
+              "key_features": "Rs 6000 crore outlay, processing units, cold chains, 200+ clusters targeted",
+              "current_status": "Active with expanded scope"
+            }
+          ],
+          "issues_and_challenges": [
+            "Quality and certification requirements creating barriers for smallholder farmers",
+            "Low value-addition - exports mostly raw or semi-processed commodities",
+            "Competition from developed nations with subsidized production and exports",
+            "Trade disputes and protectionist measures in major markets",
+            "Supply chain vulnerabilities exposed during COVID-19",
+            "Seasonal fluctuation in production affecting consistent export supply",
+            "Low farmer awareness about quality and global standards"
+          ],
+          "way_forward": [
+            "Strengthen agro-processing infrastructure for value-added exports",
+            "Develop certification and quality assurance systems accessible to smallholder groups",
+            "Promote geographical indication products for premium pricing",
+            "Build e-commerce platforms for direct farmer-buyer connections",
+            "Invest in supply chain resilience and diversification",
+            "Negotiate trade agreements for better market access in major economies"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Relevant for trade and commerce policy discussion in mains",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "India's position in global agricultural exports and growth potential",
+            "Export-oriented vs domestic supply balance in agricultural policy",
+            "Quality standards and certification requirements for export",
+            "Trade barriers and negotiation strategies for market access",
+            "Value addition and agro-processing in export competitiveness"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_002",
+      "module_name": "Land Reforms & Land Use",
+      "topics": [
+        {
+          "topic_id": "TOP_002_001",
+          "topic_name": "Land Reforms - Pre & Post Independence",
+          "primary_book": "Economic Survey & NSSO Land Holdings Survey",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Pre-independence land systems: Zamindari in Bengal, Bihar, Odisha (landlord intermediaries extracting rent); Ryotwari in Madras, Bombay (direct peasant-government); Mahalwari in MP, UP (community-based)",
+            "Zamindari system characteristics: feudal structure, high rent extraction (up to 50%), tenant insecurity, poor incentive for improvement",
+            "Ryotwari system: direct peasant-state interaction, but high revenue demand often exceeding productivity",
+            "Zamindari abolition (1950s): end of landlord intermediaries, direct peasant ownership, but inadequate rehabilitation compensation",
+            "Tenancy reforms: aimed at tenant protection and conversion to ownership, varied success across states",
+            "Land ceiling acts: limitation on maximum land holding (state-specific, 10-50 hectares), redistribution of surplus land",
+            "Land ceiling effectiveness: poor implementation, 4-5 million hectares distributed but mostly to non-cultivators",
+            "Tenant security measures: fair rent, fixity of tenure, conversion rights, state variations in implementation",
+            "Success and failures: Kerala's radical reforms achieved high tenancy rates; West Bengal's Operation Barga moderately successful; other states showed poor implementation",
+            "Land records digitization: DILRMP (Digital India Land Records Modernization Programme) for land documentation",
+            "Ownership security: property rights essential for investment and productivity, but small holder security weak",
+            "Caste-based land ownership patterns: marginalized communities hold disproportionately small holdings",
+            "Land acquisition issues: LARR Act 2013 replacing 1894 act with better rehabilitation provisions but still contested"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Digital India Land Records Modernization Programme (DILRMP)",
+              "year_launched": 2008,
+              "objective": "Digitize and modernize land records for transparent ownership",
+              "key_features": "Survey and settlement, mapping, digitization, Rs 950 crore central assistance, all states covered",
+              "current_status": "Ongoing with 70%+ coverage"
+            },
+            {
+              "scheme_name": "Land Acquisition, Rehabilitation and Resettlement (LARR) Act 2013",
+              "year_launched": 2013,
+              "objective": "Protect farmer rights in land acquisition with fair compensation",
+              "key_features": "Multi-purpose acquisition, 4x rural/2x urban market price, R&R provisions, consent requirement",
+              "current_status": "Active - frequent amendments proposed"
+            },
+            {
+              "scheme_name": "Model Agricultural Produce and Livestock Marketing (Promotion and Facilitation) Act 2017",
+              "year_launched": 2017,
+              "objective": "Facilitate agricultural land leasing for tenant security",
+              "key_features": "Registered leasing, contract enforcement, tenant rights, state adoption variable",
+              "current_status": "Adopted by 20+ states"
+            }
+          ],
+          "issues_and_challenges": [
+            "Land fragmentation: average holding size declining to 1.1 hectares from 2.3 hectares over 25 years",
+            "Land ceiling evasion: benami transactions, family subdivision allowing circumvention",
+            "Land record quality issues: disputes, overlapping claims despite digitization efforts",
+            "Tenant insecurity: informal tenancy remains dominant (50-60%), no government recognition",
+            "Land acquisition conflicts: farmer protests against industrialization and mining",
+            "Environmental degradation: agricultural land converted to non-agricultural uses",
+            "Marginalization of SC/ST farmers: lower land quality and smaller holdings"
+          ],
+          "way_forward": [
+            "Accelerate DILRMP implementation with blockchain technology for immutable records",
+            "Strengthen tenant rights through legal recognition and contract enforcement mechanisms",
+            "Implement land consolidation schemes to reverse fragmentation",
+            "Regulate land acquisition with stronger environmental and social impact assessment",
+            "Promote agricultural land leasing with fair terms and security for both parties",
+            "Enforce land ceiling more effectively with technology to prevent evasion",
+            "Special focus on marginalized community land rights and asset building"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Direct exam focus - land reforms critical for GS3",
+          "daily_target_hours": 2.0,
+          "mains_answer_angles": [
+            "Land reform models comparison - zamindari abolition vs tenancy reform effectiveness",
+            "Land fragmentation as structural problem - causes and solutions",
+            "Digital land records role in tenure security and dispute resolution",
+            "Land acquisition and farmer displacement - balancing development and rights",
+            "Tenant security frameworks and implementation challenges across states"
+          ]
+        },
+        {
+          "topic_id": "TOP_002_002",
+          "topic_name": "Land Use Pattern & Degradation",
+          "primary_book": "NSSO Land Use Statistics & Environmental Reports",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "Land use classification: forest area 24%, net sown area 51%, pastures 3%, waste land 8%, built-up 2%, others 12%",
+            "Net Sown Area (NSA): 157 million hectares, relatively stagnant for 20+ years, scope limited for expansion",
+            "Fallow land categories: temporary fallows (6-7%) and permanent fallows (2-3%), indicates unproductive land",
+            "Forest degradation: clearing for agriculture, grazing, timber extraction; net forest loss 0.2 million hectares annually",
+            "Land degradation extent: 96 million hectares affected by soil degradation, 42% of total land area",
+            "Desertification: 68 million hectares vulnerable to desertification, concentrated in arid/semi-arid regions",
+            "Soil erosion: water erosion affecting 83%, wind erosion 17%, highest in hilly and rainfed regions",
+            "Salinization and alkalinization: 6-8 million hectares affected, particularly in irrigated command areas",
+            "Waterlogging: 7-8 million hectares, result of excessive irrigation without proper drainage",
+            "Urban sprawl: 2-3% annual agricultural land conversion to urban use, loss of prime agricultural land",
+            "Mining impact: 0.2-0.3 million hectares degraded annually through mining activities",
+            "Cropping intensity: 130-140% nationally, higher in irrigated areas leading to soil exhaustion",
+            "Carbon sequestration: agriculture's role in climate change mitigation through improved practices"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "National Mission for Green India (GrIM)",
+              "year_launched": 2014,
+              "objective": "Afforestation and greening of degraded land",
+              "key_features": "10 million hectares target, Rs 3200 crore allocation, carbon sequestration benefits",
+              "current_status": "Active - 20% target achieved"
+            },
+            {
+              "scheme_name": "Integrated Watershed Management Programme (IWMP)",
+              "year_launched": 2009,
+              "objective": "Watershed development for land and water conservation",
+              "key_features": "Soil conservation, groundwater recharge, Rs 5000 crore allocation, 15 million hectares covered",
+              "current_status": "Active across states"
+            },
+            {
+              "scheme_name": "National Afforestation Programme (NAP)",
+              "year_launched": 2000,
+              "objective": "Combat land degradation through afforestation",
+              "key_features": "Degraded forest land and non-forest land, community participation, livelihood support",
+              "current_status": "Ongoing with focus on marginal lands"
+            }
+          ],
+          "issues_and_challenges": [
+            "Agricultural land conversion to non-agricultural uses accelerating due to industrialization and urbanization",
+            "Groundwater depletion making irrigated agriculture unsustainable in water-scarce regions",
+            "Excessive pesticide and fertilizer use contaminating soil and water",
+            "Poor implementation of land degradation mitigation programs - reach and effectiveness limited",
+            "Climate change increasing severity of drought and flood impacts on land",
+            "Competing demands: food security vs environmental protection vs industrial development"
+          ],
+          "way_forward": [
+            "Strengthen implementation of watershed management programs with community participation",
+            "Regulate agricultural land conversion through stricter urban planning regulations",
+            "Promote conservation agriculture practices for soil health maintenance",
+            "Develop degraded land through afforestation and alternative uses",
+            "Control groundwater extraction through regulations and technological solutions",
+            "Integrate land use planning with agricultural productivity and environmental sustainability"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Relevant for environment and sustainability angles",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Land degradation extent and environmental sustainability of agriculture",
+            "Groundwater depletion and irrigation sustainability challenges",
+            "Land use conversion and urban agriculture implications",
+            "Watershed management as integrated solution to land and water conservation",
+            "Climate change vulnerability of agricultural lands and adaptation strategies"
+          ]
+        },
+        {
+          "topic_id": "TOP_002_003",
+          "topic_name": "Land Fragmentation & Holding Patterns",
+          "primary_book": "NSSO Agricultural Census Data",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Land fragmentation definition: average farm size declining from 2.3 hectares (1980) to 1.1 hectares (2020)",
+            "Causes of fragmentation: population growth, property inheritance practices, legal restrictions on consolidation",
+            "Holdings size distribution: marginal (< 1 ha) 67%, small (1-2 ha) 18%, medium (2-4 ha) 10%, large (> 4 ha) 5%",
+            "Marginal farmers: constitute 67% of farmers holding just 20% of land, very low productivity",
+            "NSSO Agricultural Census: comprehensive data on holdings, crops, irrigation, productivity by state",
+            "Efficiency implications: consolidation leads to 20-30% productivity improvement, economies of scale",
+            "Technology adoption barriers: fragmented holdings limiting mechanization viability",
+            "Land leasing: informal leasing widespread (30-50% of farmers) but unrecognized, causing insecurity",
+            "Sharecropping prevalence: 20-30% agricultural land under sharecropping arrangements, often exploitative",
+            "Consolidation schemes: land redistribution and consolidation programs showing mixed results",
+            "Cooperative farms: collective cultivation models tested but facing sustainability challenges",
+            "Precision agriculture: possible even on small holdings with group approaches and technology sharing",
+            "FPO model: aggregation through producer organizations without consolidation, emerging solution"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Scheme for Reorganisation of Land Holdings",
+              "year_launched": 1971,
+              "objective": "Consolidate fragmented holdings through voluntary exchange",
+              "key_features": "Revenue board facilitation, voluntary participation, state-wise implementation",
+              "current_status": "Active but limited uptake"
+            },
+            {
+              "scheme_name": "Model Tenancy Act 2016",
+              "year_launched": 2016,
+              "objective": "Regulate agricultural land leasing for tenant and owner security",
+              "key_features": "Registered leases, fair rent determination, dispute resolution, state adoption",
+              "current_status": "Model act — state-wise adoption"
+            },
+            {
+              "scheme_name": "Farmer Producer Organisations (10,000 FPO Scheme)",
+              "year_launched": 2020,
+              "objective": "Aggregate smallholder farmers without land consolidation",
+              "key_features": "FPO formation in 50 districts, Rs 5000 crore commitment, value chain integration",
+              "current_status": "Active - 6000+ FPOs formed"
+            }
+          ],
+          "issues_and_challenges": [
+            "Consolidation schemes facing resistance from farmers with non-contiguous plots",
+            "Unequal land quality making fair exchange difficult",
+            "Tenant insecurity prevents investment and improvement in shared/leased holdings",
+            "Informal tenancy lacks legal protection despite dominance",
+            "Cooperative and collective farming models showing sustainability issues",
+            "Technology not accessible to all sizes of holdings equally"
+          ],
+          "way_forward": [
+            "Promote willing buyer-willing seller approach to land consolidation",
+            "Strengthen legal framework for agricultural tenancy with written contracts",
+            "Scale up FPO model as alternative to physical consolidation",
+            "Develop custom hiring services for mechanization even on small holdings",
+            "Create land registries specifically for leased/shared holdings",
+            "Provide financial support for consolidation-related surveying and legal costs"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Important structural issue affecting agricultural productivity",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Land fragmentation as structural constraint on productivity and modernization",
+            "Solutions: consolidation vs FPO vs cooperative models - comparative analysis",
+            "Tenant security and informal tenancy implications for agricultural development",
+            "Technology adoption on fragmented holdings - mechanisms and challenges",
+            "Policy interventions for land market development and consolidation"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_003",
+      "module_name": "Agricultural Marketing & Pricing",
+      "topics": [
+        {
+          "topic_id": "TOP_003_001",
+          "topic_name": "MSP, Procurement & Buffer Stock",
+          "primary_book": "Economic Survey & CACP Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 7: Employment",
+          "key_concepts": [
+            "Minimum Support Price (MSP): floor price announced by government to protect farmer incomes, 22-23 commodities",
+            "Swaminathan Committee formula: C2+50% (cost + 50% margin), later modified to A2+FL+50% (current approach)",
+            "C2 costs: owned capital costs including land, A2/FL: paid-out costs + family labor wages",
+            "MSP determination process: CACP (Commission for Agricultural Costs and Prices) review, seasonality adjustment",
+            "CACP formation: 1965, multidisciplinary body analyzing production costs and market factors",
+            "Procurement system: government agencies (FCI, state agencies) procure at MSP to stabilize markets",
+            "FCI role: food procurement, storage, distribution, maintains buffer stock, public distribution system supply",
+            "Buffer stock norms: strategic minimum (4-5 million tonnes rice, 5-6 million tonnes wheat), operational (10-12 million tonnes rice, 10-13 million tonnes wheat)",
+            "Current stock levels: often exceed norms creating storage burden, financial strain",
+            "Seasonal price variation: sharp increases after harvest, decline during consumption season",
+            "MSP coverage: only 22 commodities, 60-70% procurement rice-wheat centric, pulses and oilseeds low",
+            "Procurement procurement adequacy: wheat 25-30% of production, rice 30-40%, pulses <5%",
+            "Foodgrain production stabilization: buffer stock crucial for supply management and price stability",
+            "Storage costs: Rs 1000-1500 per tonne annually, significant financial burden, food quality degradation risk"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Pradhan Mantri Annodaya Yojana (PM-AGP)",
+              "year_launched": 2000,
+              "objective": "Distribute foodgrains at subsidized rates to poor",
+              "key_features": "Rice at Rs 3/kg, wheat at Rs 2/kg to targeted beneficiaries, subsidized distribution",
+              "current_status": "Active under NFSA"
+            },
+            {
+              "scheme_name": "Crop Insurance Schemes (PMFBY, WBCIS)",
+              "year_launched": "2016 (PMFBY) / 2007 (WBCIS)",
+              "objective": "Protect farm incomes from production risks",
+              "key_features": "Premium subsidies, claim settlement through insurance partners, weather-based variants",
+              "current_status": "Active with renewed focus on redesign"
+            },
+            {
+              "scheme_name": "Agricultural Price Stabilization Scheme (APSS)",
+              "year_launched": "Ongoing",
+              "objective": "Stabilize prices through market intervention",
+              "key_features": "Storage and supply-based operations, public warehousing, buffer stock management",
+              "current_status": "Active - evolving with market conditions"
+            }
+          ],
+          "issues_and_challenges": [
+            "MSP-real costs gap: announced MSP often below actual production costs, discouraging production",
+            "Procurement inefficiency: high transaction costs, quality losses in storage",
+            "Buffer stock food waste: 2-3% annual deterioration in stored foodgrains, quality decline",
+            "Limited commodity coverage: MSP and procurement absent for most horticulture and pulses",
+            "Market distortion: MSP focus on rice-wheat creating mono-crop tendency in plains",
+            "Storage capacity constraints: inadequate cold chain and modern storage infrastructure",
+            "Fiscal burden: subsidies and storage costs straining government finances annually (Rs 50,000+ crore)"
+          ],
+          "way_forward": [
+            "Extend MSP and procurement to more commodities, especially pulses and oilseeds",
+            "Implement Swaminathan Committee recommendations fully - transparent cost estimation",
+            "Develop modern storage infrastructure: metal silos, scientific godown management",
+            "Strengthen direct procurement from producer organizations to reduce intermediation",
+            "Link MSP with income support rather than procurement-based distribution",
+            "Promote market-based price discovery mechanisms alongside MSP",
+            "Integrate storage with value addition for processed food production"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Core topic - direct exam focus multiple times",
+          "daily_target_hours": 2.0,
+          "mains_answer_angles": [
+            "MSP logic, determination formula, and farmer income protection effectiveness",
+            "Procurement system inefficiencies and reform options",
+            "Buffer stock rationale vs fiscal implications",
+            "Market distortions from procurement-centric approach",
+            "Alternative mechanisms for farm income support beyond MSP",
+            "Swaminathan Committee recommendations implementation status"
+          ]
+        },
+        {
+          "topic_id": "TOP_003_002",
+          "topic_name": "Agricultural Marketing - APMC, e-NAM & Reforms",
+          "primary_book": "Ministry of Agriculture & Department of Agriculture Reports",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "APMC (Agricultural Produce Market Committee) Act: state-level laws regulating agricultural commodity trading",
+            "APMC objectives: protect farmer interests, ensure fair trading, prevent speculation",
+            "APMC structure: one market per district, regulated by state agricultural department, farmer representation",
+            "APMC functions: marketplace operation, cess collection (2-3% on transactions), quality assurance",
+            "Market fee structure: entry tax 2-6%, market fee 2-3%, commission 6-10%, multiple taxes reducing farmer price",
+            "APMC problems: fragmented markets (>2000 in India), limited buyer competition, quality degradation",
+            "Agricultural Produce Market Committee issues: farmer exploitation through multiple middlemen, lack of transparency",
+            "Model APMC Act 2017: proposed reforms including contract farming, direct marketing, e-trading provisions",
+            "e-NAM (National Agriculture Market): unified online trading platform launched 2016",
+            "e-NAM functionality: price transparency, competitive bidding, electronic settlement, 1000+ mandis connected",
+            "e-NAM impact: 50%+ price improvement in some commodities, trading volume Rs 5000+ crore annually",
+            "Direct marketing schemes: SAFAL (ITC), Kisan Mandi (farmer-to-consumer), reducing middlemen",
+            "Contract farming: pre-agreed price and quality terms between farmer and buyer, risk reduction",
+            "Farm laws 2020: liberalization of agricultural markets - repealed 2021 after farmer protests",
+            "Farmer concerns: subsidy removal, MSP elimination, corporate monopoly risks from complete liberalization"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "e-NAM (National Agriculture Market)",
+              "year_launched": 2016,
+              "objective": "Unified online agricultural commodity trading platform",
+              "key_features": "1000+ mandis connected, real-time prices, e-auction, Rs 100+ transaction value daily",
+              "current_status": "Active - expansion to more states"
+            },
+            {
+              "scheme_name": "Model Agricultural Produce Market Committee Act 2017",
+              "year_launched": 2017,
+              "objective": "Liberalize agricultural markets while maintaining farmer protection",
+              "key_features": "Contract farming legalization, direct marketing, e-trading provisions, adopted by multiple states",
+              "current_status": "Active - state-wise implementation"
+            },
+            {
+              "scheme_name": "Agricultural Export Policy 2018",
+              "year_launched": 2018,
+              "objective": "Promote agricultural exports through policy framework",
+              "key_features": "Export promotion, zero-tariff, infrastructure investment, Rs 10,000 crore agri-exports target",
+              "current_status": "Active guide for export strategy"
+            }
+          ],
+          "issues_and_challenges": [
+            "APMC system fragmentation limiting scale and efficiency",
+            "Multiple taxes and levies increasing consumer prices by 30-40% above farmer price",
+            "Information asymmetry: farmers unaware of price variations across markets",
+            "Middleman exploitation: 4-5 layers of intermediation between farmer and consumer",
+            "Quality degradation: inadequate infrastructure for grading and storage",
+            "e-NAM adoption slow: awareness and digital literacy barriers for smallholders",
+            "Farm Laws repeal: leaving liberalization in limbo, market reforms stalled"
+          ],
+          "way_forward": [
+            "Strengthen e-NAM adoption through digital literacy and incentive support",
+            "Harmonize state-level APMC Acts with model act provisions",
+            "Reduce market fee and tax burden on agricultural transactions",
+            "Promote FPOs and aggregation to improve bargaining power",
+            "Develop direct marketing infrastructure and consumer awareness",
+            "Establish quality standards and grading infrastructure",
+            "Facilitate contract farming with farmer protection clauses",
+            "Create dispute resolution mechanisms for agricultural trade"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Direct exam focus - market reforms and Farm Laws frequently asked",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "APMC system problems and inefficiencies in farmer price realization",
+            "e-NAM potential and adoption challenges - structural barriers",
+            "Farm Laws 2020 - provisions, objectives, farmer concerns, repeal implications",
+            "Market liberalization vs farmer protection - balancing act",
+            "Direct marketing models and FPO aggregation viability",
+            "Contract farming - benefits and risks for smallholder farmers"
+          ]
+        },
+        {
+          "topic_id": "TOP_003_003",
+          "topic_name": "Farmer Producer Organizations & Cooperative Approach",
+          "primary_book": "Ministry of Agriculture Reports & NITI Aayog Studies",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "FPO (Farmer Producer Organization): legal entities aggregating farmers for collective action",
+            "FPO advantages: economies of scale, technology access, better bargaining power, market linkages",
+            "FPO value chain: production planning, input supply, quality control, marketing, value addition",
+            "10,000 FPO Scheme (2020): government target to form 10,000 FPOs, Rs 5000 crore allocation",
+            "FPO formation status: 6000+ FPOs operational across states, varying models (company, coop, society)",
+            "Coop movement history: cooperative societies 100+ years old, varying success across states",
+            "Cooperative advantages: democratic management, member benefit focus, transparent operations",
+            "Cooperative challenges: weak management, farmer participation variability, market access gaps",
+            "Capacity building: training needs for FPO leaders and members on business management",
+            "Technology integration: FPOs enabling precision agriculture and modern inputs access",
+            "Market access: FPOs improving bargaining position, reducing transaction costs",
+            "Value addition: FPOs enabling processing and branding for premium pricing",
+            "Government support: credit guarantee, subsidy pass-through, market linkage facilitation"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Scheme to formulate 10,000 Farmer Producer Organisations (FPOs)",
+              "year_launched": 2020,
+              "objective": "Aggregate smallholder farmers for economies of scale and market access",
+              "key_features": "Rs 5000 crore fund, FPO formation support, capacity building, 50 clusters focused",
+              "current_status": "Active - 6000+ FPOs formed targeting 2 lakh farmers"
+            },
+            {
+              "scheme_name": "Prime Minister Formalisation of Micro Food Enterprises (PM FME)",
+              "year_launched": 2020,
+              "objective": "Formalize micro food enterprises including farmer-based processing",
+              "key_features": "Rs 10,000 crore credit guarantee, technology upgradation, FPO participation",
+              "current_status": "Active - targeting 200,000 enterprises"
+            },
+            {
+              "scheme_name": "National Cooperative Agriculture & Rural Development Bank (NCARDB)",
+              "year_launched": "Ongoing",
+              "objective": "Provide credit to cooperatives and FPOs",
+              "key_features": "Long-term credit for infrastructure, working capital support, subsidy linkages",
+              "current_status": "Active - Rs 5000+ crore annual lending"
+            }
+          ],
+          "issues_and_challenges": [
+            "FPO sustainability challenges: farmer participation inconstancy, professional management gaps",
+            "Cooperative bureaucracy: slow decision-making, inefficient operations in many cases",
+            "Market access promises: many FPOs struggling to secure consistent buyers",
+            "Value addition complexity: technology and capital-intensive, skill requirements high",
+            "Farmer trust deficit: historical bad experiences with cooperatives reduce new FPO participation",
+            "Competition with private sector: difficult to match scale and efficiency of big corporates",
+            "Financing challenges: credit access limited despite government support"
+          ],
+          "way_forward": [
+            "Strengthen professional management in FPOs through trained CEOs and staff",
+            "Develop FPO clusters for critical mass and operational efficiency",
+            "Link FPOs with government procurement for guaranteed market access",
+            "Provide technology and innovation support for value addition",
+            "Create FPO support organizations for capacity building and market information",
+            "Facilitate contract farming and buyer linkages for FPOs",
+            "Encourage merger of weaker cooperatives for consolidation"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Emerging model - increasing exam focus",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "FPO model as solution to fragmentation without land consolidation",
+            "Cooperative vs FPO comparison - strengths and implementation challenges",
+            "Value chain integration through FPOs - feasibility and requirements",
+            "Government support mechanisms for FPO sustainability",
+            "Technology and market access enabling through FPOs"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_004",
+      "module_name": "Agricultural Credit & Insurance",
+      "topics": [
+        {
+          "topic_id": "TOP_004_001",
+          "topic_name": "Agricultural Credit System & Priority Sector Lending",
+          "primary_book": "NABARD Reports & RBI Circulars",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Agricultural credit definition: loans for crop production, animal husbandry, fisheries, agriculture allied activities",
+            "Credit sources: institutional (banks, cooperatives) 60-65%, non-institutional (moneylenders, traders) 35-40%",
+            "Non-institutional credit cost: 20-60% interest rates vs institutional 7-12%, farmer exploitation mechanism",
+            "NABARD (National Bank for Agriculture and Rural Development): apex institution for rural credit",
+            "NABARD functions: refinancing banks, rural infrastructure development fund (RIDF), research, policy advice",
+            "KCC (Kisan Credit Card): major institutional credit product, 3 crore cardholders, single-window credit",
+            "Priority Sector Lending (PSL): 18% of ANBC (Adjusted Net Banking Credit) mandated for agriculture",
+            "PSL importance: ensuring credit reach to agriculture despite lower profitability for banks",
+            "Interest subvention scheme: 2% central government subsidy on agricultural loans up to 3 lakh",
+            "Short-term credit: production loans for 1 crop cycle, 9-12 months duration",
+            "Medium-term credit: 5-10 years for agricultural inputs and improvements",
+            "Long-term credit: 15-20 years for land development, machinery, irrigation",
+            "Credit accessibility: only 40-50% of farmers have access to institutional credit",
+            "Regional disparities: southern and western India better served, eastern and central regions underserved",
+            "Collateral requirements: major barrier for smallholder and marginal farmers"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Pradhan Mantri Kisan Credit Card (PM-KCC)",
+              "year_launched": 1998,
+              "objective": "Provide flexible credit for agricultural needs",
+              "key_features": "3 crore cardholders, up to Rs 3 lakh credit, single-window facility, interest subsidy",
+              "current_status": "Active - expanded to agriculture and allied sectors"
+            },
+            {
+              "scheme_name": "Agriculture Interest Subvention Scheme (AISS)",
+              "year_launched": 2009,
+              "objective": "Reduce agricultural loan burden through interest subsidy",
+              "key_features": "2% central subsidy, farmers pay at reduced rate, banks get reimbursement",
+              "current_status": "Active - annual Rs 1500+ crore subsidy"
+            },
+            {
+              "scheme_name": "MUDRA (Micro Units Development and Refinance Agency) Scheme",
+              "year_launched": 2015,
+              "objective": "Credit for micro enterprises including agricultural activities",
+              "key_features": "Unsecured loans up to Rs 10 lakh, small business focus, 5+ crore loans disbursed",
+              "current_status": "Active - agricultural component expanding"
+            }
+          ],
+          "issues_and_challenges": [
+            "Credit gap: agriculture needs Rs 20+ lakh crore annually but receives Rs 12-14 lakh crore",
+            "Collateral requirements: exclude smallholders from institutional credit despite subsidies",
+            "Bank reluctance: agriculture seen as risky, preference for urban retail lending",
+            "Loan recovery issues: farmer defaults rising during price/production crises",
+            "Credit stacking: farmers accessing multiple informal credits simultaneously creating distress",
+            "Unequal credit access: large and medium farmers capture 60-70% institutional credit despite being 15% farmers",
+            "Agricultural distress: credit-related farm debt stress leading to farmer suicides in some regions"
+          ],
+          "way_forward": [
+            "Expand KCC coverage to remaining 50% unbanked farmers",
+            "Relax collateral requirements through credit guarantee mechanisms",
+            "Strengthen cooperative credit system for better reach and relationship banking",
+            "Develop credit history systems through digital platforms for smallholder farmers",
+            "Link credit with risk management through insurance products",
+            "Create specialized agricultural banks focused on long-term financing",
+            "Implement debt waiver through transparent and targeted criteria"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Relevant for farmer distress and financial inclusion discussion",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Agricultural credit adequacy and institutional vs non-institutional sources",
+            "KCC scheme effectiveness and coverage expansion challenges",
+            "Priority Sector Lending obligations and implementation gaps",
+            "Collateral-free credit mechanisms and risk management",
+            "Interest subvention effectiveness in farm income support",
+            "Debt burden and farmer distress linkage"
+          ]
+        },
+        {
+          "topic_id": "TOP_004_002",
+          "topic_name": "Crop Insurance & Farm Risk Management",
+          "primary_book": "Ministry of Agriculture Insurance Division Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 7: Employment",
+          "key_concepts": [
+            "Crop insurance rationale: protect farmers from production and price risks, capital requirements for recovery",
+            "Insurance evolution: individual indemnity (pre-2000s), weather-based, yield-based, value-based variants",
+            "PMFBY (Pradhan Mantri Fasal Bima Yojana) launched 2016: comprehensive crop insurance redesign",
+            "PMFBY features: affordable premiums (2% kharif, 1.5% rabi), technology-based claim settlement, actuarial pricing",
+            "PMFBY coverage: 50 million+ farmers enrolled, premium Rs 5000+ crore annually",
+            "Loss assessment mechanisms: crop-cutting experiments (CCE) for yield estimation, satellite monitoring",
+            "Claim settlement: Rs 20,000+ crore paid annually, but settlement delays common (3-6 months)",
+            "Weather-based crop insurance (WBCIS): indemnity based on rainfall/temperature deviations, objective assessment",
+            "Rainfall insurance: protection against excess/deficient rainfall, common in rainfed areas",
+            "Temperature insurance: protection against heat stress, cold waves in sensitive crops",
+            "Pilot insurance schemes: localized products tested in select districts before scale-up",
+            "Private insurance participation: 50-50 partnership with PSU insurers, claim settlement responsibility",
+            "Actuarial pricing: premiums calculated on loss probability, leading to farmer affordability issues",
+            "Subsidy burden: government subsidy 50-60% of premium, Rs 15,000-20,000 crore annual expenditure"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+              "year_launched": 2016,
+              "objective": "Comprehensive crop insurance with affordable premiums",
+              "key_features": "2% kharif, 1.5% rabi premium, CCE-based claim settlement, 50 million+ farmers covered",
+              "current_status": "Active - continuous redesign and improvement"
+            },
+            {
+              "scheme_name": "Restructured Weather-Based Crop Insurance Scheme (RWBCIS)",
+              "year_launched": 2019,
+              "objective": "Weather-based insurance for rainfed agriculture",
+              "key_features": "Objective assessment, lower premiums, early payout, 10+ million farmers covered",
+              "current_status": "Active expansion phase"
+            },
+            {
+              "scheme_name": "Agricultural Infrastructure Development Fund (AIDF)",
+              "year_launched": 2020,
+              "objective": "Risk mitigation through improved infrastructure",
+              "key_features": "Cold chains, storage facilities, reduces post-harvest losses, indirect insurance",
+              "current_status": "Active - 900+ projects"
+            }
+          ],
+          "issues_and_challenges": [
+            "Claim settlement delays: farmers waiting 3-6 months creating distress",
+            "Loss assessment issues: subjective CCE methodology, satellite data limitations",
+            "Farmer participation decline: 2021-2023 enrollment dropped 30% due to poor payouts",
+            "Moral hazard concerns: insurance potentially reducing farmer crop care incentives",
+            "Basis risk: indemnity not matching actual losses due to assessment methodology issues",
+            "Subsidy inefficiency: high government expenditure with low benefit realization by farmers",
+            "Coordination gaps: implementation across multiple agencies creating delays",
+            "Data quality: inadequate historical loss data in many regions affecting actuarial pricing"
+          ],
+          "way_forward": [
+            "Strengthen claim settlement infrastructure with fast-track processing",
+            "Improve loss assessment through satellite technology and AI-based systems",
+            "Design insurance products for specific crop-region combinations",
+            "Reduce premiums through operational efficiency and technology",
+            "Integrate insurance with credit products for universal coverage",
+            "Develop weather forecast-based early warning systems linked to insurance",
+            "Ensure transparent claim settlement with farmer grievance redressal",
+            "Move towards index-based insurance for objective, rapid payouts"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Major policy focus - exam frequently covers PMFBY",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "PMFBY design and implementation challenges",
+            "Claim settlement delays and farmer distress linkage",
+            "Weather-based vs indemnity-based insurance comparison",
+            "Insurance subsidy effectiveness and fiscal sustainability",
+            "Technology role in claim assessment and dispute resolution",
+            "Alternatives to insurance for risk management"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_005",
+      "module_name": "Irrigation & Water Management",
+      "topics": [
+        {
+          "topic_id": "TOP_005_001",
+          "topic_name": "Irrigation Potential & Types",
+          "primary_book": "Ministry of Water Resources Reports",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "Irrigation potential: land capable of being irrigated with available water resources",
+            "Created Irrigation Potential (CIP): infrastructure developed for irrigation use",
+            "Utilised Irrigation Potential (UIP): actual irrigation area under cultivation",
+            "IP gap: 15-20% gap between CIP and UIP indicates inefficient infrastructure utilization",
+            "Irrigation types: canal irrigation (43% of area), tankage/well (25%), groundwater (32%)",
+            "Canal irrigation: major/medium rivers, 40+ million hectares potential, 25 million hectares actual",
+            "Major irrigation commands: Bhakra-Nangal (Punjab, Haryana), Indira Gandhi Canal (Rajasthan), Sardar Sarovar",
+            "Tank/pond irrigation: traditional system, 100+ million tanks in India, revival focus",
+            "Well and tube well irrigation: 90+ million wells, groundwater dependent, sustainability concerns",
+            "Micro-irrigation: drip and sprinkler, 7-8 million hectares, water efficient, high capital cost",
+            "Drip irrigation advantages: 30-50% water saving, precise nutrient delivery, suitable for hilly terrain",
+            "Sprinkler irrigation: 15-30% water saving, suitable for undulating terrain, moderate capital cost",
+            "Lift irrigation: pumped water from sources below cropping area, energy-intensive",
+            "Irrigation efficiency: canal system 40-50%, well system 60-70%, micro-irrigation 90-95%",
+            "Waterlogging: 7-8 million hectares affected, from excessive canal irrigation and poor drainage",
+            "Salinization: 6-8 million hectares, from groundwater extraction leading to salt concentration"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)",
+              "year_launched": 2015,
+              "objective": "Integrated irrigation development addressing created vs utilized gap",
+              "key_features": "AIBP (dam rehabilitation), WDC (watershed development), PDMC (groundwater management), Per Drop More Crop",
+              "current_status": "Active - Rs 50,000 crore allocation"
+            },
+            {
+              "scheme_name": "PMKSY - Accelerated Irrigation Benefit Programme (AIBP)",
+              "year_launched": 1996,
+              "objective": "Complete irrigation projects and increase water availability",
+              "key_features": "Dam rehabilitation, canal modernization, 100+ projects, Rs 5000+ crore annual investment",
+              "current_status": "Active focus on project completion"
+            },
+            {
+              "scheme_name": "PMKSY - Watershed Development Component (WDC)",
+              "year_launched": 2015,
+              "objective": "Groundwater recharge through watershed management",
+              "key_features": "Soil conservation, checkdams, percolation tanks, 15 million hectares targeted",
+              "current_status": "Active expansion phase"
+            }
+          ],
+          "issues_and_challenges": [
+            "Project delays: irrigation project completion taking 15-20 years vs planned 5-7 years",
+            "Cost overruns: 50-100% budget overruns common in major projects",
+            "CIP-UIP gap: created infrastructure not fully utilized due to poor management",
+            "Groundwater depletion: extraction exceeding recharge by 50-100% in many areas",
+            "Canal inefficiency: seepage and evaporation losses 30-50% in open canals",
+            "Equity issues: head-end farmers benefiting more than tail-end",
+            "Waterlogging and salinization: secondary waterlogging from poor drainage design",
+            "Displacement: dam projects displacing millions with inadequate rehabilitation"
+          ],
+          "way_forward": [
+            "Focus on completing ongoing projects before starting new ones",
+            "Modernize canal systems with lining and automation for efficiency",
+            "Expand micro-irrigation coverage to 25+ million hectares by 2030",
+            "Implement groundwater regulation through AIBP groundwater management component",
+            "Restore tanks and traditional water harvesting systems",
+            "Ensure equitable water distribution through volumetric pricing",
+            "Strengthen operation and maintenance of irrigation systems",
+            "Integrate rainfed area development with micro-irrigation"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Core infrastructure topic for agriculture",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Irrigation potential creation vs utilization gap - causes and solutions",
+            "Micro-irrigation expansion potential and barriers",
+            "Groundwater depletion and regulation mechanisms",
+            "Major irrigation project implementation challenges",
+            "Efficiency improvements in irrigation system"
+          ]
+        },
+        {
+          "topic_id": "TOP_005_002",
+          "topic_name": "Groundwater Management & Inter-State Water Issues",
+          "primary_book": "Central Groundwater Board Reports",
+          "ncert_reference": "Class 10 - Contemporary India II - Chapter 4: Agriculture",
+          "key_concepts": [
+            "Groundwater contribution: 55-60% of irrigation, 85% of rural drinking water supply",
+            "Extraction rates: 250+ million hectares-meter annually vs recharge of 220 million hectares-meter",
+            "Depletion zones: 'dark zones' with critical groundwater; Punjab, western UP, Rajasthan, Gujarat critical",
+            "Depletion rate: 2-3% annual decline in water tables in critical zones",
+            "Over-exploitation: 35-40% of blocks classified as over-exploited or critical",
+            "Causes of depletion: agricultural extraction (90%), industrial use (5%), domestic (5%)",
+            "Groundwater regulation: Groundwater Act 2005-06 adopted by select states, monitoring systems weak",
+            "Well density: 25-30 million wells in country, poorly regulated, many illegal",
+            "Subsidy-induced extraction: free/subsidized electricity promoting excessive groundwater pumping",
+            "Inter-state river disputes: major causes of conflict and water insecurity",
+            "Dispute examples: Krishna river (Karnataka-AP-Telangana), Kaveri (Karnataka-Tamil Nadu), Sutlej-Beas",
+            "Interstate Water Disputes Act 1956: judicial mechanism for resolution, slow and contested",
+            "River water treaties: bilateral agreements like Indus Waters Treaty (Pakistan), working models",
+            "Cauvery Water Disputes tribunal: decades-old disputes still unresolved leading to social tension",
+            "Transboundary river issues: Teesta (Bangladesh), Brahmaputra (Bangladesh, Bhutan), diplomatic complexity"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "PMKSY - Per Drop More Crop",
+              "year_launched": 2015,
+              "objective": "Micro-irrigation expansion for water conservation in agriculture",
+              "key_features": "Drip and sprinkler irrigation, 10 million hectares targeted, Rs 5000+ crore allocation",
+              "current_status": "Active with focus on expansion"
+            },
+            {
+              "scheme_name": "Central Groundwater Board (CGWB) Regulation and Monitoring",
+              "year_launched": "Ongoing",
+              "objective": "Groundwater assessment and over-exploitation prevention",
+              "key_features": "Periodic assessments, monitoring networks, dark and semi-critical zone identification",
+              "current_status": "Active - expanding monitoring capacity"
+            },
+            {
+              "scheme_name": "Jal Jeevan Mission (Rural Water Supply)",
+              "year_launched": 2019,
+              "objective": "Drinking water supply through groundwater and surface sources",
+              "key_features": "Household taps, Rs 3.5 lakh crore outlay, surface water preference, groundwater supplementary",
+              "current_status": "Active - 85% households covered (goal: 100% by 2024)"
+            }
+          ],
+          "issues_and_challenges": [
+            "Groundwater regulation weak: state acts not implemented effectively",
+            "Monitoring capacity inadequate: CGWB covering only 40% blocks regularly",
+            "Agricultural groundwater extraction difficult to regulate: large number of small users",
+            "Interstate disputes unresolved: legal mechanism slow, political sensitivity high",
+            "Transboundary water issues: diplomatic complexity, climate variability",
+            "Seasonal water conflicts: water sharing during drought years most contentious",
+            "Agricultural lobby resistance: farmers oppose groundwater regulation fearing production impact"
+          ],
+          "way_forward": [
+            "Strengthen CGWB with adequate resources and technical capacity",
+            "Implement groundwater regulation with carrot-and-stick approach",
+            "Promote water-efficient agriculture through micro-irrigation and crop selection",
+            "Develop alternative surface water sources (river linking, storage)",
+            "Establish interstate water commissions with clear allocation rules",
+            "Promote inter-state water agreements based on hydrological reality",
+            "Shift from extraction-focus to conservation-focus in agricultural policy",
+            "Integrate groundwater management with food security considerations"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Exam focus on groundwater crisis and interstate disputes",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Groundwater depletion extent and long-term sustainability concerns",
+            "Regulation mechanisms and their effectiveness in different states",
+            "Crop pattern shift towards less water-intensive crops",
+            "Interstate water disputes and resolution mechanisms",
+            "Linking surface water sources as long-term solution",
+            "Technology role in water conservation and efficiency"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_006",
+      "module_name": "Food Security & Public Distribution System",
+      "topics": [
+        {
+          "topic_id": "TOP_006_001",
+          "topic_name": "Food Security & National Food Security Act",
+          "primary_book": "Ministry of Food Public Distribution Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Food security definition: access to sufficient, safe, nutritious food for active and healthy life",
+            "Four pillars: availability (production/import), access (income/purchasing power), utilization (nutrition), stability (consistent access)",
+            "Global food insecurity: 800+ million undernourished despite food production sufficient globally",
+            "India's food security: self-sufficiency in foodgrains since 1980s, but nutrition insecurity persistent",
+            "Malnutrition prevalence: 37% children stunted, 20% wasted, high micronutrient deficiencies",
+            "NFSA 2013: landmark legislation establishing food as legal right, 67% population coverage",
+            "NFSA entitlements: 5kg/month per person in priority households, 3.5kg/month in AAY",
+            "NFSA target: 81.40 crore beneficiaries, prioritize poor and vulnerable populations",
+            "Targeted PDS: Priority Households (APL converted) and AAY for poorest",
+            "Food grain supply: government procurement ensures stock for 2-3 months buffer",
+            "Nutritional aspects: rice and wheat focus, pulses and fortification for nutrition security",
+            "School meals program: MDMS reaches 100+ million children, nutrition and school enrollment benefit",
+            "ICDS (Integrated Child Development Services): nutrition and development focus for 0-6 years",
+            "Food subsidies: Rs 1.5-2 lakh crore annually for PDS, budget sustainability question"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "National Food Security Act (NFSA) 2013",
+              "year_launched": 2013,
+              "objective": "Provide legal food security right to 67% population",
+              "key_features": "5kg/month per person in priority HH, 3.5kg/month in AAY, targeted PDS coverage",
+              "current_status": "Active - 81.40 crore beneficiaries"
+            },
+            {
+              "scheme_name": "Mid-Day Meal Scheme (MDMS)",
+              "year_launched": 1925,
+              "objective": "Nutrition and school enrollment improvement in children",
+              "key_features": "100+ million children, free meals in government schools, 600-700 calories daily",
+              "current_status": "Active - universal coverage in public schools"
+            },
+            {
+              "scheme_name": "Integrated Child Development Services (ICDS)",
+              "year_launched": 1975,
+              "objective": "Comprehensive nutrition and development support for 0-6 years",
+              "key_features": "Nutrition, health checks, pre-school education, 130+ million children coverage",
+              "current_status": "Active - focus on nutrition improvement"
+            }
+          ],
+          "issues_and_challenges": [
+            "Food subsidy burden: Rs 1.5-2 lakh crore annually, fiscal sustainability question",
+            "Nutrition security gap: foodgrain provision not addressing malnutrition despite access",
+            "Coverage adequacy: NFSA covers 67%, remaining 33% without explicit food security",
+            "Public distribution efficiency: leakages and diversion reduce reach to target beneficiaries",
+            "Targeting errors: exclusion and inclusion errors in beneficiary selection",
+            "Infrastructure constraints: inadequate storage, transportation, dealer network",
+            "Program coordination: multiple ministries (Food, ICDS, MDMS) with integration gaps",
+            "Calorie supplementation focus: micronutrient fortification lagging despite known benefits"
+          ],
+          "way_forward": [
+            "Extend NFSA to remaining 33% population through targeted expansion",
+            "Shift from calorie focus to nutritionally-balanced food basket",
+            "Strengthen nutrition fortification in PDS foodgrains",
+            "Integrate NFSA with nutritional programs (MDMS, ICDS) for synergy",
+            "Implement Direct Benefit Transfer (DBT) for food subsidies with digital inclusion",
+            "Strengthen implementation and monitoring for leakage reduction",
+            "Develop state capacity for program administration and targeting",
+            "Link NFSA with agricultural production policy for sustainability"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Core social security topic - direct mains focus",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "NFSA objectives, coverage, and implementation status",
+            "Food subsidy sustainability and reform options",
+            "Nutrition security vs food grain availability distinction",
+            "PDS implementation challenges and reform needed",
+            "Integration of food security with other nutritional programs",
+            "DBT in food subsidy - feasibility and limitations"
+          ]
+        },
+        {
+          "topic_id": "TOP_006_002",
+          "topic_name": "Public Distribution System & PDS Reforms",
+          "primary_book": "Shanta Kumar Committee Report & Ministry of Food Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "PDS structure: three-tier - central pool (FCI), state procurement, fair price shops (FPS)",
+            "Fair Price Shops (FPS): 0.5 million shops, retail distribution, margin 3-4% on food",
+            "PDS coverage: 81.40 crore beneficiaries in priority and AAY categories",
+            "Foodgrain allocation: center determines allocation, states distribute through FPS",
+            "PDS leakage extent: Shanta Kumar Committee estimated 30-40% loss through diversion",
+            "Leakage channels: FPS diversion to open market, ration card misuse, dealer corruption",
+            "One Nation One Ration Card: portability scheme allowing purchase across states",
+            "Computerization of PDS: end-to-end integration reducing manual intervention and leakages",
+            "Aadhar-PDS integration: biometric authentication for beneficiary verification",
+            "Buffer stock role: strategic and operational reserves for supply stability",
+            "Issue Price: heavily subsidized (Rs 2-3/kg) vs economic cost (Rs 25-30/kg)",
+            "Fiscal subsidy: Rs 1.5-2 lakh crore annually in food subsidy",
+            "PDS vs open market: open market competition increasing, PDS relevance questioned",
+            "Implementation variations: state-wise differences in design, coverage, efficiency"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Targeted Public Distribution System (TPDS)",
+              "year_launched": 1997,
+              "objective": "Equitable distribution targeting poor",
+              "key_features": "APL converted to priority, AAY for poorest, differentiated prices",
+              "current_status": "Active - major distribution mechanism"
+            },
+            {
+              "scheme_name": "One Nation One Ration Card Scheme",
+              "year_launched": 2019,
+              "objective": "Enable portability of ration cards across states",
+              "key_features": "Intra-state and inter-state transfer of rations, ePoS integration, 80%+ coverage",
+              "current_status": "Active - national rollout completed"
+            },
+            {
+              "scheme_name": "End-to-End Computerisation of PDS",
+              "year_launched": "2000s",
+              "objective": "Reduce leakages through technology",
+              "key_features": "Digital tracking, Aadhar authentication, electronic point of sale (ePoS), real-time data",
+              "current_status": "Active implementation with state variations"
+            }
+          ],
+          "issues_and_challenges": [
+            "Leakage persistence: despite reforms, 20-30% diversion continues",
+            "Targeting errors: both inclusion (non-poor in scheme) and exclusion (poor excluded)",
+            "FPS viability: dealer margins inadequate for sustainability",
+            "Technology adoption barriers: digital literacy in rural areas limiting ePoS effectiveness",
+            "Food quality: storage and handling issues affecting PDS grain quality",
+            "Fiscal burden: food subsidy crowding out other investments",
+            "Political economy: subsidy reduction politically unpopular despite efficiency arguments",
+            "Coordination gaps: between central, state, district agencies causing implementation delays"
+          ],
+          "way_forward": [
+            "Strengthen PDS targeting through better data and technology",
+            "Implement Direct Benefit Transfer (DBT) for food subsidies allowing choice",
+            "Modernize storage infrastructure for quality preservation",
+            "Ensure fair dealer margins for FPS viability and motivation",
+            "Expand computerization and Aadhar integration for leakage reduction",
+            "Integrate PDS with nutrition programs for comprehensive food security",
+            "Promote private sector participation in grain storage and transportation",
+            "Phase out issues price difference through gradual subsidy reforms"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Direct exam focus - Shanta Kumar Committee frequently asked",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "PDS structure and implementation across states",
+            "Leakage extent and mechanisms in PDS",
+            "Technology role in leakage reduction (ePoS, Aadhar)",
+            "One Nation One Ration Card - implementation progress and challenges",
+            "DBT in food vs PDS - comparative advantages and disadvantages",
+            "Shanta Kumar Committee recommendations implementation"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_007",
+      "module_name": "Agricultural Technology & Innovation",
+      "topics": [
+        {
+          "topic_id": "TOP_007_001",
+          "topic_name": "Seeds, Soil Health & Organic Farming",
+          "primary_book": "Ministry of Agriculture & NITI Aayog Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Seed sector: public seed production 30%, private 70%, critical for productivity",
+            "HYV seeds: High Yielding Variety adoption essential for modern agriculture productivity",
+            "Seed replacement rate (SRR): Kharif 50-60%, Rabi 80-90%, targets SRR of 100% for all crops",
+            "Seed certification: ensuring genetic purity and germination standards for farmer benefit",
+            "Seed village program: farmer multiplication of seeds at village level for cost reduction",
+            "Soil Health Card scheme: free soil testing recommendations for balanced nutrient use",
+            "Soil test coverage: 80+ million tests conducted, farmer adoption of recommendations variable",
+            "Nutrient management: balanced NPK use improving, but still regional imbalances",
+            "NBS (Nutrient Based Subsidy) policy: subsidizing nutrients instead of fertilizer for efficiency",
+            "Organic farming: zero synthetic inputs, soil health focus, premium prices",
+            "PKVY scheme: 500,000+ hectares under organic farming, cluster approach, certification support",
+            "Organic certification: high cost 30,000-50,000 barrier for farmers",
+            "Natural farming: zero budget natural farming (ZBNF) in Andhra Pradesh, minimal external inputs",
+            "ZBNF features: on-farm input production (jeevamrut, bijamrut), local crop varieties"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Paramparagat Krishi Vikas Yojana (PKVY)",
+              "year_launched": 2015,
+              "objective": "Organic farming through cluster approach with incentives",
+              "key_features": "2.5 hectare clusters, organic certification subsidy, premium link, 500,000+ hectares covered",
+              "current_status": "Active - expansion to tribal areas"
+            },
+            {
+              "scheme_name": "Zero Budget Natural Farming (ZBNF)",
+              "year_launched": 2016,
+              "objective": "Natural farming reducing input costs and environmental impact",
+              "key_features": "On-farm input production, zero budget concept, Andhra Pradesh model, subsidy support",
+              "current_status": "Active - scaling nationally"
+            },
+            {
+              "scheme_name": "Soil Health Card Scheme",
+              "year_launched": 2015,
+              "objective": "Improve soil fertility through scientific soil testing and recommendations",
+              "key_features": "Free testing, micronutrient recommendations, 80+ million cards issued, periodic retesting",
+              "current_status": "Active - focus on adoption of recommendations"
+            }
+          ],
+          "issues_and_challenges": [
+            "Private seed sector concentration: reducing diversity and increasing farmer dependence",
+            "Hybrid seed sterility: forcing farmers to buy new seeds every season",
+            "Seed quality issues: inadequate testing and certification in some regions",
+            "Organic farming transition risks: 2-3 years low productivity before recovery",
+            "Organic certification costs: prohibitive for smallholder farmers",
+            "Market access for organic: limited organic market infrastructure",
+            "Soil test recommendation adoption: farmers not implementing due to capital constraints",
+            "Sustainability concerns: even organic farming needs appropriate technical support"
+          ],
+          "way_forward": [
+            "Promote public seed variety development for farmer autonomy",
+            "Strengthen seed certification and quality assurance systems",
+            "Expand soil health card outreach with farmer-friendly recommendations",
+            "Develop regional organic certification standards reducing costs",
+            "Create aggregator models for organic produce aggregation and marketing",
+            "Promote ZBNF as alternative to organic requiring lower capital",
+            "Link organic/natural farming with premium price schemes",
+            "Develop farmer seed production networks for local varieties"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Technology and sustainability focus - increasing exam importance",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "Seed sector role in productivity and farmer autonomy",
+            "Organic farming viability and sustainability benefits",
+            "Natural farming (ZBNF) potential and scalability",
+            "Soil health management and sustainability",
+            "Organic certification barriers and solutions"
+          ]
+        },
+        {
+          "topic_id": "TOP_007_002",
+          "topic_name": "Precision Agriculture & Digital Transformation",
+          "primary_book": "Ministry of Agriculture Digital Agriculture Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Precision agriculture: technology-based farming (IoT, drones, AI) for optimal resource use",
+            "Farm mechanization: mechanized operations replacing manual labor, reducing costs 30-40%",
+            "Drones in agriculture: crop monitoring, pesticide spraying, land measurement",
+            "PM Kisan Drones: government scheme supporting drone adoption in farming",
+            "Soil moisture sensors: IoT devices for optimized irrigation scheduling",
+            "Weather forecasting: AI-based prediction for better crop planning",
+            "Crop health monitoring: satellite and drone-based early warning systems",
+            "Artificial intelligence: crop recommendation engines based on soil, weather, market data",
+            "AgriTech startups: 100+ startups in farm management, supply chain, marketplace domains",
+            "e-agriculture platforms: aggregating price, weather, technical advice information",
+            "Digital literacy: major barrier to technology adoption in rural areas",
+            "Agri Stack: digital infrastructure for agriculture including farmer registry, land records",
+            "IDEA (Intelligent Decision Agriculture): AI-powered decision support system",
+            "Technology adoption costs: high capital requirement limiting smallholder access"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "PM Kisan Drones Scheme",
+              "year_launched": 2023,
+              "objective": "Promote agricultural drones for precision farming",
+              "key_features": "Subsidy for drone purchase, training programs, custom hiring services, Mahila Kisan Drones",
+              "current_status": "Active expansion phase"
+            },
+            {
+              "scheme_name": "Agri Stack Development",
+              "year_launched": "Ongoing",
+              "objective": "Digital infrastructure for agriculture",
+              "key_features": "Farmer registry, land records integration, standardized data formats",
+              "current_status": "Under development - various state-level pilots"
+            },
+            {
+              "scheme_name": "E-Agriculture Services",
+              "year_launched": "Various",
+              "objective": "Information and market access through digital platforms",
+              "key_features": "Weather info, price data, technical advice, market linkages",
+              "current_status": "Multiple platforms operational - limited integration"
+            }
+          ],
+          "issues_and_challenges": [
+            "Technology cost barriers: precision agriculture equipment expensive for smallholders",
+            "Digital literacy gaps: rural population lacking IT skills for technology use",
+            "Connectivity issues: poor internet connectivity in rural areas limiting digital services",
+            "Technology appropriateness: many solutions designed for developed countries",
+            "Data privacy concerns: farmer data collection and usage not well regulated",
+            "Technology standardization: multiple incompatible platforms and data formats",
+            "Farmer participation low: technology push without demand-driven adoption",
+            "Last-mile services inadequate: implementation and support infrastructure weak"
+          ],
+          "way_forward": [
+            "Promote shared ownership models for expensive farm equipment",
+            "Design affordable, farmer-friendly technology interfaces",
+            "Strengthen rural connectivity through government infrastructure",
+            "Develop agri-tech incubators for locally appropriate solutions",
+            "Create data governance frameworks protecting farmer interests",
+            "Integrate digital services into existing farmer support systems",
+            "Invest in farmer digital literacy through training programs",
+            "Develop custom hiring services for technology access"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "Emerging focus area - future-proofing agriculture",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "Technology role in agricultural transformation",
+            "Adoption barriers and solutions for precision agriculture",
+            "Digital platforms and farmer access to information",
+            "AgriTech ecosystem development in India",
+            "Data governance and farmer protection in digital agriculture"
+          ]
+        },
+        {
+          "topic_id": "TOP_007_003",
+          "topic_name": "Biotechnology & Climate-Smart Agriculture",
+          "primary_book": "Department of Biotechnology & Ministry of Agriculture",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Plant biotechnology: genetic modification for crop improvement",
+            "BT Cotton: genetically modified cotton with Bt toxin for pest resistance",
+            "BT Cotton adoption: 95%+ of cotton area, successful pest management",
+            "GM Crops regulatory framework: GEAC (Genetic Engineering Assessment Committee) oversight",
+            "Public acceptance concerns: food safety, environmental impact worries",
+            "Bt Brinjal: approved for field testing but consumer resistance limiting commercialization",
+            "GM Mustard: developed for herbicide tolerance, pending approval",
+            "Marker-assisted selection: breeding faster through genetic markers without full GM",
+            "Climate change agriculture impact: increased temperature, variable precipitation",
+            "Climate-smart agriculture: production, adaptation, mitigation focus",
+            "Flood-tolerant varieties: Sub1 rice gene developing flood resilience",
+            "Drought-tolerant crops: developing deep-root, low-water varieties",
+            "Crop diversification: shift towards climate-resilient crops",
+            "Agroforestry: tree integration reducing temperature extremes and improving resilience",
+            "Water management: conservation and efficiency for climate adaptation"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "National Biodiversity Authority & Biotechnology Regulation",
+              "year_launched": 1996,
+              "objective": "Regulate biotechnology research and commercialization",
+              "key_features": "GEAC approval, institutional biosafety committees, public engagement",
+              "current_status": "Active oversight of GM crop development"
+            },
+            {
+              "scheme_name": "ICAR Climate Change Research Program",
+              "year_launched": 2009,
+              "objective": "Develop climate-resilient crop varieties",
+              "key_features": "Crop variety development, farmer training, adaptation strategies",
+              "current_status": "Active - Sub1 rice, drought-tolerant varieties in pipeline"
+            },
+            {
+              "scheme_name": "National Mission for Sustainable Agriculture (NMSA)",
+              "year_launched": 2014,
+              "objective": "Climate adaptation and mitigation in agriculture",
+              "key_features": "Soil and water conservation, energy efficiency, crop diversification",
+              "current_status": "Active integration with other missions"
+            }
+          ],
+          "issues_and_challenges": [
+            "Public resistance to GM crops due to food safety concerns",
+            "Approval delays: Bt Brinjal and GM Mustard pending due to social sensitivity",
+            "Corporate concentration: multinational companies dominating GM seed market",
+            "Farmer autonomy concerns: proprietary seeds reducing farmer seed saving",
+            "Environmental unknowns: long-term ecological impacts of GM crops uncertain",
+            "Climate variability increasing: farming becoming more unpredictable",
+            "Infrastructure gaps: inadequate weather forecasting and early warning systems",
+            "Adoption barriers: farmers preferring traditional practices due to knowledge gaps"
+          ],
+          "way_forward": [
+            "Transparent public communication on GM crop safety and benefits",
+            "Develop public sector GM crop varieties for affordability and accessibility",
+            "Strengthen intellectual property frameworks protecting farmer interests",
+            "Invest in climate adaptation research for Indian agroecology",
+            "Promote farmer-participatory variety selection and development",
+            "Integrate traditional knowledge with modern biotechnology",
+            "Develop early warning systems for climate-linked farm risks",
+            "Create farmer extension networks for climate-smart agriculture adoption"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "Emerging concern - climate adaptation increasingly asked",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "BT Cotton success model and implications for other crops",
+            "Public resistance to GM crops - managing concerns",
+            "Climate change impact on Indian agriculture and adaptation needs",
+            "Climate-smart agriculture options and feasibility",
+            "Research pipeline for crop improvement and climate resilience"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_008",
+      "module_name": "Rural Development & Agricultural Challenges",
+      "topics": [
+        {
+          "topic_id": "TOP_008_001",
+          "topic_name": "Farmer Distress & Doubling Farmers' Income",
+          "primary_book": "Ashok Dalwai Committee Report",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Doubling Farmers' Income: government target for 2022 (later extended), nominal income increase focus",
+            "Ashok Dalwai Committee (2017): comprehensive strategy with 7 sources of income growth",
+            "7 sources: crop productivity, cropping intensity, crop diversification, agricultural prices, allied activities, asset management, non-farm income",
+            "Farm income components: crops 70-75%, animal husbandry 15-20%, fisheries 5%, non-farm 10-15%",
+            "Productivity gap: Indian crop yields 30-50% below developed nations, improvement potential",
+            "Price realization: farmer netted price 60-70% of consumer price, market intermediation cost",
+            "Allied activities: dairy, poultry, fisheries high-return options for income growth",
+            "Farmer distress indicators: suicide rates, loan defaults, migration",
+            "Causes of distress: input costs rising, prices stagnant, credit burden, climate risks",
+            "Seasonal income variability: agricultural income highly seasonal affecting cash flow",
+            "Debt accumulation: farmer debt reaching Rs 15-20 lakh crore nationally",
+            "Formal credit constraints: only 40-50% farmers accessing institutional credit",
+            "Non-farm income options: limited in rural areas, skills-income mismatch",
+            "Regional variations: eastern and central India more distressed than western states"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+              "year_launched": 2019,
+              "objective": "Direct income support to all farmers",
+              "key_features": "Rs 6000 annual support in 3 instalments, 120+ million beneficiaries, DBT-based",
+              "current_status": "Active - universal coverage achieved"
+            },
+            {
+              "scheme_name": "Pradhan Mantri Crop Insurance Scheme (PMFBY)",
+              "year_launched": 2016,
+              "objective": "Protect incomes from production risks",
+              "key_features": "Comprehensive crop insurance, affordability, rapid settlement",
+              "current_status": "Active with ongoing redesign"
+            },
+            {
+              "scheme_name": "Kisan Credit Card (KCC) Scheme",
+              "year_launched": 1998,
+              "objective": "Flexible agricultural credit access",
+              "key_features": "Up to Rs 3-5 lakh credit, single-window facility, interest subsidy",
+              "current_status": "Active - expanded to allied sectors"
+            }
+          ],
+          "issues_and_challenges": [
+            "Income doubling target unrealistic: required 7-8% annual growth vs achieved 3-4%",
+            "Structural constraints: small holdings, fragmentation limiting productivity gains",
+            "Input cost inflation: outpacing output price growth, squeezing margins",
+            "Market access gaps: farmers unable to reach remunerative markets",
+            "Risk management inadequate: insurance and credit insufficient safety nets",
+            "Non-farm employment scarce: insufficient rural employment outside agriculture",
+            "Regional disparity: some states progressing better than others"
+          ],
+          "way_forward": [
+            "Promote agricultural diversification towards high-value crops",
+            "Strengthen market linkages through FPOs and e-commerce platforms",
+            "Invest in rural non-farm employment creation",
+            "Expand credit access and insurance coverage",
+            "Implement targeted income support for vulnerable farmers",
+            "Develop agricultural entrepreneurship through business training",
+            "Create value addition infrastructure for premium pricing",
+            "Promote balanced growth across all agricultural regions"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Direct policy objective - core mains topic",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Ashok Dalwai Committee recommendations and implementation",
+            "7 sources of farmer income growth - feasibility of each",
+            "Farm income inadequacy causes and structural solutions",
+            "Allied activities role in income diversification",
+            "Regional disparities in agricultural income and policy",
+            "PM-KISAN scheme effectiveness and limitations"
+          ]
+        },
+        {
+          "topic_id": "TOP_008_002",
+          "topic_name": "Farmer Suicides, Agricultural Labour & Women Farmers",
+          "primary_book": "Ministry of Agriculture & Social Science Research",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Farmer suicide extent: 10,000+ deaths annually, concentrated in cotton belt and sugarcane zones",
+            "High-risk states: Maharashtra, Andhra Pradesh, Karnataka, Punjab",
+            "Suicide causes: debt burden 40-50%, crop loss 20-30%, health issues 10-15%",
+            "Debt-suicide linkage: farmers in debt 5-6x more suicide-prone",
+            "Vulnerability factors: marginal farmers, cotton-sugarcane farmers, natural calamity areas",
+            "Policy response inadequacy: limited targeted support for most vulnerable",
+            "Agricultural labour: 110+ million agricultural workers, separate from farmers",
+            "Labour issues: low wages Rs 150-300/day, seasonal employment, no benefits",
+            "MGNREGA linkage: alternative employment option for agricultural workers in off-season",
+            "Women in agriculture: 40-50% workforce but 12-15% land ownership",
+            "Women farmer challenges: property rights, access to credit, extension services",
+            "Women workers: vulnerable to exploitation, wage discrimination, no social security",
+            "Land rights for women: self-cultivation preference for inheritance transfer",
+            "Gender-differentiated constraints: time poverty, mobility restrictions affecting participation"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "Agricultural Debt Waiver and Debt Relief Scheme 2008",
+              "year_launched": 2008,
+              "objective": "Provide debt relief to distressed farmers",
+              "key_features": "Rs 71,000 crore debt waived, targeted to small/marginal farmers",
+              "current_status": "Completed - limited state-level repeats"
+            },
+            {
+              "scheme_name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+              "year_launched": 2019,
+              "objective": "Direct income support for farmer wellbeing",
+              "key_features": "Rs 6000 annual, universal coverage, income security dimension",
+              "current_status": "Active - potential suicide prevention avenue"
+            },
+            {
+              "scheme_name": "Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA)",
+              "year_launched": 2005,
+              "objective": "Provide employment guarantee in rural areas",
+              "key_features": "100 days employment guarantee, minimum wage, agricultural worker support",
+              "current_status": "Active - 300+ million person-days annually"
+            }
+          ],
+          "issues_and_challenges": [
+            "Debt waiver moral hazard: repeat schemes creating expectations without addressing root causes",
+            "Agricultural labour invisibility: excluded from many government programs",
+            "Women property rights weak: inheritance laws and social practices limiting land ownership",
+            "Extension services gender bias: information reach to women farmers low",
+            "Wage discrimination: women paid 20-30% less than men for same work",
+            "Social security absent: agricultural workers lacking health, pension coverage",
+            "Seasonal vulnerability: employment gaps in agricultural off-season",
+            "Exploitation: tenant and sharecropper vulnerability to landlord coercion"
+          ],
+          "way_forward": [
+            "Strengthen income support through PM-KISAN targeting most vulnerable",
+            "Provide mental health support and counseling in high-suicide areas",
+            "Implement effective debt management through credit counseling",
+            "Extend MGNREGA benefits to cover more farmers in distress",
+            "Promote women land ownership through inheritance law reform",
+            "Develop gender-sensitive extension services and technology",
+            "Ensure fair wages through minimum wage enforcement",
+            "Provide social security coverage to agricultural workers",
+            "Promote agricultural labour unionization for collective bargaining"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "Social and ethical dimension - direct exam focus",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Farmer suicide causes and policy interventions",
+            "Debt-distress-suicide linkage and prevention strategies",
+            "Agricultural labour issues and social security",
+            "Women farmers challenges and gender-sensitive policies",
+            "MGNREGA role in agricultural worker employment",
+            "Regional agricultural distress variations and interventions"
+          ]
+        },
+        {
+          "topic_id": "TOP_008_003",
+          "topic_name": "Allied Agriculture & Rural Infrastructure",
+          "primary_book": "Ministry of Animal Husbandry & Ministry of Fisheries Reports",
+          "ncert_reference": "Class 11 - Indian Economic Development - Chapter 6: Rural Development",
+          "key_concepts": [
+            "Allied sector contribution: 5-6% to agriculture GDP, growing component",
+            "Dairy sector: 200+ million dairy animals, 3rd largest producer globally",
+            "Dairy income: high-return opportunity, milk yield productivity potential 100% improvable",
+            "Poultry sector: broiler and layer production, rapid growth industry",
+            "Fisheries: 12+ million people engaged, inland and marine subsectors",
+            "Fisheries production: 10+ million tonnes annually, 2nd largest after China",
+            "Aquaculture: shrimp farming 80% export value, high-income opportunity",
+            "Livestock insurance: government schemes covering cattle and buffalo",
+            "Cold chain infrastructure: inadequate for dairy and meat products",
+            "Value addition: low currently, opportunity for premium pricing",
+            "PM Matsya Sampada Yojana: Rs 20,000 crore for fisheries infrastructure",
+            "Animal Husbandry Infrastructure Development Fund: Rs 15,000 crore for dairy/meat",
+            "PM Kisan Sampada Yojana: agri-processing for value addition",
+            "Women in allied sector: 30-40% participation, income-generation opportunity"
+          ],
+          "government_schemes": [
+            {
+              "scheme_name": "PM Matsya Sampada Yojana",
+              "year_launched": 2020,
+              "objective": "Blue Revolution - fisheries and aquaculture development",
+              "key_features": "Rs 20,000 crore outlay, hatchery, fishing harbor, cold chain infrastructure",
+              "current_status": "Active - major expansion phase"
+            },
+            {
+              "scheme_name": "Animal Husbandry Infrastructure Development Fund (AHIDF)",
+              "year_launched": 2021,
+              "objective": "Dairy and meat processing infrastructure",
+              "key_features": "Rs 15,000 crore fund, processing units, cold chains, mode-to-market linkages",
+              "current_status": "Active - focus on cluster development"
+            },
+            {
+              "scheme_name": "Pradhan Mantri Kisan Sampada Yojana",
+              "year_launched": 2016,
+              "objective": "Agro-processing and value addition",
+              "key_features": "Rs 6000 crore, processing units, cold chains, MIS clusters",
+              "current_status": "Active - expanded to allied sectors"
+            }
+          ],
+          "issues_and_challenges": [
+            "Productivity gap: Indian dairy yields 30% of developed nations",
+            "Breeding programs inadequate: genetic improvement potential underutilized",
+            "Feed availability: insufficient quality feed limiting productivity",
+            "Disease management: veterinary services limited in rural areas",
+            "Cold chain gaps: 25-30% post-harvest losses in dairy and meat",
+            "Market access: dispersed producers facing aggregation challenges",
+            "Price volatility: input and output prices unstable affecting viability",
+            "Environmental degradation: intensive livestock agriculture causing pollution"
+          ],
+          "way_forward": [
+            "Expand dairy cooperative network based on Amul model",
+            "Improve animal genetics through breeding programs and AI",
+            "Develop feed production infrastructure and promote integrated farming",
+            "Strengthen veterinary and health services in villages",
+            "Scale up cold chain infrastructure through government investment",
+            "Promote FPOs in dairy and fisheries for better market access",
+            "Implement sustainable livestock practices for environmental protection",
+            "Provide special support to women entrepreneurs in allied sectors"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "Diversification and income growth angle",
+          "daily_target_hours": 1.0,
+          "mains_answer_angles": [
+            "Allied sector role in farmer income diversification",
+            "Dairy and fisheries potential and productivity improvement",
+            "White and Blue Revolutions - models and scalability",
+            "Cold chain infrastructure importance and gaps",
+            "Government schemes for allied sector development"
+          ]
+        }
+      ]
+    }
+  ],
+  "supplementary": {
+    "important_committees": [
+      {
+        "committee_name": "Swaminathan Committee (1991)",
+        "focus": "MSP determination",
+        "key_recommendation": "C2+50% formula, later A2+FL+50%",
+        "relevance": "Core to agricultural pricing policy"
+      },
+      {
+        "committee_name": "Ashok Dalwai Committee (2017)",
+        "focus": "Doubling Farmers' Income",
+        "key_recommendation": "7 sources strategy: productivity, intensity, diversification, prices, allied, assets, non-farm",
+        "relevance": "Current government priority framework"
+      },
+      {
+        "committee_name": "Shanta Kumar Committee (2015)",
+        "focus": "PDS and Food Security",
+        "key_recommendation": "PDS leakage 30-40%, DBT alternative suggested",
+        "relevance": "Food security policy reform options"
+      },
+      {
+        "committee_name": "MS Ahluwalia Committee (2005)",
+        "focus": "Food Subsidy",
+        "key_recommendation": "Subsidy rationalization through targeted support",
+        "relevance": "Fiscal sustainability of food security"
+      }
+    ],
+    "key_statistics": {
+      "agriculture_gdp_share": "17-18% (2024)",
+      "agriculture_employment": "45% of workforce",
+      "land_holdings_average": "1.1 hectares",
+      "agro_climatic_zones": 15,
+      "procurement_coverage": "60-70% of production (wheat-rice centric)",
+      "food_subsidy_annual": "Rs 1.5-2 lakh crore",
+      "farmer_population": "120+ million",
+      "agricultural_exports": "$40-45 billion",
+      "groundwater_depletion_rate": "2-3% annually in critical zones",
+      "land_degradation": "96 million hectares"
+    },
+    "mains_answer_writing_tips": [
+      "Always structure answers: current situation - problems - policy interventions - way forward",
+      "Use latest data from Economic Survey and NITI Aayog reports",
+      "Reference committee reports for policy analysis (Ashok Dalwai, Shanta Kumar, etc.)",
+      "Include regional variations - single national narrative often inadequate",
+      "Connect to food security and climate change for comprehensive perspective",
+      "Balance farmer welfare with fiscal sustainability in subsidy discussions",
+      "Discuss both crop and allied agriculture for diversification angle",
+      "Include technology and innovation dimensions where relevant",
+      "Reference case studies from states (Sikkim organic, Kerala cooperatives, Punjab mechanization)",
+      "Critically analyze government schemes - effectiveness, implementation gaps, alternatives"
+    ],
+    "daily_study_schedule": {
+      "total_hours": 15,
+      "breakdown": {
+        "MOD_001": 3.5,
+        "MOD_002": 3.0,
+        "MOD_003": 3.0,
+        "MOD_004": 2.0,
+        "MOD_005": 2.0,
+        "MOD_006": 2.5,
+        "MOD_007": 2.0,
+        "MOD_008": 3.0
+      }
+    },
+    "pyq_pattern": {
+      "very_high_frequency_topics": [
+        "MSP and procurement system",
+        "Farmer distress and income support",
+        "Food security and NFSA",
+        "Green Revolution and agricultural transformation",
+        "Land reforms",
+        "Water management and irrigation"
+      ],
+      "high_frequency_topics": [
+        "Agricultural marketing and APMC",
+        "Crop insurance schemes",
+        "Agricultural credit system",
+        "Organic and natural farming",
+        "Allied agriculture sector"
+      ],
+      "medium_frequency_topics": [
+        "Agricultural technology and innovation",
+        "Climate-smart agriculture",
+        "Export competitiveness",
+        "Precision agriculture"
+      ]
+    }
+  }
+}

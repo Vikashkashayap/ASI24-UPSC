@@ -585,7 +585,7 @@ export const DashboardLayout = () => {
       </aside>
 
       {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
-      <div className={`flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[260px]"}`}>
+      <div className={`flex-1 flex flex-col h-screen min-w-0 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[260px]"}`}>
         {/* Fixed Header - equal alignment, better UI */}
         <header
           className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
@@ -621,7 +621,7 @@ export const DashboardLayout = () => {
           </div>
 
           {/* Right: DART (student only) + theme toggle + motivation + avatar */}
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0 max-w-[55%] sm:max-w-none">
             {isStudent && (
               <button
                 onClick={() => setDartModalOpen(true)}
@@ -653,22 +653,22 @@ export const DashboardLayout = () => {
             >
               <MoreVertical className="w-5 h-5" />
             </button>
-            <div className={`hidden md:flex items-center gap-2 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+            <div className={`hidden lg:flex items-center gap-2 min-w-0 max-w-[min(420px,50vw)] ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
               {hasActiveSubscription ? (
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#2563eb] text-white shadow-sm">
-                    <Lightbulb className="w-3.5 h-3.5" />
-                    <span>{user?.subscriptionPlan?.name || "MentorsDaily Pro"} Active</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#2563eb] text-white shadow-sm min-w-0 max-w-full">
+                    <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{user?.subscriptionPlan?.name || "MentorsDaily Pro"} Active</span>
                   </span>
                   {user?.subscriptionEndDate && (
-                    <span className="text-[10px] text-slate-500">
+                    <span className="hidden xl:inline text-[10px] text-slate-500 whitespace-nowrap shrink-0">
                       Expires {formatExpiryDate(user.subscriptionEndDate)}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => navigate("/pricing")}
-                    className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors ${
+                    className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors shrink-0 whitespace-nowrap ${
                       theme === "dark"
                         ? "border-blue-500/50 text-blue-300 hover:bg-blue-500/10"
                         : "border-blue-300 text-blue-700 hover:bg-blue-50"
@@ -733,8 +733,8 @@ export const DashboardLayout = () => {
             </div>
           ) : (
             /* Full-width scroll wrapper so scroll works even over empty side space */
-            <div className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
-              <div className="w-full min-h-full px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6">
+            <div className="flex-1 min-h-0 w-full min-w-0 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
+              <div className="w-full max-w-full min-w-0 min-h-full px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6 box-border">
                 <Outlet />
               </div>
             </div>

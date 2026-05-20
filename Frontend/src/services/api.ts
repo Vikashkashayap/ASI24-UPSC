@@ -385,18 +385,65 @@ export interface StudyPlanTask {
   topic: string;
   taskType: "subject_study" | "current_affairs" | "mcq_practice" | "revision" | "mock_test";
   duration: number;
+  difficulty?: "easy" | "medium" | "hard";
+  priority?: "low" | "medium" | "high";
+  sortOrder?: number;
   startTime?: string | null;
   endTime?: string | null;
   completed: boolean;
   completedAt: string | null;
+  rescheduledFrom?: string | null;
+}
+
+export interface StudyPlanBadge {
+  id: string;
+  name: string;
+  icon: string;
+  earnedAt?: string;
+}
+
+export interface StudyPlanInsight {
+  _id?: string;
+  type: "warning" | "success" | "tip";
+  title: string;
+  message: string;
+  priority: "low" | "medium" | "high";
+  subject?: string | null;
+  createdAt?: string;
 }
 
 export interface StudyPlanType {
   _id: string;
   userId: string;
   examDate: string;
+  examType?: "UPSC" | "MPPSC";
+  targetYear?: string;
   dailyHours: number;
   preparationLevel: "beginner" | "intermediate" | "advanced";
+  weakSubjects?: string[];
+  strongSubjects?: string[];
+  optionalSubject?: string;
+  sleepTime?: string;
+  wakeTime?: string;
+  preferredSession?: "morning" | "afternoon" | "evening" | "night";
+  mockTestAverageScore?: number;
+  motivationalLine?: string;
+  weeklyGoals?: string[];
+  monthlyTargets?: string[];
+  revisionStrategy?: string;
+  readinessScore?: number;
+  readinessBreakdown?: {
+    mockScores: number;
+    completion: number;
+    revision: number;
+    consistency: number;
+    studyHours: number;
+  };
+  xpPoints?: number;
+  badges?: StudyPlanBadge[];
+  aiInsights?: StudyPlanInsight[];
+  heatmap?: { date: string; completedTasks: number; totalTasks: number; studyMinutes: number }[];
+  dailyQuote?: string;
   subjects: string[];
   tasks: StudyPlanTask[];
   currentStreak: number;
@@ -404,6 +451,42 @@ export interface StudyPlanType {
   longestStreak: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface AdvancedPlannerSetup {
+  examDate: string;
+  examType?: "UPSC" | "MPPSC";
+  targetYear?: string;
+  dailyHours?: number;
+  weakSubjects?: string[];
+  strongSubjects?: string[];
+  optionalSubject?: string;
+  preparationLevel?: string;
+  sleepTime?: string;
+  wakeTime?: string;
+  preferredSession?: string;
+  mockTestAverageScore?: number;
+}
+
+export interface PlannerAnalytics {
+  consistency: { date: string; label: string; completed: number; total: number; percent: number }[];
+  subjectStrength: { subject: string; strength: number; completed: number; total: number }[];
+  weakTopics: { topic: string; accuracy: number }[];
+  dailyHours: { date: string; label: string; hours: number }[];
+  mockPerformance: { date: string; score: number; name: string }[];
+  completionPercent: number;
+  heatmap: { date: string; completedTasks: number; totalTasks: number; studyMinutes: number }[];
+}
+
+export interface PlannerDashboard {
+  plan: StudyPlanType;
+  progress: StudyPlanProgress;
+  daysRemaining: number | null;
+  dailyTasks: StudyPlanTask[];
+  analytics: PlannerAnalytics;
+  insights: StudyPlanInsight[];
+  streak: { current: number; longest: number; xp: number; badges: StudyPlanBadge[] };
+  readiness: { score: number; breakdown: StudyPlanType["readinessBreakdown"] };
 }
 
 export interface StudyPlanProgress {
@@ -428,6 +511,39 @@ export const studyPlanAPI = {
     api.get<{ progress: StudyPlanProgress }>("/api/study-plan/progress", {
       params: date ? { date } : undefined,
     }),
+};
+
+// Advanced AI Study Planner
+export const advancedStudyPlannerAPI = {
+  generatePlan: (data: AdvancedPlannerSetup) =>
+    api.post<{ success: boolean; plan: StudyPlanType; progress: StudyPlanProgress; daysRemaining: number }>(
+      "/api/study-planner/generate-plan",
+      data
+    ),
+  regeneratePlan: (data: AdvancedPlannerSetup) =>
+    api.post<{ success: boolean; plan: StudyPlanType; progress: StudyPlanProgress; daysRemaining: number }>(
+      "/api/study-planner/regenerate-plan",
+      data
+    ),
+  getDashboard: (date?: string) =>
+    api.get<PlannerDashboard | { plan: null }>("/api/study-planner/dashboard", {
+      params: date ? { date } : undefined,
+    }),
+  getDailyTasks: (date?: string) =>
+    api.get("/api/study-planner/daily-tasks", { params: date ? { date } : undefined }),
+  completeTask: (taskId: string) =>
+    api.post<{ plan: StudyPlanType; task: StudyPlanTask; progress: StudyPlanProgress }>(
+      "/api/study-planner/complete-task",
+      { taskId }
+    ),
+  reorderTasks: (date: string, taskIds: string[]) =>
+    api.post<{ plan: StudyPlanType }>("/api/study-planner/reorder-tasks", { date, taskIds }),
+  analyzeMock: (data: Record<string, unknown>) =>
+    api.post("/api/study-planner/analyze-mock", data),
+  getAnalytics: () => api.get<{ analytics: PlannerAnalytics }>("/api/study-planner/analytics"),
+  aiChat: (message: string) => api.post<{ reply: string }>("/api/study-planner/ai-chat", { message }),
+  refreshInsights: () => api.post<{ insights: StudyPlanInsight[] }>("/api/study-planner/refresh-insights"),
+  regenerateMotivation: () => api.post<{ motivationalLine: string }>("/api/study-planner/regenerate-motivation"),
 };
 
 // Student Profiler API

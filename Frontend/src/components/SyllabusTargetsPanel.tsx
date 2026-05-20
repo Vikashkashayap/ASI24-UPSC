@@ -8,6 +8,9 @@ import modernHistoryData from "../data/upsc_history_modern.json";
 import worldHistoryData from "../data/upsc_world_history.json";
 import geographyPhysicalData from "../data/upsc_geography_physical.json";
 import geographyIndiaData from "../data/upsc_geography_india.json";
+import geographyWorldData from "../data/upsc_geography_world.json";
+import economyData from "../data/upsc_economy.json";
+import agricultureData from "../data/upsc_agriculture.json";
 
 type Subtopic = { id: string; name: string; hours?: number };
 type Topic = {
@@ -82,17 +85,160 @@ const geographyIndiaModules = ((((geographyIndiaData as unknown) as { modules?: 
   (a, b) => String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
 );
 
+function normalizeWorldGeoTopic(raw: Record<string, unknown>): PolityTopic {
+  const keyConcepts: string[] = [];
+  const importantFacts: Record<string, unknown> = {};
+
+  const arrayFields = ["major_ranges", "major_straits", "major_disputes"];
+  for (const field of arrayFields) {
+    const value = raw[field];
+    if (Array.isArray(value)) keyConcepts.push(...value.map(String));
+  }
+
+  const objectFields = [
+    "key_facts",
+    "key_data",
+    "major_rivers",
+    "major_lakes",
+    "major_deserts",
+    "major_boundaries",
+    "climate_zones",
+    "major_regions",
+    "systems",
+    "top_producers",
+    "regions",
+    "major_grounds",
+    "stages",
+    "routes",
+    "major_ports",
+    "organizations",
+    "hot_spots",
+    "disputes",
+    "arctic_data",
+  ];
+  for (const field of objectFields) {
+    const value = raw[field];
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(importantFacts, value as Record<string, unknown>);
+    }
+  }
+
+  if (raw.hdi_notes) importantFacts.hdi_notes = raw.hdi_notes;
+
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    ncert_reference: raw.ncert_reference as PolityTopic["ncert_reference"],
+    key_concepts: keyConcepts.length > 0 ? keyConcepts : undefined,
+    important_facts: Object.keys(importantFacts).length > 0 ? importantFacts : undefined,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    prelims_importance: raw.prelims_importance as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+  };
+}
+
+function buildGeographyWorldModules(raw: Record<string, unknown>): PolityModule[] {
+  const modules = (raw.modules as PolityModule[] | undefined) ?? [];
+  return modules
+    .map((mod) => {
+      const id = String(mod.module_id);
+      const topicsKey = `${id}_Topics`;
+      const summaryKey = `${id}_Topics_Summary`;
+      const rawTopics = (raw[topicsKey] ?? raw[summaryKey] ?? []) as Record<string, unknown>[];
+      return {
+        ...mod,
+        module_overview: (mod as PolityModule & { description?: string }).description ?? mod.module_overview,
+        topics: rawTopics.map(normalizeWorldGeoTopic),
+      };
+    })
+    .sort((a, b) =>
+      String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
+    );
+}
+
+const geographyWorldModules = buildGeographyWorldModules(geographyWorldData as unknown as Record<string, unknown>);
+
+type EconomyModuleRaw = PolityModule & { module_duration_days?: number };
+const economyModules = (
+  (((economyData as unknown) as { modules?: EconomyModuleRaw[] }).modules ?? []).map((m) => ({
+    ...m,
+    estimated_days: m.estimated_days ?? m.module_duration_days,
+  })) as PolityModule[]
+).sort((a, b) =>
+  String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
+);
+
+function normalizeAgricultureTopic(raw: Record<string, unknown>): PolityTopic {
+  const extraConcepts: string[] = [];
+  const schemes = raw.government_schemes;
+  if (Array.isArray(schemes)) {
+    for (const s of schemes) {
+      if (s && typeof s === "object" && "scheme_name" in (s as object)) {
+        const o = s as Record<string, unknown>;
+        extraConcepts.push(
+          [o.scheme_name, o.objective, o.key_features].filter(Boolean).join(" — "),
+        );
+      }
+    }
+  }
+  if (Array.isArray(raw.issues_and_challenges)) {
+    extraConcepts.push(...(raw.issues_and_challenges as string[]).map((x) => `Challenge: ${x}`));
+  }
+  if (Array.isArray(raw.way_forward)) {
+    extraConcepts.push(...(raw.way_forward as string[]).map((x) => `Way forward: ${x}`));
+  }
+  if (Array.isArray(raw.mains_answer_angles)) {
+    extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
+  }
+  const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: raw.primary_book as PolityTopic["primary_book"],
+    ncert_reference: raw.ncert_reference as PolityTopic["ncert_reference"],
+    key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    prelims_importance: raw.prelims_importance as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+    daily_target_hours: raw.daily_target_hours as number | undefined,
+  };
+}
+
+const agricultureModules = (
+  (((agricultureData as unknown) as { modules?: PolityModule[] }).modules ?? []).map((m) => ({
+    ...m,
+    topics: (m.topics ?? []).map((t) => normalizeAgricultureTopic(t as unknown as Record<string, unknown>)),
+  })) as PolityModule[]
+).sort((a, b) =>
+  String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
+);
+
+type HistoryPart = "ancient_history" | "medieval_history" | "modern_history" | "world_history";
+
+type GeographyPart = "geography_physical" | "geography_india" | "geography_world";
+
 type Segment =
   | "prelims"
   | "mains"
   | "optionals"
   | "polity"
-  | "ancient_history"
-  | "medieval_history"
-  | "modern_history"
-  | "world_history"
-  | "geography_physical"
-  | "geography_india";
+  | "history"
+  | "geography"
+  | "economy"
+  | "agriculture";
+
+const HISTORY_PERIOD_TABS: readonly { id: HistoryPart; label: string }[] = [
+  { id: "ancient_history", label: "Ancient" },
+  { id: "medieval_history", label: "Medieval" },
+  { id: "modern_history", label: "Modern" },
+  { id: "world_history", label: "World" },
+] as const;
+
+const GEOGRAPHY_SCOPE_TABS: readonly { id: GeographyPart; label: string }[] = [
+  { id: "geography_physical", label: "Geo Physical" },
+  { id: "geography_india", label: "Geo India" },
+  { id: "geography_world", label: "Geo World" },
+] as const;
 
 type StudentProfile = {
   targetYear?: string;
@@ -122,13 +268,67 @@ function parseDailyHours(value?: string) {
 
 function recommendedSegmentByBackground(background?: string): Segment {
   const normalized = (background || "").toLowerCase();
-  if (normalized.includes("arts")) return "modern_history";
+  if (normalized.includes("arts")) return "history";
   if (normalized.includes("engineering")) return "polity";
-  if (normalized.includes("science")) return "geography_physical";
-  if (normalized.includes("medical")) return "geography_india";
+  if (normalized.includes("science")) return "geography";
+  if (normalized.includes("medical")) return "geography";
   if (normalized.includes("commerce")) return "prelims";
   if (normalized.includes("law")) return "mains";
   return "prelims";
+}
+
+function defaultHistoryPartForProfile(background?: string): HistoryPart {
+  const normalized = (background || "").toLowerCase();
+  if (normalized.includes("arts")) return "modern_history";
+  return "ancient_history";
+}
+
+function defaultGeographyPartForProfile(background?: string): GeographyPart {
+  const normalized = (background || "").toLowerCase();
+  if (normalized.includes("medical")) return "geography_india";
+  if (normalized.includes("science")) return "geography_physical";
+  return "geography_physical";
+}
+
+function historySubtitle(part: HistoryPart): string {
+  if (part === "ancient_history") return "Ancient History — module-wise full syllabus view";
+  if (part === "medieval_history") return "Medieval History — module-wise full syllabus view";
+  if (part === "modern_history") return "Modern History — module-wise full syllabus view";
+  return "World History — module-wise full syllabus view";
+}
+
+function historyMetaSnippet(
+  part: HistoryPart,
+  ancientMeta: { version?: string },
+  medievalMeta: { version?: string; last_updated?: string },
+  modernMeta: { version?: string; last_updated?: string },
+  worldMeta: { version?: string },
+): string {
+  if (part === "ancient_history") return `Ancient v${ancientMeta.version ?? "1.x"}`;
+  if (part === "medieval_history")
+      return `Medieval v${medievalMeta.version ?? "1.x"}${medievalMeta.last_updated ? ` · ${medievalMeta.last_updated}` : ""}`;
+  if (part === "modern_history")
+    return `Modern v${modernMeta.version ?? "1.x"}${modernMeta.last_updated ? ` · ${modernMeta.last_updated}` : ""}`;
+  return `World v${worldMeta.version ?? "1.x"}`;
+}
+
+function geographySubtitle(part: GeographyPart): string {
+  if (part === "geography_physical") return "Physical Geography — module-wise full syllabus view";
+  if (part === "geography_india") return "Indian Geography — module-wise full syllabus view";
+  return "World Geography — module-wise full syllabus view";
+}
+
+function geographyMetaSnippet(
+  part: GeographyPart,
+  physicalMeta: { version?: string; created_date?: string },
+  indiaMeta: { created_date?: string },
+  worldMeta: { version?: string; last_updated?: string },
+): string {
+  if (part === "geography_physical")
+    return `Physical Geography v${physicalMeta.version ?? "1.x"}${physicalMeta.created_date ? ` · ${physicalMeta.created_date}` : ""}`;
+  if (part === "geography_india")
+    return `Indian Geography v1.x${indiaMeta.created_date ? ` · ${indiaMeta.created_date}` : ""}`;
+  return `World Geography v${worldMeta.version ?? "1.x"}${worldMeta.last_updated ? ` · ${worldMeta.last_updated}` : ""}`;
 }
 
 function daysUntil(date: Date) {
@@ -519,10 +719,26 @@ function GeographyIndiaSection() {
   return <GenericSyllabusSection modules={geographyIndiaModules} />;
 }
 
+function GeographyWorldSection() {
+  return <GenericSyllabusSection modules={geographyWorldModules} />;
+}
+
+function EconomySection() {
+  return <GenericSyllabusSection modules={economyModules} />;
+}
+
+function AgricultureSection() {
+  return <GenericSyllabusSection modules={agricultureModules} />;
+}
+
 type Props = { todayLabel: string };
 
 export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { studentProfile?: StudentProfile }) {
   const [segment, setSegment] = useState<Segment>(recommendedSegmentByBackground(studentProfile?.educationBackground));
+  const [historyPart, setHistoryPart] = useState<HistoryPart>(() => defaultHistoryPartForProfile(studentProfile?.educationBackground));
+  const [geographyPart, setGeographyPart] = useState<GeographyPart>(() =>
+    defaultGeographyPartForProfile(studentProfile?.educationBackground),
+  );
   const meta = syllabusData.meta as { description?: string; last_updated?: string; version?: string };
   const polityMeta = polityData.meta as { version?: string };
   const ancientMeta = ancientHistoryData.meta as { version?: string };
@@ -531,6 +747,9 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
   const worldMeta = worldHistoryData.meta as { version?: string };
   const geographyPhysicalMeta = geographyPhysicalData.metadata as { version?: string; created_date?: string };
   const geographyIndiaMeta = geographyIndiaData.metadata as { created_date?: string };
+  const geographyWorldMeta = geographyWorldData.meta as { version?: string; last_updated?: string };
+  const economyMeta = economyData.metadata as { last_updated?: string; subject?: string };
+  const agricultureMeta = agricultureData.meta as { version?: string; creation_date?: string; subject?: string };
   const dailyHours = parseDailyHours(studentProfile?.dailyStudyHours);
   const prelimsDate = estimatePrelimsDate(studentProfile?.targetYear);
   const daysLeft = daysUntil(prelimsDate);
@@ -541,14 +760,12 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     if (segment === "prelims") return "Prelims — GS Paper I & CSAT (full topic tree)";
     if (segment === "mains") return "Mains — GS I–IV & Essay (official-style modules)";
     if (segment === "polity") return "Polity — Prelims + GS II mapped for quick access";
-    if (segment === "ancient_history") return "Ancient History — module-wise full syllabus view";
-    if (segment === "medieval_history") return "Medieval History — module-wise full syllabus view";
-    if (segment === "modern_history") return "Modern History — module-wise full syllabus view";
-    if (segment === "world_history") return "World History — module-wise full syllabus view";
-    if (segment === "geography_physical") return "Physical Geography — module-wise full syllabus view";
-    if (segment === "geography_india") return "Indian Geography — module-wise full syllabus view";
+    if (segment === "history") return historySubtitle(historyPart);
+    if (segment === "geography") return geographySubtitle(geographyPart);
+    if (segment === "economy") return "Indian Economy — module-wise full syllabus view";
+    if (segment === "agriculture") return "Agriculture (GS 3) — module-wise full syllabus view";
     return "Popular optionals — Paper I & II outlines";
-  }, [segment]);
+  }, [segment, historyPart, geographyPart]);
 
   const planHint = useMemo(() => {
     return `Plan: ${dailyTargetsCount} focus targets/day (${dailyHours.toFixed(1)}h) • ${preparationMode}`;
@@ -569,19 +786,15 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
         <span>
           {segment === "polity"
             ? `Polity v${polityMeta.version ?? "1.x"}`
-            : segment === "ancient_history"
-              ? `Ancient v${ancientMeta.version ?? "1.x"}`
-              : segment === "medieval_history"
-                ? `Medieval v${medievalMeta.version ?? "1.x"}${medievalMeta.last_updated ? ` · ${medievalMeta.last_updated}` : ""}`
-                : segment === "modern_history"
-                  ? `Modern v${modernMeta.version ?? "1.x"}${modernMeta.last_updated ? ` · ${modernMeta.last_updated}` : ""}`
-                  : segment === "world_history"
-                    ? `World v${worldMeta.version ?? "1.x"}`
-                    : segment === "geography_physical"
-                      ? `Physical Geography v${geographyPhysicalMeta.version ?? "1.x"}${geographyPhysicalMeta.created_date ? ` · ${geographyPhysicalMeta.created_date}` : ""}`
-                      : segment === "geography_india"
-                        ? `Indian Geography v1.x${geographyIndiaMeta.created_date ? ` · ${geographyIndiaMeta.created_date}` : ""}`
-                    : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
+            : segment === "history"
+              ? historyMetaSnippet(historyPart, ancientMeta, medievalMeta, modernMeta, worldMeta)
+              : segment === "geography"
+                ? geographyMetaSnippet(geographyPart, geographyPhysicalMeta, geographyIndiaMeta, geographyWorldMeta)
+                : segment === "economy"
+                      ? `${economyMeta.subject ?? "Indian Economy"}${economyMeta.last_updated ? ` · ${economyMeta.last_updated}` : ""}`
+                      : segment === "agriculture"
+                        ? `${agricultureMeta.subject ?? "Agriculture"} v${agricultureMeta.version ?? "1.x"}${agricultureMeta.creation_date ? ` · ${agricultureMeta.creation_date}` : ""}`
+                        : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
         </span>
         <span>
           {" "}• UPSC Prelims {studentProfile?.targetYear || new Date().getFullYear() + 1}:{" "}
@@ -597,12 +810,10 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
             ["mains", "Mains"],
             ["optionals", "Optionals"],
             ["polity", "Polity"],
-            ["ancient_history", "Ancient"],
-            ["medieval_history", "Medieval"],
-            ["modern_history", "Modern"],
-            ["world_history", "World"],
-            ["geography_physical", "Geo Physical"],
-            ["geography_india", "Geo India"],
+            ["history", "History"],
+            ["geography", "Geography"],
+            ["economy", "Economy"],
+            ["agriculture", "Agriculture"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -618,16 +829,73 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
         ))}
       </div>
 
+      {segment === "history" ? (
+        <div className="sd-syll-history-group">
+          <div className="sd-syll-history-label" id="history-period-label">
+            History — pick a period (all four below)
+          </div>
+          <div
+            className="sd-syll-history-pills"
+            role="tablist"
+            aria-labelledby="history-period-label"
+            aria-label="History period"
+          >
+            {HISTORY_PERIOD_TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={historyPart === id}
+                className={historyPart === id ? "active" : ""}
+                onClick={() => setHistoryPart(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {segment === "geography" ? (
+        <div className="sd-syll-history-group">
+          <div className="sd-syll-history-label" id="geography-scope-label">
+            Geography — choose scope (all three below)
+          </div>
+          <div
+            className="sd-syll-history-pills"
+            role="tablist"
+            aria-labelledby="geography-scope-label"
+            aria-label="Geography scope"
+          >
+            {GEOGRAPHY_SCOPE_TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={geographyPart === id}
+                className={geographyPart === id ? "active" : ""}
+                onClick={() => setGeographyPart(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {segment === "prelims" ? <PrelimsSection /> : null}
       {segment === "mains" ? <MainsSection /> : null}
       {segment === "optionals" ? <OptionalsSection /> : null}
       {segment === "polity" ? <PolitySection /> : null}
-      {segment === "ancient_history" ? <AncientHistorySection /> : null}
-      {segment === "medieval_history" ? <MedievalHistorySection /> : null}
-      {segment === "modern_history" ? <ModernHistorySection /> : null}
-      {segment === "world_history" ? <WorldHistorySection /> : null}
-      {segment === "geography_physical" ? <GeographyPhysicalSection /> : null}
-      {segment === "geography_india" ? <GeographyIndiaSection /> : null}
+      {segment === "history" && historyPart === "ancient_history" ? <AncientHistorySection /> : null}
+      {segment === "history" && historyPart === "medieval_history" ? <MedievalHistorySection /> : null}
+      {segment === "history" && historyPart === "modern_history" ? <ModernHistorySection /> : null}
+      {segment === "history" && historyPart === "world_history" ? <WorldHistorySection /> : null}
+      {segment === "geography" && geographyPart === "geography_physical" ? <GeographyPhysicalSection /> : null}
+      {segment === "geography" && geographyPart === "geography_india" ? <GeographyIndiaSection /> : null}
+      {segment === "geography" && geographyPart === "geography_world" ? <GeographyWorldSection /> : null}
+      {segment === "economy" ? <EconomySection /> : null}
+      {segment === "agriculture" ? <AgricultureSection /> : null}
     </>
   );
 }

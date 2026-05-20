@@ -1,0 +1,390 @@
+{
+  "meta": {
+    "title": "UPSC World Geography Complete Syllabus",
+    "version": "2.0",
+    "last_updated": "2026-04-16",
+    "upsc_weightage": "4-6 questions per year in Prelims, 2-3 questions in Mains",
+    "primary_sources": [
+      "NCERT Class 6 - The Earth Our Habitat",
+      "NCERT Class 7 - Our Environment",
+      "NCERT Class 11 - Fundamentals of Physical Geography",
+      "NCERT Class 12 - Fundamentals of Human Geography (All Chapters)"
+    ],
+    "mains_paper": "GS Paper 1 - Indian Geography & World Geography",
+    "study_duration": "90-120 days for comprehensive coverage",
+    "daily_target_hours": 1.5
+  },
+  "modules": [
+    {
+      "module_id": "M1",
+      "module_name": "Module 1: World Physical Features (Continents, Mountains, Rivers, Lakes, Deserts, Straits, Gulfs)",
+      "description": "Geographic landforms, physical features, and water bodies spanning all continents",
+      "topics_count": 7,
+      "estimated_hours": 12,
+      "pyq_frequency": "very_high"
+    },
+    {
+      "module_id": "M2",
+      "module_name": "Module 2: World Political Geography (Countries, Boundaries, Disputes)",
+      "description": "Political divisions, international boundaries, disputed territories, and geopolitical conflicts",
+      "topics_count": 3,
+      "estimated_hours": 10,
+      "pyq_frequency": "very_high"
+    },
+    {
+      "module_id": "M3",
+      "module_name": "Module 3: World Climate and Natural Regions (Climatic Zones, Biomes, Winds, Currents)",
+      "description": "Climate classification, natural regions, vegetation zones, and climate systems",
+      "topics_count": 3,
+      "estimated_hours": 12,
+      "pyq_frequency": "very_high"
+    },
+    {
+      "module_id": "M4",
+      "module_name": "Module 4: World Resources and Economic Geography (Minerals, Agriculture, Fishing)",
+      "description": "Mineral resources, agricultural zones, fishing grounds, and economic geography",
+      "topics_count": 3,
+      "estimated_hours": 9,
+      "pyq_frequency": "high"
+    },
+    {
+      "module_id": "M5",
+      "module_name": "Module 5: Population and Human Development (Distribution, Density, Demographic Transition)",
+      "description": "World population patterns, demographic transition model, and human development indices",
+      "topics_count": 2,
+      "estimated_hours": 8,
+      "pyq_frequency": "very_high"
+    },
+    {
+      "module_id": "M6",
+      "module_name": "Module 6: Trade, Transport and Geopolitics (Sea Routes, Ports, Organizations)",
+      "description": "Major shipping routes, international ports, trade corridors, and global organizations",
+      "topics_count": 2,
+      "estimated_hours": 8,
+      "pyq_frequency": "high"
+    },
+    {
+      "module_id": "M7",
+      "module_name": "Module 7: Places in News and Contemporary Geopolitics (Hotspots, Water Issues, Arctic)",
+      "description": "Current geopolitical situations, countries in news, water disputes, and emerging frontiers",
+      "topics_count": 3,
+      "estimated_hours": 10,
+      "pyq_frequency": "very_high"
+    }
+  ],
+  "M1_Topics": [
+    {
+      "topic_id": "M1T1",
+      "topic_name": "Continents - Area, Relief and Major Features",
+      "key_facts": {
+        "Asia": "44.6M km\u00b2, Everest 8849m, K2 8611m, Yangtze 6300km, Ob 3650km",
+        "Africa": "30.4M km\u00b2, Kilimanjaro 5895m, Nile 6650km (world's longest), Sahara Desert",
+        "North America": "24.7M km\u00b2, McKinley 6194m, Mississippi-Missouri 6275km, Rockies",
+        "South America": "17.8M km\u00b2, Aconcagua 6960m, Amazon 6400km (largest discharge), Andes",
+        "Europe": "10.2M km\u00b2, Elbrus 5642m, Volga 3530km, Caucasus and Alps",
+        "Australia": "7.7M km\u00b2, Kosciuszko 2228m, Murray-Darling 2508km",
+        "Antarctica": "14.2M km\u00b2, Vinson 4892m, 98% ice sheet, no rivers"
+      },
+      "ncert_reference": "Class 6: The Earth Our Habitat, Ch.2",
+      "pyq_frequency": "high",
+      "prelims_importance": 9,
+      "mains_importance": 7
+    },
+    {
+      "topic_id": "M1T2",
+      "topic_name": "Major Mountain Ranges",
+      "major_ranges": [
+        "Rockies (4830km, Canada-Mexico)",
+        "Andes (7000km, South America - longest)",
+        "Alps (1200km, Europe)",
+        "Urals (2500km, Europe-Asia divide)",
+        "Atlas (2400km, North Africa)",
+        "Himalayas (2400km, highest - Everest 8849m)",
+        "Great Dividing Range (3500km, Australia)",
+        "Appalachians (ancient, eastern USA)"
+      ],
+      "ncert_reference": "Class 11: Fundamentals of Physical Geography, Ch.2",
+      "pyq_frequency": "high",
+      "prelims_importance": 8,
+      "mains_importance": 8
+    },
+    {
+      "topic_id": "M1T3",
+      "topic_name": "Major River Systems",
+      "major_rivers": {
+        "Nile": "6650km (longest), Egypt-Sudan lifeline, Aswan High Dam",
+        "Amazon": "6400km, largest discharge 209000 m\u00b3/s, rainforest, 40% SA",
+        "Congo": "4670km, second-largest discharge, African rainforest",
+        "Mississippi-Missouri": "6275km, North America's main system",
+        "Yangtze": "6300km, longest in Asia, Three Gorges Dam",
+        "Ob": "3650km, Siberia, Arctic discharge",
+        "Mekong": "4350km, SE Asia lifeline, delta rice region"
+      },
+      "ncert_reference": "Class 6: The Earth Our Habitat, Ch.4",
+      "pyq_frequency": "very_high",
+      "prelims_importance": 9,
+      "mains_importance": 8
+    },
+    {
+      "topic_id": "M1T4",
+      "topic_name": "Major Lakes and Water Bodies",
+      "major_lakes": {
+        "Caspian Sea": "371000 km\u00b2 (world's largest), salt, oil/gas reserves",
+        "Lake Superior": "82100 km\u00b2 (largest freshwater)",
+        "Lake Victoria": "68870 km\u00b2, East Africa, White Nile source",
+        "Lake Baikal": "23615 km\u00b2 (deepest 1642m), Siberia, 25% world freshwater",
+        "Aral Sea": "64500 km\u00b2 (drastically shrunk - environmental disaster)"
+      },
+      "ncert_reference": "Class 7: Our Environment, Ch.2",
+      "pyq_frequency": "medium",
+      "prelims_importance": 7,
+      "mains_importance": 6
+    },
+    {
+      "topic_id": "M1T5",
+      "topic_name": "Major Deserts",
+      "major_deserts": {
+        "Sahara": "9M km\u00b2 (world's largest hot desert), 11 countries, sand dunes",
+        "Arabian": "2.3M km\u00b2, Middle East, oil-rich, 50\u00b0C+ heat",
+        "Gobi": "1.3M km\u00b2, Mongolia-China, cold desert, dust storms",
+        "Atacama": "140000 km\u00b2 (driest place), Chile-Peru",
+        "Kalahari": "900000 km\u00b2, southern Africa",
+        "Namib": "80000 km\u00b2, coastal desert, dunes to 300m"
+      },
+      "ncert_reference": "Class 7: Our Environment, Ch.9",
+      "pyq_frequency": "medium",
+      "prelims_importance": 7,
+      "mains_importance": 6
+    },
+    {
+      "topic_id": "M1T6",
+      "topic_name": "Important Straits - Strategic and Economic Significance",
+      "major_straits": [
+        "Malacca: 900km, 33% global maritime trade, Malaysia-Indonesia",
+        "Hormuz: 53km, 30% world oil, Iran-Oman",
+        "Bab-el-Mandeb: 30km, Red Sea-Gulf of Aden, 12% global trade",
+        "Gibraltar: 14km, Mediterranean-Atlantic, Spain-Morocco",
+        "Dover: 50km (busiest), England-France",
+        "Bering: 85km, Alaska-Russia, Pacific-Arctic",
+        "Palk: 64km, India-Sri Lanka",
+        "Taiwan: 180km, geopolitical hotspot"
+      ],
+      "ncert_reference": "Class 12: Fundamentals of Human Geography, Ch.7",
+      "pyq_frequency": "very_high",
+      "prelims_importance": 9,
+      "mains_importance": 8
+    }
+  ],
+  "M2_Topics_Summary": [
+    {
+      "topic_id": "M2T1",
+      "topic_name": "Countries and Political Boundaries",
+      "key_data": {
+        "total_countries": 195,
+        "largest_by_area": "Russia 17.1M km\u00b2",
+        "smallest": "Vatican City 0.44 km\u00b2",
+        "landlocked_countries": 45,
+        "important_capitals": [
+          "Beijing",
+          "Tokyo",
+          "Delhi",
+          "Washington DC",
+          "Moscow"
+        ]
+      }
+    },
+    {
+      "topic_id": "M2T2",
+      "topic_name": "Disputed Territories and Conflicts",
+      "major_disputes": [
+        "South China Sea (Spratly Islands, Paracel Islands)",
+        "Taiwan (self-governing, PRC claims)",
+        "Palestine-Israel (West Bank, Gaza, Jerusalem)",
+        "Kashmir (India-Pakistan, LoC)",
+        "Crimea (Russia-Ukraine 2014)",
+        "Western Sahara (Morocco claims)",
+        "Nagorno-Karabakh (Armenia-Azerbaijan)"
+      ]
+    },
+    {
+      "topic_id": "M2T3",
+      "topic_name": "Important International Boundaries",
+      "major_boundaries": {
+        "McMahon Line": "India-Tibet/China, 1914, Arunachal Pradesh",
+        "Durand Line": "Afghanistan-Pakistan, 1893, 2640km",
+        "Radcliffe Line": "India-Pakistan partition 1947",
+        "38th Parallel": "North-South Korea DMZ",
+        "Line of Control": "India-Pakistan Kashmir"
+      }
+    }
+  ],
+  "M3_Topics_Summary": [
+    {
+      "topic_id": "M3T1",
+      "topic_name": "Climate Classification and Zones",
+      "climate_zones": {
+        "Tropical": "0-23.5\u00b0, high temp, heavy rainfall, rainforests",
+        "Subtropical": "23.5-35\u00b0, warm summers, mild winters",
+        "Temperate": "35-66.5\u00b0, 4 seasons, moderate rainfall",
+        "Sub-polar": "66.5-90\u00b0, very cold, taiga forests",
+        "Polar": ">66.5\u00b0, extreme cold, tundra, ice sheets"
+      }
+    },
+    {
+      "topic_id": "M3T2",
+      "topic_name": "Natural Regions and Biomes",
+      "major_regions": {
+        "Amazon Basin": "5.5M km\u00b2, 10% world species, 40% SA area",
+        "Congo Basin": "2.3M km\u00b2, Africa's largest rainforest",
+        "Sahara": "9M km\u00b2 hot desert, nomadic pastoralism",
+        "Savanna": "Africa grasslands, seasonal burning, wildlife",
+        "Taiga": "40% world forests, Russia-Canada, subarctic",
+        "Tundra": "Polar, permafrost, Indigenous peoples"
+      }
+    },
+    {
+      "topic_id": "M3T3",
+      "topic_name": "Global Wind and Ocean Current Systems",
+      "systems": {
+        "Trade Winds": "0-30\u00b0N/S, consistent patterns",
+        "Westerlies": "30-60\u00b0N/S, temperate weather",
+        "Gulf Stream": "Warm Atlantic, moderates Europe climate",
+        "Kuroshio": "Warm Pacific, East Asia climate",
+        "Benguela/Peru": "Cold currents, desert-creating upwelling",
+        "Monsoon": "Seasonal reversal, South Asia rains"
+      }
+    }
+  ],
+  "M4_Topics_Summary": [
+    {
+      "topic_id": "M4T1",
+      "topic_name": "Mineral Resources and Production",
+      "top_producers": {
+        "Iron Ore": "China 350Mt, India 250Mt, Australia 160Mt",
+        "Coal": "China 1.1Bt, India 700Mt, USA 500Mt",
+        "Petroleum": "USA 1000Mt, Saudi 600Mt, Russia 500Mt",
+        "Copper": "Chile 6Mt, Peru 2.3Mt, China 1.8Mt",
+        "Gold": "China 600t, Australia 300t, Russia 300t",
+        "Lithium": "Australia 50kt, Chile 40kt (EV demand surge)"
+      }
+    },
+    {
+      "topic_id": "M4T2",
+      "topic_name": "Agricultural Regions",
+      "regions": {
+        "Wheat Belt": "USA Great Plains, Russia, Ukraine, EU",
+        "Rice": "Asia 90%, China 200Mt, India 120Mt",
+        "Coffee": "Brazil 40%, Vietnam 20%, tropical highlands",
+        "Tea": "China 40%, India 20%, monsoon regions",
+        "Cocoa": "Ivory Coast 40%, Ghana 20%, West Africa",
+        "Green Revolution": "1960s-70s high-yield varieties, irrigation"
+      }
+    },
+    {
+      "topic_id": "M4T3",
+      "topic_name": "Fishing Grounds and Marine Resources",
+      "major_grounds": {
+        "Grand Banks": "Newfoundland, cod collapse 1990s",
+        "North Sea": "UK-Scandinavia, oil/gas, declining stocks",
+        "Bering Sea": "Alaska-Russia, salmon/pollock/crab",
+        "Southeast Asia": "High productivity, aquaculture boom",
+        "Peruvian": "Humboldt Current, world's largest biomass"
+      }
+    }
+  ],
+  "M5_Topics_Summary": [
+    {
+      "topic_id": "M5T1",
+      "topic_name": "World Population Distribution",
+      "key_data": {
+        "global_population": "8.1 billion (2026)",
+        "densest_regions": "Indo-Gangetic Plain, East China Plain, Java",
+        "sparsest_regions": "Amazon, Congo, Sahara, Antarctica",
+        "megacities": [
+          "Tokyo 37M",
+          "Delhi 32M",
+          "Shanghai 28M",
+          "S\u00e3o Paulo 22M"
+        ],
+        "urbanization_rate": "50% global, 1.8% annual growth"
+      }
+    },
+    {
+      "topic_id": "M5T2",
+      "topic_name": "Demographic Transition Model",
+      "stages": {
+        "Stage1": "High birth/death rates, rare now",
+        "Stage2": "High birth, declining death (Nigeria, Kenya)",
+        "Stage3": "Declining birth rates (Brazil, Mexico)",
+        "Stage4": "Low birth/death rates (Europe, Japan)",
+        "Stage5": "Declining population (Spain, Italy)"
+      },
+      "hdi_notes": "India rank 134/193, 0.633 score, global average 0.71"
+    }
+  ],
+  "M6_Topics_Summary": [
+    {
+      "topic_id": "M6T1",
+      "topic_name": "Major Sea Routes and Chokepoints",
+      "routes": {
+        "Suez Canal": "193km, 12% global trade, Egypt revenue",
+        "Panama Canal": "82km, 5% global trade, Atlantic-Pacific",
+        "Malacca Strait": "900km, 25-30% maritime trade",
+        "Cape of Good Hope": "Africa southern tip, oil tanker route",
+        "English Channel": "400+ ships daily, busiest strait"
+      }
+    },
+    {
+      "topic_id": "M6T2",
+      "topic_name": "Important Ports and Organizations",
+      "major_ports": {
+        "Shanghai": "44M TEU (world's busiest)",
+        "Singapore": "38M TEU (transshipment hub)",
+        "Rotterdam": "15M TEU (Europe's largest)"
+      },
+      "organizations": {
+        "UN": "New York, 193 members",
+        "WHO": "Geneva, health emergencies",
+        "WTO": "Geneva, trade disputes",
+        "IMF/World Bank": "Washington DC, development",
+        "OPEC": "Vienna, 13 oil producers"
+      }
+    }
+  ],
+  "M7_Topics_Summary": [
+    {
+      "topic_id": "M7T1",
+      "topic_name": "Countries in UPSC News",
+      "hot_spots": {
+        "Ukraine": "44M, Russia invasion 2022, NATO expansion",
+        "Taiwan": "23M, semiconductors, US military support",
+        "Palestine": "5M, Israeli occupation, recurring violence",
+        "Myanmar": "54M, military coup 2021, Rohingya crisis",
+        "Afghanistan": "40M, Taliban 2021, regional instability",
+        "Yemen": "33M, civil war, humanitarian catastrophe"
+      }
+    },
+    {
+      "topic_id": "M7T2",
+      "topic_name": "Rivers and Water Bodies in News",
+      "disputes": {
+        "Mekong": "China dams, flow reduction, fisheries impact",
+        "GERD": "Blue Nile, Egypt-Sudan-Ethiopia dispute",
+        "Nile": "Egypt 55.5bcm, Sudan 18.5bcm, Ethiopia minimal",
+        "Indus": "1960 treaty, India-Pakistan cooperation success",
+        "Amazon": "17% deforestation, logging/cattle ranching"
+      }
+    },
+    {
+      "topic_id": "M7T3",
+      "topic_name": "Arctic Geopolitics and Climate Change",
+      "arctic_data": {
+        "warming": "2x global rate, permafrost thaw, methane release",
+        "nsr": "Northern Sea Route, 40% shorter to Asia",
+        "nwp": "Northwest Passage, Canada-USA dispute",
+        "resources": "Oil 90Bbbl, gas 47Tcm, minerals",
+        "council": "8 countries, Russia reduced role post-2022"
+      }
+    }
+  ]
+}

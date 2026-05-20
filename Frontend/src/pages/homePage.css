@@ -11,6 +11,11 @@
   --sd-card: #ffffff;
   --sd-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
   color: var(--sd-text);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 
 /* ── Hero ── */
@@ -200,7 +205,7 @@
 .sd-stats-grid {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 12px;
 }
 
@@ -214,6 +219,8 @@
   align-items: center;
   gap: 12px;
   min-height: 76px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .sd-stat-icon {
@@ -337,9 +344,16 @@
 .sd-grid {
   margin-top: 20px;
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, min(300px, 100%));
   gap: 16px;
   align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.sd-grid > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .sd-card {
@@ -355,6 +369,12 @@
   justify-content: space-between;
   gap: 10px;
   align-items: flex-start;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.sd-card-hd > * {
+  min-width: 0;
 }
 
 .sd-card-title-wrap {
@@ -391,6 +411,8 @@
   min-height: 440px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sd-syll-deck {
@@ -412,17 +434,23 @@
   background: #f8fafc;
   border-radius: 10px;
   border: 1px solid #f1f5f9;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sd-syll-meta-bar span {
+  min-width: 0;
 }
 
 .sd-syll-tabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 12px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .sd-syll-tabs button {
@@ -430,12 +458,13 @@
   background: #f8fafc;
   color: var(--sd-muted);
   border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 12px;
+  padding: 6px 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  max-width: 100%;
   transition: all 0.15s ease;
 }
 
@@ -450,6 +479,67 @@
   color: #fff;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* History: one main tab + sub-row for periods (wraps on small screens) */
+.sd-syll-history-group {
+  margin: -4px 0 14px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 55%, #f5f3ff 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.sd-syll-history-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sd-muted);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.sd-syll-history-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sd-syll-history-pills button {
+  border: 1px solid var(--sd-border);
+  background: #fff;
+  color: var(--sd-muted);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: min(100%, 104px);
+  max-width: 100%;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.sd-syll-history-pills button:hover {
+  border-color: #bfdbfe;
+  color: var(--sd-blue);
+  background: #eff6ff;
+}
+
+.sd-syll-history-pills button.active {
+  background: linear-gradient(135deg, var(--sd-blue), var(--sd-indigo));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .sd-syll-scroll {
@@ -900,21 +990,30 @@
   min-height: 0;
 }
 
-/* ── Responsive ── */
-@media (max-width: 1100px) {
+/* ── Responsive (accounts for ~260px dashboard sidebar) ── */
+@media (max-width: 1280px) {
   .sd-grid {
     grid-template-columns: 1fr;
   }
 
   .sd-right {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   }
 }
 
 @media (max-width: 900px) {
   .sd-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sd-hero-row {
+    flex-direction: column;
+  }
+
+  .sd-countdown-card {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -927,11 +1026,12 @@
     font-size: 24px;
   }
 
-  .sd-countdown-card {
-    width: 100%;
-  }
-
   .sd-right {
     grid-template-columns: 1fr;
+  }
+
+  .sd-syll-tabs button {
+    font-size: 10px;
+    padding: 5px 10px;
   }
 }
