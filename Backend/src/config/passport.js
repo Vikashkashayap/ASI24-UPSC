@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { findOrCreateGoogleUser } from "../services/authService.js";
+import { loginGoogleUser } from "../services/authService.js";
 import { getFrontendOrigin, getGoogleCallbackUrl } from "./urlConfig.js";
 
 let googleStrategyRegistered = false;
@@ -41,7 +41,7 @@ export function ensureGoogleStrategy(req) {
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {
-          const { user, token } = await findOrCreateGoogleUser(profile);
+          const { user, token } = await loginGoogleUser(profile);
           return done(null, { user, token });
         } catch (err) {
           return done(err, null);
@@ -70,12 +70,19 @@ export const googleAuth = (req, res, next) => {
 
   const callbackURL = getGoogleCallbackUrl(req);
 
+  const oauthState = req.query.from === "register" ? "register" : "login";
+
   passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false,
     callbackURL,
+    state: oauthState,
   })(req, res, next);
 };
+
+function oauthReturnPath(state) {
+  return state === "register" ? "/register" : "/login";
+}
 
 export const googleAuthCallback = (req, res, next) => {
   if (!isGoogleOAuthConfigured() || !ensureGoogleStrategy(req)) {
@@ -95,16 +102,17 @@ export const googleAuthCallback = (req, res, next) => {
     },
     (err, result) => {
       const origin = getFrontendOrigin(req);
+      const returnPath = oauthReturnPath(req.query.state);
 
       if (err) {
         const message = encodeURIComponent(
           err.message || "Google sign-in failed"
         );
-        return res.redirect(`${origin}/login?error=${message}`);
+        return res.redirect(`${origin}${returnPath}?error=${message}`);
       }
 
       if (!result?.token) {
-        return res.redirect(`${origin}/login?error=no_token`);
+        return res.redirect(`${origin}${returnPath}?error=no_token`);
       }
 
       return res.redirect(

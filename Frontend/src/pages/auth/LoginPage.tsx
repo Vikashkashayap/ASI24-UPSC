@@ -1,4 +1,4 @@
-﻿import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { api, apiBaseURL } from "../../services/api";
@@ -72,7 +72,7 @@ export const LoginPage = () => {
 
             <div className="mt-6 rounded-xl border border-blue-400/20 bg-[#0b1a3b] p-4 sm:p-5">
               <a
-                href={`${apiBaseURL}/api/auth/google`}
+                href={`${apiBaseURL}/api/auth/google?from=login`}
                 className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-[#111827] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1f2937]"
               >
                 <span className="absolute left-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow">
@@ -97,6 +97,9 @@ export const LoginPage = () => {
                 </span>
                 Continue with Google
               </a>
+              <p className="mb-4 text-center text-xs text-slate-400">
+                Use Google only if you have already registered with the same email.
+              </p>
               <div className="mb-4 flex items-center gap-3 text-xs text-slate-300">
                 <div className="h-px flex-1 bg-blue-200/25" />
                 <span>or sign in with email</span>
