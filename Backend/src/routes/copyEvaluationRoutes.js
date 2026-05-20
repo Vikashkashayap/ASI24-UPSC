@@ -7,51 +7,85 @@ import {
   getUserEvaluationHistory,
   getUserAnalytics,
   deleteEvaluation,
-  getEvaluationStats
+  getEvaluationStats,
+  getEvaluationPageImage,
 } from "../controllers/copyEvaluationController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { isAllowedUploadMime } from "../services/copyFileService.js";
 
 const router = express.Router();
 
-// Configure multer for memory storage (we'll process buffer directly)
 const storage = multer.memoryStorage();
 
 const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
+  storage,
+  limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    if (isAllowedUploadMime(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed'), false);
+      cb(
+        new Error(
+          "Only PDF and image files (JPEG, PNG, WebP) are allowed"
+        ),
+        false
+      );
     }
-  }
+  },
 });
 
-// All routes require authentication
+/** Accept `file` or legacy `pdf` field name */
+const uploadMiddleware = (req, res, next) => {
+  upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "pdf", maxCount: 1 },
+  ])(req, res, (err) => {
+    if (err) return next(err);
+    req.file = req.files?.file?.[0] || req.files?.pdf?.[0] || null;
+    next();
+  });
+};
+
 router.use(authMiddleware);
 
-// Upload and evaluate PDF
-router.post('/upload', upload.single('pdf'), uploadAndEvaluateCopy);
+router.post("/upload", uploadMiddleware, uploadAndEvaluateCopy);
 
-// Process AI evaluation for uploaded PDF
-router.post('/:id/process', processEvaluation);
+router.get("/history", getUserEvaluationHistory);
+router.get("/history/list", getUserEvaluationHistory);
 
-// Get user's evaluation history (must be before /:id route)
-router.get('/history/list', getUserEvaluationHistory);
+router.get("/analytics/summary", getUserAnalytics);
 
-// Get user analytics (must be before /:id route)
-router.get('/analytics/summary', getUserAnalytics);
+router.post("/:id/process", processEvaluation);
 
-// Get evaluation by ID (must be after other specific routes)
-router.get('/:id', getEvaluationById);
+router.get("/:id/pages/:pageNum", getEvaluationPageImage);
+router.get("/:id/stats", getEvaluationStats);
+router.get("/:id", getEvaluationById);
 
-// Get specific evaluation stats
-router.get('/:id/stats', getEvaluationStats);
+router.delete("/:id", deleteEvaluation);
 
-// Delete evaluation
-router.delete('/:id', deleteEvaluation);
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        message: "File too large",
+        error: "Maximum file size is 15MB",
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: "Upload error",
+      error: err.message,
+    });
+  }
+  if (err) {
+    return res.status(400).json({
+      success: false,
+      message: "Upload failed",
+      error: err.message,
+    });
+  }
+  next();
+});
 
 export default router;
