@@ -13,6 +13,10 @@ import economyData from "../data/upsc_economy.json";
 import agricultureData from "../data/upsc_agriculture.json";
 import environmentData from "../data/upsc_environment.json";
 import scienceTechData from "../data/upsc_science_tech.json";
+import societyData from "../data/upsc_society.json";
+import governanceData from "../data/upsc_governance_social_justice.json";
+import ethicsData from "../data/upsc_ethics_gs4.json";
+import internationalRelationsData from "../data/upsc_international_relations.json";
 
 type Subtopic = { id: string; name: string; hours?: number };
 type Topic = {
@@ -333,6 +337,231 @@ const scienceTechModules = (
   String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
 );
 
+function flattenSocietyNcert(ref: unknown): string[] {
+  if (!ref) return [];
+  if (typeof ref === "string") return [ref];
+  if (Array.isArray(ref)) return ref.map(String);
+  if (typeof ref !== "object") return [];
+  const lines: string[] = [];
+  for (const [key, val] of Object.entries(ref as Record<string, unknown>)) {
+    if (Array.isArray(val)) {
+      for (const item of val) lines.push(`${key}: ${String(item)}`);
+    } else if (val != null) {
+      lines.push(`${key}: ${String(val)}`);
+    }
+  }
+  return lines;
+}
+
+function normalizeSocietyTopic(raw: Record<string, unknown>): PolityTopic {
+  const extraConcepts: string[] = [];
+  if (Array.isArray(raw.thinkers_referenced)) {
+    extraConcepts.push(...(raw.thinkers_referenced as string[]).map((x) => `Thinker: ${x}`));
+  }
+  if (Array.isArray(raw.current_affairs_connect)) {
+    extraConcepts.push(...(raw.current_affairs_connect as string[]).map((x) => `Current affairs: ${x}`));
+  }
+  if (Array.isArray(raw.mains_answer_angles)) {
+    extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
+  }
+  const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  const ncertLines = flattenSocietyNcert(raw.ncert_reference);
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: typeof raw.primary_book === "string" ? raw.primary_book : undefined,
+    ncert_reference: ncertLines.length > 0 ? ncertLines : undefined,
+    key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+    daily_target_hours: raw.daily_target_hours as number | undefined,
+  };
+}
+
+function normalizeGovernanceTopic(raw: Record<string, unknown>): PolityTopic {
+  const extraConcepts: string[] = [];
+  const schemes = raw.government_schemes;
+  if (schemes && typeof schemes === "object" && !Array.isArray(schemes)) {
+    for (const value of Object.values(schemes as Record<string, unknown>)) {
+      if (value && typeof value === "object") {
+        const o = value as Record<string, unknown>;
+        extraConcepts.push([o.name, o.year, o.objective, o.status].filter(Boolean).join(" — "));
+      }
+    }
+  }
+  if (Array.isArray(raw.issues_challenges)) {
+    extraConcepts.push(...(raw.issues_challenges as string[]).map((x) => `Issue: ${x}`));
+  }
+  if (Array.isArray(raw.reforms_needed)) {
+    extraConcepts.push(...(raw.reforms_needed as string[]).map((x) => `Reform: ${x}`));
+  }
+  if (Array.isArray(raw.mains_answer_angles)) {
+    extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
+  }
+  const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: typeof raw.primary_source === "string" ? raw.primary_source : undefined,
+    key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+    daily_target_hours: raw.daily_target_hours as number | undefined,
+  };
+}
+
+const societyModules = (
+  (((societyData as unknown) as { modules?: Record<string, unknown>[] }).modules ?? []).map((m, index) => {
+    const raw = m as Record<string, unknown>;
+    const topics = ((raw.topics as unknown[]) ?? []).map((t) =>
+      normalizeSocietyTopic(t as Record<string, unknown>),
+    );
+    const order = Number(raw.module_order) || index + 1;
+    const estHours =
+      Number(raw.estimated_study_hours) ||
+      Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10;
+    return {
+      module_id: String(raw.module_id ?? ""),
+      module_name: String(raw.module_name ?? ""),
+      sequence: order,
+      module_number: order,
+      estimated_hours: estHours,
+      estimated_days: Math.max(1, Math.ceil(estHours / 3)),
+      importance: "high",
+      topics,
+    } as PolityModule;
+  })
+).sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
+
+const governanceModules = (
+  (((governanceData as unknown) as { modules?: PolityModule[] }).modules ?? []).map((m, index) => {
+    const topics = (m.topics ?? []).map((t) => normalizeGovernanceTopic(t as unknown as Record<string, unknown>));
+    const estimatedHours = Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10;
+    const moduleNum = Number(String(m.module_id).replace(/\D/g, "")) || index + 1;
+    return {
+      ...m,
+      sequence: m.sequence ?? moduleNum,
+      module_number: m.module_number ?? moduleNum,
+      estimated_hours: m.estimated_hours ?? estimatedHours,
+      estimated_days: m.estimated_days ?? Math.max(1, Math.ceil(estimatedHours / 3)),
+      importance: m.importance ?? "critical",
+      topics,
+    };
+  }) as PolityModule[]
+).sort((a, b) =>
+  String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
+);
+
+function normalizeEthicsTopic(raw: Record<string, unknown>): PolityTopic {
+  const extraConcepts: string[] = [];
+  if (typeof raw.case_study_link === "string") {
+    extraConcepts.push(`Case study: ${raw.case_study_link}`);
+  }
+  if (Array.isArray(raw.mains_answer_angles)) {
+    extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
+  }
+  const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  const ncertLines =
+    typeof raw.ncert_reference === "string"
+      ? [raw.ncert_reference]
+      : flattenSocietyNcert(raw.ncert_reference);
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: typeof raw.primary_source === "string" ? raw.primary_source : undefined,
+    ncert_reference: ncertLines.length > 0 ? ncertLines : undefined,
+    key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    prelims_importance: raw.prelims_importance as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+    daily_target_hours: raw.daily_target_hours as number | undefined,
+  };
+}
+
+const ethicsModules = (
+  (((ethicsData as unknown) as { modules?: Record<string, unknown>[] }).modules ?? []).map((m, index) => {
+    const raw = m as Record<string, unknown>;
+    const topics = ((raw.topics as unknown[]) ?? []).map((t) =>
+      normalizeEthicsTopic(t as Record<string, unknown>),
+    );
+    const durationDays = raw.duration_days as { standard?: number; fast?: number; extended?: number } | undefined;
+    const estDays =
+      durationDays?.standard ??
+      Math.max(1, Math.ceil((topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) || 18) / 3));
+    const estHours =
+      Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10 ||
+      estDays * (Number(raw.daily_target_hours) || 3);
+    const moduleNum = Number(String(raw.module_id).replace(/\D/g, "")) || index + 1;
+    return {
+      module_id: String(raw.module_id ?? ""),
+      module_name: String(raw.module_name ?? ""),
+      sequence: moduleNum,
+      module_number: moduleNum,
+      estimated_hours: estHours,
+      estimated_days: estDays,
+      importance: "critical",
+      upsc_prelims_weightage: "Mains GS IV only",
+      topics,
+    } as PolityModule;
+  })
+).sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
+
+function normalizeIRTopic(raw: Record<string, unknown>): PolityTopic {
+  const extraConcepts: string[] = [];
+  if (typeof raw.india_position === "string") {
+    extraConcepts.push(`India position: ${raw.india_position}`);
+  }
+  if (typeof raw.recent_developments === "string") {
+    extraConcepts.push(`Recent: ${raw.recent_developments}`);
+  }
+  if (Array.isArray(raw.mains_answer_angles)) {
+    extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
+  }
+  const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: typeof raw.primary_book === "string" ? raw.primary_book : undefined,
+    key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+  };
+}
+
+function buildInternationalRelationsModules(raw: Record<string, unknown>): PolityModule[] {
+  const moduleKeys = Object.keys(raw)
+    .filter((k) => /^module_\d+$/.test(k))
+    .sort(
+      (a, b) =>
+        parseInt(a.replace("module_", ""), 10) - parseInt(b.replace("module_", ""), 10),
+    );
+  return moduleKeys.map((key, index) => {
+    const m = raw[key] as Record<string, unknown>;
+    const topics = ((m.topics as unknown[]) ?? []).map((t) =>
+      normalizeIRTopic(t as Record<string, unknown>),
+    );
+    const moduleNum = parseInt(key.replace("module_", ""), 10) || index + 1;
+    const estHours =
+      Number(m.daily_target_hours) ||
+      Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 1.5), 0) * 10) / 10;
+    return {
+      module_id: String(m.module_id ?? `M${moduleNum}`),
+      module_name: String(m.module_name ?? ""),
+      sequence: moduleNum,
+      module_number: moduleNum,
+      estimated_hours: estHours,
+      estimated_days: Math.max(1, Math.ceil(estHours / 3)),
+      importance: "critical",
+      upsc_prelims_weightage: "Prelims: 2-3 questions",
+      topics,
+    } as PolityModule;
+  });
+}
+
+const internationalRelationsModules = buildInternationalRelationsModules(
+  internationalRelationsData as unknown as Record<string, unknown>,
+);
+
 type HistoryPart = "ancient_history" | "medieval_history" | "modern_history" | "world_history";
 
 type GeographyPart = "geography_physical" | "geography_india" | "geography_world";
@@ -347,7 +576,11 @@ type Segment =
   | "economy"
   | "agriculture"
   | "environment"
-  | "science_tech";
+  | "science_tech"
+  | "society"
+  | "governance"
+  | "ethics"
+  | "international_relations";
 
 const HISTORY_PERIOD_TABS: readonly { id: HistoryPart; label: string }[] = [
   { id: "ancient_history", label: "Ancient" },
@@ -868,6 +1101,22 @@ function ScienceTechSection() {
   return <GenericSyllabusSection modules={scienceTechModules} />;
 }
 
+function SocietySection() {
+  return <GenericSyllabusSection modules={societyModules} />;
+}
+
+function GovernanceSection() {
+  return <GenericSyllabusSection modules={governanceModules} />;
+}
+
+function EthicsSection() {
+  return <GenericSyllabusSection modules={ethicsModules} />;
+}
+
+function InternationalRelationsSection() {
+  return <GenericSyllabusSection modules={internationalRelationsModules} />;
+}
+
 type Props = { todayLabel: string };
 
 export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { studentProfile?: StudentProfile }) {
@@ -898,6 +1147,39 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     last_updated?: string;
     total_modules?: number;
   };
+  const societyMeta = societyData.syllabus_metadata as {
+    topic?: string;
+    subject?: string;
+    marks_weightage?: string;
+    last_updated?: string;
+    total_modules?: number;
+    total_topics?: number;
+  };
+  const governanceMeta = governanceData.metadata as {
+    title?: string;
+    creation_date?: string;
+    total_modules?: number;
+    gs2_weightage_marks?: string;
+    estimated_preparation_hours?: number;
+  };
+  const ethicsMeta = ethicsData.metadata as {
+    title?: string;
+    paper?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+    total_marks?: number;
+  };
+  const irMeta = (internationalRelationsData as { syllabus_metadata?: Record<string, unknown> })
+    .syllabus_metadata as {
+    subject?: string;
+    paper?: string;
+    weightage_marks?: string;
+    prelims_questions?: string;
+    total_modules?: number;
+    target_study_hours?: number;
+    last_updated?: string;
+  };
   const dailyHours = parseDailyHours(studentProfile?.dailyStudyHours);
   const prelimsDate = estimatePrelimsDate(studentProfile?.targetYear);
   const daysLeft = daysUntil(prelimsDate);
@@ -914,6 +1196,11 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     if (segment === "agriculture") return "Agriculture (GS 3) — module-wise full syllabus view";
     if (segment === "environment") return "Environment & Ecology (GS 3) — module-wise full syllabus view";
     if (segment === "science_tech") return "Science & Technology (GS 3) — module-wise full syllabus view";
+    if (segment === "society") return "Indian Society (GS 1) — NCERT Sociology mapped module-wise";
+    if (segment === "governance") return "Governance & Social Justice (GS 2) — 2nd ARC & schemes module-wise";
+    if (segment === "ethics") return "Ethics, Integrity & Aptitude (GS 4) — theory + case studies module-wise";
+    if (segment === "international_relations")
+      return "International Relations (GS 2) — Pavneet Singh & NCERT Contemporary World Politics";
     return "Popular optionals — Paper I & II outlines";
   }, [segment, historyPart, geographyPart]);
 
@@ -948,7 +1235,15 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
                           ? `${environmentMeta.subject ?? "Environment & Ecology"}${environmentMeta.creation_date ? ` · ${environmentMeta.creation_date}` : ""}${environmentMeta.total_modules ? ` · ${environmentMeta.total_modules} modules` : ""}`
                           : segment === "science_tech"
                             ? `${scienceTechMeta.subject ?? "Science & Technology"}${scienceTechMeta.last_updated ? ` · ${scienceTechMeta.last_updated}` : scienceTechMeta.creation_date ? ` · ${scienceTechMeta.creation_date}` : ""}${scienceTechMeta.total_modules ? ` · ${scienceTechMeta.total_modules} modules` : ""}`
-                            : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
+                            : segment === "society"
+                              ? `${societyMeta.topic ?? societyMeta.subject ?? "Indian Society"}${societyMeta.marks_weightage ? ` · ${societyMeta.marks_weightage}` : ""}${societyMeta.last_updated ? ` · ${societyMeta.last_updated}` : ""}${societyMeta.total_modules ? ` · ${societyMeta.total_modules} modules` : ""}`
+                              : segment === "governance"
+                                ? `Governance & Social Justice${governanceMeta.creation_date ? ` · ${governanceMeta.creation_date}` : ""}${governanceMeta.total_modules ? ` · ${governanceMeta.total_modules} modules` : ""}${governanceMeta.gs2_weightage_marks ? ` · ${governanceMeta.gs2_weightage_marks}` : ""}`
+                                : segment === "ethics"
+                                  ? `${ethicsMeta.paper ?? "GS Paper 4"}${ethicsMeta.creation_date ? ` · ${ethicsMeta.creation_date}` : ""}${ethicsMeta.total_modules ? ` · ${ethicsMeta.total_modules} modules` : ""}${ethicsMeta.total_marks ? ` · ${ethicsMeta.total_marks} marks` : ""}`
+                                  : segment === "international_relations"
+                                    ? `${irMeta.subject ?? "International Relations"}${irMeta.weightage_marks ? ` · ${irMeta.weightage_marks}` : ""}${irMeta.prelims_questions ? ` · Prelims ${irMeta.prelims_questions}` : ""}${irMeta.total_modules ? ` · ${irMeta.total_modules} modules` : ""}`
+                                    : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
         </span>
         <span>
           {" "}• UPSC Prelims {studentProfile?.targetYear || new Date().getFullYear() + 1}:{" "}
@@ -970,6 +1265,10 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
             ["agriculture", "Agriculture"],
             ["environment", "Environment"],
             ["science_tech", "S&T"],
+            ["society", "Society"],
+            ["governance", "Governance"],
+            ["ethics", "Ethics"],
+            ["international_relations", "IR"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -1054,6 +1353,10 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
       {segment === "agriculture" ? <AgricultureSection /> : null}
       {segment === "environment" ? <EnvironmentSection /> : null}
       {segment === "science_tech" ? <ScienceTechSection /> : null}
+      {segment === "society" ? <SocietySection /> : null}
+      {segment === "governance" ? <GovernanceSection /> : null}
+      {segment === "ethics" ? <EthicsSection /> : null}
+      {segment === "international_relations" ? <InternationalRelationsSection /> : null}
     </>
   );
 }

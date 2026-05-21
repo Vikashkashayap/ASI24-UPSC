@@ -1,0 +1,1762 @@
+{
+  "syllabus_metadata": {
+    "exam": "UPSC Civil Services",
+    "paper": "General Studies Paper 2 (Governance, Constitution, IR)",
+    "subject": "International Relations",
+    "weightage_marks": "40-60 marks",
+    "prelims_questions": "2-3 questions",
+    "total_modules": 10,
+    "target_study_hours": 180,
+    "last_updated": "2024",
+    "primary_sources": [
+      "Pavneet Singh - International Relations",
+      "NCERT Class 12 - Contemporary World Politics (9 chapters)"
+    ],
+    "ncert_chapters": {
+      "chapter_1": "Cold War Era",
+      "chapter_2": "End of Bipolarity",
+      "chapter_3": "US Hegemony",
+      "chapter_4": "Alternative Centres of Power",
+      "chapter_5": "Contemporary South Asia",
+      "chapter_6": "International Organisations",
+      "chapter_7": "Security",
+      "chapter_8": "Environment",
+      "chapter_9": "Globalisation"
+    }
+  },
+  "module_1": {
+    "module_name": "India's Foreign Policy — Foundations",
+    "module_id": "M1",
+    "daily_target_hours": 18,
+    "topics": [
+      {
+        "topic_id": "M1T1",
+        "topic_name": "Foreign Policy Determinants",
+        "primary_book": "Pavneet Singh Ch 2-3; NCERT Ch 1-2",
+        "key_concepts": [
+          "Geography — peninsular advantage, maritime boundaries (12 maritime zones), 7,516 km coastline, 15,106 km land border",
+          "Historical consciousness — colonial legacy, Independence 1947, role in NAM formation",
+          "Ideological foundations — secularism, democracy, pluralism differentiate India's FP approach",
+          "Economic considerations — 5th largest economy, $3.5 trillion GDP, development needs influence FP priorities",
+          "Military capacity — armed forces 1.4 million, nuclear power, strategic autonomy requirement",
+          "Demographic factors — 1.4 billion population, regional power status, responsibility as emerging economy",
+          "Strategic culture — Kautilya's Mandala theory influence, great power responsibility",
+          "Non-alignment mindset — independence in decision-making, not bloc-dependent",
+          "Regional power aspirations — South Asian preponderance, Asian balance, global voice",
+          "Development imperatives — poverty alleviation, food security, energy independence affect alliances",
+          "Multi-alignment era — partnerships with USA, Russia, Japan, France simultaneously",
+          "Civilizational ethos — Buddhism, Ashoka's dhamma influence soft power",
+          "Neighborhood sensitivity — stability requires friendly borders, Pakistan-China alliance challenge",
+          "Technology access — self-reliance in critical sectors drives partnerships, NSG membership importance"
+        ],
+        "india_position": "India's foreign policy balances multiple determinants: security (China-Pakistan concerns), development needs (FDI, technology), and strategic autonomy. Core position: independent decision-making, non-ideological partnerships, civilizational projection.",
+        "recent_developments": "2023-24: Voice of Global South initiative; G20 presidency with African Union inclusion; India-US PACT 2.0 upgrades defense cooperation; IMEC corridor launched; Quad Focus Forward dialogue expanded.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Impact of geography and history on India's strategic choices (LAC, IOR, SAARC)",
+          "Balancing development and security — resource competition with neighbors",
+          "Strategic autonomy vs. great power partnerships — Modi era's multi-alignment",
+          "Ideological differentiation — how democracy shapes India's diplomacy approach",
+          "Regional power status implications — leadership in South Asia, voice in UN"
+        ]
+      },
+      {
+        "topic_id": "M1T2",
+        "topic_name": "Panchsheel (1954) — Five Principles of Peaceful Coexistence",
+        "primary_book": "Pavneet Singh Ch 3; NCERT Ch 2",
+        "key_concepts": [
+          "Mutual respect for sovereignty and territorial integrity — core principle, still referenced in treaties",
+          "Mutual non-aggression — renunciation of force, applies to border disputes",
+          "Mutual non-interference in internal affairs — contrast with NATO interventionism",
+          "Equality and mutual benefit — economic partnerships based on this",
+          "Peaceful co-existence — alternative to Cold War bipolarity, foundational to NAM",
+          "Historical context — 1954 Sino-Indian treaty, result of Bandung Conference momentum",
+          "Nehru's idealism — vision of post-colonial world order, criticized as naive by realists",
+          "Practice vs. principle — breached by China 1962 war despite treaty",
+          "Relevance in contemporary IR — basis of India-Vietnam, India-ASEAN partnerships",
+          "Limitations exposed — cannot prevent security competitions, state interest overrides",
+          "Soft power tool — India cites Panchsheel in diplomacy despite violations",
+          "Influence on NAM — extended to multi-lateral forums, LDC advocacy",
+          "Regional application — India-Nepal treaties incorporate Panchsheel language",
+          "Modern challenges — cyber warfare, space security testing these principles"
+        ],
+        "india_position": "India upholds Panchsheel as civilizational principle despite breach by China 1962. Continues invoking it in diplomacy; proposes updates for cyber, space security. Core pillar of India-Global South solidarity.",
+        "recent_developments": "2023: Referenced in India's G20 presidency outcome documents; India-Vietnam Comprehensive Strategic Partnership reaffirms Panchsheel; India-ASEAN relations anchor on this principle.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Panchsheel as counter to Western Cold War model — post-colonial vision",
+          "Gap between principle and practice — Sino-Indian 1962 war reality",
+          "Contemporary relevance in multilateral forums — G20, BRICS, ASEAN",
+          "Soft power dimension — moral authority for developing nations leadership",
+          "Need for modernization — addressing cyber, space, economic coercion issues"
+        ]
+      },
+      {
+        "topic_id": "M1T3",
+        "topic_name": "Non-Alignment Movement (NAM) — Origins, Founding, Relevance",
+        "primary_book": "Pavneet Singh Ch 3-4; NCERT Ch 2",
+        "key_concepts": [
+          "Origins — Bandung Conference April 1955, 29 Afro-Asian nations, India-Yugoslavia-Egypt leadership",
+          "Founding — Belgrade September 1961, formal NAM establishment, 25 founding members",
+          "Core principle — independence from Cold War blocs, neither capitalism nor communism",
+          "NAM Ten Commandments — sovereign equality, settling disputes peacefully, opposition to colonialism",
+          "India's role — Nehru's vision, Rajiv Gandhi presidency 1983, continued leadership",
+          "Cold War context — maximum membership 118 nations (1980s), balance between superpowers",
+          "Structural autonomy — no permanent secretariat initially, consensus-based decisions",
+          "Relevance during bipolar era — amplified voice of developing nations, G77 emergence",
+          "Post-Cold War decline — reduced purpose when bipolarity ended 1991",
+          "Stagnation factors — divided membership on key issues, competing leaders",
+          "21st century revival — 2012 Tehran summit assertiveness, climate change advocacy",
+          "India's contemporary stance — selective engagement, focus on Global South (Voice of Global South 2023)",
+          "Institutional transformation — merger with non-aligned principles into G20, BRICS frameworks",
+          "Soft power platform — NAM for India's civilizational diplomacy, developing world solidarity"
+        ],
+        "india_position": "India views NAM as foundational but evolved. No longer restrictive non-alignment; multi-alignment era. Preserves NAM's spirit through Global South initiatives, G20 leadership, BRICS expansion. Advocates reformed multilateralism.",
+        "recent_developments": "2023: India leverages NAM legacy through Voice of Global South; G20 presidency emphasizes Global South priorities; India advocates for reformed UNSC reflecting developing nation power.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Historical significance of NAM — how Bandung/Belgrade reshaped post-WWII order",
+          "NAM principles vs. practice — internal contradictions, member state divergences",
+          "From NAM to multi-alignment — why India moved beyond strict non-alignment",
+          "Contemporary relevance — Global South coalitions replacing NAM",
+          "India's leadership role — continuity and change in Global South solidarity"
+        ]
+      },
+      {
+        "topic_id": "M1T4",
+        "topic_name": "India's Foreign Policy Phases — Nehru to Modi Era",
+        "primary_book": "Pavneet Singh Ch 4-7; NCERT Ch 1-4",
+        "key_concepts": [
+          "Nehru Phase (1947-1964) — idealism, Panchsheel, NAM foundation, FTSE membership denial",
+          "Post-1962 Phase (1962-1966) — military humiliation impact, security reorientation, USA rapprochement",
+          "Indira Gandhi Phase (1966-1977, 1980-1984) — assertive power, Bangladesh 1971, nuclear option, Soviet tilt",
+          "Cold War alignment — 1971 Indo-Soviet treaty against Pakistan-USA nexus, realpolitik shift",
+          "Rajiv Gandhi Phase (1984-1989) — liberalization signals, technology partnerships, NAM presidency",
+          "Post-1991 Liberalization Phase (1991-1998) — Look East policy, economic openness, pragma",
+          "Nuclear inflection (1998) — Pokhran-II tests, strategic weapons capability, West pressure",
+          "Post-1998 Strategic Autonomy — MTCR, NSG engagement despite non-signatory status, USA relations upgrade",
+          "Modi Phase-1 (2014-2019) — Act East, Link West, Neighbourhood First, Quad formation, Rafale deal",
+          "Modi Phase-2 (2019-present) — Atmanirbhar Bharat, IMEC launch, Abraham Accords engagement, Ukraine stand",
+          "Strategic partnerships evolution — Russia (S-400), USA (BECA, COMCASA), France (Horizon 2047), Japan (Quad)",
+          "Neighborhood diplomacy shift — SAARC stagnation, BIMSTEC focus, bilateral emphasis",
+          "Economic FP dimension — FTAs, RCEP rejection, selective IPEF engagement, CEPA with UAE",
+          "Global South assertion — G20 presidency, Voice of Global South, African Union engagement"
+        ],
+        "india_position": "India has evolved from Nehruvian idealism to pragmatic multi-alignment. Retains strategic autonomy principle, non-ideological partnerships. Current phase emphasizes development diplomacy, neighborhood stabilization, great power role.",
+        "recent_developments": "2023-24: India G20 presidency represents culmination of Global South emergence; IMEC launch signifies India's West linkage strategy; Ukraine abstentions reflect continued strategic autonomy; BRICS expansion aligns with Global South projection.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Pendulum from idealism to realism — factors driving policy shifts across decades",
+          "1962 war as watershed — security consciousness transformation",
+          "Cold War alignment dynamics — Indo-Soviet treaty implications for Western relations",
+          "1991 and post-liberalization — economic factors reshaping partnerships",
+          "Contemporary multi-alignment — balancing Russia, USA, others without choosing sides"
+        ]
+      },
+      {
+        "topic_id": "M1T5",
+        "topic_name": "Strategic Autonomy — Concept and Practice",
+        "primary_book": "Pavneet Singh Ch 2; NCERT Ch 1-2",
+        "key_concepts": [
+          "Definition — independent decision-making capacity without external pressure, cornerstone of Indian FP",
+          "Historical roots — Nehru's non-alignment philosophy, resistance to bloc membership",
+          "Differentiator from alignment — partnerships allowed but decisions unilateral",
+          "Military implications — indigenous weapons development, minimal arms dependency, SSN Arihant",
+          "Economic dimension — self-reliance in food, energy, technology; import substitution emphasis",
+          "Diplomatic expression — abstaining on UNSC votes (Ukraine 2022), not joining US-led coalitions",
+          "Nuclear weapons as autonomy marker — India's deterrent independent, not NATO-style umbrella",
+          "Technology acquisition strategy — NSG membership seeking despite non-NPT signatory status",
+          "Partnership selectivity — USA relationship deepening while maintaining Russia engagement",
+          "Limitations in practice — US sanctions threats (CAATSA on S-400), pressure on Iran, China policies",
+          "Development requirements vs. autonomy tension — FDI needs, tech imports reduce pure autonomy",
+          "Quadrilateral grouping paradox — Quad seen as autonomy-limiting by critics, India insists on flexibility",
+          "Modi-era interpretation — Atmanirbhar Bharat as autonomy expression, domestic manufacturing emphasis",
+          "Contemporary challenges — supply chains, climate diplomacy, technology standards vs. autonomy"
+        ],
+        "india_position": "Strategic autonomy as non-negotiable principle. India balances partnerships (USA, Russia, France, Japan) without surrendering decision-making. Resists bloc alignment while deepening multilateral engagement. Refuses AUKUS, maintains BRICS flexibility.",
+        "recent_developments": "2023-24: India's Ukraine abstentions reaffirm autonomy; selective IPEF participation; BRICS expansion without alignment pressure; G20 leadership without bloc dominance reflects autonomous positioning.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Strategic autonomy vs. strategic partnership tension — how India manages both",
+          "Technology independence initiatives — Atmanirbhar Bharat rationale",
+          "Military capability as autonomy foundation — indigenous production significance",
+          "Diplomatic flexibility — example from Ukraine, Iran, China policies",
+          "Constraints on autonomy — economic dependence, global supply chains, climate needs"
+        ]
+      },
+      {
+        "topic_id": "M1T6",
+        "topic_name": "India's Regional Strategies — Neighborhood First, Act East, Link West, SAGAR",
+        "primary_book": "Pavneet Singh Ch 8-9; NCERT Ch 3-5",
+        "key_concepts": [
+          "Neighborhood First Policy — 2014 Modi initiative, regional stability prerequisite for development",
+          "Rationale — neighbors' stability enables India's rise, cross-border security threats otherwise",
+          "Implementation — bilateral focus, SAARC marginalization, BIMSTEC prioritization",
+          "Challenges — Pakistan anti-India stance, China's neighborhood overtures, resource competition",
+          "Act East Policy — evolution from Look East 1991, comprehensive regional engagement",
+          "ASEAN centrality — India-ASEAN FTA (review), Mekong-Ganga Cooperation, Act East Dialogue",
+          "Northeast connectivity — Bangladesh rail, Myanmar road, improved ASEAN access",
+          "Indo-Pacific presence — naval posture, freedom of navigation operations (FONOPS), Quad coordination",
+          "Link West Strategy — Middle East, Gulf region engagement, 9 million diaspora economic ties",
+          "GCC relations — oil imports (70% from Gulf), defense cooperation, remittances ($60+ billion from Gulf)",
+          "Iran engagement — Chabahar Port strategic importance, Afghanistan access, Central Asia connectivity",
+          "Israel normalization — Abraham Accords supporting stance, defense technology partnership",
+          "SAGAR Doctrine (Security and Growth for All in Region) — maritime security emphasis",
+          "Indian Ocean governance — freedom of navigation, anti-piracy, environmental security"
+        ],
+        "india_position": "Neighborhood First as development cornerstone; Act East/Link West as regional integration strategies. SAGAR projects India as responsible maritime power. Balanced approach between Pakistan isolation and strategic hedging.",
+        "recent_developments": "2023-24: Bangladesh political change affects India relations; Myanmar situation complicates Act East; Iran Chabahar expansion; UAE CEPA operationalization; Gulf diversification away from oil.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Geographic necessity of neighborhood stability — India's strategic compulsion",
+          "SAARC stagnation factors — why BIMSTEC replaced it",
+          "Act East implementation challenges — ASEAN non-alignment, Myanmar instability",
+          "Link West economic imperative — diaspora, energy, investment linkages",
+          "SAGAR vision — India's maritime strategy in IOR"
+        ]
+      },
+      {
+        "topic_id": "M1T7",
+        "topic_name": "Vasudhaiva Kutumbakam — Ancient Philosophy in Modern Diplomacy",
+        "primary_book": "Pavneet Singh Ch 1; NCERT Ch 1",
+        "key_concepts": [
+          "Sanskrit meaning — 'the world is one family,' Maha Upanishad 6.72",
+          "Ancient text roots — Upanishads, Kautilya's Arthashastra (state interests primacy) contrast",
+          "Philosophical foundation — unity of humanity transcending nationalism, civilization-level thinking",
+          "Modern articulation — Nehru's universalism, Gandhi's ahimsa expansion to IR",
+          "Modi's projection — 2022 UN General Assembly speech centerpiece, soft power tool",
+          "G20 India presidency connection — universal development concerns, Global South advocacy",
+          "Practical implications — development as shared responsibility, climate action as common duty",
+          "Critique — tension between philosophy (universal welfare) and practice (national interest)",
+          "Diplomatic messaging — differentiates India from Western IR approaches, civilizational authority",
+          "Buddhism diplomacy link — compassion, interdependence principles from ancient Indian thought",
+          "Environmental application — interconnected world facing climate crisis, Vasudhaiva framing",
+          "Economic cooperation angle — BRICS, SAARC, ASEAN cooperation as family obligations",
+          "Soft power utility — appeals to Global South, post-colonial solidarity narrative",
+          "UNSC speech deployment — India's voice expressing universal concerns, not bloc interests"
+        ],
+        "india_position": "Vasudhaiva Kutumbakam as India's civilizational contribution to modern IR. Guides universal stance on climate, development, democracy. Reflects India's non-ideological, humanitarian approach to global challenges.",
+        "recent_developments": "2023: G20 presidency incorporated this concept; India's Climate Action on Loss and Damage fund reflects principle; Voice of Global South frames universal concerns.",
+        "pyq_frequency": "medium",
+        "mains_importance": 6,
+        "mains_answer_angles": [
+          "Ancient Indian philosophy's relevance to contemporary IR challenges",
+          "Vasudhaiva vs. Machiavellian realism — India's diplomatic approach differentiation",
+          "Soft power dimensioning — how civilizational concepts enhance India's diplomatic standing",
+          "Critique: idealism vs. practice — can philosophy guide state interests?",
+          "Application to global challenges — climate, development, democracy from this lens"
+        ]
+      }
+    ]
+  },
+  "module_2": {
+    "module_name": "India & South Asia",
+    "module_id": "M2",
+    "daily_target_hours": 20,
+    "topics": [
+      {
+        "topic_id": "M2T1",
+        "topic_name": "SAARC — Formation, Stagnation, BIMSTEC Alternative",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 5",
+        "key_concepts": [
+          "SAARC founded 1985 — South Asian Association for Regional Cooperation, 8 members",
+          "Members — India, Pakistan, Sri Lanka, Nepal, Bangladesh, Bhutan, Maldives, Afghanistan",
+          "Objectives — regional development, poverty alleviation, cultural exchange, mutual growth",
+          "Stagnation causes — India-Pakistan tensions since 1990s, 1999 Kargil war impact",
+          "Pakistan-centric opposition — Pakistani military's India-skeptical stance",
+          "Last summit 2014 — suspended since then, no momentum post-Siachen 2003 agreement",
+          "Trade barrier — non-tariff barriers, regional protectionism, unequal development",
+          "China factor — Pakistan's China alliance complicates SAARC independence",
+          "Afghanistan instability — post-2001, then Taliban 2021, security concerns",
+          "SAARC failures — CoSAI (Court of Arbitration) never functional, SAARC Bank limited",
+          "BIMSTEC emergence — Bangladesh, India, Myanmar, Sri Lanka, Thailand focus",
+          "BIMSTEC advantages — SAARC excludes Pakistan, larger trade volumes, security focus",
+          "India-led regionalism shift — BIMSTEC vs. SAARC represents India's strategic choice",
+          "SAARC revival obstacles — no structural reform, Pakistan veto capacity, geopolitics"
+        ],
+        "india_position": "SAARC defunct due to Pakistan's obstructionism. India shifted to BIMSTEC, bilateral focus. Supports multilateralism but practical engagement through alternative forums. Open to SAARC revival under conditions.",
+        "recent_developments": "2023-24: SAARC remains suspended; BIMSTEC activities increase; India-Bangladesh-Myanmar connectivity projects bypass SAARC framework.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Why SAARC failed — structural design vs. political obstacles",
+          "Pakistan's role in SAARC paralysis — 1990s terror, military government factors",
+          "BIMSTEC as alternative — advantages over SAARC framework",
+          "India's response — pragmatic bilateralism vs. multilateral idealism",
+          "Future prospects — revival conditions, regional stability requirements"
+        ]
+      },
+      {
+        "topic_id": "M2T2",
+        "topic_name": "India-Pakistan Relations — Kashmir, Terrorism, Indus Waters, CPEC",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Kashmir dispute — Partition 1947 unresolved, 3 wars (1947, 1965, 1999), underlying cause",
+          "LOC (Line of Control) — 1949 Karachi Agreement, ceasefire line status, demilitarization attempts",
+          "Pakistan's cross-border terrorism — active support to militants, 2001 Parliament attack, 2008 Mumbai terror",
+          "26/11 Mumbai attacks 2008 — 166 killed, Pakistan-based Lashkar-e-Taiba, diplomacy impact",
+          "Pulwama-Balakot 2019 — suicide bombing 40 CRPF, India's Balakot airstrike response",
+          "Kargil War 1999 — Pakistani-backed intrusion, Siachen glacier dispute linked",
+          "Indus Waters Treaty 1960 — successful water-sharing mechanism, 3 eastern (India), 3 western (Pakistan) rivers",
+          "IWT effectiveness — despite wars, treaty survived, technical commissions function",
+          "Climate impact on IWT — glacial melt, climate change, flow patterns uncertain future",
+          "CPEC (China-Pakistan Economic Corridor) — $60+ billion BRI project, Gwadar Port, India's security concern",
+          "CPEC route — passes through disputed Gilgit-Baltistan, India's sovereignty claim",
+          "Strategic competition — India's IPEC (India-Middle East-Europe) as CPEC counter",
+          "Ceasefire lines — 2003 ceasefire, 2019 Pulwama tensions, sporadic violations",
+          "International mediation — US role historically, Saudi Arabia recent attempts, UAE contacts"
+        ],
+        "india_position": "Kashmir as core issue requiring Pakistan's acceptance of LOC/LoM. Counter terrorism as non-negotiable precondition. IWT as success model. CPEC seen as strategic encirclement. Prefer bilateral dialogue without external pressure.",
+        "recent_developments": "2023-24: Ceasefire holds; some back-channel discussions reported; India-Pakistan sports, cricket resumptions partial normalization.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Kashmir's international dimensions — UN role, regional power impact, humanitarian aspects",
+          "Terrorism as foreign policy tool — Pakistan's state sponsorship mechanisms",
+          "Indus Waters Treaty success — why institutional frameworks survive political crises",
+          "CPEC threat perception — geographic, strategic, sovereignty dimensions",
+          "Ceasefire sustainability — incentive structures, cross-border trade potential"
+        ]
+      },
+      {
+        "topic_id": "M2T3",
+        "topic_name": "India-China Relations — LAC, Galwan 2020, Border Dispute, Trade",
+        "primary_book": "Pavneet Singh Ch 5-6; NCERT Ch 4-5",
+        "key_concepts": [
+          "1962 war — defining moment, India's military defeat, lasting impact on strategic thinking",
+          "LAC (Line of Actual Control) — 3,488 km, never formally demarcated, multiple interpretations",
+          "Sino-Indian border dispute — McMahon Line (NE), Western sector divergence, Aksai Chin",
+          "1998-2005 period — some confidence-building measures, strategic dialogue establishment",
+          "2009-2012 border tensions — incursions, face-offs, standoff cycles",
+          "2013 Chumar incident — 21-day standoff, modern face-off template",
+          "2017 Doklam standoff — 73-day face-off, Bhutan's vassal status as dispute factor",
+          "Galwan Valley clash June 2020 — 20 Indian soldiers killed, worst in 45 years, disengagement talks",
+          "Post-2020 disengagements — Pangong, Gogra-Hot Springs partial pullbacks, LAC friction remains",
+          "Military buildup — both sides increasing deployments, infrastructure development (roads, airbases)",
+          "Panchsheel breach — China violated 1954 agreement principles, India's civilizational stand response",
+          "Trade relationship — 2024 bilateral $136+ billion, deficit favoring China, dependency concerns",
+          "Tech competition — semiconductors, AI, 5G rivalry, Chinese apps ban in India",
+          "Economic decoupling signals — India's selective FDI curbs, Make in India alternatives"
+        ],
+        "india_position": "LAC maintenance under status quo arrangement. No compromise on sovereignty. Military strength demonstration deterrence. Economic decoupling selective. Diplomatic channels open but guarded. Panchsheel cited rhetorically despite violations.",
+        "recent_developments": "2023-24: LAC tensions episodic; disengagement stalled (Demchok, Depsang); Chinese military exercises increased; India's defense spending rise.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "1962 war's lasting legacy — strategic culture transformation, security consciousness",
+          "LAC undefined nature — why demarcation remains unresolved",
+          "Galwan 2020 implications — military clash risk, escalation ladder",
+          "Trade interdependence paradox — economic ties vs. strategic competition",
+          "Long-term positioning — India's multi-vector strategy (Quad, Russia, others)"
+        ]
+      },
+      {
+        "topic_id": "M2T4",
+        "topic_name": "India-Nepal Relations — Open Border, Mahakali Treaty, China Factor",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Open border — 1950 Treaty of Peace and Friendship, no visa requirement, free movement",
+          "Mahakali Treaty 1996 — boundary demarcation, hydropower development, water resource sharing",
+          "Constitutional overlap — Nepal's 2015 constitution caused India-Nepal tensions",
+          "India's security concern — Nepal's China tilt, Beijing's inroads in Himalayan region",
+          "Pashupatinath Temple sensitivity — Hindu pilgrimage site, Indo-Nepal religious ties",
+          "Nepal's non-alignment stance — balancing India and China, assertive independence post-2015",
+          "Oli government (2018-2021) — pro-China tilt, Communist Party alliance, India concerns",
+          "Hydropower projects — Kali Gandaki-3, Pancheswar blocked by political instability",
+          "Trade imbalance — India's exports dominant, Nepal feels dependent, protectionist measures",
+          "Chinese encroachment — BRI projects, Kathmandu-Beijing highway plans, military training",
+          "2022-2023 political churn — multiple governments, stability uncertain",
+          "India's Himalayan security — Nepal's strategic location, China's Tibetan access implications",
+          "People-to-people ties — Nepali workers in India, family networks, cultural connection",
+          "BIMSTEC integration — Nepal's participation, connectivity projects through India"
+        ],
+        "india_position": "India values open border, people-to-people ties. Concerned about Chinese military/economic expansion. Open border should not enable security threats. Hydropower cooperation as mutual benefit. Prefer Nepal's non-alignment over China tilt.",
+        "recent_developments": "2023-24: Nepal political stability improving; India-Nepal border talks ongoing; Chinese infrastructure projects advancing despite delays.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Open border as strategic advantage and vulnerability — India's balancing act",
+          "China's Nepal strategy — BRI, military linkages, India's counter",
+          "Hydropower development — mutual benefit potential, political obstacles",
+          "Nepali nationalism — balancing India relations with strategic autonomy",
+          "Mahakali Treaty as model — water-sharing success, implementation challenges"
+        ]
+      },
+      {
+        "topic_id": "M2T5",
+        "topic_name": "India-Sri Lanka Relations — Tamil Issue, Hambantota Port",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Tamil issue — Sri Lankan Tamils' autonomy aspirations, Hindu-Buddhist conflict dimensions",
+          "1983 Black July — anti-Tamil riots, Indian concerns about minority persecution",
+          "LTTE (Liberation Tigers of Tamil Eelam) — militant organization, received Indian training 1980s",
+          "Indian support reversal — initial backing reversed after anti-India operations, 1987 Accord",
+          "1987-89 Accord — Indian Peace Keeping Force (IPKF) intervention, eventual withdrawal",
+          "IPKF legacy — 1,155 Indian soldiers lost, Rajiv Gandhi assassination connection",
+          "Civil war 1983-2009 — Sri Lankan military's Tamil suppression, humanitarian concerns",
+          "2009 war end — Sri Lankan victory, alleged war crimes, international investigations",
+          "Hambantota Port — Chinese-funded, 99-year lease to China, India's strategic concern",
+          "Chinese presence — port becomes Chinese military leverage point in Indian Ocean",
+          "India's counter-moves — Trincomalee port development, naval presence expansion",
+          "Trade ties — bilateral $7+ billion, textiles, tea, spices interdependence",
+          "Diaspora factor — Tamil population in India, AIADMK/DMK political impact",
+          "Regional balance — India-China competition for Sri Lankan strategic location",
+          "Reconciliation process — India pushes for Tamil grievance resolution, constitutional amendments"
+        ],
+        "india_position": "Tamil minority rights as principle, not interference. Concern about Hambantota Port Chinese control. Counter through economic engagement, infrastructure investment. Prefer Sri Lanka's non-alignment over China dependence.",
+        "recent_developments": "2023-24: Sri Lanka's debt crisis eases; India's development assistance programs expand; Hambantota port concerns persist despite Chinese leasing issues.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Tamil grievances — historical context, internationalization attempts",
+          "IPKF intervention lessons — when regional peacekeeping fails",
+          "Hambantota port implications — strategic vulnerability of small states to great powers",
+          "India-China competition — Sri Lanka as contested space in IOR",
+          "Diaspora influence — how AIADMK/DMK affect India's foreign policy"
+        ]
+      },
+      {
+        "topic_id": "M2T6",
+        "topic_name": "India-Bangladesh Relations — Water Sharing, Connectivity, Political Transitions",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Teesta water-sharing — river originating in Sikkim, lower riparian Bangladesh concerns",
+          "1996 Ganges Agreement — river water-sharing precedent, limited to dry season",
+          "Teesta Accord stalled — Bangladesh wants larger share, India's hydropower needs",
+          "Border demarcation — 2015 agreement resolved 99% of 4,096 km land border",
+          "Rohingya crisis — 900,000+ Rohingyas in Bangladesh camps, security concern for India",
+          "IMDT (Illegal Migrants (Determination by Tribunal) Act) — Indian border disputes",
+          "Economic ties — $15+ billion bilateral trade, RMG industry, pharmaceuticals",
+          "Connectivity projects — Bangladesh-China-India (BCIM), Northeast India access",
+          "Bangladesh-Myanmar-India corridor — regional integration, BIMSTEC axis",
+          "Political factor — Sheikh Hasina's pro-India stance vs. BNP skepticism (2024 transition)",
+          "2024 Bangladesh transition — Hasina's resignation, political instability, India's diplomatic challenge",
+          "Chinese competition — Chinese investments in Bangladesh, Dhaka-Beijing partnership",
+          "Myanmar instability spillover — Bangladesh affected by Rohingya, Myanmar conflicts",
+          "Cultural ties — Bengali language, literature, Rabindranath Tagore, people-to-people bonds",
+          "Defense cooperation — Bangladesh military training in India, strategic partnership deepening"
+        ],
+        "india_position": "Bangladesh as key regional partner despite water disputes. Rohingya burden-sharing sought internationally. Teesta agreement important but not precondition. Prefer political stability for trade growth. Concerned about Chinese influence.",
+        "recent_developments": "2023-24: Bangladesh political turmoil with Hasina's exit; India recalibrating engagement; Rohingya crisis persists; connectivity projects advance slowly.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Water diplomacy — Teesta unresolved; Ganges model success; riparian justice concepts",
+          "Rohingya crisis — humanitarian, security, responsibility-sharing dimensions",
+          "Political stability prerequisite — how Bangladesh's democracy affects India ties",
+          "Regional connectivity imperative — BCIM and Northeast integration benefits",
+          "2024 transition management — India's diplomatic flexibility with new Bangladesh regime"
+        ]
+      },
+      {
+        "topic_id": "M2T7",
+        "topic_name": "India-Myanmar Relations — Rohingya Crisis, BCIM Corridor, Strategic Position",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Myanmar's strategic location — Southeast Asia gateway, China's land access point",
+          "India's Northeast access — Myanmar connectivity to ASEAN, Act East priority",
+          "2021 coup — Myanmar's political turmoil, ASEAN-India coordination challenges",
+          "Rohingya crisis — 2017 ethnic cleansing, 900,000+ refugees in Bangladesh, India affected",
+          "India's refugee strain — Northeast states host Rohingyas, security-development trade-off",
+          "China's Myanmar nexus — BRI projects, military aid, Naypyidaw's strategic location",
+          "Kaladan Multimodal Project — India's investment for Sittwe Port access, connectivity",
+          "BCIM corridor — Bangladesh-China-India-Myanmar, regional integration framework",
+          "India-Myanmar border — 1,468 km, shared tribal populations, insurgency concerns",
+          "Aung San Suu Kyi's fall — India's democracy concern, Myanmar's junta alignment with China",
+          "Strategic choice — Myanmar torn between India and China influence",
+          "Defense cooperation — India provides military training, arms sales (limited)",
+          "Economic ties — $2+ billion trade, smaller than China-Myanmar volume",
+          "ASEAN consensus challenge — Myanmar's political crisis, ASEAN centrality erosion",
+          "Insurgency factor — Northeast Indian groups sheltered in Myanmar hills"
+        ],
+        "india_position": "Myanmar crucial for Act East success. Rohingya crisis must be managed without destabilizing Northeast India. China's influence concerning but Myanmar's autonomy respected. BCIM as alternative to China-led projects.",
+        "recent_developments": "2023-24: Myanmar conflict escalates; Rohingya pressure continues; China's influence grows; India-Myanmar defense talks advance cautiously.",
+        "pyq_frequency": "medium",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Myanmar's geopolitical significance — India vs. China competition arena",
+          "Rohingya burden-sharing — international responsibility, India's capacity limits",
+          "Kaladan project success factors — infrastructure, political stability prerequisites",
+          "BCIM potential — why corridor remains underdeveloped despite benefits",
+          "Insurgency factor — Northeast India's security vulnerability, cross-border dimension"
+        ]
+      },
+      {
+        "topic_id": "M2T8",
+        "topic_name": "India-Bhutan Relations — Doklam 2017, China-Bhutan Border Normalization",
+        "primary_book": "Pavneet Singh Ch 5; NCERT Ch 5",
+        "key_concepts": [
+          "Unique relationship — India-Bhutan Treaty 1949, near-vassal status, defense cooperation",
+          "2008 democracy transition — Bhutan's transformation, India's moral support",
+          "Doklam plateau — tri-junction of Bhutan-China-India, 2017 standoff epicenter",
+          "2017 Doklam standoff — 73-day face-off between India and China troops over Bhutan's territory",
+          "Strategic significance — Doklam overlooks Siliguri Corridor (India's narrow connection to Northeast)",
+          "India's intervention — defending Bhutan's territorial integrity, China's encroachment deterrence",
+          "China-Bhutan border agreement 2024 — normalization talks, India's leverage reduction",
+          "Bhutan's strategic autonomy — balancing India dependence with China engagement",
+          "India's security interest — Bhutan's buffer state role, prevent Chinese flanking of Siliguri",
+          "Defense cooperation — India's military presence, Bhutan Army training",
+          "Economic ties — 60% Bhutan exports to India, electricity sale (hydropower)",
+          "Paro Druk Chirwang Tshogpa — Bhutan's election outcomes affecting India relations",
+          "Hydropower development — India's investment in Bhutanese dams, water resource sharing",
+          "Cultural affinity — Buddhist heritage, Tibetan Buddhism connections, people-to-people ties",
+          "SAARC membership — Bhutan in SAARC but limited participation, India's closest SAARC partner"
+        ],
+        "india_position": "Bhutan's security dependent on India. Doklam defense as moral obligation. China-Bhutan normalization acceptable if not militarized. India remains primary partner but respects Bhutan's increasing autonomy.",
+        "recent_developments": "2023-24: China-Bhutan border agreement signed; India-Bhutan ties steady; hydropower projects continue; strategic partnership deepening.",
+        "pyq_frequency": "medium",
+        "mains_importance": 6,
+        "mains_answer_angles": [
+          "Doklam as precedent — India's willingness to defend regional allies against China",
+          "Siliguri Corridor vulnerability — India's Northeast security dependence on Bhutan",
+          "Buffer state significance — small nations' geopolitical value in great power competition",
+          "China-Bhutan normalization implications — India's leverage in Himalayan region",
+          "India-Bhutan model — alternative to bloc alignment, cooperative partnership"
+        ]
+      }
+    ]
+  },
+  "module_3": {
+    "module_name": "India & Major Powers",
+    "module_id": "M3",
+    "daily_target_hours": 20,
+    "topics": [
+      {
+        "topic_id": "M3T1",
+        "topic_name": "India-USA Relations — 2+2 Dialogue, LEMOA, COMCASA, BECA, GSOMIA",
+        "primary_book": "Pavneet Singh Ch 6-7; NCERT Ch 3-4",
+        "key_concepts": [
+          "Cold War separation — USA-Pakistan vs. India alignment, ideological distance post-1947",
+          "Post-1991 opening — economic liberalization enabling partnership",
+          "2000s strategic dialogue — Strobe Talbott-Jaswant Singh back-channel talks",
+          "2005 Next Steps in Strategic Partnership — bilateral defense, civilian nuclear cooperation",
+          "2+2 Dialogue — Foreign and Defense Ministers, begun 2018, formalized strategic engagement",
+          "LEMOA (Logistics Exchange Memorandum of Agreement) 2016 — logistical support at bases",
+          "COMCASA (Communications Compatibility and Security Agreement) 2018 — secure military communications",
+          "BECA (Basic Exchange and Cooperation Agreement) 2020 — geospatial intelligence sharing",
+          "GSOMIA (General Security of Military Information) — classified information exchange",
+          "Foundation framework — four agreements anchor strategic partnership, ladder of cooperation",
+          "India's hesitation — legacy of non-alignment, US pressure concerns, nuclear suppliers issue",
+          "CAATSA sanctions threat — USA options on India's S-400 purchases, sanctions waiver diplomacy",
+          "Quad formation 2017 — India-USA-Japan-Australia strategic partnership, Chinese concerns",
+          "Trade relationship — $190+ billion bilateral, $16+ billion defense trade",
+          "Technology partnership — semiconductors, AI, cybersecurity cooperation emphasis",
+          "Defense trade — Predator drones, Apache helicopters, defense manufacturing agreements"
+        ],
+        "india_position": "Deepening USA strategic partnership while maintaining Russia relations. Selective technology sharing, defense cooperation. Strategic autonomy preserved through selective engagement. CAATSA waiver expected; no bloc membership.",
+        "recent_developments": "2023-24: India-USA defense ties expand; CHIPS Act cooperation; semiconductor manufacturing partnership; PACT 2.0 framework discussed.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Evolution from Cold War distance to strategic partnership — factors driving shift",
+          "Strategic autonomy in USA partnership — how India avoids bloc membership",
+          "Defense frameworks (LEMOA, COMCASA, BECA) — deepening military integration implications",
+          "Technology partnership rationale — semiconductors, AI as shared concerns against China",
+          "CAATSA conundrum — balancing USA pressure with Russia ties"
+        ]
+      },
+      {
+        "topic_id": "M3T2",
+        "topic_name": "Quad (USA-Japan-Australia-India) — Objectives, Deliverables, China Factor",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 3",
+        "key_concepts": [
+          "Quad origins — 2007 informal grouping, 2017 formalization, China's South China Sea claims trigger",
+          "Member roles — USA: strategic leadership; Japan: tech partner; Australia: Indo-Pacific pivot; India: regional heft",
+          "Objectives — free, open, inclusive Indo-Pacific; freedom of navigation; rules-based order",
+          "Anti-China stance — implicit but not stated; South China Sea concerns central",
+          "Quad Summit — 2021 first, 2022 Japan, 2023 India (virtual), 2024 US planned",
+          "Deliverables — QUAD Vaccine Initiative (COVID), Semiconductor supply chain cooperation",
+          "Infrastructure partnership — Quad meets need for BRI alternative investment",
+          "Military exercises — Malabar (USA-India-Japan-Australia) naval drills in IOR",
+          "Technology collaboration — rare earth elements, semiconductors, critical minerals",
+          "China's response — 'Asian NATO' accusations, confrontational diplomacy",
+          "India's balancing act — Quad participation without alienating Russia",
+          "Multilateral coordination — FOIP (Free and Open Indo-Pacific) strategy alignment",
+          "Expansion discussions — South Korea, Philippines potential additions",
+          "Public messaging — 'not against anyone' rhetoric masks China containment",
+          "Constraints on India — Russian proximity, BRICS membership, non-alignment legacy"
+        ],
+        "india_position": "Quad as positive framework for Indo-Pacific stability, not anti-China bloc. India balances Quad with BRICS, Russia ties. Selective participation, no military alliance implications.",
+        "recent_developments": "2023-24: Quad Focus Forward dialogue expanded; Indo-Pacific cooperation deepens; Malabar exercises scaled up; India hosts Quad Virtual Summit.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Quad as containment strategy — how implicit China focus defines grouping",
+          "India's balancing challenge — Quad vs. BRICS, Russia partnership management",
+          "Alternative to BRI — infrastructure cooperation, shared standards",
+          "Freedom of navigation doctrine — India's role in South China Sea claims",
+          "Future expansion — who should be included, when to formalize alliance structure"
+        ]
+      },
+      {
+        "topic_id": "M3T3",
+        "topic_name": "India-Russia Relations — S-400, CAATSA Waiver, Ukraine War Challenge",
+        "primary_book": "Pavneet Singh Ch 4,6; NCERT Ch 2,4",
+        "key_concepts": [
+          "Soviet-India alliance roots — Cold War partnership, 1971 Indo-Soviet treaty defense",
+          "Post-1991 transition — Russia relations maintained despite ideological shift",
+          "Defense partnership continuity — India's military Russian-origin (40%+ equipment)",
+          "S-400 Triumf purchase — $5.5 billion 2018, air defense system, CAATSA sanctions risk",
+          "CAATSA waiver — India exempted from sanctions despite Russian arms, USA strategic interest",
+          "Nuclear cooperation — Russian reactors, uranium supply, energy partnership",
+          "Energy imports — 10%+ of India's oil from Russia, especially post-2022 sanctions",
+          "Ukraine war dilemma — India's abstentions on UNSC, calls for dialogue, strategic autonomy assertion",
+          "India's voting record — 2 abstentions, 43 votes for resolutions (humanitarian focus)",
+          "Western pressure — USA, EU criticism of India's stance, 'friend of Russia' narrative",
+          "India's narrative — no bloc membership, humanitarian concerns, multipolar world advocacy",
+          "Military platforms — MiG, Su-30MKI, submarine cooperation, SSN Arihant Russian design",
+          "Economic ties — $40+ billion trade post-sanctions, imbalance (energy imports dominate)",
+          "Strategic autonomy assertion — Ukraine vote demonstrates independence from Western pressure",
+          "Future uncertainty — sanctions duration, Western tech alternatives, India's options"
+        ],
+        "india_position": "Russia partnership non-negotiable for security independence. Ukraine abstentions reflect strategic autonomy, not pro-Russia stance. CAATSA waiver expected. Energy, defense ties continuing despite sanctions.",
+        "recent_developments": "2023-24: India-Russia trade surges despite sanctions; S-400 integration continues; India hosts Modi-Putin summit; abstains on Ukraine votes.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Soviet legacy in India — how Cold War alliance shapes modern security",
+          "S-400 controversy — balancing USA-Russia relations, CAATSA implications",
+          "Ukraine position rationale — strategic autonomy vs. Western pressure",
+          "Energy dependence — Russia's sanctions-driven India tilt, India's opportunity",
+          "Future Russia transition — post-Putin scenarios, India's positioning"
+        ]
+      },
+      {
+        "topic_id": "M3T4",
+        "topic_name": "India-France Relations — Rafale, Horizon 2047, Indo-Pacific Strategic Vision",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 3",
+        "key_concepts": [
+          "Historical partnership — France's India non-alignment support during Cold War",
+          "Nuclear relationship — France's early recognition of India's nuclear capability",
+          "Rafale fighters — $8.4 billion deal 2016, 36 aircraft, India's air superiority asset",
+          "Rafale offset issues — Dassault offset commitments, Make in India production concerns",
+          "Horizon 2047 — 25-year strategic vision document, comprehensive partnership roadmap",
+          "Indo-Pacific partnership — France's Reunion, Mayotte Indian Ocean presence, shared concerns",
+          "Naval cooperation — joint exercises in IOR, maritime security emphasis",
+          "Defense partnerships — Mistral, Caesar howitzer supplies, defense manufacturing",
+          "Technology collaboration — civilian nuclear, space, cybersecurity",
+          "French technical expertise — submarine design (Scorpene), aerospace",
+          "IOR security — France's oceanic territories give Indian Ocean stake",
+          "China concerns — shared Indo-Pacific competition, Quad-like vision",
+          "Economic ties — $15+ billion bilateral trade, but less than USA/Russia volumes",
+          "Macron's India focus — strategic pivot toward Asia, India centrality assertion",
+          "FTA negotiations — ongoing discussions, trade liberalization potential"
+        ],
+        "india_position": "France as trusted defense partner, technology supplier, Indo-Pacific ally. Horizon 2047 reflects deep strategic commitment. IOR cooperation as cornerstone. France valuable for Western technology access without bloc pressure.",
+        "recent_developments": "2023-24: Horizon 2047 implementation accelerates; Rafale integration ongoing; FTA negotiations progress; IOR naval exercises expanded.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "France-India partnership — why France differs from USA in India's eyes",
+          "Rafale significance — fighter jet modernization, Make in India aspirations",
+          "Indo-Pacific vision alignment — how France-India's IOR interests converge",
+          "European tech access — France's role in technology autonomy without USA dominance",
+          "Horizon 2047 implications — 25-year strategic commitment sustainability"
+        ]
+      },
+      {
+        "topic_id": "M3T5",
+        "topic_name": "India-EU Relations — FTA Negotiations, Technology Partnership",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 3",
+        "key_concepts": [
+          "Trade partnership — EU 2nd largest trading partner ($150+ billion), critical minerals, pharmaceuticals",
+          "FTA negotiations — stalled since 2013, disagreements on labor, environment, data localization",
+          "Bilateral Investment Agreement — parallel negotiations, intellectual property protection concerns",
+          "Digital Services Tax — EU concerns about India's e-commerce policies, Google/Meta regulation",
+          "Data localization — EU GDPR vs. India's data security requirements, conflict",
+          "Carbon Border Adjustment Mechanism (CBAM) — EU climate policy, impact on India's exports",
+          "Green energy cooperation — EU's renewable focus, India's solar, wind partnership potential",
+          "Sustainability linkages — FTA stalled partly due to labor, environment standards",
+          "Technology transfer — semiconductors, AI, cybersecurity collaboration potential",
+          "Critical minerals — EU's rare earth dependence, India's supply chain role",
+          "Geopolitical realignment — EU's 'strategic autonomy' overlaps with India's autonomy concept",
+          "Strategic Compass — EU's 2022 security strategy mentions Indo-Pacific, India cooperation",
+          "Defense cooperation — limited but increasing, some defense trade discussions",
+          "Disinformation concerns — shared challenges, information warfare threats",
+          "People-to-people ties — Indian diaspora in EU (2+ million), education partnerships"
+        ],
+        "india_position": "FTA desirable but not at cost of domestic policies (data, labor). Willing to align on climate if burden-sharing fair. Technology partnership with EU as Western alternative to USA.",
+        "recent_developments": "2023-24: FTA talks resume after stagnation; GDPR compliance discussions; India-EU digital trade agreements advance.",
+        "pyq_frequency": "medium",
+        "mains_importance": 6,
+        "mains_answer_angles": [
+          "Why EU-India FTA stalled — regulatory divergence, domestic policy tensions",
+          "Data localization dispute — competing sovereignty, security frameworks",
+          "Green energy partnership — climate cooperation despite trade tensions",
+          "Technology autonomy — EU partnership as USA alternative source",
+          "Critical minerals dependency — EU's vulnerabilities, India's supply role"
+        ]
+      },
+      {
+        "topic_id": "M3T6",
+        "topic_name": "India-UK Relations — Post-Brexit FTA Negotiations",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 3",
+        "key_concepts": [
+          "Colonial legacy — British India independence, persistent historical tensions",
+          "Commonwealth membership — India's role despite colonial history, shared institutions",
+          "Post-Brexit repositioning — UK seeks India partnership as economic diversification",
+          "FTA negotiations — begun 2022, target 2030 completion, potential £50+ billion trade growth",
+          "Trade barriers — UK pharmaceutical concerns, India's generic drug policies",
+          "IP protection — UK concerns about patent enforcement, India's affordability emphasis",
+          "Visa liberalization — potential for increased people-to-people movement",
+          "Defense cooperation — limited arms sales, some military training exchanges",
+          "Technology partnership — fintech, AI, cybersecurity collaboration potential",
+          "Educational ties — Indian students in UK (186,000+), brain drain concerns",
+          "Migration question — UK points-based system, India seeks skilled visa quotas",
+          "CPTPP interest — UK's Indo-Pacific trade framework participation, India opportunities",
+          "Strategic partnerships — UK's 'AUKUS-lite' interest in India cooperation",
+          "Economic potential — Indian FDI in UK post-Brexit, investment flows",
+          "Diaspora leverage — 1+ million Indians in UK, political influence, cultural connection"
+        ],
+        "india_position": "FTA valuable for market access but not overriding domestic policies (generics, IP). UK partnership selective. Visa liberalization sought. CPTPP membership unlikely but cooperation on standards beneficial.",
+        "recent_developments": "2023-24: FTA negotiations accelerate; visa discussions expand; technology partnerships formalize; defense cooperation increases.",
+        "pyq_frequency": "low",
+        "mains_importance": 5,
+        "mains_answer_angles": [
+          "Post-Brexit UK pivot — how economic pressure drives India engagement",
+          "FTA complexity — IP protection vs. affordability tensions",
+          "CPTPP alternative — why India selective on multilateral trade frameworks",
+          "Diaspora influence — how UK's Indian population affects diplomatic leverage",
+          "Technology collaboration — AI, fintech areas of mutual interest"
+        ]
+      },
+      {
+        "topic_id": "M3T7",
+        "topic_name": "India-Israel Relations — Defense, Technology, Abraham Accords Impact",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 4",
+        "key_concepts": [
+          "Cold War distance — Indian foreign policy emphasized Palestinian cause",
+          "Post-1992 opening — India-Israel diplomatic recognition (1992), gradual normalization",
+          "Defense partnership growth — Israel as tech provider, UAV systems, intelligence",
+          "Counterterrorism cooperation — shared concerns about Pakistan-backed terrorism",
+          "Defense imports — Barak system, Harop drones, Spike missiles; $10+ billion cumulative trade",
+          "Israeli technology — cybersecurity, agriculture tech, water management expertise",
+          "Palestine position evolution — India maintains two-state solution support but de-emphasizes",
+          "Abraham Accords 2020 — Israel-UAE normalization, India supports as regional stability",
+          "India's balanced stance — Palestinian rights advocacy vs. Israel security partnership",
+          "Diaspora factor — Indian Jews limited influence compared to Muslim population concerns",
+          "Regional stability priority — India values Israel's strategic alignment over Palestinian solidarity",
+          "Tech transfer — agricultural innovation, desert farming techniques from Israel",
+          "Intelligence sharing — counterterrorism, security threat assessments",
+          "Semiconductor ecosystem — Israeli expertise in chip design, India's manufacturing",
+          "Gaza conflict 2024 — India's measured response, humanitarian concerns expressed"
+        ],
+        "india_position": "Israel as strategic defense partner, technology source. Two-state solution principle maintained but not primary. Regional stability over ideological solidarity. Counterterrorism cooperation prioritized.",
+        "recent_developments": "2023-24: India-Israel defense ties deepen; Abraham Accords alignment; Gaza conflict India's balanced statement; tech partnerships expand.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "India's Israel policy evolution — from Cold War distance to strategic partnership",
+          "Palestine principle vs. practice — how India balances both constituencies",
+          "Defense partnership significance — technology acquisition, counterterrorism cooperation",
+          "Abraham Accords implications — regional stability priority over ideology",
+          "Tech partnerships — water, agriculture, cybersecurity domains"
+        ]
+      }
+    ]
+  },
+  "module_4": {
+    "module_name": "Indo-Pacific & ASEAN",
+    "module_id": "M4",
+    "daily_target_hours": 18,
+    "topics": [
+      {
+        "topic_id": "M4T1",
+        "topic_name": "Indo-Pacific Strategy — India's Definition, Freedom of Navigation, IPEF",
+        "primary_book": "Pavneet Singh Ch 8-9; NCERT Ch 3",
+        "key_concepts": [
+          "Indo-Pacific terminology — merged Indian and Pacific Oceans, geopolitical concept",
+          "India's definition — 'free, open, inclusive' contrasts China's hegemonic vision",
+          "Geographic scope — from East Africa to USA West Coast, inclusive of ASEAN",
+          "Freedom of navigation — Open Seas principles, no closure by single power",
+          "FONOPS (Freedom of Navigation Operations) — India's South China Sea patrols, Chinese objections",
+          "Rules-based order — India advocates international law over power politics",
+          "IPEF (Indo-Pacific Economic Framework) — USA's 2022 initiative, India's selective engagement",
+          "India's IPEF participation — supply chain resilience, digital trade pillars relevant",
+          "IPEF limitations — no tariff reductions, narrower than TPP/CPTPP",
+          "IMEC launch 2023 — India-Middle East-Europe Corridor alternative to Chinese BRI",
+          "Quad coordination — shared Indo-Pacific vision with USA, Japan, Australia",
+          "China containment — implicit but explicit through freedom, openness rhetoric",
+          "Small island states inclusion — Mauritius, Maldives, Seychelles involvement",
+          "Environmental security — climate change, maritime pollution in Indo-Pacific",
+          "Piracy, smuggling prevention — regional maritime security cooperation"
+        ],
+        "india_position": "Indo-Pacific vision emphasizes inclusivity, rules-based order, freedom of navigation. India as responsible maritime power, regional voice. Selective IPEF participation balancing USA, China.",
+        "recent_developments": "2023-24: IPEF progresses; IMEC corridor launched; India's Indo-Pacific Oceans Declaration; naval presence expansion in region.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Indo-Pacific concept evolution — why merged terminology emerged as geopolitical framing",
+          "India's inclusive vision — contrast with Quad's implicit containment",
+          "IPEF significance — economic dimension of Indo-Pacific strategy",
+          "IMEC alternative — India's counter to Chinese BRI in region",
+          "Small state inclusion — how India differs from China in regionalism approach"
+        ]
+      },
+      {
+        "topic_id": "M4T2",
+        "topic_name": "ASEAN Relations — FTA Review, Connectivity, Act East Implementation",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 3",
+        "key_concepts": [
+          "ASEAN centrality — India's 'pivot to Asia' prioritizes 10-nation bloc",
+          "India-ASEAN FTA signed 2009 — goods, services, investment agreements",
+          "FTA review underway — tariff reduction schedules, rules of origin modernization",
+          "Trade volume — $136+ billion bilateral, increased from $7 billion (2001)",
+          "Mekong-Ganga Cooperation — 6 member group, cultural, development focus",
+          "Act East Dialogue — India's engagement mechanism within ASEAN framework",
+          "ASEAN Regional Forum (ARF) — India's security dialogue participation",
+          "East Asia Summit (EAS) — India's mega-regional participation, ASEAN hosted",
+          "ASEAN+3 (China, Japan, Korea) — competing influence, India outside",
+          "Comprehensive Investment Agreement — negotiations, investor protection",
+          "Connectivity imperative — Bangladesh-Myanmar rail, Northeast India access",
+          "South China Sea position — India's freedom of navigation support for ASEAN",
+          "Myanmar crisis impact — ASEAN unity tested, India's diplomatic role",
+          "ASEAN's non-alignment — balancing India, China, USA influence",
+          "Diaspora factor — Indian traders in ASEAN, cultural bridges"
+        ],
+        "india_position": "ASEAN as cornerstone of Act East. FTA optimization sought. Connectivity projects as integration mechanism. Respect ASEAN's centrality and non-alignment while deepening economic ties.",
+        "recent_developments": "2023-24: ASEAN-India FTA review progresses; connectivity projects advance; Myanmar political situation affects ASEAN unity; India-ASEAN trade grows.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "ASEAN's strategic importance — India's Act East centerpiece",
+          "FTA evolution — goods to services to investment, deepening integration",
+          "Connectivity projects — Bangladesh-Myanmar-India corridor necessity",
+          "China's ASEAN influence — competing regional roles, India's positioning",
+          "Myanmar crisis — ASEAN unity, India's diplomatic opportunity"
+        ]
+      },
+      {
+        "topic_id": "M4T3",
+        "topic_name": "India-Japan Partnership — Bullet Train, Infrastructure, Quad, Indo-Pacific",
+        "primary_book": "Pavneet Singh Ch 6,8; NCERT Ch 3",
+        "key_concepts": [
+          "Strategic partnership 2008 — Japan's India pivot, shifting from China-focused Asia",
+          "Bullet train project — $100+ billion Tokyo-Osaka shinkansen investment in India",
+          "Mumbai-Ahmedabad High-Speed Rail — flagship project, technological transfer",
+          "Infrastructure investment — Japan's ODA to India, 2nd largest source after ADB",
+          "Defense cooperation — Japan Maritimes Self-Defense Force, Malabar exercises",
+          "QUAD founding member — Japan's key role in Quad architecture",
+          "Free and Open Indo-Pacific (FOIP) — Japan's original concept, now Quad framing",
+          "Economic ties — $20+ billion bilateral, Japanese FDI in India growing",
+          "Manufacturing partnership — India as alternative to China-dependent supply chains",
+          "Technology transfer — automotive, electronics, robotics sectors",
+          "Shared China concerns — border tensions, hegemonic assertion, regional balance",
+          "People-to-people ties — anime/manga soft power, 60,000 Japanese in India",
+          "Intellectual property — Japan's IP-intensive industries, India's IP frameworks",
+          "Climate cooperation — renewable energy, hydrogen fuel cells",
+          "Abe's legacy — strategic vision for India-Japan partnership evolution"
+        ],
+        "india_position": "Japan as natural strategic partner; shared concerns about China. Bullet train symbolizes long-term commitment. Quad cooperation without alliance formalism. FTA potential in future.",
+        "recent_developments": "2023-24: Bullet train project progresses; Malabar exercises expand; India-Japan defense talks increase; trade partnerships deepen.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Japan's India strategy — why Japan shifted from China-centric to India-centric",
+          "Bullet train significance — technology, investment, symbol of long-term commitment",
+          "Quad foundation — Japan's FOIP concept, India's role evolution",
+          "Manufacturing shift — Japan's China alternative, India as opportunity",
+          "China as shared concern — how bilateral partnership reflects regional balance"
+        ]
+      },
+      {
+        "topic_id": "M4T4",
+        "topic_name": "India-Australia Relations — ECTA, Critical Minerals, Quad Cooperation",
+        "primary_book": "Pavneet Singh Ch 8; NCERT Ch 3",
+        "key_concepts": [
+          "ECTA (Economic Cooperation and Trade Agreement) signed 2022 — comprehensive FTA",
+          "Trade liberalization — significant tariff reductions, goods and services",
+          "Critical minerals — lithium, rare earths, Australia's supply, India's demand",
+          "Strategic minerals partnership — securing supply chains against Chinese dependence",
+          "Defense cooperation — 2+2 dialogue equivalent, military exercises",
+          "Quad membership — Australia's role as democratic, regional ally",
+          "Indian diaspora — 650,000+ Indians in Australia, largest source of migration",
+          "Education partnerships — Australian universities, Indian student numbers",
+          "Wine, uranium trade — traditionally tense issues now liberalizing",
+          "Technology collaboration — 5G, cybersecurity, critical infrastructure",
+          "Indo-Pacific positioning — Australia's post-China tensions pivot to India",
+          "COVID vaccine cooperation — Quad's vaccine diplomacy in Indo-Pacific",
+          "Immigration policy concerns — Australian migration points system, skilled visas",
+          "Cricket diplomacy — sport as people-to-people connection mechanism",
+          "Regional security balance — Australia's strategic tilt toward India-Japan partnership"
+        ],
+        "india_position": "Australia as critical minerals partner, Quad ally, trusted democracy. ECTA success opens further cooperation. Strategic minerals security crucial for India's energy transition.",
+        "recent_developments": "2023-24: ECTA implementation begins; critical minerals deals expand; India-Australia defense ties deepen; Quad cooperation expands.",
+        "pyq_frequency": "medium",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "ECTA implications — India-Australia economic integration significance",
+          "Critical minerals security — why Australia partnership crucial for energy transition",
+          "Quad dimension — Australia's role in Indo-Pacific balance",
+          "China factor — Australia's China-tension pivot to India-Japan",
+          "Diaspora economic impact — Indian immigration, remittances, business networks"
+        ]
+      }
+    ]
+  },
+  "module_5": {
+    "module_name": "West Asia & Africa",
+    "module_id": "M5",
+    "daily_target_hours": 16,
+    "topics": [
+      {
+        "topic_id": "M5T1",
+        "topic_name": "India-Gulf Relations — GCC, Oil, Diaspora, Geopolitics",
+        "primary_book": "Pavneet Singh Ch 5,6; NCERT Ch 4,5",
+        "key_concepts": [
+          "Oil imports — 70% from Gulf region, supply security critical for energy independence",
+          "Diaspora presence — 9 million Indians in Gulf, $60+ billion annual remittances",
+          "GCC (Gulf Cooperation Council) — Saudi Arabia, UAE, Qatar, Oman, Bahrain, Kuwait",
+          "India-Saudi bilateral — Vision 2030 partnership, investments, defense cooperation",
+          "India-UAE relations — closest Gulf partner, CEPA 2022 ($100 billion potential trade)",
+          "India-Qatar LNG — major supplier, energy security, defense presence",
+          "Defense agreements — security cooperation, military training, equipment sales",
+          "Iran factor — Chabahar Port partnership complicates Gulf relations",
+          "Saudi-Iran tensions — India balances both, Yemen conflict complication",
+          "Abraham Accords — Israel-UAE normalization, India supports as stability measure",
+          "Iranian oil sanctions — India's exemption granted then removed, policy fluctuation",
+          "Investment flows — Gulf sovereign wealth funds investing in India (infrastructure, real estate)",
+          "Trade deals — India-Saudi FTA discussions, UAE CEPA implementation",
+          "Terrorism links — Pakistan connections, India-Gulf security cooperation",
+          "Labor migration policy — India advocates rights protection, fair wage standards"
+        ],
+        "india_position": "Gulf as energy security pillar, diaspora anchor. Balances Saudi-Iran tensions while engaging both. CEPA with UAE symbolizes deepening ties. Protects diaspora interests while respecting Gulf sovereignty.",
+        "recent_developments": "2023-24: UAE CEPA operationalization accelerates; Saudi-India FTA talks; Gulf diversification from oil dependency; diaspora protection initiatives.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Energy security dependence — why Gulf dominates India's oil imports",
+          "Diaspora economic impact — remittances scale, dual citizenship arguments",
+          "Saudi-Iran balancing — India's non-aligned approach in Gulf politics",
+          "CEPA significance — trade opening, investment flows with UAE",
+          "Chabahar complication — Iran partnership vs. Gulf relations tension"
+        ]
+      },
+      {
+        "topic_id": "M5T2",
+        "topic_name": "India-Iran Relations — Chabahar Port, Afghanistan Access, JCPOA Impact",
+        "primary_book": "Pavneet Singh Ch 5,6; NCERT Ch 4",
+        "key_concepts": [
+          "Chabahar Port development — India's $500+ million investment in Iranian port",
+          "Strategic importance — gateway to Afghanistan, Central Asia, bypass Strait of Hormuz",
+          "India's Afghanistan access — land route alternative to Pakistani airspace",
+          "Tripartite mechanism — India-Iran-Afghanistan cooperation framework",
+          "JCPOA (Joint Comprehensive Plan of Action) — Iran nuclear deal, USA withdrawal 2018",
+          "Sanctions impact — USA pressure on India to reduce Iran oil imports",
+          "Oil imports sacrifice — India reduced Iran oil imports (peak 30%, now minimal)",
+          "Chabahar bottleneck — US sanctions restricting operations, development delays",
+          "Afghanistan disruption — Taliban 2021 takeover complicates Chabahar utility",
+          "Central Asia connectivity — Chabahar as part of broader Eurasia linkage",
+          "Chinese influence — China's Iran partnership, Belt and Road presence",
+          "Nuclear technology — India-Iran civilian nuclear cooperation agreements",
+          "Defense cooperation — submarine technology exchange, military training",
+          "Balancing act — Chabahar against USA-Saudi pressure on Iran",
+          "BIMSTEC alternative — Bangladesh-Myanmar-India corridor as partial Chabahar backup"
+        ],
+        "india_position": "Chabahar as strategic investment despite sanctions pressure. Maintains Iran partnership balancing US relations. Afghanistan access crucial for Central Asia connectivity despite Taliban transition.",
+        "recent_developments": "2023-24: Chabahar operates with restrictions; Afghanistan transit potential limited; India-Iran bilateral ties stable; sanctions navigation continues.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Chabahar significance — Afghanistan and Central Asia access imperative",
+          "Sanctions pressure — how USA-Iran tensions affect India's strategic options",
+          "Alternative routes — Chabahar vs. Pakistan, land routes to Afghanistan",
+          "Taliban complication — Chabahar utility diminished but long-term importance remains",
+          "Central Asia strategy — Chabahar as part of broader connectivity vision"
+        ]
+      },
+      {
+        "topic_id": "M5T3",
+        "topic_name": "India-Africa Relations — Forum Summit, Lines of Credit, Strategic Engagement",
+        "primary_book": "Pavneet Singh Ch 5,9; NCERT Ch 5",
+        "key_concepts": [
+          "India-Africa Forum Summit (IAFS) — 2008 first, 2015 second, 2024 planned third",
+          "54 AU member states — Africa's development potential, India's investment opportunity",
+          "Lines of Credit (LoCs) — $54+ billion disbursed to African countries since 2003",
+          "EXIM Bank role — concessional financing, Indian infrastructure exports",
+          "Trade volume — $100+ billion bilateral, growing from $10 billion (2000s)",
+          "Indian diaspora — 3+ million Indians in Africa, historical trader networks",
+          "Technology transfer — African tech startups, digital innovation hubs supported by India",
+          "Agricultural cooperation — India's farming expertise, food security partnerships",
+          "UN General Assembly voting — African nations provide India significant voting bloc",
+          "Non-permanent UNSC seat — Africa's support crucial for India's membership aspirations",
+          "Regional power balance — India vs. China competition for African influence",
+          "Chinese competition — BRI infrastructure dominance, India's IAFS alternative",
+          "Energy cooperation — African oil, minerals supply; India's energy demand",
+          "Education partnerships — ITEC scholarship, 10,000+ African students in India annually",
+          "Defense cooperation — growing military training, arms sales to select African countries"
+        ],
+        "india_position": "Africa as development partner, growth market, UN voting support. IAFS as India-Africa centric platform vs. China BRI. Lines of Credit as interest-subsidized development financing. Respect African sovereignty, non-colonial engagement.",
+        "recent_developments": "2023-24: IAFS summit 2024 planned; India-Africa trade grows; LoC disbursements expand; African students in India increasing.",
+        "pyq_frequency": "medium",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "India-Africa trade asymmetry — why Africa less developed despite 20-year partnership",
+          "IAFS vs. China BRI — soft power approach differences",
+          "UN voting bloc — how Africa affects India's UNSC reform ambitions",
+          "EXIM LoCs — development financing mechanism, sustainability questions",
+          "Energy security — African oil, minerals access for India's development"
+        ]
+      },
+      {
+        "topic_id": "M5T4",
+        "topic_name": "Shanghai Cooperation Organisation (SCO) — India's Role, BRICS Plus, Central Asia",
+        "primary_book": "Pavneet Singh Ch 6,9; NCERT Ch 4",
+        "key_concepts": [
+          "SCO founding — 1996 Shanghai Five (China, Russia, Kazakhstan, Kyrgyzstan, Tajikistan)",
+          "India's 2015 admission — along with Pakistan, significant expansion",
+          "Regional security concerns — terrorism, separatism, transnational crime",
+          "Regional Forum mechanism — Shanghai Spirit non-interference principle",
+          "RATS (Regional Anti-Terrorism Structure) — counterterrorism operations",
+          "Economic cooperation — SCO trade facilitation, development projects",
+          "India-Pakistan complexity — SCO's Pakistan membership problematic for India",
+          "Counter-terrorism tension — India pushes harder Pakistan stance; Pakistan-China alignment",
+          "Central Asia connectivity — Connect Central Asia policy through SCO",
+          "BRICS-SCO overlap — Russia-China-India-Pakistan in both (plus Brazil, South Africa BRICS only)",
+          "Military exercises — ZAPAD, VOSTOK Russian exercises, India participation limited",
+          "Ukraine impact — SCO divided on Russia position; India's neutrality useful",
+          "Chinese dominance — Belt and Road influence in SCO member states",
+          "Strategic autonomy assertion — India balances SCO membership with Russia, China wariness",
+          "Observer states — Afghanistan (Taliban government), Iran membership discussions"
+        ],
+        "india_position": "SCO membership valuable but Pakistan presence complicates. Regional security cooperation pursued while managing Pakistan antagonism. Central Asia connectivity through SCO valued.",
+        "recent_developments": "2023-24: SCO meetings resume post-Ukraine; India-Pakistan tensions in SCO context; Iran observer status discussions; Central Asia cooperation advances.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "India-Pakistan SCO dynamic — how organization manages bilateral animosity",
+          "Central Asia strategy — SCO as connectivity mechanism to landlocked region",
+          "China's SCO influence — BRI presence dominance in organization",
+          "Terrorism focus — why India emphasizes counterterrorism in SCO",
+          "BRICS-SCO overlap — multiple memberships complicate India's strategic choices"
+        ]
+      }
+    ]
+  },
+  "module_6": {
+    "module_name": "Multilateral Organisations",
+    "module_id": "M6",
+    "daily_target_hours": 18,
+    "topics": [
+      {
+        "topic_id": "M6T1",
+        "topic_name": "UN Structure and India's Role — GA, SC, ECOSOC, ICJ",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 6",
+        "key_concepts": [
+          "UN founding 1945 — 51 original members, 193 current (including India since 1945)",
+          "UN General Assembly (GA) — universal membership, one country one vote",
+          "GA functions — budget approval, peacekeeping, human rights resolutions",
+          "India's GA role — permanent representative status, significant voting bloc leader",
+          "Security Council (SC) — P5 permanence (USA, Russia, China, France, UK), India non-permanent",
+          "SC P5 veto power — permanent member blocking capability",
+          "India's SC campaigns — 1950-1951, 1967-1968, 1972-1973 non-permanent terms",
+          "Peacekeeping contribution — India 2nd largest troop contributor (185,000+ deployed historically)",
+          "ECOSOC (Economic and Social Council) — development, humanitarian coordination",
+          "ICJ (International Court of Justice) — highest court, India's legal representation",
+          "Secretary-General election — India's candidatures (Shashi Tharoor 2016)",
+          "G4 alliance — Germany, Japan, Brazil, India coordinated UNSC reform candidature",
+          "L69 group — support for UNSC expansion, African representation advocacy",
+          "India's permanent seat ambition — strategic objective, structural reform necessary",
+          "Veto power implication — five permanent members insufficient for 21st century"
+        ],
+        "india_position": "India advocates reformed UN reflecting contemporary power distribution. Pushes for UNSC permanent seat, expanded P5+10 or similar. Opposes vetoing by single power on global concerns.",
+        "recent_developments": "2023-24: India's UNSC reform advocacy; G4 coordination continues; India's SC rotation cycle awaited; Global South voice amplification.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "UN structure obsolescence — why post-WWII architecture inadequate for multipolar world",
+          "India's UNSC candidacy — why India's permanent seat justified",
+          "Peacekeeping role — India's sacrifice for global peace and stability",
+          "G4 vs. P5 resistance — reform obstacles, strategic interests blocking change",
+          "Global South voice — India's representation of developing nations in UN"
+        ]
+      },
+      {
+        "topic_id": "M6T2",
+        "topic_name": "UNSC Reform — G4, P5 Opposition, India's Permanent Seat Candidacy",
+        "primary_book": "Pavneet Singh Ch 6; NCERT Ch 6",
+        "key_concepts": [
+          "Veto power problem — P5 single-country blocking of global actions (Syria, Palestine)",
+          "Post-Cold War obsolescence — UN structure reflects 1945 power, not 2024 reality",
+          "G4 proposal — Germany, Japan, Brazil, India permanent seat expansion",
+          "Africa's case — African Union demanding representation, AU as Union not individual countries",
+          "L69 group (LDCs) — least developed countries advocating for least-developed state seat",
+          "Expansion mechanics — changing Charter requires 2/3 GA majority plus all P5 approval",
+          "P5 resistance — France open, Russia-China skeptical, USA wavering",
+          "Russia-China reasons — emerging powers' entry threatens status quo",
+          "USA position — varying across administrations, structural reform benefits debated",
+          "Veto power retention — any reform likely preserves P5 veto for expanded membership",
+          "Alternative proposals — SC expansion without more permanent seats",
+          "India's argument — largest democracy, developing world economy, peacekeeping contributor",
+          "Japan's candidacy — peaceful nation, second-largest UNSC contributor",
+          "Brazil's candidacy — Latin American voice absence from permanent membership",
+          "Germany's candidacy — European representation, post-Cold War democratic power"
+        ],
+        "india_position": "India's permanent seat justified by economy, population, UN contribution, democracy, developing world representation. Supports expansion but not at cost of credibility. Veto power controversial but necessary for reform acceptance.",
+        "recent_developments": "2023-24: G4 continues coordinated lobbying; USA non-committal; China-Russia blocking stance; India's advocacy in UNGA speeches.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Why P5 structure inadequate — geopolitical shifts, veto power paralysis examples",
+          "India's candidacy justification — economy, democracy, development, peacekeeping",
+          "Reform obstacles — P5 veto power necessary for any structural change",
+          "Alternative models — expansion without permanent seats, secondary tier options",
+          "Developing world representation — why Africa, Asia underrepresented in current structure"
+        ]
+      },
+      {
+        "topic_id": "M6T3",
+        "topic_name": "WTO and Trade Negotiations — India's Stand on Agriculture, TRIPS Waiver",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 9",
+        "key_concepts": [
+          "WTO founding 1995 — replacement for GATT, rules-based multilateral trade",
+          "Doha Round — launched 2001, promised agricultural reform, still stalled",
+          "Agricultural subsidies — developed nations' $700+ billion annual subsidies distort trade",
+          "India's position — agriculture as livelihood, subsidy reduction non-negotiable",
+          "India's farming community — 60% population dependent, crop prices sensitive to subsidies",
+          "Non-Agricultural Market Access (NAMA) — manufacturing tariff cuts debate",
+          "Services liberalization — India's concern about skill outsourcing resistance",
+          "TRIPS (Trade-Related Aspects of Intellectual Property) — patent protection rules",
+          "TRIPS waiver 2021 — India-South Africa push for COVID vaccine IP relaxation",
+          "Waiver success — allows generic production of vaccines in developing countries",
+          "Biodiversity and traditional knowledge — India advocates for protection clauses",
+          "Dispute settlement system — India's concerns about developed nation litigation dominance",
+          "Special and Differential treatment — developing nations' flexibilities in compliance",
+          "Fisheries subsidies — India's fishing industry concerns in negotiations",
+          "India's blocking role — coalition building (ALBA, ACT, others) to prevent consensus"
+        ],
+        "india_position": "Agriculture as sensitive sector, subsidy reduction mandatory for developed nations. TRIPS waiver precedent for public health over IP. Special treatment for developing nations justified. Doha Round reform necessary.",
+        "recent_developments": "2023-24: Doha Round remains stalled; TRIPS waiver implementation; fisheries subsidy agreement; India's coalition building on agriculture continues.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Doha Round failure — why agricultural liberalization remains unresolved",
+          "India's agriculture stake — 60% population dependence, trade impact",
+          "TRIPS waiver significance — precedent for balancing IP and public health",
+          "Coalition building — India's role in developing nations' bloc",
+          "Subsidy asymmetry — developed nations' agricultural support, developing nation disadvantage"
+        ]
+      },
+      {
+        "topic_id": "M6T4",
+        "topic_name": "G20 Leadership and Outcomes — India's 2023 Presidency, Global South Focus",
+        "primary_book": "Pavneet Singh Ch 6,9; NCERT Ch 6,9",
+        "key_concepts": [
+          "G20 composition — 19 countries plus EU, 90% global GDP representation",
+          "India's presidency 2023 — first BRICS country to lead G20",
+          "New Delhi Declaration — consensus on development, climate, reform issues",
+          "African Union inclusion — India's push for AU representation, historic first",
+          "Global South voice — India's presidency amplified developing nations' priorities",
+          "Development in name — added 'Development' to 'Global South' framing",
+          "Debt restructuring — Common Framework for sustainable debt resolution",
+          "Climate action — Loss and Damage Fund for climate-vulnerable nations",
+          "Financial architecture reform — IMF, World Bank quota adjustments discussed",
+          "Digital public infrastructure — India's UPI model, digital divide bridging",
+          "Health cooperation — pandemic preparedness, vaccine equity discussions",
+          "Consensus requirement — India achieved consensus without alienating any member",
+          "USA-China competition — managed within G20 structure, divisiveness avoided",
+          "Russia participation — despite Ukraine war, Russia remained in G20",
+          "BRICS expansion — G20 presidency coinciding with BRICS+ expansion announcement",
+          "Vasudhaiva theme — philosophical framing uniting diverse membership"
+        ],
+        "india_position": "G20 as Global South platform, not hegemonic bloc. Consensus-seeking despite divisions. African Union inclusion as equity measure. Development emphasis over narrow growth metrics.",
+        "recent_developments": "2023-24: G20 India presidency outcomes implemented; successor Brazil presidency 2024; AU remains in expanded membership discussions.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "India's G20 presidency significance — first BRICS, first Global South leader",
+          "AU inclusion precedent — power redistribution in multilateral institutions",
+          "Loss and Damage Fund — climate justice implementation, India's initiative",
+          "Consensus achievement — how India managed USA, China, others' interests",
+          "Financial architecture reform — IMF quotas, World Bank representation equity"
+        ]
+      },
+      {
+        "topic_id": "M6T5",
+        "topic_name": "BRICS Expansion and New Development Bank — India's Role in BRICS+",
+        "primary_book": "Pavneet Singh Ch 6,9; NCERT Ch 4,6",
+        "key_concepts": [
+          "BRICS founding 2009 — Brazil, Russia, India, China, South Africa",
+          "BRICS' objectives — emerging markets voice, multipolar world, development focus",
+          "New Development Bank (NDB) 2014 — alternative to World Bank, projects financing",
+          "BRICS Bank achievements — $40+ billion projects financed, 60+ countries assisted",
+          "India's NDB role — headquarters in Shanghai but India's contributions significant",
+          "BRICS expansion 2023 — addition of Saudi Arabia, UAE, Egypt, Iran, Ethiopia",
+          "BRICS+ name — expanded membership, 11 members post-2023",
+          "Expansion rationale — developing nations' voice amplification, counter US-led order",
+          "Iran admission — Middle East voice, sanctions resilience signal",
+          "Saudi Arabia shift — from G20 to BRICS, China-Saudi relationship deepening",
+          "India's concerns — BRICS+ legitimacy when China dominates, geopolitical balance",
+          "Consensus challenge — expanded membership complicates decision-making",
+          "Alternative currency discussions — de-dollarization via BRICS trade",
+          "India's caution — balances Russia partnership with concerns about China-dominated bloc",
+          "De-dollarization limits — practical alternatives to USD limited, trade finance only"
+        ],
+        "india_position": "BRICS+ expansion broadens Global South representation. NDB as development alternative valued. China's dominance concern managed through consensus procedures. Selective expansion scrutiny.",
+        "recent_developments": "2023-24: BRICS+ first summit 2024; NDB operations scale-up; de-dollarization discussions advance; India balances China influence.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "BRICS expansion wisdom — when larger is not better, consensus challenges",
+          "NDB significance — development finance alternative to Western institutions",
+          "De-dollarization potential — trade finance experiments, limitations realistic",
+          "China's BRICS role — dominance vs. consensus principle tension",
+          "India's strategic balance — BRICS vs. Quad, multiple memberships management"
+        ]
+      }
+    ]
+  },
+  "module_7": {
+    "module_name": "International Security",
+    "module_id": "M7",
+    "daily_target_hours": 16,
+    "topics": [
+      {
+        "topic_id": "M7T1",
+        "topic_name": "Nuclear Non-Proliferation Treaty (NPT) and India's Position",
+        "primary_book": "Pavneet Singh Ch 7; NCERT Ch 7",
+        "key_concepts": [
+          "NPT framework 1970 — non-nuclear weapons states pledge non-development, verification",
+          "NPT structure — 191 signatories, India, Pakistan, North Korea unsigned",
+          "India's nuclear weapons — 1974 'peaceful explosion,' 1998 Pokhran-II declaration",
+          "Signatory's dilemma — India's development predated NPT, treaty's discrimination against new powers",
+          "Declared nuclear states — P5 recognized; India, Pakistan, North Korea undeclared/unrecognized",
+          "Disarmament clause — NPT Article VI commits all to eventual nuclear disarmament",
+          "Hypocrisy critique — P5 retention while others surrender development",
+          "India's non-signatory stand — sovereignty principle, strategic autonomy assertion",
+          "Comprehensive Test Ban Treaty (CTBT) — India signed but not ratified, moratorium on tests",
+          "CTBT constraints — verification technology, India's confidence in weapons",
+          "International Atomic Energy Agency (IAEA) — safeguards oversight, India's compliance",
+          "Nuclear Suppliers Group (NSG) — export controls, India's membership bid",
+          "Civil nuclear cooperation — India signed despite NPT non-signatory status (2005 USA)",
+          "Nuclear doctrine — No First Use (NFU), massive retaliation, credible deterrence",
+          "Pakistan's nuclear dimension — India's security concern, arms race dynamic"
+        ],
+        "india_position": "NPT discriminatory; India justified in non-signature. Unilateral CTBT moratorium, IAEA compliance demonstrate responsibility. Seek NSG membership as recognized nuclear state. NFU doctrine and deterrence credible.",
+        "recent_developments": "2023-24: NSG membership bid continues; IAEA cooperation strengthens; India-Pakistan nuclear threshold management; India's nuclear policy stability.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "NPT discrimination — why India rejects framework it didn't create",
+          "Nuclear sovereignty principle — India's legal and strategic justification",
+          "India's responsibility record — CTBT moratorium, IAEA compliance despite non-signatory",
+          "NSG membership quest — why recognized nuclear states should be included",
+          "Disarmament double-standard — P5 nuclear retention vs. non-proliferation demands"
+        ]
+      },
+      {
+        "topic_id": "M7T2",
+        "topic_name": "India's Nuclear Doctrine — No First Use, Credible Minimum Deterrence",
+        "primary_book": "Pavneet Singh Ch 7; NCERT Ch 7",
+        "key_concepts": [
+          "1998 Pokhran tests — India declared nuclear power, strategic doctrine necessity",
+          "No First Use (NFU) — India will not initiate nuclear weapons use",
+          "Retaliatory principle — India reserves right for massive retaliation if attacked with nuclear weapons",
+          "Credible Minimum Deterrence (CMD) — sufficient weapons to dissuade nuclear attacks",
+          "Triad concept — submarine (SSN Arihant), air (Agni missiles), land (mobile launchers)",
+          "Pakistan's terrorism dilemma — conventional attack doesn't trigger nuclear response",
+          "USA pressure — some Cold War hawks questioned NFU as weakness",
+          "China's ambiguity — China's 'no first use at international frontiers' less clear",
+          "Accidental escalation concerns — nuclear-armed tensions risk, command and control",
+          "Minimum deterrence interpretation — how many warheads constitute 'minimum'?",
+          "Modernization drive — INS Arihant deployment, Agni missiles advancement",
+          "Surgical strike dilemma — 2019 Balakot airstrike near-nuclear threshold test",
+          "Policy review 1999 — Kargil war aftermath, doctrine refinement",
+          "Communication clarity — India's nuclear doctrine publicly stated, unlike others",
+          "Strategic stability — NFU with sufficient arsenal as deterrence paradox"
+        ],
+        "india_position": "NFU as civilizational principle, not weakness. Credible deterrence through sufficient arsenal, strong delivery systems. Pakistan's terrorism below nuclear threshold policy justified. China's ambiguity concerning.",
+        "recent_developments": "2023-24: INS Arihant operations expand; Agni missile tests; India's nuclear doctrine stability reaffirmed; Pakistan's tactical nuclear threats.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "NFU rationale — civilizational vs. strategic weakness arguments",
+          "Credible Minimum Deterrence — what constitutes 'minimum' arsenal sufficiency",
+          "Triad deployment — submarine, air, land systems for survivability",
+          "Pakistan's terrorism-below-nuclear threshold — testing India's deterrence doctrine",
+          "2019 Balakot test — near-nuclear escalation, strategic stability questions"
+        ]
+      },
+      {
+        "topic_id": "M7T3",
+        "topic_name": "Terrorism and Counter-Terrorism — FATF, UNSC Designations, Pakistan Factor",
+        "primary_book": "Pavneet Singh Ch 7; NCERT Ch 7",
+        "key_concepts": [
+          "Pakistan's terrorism export — active support to Kashmir militants, 26/11 orchestration",
+          "Lashkar-e-Taiba (LeT) — Pakistan's primary proxy, Mumbai attacks 2008",
+          "Jaish-e-Mohammed (JeM) — Pulwama 2019 attack perpetrator, Pakistan-sheltered",
+          "UN sanctions regime — UNSC designating terrorist organizations, Pakistani groups listed",
+          "FATF (Financial Action Task Force) — money laundering, terrorist financing watchdog",
+          "FATF Grey List — Pakistan placed repeatedly for terrorism financing failures",
+          "India's FATF role — advocate for Pakistan accountability, evidence submission",
+          "Masood Azhar designation 2019 — JeM chief, China's veto broken after India push",
+          "UNSC P-lists — Persons/Entities/Organizations designated as terrorist",
+          "Financial sanctions — freezing terrorist group assets, reducing operational capacity",
+          "UNSC 1267 Committee — terrorist designation review, India's participation",
+          "Cross-border terror operations — Pakistan-based training camps, infiltration routes",
+          "2019 Balakot response — India's counter-terrorism operation in Pakistan",
+          "Ceasefire violations post-2019 — terror attacks continuing despite diplomatic tensions",
+          "International pressure on Pakistan — FATF, US concerns, Saudi Arabia leverage"
+        ],
+        "india_position": "Pakistan's terrorism support incontrovertible, state-sponsored. India pushes FATF, UNSC designations relentlessly. Military counter-terrorism strikes justified. International pressure on Pakistan accountability essential.",
+        "recent_developments": "2023-24: FATF pressure on Pakistan continues; terror designations update; India's UNSC counter-terror role; Pakistan's compliance gaps.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Pakistan's terrorism state-sponsorship — evidence, mechanisms, groups",
+          "FATF leverage — how financial pressure affects terrorism financing",
+          "India's counter-terrorism doctrine — military response (Balakot) vs. diplomatic pressure",
+          "UNSC designations effectiveness — terrorist asset freezing, operational impact",
+          "International cooperation necessity — terrorism transnational nature requires coordinated response"
+        ]
+      },
+      {
+        "topic_id": "M7T4",
+        "topic_name": "Space Security and ASAT Weapons — Artemis Accords, India's Interests",
+        "primary_book": "Pavneet Singh Ch 7; NCERT Ch 7",
+        "key_concepts": [
+          "ASAT (Anti-Satellite) weapons — capability to destroy orbital satellites",
+          "India's 2019 ASAT test — Mission Shakti, low-orbit satellite destruction",
+          "Debris creation — ASAT tests create thousands of fragments, collision hazards",
+          "Space militarization concern — ASAT as arms race escalation in space domain",
+          "USA's ASAT capability — demonstrated 1985, current anti-satellite programs",
+          "Russia's ASAT development — direct-ascent and co-orbital capabilities",
+          "China's 2007 test — created massive debris field, international outcry",
+          "Outer Space Treaty 1967 — prohibits weapons of mass destruction, not kinetic ASAT",
+          "India's rationale — space self-defense, satellite protection necessity",
+          "Artemis Accords 2023 — India's signature, space exploration cooperation",
+          "Moon and Mars exploration — India's Chandrayaan, Mangalyaan successes",
+          "Space debris mitigation — responsible space behavior emphasis",
+          "UNCDOP (UN Committee on Disarmament) — space weapons regulation discussions",
+          "Dual-use technology — missiles capable of ASAT, hard to distinguish",
+          "India's peaceful space doctrine — ASAT as defensive, not offensive mechanism"
+        ],
+        "india_position": "Space self-defense necessary in militarized space. ASAT test validated capability. Artemis Accords signature reflects responsible space behavior. Debris concerns acknowledged, mitigation efforts pursued.",
+        "recent_developments": "2023-24: Artemis Accords implementation; Moon landing Chandrayaan 3 success; India's space ambitions expansion; space security concerns",
+        "pyq_frequency": "medium",
+        "mains_importance": 6,
+        "mains_answer_angles": [
+          "ASAT necessity — space militarization reality, India's defensive justification",
+          "Debris problem — ASAT externalities, space sustainability concerns",
+          "Artemis Accords significance — India's space exploration cooperation framework",
+          "Outer Space Treaty limitations — kinetic ASAT not explicitly prohibited",
+          "India's space ambitions — Moon, Mars exploration, satellite capabilities"
+        ]
+      }
+    ]
+  },
+  "module_8": {
+    "module_name": "Economic Diplomacy",
+    "module_id": "M8",
+    "daily_target_hours": 15,
+    "topics": [
+      {
+        "topic_id": "M8T1",
+        "topic_name": "Free Trade Agreements (FTAs) — ASEAN, UAE CEPA, Australia ECTA, EU Negotiations",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 9",
+        "key_concepts": [
+          "India-ASEAN FTA 2009 — goods, services, investment framework",
+          "FTA review ongoing — tariff schedule modernization, rules of origin updates",
+          "India-UAE CEPA 2022 — $100+ billion bilateral trade potential, digital economy included",
+          "CEPA implementation — tariff reduction phasing, exemptions negotiated",
+          "India-Australia ECTA 2022 — critical minerals, manufactured goods, agricultural products",
+          "ECTA operational phase — trade facilitation, rules of origin simplification",
+          "India-EU FTA negotiations — stalled on data localization, labor standards, environmental norms",
+          "EU digital demands — GDPR compliance pressure, data protection standards",
+          "India's data localization stance — data sovereignty, security imperatives",
+          "Labor standards negotiation — EU demands impact Indian competitive advantage",
+          "Environmental provisions — carbon borders, emission standards, India's concerns",
+          "IPEF participation — selective engagement, supply chain resilience focus",
+          "IPEF limitations — no tariff reduction, narrower scope than FTAs",
+          "FTA flexibility — India uses selective engagement strategy, chooses partners carefully",
+          "Strategic considerations — FTAs align with regional (Act East) and power (USA, France) strategies"
+        ],
+        "india_position": "FTAs as economic growth tools but protect sensitive sectors (data, agriculture). CEPA with UAE successful model. EU FTA conditional on reasonable standards. IPEF selective participation balancing USA without commitment.",
+        "recent_developments": "2023-24: UAE CEPA implementation accelerates; India-EU FTA talks resume; Australia ECTA operationalized; India-UK FTA progresses.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "FTA strategy diversity — choosing partners, protecting sensitive sectors",
+          "UAE CEPA success — why this agreement progressed where others stalled",
+          "EU regulatory demands — when trade openness conflicts with domestic policy",
+          "IPEF participation logic — supply chain resilience vs. tariff reduction trade-off",
+          "Regional integration imperative — FTAs as Act East, Link West implementation"
+        ]
+      },
+      {
+        "topic_id": "M8T2",
+        "topic_name": "RCEP Rejection 2019 — Why India Opted Out, Strategic Implications",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 9",
+        "key_concepts": [
+          "RCEP (Regional Comprehensive Economic Partnership) — 15 members, China-led ASEAN+5",
+          "China's manufacturing dominance — cheap exports flooding regional markets concern",
+          "India's domestic industry — textile, manufacturing sectors vulnerable to Chinese products",
+          "RCEP tariff schedules — China requested 80%+ tariff elimination, India's concern",
+          "Agricultural imports risk — regional agricultural products undercutting Indian farmers",
+          "India's negotiation failures — weak bargaining position, limited leverage vs. China-led group",
+          "Domestic lobby pressure — Indian industry opposition to RCEP terms",
+          "Services exclusion — RCEP's weak services liberalization, India's service advantage underused",
+          "Investment provisions — India's concerns about capital outflows, China's investment dominance",
+          "Trade deficit projection — India-RCEP trade imbalance forecast ($50+ billion annually)",
+          "Strategic rationale — opting out as asserting autonomy, not bloc submission",
+          "Regional criticism — India's opt-out seen as abandoning regional integration",
+          "Self-reliance framing — Atmanirbhar Bharat as rationale for selective trade openness",
+          "Future RCEP participation — conditions for re-engagement, structural reforms needed",
+          "CPTPP alternative — India's option for different regional trade grouping"
+        ],
+        "india_position": "RCEP terms unacceptable given China's manufacturing dominance. Industry protection justified against unfair competition. Strategic autonomy assertion through opt-out. Willing to join if terms revised equitably.",
+        "recent_developments": "2023-24: India remains outside RCEP; other member tensions evident; India's alternative frameworks development; selective engagement continues.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "RCEP rejection rationale — when regional integration harms domestic industry",
+          "China's competitive advantage — manufacturing dominance, RCEP benefits asymmetry",
+          "India's weak bargaining position — ASEAN+5 structure, limited leverage",
+          "Alternative strategies — ASEAN FTA review, bilateral FTAs more favorable terms",
+          "Strategic autonomy expression — refusing unfavorable multilateral frameworks"
+        ]
+      },
+      {
+        "topic_id": "M8T3",
+        "topic_name": "Diaspora Diplomacy and Economic Contribution — Remittances, Investment, Soft Power",
+        "primary_book": "Pavneet Singh Ch 8; NCERT Ch 9",
+        "key_concepts": [
+          "Diaspora size — 32 million Indians abroad, largest diaspora globally",
+          "Remittances — $125+ billion annually 2023, largest for India",
+          "Gulf remittances — $60+ billion from 9 million in Gulf, primary source",
+          "USA remittances — $30+ billion from Indian Americans, growing tech sector",
+          "NRI/OCI status — Non-Resident Indian, Overseas Citizen of India legal categories",
+          "Investment flows — diaspora FDI in India significant, venture capital, startups",
+          "Pravasi Bharatiya Divas — annual celebration of diaspora, government recognition",
+          "OCI card benefits — overseas visits, property rights, long-term residence",
+          "Dual citizenship limitations — India doesn't permit dual citizenship (except OCI status)",
+          "Political lobbying — diaspora's role in shaping India's foreign policy (USA, Gulf)",
+          "Soft power impact — Indian cuisine, yoga, Bollywood, tech reputation",
+          "Cultural preservation — diaspora's role in maintaining Indian cultural identity abroad",
+          "Investment in homeland — diaspora investing in real estate, businesses, startups",
+          "Brain drain concerns — India's skilled migration, tech sector talent loss",
+          "Fiscal impact — remittances improve forex reserves, development financing"
+        ],
+        "india_position": "Diaspora as economic and soft power assets. Remittances crucial for forex, consumer spending. OCI status encourages engagement without dual citizenship complication. Investment in homeland supported.",
+        "recent_developments": "2023-24: OCI expansion; Pravasi Bharatiya Divas 2024; diaspora startup investments increase; remittances resilience despite global slowdowns.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Remittances scale — $125 billion annual impact on India's economy",
+          "Investment flows — diaspora FDI in startups, infrastructure, real estate",
+          "Soft power dimension — diaspora's role in projecting India globally",
+          "Political influence — USA, Gulf, UK diaspora's foreign policy role",
+          "Brain drain vs. engagement — how to balance talent loss with diaspora ties"
+        ]
+      }
+    ]
+  },
+  "module_9": {
+    "module_name": "Soft Power and Cultural Diplomacy",
+    "module_id": "M9",
+    "daily_target_hours": 12,
+    "topics": [
+      {
+        "topic_id": "M9T1",
+        "topic_name": "Soft Power Assets — Yoga Diplomacy, Buddhism, Bollywood, Digital Innovation",
+        "primary_book": "Pavneet Singh Ch 1,8; NCERT Ch 1,6",
+        "key_concepts": [
+          "Soft power definition (Nye) — attraction vs. coercion, values-based influence",
+          "International Yoga Day 2015 — UN resolution, June 21 celebration, 177 countries",
+          "Yoga diplomacy impact — India as wellness authority, cultural bridge",
+          "Buddhism expansion — ancient roots, modern relevance, meditation trend",
+          "Nalanda University revival — ancient center of learning, cultural prestige",
+          "Buddhist heritage sites — Bodh Gaya, Buddhist pilgrimage tourism",
+          "Ayurveda globalization — traditional medicine gaining Western acceptance",
+          "Bollywood influence — Indian cinema global reach, soft power tool",
+          "Bollywood revenue — $2+ billion annual, significant cultural export",
+          "IT sector reputation — Indian tech talent globally recognized, competitive advantage",
+          "Startup ecosystem — Indian unicorns, innovation perception boost",
+          "ICCR (Indian Council for Cultural Relations) — cultural centers globally",
+          "ICCR activities — language classes, cultural performances, scholarships",
+          "Cuisine diplomacy — Indian restaurants globally, culinary soft power",
+          "Digital soft power — UPI expansion, AI research, tech leadership claims"
+        ],
+        "india_position": "Soft power as intrinsic asset, not artificial construct. Yoga, Buddhism, Ayurveda as civilizational strengths. Bollywood, IT sectors as modern soft power. Systematic cultivation through ICCR, government support.",
+        "recent_developments": "2023-24: Yoga Day celebrations expand; Nalanda University development; Bollywood productions increase; Indian startups gain global prominence.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Soft power assets inventory — what makes India attractive to world",
+          "Yoga diplomacy effectiveness — how ancient practice became geopolitical tool",
+          "Bollywood's global reach — Indian cinema as cultural ambassador",
+          "Tech sector reputation — India's startup ecosystem, IT talent perceptions",
+          "Systematic cultivation — ICCR, government roles in soft power projection"
+        ]
+      },
+      {
+        "topic_id": "M9T2",
+        "topic_name": "Vaccine Maitri and COVID-19 Diplomacy",
+        "primary_book": "Pavneet Singh Ch 1,7; NCERT Ch 6,8",
+        "key_concepts": [
+          "Vaccine Maitri (friendship) initiative 2021 — India's vaccine donation program",
+          "COVID-19 context — India as vaccine manufacturer, global production capacity",
+          "Covishield production — Oxford-AstraZeneca, India's Serum Institute production",
+          "Covaxin — India's indigenous vaccine, Bharat Biotech development",
+          "Export scale — 66+ million vaccine doses donated/exported, GAVI partnership",
+          "Soft power impact — India as 'pharmacy of the world,' humanitarian leader",
+          "Neighbors first — vaccine donations to Bangladesh, Nepal, Sri Lanka, Myanmar",
+          "African focus — substantial donations to African continent nations",
+          "Quad vaccine initiative — coordinated with USA, Japan, Australia",
+          "Vaccine diplomacy leverage — India's manufacturing, donation power",
+          "Narrative power — India as equitable vaccine distributor vs. hoarding West",
+          "Export restrictions — later restrictions (2021) due to domestic shortage, policy reversal",
+          "Domestic impact — vaccination priority shifted to India's population needs",
+          "Legacy benefits — soft power gains despite export reduction",
+          "Future pandemic preparedness — India's role in global health security"
+        ],
+        "india_position": "Vaccine Maitri as humanitarian action, not pure diplomacy. India's production capacity as global asset. Domestic requirements take precedence but international responsibility recognized.",
+        "recent_developments": "2023-24: Post-COVID vaccine landscape; India's pandemic preparedness role; vaccine diplomacy lessons applied to future health initiatives.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Vaccine Maitri soft power impact — humanitarian action as geopolitical tool",
+          "India's production capacity leverage — 'pharmacy of world' status",
+          "Equity narrative — developing nations' vaccine access advocacy",
+          "Export reversal lesson — when domestic needs override international commitments",
+          "Quad vaccine cooperation — multilateral health response coordination"
+        ]
+      }
+    ]
+  },
+  "module_10": {
+    "module_name": "Contemporary Geopolitics and Future Challenges",
+    "module_id": "M10",
+    "daily_target_hours": 14,
+    "topics": [
+      {
+        "topic_id": "M10T1",
+        "topic_name": "Russia-Ukraine War — India's Position, UNSC Abstentions, Strategic Implications",
+        "primary_book": "Pavneet Singh Ch 2,4; NCERT Ch 1,2",
+        "key_concepts": [
+          "Ukraine invasion Feb 2022 — Russia's military action, Western sanctions regime",
+          "India's UNSC votes — 2 abstentions on resolutions, humanitarian focus",
+          "Abstention rationale — neutrality, non-alignment principle, no bloc submission",
+          "Western pressure — USA, EU criticism of India's 'friends of Russia' stance",
+          "India's counter-narrative — humanitarian concern, multipolar world advocacy",
+          "Energy imports — India's oil imports from Russia surge due to sanctions",
+          "Trade opportunity — India benefits from Russian oil/commodity price reductions",
+          "Strategic autonomy assertion — India's votes demonstrate independence",
+          "Russia partnership non-negotiable — Security, defense ties require neutrality maintenance",
+          "USA understanding — America's de facto acceptance of India's strategic autonomy",
+          "Long-term implications — Russia-Europe rupture, China-Russia alignment deepening",
+          "India's mediatory role — attempts at peace negotiation, dialogue advocacy",
+          "NATO expansion debate — India's neutrality on NATO's role in escalation",
+          "Winter aid humanitarian access — India's abstentions allow humanitarian action",
+          "Sanctions regime impact — India's refusal to join, alternative payment mechanisms"
+        ],
+        "india_position": "Strategic autonomy non-negotiable, UNSC abstentions reflect it. Russia partnership for security independence. Humanitarian focus genuine, not geopolitical camouflage. Western understanding of India's position evolving.",
+        "recent_developments": "2023-24: Ukraine war continues; India's abstention pattern consistent; Russia-India energy trade robust; diplomatic positioning stable.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "Strategic autonomy assertion — why India refuses bloc alignment despite pressure",
+          "Russia dependence reality — why India cannot abandon Russia relationship",
+          "Energy opportunity — sanctions as India's geopolitical advantage",
+          "Western understanding growth — USA accepting India's independent stance",
+          "Long-term shifts — multipolar world emerging from Ukraine crisis"
+        ]
+      },
+      {
+        "topic_id": "M10T2",
+        "topic_name": "Israel-Palestine Conflict — India's Evolving Position, Two-State Solution",
+        "primary_book": "Pavneet Singh Ch 4,5; NCERT Ch 4,5",
+        "key_concepts": [
+          "Historical position — Cold War era pro-Palestinian solidarity",
+          "Post-1947 principle — India's support for Palestinian self-determination",
+          "Policy evolution — growing Israel partnership despite Palestine rhetoric",
+          "Dual diplomacy challenge — maintaining both Israel security ties, Palestinian rights advocacy",
+          "Recent Gaza conflicts — India's measured responses, humanitarian concerns stated",
+          "UNSC voting — India's abstentions/votes reflecting balanced approach",
+          "Two-state solution principle — India's official position, implementation obstacles",
+          "Abraham Accords support — India views Israel-UAE normalization as regional stability",
+          "diaspora factor — Muslim population concerns vs. security partnership pragmatism",
+          "Humanitarian access advocacy — India's focus on civilian protection, aid distribution",
+          "UNHRC position — India's voting reflecting principle without excessive criticism",
+          "Mediation attempts — India's offers to facilitate dialogue occasionally made",
+          "Terrorism counter — India uses security concerns to justify Israel partnership",
+          "International criticism tolerance — India accepts Global South criticism on Israel policy",
+          "Balancing act sustainability — long-term viability of dual engagement questioned"
+        ],
+        "india_position": "Two-state solution principle maintained but practical Israel partnership prioritized. Palestine rights important but not primary foreign policy driver. Humanitarian concerns expressed without security partnership compromise.",
+        "recent_developments": "2023-24: Gaza conflict; India's measured statements; Israel-India defense ties deepen despite Palestinian concerns; humanitarian aid discussions.",
+        "pyq_frequency": "high",
+        "mains_importance": 7,
+        "mains_answer_angles": [
+          "Cold War legacy vs. contemporary partnerships — India's position evolution",
+          "Two-state principle reality — why implementation remains elusive",
+          "Dual engagement challenge — Israel security ties vs. Palestine solidarity",
+          "Abraham Accords implications — regional normalization changing equation",
+          "Diaspora pressure management — Muslim concerns vs. pragmatic foreign policy"
+        ]
+      },
+      {
+        "topic_id": "M10T3",
+        "topic_name": "IMEC and India-Middle East-Europe Corridor — BRI Alternative, G20 2023",
+        "primary_book": "Pavneet Singh Ch 9; NCERT Ch 4,9",
+        "key_concepts": [
+          "IMEC announcement June 2023 — India-Middle East-Europe Corridor announced at G20",
+          "BRI alternative — counter to China's Belt and Road Initiative dominance",
+          "Route components — India to UAE to Saudi Arabia to Israel to EU",
+          "Logistics efficiency — shorter than BRI routes, faster delivery, reliability",
+          "Partnership participants — India, USA, Saudi Arabia, UAE, Israel, France, Germany, Italy",
+          "Rail connectivity — planned railway networks, shipping lanes integration",
+          "Port development — existing ports (Chabahar, Jeddah, Israeli ports) utilized",
+          "Trade facilitation — tariff reduction, customs coordination, logistics optimization",
+          "Regional peace prerequisite — Israeli-Palestinian normalization assumption risky",
+          "Investment attraction — private sector participation, return on investment emphasis",
+          "Technology integration — digital customs, blockchain logistics, smart infrastructure",
+          "Environmental standards — carbon-neutral operations, green corridors claimed",
+          "Implementation timeline — 2024-2028 development phases planned",
+          "Challenges ahead — political instability (Iran, Syria), Gaza conflict impacts",
+          "Competing interest management — Saudi-Iran tensions, Israel-Palestine complexity"
+        ],
+        "india_position": "IMEC as legitimate alternative to BRI, not anti-China rhetoric. Focus on efficiency, equity, environmental responsibility. Regional peace prerequisite challenging but not insurmountable.",
+        "recent_developments": "2023-24: IMEC launches formally; infrastructure projects initiated; G20 outcome implementation begins; stakeholder meetings ongoing.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "BRI comparison — why IMEC positioned as superior alternative",
+          "Regional cooperation necessity — can Mideast cooperation overcome political divisions?",
+          "Infrastructure focus — trade facilitation over geopolitical positioning",
+          "Investment models — private-sector driven vs. government-financed infrastructure",
+          "Long-term sustainability — regional political stability prerequisite"
+        ]
+      },
+      {
+        "topic_id": "M10T4",
+        "topic_name": "USA-China Competition and India's Strategic Positioning",
+        "primary_book": "Pavneet Singh Ch 3,4,6; NCERT Ch 3,4",
+        "key_concepts": [
+          "Bipolarity returns — USA-China competition replacing Cold War geopolitics",
+          "India as contested prize — both USA and China courting India's alignment",
+          "Quad mechanism — USA's tool for China containment with India participation",
+          "India's multi-alignment — partnerships with both camps, avoiding bloc submission",
+          "Technology competition — AI, semiconductors, 5G as competition arenas",
+          "South China Sea implications — USA's freedom of navigation, China's claims",
+          "Taiwan factor — USA commitment, China's unification claims, India's non-position",
+          "Economic decoupling — USA-China trade tensions, India as alternative destination",
+          "Manufacturing shift — China+1 strategy benefiting India's FDI prospects",
+          "Indian Ocean geopolitics — both powers' strategic interests converging",
+          "Defense spending race — USA-China competition driving military modernization",
+          "Technology sanctions — USA limits China's semiconductor access, India concerned",
+          "Dollar hegemony challenge — China's de-dollarization efforts, India's participation skepticism",
+          "Russia as complicating factor — USA-Russia rupture, China-Russia alignment",
+          "India's leverage — becoming sought-after partner by both superpowers"
+        ],
+        "india_position": "Strategic opportunity in USA-China competition; India refuses bloc membership. Maximum leverage through balanced positioning. Technology, manufacturing access from both. Defense partnerships with both.",
+        "recent_developments": "2023-24: USA-China tensions escalate; India deepens tech partnerships with both; manufacturing investments increase; India's strategic value rises.",
+        "pyq_frequency": "very_high",
+        "mains_importance": 9,
+        "mains_answer_angles": [
+          "India's leverage in bipolar competition — becoming strategic prize",
+          "Multi-alignment sustainability — how long can India balance both camps?",
+          "Technology transfer competition — USA vs. China access for India",
+          "Manufacturing opportunity — China+1 strategy, India as beneficiary",
+          "Defense partnerships paradox — deep ties with both superpowers"
+        ]
+      },
+      {
+        "topic_id": "M10T5",
+        "topic_name": "Climate Diplomacy and Loss and Damage — India's LiFE Movement, COP Leadership",
+        "primary_book": "Pavneet Singh Ch 8; NCERT Ch 8",
+        "key_concepts": [
+          "Climate vulnerability — India's development needs conflict with climate targets",
+          "Historical responsibility — developed nations' emissions, developing nations' suffering",
+          "Loss and Damage Fund 2023 — India-led COP28 initiative, climate justice focus",
+          "Fund operationalization — $700 billion pledged (goal), vulnerability nation support",
+          "BASIC group — Brazil, South Africa, India, China climate negotiation bloc",
+          "Common but Differentiated Responsibility (CBDR) — principle India champions",
+          "Mitigation vs. adaptation — India emphasizes adaptation for vulnerable nations",
+          "Renewable energy transition — India's solar, wind leadership among developing nations",
+          "Coal phase-out resistance — India argues development requires coal, gradual transition",
+          "LiFE (Lifestyle for Environment) — Modi's movement emphasizing individual actions",
+          "G20 climate outcomes — India presidency outcomes on climate finance, developing nation focus",
+          "Climate finance access — India needs concessional funding, technology transfer",
+          "COP presidency pursuit — India advocated for rotating COP leadership",
+          "Just transition support — fossil fuel workers' reskilling, climate-conscious development",
+          "Climate justice narrative — developed nations' responsibility, developing nations' rights"
+        ],
+        "india_position": "Climate action necessary but development needs paramount. Loss and Damage Fund as climate justice mechanism. Developed nations' historical responsibility, financial support obligation. India's renewable transition while maintaining development.",
+        "recent_developments": "2023-24: Loss and Damage Fund implementation begins; India's climate initiatives expand; renewable energy targets accelerate; COP29 participation.",
+        "pyq_frequency": "high",
+        "mains_importance": 8,
+        "mains_answer_angles": [
+          "Historical responsibility principle — why developed nations owe climate reparations",
+          "Loss and Damage justice — differentiation from mitigation and adaptation",
+          "India's transition challenge — development and climate action balance",
+          "Renewable energy leadership — India's solar/wind ambitions achievement scope",
+          "Climate finance access — concessional support, technology transfer necessity"
+        ]
+      }
+    ]
+  },
+  "study_meta": {
+    "total_topics": 52,
+    "total_study_hours": 180,
+    "average_hours_per_topic": 3.5,
+    "pyq_analysis": {
+      "very_high_frequency": 12,
+      "high_frequency": 23,
+      "medium_frequency": 12,
+      "low_frequency": 5
+    },
+    "mains_importance_distribution": {
+      "9_marks": 8,
+      "8_marks": 20,
+      "7_marks": 15,
+      "6_marks": 5,
+      "5_marks": 4
+    },
+    "key_sources": [
+      "Pavneet Singh - International Relations (All chapters)",
+      "NCERT Class 12 Contemporary World Politics (Ch 1-9)",
+      "UPSC PYQ Analysis 2018-2024",
+      "Diplomat and IDSA publications",
+      "Ministry of External Affairs statements",
+      "Government of India official documents"
+    ],
+    "mains_answer_writing_tips": [
+      "Use facts, dates, treaties to substantiate arguments",
+      "Balance principle vs. pragmatism in India's foreign policy",
+      "Draw examples from bilateral/multilateral relationships",
+      "Reference NCERT and Pavneet Singh for credibility",
+      "Connect contemporary developments to policy foundations",
+      "Avoid jargon; use clear, analytical language",
+      "Structure answers with introduction, body (3-4 points), conclusion",
+      "Mention India's official position; don't invent policy",
+      "Use recent events (2023-24) as examples and illustration"
+    ],
+    "preparation_schedule_suggestion": {
+      "phase_1_weeks_1_to_3": "Modules 1-2 (Foundations and South Asia)",
+      "phase_2_weeks_4_to_6": "Modules 3-4 (Major Powers and Indo-Pacific)",
+      "phase_3_weeks_7_to_9": "Modules 5-6 (West Asia/Africa and Multilaterals)",
+      "phase_4_weeks_10_to_12": "Modules 7-8 (Security and Economics)",
+      "phase_5_weeks_13_to_14": "Modules 9-10 (Soft Power and Contemporary)",
+      "revision_weeks_15_to_17": "Topic-wise revision, PYQ practice, current affairs integration"
+    },
+    "exam_day_focus_areas": [
+      "India-China LAC, border diplomacy",
+      "India-Pakistan Kashmir, terrorism",
+      "USA-India strategic partnership",
+      "Russia partnership, Ukraine position",
+      "UNSC reform, G20 leadership",
+      "Economic partnerships (FTAs)",
+      "Climate diplomacy, Loss and Damage",
+      "South China Sea freedom of navigation",
+      "Afghanistan, Pakistan role",
+      "Technology partnerships, semiconductors"
+    ]
+  }
+}

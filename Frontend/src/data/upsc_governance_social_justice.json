@@ -1,0 +1,1576 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 2 - Governance & Social Justice Comprehensive Syllabus",
+    "purpose": "Complete syllabus for MentorsDaily UPSC portal",
+    "total_modules": 9,
+    "estimated_preparation_hours": 200,
+    "gs2_weightage_marks": "40-60 marks per exam",
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Pattern 2023-2026"
+  },
+  "second_arc_reports": {
+    "report_1": "Good Governance and Probity in Public Life",
+    "report_2": "Refurbishing of Personnel Administration - A Philosophy of Governance",
+    "report_3": "Ethics in Governance",
+    "report_4": "Social Capital - A Shared Destiny",
+    "report_5": "Refurbishing Personnel Administration - Cadre Management",
+    "report_6": "Local Governance and Devolution of Powers",
+    "report_7": "State and District Administration",
+    "report_8": "Combating Terrorism and Use of Force",
+    "report_9": "Public Order",
+    "report_10": "Financing of Political Parties and Election Commission",
+    "report_11": "Right to Information and Transparency in Governance",
+    "report_12": "Crisis Management - From Despair to Hope",
+    "report_13": "Separated and Marginalised Groups and Communities",
+    "report_14": "Protecting Children - A Comprehensive Perspective",
+    "report_15": "e-Governance for Improved Service Delivery"
+  },
+  "modules": [
+    {
+      "module_id": "MOD_001",
+      "module_name": "Good Governance Concepts",
+      "topics": [
+        {
+          "topic_id": "MOD_001_T001",
+          "topic_name": "UNDP 8 Characteristics of Good Governance",
+          "primary_source": "2nd ARC Report 1: Good Governance and Probity in Public Life - Recommendations on participatory, transparent, accountable governance structures",
+          "key_concepts": [
+            "Participation - all stakeholders in decision-making processes",
+            "Rule of law - impartial legal framework and enforcement",
+            "Transparency - open information access and decision clarity",
+            "Responsiveness - timely service delivery addressing citizen needs",
+            "Consensus orientation - mediation of diverse interests",
+            "Equity and inclusiveness - all groups represented especially marginalized",
+            "Effectiveness and efficiency - achieving objectives with optimal resource use",
+            "Accountability - decision-makers answerable to public and institutions",
+            "Distinction from governance - governance is broader institutional framework",
+            "Local governance application - PESA 1996, scheduled areas democratic governance",
+            "Devolution principles - 73rd/74th Amendment implementation",
+            "Inter-relationship between characteristics - synergistic effect needed",
+            "India's governance gaps - bureaucratic discretion, corruption, capacity constraints",
+            "Reform measures - RTI, CAG oversight, parliamentary committees",
+            "Citizen engagement - increasing participation through e-platforms"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "National e-Governance Plan (NeGP)",
+              "year": 2006,
+              "objective": "Leverage ICT for governance transformation across center, states, districts",
+              "status": "Ongoing - Mission Mode Projects shifted to Digital India"
+            },
+            "scheme_2": {
+              "name": "Digital India Programme",
+              "year": 2015,
+              "objective": "9 pillars - broadband connectivity, capacity building, e-governance",
+              "status": "Active - integrated with government service delivery"
+            }
+          },
+          "issues_challenges": [
+            "Persistence of discretionary power in bureaucracy",
+            "Corruption and rent-seeking behavior despite reforms",
+            "Low awareness among citizens about participation mechanisms",
+            "Accountability gaps when multiple agencies involved",
+            "Resource constraints in implementing governance reforms"
+          ],
+          "reforms_needed": [
+            "Strengthen institutional checks and balances",
+            "Simplify procedures for citizen grievance redressal",
+            "Capacity building of public officials on governance principles",
+            "Decentralization of authority with accountability mechanisms",
+            "Integration of e-governance with ground-level service delivery"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "8 pillars of good governance and India's implementation status",
+            "Good governance as prerequisite for development and citizen welfare",
+            "Role of transparency and accountability in fighting corruption",
+            "e-Governance as enabler of good governance principles",
+            "Challenges in establishing participatory governance in federal structure"
+          ]
+        },
+        {
+          "topic_id": "MOD_001_T002",
+          "topic_name": "New Public Management vs New Public Service Paradigms",
+          "primary_source": "2nd ARC Report 2: Refurbishing Personnel Administration - Philosophy of Governance - Contrast between service-delivery and citizen-centric approaches",
+          "key_concepts": [
+            "New Public Management - market mechanisms, efficiency, customer service orientation",
+            "NPM critique - reduced equity focus, privatization pressures, citizen as customer",
+            "New Public Service - restoration of democratic values and citizenship",
+            "NPS principles - public interest, democratic governance, social equity",
+            "Public service motivation - intrinsic drivers beyond financial incentives",
+            "Separation of politics and administration - limitations and interdependence",
+            "Hollowing out thesis - erosion of public sector capability through privatization",
+            "Citizen participation vs consumer choice - fundamental difference in approach",
+            "Implementation in Indian context - hybrid model necessity",
+            "Performance management - output vs outcome measures tension",
+            "Accountability mechanisms - different under NPM vs NPS",
+            "Public administration reform - learning from global experiences",
+            "Civil service values - neutrality, impartiality, public interest",
+            "Service delivery quality - standardization vs customization"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Sevottam (Citizen Service Engagement) Model",
+              "year": 2005,
+              "objective": "Implement citizen charter and service standards across government",
+              "status": "Active - adopted by multiple ministries and states"
+            },
+            "scheme_2": {
+              "name": "Mission Karmayogi",
+              "year": 2020,
+              "objective": "Competency-based human resource capacity building for civil servants",
+              "status": "Ongoing - integrated learning platform iGOT Karmayogi launched"
+            }
+          },
+          "issues_challenges": [
+            "Tension between efficiency and equity objectives",
+            "Market-based approaches reducing social protection focus",
+            "Decline in permanent bureaucracy morale and retention",
+            "Blurred accountability in outsourced service delivery",
+            "Resistance to organizational culture change in public agencies"
+          ],
+          "reforms_needed": [
+            "Integrate NPS principles with performance metrics",
+            "Strengthen democratic control over market mechanisms",
+            "Develop context-specific hybrid governance models",
+            "Enhance public service motivation through values-based training",
+            "Balance efficiency with equity and social welfare objectives"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "7/10",
+          "daily_target_hours": 1.2,
+          "mains_answer_angles": [
+            "Strengths and weaknesses of NPM approach in Indian governance",
+            "Relevance of NPS principles for democratic India",
+            "Hybrid models combining best of both approaches",
+            "Impact of paradigm shifts on civil service culture",
+            "Citizen participation vs market efficiency tensions"
+          ]
+        },
+        {
+          "topic_id": "MOD_001_T003",
+          "topic_name": "Regulatory Governance - TRAI, CERC, IRDAI, SEBI",
+          "primary_source": "2nd ARC Report 1: Good Governance - Institutional framework for independent regulation protecting stakeholder interests",
+          "key_concepts": [
+            "Regulatory agencies - need for independence from government and regulated entities",
+            "TRAI (Telecom Regulatory Authority of India) - 1997 - spectrum allocation, tariff regulation",
+            "CERC (Central Electricity Regulatory Commission) - 1998 - tariff, licensing, dispute resolution",
+            "IRDAI (Insurance Regulatory Development Authority) - 1999 - market conduct, consumer protection",
+            "SEBI (Securities Exchange Board of India) - 1988 - investor protection, market integrity",
+            "Board composition - independence criteria, conflict of interest provisions",
+            "Accountability mechanisms - parliamentary oversight, judicial review, transparency",
+            "Regulatory capture risk - regulated entities influencing regulators",
+            "Multi-stakeholder approach - balancing industry, consumer, government interests",
+            "Dispute resolution powers - quasi-judicial authority of regulators",
+            "Tariff-setting principles - cost-plus methodology vs competitive pricing",
+            "Consumer grievance redressal - robust mechanisms and OMBUDSMAN offices",
+            "Sectoral variations - telecom open competition vs electricity regulated tariff",
+            "International coordination - convergence with global regulatory practices"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "TRAI Regulatory Framework",
+              "year": 1997,
+              "objective": "Autonomous regulation of telecom sector, spectrum management, consumer protection",
+              "status": "Active - recent focus on 5G rollout, spectrum auctions, net neutrality"
+            },
+            "scheme_2": {
+              "name": "CERC Regulatory Framework",
+              "year": 1998,
+              "objective": "Federal regulation of interstate electricity transactions and tariffs",
+              "status": "Active - renewables integration, smart grid development"
+            },
+            "scheme_3": {
+              "name": "IRDAI Market Conduct Framework",
+              "year": 2023,
+              "objective": "Protection of policyholders, grievance redressal, regulatory innovation",
+              "status": "Recent reforms - health insurance regulations, Bima Sugam platform"
+            }
+          },
+          "issues_challenges": [
+            "Regulatory capture by powerful industry players",
+            "Conflict between pro-consumer and pro-industry objectives",
+            "Limited appeal mechanisms against regulatory decisions",
+            "Resource constraints affecting regulatory capacity",
+            "Political pressure on independent regulatory decisions"
+          ],
+          "reforms_needed": [
+            "Strengthen independence guarantees through statutory provisions",
+            "Enhance transparency in regulatory decision-making",
+            "Improve technical expertise of regulatory officials",
+            "Develop robust consumer representation mechanisms",
+            "Establish clear appellate processes with reasonable timelines"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Role of independent regulatory agencies in market governance",
+            "Balancing independence with accountability and transparency",
+            "Sectoral regulatory frameworks - comparison across telecom, power, insurance, securities",
+            "Consumer protection mechanisms in regulated sectors",
+            "Challenges of regulatory capture and mitigation strategies"
+          ]
+        },
+        {
+          "topic_id": "MOD_001_T004",
+          "topic_name": "Governance Deficit in India",
+          "primary_source": "2nd ARC Report 1: Good Governance and Probity - Identifies systemic gaps in transparency, accountability, service delivery",
+          "key_concepts": [
+            "Definition - gap between governance principles and ground-level implementation",
+            "Institutional weaknesses - overlapping jurisdictions, accountability gaps",
+            "Discretionary power abuse - inadequate checks on bureaucratic discretion",
+            "Corruption manifestations - petty to systemic, endemic to sectors",
+            "Service delivery failures - delays, quality issues, exclusion of marginalized",
+            "Transparency deficit - information withholding, opaque decision processes",
+            "Participation deficit - limited citizen engagement in governance",
+            "Accountability gap - weak mechanisms for punishing officials",
+            "Resource constraints - insufficient capacity for reform implementation",
+            "Coordination failure - fragmented approach across government levels",
+            "Capacity deficit - skill gaps in public administration",
+            "Trust deficit - erosion of citizen confidence in institutions",
+            "Electoral malpractices - money and muscle power in elections",
+            "Organizational dysfunction - red tape, bureaucratic inertia"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Right to Information Act 2005",
+              "year": 2005,
+              "objective": "Enhance transparency and accountability through information access",
+              "status": "Active - over 50 lakh RTI applications filed annually"
+            },
+            "scheme_2": {
+              "name": "e-Governance initiatives",
+              "year": 2006,
+              "objective": "Use technology to reduce discretion, improve efficiency, transparency",
+              "status": "Ongoing - rapid expansion through Digital India Programme"
+            }
+          },
+          "issues_challenges": [
+            "Systemic nature - deficits rooted in institutional design",
+            "Multiple causes - capacity, incentives, accountability structures",
+            "Resistance to change - vested interests in existing systems",
+            "Resource constraints - limited funding for reforms",
+            "Federal complexity - coordination across center-state-local"
+          ],
+          "reforms_needed": [
+            "Strengthen institutional independence - statutory protections",
+            "Enhance transparency through e-governance and RTI",
+            "Develop robust accountability mechanisms - Lokpal, CAG",
+            "Improve service delivery design - citizen-centric approach",
+            "Invest in capacity building - training, technology, infrastructure"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "Nature and extent of governance deficit in Indian context",
+            "Root causes - institutional, behavioral, structural factors",
+            "Manifestations across sectors - health, education, infrastructure",
+            "Impact on development outcomes and social welfare",
+            "Strategies for addressing governance deficit - comprehensive approach needed"
+          ]
+        },
+        {
+          "topic_id": "MOD_001_T005",
+          "topic_name": "National e-Governance Plan - Components and Implementation",
+          "primary_source": "2nd ARC Report 15: e-Governance for Improved Service Delivery - Framework for integrating ICT across governance",
+          "key_concepts": [
+            "NeGP pillars - mission mode projects, service delivery, infrastructure",
+            "Mission Mode Projects - core e-governance implementations across sectors",
+            "Service delivery portals - single-window systems, integrated databases",
+            "Infrastructure layer - broadband connectivity, data centers, security",
+            "Capacity building - digital literacy, skill development programs",
+            "Legal framework - Digital Signature Act, IT Act 2000, data protection",
+            "G2C services - citizen access to government services online",
+            "G2B services - business registration, licensing, compliance",
+            "G2E services - employee management, pension systems",
+            "G2G services - inter-government communication and coordination",
+            "Open Government Data - public access to government datasets",
+            "Standards and interoperability - ensuring system connectivity",
+            "Security and cybersecurity - protection of government and citizen data",
+            "Change management - transition from paper to digital processes"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "National e-Governance Plan",
+              "year": 2006,
+              "objective": "Transform governance through ICT - reduce corruption, improve efficiency, enhance service delivery",
+              "status": "Evolved into Digital India Programme 2015"
+            },
+            "scheme_2": {
+              "name": "Digital India - 9 Pillars",
+              "year": 2015,
+              "objective": "Broadband, digital literacy, e-governance, e-services, public database, cybersecurity",
+              "status": "Ongoing - integrated approach across government"
+            },
+            "scheme_3": {
+              "name": "Government e-Marketplace (GeM)",
+              "year": 2016,
+              "objective": "Online procurement platform eliminating middlemen, ensuring transparency",
+              "status": "Active - over 50 lakh vendors, transactions exceeding 5 lakh crores"
+            }
+          },
+          "issues_challenges": [
+            "Digital divide - rural areas lacking connectivity infrastructure",
+            "Adoption barriers - resistance from officials, low digital literacy",
+            "Legacy systems incompatibility - difficulty in data migration",
+            "Cybersecurity vulnerabilities - data breaches and unauthorized access",
+            "Last-mile delivery gaps - technology not reaching poorest beneficiaries"
+          ],
+          "reforms_needed": [
+            "Expand broadband connectivity to underserved areas",
+            "Mandatory digital literacy programs for officials and citizens",
+            "Strengthen cybersecurity frameworks and regular audits",
+            "Integrate offline service delivery with online systems",
+            "Community-based support for technology adoption"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "e-Governance as tool for reducing corruption and improving transparency",
+            "Role of technology in enhancing service delivery efficiency",
+            "Digital India integration with e-governance objectives",
+            "Challenges of implementing technology-driven governance in India",
+            "Citizens' rights and data protection in digital governance systems"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_002",
+      "module_name": "Civil Services & Administrative Reforms",
+      "topics": [
+        {
+          "topic_id": "MOD_002_T001",
+          "topic_name": "IAS, IPS, IFS - Recruitment, Training, Career Structure",
+          "primary_source": "2nd ARC Report 2: Refurbishing Personnel Administration - Cadre Management recommendations for civil service excellence",
+          "key_concepts": [
+            "UPSC recruitment - eligibility, CSE examination pattern, selection process",
+            "IAS cadre - generalist civil service, all-India deployment, hierarchy",
+            "IPS cadre - law enforcement, paramilitary command, specialized units",
+            "IFS cadre - diplomatic service, international negotiations, cultural representation",
+            "Training institutions - LBSNAA, NIMA, FIA for foundational courses",
+            "In-service training - mid-career courses, specialized programs, foreign deputation",
+            "Seniority systems - promotion based on seniority with merit assessment",
+            "Career progression - from Group A to senior positions, lateral moves possible",
+            "Deputation - temporary transfer to other organizations for experience",
+            "Superannuation rules - retirement at 60 years, extension provisions",
+            "Performance appraisal - APAR system, confidential reports",
+            "Separation from service - grounds, procedures, appeals mechanism",
+            "Cadre management - state cadre, inter-cadre movements",
+            "Emoluments and benefits - pay scales, allowances, pension"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Civil Services Examination",
+              "year": 1921,
+              "objective": "Competitive selection of meritorious candidates for civil services",
+              "status": "Annual - over 10 lakh aspirants, multiple attempts allowed"
+            },
+            "scheme_2": {
+              "name": "Lal Bahadur Shastri National Academy of Administration",
+              "year": 1959,
+              "objective": "Foundational training for IAS officers, inculcate public service values",
+              "status": "Ongoing - curriculum reformed regularly, international exposure"
+            }
+          },
+          "issues_challenges": [
+            "Generalist-specialist debate - whether generalists adequate for complex governance",
+            "Seniority vs merit tension - inflexible promotion systems",
+            "Representation gaps - dominated by certain social groups",
+            "Motivation decline - poor morale, brain drain to private sector",
+            "Accountability gaps - difficult to hold senior officials accountable"
+          ],
+          "reforms_needed": [
+            "Introduce functional specialization in civil service careers",
+            "Strengthen merit-based performance appraisal and promotion",
+            "Increase diversity through targeted recruitment and training",
+            "Improve compensation and working conditions",
+            "Establish clear accountability mechanisms"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Civil service as backbone of good governance",
+            "Recruitment, training, career management - current system and reforms",
+            "Challenges of bureaucratic autonomy and democratic accountability",
+            "Role of civil services in policy formulation and implementation",
+            "Representation and diversity in civil services"
+          ]
+        },
+        {
+          "topic_id": "MOD_002_T002",
+          "topic_name": "Generalist vs Specialist Debate",
+          "primary_source": "2nd ARC Report 2: Refurbishing Personnel Administration - Analysis of generalist tradition vs specialized expertise requirement",
+          "key_concepts": [
+            "Generalist tradition - Indian civil service heritage, broader perspective",
+            "Generalist advantages - flexibility, wider understanding, adaptability",
+            "Generalist limitations - insufficient technical depth, complex policy errors",
+            "Specialist requirements - technical domains need domain expertise",
+            "Specialist advantages - deeper knowledge, better implementation, quality",
+            "Specialist risks - narrow perspective, lack of policy breadth",
+            "Functional specialization - creating specialized cadres within IAS",
+            "Technical bureaucracy - IIFC, forest service, engineering services",
+            "Inter-cadre coordination - specialists working under generalist administrators",
+            "International models - US civil service, UK system comparisons",
+            "Hybrid approaches - specialist tracks within general cadre",
+            "Training for generalists - how to develop technical understanding",
+            "Lateral entry - specialized professionals from private sector",
+            "Policy formulation - generalist role in translating specialist input"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Indian Agricultural Service, Indian Forest Service (Specialized cadres)",
+              "year": 1947,
+              "objective": "Specialized administration in agriculture and forestry sectors",
+              "status": "Ongoing - parallel to generalist IAS cadre"
+            },
+            "scheme_2": {
+              "name": "Lateral Entry for IAS",
+              "year": 2019,
+              "objective": "Bring specialized expertise into generalist cadre",
+              "status": "Implemented - appointments made annually in select ministries"
+            }
+          },
+          "issues_challenges": [
+            "Career progression barriers for specialists within generalist system",
+            "Coordination issues between generalists and specialists",
+            "Dual hierarchies creating confusion and conflicts",
+            "Generalist preponderance limiting specialist influence",
+            "Resistance to specialist-led decision making"
+          ],
+          "reforms_needed": [
+            "Create clearer functional specialization track within civil service",
+            "Develop specialized expertise certifications",
+            "Ensure specialist participation in policy formulation",
+            "Promote inter-cadre coordination mechanisms",
+            "Value technical expertise in performance appraisal"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "7/10",
+          "daily_target_hours": 1.2,
+          "mains_answer_angles": [
+            "Historical context of generalist tradition in Indian civil service",
+            "Adequacy of generalist approach for modern governance challenges",
+            "Case for specialized expertise in technical domains",
+            "Integrating generalists and specialists - best practices",
+            "Impact on policy quality and implementation effectiveness"
+          ]
+        },
+        {
+          "topic_id": "MOD_002_T003",
+          "topic_name": "APAR System - Performance Appraisal of Civil Servants",
+          "primary_source": "2nd ARC Report 2: Refurbishing Personnel Administration - Need for objective, transparent performance assessment",
+          "key_concepts": [
+            "APAR (Annual Performance Appraisal Report) - annual evaluation of officers",
+            "Confidentiality issue - appraisals kept secret from appraisees",
+            "Reporting officers - immediate superior provides assessment",
+            "Countersigning authority - review and verification of reports",
+            "Performance criteria - competence, ability, character, conduct, health",
+            "Rating system - numerical scale, comparative ranking",
+            "Self-assessment - officer's own evaluation (limited use)",
+            "Visibility period - year-long observation before assessment",
+            "Grievance redressal - limited appeal mechanisms against appraisals",
+            "Promotion implications - APAR scores influence career progression",
+            "Subjectivity concerns - potential for bias, favoritism",
+            "360-degree feedback - multi-rater approach (limited adoption)",
+            "Comparative ranking issues - zero-sum promotion competitions",
+            "Performance incentives - linking APAR to career advancement"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "APAR Reform Initiative",
+              "year": 2023,
+              "objective": "Make APAR more transparent, objective, focused on competencies",
+              "status": "Proposed - recommendations pending implementation"
+            },
+            "scheme_2": {
+              "name": "Mission Karmayogi Competency Framework",
+              "year": 2020,
+              "objective": "Develop competency-based appraisal linked to performance",
+              "status": "Ongoing - integration with APAR under discussion"
+            }
+          },
+          "issues_challenges": [
+            "Lack of transparency - officers not shown their appraisals",
+            "Subjectivity - personal preferences influencing assessments",
+            "Compartmentalization - comparing officers across different roles",
+            "Limited appeal - weak grievance mechanisms",
+            "Morale impact - demotivation from subjective assessments"
+          ],
+          "reforms_needed": [
+            "Transparency - provide feedback to appraisees",
+            "Objective criteria - competency-based, behavioral indicators",
+            "Multi-rater system - 360-degree feedback implementation",
+            "Robust appeals - independent review of contested appraisals",
+            "Link to learning - development plans from performance gaps"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "6/10",
+          "daily_target_hours": 1,
+          "mains_answer_angles": [
+            "Current APAR system - strengths and limitations",
+            "Link between performance appraisal and career progression",
+            "Transparency vs confidentiality tension in appraisal systems",
+            "International comparisons - 360-degree feedback models",
+            "Role of appraisals in accountability and performance improvement"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_003",
+      "module_name": "Transparency & Accountability",
+      "topics": [
+        {
+          "topic_id": "MOD_003_T001",
+          "topic_name": "Right to Information Act 2005 - Provisions and Exemptions",
+          "primary_source": "2nd ARC Report 11: Right to Information and Transparency in Governance - Framework for public access to government information",
+          "key_concepts": [
+            "RTI Act 2005 - statutory right to information held by government agencies",
+            "Applicability - extends to central, state governments and public authorities",
+            "Application process - written request to Public Information Officer (PIO)",
+            "Timeline - 30 days for response, 48 hours for urgent matters",
+            "Fees - minimal charge, nominal rupee per page, appeals processing",
+            "Section 8 exemptions - information compromising sovereignty, national security",
+            "Section 8(1)(a) - national security and diplomatic relations",
+            "Section 8(1)(b) - strategic economic interests and trade secrets",
+            "Section 8(1)(d) - Cabinet papers and internal government deliberations",
+            "Section 8(1)(e) - information that violates privacy or causes bodily harm",
+            "Section 8(1)(j) - information in fiduciary relationship (banking, insurance)",
+            "Section 9 exemptions - information given in confidence by other entities",
+            "Privacy dimension - balancing transparency with personal data protection",
+            "Proactive disclosure - government's duty to proactively publish information",
+            "Third-party information - consent requirements before disclosure"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Right to Information Act 2005",
+              "year": 2005,
+              "objective": "Enable citizens to access government information, enhance transparency",
+              "status": "Active - over 50 lakh applications annually across center and states"
+            },
+            "scheme_2": {
+              "name": "Open Government Data Portal",
+              "year": 2013,
+              "objective": "Proactive disclosure of government datasets for public use",
+              "status": "Ongoing - expanding datasets across ministries"
+            }
+          },
+          "issues_challenges": [
+            "Implementation gaps - slow responses, incomplete information provided",
+            "Exemption abuse - excessive use of Section 8 exemptions",
+            "Privacy conflicts - tension between transparency and data protection",
+            "Third-party issues - difficulty in handling third-party information",
+            "Capacity constraints - insufficient PIO training and resources"
+          ],
+          "reforms_needed": [
+            "Strict timelines enforcement - penalties for delays",
+            "Narrow exemptions - interpretation against public interest",
+            "Proactive disclosure - more government information published upfront",
+            "Appeal mechanisms - streamlined, faster appellate process",
+            "Capacity building - training for PIOs and appeals officers"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "RTI as transparency mechanism and its role in accountability",
+            "Balance between public interest and legitimate exemptions",
+            "Impact of RTI on government functioning and citizen participation",
+            "Implementation challenges and remedies",
+            "Integration with data protection frameworks - DPDP Act 2023"
+          ]
+        },
+        {
+          "topic_id": "MOD_003_T002",
+          "topic_name": "RTI Amendment 2019 and Information Commissioner Tenure Controversy",
+          "primary_source": "2nd ARC Report 11: Right to Information - Strength of Information Commission as independent institution",
+          "key_concepts": [
+            "RTI Amendment 2019 - controversial changes to Information Commission functioning",
+            "CIC tenure change - fixed 5-year term instead of until age 65",
+            "Removal provisions - amendments to dismissal procedures",
+            "Independence implications - reduced security of tenure affects decisions",
+            "Finance Commission impact - government control over salary structure",
+            "Debate on amendments - criticism from transparency advocates",
+            "Counter-arguments - need for reviewing commission's decisions",
+            "Comparative analysis - tenure provisions in other countries",
+            "Impact on RTI culture - chilling effect on information disclosure",
+            "Subsequent developments - continuation of controversy",
+            "State Information Commissions - less affected, more variation",
+            "Judicial intervention - challenges in higher courts",
+            "International criticism - pressure from transparency organizations",
+            "Reversibility - calls for amendments to restore independence"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "RTI Amendment 2019",
+              "year": 2019,
+              "objective": "Regulatory changes to Information Commission structure",
+              "status": "Implemented - remains controversial, challenged in courts"
+            }
+          },
+          "issues_challenges": [
+            "Perceived reduction in CIC independence",
+            "Uncertainty about career security affects decision-making",
+            "Potential bias toward government interests",
+            "Increased political influence over transparency decisions",
+            "International pressure and credibility concerns"
+          ],
+          "reforms_needed": [
+            "Restore enhanced tenure security for Information Commissioners",
+            "Constitutional amendment protecting CIC independence",
+            "Transparent appointment process with multi-stakeholder involvement",
+            "Enhanced accountability without compromising independence",
+            "Strengthen state Information Commissions"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "RTI Amendment 2019 - rationale and criticism",
+            "Independence of Information Commissions - importance and threats",
+            "Impact on RTI effectiveness and transparency culture",
+            "Tension between government oversight and institutional autonomy",
+            "Comparative position with other constitutional institutions"
+          ]
+        },
+        {
+          "topic_id": "MOD_003_T003",
+          "topic_name": "Lokpal and Lokayukta - Anti-Corruption Framework",
+          "primary_source": "2nd ARC Report 1: Good Governance and Probity in Public Life - Institutional mechanisms for public probity",
+          "key_concepts": [
+            "Lokpal concept - parliamentary ombudsman for government corruption",
+            "Lokayukta - state-level anti-corruption authority",
+            "Lokpal Act 2013 - statutory framework for central Lokpal",
+            "Applicability - Lokpal investigates Prime Minister, ministers, MPs, civil servants",
+            "Structure - Lokpal Chairperson plus members (judges, civil servants, eminent persons)",
+            "Jurisdiction conflicts - coordination with CBI, state authorities",
+            "Prosecution procedures - cases referred to CBI for investigation",
+            "Powers - investigation authority, complaint receiving, report submission",
+            "Complaints process - public complaints about corruption",
+            "Immunity provisions - protection from baseless complaints",
+            "Bench strength - inadequate number of benches affecting case disposal",
+            "Lokayukta establishment - state version with varying frameworks",
+            "Delay issues - long investigation and prosecution timelines",
+            "Comparison with Ombudsman - different models in different countries"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Lokpal Institution",
+              "year": 2013,
+              "objective": "Independent mechanism to investigate corruption by government officials",
+              "status": "Operational - yet to achieve full bench strength, pending criminal prosecutions"
+            },
+            "scheme_2": {
+              "name": "Lokayukta Institutions",
+              "year": 2013,
+              "objective": "State-level parallel to Lokpal for investigating state government corruption",
+              "status": "Operational in most states - varying efficiency and resources"
+            }
+          },
+          "issues_challenges": [
+            "Bench strength shortage - delays in case processing",
+            "CBI referral system - creates gaps, prosecution delays",
+            "Immunity implications - officers may take actions with impunity",
+            "Federal coordination - center-state conflicts",
+            "Resource constraints - limited investigation capacity"
+          ],
+          "reforms_needed": [
+            "Enhance Lokpal and Lokayukta bench strength",
+            "Direct prosecution authority - reduce CBI reliance",
+            "Streamline immunity provisions - prevent abuse",
+            "Improve federal coordination mechanisms",
+            "Technology integration for investigation efficiency"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Lokpal as institutional mechanism for fighting corruption",
+            "Comparison of Lokpal and Lokayukta - effectiveness differences",
+            "Limitations of current framework - bench strength, prosecution delays",
+            "International comparisons - ombudsman institutions elsewhere",
+            "Role in ensuring accountability of government officials"
+          ]
+        },
+        {
+          "topic_id": "MOD_003_T004",
+          "topic_name": "CAG - Audit, Accountability and Parliamentary Role",
+          "primary_source": "2nd ARC Report 1: Good Governance - CAG as institutional pillar of accountability",
+          "key_concepts": [
+            "CAG (Comptroller and Auditor General) - constitutional authority (Article 148)",
+            "Appointment - by President on recommendation of Prime Minister",
+            "Tenure - 6 years or until age 65, whichever earlier",
+            "Independence - protected through constitutional provisions",
+            "Functions - audit of accounts, legality check, propriety audit",
+            "Financial audit - verification of government expenditure legitimacy",
+            "Compliance audit - checking adherence to rules and procedures",
+            "Performance audit - efficiency and effectiveness of programs",
+            "Standards - follows INTOSAI (International Organization of Supreme Audit Institutions)",
+            "Reporting - submits reports to Parliament, published as public documents",
+            "Parliamentary scrutiny - reports examined by PAC (Public Accounts Committee)",
+            "Enforcement - recommendations but not direct enforcement authority",
+            "Limitations - forensic investigation beyond scope, depends on agencies",
+            "Evolution - expanded scope from financial to performance auditing"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "CAG Institution",
+              "year": 1860,
+              "objective": "Ensure public accountability through independent audit of government accounts",
+              "status": "Operational - constitutional authority, reports tabled in Parliament"
+            }
+          },
+          "issues_challenges": [
+            "Delayed reporting - time lag between audit and parliamentary discussion",
+            "Non-implementation - recommendations often not acted upon",
+            "Limited follow-up - no mechanism to ensure corrective action",
+            "Resource constraints - insufficient audit staff for vast government",
+            "Scope limitations - cannot investigate criminal aspects"
+          ],
+          "reforms_needed": [
+            "Faster reporting cycles - reduce audit-to-report timelines",
+            "Mandatory action plans - government must respond to recommendations",
+            "Follow-up mechanism - track implementation of CAG recommendations",
+            "Capacity enhancement - audit staff and technical resources",
+            "Coordination with anti-corruption agencies - CAG-CBI-CID linkage"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "CAG as pillar of parliamentary accountability",
+            "Evolution from financial to performance audit",
+            "Effectiveness of audit system in ensuring government accountability",
+            "Challenges in CAG implementation and remedies",
+            "Coordination with Parliamentary oversight mechanisms"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_004",
+      "module_name": "e-Governance & Digital Governance",
+      "topics": [
+        {
+          "topic_id": "MOD_004_T001",
+          "topic_name": "Digital India Programme and e-Governance Models",
+          "primary_source": "2nd ARC Report 15: e-Governance for Improved Service Delivery - G2C, G2B, G2G, G2E service delivery transformation",
+          "key_concepts": [
+            "G2C (Government-to-Citizen) services - bill payment, licenses, certificates",
+            "G2B (Government-to-Business) - registration, permits, compliance",
+            "G2G (Government-to-Government) - inter-ministry data sharing",
+            "G2E (Government-to-Employee) - payroll, benefits, leave management",
+            "Digital India 9 pillars - broadband, literacy, services, e-governance",
+            "UMANG platform - 1400+ services, single portal access",
+            "Aadhaar integration - unique ID enabling seamless service access",
+            "Mobile governance - m-governance expanding through smartphones",
+            "AI and automation - predictive analytics, process automation",
+            "Blockchain applications - transparency and immutability",
+            "Cloud infrastructure - scalable, cost-effective government IT",
+            "Cybersecurity hardening - data protection, vulnerability management",
+            "Digital literacy - capacity building for citizens and officials",
+            "Service quality benchmarking - citizen satisfaction metrics"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Digital India Programme",
+              "year": 2015,
+              "objective": "Digitally empowered society through broadband, literacy, e-services",
+              "status": "Ongoing"
+            },
+            "scheme_2": {
+              "name": "UMANG Portal",
+              "year": 2017,
+              "objective": "Single access point for 1400+ government services",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Digital divide - rural connectivity gaps",
+            "Cybersecurity threats",
+            "Legacy system integration",
+            "Accessibility barriers"
+          ],
+          "reforms_needed": [
+            "Universal broadband access",
+            "Digital literacy programs",
+            "Cybersecurity strengthening",
+            "WCAG accessibility standards"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Digital India as governance transformation",
+            "e-Governance service delivery models",
+            "Technology-enabled transparency",
+            "Last-mile challenges"
+          ]
+        },
+        {
+          "topic_id": "MOD_004_T002",
+          "topic_name": "Aadhaar and Data Protection Framework",
+          "primary_source": "2nd ARC Report 15: e-Governance - Unique identification as service delivery enabler with privacy safeguards",
+          "key_concepts": [
+            "Aadhaar - 12-digit unique identity for 130+ crore people",
+            "UIDAI authority - issuance, security, grievance redressal",
+            "Biometric authentication - iris, fingerprint collection",
+            "JAM Trinity - Jan Dhan, Aadhaar, Mobile financial inclusion",
+            "DBT system - Direct Benefit Transfer using Aadhaar",
+            "SC 2018 judgment - balance privacy with necessity",
+            "Section 57 controversy - private sector access restrictions",
+            "Linkage mandates - bank, PAN, mobile, ration card integration",
+            "Authentication failures - exclusion of poor in service delivery",
+            "Data security - CIDR encryption, breach incidents",
+            "DPDP Act 2023 - data protection provisions and exemptions",
+            "Consent mechanisms - explicit opt-in requirements",
+            "International models - comparison with other ID systems",
+            "Surveillance risks - potential for state tracking"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Aadhaar Identification",
+              "year": 2009,
+              "objective": "Unique ID for service delivery and financial inclusion",
+              "status": "Operational"
+            },
+            "scheme_2": {
+              "name": "JAM Trinity",
+              "year": 2015,
+              "objective": "Financial inclusion through account-identity-mobile nexus",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Privacy concerns",
+            "Data security risks",
+            "Exclusion from authentication failures",
+            "Linkage controversies"
+          ],
+          "reforms_needed": [
+            "DPDP Act enforcement",
+            "Private sector access regulation",
+            "Authentication improvement",
+            "Transparency in data breaches"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "Aadhaar as game-changer for DBT",
+            "SC 2018 judgment implications",
+            "Privacy-efficiency balance",
+            "Data protection integration"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_005",
+      "module_name": "Welfare Schemes & Social Justice",
+      "topics": [
+        {
+          "topic_id": "MOD_005_T001",
+          "topic_name": "Welfare Design - Universalism vs Targeting and Leakages",
+          "primary_source": "2nd ARC Report 4: Social Capital - A Shared Destiny - Framework for inclusive welfare delivery with minimal wastage",
+          "key_concepts": [
+            "Universal approach - covering all, ensuring certainty, reducing stigma",
+            "Targeting approach - concentrating on poorest, fiscal efficiency",
+            "Design trade-offs - cost vs coverage comprehensiveness",
+            "Inclusion-exclusion errors - false positives and negatives",
+            "Leakage sources - corruption, misadministration, design gaps",
+            "MGNREGA - universal employment guarantee model",
+            "PDS - mixed universal-targeted food security",
+            "Technology reduction - Aadhaar, DBT limiting corruption",
+            "Last-mile delivery - beneficiary awareness and access barriers",
+            "Intermediary discretion - local officials' gatekeeping role",
+            "Fiscal sustainability - balancing welfare and budget",
+            "Hybrid models - combining universal and targeted elements",
+            "Monitoring mechanisms - tracking benefit reach",
+            "Social audit - beneficiary participation and accountability"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "MGNREGA",
+              "year": 2005,
+              "objective": "Guarantee rural employment - universal right-based approach",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "Public Distribution System",
+              "year": 1965,
+              "objective": "Subsidized food security - mixed approach",
+              "status": "Ongoing"
+            }
+          },
+          "issues_challenges": [
+            "High leakage rates",
+            "Targeting complexity",
+            "Exclusion errors",
+            "Administrative costs"
+          ],
+          "reforms_needed": [
+            "Technology integration",
+            "Data quality improvement",
+            "Transparency in beneficiary lists",
+            "Grievance mechanisms"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Design trade-offs in welfare",
+            "Leakage mitigation strategies",
+            "Technology role in reducing wastage",
+            "Fiscal sustainability of programs"
+          ]
+        },
+        {
+          "topic_id": "MOD_005_T002",
+          "topic_name": "Health and Education Schemes",
+          "primary_source": "2nd ARC Report 14: Protecting Children and Public Health - Comprehensive access to essential services",
+          "key_concepts": [
+            "RTE Act 2009 - constitutional right to free, compulsory education 6-14",
+            "Samagra Shiksha - integrated school education scheme",
+            "NEP 2020 - 5+3+3+4 structural reform",
+            "PM POSHAN - nutrition scheme with mid-day meals",
+            "Teacher quality - DIET training, NCTE standards",
+            "Digital learning - AI, MOOCs, online education",
+            "Assessment reform - continuous evaluation over board exams",
+            "Ayushman Bharat PMJAY - 5 lakh health coverage",
+            "HWCs - Health and Wellness Centers primary care",
+            "CDSCO - drug regulation and quality assurance",
+            "NHM - National Health Mission coordination",
+            "Mental Health Act 2017 - mental healthcare as right",
+            "NMC 2019 - replaced MCI with autonomous regulation",
+            "Telemedicine - remote service delivery expansion"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Samagra Shiksha",
+              "year": 2018,
+              "objective": "Integrated school education from pre-primary to secondary",
+              "status": "Ongoing"
+            },
+            "scheme_2": {
+              "name": "Ayushman Bharat",
+              "year": 2018,
+              "objective": "Health coverage and wellness centers",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Infrastructure gaps",
+            "Teacher shortage",
+            "Quality of care concerns",
+            "Digital divide"
+          ],
+          "reforms_needed": [
+            "Fiscal investment",
+            "Capacity building",
+            "Outcome focus",
+            "Equity in access"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "RTE implementation challenges",
+            "NEP 2020 radical reforms",
+            "Health access universalization",
+            "Quality vs coverage balance"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_006",
+      "module_name": "Vulnerable Sections - SC/ST/OBC",
+      "topics": [
+        {
+          "topic_id": "MOD_006_T001",
+          "topic_name": "Constitutional Provisions and Reservation Framework",
+          "primary_source": "2nd ARC Report 13: Separated and Marginalised Groups - Constitutional protections for historical remediation",
+          "key_concepts": [
+            "Article 15 - non-discrimination on caste grounds",
+            "Article 15(4) - special provisions for SC/ST advancement",
+            "Article 16(4) - public employment reservation",
+            "Article 17 - untouchability abolition",
+            "Article 46 - state duty for SC/ST welfare",
+            "Article 338 - National Commission for SCs",
+            "Article 338A - National Commission for STs",
+            "Article 338B - National Commission for OBCs",
+            "Reservation scope - services, education, promotions",
+            "50% ceiling - total reservation cap (with exceptions)",
+            "Mandal Commission - 27% OBC reservation",
+            "Indra Sawhney judgment - constitutional validation",
+            "103rd Amendment - 10% EWS reservation",
+            "Creamy layer - income exclusion criteria"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "SC/ST Reservation",
+              "year": 1950,
+              "objective": "Constitutional reservation for SC/ST advancement",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "National Commission for SCs/STs",
+              "year": 1990,
+              "objective": "Investigate grievances, review programs",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Implementation gaps",
+            "Upper caste resistance",
+            "Promotion quota limits"
+          ],
+          "reforms_needed": [
+            "Enhanced promotion reservations",
+            "Commission strengthening",
+            "Data accuracy"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "Constitutional basis",
+            "Reservation scope and limits",
+            "Judicial interpretation",
+            "Implementation variations"
+          ]
+        },
+        {
+          "topic_id": "MOD_006_T002",
+          "topic_name": "OBC Reservation and Mandal Commission",
+          "primary_source": "2nd ARC Report 13: Separated Groups - Backward classes identification and socioeconomic advancement",
+          "key_concepts": [
+            "Mandal Commission 1980 - backward classes survey",
+            "27% OBC reservation - public services and education",
+            "Backward class definition - educational, economic, social criteria",
+            "2600+ castes - OBC list notification",
+            "Creamy layer concept - exclusion of advanced members",
+            "Mandal implementation 1990 - social upheaval, protests",
+            "Indra Sawhney judgment - upheld quota with creamy layer",
+            "Income thresholds - periodic updates needed",
+            "State variations - TN 69%, some states lower",
+            "Private sector - excluded from OBC benefits",
+            "Inter-OBC conflicts - status competition within castes",
+            "Promotion quota - limited SC/ST/OBC advancement",
+            "103rd Amendment - EWS 10% for economically weaker",
+            "Grievance mechanisms - NCOB investigation powers"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "OBC Reservation System",
+              "year": 1990,
+              "objective": "27% reservation for socioeconomically backward classes",
+              "status": "Ongoing"
+            },
+            "scheme_2": {
+              "name": "National Commission for OBCs",
+              "year": 2017,
+              "objective": "Statutory commission for OBC grievances and list management",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Creamy layer definition outdated",
+            "OBC list verification lacking",
+            "Private sector exclusion",
+            "Promotion quota limits"
+          ],
+          "reforms_needed": [
+            "Updated income thresholds",
+            "Rationalized OBC list",
+            "Private sector engagement",
+            "Litigation reduction"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "Mandal recommendations and implementation",
+            "Creamy layer concept evolution",
+            "Judicial approach to reservations",
+            "Social impact of OBC quotas"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_007",
+      "module_name": "Women, Children & Minority Rights",
+      "topics": [
+        {
+          "topic_id": "MOD_007_T001",
+          "topic_name": "Women's Rights and Protection Laws",
+          "primary_source": "2nd ARC Report 14: Protecting Children - Comprehensive framework for gender justice and women's safety",
+          "key_concepts": [
+            "Domestic Violence Act 2005 - civil and criminal remedies",
+            "POSH Act 2013 - workplace sexual harassment prevention",
+            "Dowry Prohibition Act 1961 - regulates dowry practice",
+            "Pre-conception Pre-natal Diagnostic Act 1994 - gender-selective abortion prevention",
+            "Women's Reservation Act 2023 - 106th Amendment for 33% parliamentary seats",
+            "National Commission for Women - grievance investigation, advocacy",
+            "One-stop centers - integrated support for violence survivors",
+            "Beti Bachao Beti Padhao - girl child protection and education",
+            "Mahila Shakti Kendra - women's empowerment at grassroots",
+            "Sexual harassment definition - expanding scope of workplace protections",
+            "Victim support services - counseling, legal aid, rehabilitation",
+            "Intersectionality - addressing discrimination by caste, religion, sexuality",
+            "Implementation gaps - low conviction rates in gender violence cases",
+            "Awareness campaigns - behavior change communication"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Women's Reservation Act 2023",
+              "year": 2023,
+              "objective": "33% reservation in Lok Sabha and state assemblies",
+              "status": "Implementing"
+            },
+            "scheme_2": {
+              "name": "Beti Bachao Beti Padhao",
+              "year": 2015,
+              "objective": "Girl child protection, education, economic independence",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Low conviction in violence cases",
+            "Implementation gaps",
+            "Social resistance",
+            "Awareness deficit"
+          ],
+          "reforms_needed": [
+            "Faster prosecution",
+            "Training judicial officers",
+            "Support services expansion",
+            "Community engagement"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Gender justice through legal framework",
+            "Women's safety and empowerment",
+            "Barriers to implementation",
+            "Intersectional approach needed"
+          ]
+        },
+        {
+          "topic_id": "MOD_007_T002",
+          "topic_name": "Child Protection Framework",
+          "primary_source": "2nd ARC Report 14: Protecting Children - Comprehensive Perspective - Rights-based approach to child welfare",
+          "key_concepts": [
+            "POCSO Act 2012 - sexual offenses against children",
+            "JJ Act 2015 - juvenile justice and child welfare",
+            "NCR provisions - child marriage, trafficking prevention",
+            "Child Labor Prohibition Act 2016 - hazardous work bans",
+            "NCPCR - statutory authority for child rights",
+            "CHILDLINE 1098 - emergency helpline for distressed children",
+            "Best interests doctrine - child welfare prioritized in decisions",
+            "Alternative care - foster, institutional, community care options",
+            "Education rights - access to quality education",
+            "Health and nutrition - ICDS, nutrition programs",
+            "PENCIL portal - child labor monitoring system",
+            "Rehabilitation services - trauma counseling, vocational training",
+            "Prevention strategies - awareness, community mobilization",
+            "Data collection - improving information on child abuse"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Juvenile Justice Act 2015",
+              "year": 2015,
+              "objective": "Child-centered justice system, rehabilitation focus",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "POCSO Act 2012",
+              "year": 2012,
+              "objective": "Special protections against sexual offenses",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Overburdened system",
+            "Inadequate rehabilitation",
+            "Implementation inconsistency",
+            "Resource constraints"
+          ],
+          "reforms_needed": [
+            "Specialized trained personnel",
+            "Better infrastructure",
+            "Community support",
+            "Outcome monitoring"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Child rights as fundamental",
+            "Protection mechanisms and gaps",
+            "Rehabilitation vs punishment",
+            "Role of civil society"
+          ]
+        },
+        {
+          "topic_id": "MOD_007_T003",
+          "topic_name": "Minority Rights and Religious Freedoms",
+          "primary_source": "2nd ARC Report 13: Separated Groups - Constitutional protections for religious and linguistic minorities",
+          "key_concepts": [
+            "Article 29 - minority rights to culture, language",
+            "Article 30 - minority educational institution rights",
+            "Minority definition - numerical and constitutional",
+            "Linguistic minorities - regional language protection",
+            "Religious freedom - Article 25-28, freedom of conscience",
+            "Personal law - faith-based family law systems",
+            "Waqf Amendment Act 2024 - controversial property management changes",
+            "Minority Commission - grievance investigation, advocacy",
+            "Communal violence - prevention and prosecution",
+            "Interfaith dialogue - promoting coexistence",
+            "Hate speech laws - balancing expression and protection",
+            "Data collection - mapping minority concerns",
+            "Educational access - minority institutions support",
+            "Employment discrimination - addressing exclusion"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Waqf Act 1995",
+              "year": 1995,
+              "objective": "Manage religious endowments, protect minority property",
+              "status": "Amendment 2024 controversial"
+            },
+            "scheme_2": {
+              "name": "Minority Commission",
+              "year": 1992,
+              "objective": "Investigate complaints, report on minority welfare",
+              "status": "Active"
+            }
+          },
+          "issues_challenges": [
+            "Waqf amendment controversy",
+            "Communal violence",
+            "Employment discrimination",
+            "Hate speech unchecked"
+          ],
+          "reforms_needed": [
+            "Community dialogue",
+            "Anti-discrimination enforcement",
+            "Hate speech prosecution",
+            "Minority input in policies"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "7/10",
+          "daily_target_hours": 1.2,
+          "mains_answer_angles": [
+            "Constitutional protections for minorities",
+            "Waqf Act reforms debate",
+            "Communal harmony importance",
+            "Religious freedom vs public order"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_008",
+      "module_name": "Health and Education Governance",
+      "topics": [
+        {
+          "topic_id": "MOD_008_T001",
+          "topic_name": "Health Governance Framework",
+          "primary_source": "2nd ARC Report 14: Protecting Children - Public health system strengthening and service delivery",
+          "key_concepts": [
+            "National Health Policy 2017 - targets, frameworks, accountability",
+            "NHM (National Health Mission) - maternal, child, communicable disease focus",
+            "Ayushman Bharat - health coverage and wellness centers",
+            "PMJAY - 5 lakh coverage, hospitalization benefits",
+            "HWCs - primary care, non-communicable disease management",
+            "CDSCO - drug regulation, clinical trials oversight",
+            "National Medical Commission Act 2019 - replaced MCI regulation",
+            "Telemedicine expansion - remote diagnosis and consultation",
+            "Mental Healthcare Act 2017 - mental health as right",
+            "Pandemic preparedness - COVID-19 lessons, strengthening",
+            "Vaccine distribution - universal immunization program",
+            "Medical education - quality, accessibility, ethics",
+            "Health worker shortage - rural posting incentives",
+            "Data systems - HMIS, vital statistics improvement"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Ayushman Bharat PMJAY",
+              "year": 2018,
+              "objective": "Health coverage for 5 lakh hospitalization per family",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "National Health Mission",
+              "year": 2013,
+              "objective": "Maternal, child, communicable disease management",
+              "status": "Ongoing"
+            }
+          },
+          "issues_challenges": [
+            "Doctor shortage",
+            "Infrastructure gaps",
+            "High out-of-pocket spending",
+            "Quality variation"
+          ],
+          "reforms_needed": [
+            "Health worker recruitment",
+            "Infrastructure investment",
+            "Quality standards",
+            "Data strengthening"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Universal Health Coverage progress",
+            "Ayushman Bharat effectiveness",
+            "Public health governance challenges",
+            "Pandemic lessons integration"
+          ]
+        },
+        {
+          "topic_id": "MOD_008_T002",
+          "topic_name": "Education Governance and Quality",
+          "primary_source": "2nd ARC Report 14: Protecting Children - Comprehensive education access and learning outcomes",
+          "key_concepts": [
+            "RTE Act 2009 - free, compulsory education right 6-14",
+            "Samagra Shiksha - integrated scheme pre-primary to secondary",
+            "NEP 2020 - 5+3+3+4 structure overhaul",
+            "NCF 2023 - National Curriculum Framework",
+            "Learning outcomes - focus beyond enrollment numbers",
+            "Teacher quality - DIET training, NCTE standards, accountability",
+            "Vocational education - skill-based learning integration",
+            "Assessment reform - continuous evaluation over board exams",
+            "Technology integration - AI, digital learning platforms",
+            "Infrastructure standards - pupil-teacher ratio, facilities",
+            "25% reservation - private school disadvantaged child admission",
+            "Special education - inclusive education mandate",
+            "Girls education - safety, quality, gender-sensitive pedagogy",
+            "NEP implementation challenges - state readiness, resources"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "Samagra Shiksha Abhiyaan",
+              "year": 2018,
+              "objective": "Integrated school education access and quality",
+              "status": "Ongoing"
+            },
+            "scheme_2": {
+              "name": "National Education Policy 2020",
+              "year": 2020,
+              "objective": "Transformative educational system reforms",
+              "status": "Implementation ongoing"
+            }
+          },
+          "issues_challenges": [
+            "Infrastructure gaps",
+            "Teacher shortage",
+            "Learning quality concerns",
+            "NEP implementation challenges"
+          ],
+          "reforms_needed": [
+            "Fiscal investment",
+            "Teacher capacity",
+            "Outcome focus",
+            "Technology integration support"
+          ],
+          "pyq_frequency": "very_high",
+          "mains_importance": "9/10",
+          "daily_target_hours": 2,
+          "mains_answer_angles": [
+            "RTE implementation progress",
+            "NEP 2020 radical reforms",
+            "Learning outcomes vs enrollment",
+            "Equity in quality education"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD_009",
+      "module_name": "Civil Society, NGOs and Democratic Participation",
+      "topics": [
+        {
+          "topic_id": "MOD_009_T001",
+          "topic_name": "Civil Society, NGOs and FCRA",
+          "primary_source": "2nd ARC Report 1: Good Governance - Civil society as accountability mechanism and democratic participant",
+          "key_concepts": [
+            "Civil society definition - associations outside state and market",
+            "NGO role - service delivery, advocacy, monitoring",
+            "FCRA Act 2010 - foreign contribution regulation",
+            "FCRA Amendment 2020 - controversial restrictions on funding",
+            "Foreign funding concerns - sovereignty, autonomy, transparency",
+            "Domestic funding sources - CSR, individual donors, foundations",
+            "Memorandum of Association - NGO governance structure",
+            "12A, 80G registration - tax exemption for charitable organizations",
+            "SHGs (Self-Help Groups) - women's economic empowerment",
+            "NABARD role - SHG promotion, microfinance support",
+            "Civil society accountability - transparency, governance standards",
+            "Advocacy role - policy influence, rights protection",
+            "Service delivery gaps - NGO complementing government",
+            "Regulatory balance - enabling participation vs oversight"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "FCRA Act 2010 (Amended 2020)",
+              "year": 2010,
+              "objective": "Regulate foreign contributions to organizations",
+              "status": "Active with Amendment"
+            },
+            "scheme_2": {
+              "name": "SHG-Bank Linkage",
+              "year": 1992,
+              "objective": "Microfinance through self-help groups",
+              "status": "Ongoing"
+            }
+          },
+          "issues_challenges": [
+            "FCRA restrictions on NGOs",
+            "Foreign funding scrutiny",
+            "Governance challenges",
+            "Accountability gaps"
+          ],
+          "reforms_needed": [
+            "FCRA clarity and narrowing",
+            "Domestic funding expansion",
+            "NGO capacity building",
+            "Regulatory streamlining"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "7/10",
+          "daily_target_hours": 1.2,
+          "mains_answer_angles": [
+            "Civil society role in democracy",
+            "FCRA amendment implications",
+            "NGO-government partnership",
+            "Accountability and autonomy balance"
+          ]
+        },
+        {
+          "topic_id": "MOD_009_T002",
+          "topic_name": "Media, CSR and Democratic Accountability",
+          "primary_source": "2nd ARC Report 1: Good Governance - Democratic institutions ensuring accountability and public participation",
+          "key_concepts": [
+            "Press freedom - fourth estate watchdog function",
+            "Media regulation - self-regulation vs government oversight",
+            "IT Rules 2021 - social media intermediary guidelines controversy",
+            "Fake news - misinformation in digital age",
+            "Media ownership concentration - diversity concerns",
+            "Journalistic ethics - codes of conduct, professional standards",
+            "CSR (Corporate Social Responsibility) - Section 135, 2% spend",
+            "CSR priorities - education, health, sanitation, environment",
+            "CSR implementation - effectiveness, transparency challenges",
+            "Think tanks - policy research, intellectual input",
+            "Public intellectuals - civil society advocacy role",
+            "Public opinion - media's role in shaping democratic discourse",
+            "Transparency reports - media, CSR, government accountability",
+            "Digital democracy - e-petitions, online participation"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "CSR Companies Act",
+              "year": 2013,
+              "objective": "Mandatory 2% profit spending on social programs",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "IT Rules 2021",
+              "year": 2021,
+              "objective": "Social media content regulation and accountability",
+              "status": "Operational and contested"
+            }
+          },
+          "issues_challenges": [
+            "Press freedom concerns",
+            "CSR implementation gaps",
+            "Think tank independence",
+            "Digital misinformation"
+          ],
+          "reforms_needed": [
+            "Strengthen media autonomy",
+            "CSR effectiveness monitoring",
+            "Think tank support",
+            "Misinformation countermeasures"
+          ],
+          "pyq_frequency": "medium",
+          "mains_importance": "7/10",
+          "daily_target_hours": 1.2,
+          "mains_answer_angles": [
+            "Media's role in democratic accountability",
+            "CSR as social responsibility",
+            "Think tanks in policy making",
+            "Digital age challenges to democracy"
+          ]
+        },
+        {
+          "topic_id": "MOD_009_T003",
+          "topic_name": "Social Audit and Accountability Mechanisms",
+          "primary_source": "2nd ARC Report 11: Right to Information and Transparency - Public accountability through transparency and citizen participation",
+          "key_concepts": [
+            "Social audit definition - beneficiary-led program evaluation",
+            "MGNREGA social audit - model for participatory accountability",
+            "Community monitoring - citizen observation of service delivery",
+            "Public hearing mechanism - beneficiary feedback collection",
+            "RTI usage - transparency for monitoring government programs",
+            "CAG reports - parliamentary accountability mechanism",
+            "PAC (Public Accounts Committee) - legislative scrutiny",
+            "Citizen charters - service standards transparency",
+            "CPGRAMS - online grievance redressal system",
+            "Performance audits - effectiveness of government programs",
+            "Beneficiary feedback - improving service quality",
+            "Local government accountability - ward meetings, budgets",
+            "Open data - government transparency portal",
+            "Citizen engagement - participatory democracy"
+          ],
+          "government_schemes": {
+            "scheme_1": {
+              "name": "MGNREGA Social Audit",
+              "year": 2011,
+              "objective": "Beneficiary-led monitoring of MGNREGA works and payments",
+              "status": "Active"
+            },
+            "scheme_2": {
+              "name": "CPGRAMS Portal",
+              "year": 2007,
+              "objective": "Online citizen grievance registration and tracking",
+              "status": "Operational"
+            }
+          },
+          "issues_challenges": [
+            "Low citizen participation",
+            "Implementation inconsistency",
+            "Lack of follow-up action",
+            "Capacity constraints"
+          ],
+          "reforms_needed": [
+            "Awareness campaigns",
+            "Capacity building",
+            "Actionable mechanisms",
+            "Feedback integration"
+          ],
+          "pyq_frequency": "high",
+          "mains_importance": "8/10",
+          "daily_target_hours": 1.5,
+          "mains_answer_angles": [
+            "Social audit effectiveness",
+            "Citizen participation in accountability",
+            "MGNREGA model applicability",
+            "Transparency for democratic control"
+          ]
+        }
+      ]
+    }
+  ]
+}

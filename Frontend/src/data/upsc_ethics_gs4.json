@@ -1,0 +1,1091 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 4 - Ethics, Integrity & Aptitude Comprehensive Syllabus",
+    "purpose": "Complete syllabus for MentorsDaily UPSC portal — AI module generation",
+    "paper": "GS Paper 4",
+    "total_marks": 250,
+    "total_modules": 8,
+    "estimated_preparation_hours": 180,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Official Notification 2013 onwards (unchanged)",
+    "note": "Ethics GS4 is unique — 40% theory + 60% case studies in actual paper. Module design reflects this split."
+  },
+
+  "primary_books": {
+    "book_1": {
+      "title": "Lexicon for Ethics, Integrity & Aptitude for IAS General Studies Paper IV",
+      "author": "N.B. Singh",
+      "publisher": "Chronicle IAS Academy",
+      "edition": "Latest",
+      "usage": "Primary theory reference — ethics concepts, thinkers, definitions"
+    },
+    "book_2": {
+      "title": "Ethics, Integrity and Aptitude",
+      "author": "G. Subba Rao & P.N. Roy Chowdhury",
+      "publisher": "McGraw Hill",
+      "usage": "Case studies, civil services values, applied ethics in governance"
+    },
+    "book_3": {
+      "title": "2nd ARC Report 4 — Ethics in Governance",
+      "usage": "Probity in governance, conflicts of interest, public accountability frameworks"
+    },
+    "book_4": {
+      "title": "Political Theory — NCERT Class 11, Chapter 1",
+      "usage": "Normative ethics, political philosophy foundations"
+    },
+    "book_5": {
+      "title": "Work, Life and Values — NCERT Class 11 Psychology",
+      "usage": "Attitude formation, emotional intelligence, motivation theory"
+    }
+  },
+
+  "upsc_gs4_paper_pattern": {
+    "total_marks": 250,
+    "section_A": {
+      "description": "Theory questions — ethics, aptitude, thinkers, governance values",
+      "marks": "~100-110 marks",
+      "question_types": ["10-mark short answers", "12.5-mark medium answers", "Long essay on ethical issues"]
+    },
+    "section_B": {
+      "description": "Case Studies — 4-6 case studies based on real governance scenarios",
+      "marks": "~140-150 marks",
+      "question_types": ["Case analysis", "Ethical dilemma resolution", "Stakeholder analysis", "Course of action"]
+    },
+    "key_insight": "Strong conceptual grounding directly enables better case study answers — theory and application are inseparable in GS4"
+  },
+
+  "modules": [
+    {
+      "module_id": "ETH_MOD_001",
+      "module_name": "Ethics and Human Interface — Foundations",
+      "duration_days": {
+        "fast": 10,
+        "standard": 14,
+        "extended": 21
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_001_T001",
+          "topic_name": "Essence and Determinants of Ethics",
+          "primary_source": "Lexicon: Chapter 1 — Nature and Scope of Ethics; Chapter 2 — Determinants of Ethics",
+          "ncert_reference": "NCERT Class 11 Political Theory Ch 1 — Political Theory: An Introduction (normative questions)",
+          "key_concepts": [
+            "Ethics defined — systematic study of right conduct, values, moral principles",
+            "Descriptive vs Normative ethics — what IS vs what OUGHT TO BE",
+            "Meta-ethics — study of nature, foundations, and methodology of ethics",
+            "Applied ethics — ethics in specific domains (medical, business, public policy)",
+            "Three determinants: Intention (motive), Means (methods), End (outcome)",
+            "Consequences vs intentions — consequentialism vs deontology in one frame",
+            "Social vs individual ethics — personal morality vs public morality",
+            "Relativism vs universalism — cultural variation vs universal moral truths",
+            "Moral philosophy vs law — ethics as internal constraint, law as external",
+            "Evolution of ethics — Greek origins (ethos), Roman (mores), modern frameworks",
+            "Ethics in everyday life — family, profession, society, governance",
+            "Moral facts — can ethical claims be objectively true or false?",
+            "Relationship between ethics, law, and public policy",
+            "Ethics as foundation for integrity in public life",
+            "Importance of ethics in UPSC context — civil servant decision-making"
+          ],
+          "pyq_frequency": "Very High — asked every year (2013-2024)",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3,
+          "case_study_link": "Scenarios where civil servant must choose between legal compliance and ethical action"
+        },
+        {
+          "topic_id": "ETH_001_T002",
+          "topic_name": "Dimensions of Ethics — Personal, Social, Organisational",
+          "primary_source": "Lexicon: Chapter 3 — Dimensions of Ethics; Subba Rao Ch 2 — Ethics in Public Life",
+          "ncert_reference": "NCERT Class 12 Sociology Ch 1 — Structural Change (social norms formation)",
+          "key_concepts": [
+            "Personal ethics — individual moral code, conscience, character virtues",
+            "Social ethics — obligations to community, fairness, justice, rights",
+            "Professional ethics — norms of conduct in specific profession (medicine, law, civil services)",
+            "Organisational ethics — values embedded in institutional culture",
+            "Political ethics — ethics of power, representation, accountability",
+            "Environmental ethics — moral obligations to non-human nature",
+            "Tension between personal ethics and professional duty",
+            "Whistleblowing as ethical act vs institutional loyalty",
+            "Collective vs individual moral responsibility",
+            "Role morality — can an official act differently from personal morality?",
+            "Public ethics vs private ethics — why distinction matters for governance",
+            "Institutional integrity — how organisations develop ethical culture",
+            "Ethics of care — relationships, empathy, particular obligations",
+            "Civic virtue — citizenship duties and democratic ethics",
+            "Interdependence of dimensions — personal ethics shapes public conduct"
+          ],
+          "pyq_frequency": "High — frequently tested in theory section",
+          "prelims_importance": "Low",
+          "mains_importance": "High",
+          "daily_target_hours": 3,
+          "case_study_link": "IAS officer scenario: personal religious belief vs official secularism duty"
+        },
+        {
+          "topic_id": "ETH_001_T003",
+          "topic_name": "Human Values — Learning from Family, Society, Educational Institutions",
+          "primary_source": "Lexicon: Chapter 4 — Human Values and Their Sources; Subba Rao Ch 4 — Sources of Ethical Guidance",
+          "key_concepts": [
+            "Values defined — enduring beliefs that guide conduct and judgement",
+            "Instrumental vs terminal values — Rokeach Value Survey framework",
+            "Value formation process — family socialisation, peer influence, education",
+            "Role of family in value inculcation — primary agent of socialisation",
+            "Role of educational institutions — moral education, character building",
+            "Role of society and culture — community norms, religious traditions",
+            "Role of media in shaping values — positive (civic awareness) and negative (materialism)",
+            "Value conflict — when values clash in real situations",
+            "Value priorities — hierarchy of values in decision-making",
+            "Universal human values — dignity, justice, compassion, truth",
+            "Indian value traditions — dharma, karma, ahimsa, satya",
+            "Western value traditions — liberty, equality, fraternity",
+            "Values vs norms — abstract principles vs concrete behavioural expectations",
+            "Good Samaritan ethics — obligation to help vs personal safety",
+            "Moral development — Kohlberg's stages applied to civil servants"
+          ],
+          "pyq_frequency": "High — appears in both theory and case study format",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3,
+          "case_study_link": "Family pressure scenario on a civil servant deciding a contract award"
+        },
+        {
+          "topic_id": "ETH_001_T004",
+          "topic_name": "Role of Family, Society and Educational Institutions in Inculcating Values",
+          "primary_source": "Lexicon: Chapter 4 Section B; 2nd ARC Report 4 — Chapter 2 on Value Formation",
+          "key_concepts": [
+            "Family as first school of ethics — parental example vs explicit teaching",
+            "Socialisation theory — Berger and Luckmann social construction of reality",
+            "Schools and moral education — value-based curriculum, NCC, scouting",
+            "Peer groups as value shapers — conformity and moral courage",
+            "Religious institutions — moral frameworks, compassion, service ethic",
+            "Media literacy — critical engagement with value messages",
+            "Civil society organisations — NGOs, community groups fostering civic values",
+            "State role in value education — curriculum design, teacher training",
+            "Sports and games — teamwork, fair play, resilience as value training",
+            "Literature and arts — humanities as moral imagination development",
+            "Role models and mentors — learning ethics through observation",
+            "Negative socialisation — corruption, nepotism learned in same institutions",
+            "Generational value shift — postmaterialist values (Inglehart)",
+            "Dignity of labour — value that must be consciously taught",
+            "Ethics training in civil services — LBSNAA curriculum design"
+          ],
+          "pyq_frequency": "Medium-High",
+          "prelims_importance": "Low",
+          "mains_importance": "High",
+          "daily_target_hours": 2,
+          "case_study_link": "Designing ethics curriculum for a government training institute"
+        }
+      ],
+      "module_test": {
+        "theory_questions": 3,
+        "case_studies": 1,
+        "marks": 50,
+        "duration_minutes": 60,
+        "sample_questions": [
+          "What do you understand by the essence of ethics? Explain the determinants that shape ethical behaviour in individuals. (10 marks)",
+          "Distinguish between personal ethics and professional ethics. In what situations can they conflict? How should a civil servant resolve such conflicts? (12.5 marks)",
+          "Case Study: A DM discovers that the contract for building a flood shelter was given to a firm owned by his cousin under previous collector. The project quality is good. What should he do? (20 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_002",
+      "module_name": "Ethical Theories and Moral Frameworks",
+      "duration_days": {
+        "fast": 10,
+        "standard": 14,
+        "extended": 21
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_002_T001",
+          "topic_name": "Consequentialism — Utilitarianism",
+          "primary_source": "Lexicon: Chapter 6 — Consequentialist Ethics; Subba Rao Ch 5 — Ethical Theories",
+          "key_concepts": [
+            "Consequentialism — rightness judged by outcomes",
+            "Act Utilitarianism — Jeremy Bentham, each act judged by its consequences",
+            "Rule Utilitarianism — Mill, rules that generally maximise utility",
+            "Hedonistic calculus — Bentham's 7 factors: intensity, duration, certainty, etc.",
+            "Mill's higher and lower pleasures — quality matters, not just quantity",
+            "Utility principle — greatest happiness for the greatest number",
+            "Strengths: practical, measurable, democratic in treating all equally",
+            "Weaknesses: ignores minority rights, allows unjust means for good ends",
+            "Preference utilitarianism — Peter Singer, satisfying actual preferences",
+            "Rule vs Act tension — trolley problem applied to governance",
+            "Policy applications — cost-benefit analysis in public policy",
+            "Consequentialist justification for civil disobedience",
+            "Corruption as consequentialist fallacy — 'good outcome justifies bribe'",
+            "Critique from rights theory — some acts wrong regardless of outcome",
+            "Application in UPSC context — resource allocation decisions"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_002_T002",
+          "topic_name": "Deontological Ethics — Kant's Categorical Imperative",
+          "primary_source": "Lexicon: Chapter 7 — Deontological Ethics; Subba Rao Ch 5",
+          "key_concepts": [
+            "Deontology — rightness based on duty, regardless of consequences",
+            "Immanuel Kant — Groundwork of the Metaphysics of Morals",
+            "Categorical Imperative — unconditional moral obligation",
+            "First formulation: Universalisability — act only as you would want all to act",
+            "Second formulation: Humanity formula — treat persons as ends, never merely means",
+            "Third formulation: Kingdom of Ends — act as legislator in moral community",
+            "Perfect duties vs imperfect duties — lying never allowed vs charity when possible",
+            "Good will as the only unconditional good — motivation matters most",
+            "Rights-based ethics — deontological foundation for human rights",
+            "Rule of law as deontological governance — rules applied without discretion",
+            "Strengths: respects human dignity, consistent, rights-protective",
+            "Weaknesses: rigid, ignores consequences, conflicting duties problem",
+            "Ross's Prima Facie duties — fidelity, reparation, gratitude, non-maleficence",
+            "Application: civil servant cannot lie even to protect minor from harm",
+            "Deontological basis for bureaucratic neutrality and impartiality"
+          ],
+          "pyq_frequency": "High — Kant asked directly multiple times",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_002_T003",
+          "topic_name": "Virtue Ethics — Aristotle and Indian Traditions",
+          "primary_source": "Lexicon: Chapter 8 — Virtue Ethics; Chapter 14 — Indian Ethical Traditions",
+          "key_concepts": [
+            "Virtue ethics — focus on character rather than acts or consequences",
+            "Aristotle's Nicomachean Ethics — eudaimonia (flourishing) as highest good",
+            "Virtues as golden mean — courage between cowardice and recklessness",
+            "Cardinal virtues — prudence, justice, fortitude, temperance",
+            "Intellectual vs moral virtues — reason vs character",
+            "Habituation — virtues are learned through practice, not innate",
+            "Phronesis (practical wisdom) — knowing the right thing in context",
+            "Contemporary revival — Alasdair MacIntyre, Martha Nussbaum",
+            "Indian virtue ethics — dharma as virtue concept in Bhagavad Gita",
+            "Nishkama karma — duty without attachment to fruits (Gita Ch 3)",
+            "Gandhi's ethical framework — truth, non-violence, self-discipline as virtues",
+            "Buddha's Eightfold Path — virtue ethics structure in Buddhist philosophy",
+            "Mahavira's anekantavada — multiple perspectives as epistemic virtue",
+            "Strengths: holistic, context-sensitive, accounts for moral character",
+            "Weakness: circular — virtuous is what virtuous person does",
+            "Application: civil service character-building, recruitment criteria"
+          ],
+          "pyq_frequency": "Very High — Indian thinkers always feature",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_002_T004",
+          "topic_name": "Other Ethical Frameworks — Contractarianism, Care Ethics, Rawls",
+          "primary_source": "Lexicon: Chapter 9 — Social Contract Theory; Chapter 10 — Justice Theories",
+          "key_concepts": [
+            "Social Contract Theory — Hobbes, Locke, Rousseau on origins of political obligation",
+            "Hobbes — state of nature, sovereign power, security as primary value",
+            "Locke — natural rights, government by consent, right to revolution",
+            "Rousseau — general will, popular sovereignty, civic virtue",
+            "Rawls' Theory of Justice — original position and veil of ignorance",
+            "Difference Principle — inequalities justified only if they benefit least advantaged",
+            "Equal basic liberties — first principle of justice",
+            "Fairness as justice — procedural justice framework",
+            "Nozick's libertarian response — rights as side constraints, minimal state",
+            "Amartya Sen's capabilities approach — freedom as real capabilities",
+            "Care Ethics — Carol Gilligan, Nel Noddings — relationships and empathy",
+            "Feminist critique of impartial ethics — contextualised, relational decision-making",
+            "Contractarian basis for reservation policy and affirmative action",
+            "Environmental justice — Rawls extended to future generations",
+            "Application in UPSC: welfare state justification, social justice schemes"
+          ],
+          "pyq_frequency": "High — Rawls asked 2016, 2019, 2022",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "theory_questions": 4,
+        "case_studies": 1,
+        "marks": 60,
+        "duration_minutes": 75,
+        "sample_questions": [
+          "Compare and contrast Consequentialism and Deontological ethics. Which framework is more suitable for civil servants? (12.5 marks)",
+          "Explain Kant's Categorical Imperative with suitable examples. How does it apply to public service? (10 marks)",
+          "What is Virtue Ethics? How do Indian philosophical traditions contribute to virtue-based ethical frameworks? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_003",
+      "module_name": "Attitude — Structure, Function, and Change",
+      "duration_days": {
+        "fast": 8,
+        "standard": 12,
+        "extended": 18
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_003_T001",
+          "topic_name": "Attitude — Content, Structure, Function",
+          "primary_source": "Lexicon: Chapter 11 — Attitude; NCERT Class 11 Psychology Ch 6 — Attitude and Social Cognition",
+          "key_concepts": [
+            "Attitude defined — evaluative tendency towards persons, objects, ideas",
+            "Three-component model (ABC): Affective, Behavioural, Cognitive",
+            "Affective component — feelings and emotions associated with object",
+            "Behavioural component — predisposition to act in certain way",
+            "Cognitive component — beliefs and knowledge about object",
+            "Attitude vs opinion — opinion is specific, attitude is general evaluative stance",
+            "Attitude vs value — values are deeper, more stable than attitudes",
+            "Functions of attitude: knowledge, ego-defensive, utilitarian, value-expressive",
+            "Attitude strength — importance, certainty, accessibility, direct experience",
+            "Attitude-behaviour gap — low income but high environmental values",
+            "Theory of Planned Behaviour — attitude + subjective norm + perceived control",
+            "Measurement: Likert scale, semantic differential, implicit association test",
+            "Implicit vs explicit attitudes — unconscious biases",
+            "Formation through classical conditioning, operant conditioning, observational learning",
+            "Attitude as predictor of public service behaviour"
+          ],
+          "pyq_frequency": "Very High — asked in every exam since 2014",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_003_T002",
+          "topic_name": "Attitude Formation and Influence on Thought and Behaviour",
+          "primary_source": "Lexicon: Chapter 11 Section B; Subba Rao Ch 8 — Attitude Development",
+          "key_concepts": [
+            "Direct personal experience as strongest attitude shaper",
+            "Mere exposure effect — familiarity breeds positive evaluation",
+            "Social influence — conformity, compliance, obedience in attitude formation",
+            "Milgram's obedience experiment — implications for bureaucratic ethics",
+            "Media influence — agenda-setting, priming, framing effects on attitudes",
+            "Peer group influence — adolescence and attitude crystallisation",
+            "Authoritarian personality — attitude syndrome (Adorno)",
+            "Stereotyping — overgeneralised attitudes about groups",
+            "Prejudice — negative attitude without sufficient justification",
+            "Discrimination — behavioural expression of prejudice",
+            "Contact hypothesis — Allport's theory for reducing prejudice",
+            "Cognitive dissonance — Festinger's theory of attitude-behaviour inconsistency",
+            "Self-perception theory — inferring attitudes from own behaviour",
+            "Attitude influence on perception — confirmation bias",
+            "Civil servant attitude towards marginalised groups — case study relevance"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_003_T003",
+          "topic_name": "Moral and Political Attitudes — Social Influence and Persuasion",
+          "primary_source": "Lexicon: Chapter 12 — Persuasion and Attitude Change; Subba Rao Ch 9",
+          "key_concepts": [
+            "Persuasion defined — intentional change of attitude through communication",
+            "Elaboration Likelihood Model — central route (logic) vs peripheral route (heuristics)",
+            "Source credibility — expertise and trustworthiness in message acceptance",
+            "Message characteristics — one-sided vs two-sided, emotional vs rational appeals",
+            "Fear appeals — effectiveness and ethics of using fear for behaviour change",
+            "Audience factors — need for cognition, prior knowledge, personal relevance",
+            "Resistance to persuasion — reactance theory, attitude inoculation",
+            "Propaganda vs persuasion — distinction in democratic societies",
+            "Political attitudes — spectrum from conservative to liberal, not just left-right",
+            "Attitude change in public policy — nudge theory (Thaler and Sunstein)",
+            "Social norms marketing — changing behaviour through perceived social norms",
+            "Ethics of persuasion — when does persuasion become manipulation?",
+            "Attitude change in civil servants — training, exposure, leadership example",
+            "Role of political leadership in shaping citizens' political attitudes",
+            "Media literacy as defence against manipulative persuasion"
+          ],
+          "pyq_frequency": "Medium-High",
+          "prelims_importance": "Low",
+          "mains_importance": "High",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "theory_questions": 3,
+        "case_studies": 1,
+        "marks": 50,
+        "duration_minutes": 60,
+        "sample_questions": [
+          "What is attitude? Explain the three-component model of attitude with examples. (10 marks)",
+          "How does social influence shape attitude formation? Discuss the role of media in this process. (12.5 marks)",
+          "Case Study: A senior IAS officer holds stereotypical attitudes towards tribals while implementing a forest rights scheme. How should this be addressed? (20 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_004",
+      "module_name": "Aptitude and Foundational Values for Civil Services",
+      "duration_days": {
+        "fast": 10,
+        "standard": 14,
+        "extended": 21
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_004_T001",
+          "topic_name": "Civil Services — Integrity, Impartiality, Non-Partisanship",
+          "primary_source": "Lexicon: Chapter 15 — Civil Services Values; 2nd ARC Report 4 — Chapter 5 on Public Service Values",
+          "key_concepts": [
+            "Integrity defined — wholeness of character, alignment of thought-word-action",
+            "Integrity vs honesty — integrity is broader (consistency), honesty is truthfulness",
+            "Intellectual integrity — following evidence even when uncomfortable",
+            "Financial integrity — no personal gain from public position",
+            "Impartiality — equal treatment regardless of personal connection",
+            "Non-partisanship — serving government of the day without political bias",
+            "Political neutrality — distinct from non-partisanship (no party affiliation)",
+            "Objectivity — evidence-based decision-making free from prejudice",
+            "Dedication to public service — service orientation over career advancement",
+            "Empathy — understanding citizen perspective especially for vulnerable groups",
+            "Tolerance and compassion — dealing with diversity in multicultural democracy",
+            "Commitment to public interest — Nolan Principles of public life",
+            "Selflessness — not acting for personal gain",
+            "Openness — willingness to change based on evidence",
+            "Leadership in civil services — values expected of IAS, IPS, IFS officers"
+          ],
+          "pyq_frequency": "Very High — core topic, asked every year",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3,
+          "nolan_principles": ["Selflessness", "Integrity", "Objectivity", "Accountability", "Openness", "Honesty", "Leadership"]
+        },
+        {
+          "topic_id": "ETH_004_T002",
+          "topic_name": "Dedication to Public Service and Tolerance",
+          "primary_source": "Lexicon: Chapter 16 — Public Service Ethic; Subba Rao Ch 12",
+          "key_concepts": [
+            "Public service motivation (PSM) — Perry's four dimensions",
+            "Attraction to policy-making vs civic duty vs compassion vs self-sacrifice",
+            "Servant leadership — Robert Greenleaf, leader as servant of followers",
+            "Civil servant as trustee — not owner of power but trustee for citizens",
+            "Accountability mechanisms — parliamentary, judicial, executive, social",
+            "Welfare state rationale — duty of care to citizens who cannot help themselves",
+            "Last mile delivery — ethical imperative to reach most marginalised",
+            "Tolerance in plural democracy — managing diversity ethically",
+            "Multiculturalism vs assimilation — policy ethics in pluralist state",
+            "Religious neutrality of civil servants — secularism as professional value",
+            "Compassion without paternalism — respecting agency of beneficiaries",
+            "Capacity building as service — empowering rather than creating dependency",
+            "Work ethic in civil services — punctuality, diligence, commitment",
+            "Public trust as social capital — bureaucratic corruption destroys trust",
+            "Ethics of discretion — when to use wide vs narrow discretion"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_004_T003",
+          "topic_name": "Commitment to Constitutional Values — Social Justice, Equality, Rule of Law",
+          "primary_source": "Lexicon: Chapter 17 — Constitutional Values; 2nd ARC Report 4",
+          "key_concepts": [
+            "Constitutional morality — Ambedkar's concept, letter vs spirit of Constitution",
+            "Rule of law — Dicey's three elements: supremacy of law, equality before law, conventions",
+            "Social justice as constitutional mandate — Article 46, DPSP framework",
+            "Equity vs equality — same treatment vs proportionate treatment",
+            "Restorative justice — repairing harm vs punitive approaches",
+            "Distributive justice — fair allocation of resources and opportunities",
+            "Procedural justice — fair process even if outcome not always ideal",
+            "Fundamental rights as ethical floor — non-derogable minimum",
+            "Directive Principles — policy ethics framework for welfare state",
+            "Article 21 expansive reading — dignity, livelihood, health as rights",
+            "Anti-corruption as constitutional value — Article 311 (protection with accountability)",
+            "Representation of marginalised — ethical imperative in democratic governance",
+            "Environmental ethics in Constitution — Article 51A(g), Article 48A",
+            "Federal ethics — centre-state relations and cooperative federalism values",
+            "Civil servant oath — constitutional commitment and its ethical implications"
+          ],
+          "pyq_frequency": "High — constitutional values questions frequent",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "theory_questions": 3,
+        "case_studies": 2,
+        "marks": 60,
+        "duration_minutes": 75,
+        "sample_questions": [
+          "What are the foundational values expected of a civil servant? Elaborate on integrity and impartiality with examples. (12.5 marks)",
+          "Explain constitutional morality as a civil service value. How does it differ from popular morality? (10 marks)",
+          "Case Study: An IAS officer receives political pressure to clear an environmental clearance for a mining project in a tribal area. What should she do? (25 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_005",
+      "module_name": "Emotional Intelligence and its Applications",
+      "duration_days": {
+        "fast": 8,
+        "standard": 11,
+        "extended": 16
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_005_T001",
+          "topic_name": "Emotional Intelligence — Concepts and Components",
+          "primary_source": "Lexicon: Chapter 13 — Emotional Intelligence; NCERT Class 11 Psychology Ch 2 — Self and Personality",
+          "key_concepts": [
+            "EI defined — ability to recognise, understand, manage emotions in self and others",
+            "IQ vs EQ debate — Goleman's claim that EQ predicts 80% of success",
+            "Four-branch model — Mayer, Salovey, Caruso: perceiving, using, understanding, managing",
+            "Goleman's five components: self-awareness, self-regulation, motivation, empathy, social skills",
+            "Self-awareness — knowing one's own emotions, strengths, limitations",
+            "Self-regulation — managing disruptive emotions and impulses",
+            "Intrinsic motivation — drive to achieve for its own sake, not external rewards",
+            "Empathy — reading others' emotional states accurately",
+            "Social skills — managing relationships, building rapport, influence",
+            "EI and leadership effectiveness — transformational leadership requires high EQ",
+            "EI in conflict resolution — calming disputes, finding common ground",
+            "EI in stress management — coping with high-pressure bureaucratic environments",
+            "EI and decision-making — avoiding emotion-driven bad decisions while using emotional info",
+            "EI training — can it be developed? Evidence for structured training",
+            "EI in UPSC context — dealing with distressed citizens, team management"
+          ],
+          "pyq_frequency": "Very High — asked almost every year since 2016",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_005_T002",
+          "topic_name": "EI Utilisation in Administration and Governance",
+          "primary_source": "Lexicon: Chapter 13 Section B; Subba Rao Ch 10 — EI in Civil Services",
+          "key_concepts": [
+            "Crisis management — EI for maintaining composure under pressure",
+            "Grievance redressal — empathetic listening transforms adversarial interactions",
+            "Community engagement — building trust with rural, tribal, marginalised communities",
+            "Inter-departmental coordination — social skills to manage turf battles",
+            "Corruption resistance — self-regulation resisting temptation",
+            "Whistleblowing decision — emotional courage vs fear of consequences",
+            "EI in negotiation — reading counterpart's emotional state",
+            "Performance management — empathetic feedback to subordinates",
+            "EI and burnout prevention — self-awareness of emotional depletion",
+            "Diversity management — empathy across cultural, linguistic, gender lines",
+            "EI and media relations — maintaining dignity under hostile questioning",
+            "Disaster response — EI for dealing with traumatised affected populations",
+            "EI and police-public relations — de-escalation vs force escalation",
+            "EI in judicial administration — empathy without compromising impartiality",
+            "Building institutional EI — organisational culture that values emotional competence"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "theory_questions": 2,
+        "case_studies": 2,
+        "marks": 50,
+        "duration_minutes": 60,
+        "sample_questions": [
+          "What is Emotional Intelligence? Explain Goleman's model and its relevance for civil servants. (12.5 marks)",
+          "Case Study: A District Collector is overseeing relief camps after a flood. Survivors are angry and shouting at officials. How should the EI of the Collector help manage this situation? (25 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_006",
+      "module_name": "Contributions of Moral Thinkers — India and World",
+      "duration_days": {
+        "fast": 10,
+        "standard": 14,
+        "extended": 21
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_006_T001",
+          "topic_name": "Indian Moral Thinkers — Ancient and Medieval",
+          "primary_source": "Lexicon: Chapter 14 — Indian Ethical Traditions; Subba Rao Ch 6",
+          "key_concepts": [
+            "Kautilya (Arthashastra) — statecraft ethics, welfare state, anti-corruption measures",
+            "Kautilya's punishment theory — graduated deterrence, proportionality",
+            "Kautilya's officer conduct — inspection, accountability, salary to prevent corruption",
+            "Buddha — Four Noble Truths, Eightfold Path, Middle Way, compassion (karuna)",
+            "Ahimsa in Buddhist ethics — harm minimisation in governance",
+            "Mahavira — anekantavada (many-sidedness), syadvada, ahimsa as universal principle",
+            "Jain ethics — non-possessiveness (aparigraha) as governance value",
+            "Adi Shankaracharya — advaita, universal consciousness, service as worship",
+            "Ramanuja — visishtadvaita, devotion with social action",
+            "Basavanna — vachana movement, anti-caste, dignity of labour",
+            "Kabir — syncretic ethics, critique of religious hypocrisy, universal brotherhood",
+            "Tukaram and Mirabai — bhakti ethics, equality before god",
+            "Chanakya vs Buddha — realist statecraft vs compassionate governance tension",
+            "Dharmashastra tradition — dharma as cosmic and social order",
+            "Upanishadic ethics — aham brahmasmi, treating others as self"
+          ],
+          "pyq_frequency": "Very High — at least one Indian thinker question per exam",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_006_T002",
+          "topic_name": "Indian Moral Thinkers — Modern",
+          "primary_source": "Lexicon: Chapter 14 Section C; Subba Rao Ch 7",
+          "key_concepts": [
+            "Mahatma Gandhi — satyagraha, ahimsa, truth, trusteeship theory of property",
+            "Gandhi's seven social sins — politics without principles, wealth without work, etc.",
+            "Talisman test — visualising the poorest person before every decision",
+            "Swami Vivekananda — seva as worship, practical vedanta, dignity of the poor",
+            "Daridra Narayana — serving the poor as serving god",
+            "B.R. Ambedkar — constitutional morality, annihilation of caste, social democracy",
+            "Liberty-equality-fraternity as inseparable trinity (Ambedkar)",
+            "Rabindranath Tagore — humanist ethics, education for whole person, Gitanjali values",
+            "Tagore's critique of narrow nationalism — universal human solidarity",
+            "Sri Aurobindo — integral yoga, divine humanity, evolutionary ethics",
+            "Vinoba Bhave — Bhoodan movement, voluntary ethics over coercive redistribution",
+            "Jayaprakash Narayan — total revolution, ethics of political participation",
+            "Rammohun Roy — rationalist ethics, social reform, widow remarriage",
+            "Gopal Krishna Gokhale — moderate reform, constitutional ethics",
+            "Lal Bahadur Shastri — simplicity, accountability, Jai Jawan Jai Kisan as values"
+          ],
+          "pyq_frequency": "Very High — Gandhi and Ambedkar asked in nearly every exam",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_006_T003",
+          "topic_name": "Western Moral Thinkers",
+          "primary_source": "Lexicon: Chapter 6-10 (thinker-specific sections); Subba Rao Ch 5",
+          "key_concepts": [
+            "Socrates — examined life, moral knowledge, intellectual humility",
+            "Plato — philosopher king, justice as harmony, allegory of the cave",
+            "Aristotle — eudaimonia, virtue as habit, practical wisdom (phronesis)",
+            "Epicurus — pleasure as absence of pain, simple life, friendship",
+            "Stoics (Marcus Aurelius, Epictetus) — virtue, reason, indifference to externals",
+            "Thomas Aquinas — natural law, divine law, reason and faith synthesis",
+            "John Locke — natural rights, government by consent, property theory",
+            "David Hume — moral sentimentalism, sympathy as basis of ethics",
+            "Immanuel Kant — duty, categorical imperative, human dignity",
+            "Jeremy Bentham — utility, hedonistic calculus, felicific calculus",
+            "John Stuart Mill — higher and lower pleasures, harm principle, women's rights",
+            "Karl Marx — historical materialism, alienation, class-based ethics",
+            "John Rawls — veil of ignorance, difference principle, justice as fairness",
+            "Peter Singer — expanding circle, global poverty as moral issue",
+            "Jürgen Habermas — discourse ethics, communicative rationality, public sphere"
+          ],
+          "pyq_frequency": "Very High — Kant, Bentham, Mill, Rawls, Aristotle all tested",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "theory_questions": 4,
+        "case_studies": 0,
+        "marks": 50,
+        "duration_minutes": 60,
+        "sample_questions": [
+          "Compare Kautilya's approach to governance ethics with Gandhi's trusteeship theory. Which is more relevant for modern India? (12.5 marks)",
+          "What lessons can modern civil servants draw from the ethical teachings of Buddha and Mahavira? (10 marks)",
+          "Explain Rawls' theory of justice and its application to India's social justice policies. (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_007",
+      "module_name": "Public/Civil Service Values and Ethics in Public Administration; Probity in Governance",
+      "duration_days": {
+        "fast": 12,
+        "standard": 16,
+        "extended": 24
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ETH_007_T001",
+          "topic_name": "Status and Problems of Ethics in Public Administration",
+          "primary_source": "Lexicon: Chapter 15-16; 2nd ARC Report 4 — Ethics in Governance (full report)",
+          "key_concepts": [
+            "Public administration ethics distinct from private sector ethics",
+            "Democratic ethos — citizens as principals, officials as agents",
+            "Ethical failures in administration — bribery, nepotism, misuse of office",
+            "Causes of corruption — low salaries, discretionary power, lack of accountability",
+            "Systemic vs individual corruption — structural vs personal failure",
+            "Ethics infrastructure — codes of conduct, training, oversight, whistleblower protection",
+            "Locke's spoils system vs merit-based civil services",
+            "Bureaucratic pathologies — red tape, buck-passing, decision avoidance",
+            "Ethical climate in organisations — top management tone setting",
+            "AIS conduct rules and their ethical rationale",
+            "Conflict of interest in public service — types and management",
+            "Gifts and hospitality — rules and ethical reasoning",
+            "Public-private partnership ethics — revolving door problem",
+            "Ethics audit — systematic review of ethical conduct in departments",
+            "CVC, Lokpal, Lokayukta as ethics enforcement institutions"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_007_T002",
+          "topic_name": "Ethical Concerns and Dilemmas in Government and Private Institutions",
+          "primary_source": "Lexicon: Chapter 18 — Ethical Dilemmas; Subba Rao Ch 13",
+          "key_concepts": [
+            "Ethical dilemma defined — choice between two or more competing ethical claims",
+            "Types: right-vs-right (two goods), right-vs-wrong (obvious), wrong-vs-wrong (tragic)",
+            "Truth vs loyalty dilemma — whistleblowing against colleague",
+            "Individual vs community dilemma — resettlement of tribals for dams",
+            "Short-term vs long-term dilemma — immediate relief vs sustainable development",
+            "Justice vs mercy dilemma — rule application vs humanitarian exception",
+            "Dilemma resolution frameworks: ends-based, rules-based, care-based",
+            "Reflective equilibrium — moving between principles and intuitions",
+            "Six-step dilemma resolution: recognise, identify stakeholders, gather facts, identify options, evaluate, decide",
+            "Corporate ethics dilemmas — whistleblowing, product safety, environmental compliance",
+            "Media ethics dilemmas — public interest vs privacy vs national security",
+            "Research ethics — human subjects, consent, data privacy",
+            "Medical ethics — four principles: autonomy, beneficence, non-maleficence, justice",
+            "Police ethics — use of force, interrogation methods, encounter killings",
+            "Judicial ethics — impartiality, recusal, independence"
+          ],
+          "pyq_frequency": "Very High — dilemma questions in Section A and B",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_007_T003",
+          "topic_name": "Probity in Governance — Concept, Components, Measures",
+          "primary_source": "Lexicon: Chapter 19 — Probity; 2nd ARC Report 4; Subba Rao Ch 14",
+          "key_concepts": [
+            "Probity defined — adherence to highest standards of integrity and ethics",
+            "Probity vs integrity — probity specifically in financial matters, integrity broader",
+            "Components: financial propriety, impartiality, accountability, transparency",
+            "Financial probity — no misuse of public funds, proper accounts, audit compliance",
+            "Code of Ethics vs Code of Conduct — principles vs specific rules",
+            "Citizens' Charter — accountability mechanism, service standards",
+            "Right to Information Act 2005 — transparency as probity instrument",
+            "Whistleblower Protection Act 2014 — probity incentive mechanism",
+            "Asset declaration by public servants — accountability of wealth",
+            "Vigilance Commission — CVC's role in maintaining probity standards",
+            "Audit and accountability — CAG function as probity check",
+            "e-Governance as probity tool — reducing human discretion",
+            "Social audit — community accountability for public works (MGNREGA)",
+            "Probity in procurement — GeM portal, tender integrity protocols",
+            "International conventions — UNCAC (UN Convention Against Corruption)"
+          ],
+          "pyq_frequency": "High — probity appears in 60%+ of exam papers",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ETH_007_T004",
+          "topic_name": "Work Culture, Quality of Service Delivery, Utilisation of Public Funds",
+          "primary_source": "Lexicon: Chapter 20; 2nd ARC Report 12 — Citizen Centric Administration; Subba Rao Ch 15",
+          "key_concepts": [
+            "Work culture in public sector — how organisational culture shapes ethics",
+            "New Public Management — performance measurement, results orientation",
+            "Good governance as work culture standard",
+            "Service delivery ethics — timeliness, courtesy, accuracy, accessibility",
+            "Total Quality Management in government — quality circles, process improvement",
+            "ISO certification for government departments — quality assurance",
+            "Funds utilisation ethics — leakages, diversion, padded estimates",
+            "PFMS (Public Financial Management System) — tracking fund flows",
+            "Outcome budgeting — linking expenditure to results",
+            "Zero-based budgeting — scrutiny of all expenditures ethically",
+            "Audit reports as accountability tools — PAC scrutiny",
+            "Anti-corruption measures — decoy operations, surprise inspections",
+            "Incentive structures — performance pay, fast-track promotions for integrity",
+            "Negative incentives — public naming, prosecution for fund misuse",
+            "Citizen feedback mechanisms — satisfaction surveys, social media redressal"
+          ],
+          "pyq_frequency": "Medium-High",
+          "prelims_importance": "Low",
+          "mains_importance": "High",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "ETH_007_T005",
+          "topic_name": "Corporate Governance — Accountability and Ethical Issues",
+          "primary_source": "Lexicon: Chapter 21 — Corporate Governance; Subba Rao Ch 16",
+          "key_concepts": [
+            "Corporate governance defined — system of rules, practices, processes for directing companies",
+            "Stakeholder theory — Friedman vs Freeman on corporate purpose",
+            "CSR (Corporate Social Responsibility) — ethical obligation vs legal compliance",
+            "Board independence — preventing management capture of oversight",
+            "Audit committee — integrity of financial reporting",
+            "Insider trading — using privileged information unethically",
+            "Executive compensation ethics — CEO pay vs worker wages",
+            "Environmental governance — greenwashing vs genuine sustainability",
+            "Corporate fraud — Enron, Satyam scandal lessons",
+            "Whistleblowing in corporations — Sarbanes-Oxley protections",
+            "Supply chain ethics — labour standards, child labour, worker rights",
+            "ESG (Environmental Social Governance) — new corporate accountability framework",
+            "SEBI and corporate ethics — regulatory framework",
+            "Companies Act 2013 — CSR mandate, independent directors provisions",
+            "Public sector enterprise ethics — CIL, ONGC accountability to citizens"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "Low",
+          "mains_importance": "High",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "theory_questions": 4,
+        "case_studies": 2,
+        "marks": 75,
+        "duration_minutes": 90,
+        "sample_questions": [
+          "What is probity in governance? Discuss the measures needed to ensure probity in the public sector. (12.5 marks)",
+          "Examine the ethical dilemmas faced by civil servants in India. How should they resolve conflicts between personal ethics and official duty? (12.5 marks)",
+          "Case Study: An IAS officer discovers that funds meant for a tribal welfare scheme have been diverted by a junior official who is also the officer's close friend. What ethical issues arise and what course of action should be taken? (25 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "ETH_MOD_008",
+      "module_name": "Case Studies Framework — Methodology and Practice",
+      "duration_days": {
+        "fast": 14,
+        "standard": 20,
+        "extended": 30
+      },
+      "daily_target_hours": 4,
+      "note": "This module is crucial — 60% of GS4 marks come from case studies. Practice daily with diverse scenarios.",
+      "topics": [
+        {
+          "topic_id": "ETH_008_T001",
+          "topic_name": "Case Study Methodology — How to Approach and Structure Answers",
+          "primary_source": "Subba Rao Ch 17-20 — Case Studies; UPSC Previous Year Case Studies 2013-2024",
+          "key_concepts": [
+            "Case study structure: Introduction → Stakeholder mapping → Ethical issues → Options → Decision + Justification",
+            "Step 1: Identify the central ethical conflict clearly in 2-3 sentences",
+            "Step 2: Map ALL stakeholders and their interests/rights",
+            "Step 3: Identify which ethical principles are in tension",
+            "Step 4: Generate at least 3 courses of action",
+            "Step 5: Evaluate each option against legal, ethical, practical criteria",
+            "Step 6: Choose and justify with ethical theory + practical constraints",
+            "UPSC expectations: decisive answer, multiple perspectives, awareness of consequences",
+            "Avoid 'both sides' fence-sitting — UPSC wants civil servant decisiveness",
+            "Length: typically 400-600 words per case study (25 marks)",
+            "Use of examples and precedents to support decisions",
+            "Institutional mechanisms to invoke — disciplinary action, RTI, CAT, CVC",
+            "Balance — don't be so idealistic as to be impractical",
+            "Emotional intelligence in answer — show empathy in stakeholder analysis",
+            "Format: use paragraphs, not bullet points for case study answers"
+          ],
+          "pyq_frequency": "Very High — half the paper is case studies",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "ETH_008_T002",
+          "topic_name": "Category 1 — Corruption and Conflict of Interest Cases",
+          "primary_source": "Subba Rao Ch 18; UPSC 2014, 2016, 2018 Case Studies",
+          "key_concepts": [
+            "Bribery scenarios — direct demand vs implied expectation",
+            "Gift vs bribe — when a gift becomes a bribe",
+            "Conflict of interest — family connections in contracts",
+            "Asset misuse — using government vehicle, staff for personal work",
+            "Nepotism in postings and transfers",
+            "Speed money — small facilitating payments in permits",
+            "Kickback in procurement — commission demanded by official",
+            "Prevention vs reporting dilemma — stop ongoing corruption vs collect evidence",
+            "Reporting superior's corruption — risk vs duty",
+            "Anonymous tip about colleague — how to verify and act",
+            "Corruption with development outcomes — corrupt official delivers results",
+            "Systemic corruption — single official cannot stop it",
+            "Political protection for corrupt subordinate",
+            "Use of RTI/audit findings to counter corruption",
+            "Personal dilemma: family in financial crisis, temptation to accept bribe"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "ETH_008_T003",
+          "topic_name": "Category 2 — Welfare and Rights-Based Scenarios",
+          "primary_source": "Subba Rao Ch 19; UPSC 2015, 2017, 2019 Case Studies",
+          "key_concepts": [
+            "Displacement and rehabilitation — tribal, farmer land acquisition dilemmas",
+            "Scheme benefits vs eligibility — helping deserving but technically ineligible person",
+            "Last mile delivery failure — remote villagers not receiving entitlements",
+            "Gender discrimination in beneficiary selection — local official prejudice",
+            "Disability inclusion in scheme implementation",
+            "Child labour in project — contractor employing minors",
+            "Bonded labour rescue — safety of official vs duty to victim",
+            "LGBTQ+ rights in official capacity — personal vs constitutional values",
+            "Caste-based denial of services — confronting entrenched discrimination",
+            "Right to food vs budgetary constraints",
+            "Healthcare access dilemma — rule vs life-saving emergency",
+            "School mid-day meal quality versus cost cutting by contractor",
+            "Flood relief discrimination by local leaders",
+            "Old age pension denial due to documentation gaps",
+            "Medical ethics in rural postings — resource allocation triage"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "ETH_008_T004",
+          "topic_name": "Category 3 — Whistleblowing, Loyalty, and Institutional Integrity",
+          "primary_source": "Subba Rao Ch 20; UPSC 2020-2024 Case Studies",
+          "key_concepts": [
+            "Whistleblowing process — gather evidence, use internal channels first",
+            "Whistleblower Protection Act 2014 — procedure and protections",
+            "Loyalty to institution vs loyalty to truth",
+            "Solidarity with colleague vs institutional integrity",
+            "Leaking to media — when is it justified?",
+            "Anonymous complaint vs named complaint — trade-offs",
+            "Retaliation against whistleblower — how to respond",
+            "Politicised investigation — pressure to drop case",
+            "Maintaining confidentiality while seeking redress",
+            "Digital evidence — using mobile recordings ethically and legally",
+            "Hierarchy pressure — superior ordering suppression of report",
+            "Transfer as punishment for speaking up",
+            "Courts as last resort — filing writ petition vs exhausting administrative remedies",
+            "Internal audit findings — duty to report vs cover-up pressure",
+            "Post-retirement whistleblowing — no protection but perhaps greater duty"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 4
+        },
+        {
+          "topic_id": "ETH_008_T005",
+          "topic_name": "Category 4 — Law, Discretion, and Justice Scenarios",
+          "primary_source": "Subba Rao Ch 21; UPSC 2013, 2021, 2022 Case Studies",
+          "key_concepts": [
+            "Strict law vs equity — when letter of law gives unjust result",
+            "Discretion to waive penalties in genuine hardship",
+            "Emergency clause use — extraordinary situations requiring extraordinary action",
+            "Arrest vs warning for minor offence by vulnerable person",
+            "Environmental law enforcement vs livelihood of fishermen/miners",
+            "Eviction versus livelihood — encroachment by poor vs court order",
+            "Police use of force ethics — minimum necessary force principle",
+            "Encounter killing ethics — national security vs judicial process",
+            "Custody deaths — investigation against own colleagues",
+            "Bail application in sensitive case — pressure from both sides",
+            "Disaster relief prioritisation — who gets resources first",
+            "Triage ethics — mass casualty incident, limited medical resources",
+            "Anticipatory bail and its ethics in organised crime cases",
+            "Confidential informant ethics — protecting source vs disclosure",
+            "IPC vs customary law — tribal justice systems and formal law tension"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Low",
+          "mains_importance": "Very High",
+          "daily_target_hours": 4
+        }
+      ],
+      "module_test": {
+        "theory_questions": 0,
+        "case_studies": 5,
+        "marks": 125,
+        "duration_minutes": 180,
+        "sample_questions": [
+          "You are the DM. During a flood, you have resources to save either a group of 40 elderly persons OR a group of 10 children. You cannot save both. What do you do and why? (25 marks)",
+          "An officer discovers that her departmental superior is involved in a scam worth Rs 5 crore, and the superior has also helped her career in the past. What should she do? (25 marks)",
+          "A forest officer is ordered to approve a road through a tiger reserve for political reasons. The road would fragment the corridor. What course of action should he take? (25 marks)"
+        ]
+      }
+    }
+  ],
+
+  "full_study_plan": {
+    "total_days": {
+      "fast_pace": 82,
+      "standard_pace": 105,
+      "extended_pace": 152
+    },
+    "daily_routine": {
+      "theory_reading": "1.5 hours — Lexicon primary + Subba Rao supplementary",
+      "answer_writing": "1 hour — one 10-mark answer or half of one 25-mark case study",
+      "revision": "30 minutes — flashcards of thinkers and key definitions",
+      "case_study_practice": "1 hour — one full case study analysis per day from Module 8"
+    },
+    "phase_1": {
+      "modules": ["ETH_MOD_001", "ETH_MOD_002"],
+      "focus": "Foundations and ethical theories",
+      "days_standard": 28
+    },
+    "phase_2": {
+      "modules": ["ETH_MOD_003", "ETH_MOD_004", "ETH_MOD_005"],
+      "focus": "Attitude, civil service values, EI",
+      "days_standard": 37
+    },
+    "phase_3": {
+      "modules": ["ETH_MOD_006"],
+      "focus": "Moral thinkers intensive",
+      "days_standard": 14
+    },
+    "phase_4": {
+      "modules": ["ETH_MOD_007"],
+      "focus": "Probity, governance ethics",
+      "days_standard": 16
+    },
+    "phase_5": {
+      "modules": ["ETH_MOD_008"],
+      "focus": "Case study practice — parallel with all other phases from week 3",
+      "days_standard": 20,
+      "note": "Case study practice should BEGIN in week 3, not only after completing theory"
+    }
+  },
+
+  "high_value_topics_for_quick_revision": [
+    "Gandhi's seven social sins + talisman test",
+    "Kant's categorical imperative — all three formulations",
+    "Nolan's seven principles of public life",
+    "Goleman's five components of EI",
+    "Rawls' veil of ignorance + difference principle",
+    "Kautilya's anti-corruption measures from Arthashastra",
+    "Ambedkar's constitutional morality concept",
+    "Steps to resolve ethical dilemma (6-step model)",
+    "Case study answer structure (7 steps)",
+    "Probity components — financial, impartiality, transparency, accountability"
+  ],
+
+  "pyq_trend_analysis": {
+    "2013": ["Ethics in public life", "Emotional intelligence basics", "Case study — bribery"],
+    "2014": ["Impartiality vs neutrality", "Attitude formation", "Case study — land acquisition"],
+    "2015": ["Virtue ethics + Indian traditions", "Gandhi's ethics", "Case study — tribal displacement"],
+    "2016": ["Kant's duty ethics", "Rawls' justice theory", "Case study — whistleblowing"],
+    "2017": ["Moral thinkers compare", "EI in administration", "Case study — corruption chain"],
+    "2018": ["Ethical dilemmas", "Probity measures", "Case study — fund diversion"],
+    "2019": ["Consequentialism critique", "Rawls revisited", "Case study — conflict of interest"],
+    "2020": ["Constitutional morality", "Social influence on attitude", "Case study — media leak"],
+    "2021": ["Aristotle virtue ethics", "CSR and corporate governance", "Case study — police encounter"],
+    "2022": ["Ambedkar's ethics", "EI + leadership", "Case study — disaster relief"],
+    "2023": ["Nishkama karma application", "Whisleblowing legislation", "Case study — environmental clearance"],
+    "2024": ["Gandhi talisman in digital age", "AI ethics in governance", "Case study — data privacy"]
+  },
+
+  "ai_module_generator_schema": {
+    "input_params": {
+      "student_pace": "fast | standard | extended",
+      "start_date": "ISO date string",
+      "student_type": "mentorsdaily | self_study",
+      "current_module": "ETH_MOD_001 to ETH_MOD_008",
+      "daily_available_hours": "number (2-6)"
+    },
+    "output_format": {
+      "daily_target": "topic_id + specific Lexicon chapters + key definitions to memorise",
+      "answer_writing_prompt": "one question from topic to write each day",
+      "case_study_of_day": "one scenario from Module 8 categories",
+      "revision_flashcard_set": "5-7 bullet points as Q&A flashcards"
+    },
+    "module_test_trigger": "after completing all topics in module, auto-generate from sample_questions bank",
+    "fault_analysis": "compare student answer to model answer → flag missing ethical theory citations, missing stakeholder identification, vague conclusions"
+  }
+}
