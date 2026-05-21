@@ -1,0 +1,2326 @@
+{
+  "metadata": {
+    "portal": "MentorsDaily UPSC",
+    "subject": "Environment & Ecology",
+    "total_modules": 8,
+    "upsc_weightage": {
+      "prelims_questions_per_year": "10-12",
+      "mains_marks_gs3": "30-40",
+      "importance": "Critical GS3 topic"
+    },
+    "primary_references": {
+      "main_book": "Shankar IAS Environment (5th Edition)",
+      "ncert": "Class 12 Biology Chapters 13-16 + Ecology related chapters",
+      "additional": "Previous Year Question Papers (2015-2025)"
+    },
+    "creation_date": "2026-05-20"
+  },
+  "modules": [
+    {
+      "module_id": "M1",
+      "module_name": "Ecology Fundamentals",
+      "topics": [
+        {
+          "topic_id": "M1_T1",
+          "topic_name": "Levels of Organization & Ecosystem Components",
+          "primary_book": {
+            "chapter": 1,
+            "name": "Introduction to Ecology"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 13 - Organisms and Populations",
+          "key_concepts": [
+            "Biosphere - biotic and abiotic components interaction",
+            "Biomes - tropical, temperate, polar regions classification",
+            "Ecosystems - terrestrial, aquatic (freshwater and marine)",
+            "Community - multiple species in common habitat",
+            "Population - members of same species in area",
+            "Organism - individual living being",
+            "Biotic components - producers, consumers, decomposers",
+            "Abiotic components - light, temperature, water, soil, atmosphere",
+            "Habitat - physical location of organism",
+            "Niche - role and function in ecosystem",
+            "Ecological diversity - alpha, beta, gamma diversity",
+            "Niche specialization - resource partitioning examples"
+          ],
+          "important_conventions": [
+            "UNFCCC - Framework Convention on Climate Change",
+            "CBD - Convention on Biological Diversity (1992)",
+            "Ramsar Convention - Wetlands Conservation (1971)"
+          ],
+          "government_initiatives": [
+            "National Biodiversity Action Plan",
+            "AIBP - All India Biodiversity Portal",
+            "State Biodiversity Boards (SBBs)",
+            "Biological Management Committees (BMCs)"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M1_T2",
+          "topic_name": "Food Chains, Food Webs & Trophic Levels",
+          "primary_book": {
+            "chapter": 2,
+            "name": "Energy Flow in Ecosystems"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Ecosystem",
+          "key_concepts": [
+            "Food chain - linear energy transfer pathway",
+            "Autotrophs - producers (green plants, chemosynthetic bacteria)",
+            "Heterotrophs - consumers (primary, secondary, tertiary, quaternary)",
+            "Detritivores - dead matter consumers",
+            "Decomposers - bacteria, fungi, actinomycetes",
+            "Food web - interconnected food chains",
+            "Trophic level - feeding position in chain",
+            "Primary consumers - herbivores (grasshoppers, deer, fish)",
+            "Secondary consumers - carnivores feeding on herbivores",
+            "Tertiary consumers - top predators",
+            "Omnivores - feeding at multiple levels",
+            "Keystone species - disproportionate ecological importance",
+            "Biotic cascade - top-down control effects"
+          ],
+          "important_conventions": [
+            "CMS - Convention on Migratory Species",
+            "Bonn Convention - Conservation of Migratory Species"
+          ],
+          "government_initiatives": [
+            "Project Tiger - predator conservation",
+            "Project Elephant - megafauna protection"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M1_T3",
+          "topic_name": "Ecological Pyramids (Number, Biomass, Energy)",
+          "primary_book": {
+            "chapter": 2,
+            "name": "Energy Flow & Ecological Pyramids"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Ecosystem",
+          "key_concepts": [
+            "Pyramid of numbers - organisms count at each level",
+            "Upright pyramid - herbivorous food chain (many plants, fewer animals)",
+            "Inverted pyramid - parasitic food chain (single large host, many parasites)",
+            "Pyramid of biomass - total dry weight at each level",
+            "Upright biomass pyramid - terrestrial ecosystems",
+            "Inverted biomass pyramid - aquatic ecosystems (phytoplankton biomass < zooplankton)",
+            "Pyramid of energy - energy flow (most reliable pyramid)",
+            "Always upright - energy decreases with each level",
+            "10% law - maximum 10% energy transfer between levels",
+            "Energy loss - respiration, decomposition, excretion",
+            "Trophic efficiency - varies 5-20% depending on ecosystem",
+            "Gross Primary Productivity (GPP) - total photosynthesis"
+          ],
+          "important_conventions": [],
+          "government_initiatives": [],
+          "pyq_frequency": "high",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.0
+        },
+        {
+          "topic_id": "M1_T4",
+          "topic_name": "Energy Flow: GPP, NPP, Secondary Productivity, 10% Law",
+          "primary_book": {
+            "chapter": 2,
+            "name": "Productivity in Ecosystems"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Ecosystem, Energy Flow",
+          "key_concepts": [
+            "Gross Primary Productivity (GPP) - total photosynthesis by producers",
+            "Net Primary Productivity (NPP) - GPP minus respiration by plants",
+            "NPP = GPP - (Plant Respiration)",
+            "Available energy - NPP used by consumers",
+            "Secondary Productivity - energy fixed by consumers/heterotrophs",
+            "Tertiary Productivity - energy in top carnivores",
+            "10% Law - Lindeman's law of efficiency",
+            "Each trophic level receives ~10% energy from previous level",
+            "90% energy lost in respiration, movement, heat",
+            "Standing crop - biomass at given time",
+            "Carrying capacity - maximum population supported",
+            "Nutrient cycling - interconnected with energy flow"
+          ],
+          "important_conventions": [
+            "IPCC - Intergovernmental Panel on Climate Change"
+          ],
+          "government_initiatives": [
+            "NAPCC - National Action Plan on Climate Change",
+            "SAPCCs - State Action Plan on Climate Change"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M1_T5",
+          "topic_name": "Biogeochemical Cycles (C, N, P, S, Water)",
+          "primary_book": {
+            "chapter": 3,
+            "name": "Nutrient Cycles"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Nutrient Cycling",
+          "key_concepts": [
+            "Carbon Cycle - atmospheric CO2, photosynthesis, respiration, combustion, fossilization",
+            "Carbonate buffering system - oceanic carbon storage",
+            "Fossil fuel combustion - 8 Gt CO2/year (current)",
+            "Nitrogen Cycle - N2 fixation, nitrification, denitrification, ammonification",
+            "Nitrogen fixation - Azotobacter, Rhizobium, cyanobacteria",
+            "Nitrification - NO2- to NO3- by Nitrobacter",
+            "Denitrification - NO3- to N2, releases to atmosphere",
+            "Ammonification - organic N to NH3",
+            "Phosphorus Cycle - sedimentary cycle, no atmospheric form",
+            "P weathering from rocks, plant uptake, food chain transfer",
+            "Phosphate minerals - apatite, rock phosphate mining",
+            "Eutrophication - excess P and N in water",
+            "Sulphur Cycle - atmospheric SO2, combustion, volcanic emissions",
+            "Acid rain - SO2 and NOx oxidation to H2SO4 and HNO3",
+            "Water Cycle - evaporation, transpiration, condensation, precipitation, runoff",
+            "Infiltration - groundwater recharge",
+            "Percolation - deep water storage in aquifers"
+          ],
+          "important_conventions": [
+            "UNFCCC - Climate Change Convention",
+            "CBD - Biodiversity Convention",
+            "UNCCD - Desertification Convention"
+          ],
+          "government_initiatives": [
+            "Namami Gange - Ganges cleanup initiative",
+            "Sagarmala - Coastal development scheme",
+            "National Water Mission - Water security"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M1_T6",
+          "topic_name": "Ecological Succession (Primary, Secondary, Pioneer to Climax)",
+          "primary_book": {
+            "chapter": 4,
+            "name": "Ecological Succession"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 13 - Succession",
+          "key_concepts": [
+            "Ecological succession - gradual community change over time",
+            "Primary succession - bare rock/new habitat colonization",
+            "Pioneer species - lichens, mosses, first colonizers",
+            "Lithosere - rock surface succession",
+            "Xerosere - dry habitat succession",
+            "Hydrosere - water/wet habitat succession",
+            "Secondary succession - disturbed habitat recovery",
+            "Faster than primary succession (pre-existing soil)",
+            "Sere - intermediate community stage",
+            "Climax community - stable final stage",
+            "Climax forest - oak, teak, sal (India examples)",
+            "Subclimax community - grazing, fire, human prevented climax",
+            "Disclimax - human-modified stable community",
+            "Plagioclimax - permanently altered succession due to disturbance"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - Wetland succession",
+            "CBD - Habitat succession protection"
+          ],
+          "government_initiatives": [
+            "Forest Rights Act 2006 - Succession rights",
+            "Van Mahotsav - Afforestation program"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M1_T7",
+          "topic_name": "Population Interactions (Competition, Predation, Parasitism, Mutualism, Commensalism)",
+          "primary_book": {
+            "chapter": 5,
+            "name": "Population Interactions"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 13 - Population Interactions",
+          "key_concepts": [
+            "Competition (−/−) - both species negatively affected",
+            "Competitive exclusion principle - niche differentiation prevents coexistence",
+            "Resource partitioning - temporal, spatial, dietary niche separation",
+            "Predation (+/−) - predator gains, prey loses",
+            "Predator-prey cycles - population oscillations",
+            "Coevolution - predator and prey adaptations",
+            "Camouflage, mimicry - prey defense strategies",
+            "Parasitism (+/−) - parasite gains, host loses",
+            "Endoparasites - internal parasites (tapeworms, plasmodium)",
+            "Ectoparasites - external parasites (lice, fleas, ticks)",
+            "Mutualism (+/+) - both species benefit",
+            "Mycorrhizae - fungal-plant root associations",
+            "Nitrogen-fixing bacteria - legume nodules",
+            "Pollination - plant-insect mutual benefit",
+            "Commensalism (+/0) - one benefits, other unaffected",
+            "Amensalism (−/0) - one harmed, other unaffected",
+            "Allelopathy - chemical inhibition of competitors"
+          ],
+          "important_conventions": [
+            "CITES - Trade in endangered species",
+            "CMS - Migratory species protection"
+          ],
+          "government_initiatives": [
+            "Project Tiger - Predator-prey management",
+            "Vulture Conservation Program"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M1_T8",
+          "topic_name": "Population Growth Models (Exponential vs Logistic, Carrying Capacity)",
+          "primary_book": {
+            "chapter": 5,
+            "name": "Population Growth"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 13 - Population Growth",
+          "key_concepts": [
+            "Exponential growth - J-shaped curve, unlimited resources",
+            "Exponential equation - Nt = N0e^(rt)",
+            "Doubling time - time for population to double",
+            "Biotic potential - maximum growth rate",
+            "Logistic growth - S-shaped curve, resource limitation",
+            "Logistic equation - Nt = K / (1 + (K-N0/N0)e^(-rt))",
+            "Carrying capacity (K) - maximum sustainable population",
+            "Environmental resistance - limiting factors",
+            "Lag phase - slow initial growth",
+            "Exponential phase - rapid growth",
+            "Stationary phase - growth rate = death rate",
+            "Decline phase - population decrease",
+            "Density-dependent factors - disease, predation, competition",
+            "Density-independent factors - weather, natural disasters"
+          ],
+          "important_conventions": [
+            "UN SDG - Sustainable Development Goals"
+          ],
+          "government_initiatives": [
+            "National Population Policy 2000",
+            "Census of India - Population tracking"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 6,
+          "daily_target_hours": 1.0
+        }
+      ]
+    },
+    {
+      "module_id": "M2",
+      "module_name": "Biodiversity",
+      "topics": [
+        {
+          "topic_id": "M2_T1",
+          "topic_name": "Levels of Biodiversity (Genetic, Species, Ecosystem)",
+          "primary_book": {
+            "chapter": 6,
+            "name": "Biodiversity Introduction"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Biodiversity",
+          "key_concepts": [
+            "Genetic diversity - genetic variation within species",
+            "Allelic variation - different gene forms in population",
+            "Gene banks - seed storage (National Gene Bank India)",
+            "Cryopreservation - genetic material frozen storage",
+            "Species diversity - number of different species",
+            "Taxonomic diversity - variety across species groups",
+            "Species richness - total species count",
+            "Species evenness - relative abundance distribution",
+            "Ecosystem diversity - variety of habitats and ecosystems",
+            "Habitat heterogeneity - diverse microhabitats",
+            "Landscape diversity - regional ecosystem variation",
+            "Endemism - species restricted to geographic area",
+            "Alpha diversity - local species richness",
+            "Beta diversity - species turnover between habitats",
+            "Gamma diversity - regional species richness"
+          ],
+          "important_conventions": [
+            "CBD 1992 - Nagoya Protocol on genetic resources",
+            "Cartagena Protocol - GMO trade regulation"
+          ],
+          "government_initiatives": [
+            "National Biodiversity Action Plan",
+            "National Gene Bank - Indian Council of Agricultural Research",
+            "AIBP - All India Biodiversity Portal"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M2_T2",
+          "topic_name": "Global Biodiversity Hotspots (36 Global, India's 4)",
+          "primary_book": {
+            "chapter": 7,
+            "name": "Biodiversity Hotspots"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Biodiversity Hotspots",
+          "key_concepts": [
+            "Hotspot criteria - 1500+ endemic species, <30% vegetation remaining",
+            "Western Ghats & Sri Lanka hotspot - 4,780+ endemic species",
+            "Endemic birds - Nilgiri flycatcher, Malabar trogon",
+            "Endemic mammals - Lion-tailed macaque, Nilgiri tahr",
+            "Indo-Burma hotspot - Myanmar, Thailand, Laos, Cambodia, Vietnam, India (Northeast)",
+            "Himalayan hotspot - Eastern Himalayas (5,000+ endemic plants)",
+            "Sundaland hotspot - Southeast Asia islands (Indonesia, Malaysia, Brunei)",
+            "Global hotspots - Tropical Andes, Amazon, Congo Basin, Madagascar, etc.",
+            "Endemism centers - species found nowhere else",
+            "Biodiversity gradients - latitude, altitude effects",
+            "Megabiodiversity countries - India (2nd most biodiverse)",
+            "IUCN Red List - conservation status assessment",
+            "Extinction rate - background vs current rates"
+          ],
+          "important_conventions": [
+            "CBD - Aichi Targets (modified as GBF targets)",
+            "Ramsar Convention - Wetland hotspots"
+          ],
+          "government_initiatives": [
+            "Western Ghats Task Force",
+            "Northeast Biodiversity Action Plan",
+            "Himalayan Ecosystem Conservation Programs"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M2_T3",
+          "topic_name": "IUCN Red List Categories with Indian Examples",
+          "primary_book": {
+            "chapter": 8,
+            "name": "Threatened Species Status"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Conservation",
+          "key_concepts": [
+            "Extinct (EX) - no individuals remaining",
+            "Extinct in Wild (EW) - survives only in captivity",
+            "Critically Endangered (CR) - extreme extinction risk",
+            "Endangered (EN) - high extinction risk (Tigers <4000)",
+            "Vulnerable (VU) - moderate extinction risk",
+            "Near Threatened (NT) - approaching vulnerable status",
+            "Least Concern (LC) - stable population",
+            "Data Deficient (DD) - insufficient information",
+            "Not Evaluated (NE) - not assessed yet",
+            "Population trend - increasing, stable, decreasing, unknown",
+            "Geographic range - extent of occurrence",
+            "Habitat quality - degradation assessment",
+            "Threat assessment - anthropogenic and natural causes",
+            "Criterion A - population size reduction",
+            "Criterion B - geographic range restriction"
+          ],
+          "important_conventions": [
+            "IUCN Red List - Global assessment",
+            "CBD - National Red List compilation"
+          ],
+          "government_initiatives": [
+            "Wildlife Institute of India - Assessment authority",
+            "Ministry of Environment Forest & Climate Change - Data compilation"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M2_T4",
+          "topic_name": "Threatened Species in India (Tigers, Elephants, Rhinos, Vultures, Dolphins, etc.)",
+          "primary_book": {
+            "chapter": 8,
+            "name": "Endangered Indian Species"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Endangered Species",
+          "key_concepts": [
+            "Tigers - Population ~3900 India (2018 census), IUCN EN, 54 reserves",
+            "Tiger mortality - poaching, human conflict, habitat loss",
+            "Elephants - Population 30,000+ India, habitat fragmentation, HEC",
+            "Indian Rhinoceros - Population 3,500+ Assam, poaching threat",
+            "Snow Leopard - Population ~500 India, high altitude habitat (4000m+)",
+            "Asian Lion - Population 600+ Gujarat, only Gir Forest habitat",
+            "Vultures - Population crashed 99.9% (1990-2000), diclofenac poison",
+            "Indian Pangolin - most trafficked mammal, scales used in medicine",
+            "Bengal Florican - critically endangered grassland bird",
+            "Gharial - long-snouted crocodile, Chambal River population recovery",
+            "River Dolphin - Indo-Gangetic dolphins, Ramsar species",
+            "One-horned Rhinoceros - Project Rhino (Assam)",
+            "Great Indian Bustard - near extinct, <500 remaining",
+            "Nilgiri Tahr - mountain ungulate, Western Ghats endemic"
+          ],
+          "important_conventions": [
+            "CITES Appendix I - Tigers, rhinos, pangolins, elephants",
+            "CMS - Migratory species (elephants, dolphins)"
+          ],
+          "government_initiatives": [
+            "Project Tiger - 1973, NTCA",
+            "Project Elephant - Corridor development, HEC mitigation",
+            "Project Snow Leopard - Himalayan conservation",
+            "Vulture Action Plan - Hospital guidelines on NSAID use",
+            "Gharial Crocodile Action Plan - Breeding centers"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M2_T5",
+          "topic_name": "Invasive/Alien Species (Lantana, Water Hyacinth, Parthenium)",
+          "primary_book": {
+            "chapter": 9,
+            "name": "Invasive Species Impact"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Invasive Species",
+          "key_concepts": [
+            "Alien species - non-native species in ecosystem",
+            "Invasive species - aliens that become dominant, cause damage",
+            "Lantana camara - spreading in Indian forests (2 million ha)",
+            "Lantana impact - prevents native regeneration, reduces grass cover",
+            "Water hyacinth (Eichhornia) - aquatic invasive, clogs water bodies",
+            "Eutrophication - nutrient enrichment from water hyacinth decay",
+            "Parthenium hysterophorus - Congress grass, allelopathic (poison release)",
+            "Parthenium impacts - human allergies, livestock toxicity, crop yield loss",
+            "Prosopis juliflora - invasive shrub, water depletion",
+            "Mimosa pigra - thorny invasive, river system clogging",
+            "Competition - resource exclusion of native species",
+            "Predation - alien predators eating native fauna",
+            "Hybridization - genetic pollution of native species",
+            "Disease transmission - pathogens from invasive species",
+            "Prevention & Control - early detection, mechanical/chemical removal, biocontrol"
+          ],
+          "important_conventions": [
+            "CBD - Invasive species management",
+            "Cartagena Protocol - Living modified organism trade"
+          ],
+          "government_initiatives": [
+            "IUCN Invasive Species Specialist Group",
+            "National Invasive Species Management Committee"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.0
+        },
+        {
+          "topic_id": "M2_T6",
+          "topic_name": "Sixth Mass Extinction (Current vs Background Extinction Rates)",
+          "primary_book": {
+            "chapter": 10,
+            "name": "Extinction Crisis"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Biodiversity Loss",
+          "key_concepts": [
+            "Background extinction - natural baseline rate (~1 species/year)",
+            "Current extinction rate - ~100-1000x background rate",
+            "Sixth mass extinction - Holocene extinction, human-caused",
+            "Previous 5 extinctions - Ordovician, Devonian, Permian, Triassic, Cretaceous",
+            "Cretaceous event - dinosaur extinction, asteroid impact 66 MYA",
+            "Habitat loss - primary extinction driver (70%+)",
+            "Overexploitation - hunting, fishing pressure",
+            "Pollution - chemical contamination, plastic",
+            "Climate change - temperature and precipitation shifts",
+            "Invasive species - competition, predation, disease",
+            "Synergistic effects - multiple stressors combination",
+            "Tipping points - irreversible ecosystem collapse",
+            "Extinction debt - committed loss from past habitat loss",
+            "Megafauna extinctions - large animal vulnerability"
+          ],
+          "important_conventions": [
+            "CBD 2030 targets - Species extinction prevention",
+            "IPCC - Climate extinction link"
+          ],
+          "government_initiatives": [
+            "NAPCC - Climate mitigation reducing extinction",
+            "Wildlife Protection Act enforcement"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M2_T7",
+          "topic_name": "Ecosystem Services (Provisioning, Regulating, Cultural, Supporting)",
+          "primary_book": {
+            "chapter": 11,
+            "name": "Ecosystem Services Valuation"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Ecosystem Functions",
+          "key_concepts": [
+            "Provisioning services - food, water, fuel, medicines, materials",
+            "Timber - forest timber value globally",
+            "Fisheries - marine and freshwater protein source",
+            "Medicinal plants - 80% developing countries reliance",
+            "Genetic resources - pharmaceutical and agricultural potential",
+            "Regulating services - climate regulation, flood control, disease suppression",
+            "Climate regulation - carbon sequestration, evapotranspiration",
+            "Water purification - wetland filtration, soil filtration",
+            "Pollination - crop pollination (75% food crops)",
+            "Pest control - natural enemies of agricultural pests",
+            "Disease suppression - predation on disease vectors",
+            "Supporting services - soil formation, nutrient cycling, oxygen production",
+            "Cultural services - recreation, education, spiritual, aesthetic",
+            "Ecotourism - revenue generation and conservation incentive",
+            "Spiritual values - sacred groves, pilgrimage sites"
+          ],
+          "important_conventions": [
+            "Millennium Ecosystem Assessment 2005",
+            "TEEB - The Economics of Ecosystems and Biodiversity"
+          ],
+          "government_initiatives": [
+            "Payment for Ecosystem Services (PES) schemes",
+            "REDD+ - Reducing Emissions from Deforestation"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": "M3",
+      "module_name": "Conservation",
+      "topics": [
+        {
+          "topic_id": "M3_T1",
+          "topic_name": "In-Situ Conservation (National Parks, Sanctuaries, Conservation & Community Reserves)",
+          "primary_book": {
+            "chapter": 12,
+            "name": "Protected Areas"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Conservation",
+          "key_concepts": [
+            "In-situ - species conservation in natural habitat",
+            "National Parks - 106 India, complete habitat protection, no human extraction",
+            "Wildlife Sanctuaries - 510+ India, species-specific protection, limited human use",
+            "National Park vs Sanctuary - sanctuary allows local use, park doesn't",
+            "Conservation Reserves - transitional protected areas (101 India)",
+            "Community Reserves - community-managed (newly designated)",
+            "Scheduled area - tribal rights in forests",
+            "Buffer zone - protective area around core",
+            "ESZ (Eco-Sensitive Zone) - 2 km regulated zone around parks",
+            "Corridors - habitat linkage between parks",
+            "Wildlife law enforcement - anti-poaching patrols",
+            "Research & monitoring - species population tracking",
+            "Community participation - local stake in conservation",
+            "Habitat restoration - reforestation, wetland recovery",
+            "Human-Wildlife Conflict (HWC) - compensation schemes"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - Wetland sites protection",
+            "Bonn Convention - Migratory species protection",
+            "CITES - Trade regulation"
+          ],
+          "government_initiatives": [
+            "Project Tiger - Tiger Reserve network",
+            "Project Elephant - Elephant corridors, HWC mitigation",
+            "Sanctuary Development Authority - Funding and management"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M3_T2",
+          "topic_name": "Biosphere Reserves - All 18 in India with MAB Programme",
+          "primary_book": {
+            "chapter": 13,
+            "name": "Biosphere Reserves"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Protected Areas",
+          "key_concepts": [
+            "Biosphere Reserves - UNESCO 'Man and Biosphere' program",
+            "Three zones - core (strict protection), buffer (limited use), transition (sustainable use)",
+            "Nilgiri BR - Tamil Nadu, Karnataka, Kerala - 5520 sq km - 1986",
+            "Nanda Devi BR - Uttarakhand - 5860 sq km - 1988",
+            "Sundarbans BR - West Bengal - 9630 sq km - 1989",
+            "Manas BR - Assam - 5008 sq km - 1989 (Bhutan shared)",
+            "Khangchendzonga BR - Sikkim - 2784 sq km - 2000",
+            "Great Nicobar BR - Andaman & Nicobar - 885 sq km - 1989",
+            "Gulf of Mannar BR - Tamil Nadu - 10500 sq km - 1989",
+            "Simlipal BR - Odisha - 2194 sq km - 1994",
+            "Nokrek BR - Meghalaya - 820 sq km - 2009",
+            "Pachmarhi BR - Madhya Pradesh - 1678 sq km - 2003",
+            "Seshachalam BR - Andhra Pradesh - 4123 sq km - 2010",
+            "Achanakmar-Amarkantak BR - Chhattisgarh-MP - 2915 sq km - 2012",
+            "Agasthyamalai BR - Kerala-TN - 1745 sq km - 2016",
+            "Panna BR - Madhya Pradesh - 2994 sq km - 2011",
+            "Rani Indrani BR - Kerala - 1098 sq km - 2021",
+            "Sahyadri BR - Karnataka, Maharashtra, Goa, Tamil Nadu",
+            "Cold Desert BR - Himachal Pradesh - 2730 sq km - 2009"
+          ],
+          "important_conventions": [
+            "UNESCO MAB Programme - 1968 initiative",
+            "Biosphere Reserve concept - UNESCO guidelines"
+          ],
+          "government_initiatives": [
+            "Biosphere Reserve Network - Inter-BR linkages",
+            "IUCN WCPA - Best practices sharing"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M3_T3",
+          "topic_name": "Project Tiger (1973, NTCA, 54 Reserves)",
+          "primary_book": {
+            "chapter": 14,
+            "name": "Project Tiger Implementation"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Species Conservation",
+          "key_concepts": [
+            "Project Tiger - launched April 1973, save Indian tiger",
+            "Tiger population - 1970s <1500, current ~3900",
+            "NTCA - National Tiger Conservation Authority (2006)",
+            "54 Tiger Reserves - across 18 states",
+            "Tiger taxonomy - Bengal, Siberian, Sundarbans, Deccan (India)",
+            "Bengal Tigers - highest population (2800+)",
+            "Sundarbans Tigers - man-eaters, salt-water habitat",
+            "Siberian Tigers - rare, Northeast India",
+            "Deccan Tigers - Central India (Kanha, Pench, Tadoba)",
+            "T-1 to T-200+ - tracked individual tigers",
+            "Population genetics - genetic diversity management",
+            "Corridor conservation - habitat connectivity",
+            "Human-Tiger Conflict - cattle predation, human deaths",
+            "Prey base management - ungulate population increase",
+            "International cooperation - Trans-border reserves"
+          ],
+          "important_conventions": [
+            "CITES Appendix I - Tiger protection",
+            "CMS - Migratory species coordination"
+          ],
+          "government_initiatives": [
+            "NTCA - Authority for reserve management",
+            "Tiger Task Force - 2005 recommendations implementation",
+            "MonIT System - Monitoring of Illegal Trade"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M3_T4",
+          "topic_name": "Ramsar Sites (Wetland Convention, India's Key Wetlands)",
+          "primary_book": {
+            "chapter": 15,
+            "name": "Wetland Conservation"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Wetland Ecosystems",
+          "key_concepts": [
+            "Ramsar Convention - 1971, wetland conservation treaty",
+            "Wetland definition - flooded for season, with biota adapted",
+            "India's Ramsar Sites - 50+ designated sites",
+            "Chilika Lake - Odisha, India's largest brackish lake, migratory waterfowl",
+            "Keoladeo Ghana - Rajasthan, 366 bird species, water level dependent",
+            "Loktak Lake - Manipur, floating vegetation 'phumdis', Sangai deer endemic",
+            "Wular Lake - Kashmir, largest freshwater lake, fish breeding ground",
+            "Sambhar Salt Lake - Rajasthan, flamingo habitat, IUCN EN status",
+            "Harike Wetland - Punjab, migratory waterfowl, fish nursery",
+            "Bhoj Wetlands - Madhya Pradesh, lotus cultivation, groundwater link",
+            "Indus Dolphin - Sindh/Punjab, river wetland species",
+            "Sundarbans - West Bengal, mangrove wetlands, tiger habitat",
+            "Vembanad Lake - Kerala, lagoon ecosystem",
+            "Coringa Wildlife Sanctuary - Andhra Pradesh, mangrove wetlands",
+            "Wetland loss - drainage for agriculture, pollution, urban expansion"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - 1971 Iran, wetland treaty",
+            "CBD - Wetland ecosystem protection"
+          ],
+          "government_initiatives": [
+            "Wetlands Rules 2017 - Protection and management",
+            "National Wetland Conservation Programme",
+            "AIBP - Wetland monitoring"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M3_T5",
+          "topic_name": "Ex-Situ Conservation (Zoos, Botanical Gardens, Gene Banks, Seed Banks, Cryopreservation)",
+          "primary_book": {
+            "chapter": 16,
+            "name": "Ex-Situ Methods"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Conservation Methods",
+          "key_concepts": [
+            "Ex-situ - conservation outside natural habitat",
+            "Zoos - captive breeding, education, research",
+            "Breeding programs - genetic diversity maintenance",
+            "Studbook - pedigree records for breeding decisions",
+            "Reintroduction - release to wild from captive population",
+            "Botanical gardens - plant conservation, research",
+            "IBSF - Indian Botanical Survey and Research",
+            "Gene banks - genetic material storage (seeds, tissues)",
+            "National Gene Bank - IARI, New Delhi - crop germplasm",
+            "Seed banks - long-term storage in desiccated, cold conditions",
+            "Svalbard Global Seed Vault - backup seed storage",
+            "Cryopreservation - frozen storage (-196°C liquid nitrogen)",
+            "Tissue culture - plant propagation from cells",
+            "Micropropagation - multiplication of rare plants",
+            "Genomic sequencing - genetic information preservation"
+          ],
+          "important_conventions": [
+            "CITES - Zoo and botanical garden trade",
+            "CBD - Genetic resource access and benefit-sharing"
+          ],
+          "government_initiatives": [
+            "National Gene Bank - Crop variety conservation",
+            "Zoo Authority of India - Breeding program coordination"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.0
+        },
+        {
+          "topic_id": "M3_T6",
+          "topic_name": "International Agreements (CITES, CBD, Bonn, Bern, Cartagena, CMS)",
+          "primary_book": {
+            "chapter": 17,
+            "name": "International Conservation Laws"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Global Initiatives",
+          "key_concepts": [
+            "CITES - Convention on International Trade in Endangered Species (1973)",
+            "Appendix I - prohibited trade (tigers, rhinos, pandas, elephants)",
+            "Appendix II - restricted trade with permits (many reptiles, birds)",
+            "Appendix III - country-specific trade restrictions",
+            "CITES enforcement - TRAFFIC monitoring, customs checks",
+            "CBD - Convention on Biological Diversity (1992, Rio summit)",
+            "CBD objectives - conservation, sustainable use, benefit-sharing",
+            "Nagoya Protocol - genetic resource access and benefit-sharing",
+            "Cartagena Protocol - living modified organisms (GMO) safety",
+            "Bonn Convention (CMS) - Migratory Species (1979)",
+            "CMS Appendix I - species threatened, migration protection needed",
+            "Bern Convention - European wildlife and habitats (1979)",
+            "IUCN SSC - Specialist Groups for taxa-specific conservation",
+            "Paris Agreement - climate change (biodiversity link)",
+            "Post-2020 Global Biodiversity Framework - new CBD targets"
+          ],
+          "important_conventions": [
+            "Montreal Protocol - Ozone protection (affects UV/ecosystems)",
+            "UNCCD - Desertification Convention"
+          ],
+          "government_initiatives": [
+            "MOEF & CC - International agreement implementation",
+            "Wildlife Institute of India - Scientific authority for CITES"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M3_T7",
+          "topic_name": "Wildlife Protection Act 1972 (Schedules, 2022 Amendment)",
+          "primary_book": {
+            "chapter": 18,
+            "name": "Wildlife Protection Act 1972"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Indian Wildlife Laws",
+          "key_concepts": [
+            "Wildlife Protection Act 1972 - primary Indian wildlife law",
+            "Schedule I - absolute protection, maximum penalties",
+            "Schedule I animals - tigers, lions, leopards, rhinos, elephants, crocs",
+            "Schedule I birds - eagles, bustards, cranes, owls",
+            "Schedule II - high protection level, restricted hunting",
+            "Schedule III - moderate protection level",
+            "Schedule IV - general protection, some regulated use",
+            "Schedule V - vermin (non-protected) - wolves, hyenas, crocodiles (partially)",
+            "Schedule VI - banned plants - Nepenthes, certain orchids",
+            "2022 Amendment - strengthened penalties, poaching provisions",
+            "Illegal wildlife trade - high penalties for trafficking",
+            "Habitat protection - ecosystem protection through species law",
+            "Hunting regulations - seasons, permits, gear restrictions",
+            "Rescue centers - animal rehabilitation facilities"
+          ],
+          "important_conventions": [
+            "CITES - International wildlife trade (aligns with WPA)",
+            "CBD - National biodiversity law framework"
+          ],
+          "government_initiatives": [
+            "Wildlife Crime Bureau - Anti-wildlife trafficking",
+            "Department of Wildlife Management - Implementation"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M3_T8",
+          "topic_name": "Forest Rights Act 2006 & Conservation",
+          "primary_book": {
+            "chapter": 19,
+            "name": "Forest Rights and Conservation"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Community Conservation",
+          "key_concepts": [
+            "Forest Rights Act 2006 - tribal rights recognition",
+            "Community forest rights - sustainable forest use",
+            "Individual forest rights - livelihood (food, fuel, medicine)",
+            "Community forest resource rights - collective management",
+            "Scheduled Tribes (ST) - primary beneficiaries",
+            "Other Traditional Forest Dwellers (OTFD) - pre-2006 residents",
+            "Gram Sabhas - village assemblies for rights claims",
+            "Forest survey/verification - claim assessment process",
+            "Recognition - certificate issuance for rights",
+            "Sustainable forest use - non-destructive extraction",
+            "Sacred groves - community-protected forests",
+            "Community conservation areas - grassroots protection",
+            "Participation in governance - forest management committees",
+            "Conflict resolution - dispute settlement mechanisms"
+          ],
+          "important_conventions": [
+            "ILO Convention 169 - Indigenous rights",
+            "UN Declaration on Rights of Indigenous Peoples"
+          ],
+          "government_initiatives": [
+            "FRA Implementation - Ministry of Tribal Affairs",
+            "Community Forest Resource (CFR) certification",
+            "Van Mahotsav - Community afforestation"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": "M4",
+      "module_name": "Ecosystems",
+      "topics": [
+        {
+          "topic_id": "M4_T1",
+          "topic_name": "Forest Ecosystems (Tropical Evergreen, Deciduous, Temperate, Boreal, Mangroves)",
+          "primary_book": {
+            "chapter": 20,
+            "name": "Forest Ecosystems Classification"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 13, 15 - Biomes",
+          "key_concepts": [
+            "Tropical Rainforests - high rainfall (>200 cm), biodiversity hotspots",
+            "Tropical evergreen - Western Ghats, Northeast India, no dry season",
+            "Stratification - canopy layers (emergent, canopy, understory, herb)",
+            "Tropical Deciduous - sal, teak, shisham forests (Central India)",
+            "Dry season - leaf fall during winter/dry season",
+            "Semi-evergreen forests - mixture of evergreen and deciduous",
+            "Temperate forests - oak, deodar, pine (Himalayas)",
+            "Deciduous temperate - birch, maple, oak (seasonal variation)",
+            "Coniferous forests - spruce, fir, pine (cool temperate)",
+            "Boreal forests (Taiga) - coniferous dominance (Russia, Canada, Scandinavia)",
+            "Tundra - treeless, permafrost, lichens, mosses, dwarf shrubs",
+            "Mangrove forests - salt-tolerant, halophytic (roots in saltwater)",
+            "Sundarbans - world's largest mangrove (21,000 sq km)",
+            "Mangrove functions - nursery ground, storm protection, carbon storage",
+            "Mangrove threats - aquaculture conversion, pollution, sea-level rise"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - Wetland forest types",
+            "CBD - Forest ecosystem protection"
+          ],
+          "government_initiatives": [
+            "Forest Conservation Act 1980 - Non-forest use regulation",
+            "Mangrove Conservation Program - Protection and restoration"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M4_T2",
+          "topic_name": "Wetland Ecosystems (Ramsar Definition, Types, Services)",
+          "primary_book": {
+            "chapter": 21,
+            "name": "Wetlands and Functions"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Freshwater Ecosystems",
+          "key_concepts": [
+            "Wetland definition - Ramsar: land flooded seasonally or permanently",
+            "Inland wetlands - freshwater, peatlands, floodplains, marshes",
+            "Coastal wetlands - mangroves, salt marshes, seagrass beds",
+            "Shallow lakes - emergent vegetation dominance",
+            "Deep lakes - submerged vegetation, open water",
+            "Rivers and streams - flowing water ecosystems",
+            "Peatlands - Sphagnum moss, carbon-rich deposits",
+            "Wetland services - flood mitigation, water purification, fish breeding",
+            "Fish breeding - nursery ground for commercial species",
+            "Water storage - aquifer recharge, flow regulation",
+            "Carbon storage - 20% carbon in 6% global area",
+            "Biodiversity - 40% species in 6% global wetlands",
+            "Wetland loss - 87% historical loss (1700-2000)",
+            "Restoration - wetland re-creation, hydrological management"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - Wetland site designation",
+            "CBD - Wetland biodiversity protection"
+          ],
+          "government_initiatives": [
+            "Wetlands Rules 2017 - Protection and regulation",
+            "AIBP - Monitoring network",
+            "Ramsar Site management - MOEF & CC coordination"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M4_T3",
+          "topic_name": "Coral Reefs (Fringing, Barrier, Atoll, Bleaching)",
+          "primary_book": {
+            "chapter": 22,
+            "name": "Marine Ecosystems - Reefs"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Marine Ecosystems",
+          "key_concepts": [
+            "Coral reefs - biodiversity hotspots, 30% marine species in 1% ocean",
+            "Coral polyps - symbiotic with zooxanthellae algae",
+            "Fringing reefs - attached to shore, no lagoon",
+            "Barrier reefs - offshore, lagoon between reef and shore",
+            "Atolls - ring-shaped reefs, lagoon in center (no mainland)",
+            "Great Barrier Reef - world's largest (2,300 km)",
+            "India's reefs - Lakshadweep, Andaman & Nicobar, Gulf of Mannar",
+            "Zooxanthellae - photosynthetic symbiont, gives color",
+            "Coral bleaching - expulsion of zooxanthellae (white appearance)",
+            "Bleaching causes - temperature stress (0.5°C above normal)",
+            "Ocean acidification - CO2 absorption, pH decrease, shell dissolution",
+            "Overfishing - trophic cascade, algae dominance",
+            "Pollution - sedimentation, nutrient runoff, chemical contamination",
+            "Reef recovery - resilience and resistance to disturbance",
+            "Conservation - MPAs, no-take zones, pollution control"
+          ],
+          "important_conventions": [
+            "CBD - Reef ecosystem protection",
+            "UNFCCC - Climate change mitigation"
+          ],
+          "government_initiatives": [
+            "Gulf of Mannar Marine National Park - Reef protection",
+            "Andaman & Nicobar Biosphere Reserve - Island reef conservation"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M4_T4",
+          "topic_name": "Grassland & Desert Ecosystems",
+          "primary_book": {
+            "chapter": 23,
+            "name": "Arid & Semi-Arid Ecosystems"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Terrestrial Ecosystems",
+          "key_concepts": [
+            "Grasslands - herbaceous vegetation, low rainfall (25-75 cm)",
+            "Temperate grasslands - Steppe, Prairie, Pampas",
+            "Tropical grasslands - Savanna (scattered trees)",
+            "India's grasslands - Deccan plateau, Terai grasslands",
+            "Grass adaptations - deep roots, drought resistance",
+            "Megafauna - elephants, zebras, bison, antelopes",
+            "Grassland productivity - high productivity with disturbance",
+            "Deserts - <25 cm rainfall, sparse vegetation",
+            "Hot deserts - Sahara, Kalahari, Thar, Arabian",
+            "Cold deserts - Gobi, Atacama, high altitude deserts",
+            "Thar Desert - India's major desert, 1% of global desert",
+            "Desert adaptations - water storage, heat tolerance, nocturnal",
+            "Desert organisms - camels, scorpions, lizards, succulent plants",
+            "Desertification - grassland to desert conversion",
+            "Overgrazing - primary desertification cause"
+          ],
+          "important_conventions": [
+            "UNCCD - Desertification Convention (1994)",
+            "UNCCD LDN - Land Degradation Neutrality target"
+          ],
+          "government_initiatives": [
+            "Desert Afforestation Programme - Desertification control",
+            "Pasture Development - Grassland improvement",
+            "NREGA - Vegetation conservation"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.0
+        },
+        {
+          "topic_id": "M4_T5",
+          "topic_name": "Ecosystem Services Framework (MA 2005, TEEB Concept)",
+          "primary_book": {
+            "chapter": 24,
+            "name": "Ecosystem Valuation"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Ecosystem Functions",
+          "key_concepts": [
+            "MA 2005 - Millennium Ecosystem Assessment framework",
+            "MA findings - 15 of 24 services declining",
+            "Provisioning services - food, water, fuel, fiber, biochemical, genetic",
+            "Regulating services - climate, water, disease, pest, erosion, pollination",
+            "Supporting services - nutrient cycling, soil formation, primary production",
+            "Cultural services - recreation, education, aesthetic, spiritual",
+            "TEEB - The Economics of Ecosystems and Biodiversity (2010)",
+            "TEEB methodology - valuation of ecosystem services",
+            "Economic valuation - market price or shadow pricing",
+            "Carbon credit value - $10-200/ton CO2 (varies by method)",
+            "Water purification value - ecosystem filtration vs. treatment plants",
+            "Pollination value - $200+ billion/year globally",
+            "Pest control value - $50+ billion/year globally",
+            "Loss accounting - natural capital depletion",
+            "Policy implications - conservation as economic investment"
+          ],
+          "important_conventions": [
+            "CBD - Ecosystem service protection",
+            "UNFCCC - Climate regulating service"
+          ],
+          "government_initiatives": [
+            "TEEB for India - Valuation framework development",
+            "Payment for Ecosystem Services - Implementation pilot"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": "M5",
+      "module_name": "Climate Change",
+      "topics": [
+        {
+          "topic_id": "M5_T1",
+          "topic_name": "Greenhouse Gases (CO2, CH4, N2O, HFCs, GWP Values)",
+          "primary_book": {
+            "chapter": 25,
+            "name": "Climate Change Basics"
+          },
+          "ncert_reference": "Class 12 Chemistry Chapter 16 - Environmental Chemistry",
+          "key_concepts": [
+            "Greenhouse Effect - infrared trapping, natural (15°C vs -18°C without)",
+            "CO2 - 414 ppm (2020), 48% of radiative forcing (RCP 8.5)",
+            "Sources - fossil fuel combustion (80%), land-use change (20%)",
+            "Methane (CH4) - 1,900 ppb, 28-34x CO2 on 100-year timescale",
+            "GWP CH4 - Global Warming Potential = CO2 equivalent",
+            "CH4 sources - livestock 40%, wetlands 30%, energy 20%, waste 10%",
+            "Nitrous Oxide (N2O) - 334 ppb, 265-310x CO2 over 100 years",
+            "N2O sources - agriculture 60%, energy 15%, industrial 20%, waste 5%",
+            "HFCs - refrigerants, 11,700x CO2 GWP (Kigali Amendment target)",
+            "CFCs - ozone depleting, also GHG (Montreal Protocol phase-out)",
+            "Radiative forcing - W/m² energy imbalance",
+            "Atmospheric lifetime - CO2 1000+ years, CH4 10 years, N2O 120 years",
+            "Residence time - different from lifetime (equilibration time)",
+            "Aerosols - cooling effect, black carbon warming"
+          ],
+          "important_conventions": [
+            "UNFCCC - Climate change mitigation",
+            "Montreal Protocol - ODS phase-out",
+            "Kigali Amendment - HFC phase-down"
+          ],
+          "government_initiatives": [
+            "NAPCC - GHG mitigation programs",
+            "Indian GHG Inventory - Annual reporting"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M5_T2",
+          "topic_name": "Global Warming Impacts (Temperature, Sea Level, Extreme Events, Biodiversity, Agriculture)",
+          "primary_book": {
+            "chapter": 26,
+            "name": "Climate Change Impacts"
+          },
+          "ncert_reference": "Class 12 Chemistry Chapter 16 - Climate Change",
+          "key_concepts": [
+            "Temperature rise - 1.1°C above pre-industrial, 0.18°C/decade (recent)",
+            "1.5°C target - Paris Agreement aspiration, impacts threshold",
+            "2°C target - UNFCCC article, significant impact level",
+            "Sea level rise - 3.3 mm/year thermal expansion + ice melt",
+            "Thermal expansion - 50% of SLR, water density increase",
+            "Glacier melt - 60% of SLR, mountain ice loss (Hindu Kush, Himalayas)",
+            "Ice sheet collapse - Greenland (7m SLR), Antarctic (60m SLR) potential",
+            "Extreme weather - heat waves, cold snaps, intense rainfall, droughts",
+            "Rainfall pattern shift - monsoon variability in India",
+            "Ocean acidification - 30% pH drop since 1800, 0.1 pH/decade current",
+            "Coral bleaching - 1°C warming triggers bleaching",
+            "Species migration - range shifts toward poles and high altitude",
+            "Phenology changes - earlier flowering, breeding, migration shifts",
+            "Agriculture impacts - crop yield reduction, pest range expansion",
+            "Livestock stress - heat stress, pasture productivity decline",
+            "Water scarcity - glacier melt dependency, monsoon reliability"
+          ],
+          "important_conventions": [
+            "UNFCCC - Mitigation and adaptation",
+            "Paris Agreement - 1.5°C and 2°C targets"
+          ],
+          "government_initiatives": [
+            "NAPCC - Climate adaptation programs",
+            "Loss and Damage Fund - Climate finance"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M5_T3",
+          "topic_name": "UNFCCC & COP History (Kyoto, Paris, Glasgow, Dubai)",
+          "primary_book": {
+            "chapter": 27,
+            "name": "International Climate Negotiations"
+          },
+          "ncert_reference": "Class 12 Political Science - International Relations",
+          "key_concepts": [
+            "UNFCCC 1992 - Framework Convention signed Rio Earth Summit",
+            "Annex I countries - developed nations, emissions reduction targets",
+            "Non-Annex I countries - developing nations, differentiated responsibility",
+            "CBDR-RC - Common But Differentiated Responsibility and Respective Capability",
+            "COP1 (1995) Berlin - First decision to strengthen commitments",
+            "COP3 (1997) Kyoto - Kyoto Protocol adopted, binding targets",
+            "Kyoto Protocol - 5% reduction 2008-2012 (baseline 1990)",
+            "CDM - Clean Development Mechanism (emission reduction projects)",
+            "JI - Joint Implementation (developed countries)",
+            "ET - Emissions Trading (cap-and-trade system)",
+            "COP21 (2015) Paris - Paris Agreement, 1.5°C/2°C target",
+            "NDC - Nationally Determined Contributions (country targets)",
+            "Paris ratification - entered force November 2016 (55% emissions)",
+            "COP26 (2021) Glasgow - Article 6 finalization, 1.5°C commitment",
+            "Article 6 - Carbon markets, international transfers",
+            "COP27 (2022) Sharm El-Sheikh - Loss and Damage Fund establishment",
+            "COP28 (2023) Dubai - Fossil fuel transition agreement"
+          ],
+          "important_conventions": [
+            "UNFCCC - Primary framework",
+            "Kyoto Protocol - First commitment period",
+            "Paris Agreement - Current commitment"
+          ],
+          "government_initiatives": [
+            "India Climate Change Portal - Information dissemination",
+            "Climate Finance - MOEF coordination"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M5_T4",
+          "topic_name": "Paris Agreement & India's NDC (500 GW Renewable, 50% Non-Fossil, 1 Gt CO2 Reduction)",
+          "primary_book": {
+            "chapter": 28,
+            "name": "Paris Agreement Implementation"
+          },
+          "ncert_reference": "Class 12 Political Science - International Environmental Policy",
+          "key_concepts": [
+            "Paris Agreement - 2015, ratified 2016, 195 countries",
+            "NDC - Nationally Determined Contributions (updated 2021-2023)",
+            "1.5°C target - Hold warming to 1.5°C above pre-industrial",
+            "Global Stocktake - 2023 assessment (next 2028)",
+            "India NDC targets - 2030 baseline",
+            "500 GW renewable energy - Solar (300 GW), Wind (150 GW), Hydro (50 GW)",
+            "Current renewable capacity - 200+ GW (2024)",
+            "50% non-fossil - 50% of installed capacity from non-fossil",
+            "1 billion tonnes CO2 reduction - Cumulative 2005-2030",
+            "Energy efficiency - 30% energy intensity improvement",
+            "Afforestation - 10 million hectares (2005-2030)",
+            "Blue Carbon - Mangrove and seagrass conservation",
+            "Adaptation - AIBP, SAPCC implementation",
+            "INDC vs NDC - 2015 vs 2021 update, enhanced targets",
+            "International Solar Alliance - Coalition for solar energy"
+          ],
+          "important_conventions": [
+            "Paris Agreement - Core framework",
+            "UNFCCC - Implementation mechanism"
+          ],
+          "government_initiatives": [
+            "NAPCC - National Action Plan on Climate Change",
+            "SAPCC - State Action Plans",
+            "ISA - International Solar Alliance (India-led)"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M5_T5",
+          "topic_name": "IPCC Reports & Key Findings (AR6)",
+          "primary_book": {
+            "chapter": 29,
+            "name": "IPCC Assessment Reports"
+          },
+          "ncert_reference": "Class 12 Chemistry - Global Warming Evidence",
+          "key_concepts": [
+            "IPCC - Intergovernmental Panel on Climate Change (1988)",
+            "WG1 - Physical Science Basis (climate mechanisms)",
+            "WG2 - Impacts, Adaptation, Vulnerability",
+            "WG3 - Mitigation (emissions reduction)",
+            "WGIII - Synthesis Report (integrated assessment)",
+            "AR6 (2021-2023) - Sixth Assessment Report",
+            "AR6 WG1 - Unequivocal warming, human attribution >99% confidence",
+            "1.5°C pathway - Possible but requires immediate action",
+            "Tipping points - Amazon, AMOC, permafrost carbon feedback risk",
+            "Compound events - Simultaneous hazards (heat + drought)",
+            "SROCC - Special Report on Ocean and Cryosphere (2019)",
+            "SRCCL - Special Report on Climate Change and Land (2019)",
+            "Equity concerns - Loss and Damage, climate justice, differentiation",
+            "Mitigation pathways - 1.5°C consistent policies vs. current trajectory",
+            "Cost of inaction - Economic damages from warming"
+          ],
+          "important_conventions": [
+            "UNFCCC - IPCC role in assessment",
+            "Paris Agreement - IPCC findings basis"
+          ],
+          "government_initiatives": [
+            "NAPCC - Implementation based on IPCC findings",
+            "Climate Science India - National research coordination"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M5_T6",
+          "topic_name": "Carbon Markets & Article 6 (Credits, Trading, Tax)",
+          "primary_book": {
+            "chapter": 30,
+            "name": "Carbon Market Mechanisms"
+          },
+          "ncert_reference": "Class 12 Economics - Environmental Economics",
+          "key_concepts": [
+            "Carbon pricing - Polluter pays principle implementation",
+            "Emission trading scheme (ETS) - Cap and trade (EU ETS model)",
+            "Carbon tax - Direct price on emissions (Sweden, Switzerland)",
+            "Carbon credit - 1 credit = 1 ton CO2 equivalent avoided/sequestered",
+            "Voluntary market - Non-compliance credits",
+            "Compliance market - Regulatory requirement credits",
+            "Article 6 Paris Agreement - International market mechanisms",
+            "Article 6.2 - Cooperative approaches (bilateral transfers)",
+            "Article 6.4 - New Sustainable Development Mechanism (SDM, replacement for CDM)",
+            "Article 6.4 projects - Emission reductions, removal activities",
+            "Corresponding adjustments - Ensuring no double counting",
+            "India's role - Large potential credit generator",
+            "CDM projects - India hosts 3500+ projects (solar, efficiency, waste)",
+            "Carbon sequestration - Forestry, agriculture projects value",
+            "Perverse incentives - Additionality and baseline issues"
+          ],
+          "important_conventions": [
+            "Paris Agreement Article 6",
+            "UNFCCC - Mechanism oversight"
+          ],
+          "government_initiatives": [
+            "Ministry of Power - Energy efficiency programs",
+            "PAT scheme - Perform Achieve Trade (large facilities)",
+            "UJALA scheme - Energy efficiency lighting"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M5_T7",
+          "topic_name": "India's Climate Initiatives (LiFE, ISA, NAPCC, SAPCCs, CDRI)",
+          "primary_book": {
+            "chapter": 31,
+            "name": "India's Climate Action"
+          },
+          "ncert_reference": "Class 12 Political Science - India's Environmental Policy",
+          "key_concepts": [
+            "LiFE - Lifestyle for Environment (behavior change, COP26 India initiative)",
+            "ISA - International Solar Alliance (India, France co-founding 2015)",
+            "ISA members - 180+ countries, promotes solar technology",
+            "NAPCC - National Action Plan on Climate Change (2008, 2018 update)",
+            "8 missions - Energy efficiency, solar, water, agriculture, biodiversity, etc.",
+            "SAPCC - State Action Plans on Climate Change (all states have SAP)",
+            "State missions - Aligned with national priorities",
+            "CDRI - Coalition for Disaster Resilient Infrastructure",
+            "Prakriti - Climate-Smart Agriculture program",
+            "E-Auction - Renewable energy competitive bidding",
+            "UJALA - LED bulb distribution (EESL)",
+            "PAT - Perform, Achieve and Trade (energy efficiency)",
+            "National Mission for Green India - Afforestation 10 Mha",
+            "GCF - Green Climate Fund access for adaptation"
+          ],
+          "important_conventions": [
+            "UNFCCC - India's commitments",
+            "Paris Agreement - NDC implementation"
+          ],
+          "government_initiatives": [
+            "MOEF & CC - Nodal ministry",
+            "AIBP - Implementing agency coordination"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        }
+      ]
+    },
+    {
+      "module_id": "M6",
+      "module_name": "Pollution",
+      "topics": [
+        {
+          "topic_id": "M6_T1",
+          "topic_name": "Air Pollution (AQI, PM2.5, PM10, SO2, NOx, CO, Ozone, VOCs, Smog)",
+          "primary_book": {
+            "chapter": 32,
+            "name": "Air Pollution Sources and Effects"
+          },
+          "ncert_reference": "Class 12 Chemistry Chapter 16 - Air Pollution",
+          "key_concepts": [
+            "AQI - Air Quality Index (0-500 scale, India's National AQI)",
+            "AQI categories - Good (0-50), Satisfactory (51-100), Moderately Polluted (101-200), Poor, Very Poor, Severe",
+            "PM2.5 - Fine particulates <2.5 micrometers, deep lung penetration",
+            "PM10 - Coarse particulates 2.5-10 micrometers, upper respiratory",
+            "WHO guidelines - PM2.5 <15 µg/m³ annual, PM10 <45 µg/m³",
+            "SO2 (Sulfur Dioxide) - Coal combustion byproduct, 50 µg/m³ guideline",
+            "NOx (Nitrogen Oxides) - NO and NO2, vehicle emissions, 40 µg/m³ NO2",
+            "CO (Carbon Monoxide) - Incomplete combustion, 4 mg/m³ 8-hour average",
+            "O3 (Ozone) - Photochemical formation, respiratory irritant, 100 µg/m³",
+            "VOCs - Volatile Organic Compounds, ozone precursor, indoor/outdoor",
+            "Photochemical smog - NOx + VOCs + sunlight = O3 + other oxidants",
+            "Classical smog - SO2 + PM + fog (London type, industrial)",
+            "Particulate matter sources - Transport (60%), Industry (20%), Coal (10%), Others",
+            "Health effects - Respiratory disease, cardiovascular, premature mortality",
+            "AQI in Indian cities - Delhi, Kolkata, Patna among world's worst"
+          ],
+          "important_conventions": [
+            "UNFCCC - Climate-AQI linkage",
+            "Basel Convention - Transboundary pollution"
+          ],
+          "government_initiatives": [
+            "CAAQM - Comprehensive Air Quality Management Programme (Delhi)",
+            "Air Quality Action Plans - State level implementation",
+            "BS VI emission standards - Vehicle pollution control"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M6_T2",
+          "topic_name": "Ozone Depletion (Montreal Protocol, Kigali Amendment)",
+          "primary_book": {
+            "chapter": 33,
+            "name": "Stratospheric Ozone"
+          },
+          "ncert_reference": "Class 12 Chemistry Chapter 16 - Ozone Depletion",
+          "key_concepts": [
+            "Stratospheric ozone (O3) - 15-35 km altitude, UV-B/C protection",
+            "Chapman cycle - Natural ozone production/destruction equilibrium",
+            "CFCs - Chlorofluorocarbons (Freon 11, 12) - ozone destroyers",
+            "Halons - Fire suppressants, ozone depletion potential (ODP) higher than CFCs",
+            "HCFCs - Hydrochlorofluorocarbons, interim replacement (low ODP)",
+            "HFCs - Hydrofluorocarbons, ozone safe but strong GHG",
+            "ODS - Ozone Depleting Substances phase-out target",
+            "Ozone hole - Antarctic winter depletion, 30 million tons/year loss",
+            "Montreal Protocol 1987 - First global environmental treaty (phasing out ODS)",
+            "London Amendment 1990 - Accelerated phase-out timeline",
+            "Copenhagen Amendment 1992 - Accelerated CFC phase-out",
+            "Kigali Amendment 2016 - HFC phase-down (85% by 2036)",
+            "Recovery projection - Ozone hole recovery by 2070",
+            "UV-B effects - Skin cancer, cataracts, immune suppression",
+            "Ecosystem effects - Phytoplankton damage, crop yield reduction"
+          ],
+          "important_conventions": [
+            "Montreal Protocol - Most successful environmental treaty",
+            "Kigali Amendment - Climate benefit from HFC phase-out"
+          ],
+          "government_initiatives": [
+            "Ministry of Environment - ODS phase-out coordination",
+            "ODS licensing system - CFC and halons monitoring"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M6_T3",
+          "topic_name": "Water Pollution (BOD, DO, Eutrophication, Namami Gange)",
+          "primary_book": {
+            "chapter": 34,
+            "name": "Water Quality Standards"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 15 - Aquatic Ecosystems",
+          "key_concepts": [
+            "BOD - Biochemical Oxygen Demand (mg/L), water pollution indicator",
+            "BOD standards - <2 mg/L pristine, <5 mg/L good, >10 mg/L degraded",
+            "DO - Dissolved Oxygen (mg/L), aquatic life requirement >5 mg/L",
+            "Hypoxia - DO <2 mg/L, fish kills, dead zones",
+            "Oxygen sag curve - DO deficit downstream of pollution source",
+            "Eutrophication - Nutrient overloading (N and P)",
+            "Algal bloom - Excessive algae growth, toxins, fish kills",
+            "Nutrient sources - Agriculture (fertilizer runoff), sewage, industrial",
+            "Phosphate detergents - Banned in many countries",
+            "Sewage treatment - Primary, secondary, tertiary stages",
+            "Namami Gange - 2015 initiative, 2,400 crore project",
+            "Namami Gange components - Sewage treatment, river cleanup, pollution control",
+            "Gange Action Plan - 1986 phase 1, 1993 phase 2 predecessor",
+            "CETP - Common Effluent Treatment Plants",
+            "River health monitoring - Water quality assessment network"
+          ],
+          "important_conventions": [
+            "UNEP - Water quality guidelines",
+            "CBD - Freshwater ecosystem protection"
+          ],
+          "government_initiatives": [
+            "Namami Gange - Ganges cleanup program",
+            "CPCB - Water quality monitoring",
+            "Water Act 1974 - Pollution control framework"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2.0
+        },
+        {
+          "topic_id": "M6_T4",
+          "topic_name": "Groundwater Pollution (Arsenic, Fluoride, Contamination)",
+          "primary_book": {
+            "chapter": 35,
+            "name": "Groundwater Issues"
+          },
+          "ncert_reference": "Class 12 Chemistry - Water Pollution",
+          "key_concepts": [
+            "Groundwater depletion - Over-extraction (India loses 300 Gl/year)",
+            "Arsenic contamination - Geogenic source (rock dissolution)",
+            "Arsenic hotspots - West Bengal, Assam, Bihar, Jharkhand, Uttar Pradesh",
+            "Arsenic health effects - Skin lesions, cancers, organ damage (chronic)",
+            "Arsenic standards - 10 µg/L WHO/India guideline",
+            "Fluoride contamination - Geogenic and anthropogenic sources",
+            "Fluoride hotspots - Rajasthan, Telangana, Tamil Nadu, Andhra Pradesh",
+            "Fluoride health - <1.5 mg/L beneficial, >4 mg/L dental fluorosis, skeletal effects",
+            "Nitrate contamination - Agricultural runoff, sewage sources",
+            "Nitrate standards - 45 mg/L WHO guideline",
+            "Pesticide residues - Groundwater contamination from agriculture",
+            "Heavy metals - Lead, cadmium, chromium (industrial sources)",
+            "Microplastics - Emerging groundwater contaminant",
+            "Treatment options - RO, activated carbon, ion exchange",
+            "Sustainable extraction - Rainwater harvesting, aquifer recharge"
+          ],
+          "important_conventions": [
+            "UNEP - Groundwater quality guidelines",
+            "SDG 6 - Clean water and sanitation"
+          ],
+          "government_initiatives": [
+            "AIBP - Groundwater monitoring network",
+            "Jal Jeevan Mission - Safe water supply program",
+            "CGWB - Central Groundwater Board"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M6_T5",
+          "topic_name": "Soil Pollution (Heavy Metals, Pesticides, Plastic Pollution)",
+          "primary_book": {
+            "chapter": 36,
+            "name": "Land Pollution"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 14 - Soil Ecosystem",
+          "key_concepts": [
+            "Soil contamination - Heavy metals, organics, microplastics",
+            "Heavy metals - Lead, cadmium, chromium, mercury sources",
+            "Industrial pollution - Smelters, electroplating, tanneries",
+            "Mining legacy - Acid mine drainage, metal leaching",
+            "Pesticide residues - DDT, BHC, organophosphates persistence",
+            "POPs - Persistent Organic Pollutants (Stockholm Convention)",
+            "Bioaccumulation - Concentration increase in food chain",
+            "Bioamplification - Concentration increase in higher trophic levels",
+            "Plastic pollution - Microplastics (<5 mm), nanoplastics (<0.1 µm)",
+            "Soil microplastics - 100-1000 times higher than ocean",
+            "Plastic degradation - 400+ years degradation time",
+            "Soil health - Microbial community impact, nutrient cycling disruption",
+            "Remediation - Phytoremediation, bioremediation, soil replacement",
+            "Standards - Total soil metals limits, pH, organic matter content",
+            "Brown field restoration - Industrial site cleanup"
+          ],
+          "important_conventions": [
+            "Stockholm Convention - POPs phase-out",
+            "Basel Convention - Hazardous waste management"
+          ],
+          "government_initiatives": [
+            "Soil Health Card scheme - Soil testing and farmer guidance",
+            "Remedial Measures - Ministry coordinated cleanups"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M6_T6",
+          "topic_name": "Plastic Pollution & Marine Pollution (Microplastics, Single-Use Ban)",
+          "primary_book": {
+            "chapter": 37,
+            "name": "Plastic Pollution Crisis"
+          },
+          "ncert_reference": "Class 12 Chemistry - Polymer Chemistry",
+          "key_concepts": [
+            "Plastic production - 368 million tons/year (2019), <10% recycled",
+            "Ocean plastic - 8-12 million tons/year entering ocean",
+            "Garbage patches - Pacific 5 million tons, gyres concentration",
+            "Microplastics - <5 mm particles, <1% tracked globally",
+            "Microplastic sources - Tire wear, textile shedding, primary microbeads",
+            "Marine ingestion - Sea turtles, whales, seabirds, fish",
+            "Human ingestion - Shellfish, drinking water, sea salt, fish",
+            "Health impacts - Oxidative stress, inflammation, potential toxin release",
+            "Single-use plastic ban - India 2022, list expanding (bags, straws, cups)",
+            "Alternative materials - Biodegradable, compostable, paper, cloth",
+            "Extended Producer Responsibility (EPR) - Producer liability for disposal",
+            "Circular economy - Reduce, reuse, recycle model",
+            "Ocean cleanup - Technology development, policy strengthening",
+            "Waste management - Improved collection, sorting, recycling infrastructure"
+          ],
+          "important_conventions": [
+            "Basel Convention - Plastic waste trade",
+            "UN Resolutions - Plastic pollution action"
+          ],
+          "government_initiatives": [
+            "Single-Use Plastic Ban - Government order 2022",
+            "Swachh Bharat Mission - Waste management infrastructure",
+            "Extended Producer Responsibility rules - Plastic manufacturer liability"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M6_T7",
+          "topic_name": "E-Waste Management & Rules 2022",
+          "primary_book": {
+            "chapter": 38,
+            "name": "E-Waste Management"
+          },
+          "ncert_reference": "Class 12 Chemistry - Toxic Chemicals",
+          "key_concepts": [
+            "E-waste - Electronic and electrical equipment waste (WEEE)",
+            "E-waste generation - 62 million tons/year global, India 3+ million tons/year",
+            "Hazardous components - Lead, mercury, cadmium, beryllium, hexavalent chromium",
+            "E-waste management rules 2022 - New producer responsibility model",
+            "EPR certificate system - Producers track waste collection and recycling",
+            "Collection targets - 80% collection by 2025 (schedule phase-in)",
+            "Registered dismantlers - Authorized e-waste processing",
+            "Refurbishment - Value recovery and circular economy",
+            "Recycling recovery - 65-75% material recovery rate target",
+            "Informal sector - 95% processing in India (unregulated)",
+            "Occupational health - Worker exposure to toxic metals",
+            "Environmental impact - Soil and water contamination from dumping",
+            "Precious metals recovery - Gold, silver, copper, rare earth elements",
+            "Producer responsibility - Design for recycling, take-back schemes"
+          ],
+          "important_conventions": [
+            "Basel Convention - Hazardous waste trade",
+            "Stockholm Convention - Persistent toxins"
+          ],
+          "government_initiatives": [
+            "E-Waste Management Rules 2022 - Regulatory framework",
+            "IAMAI - India's e-waste association",
+            "Ministry of Environment - Implementation oversight"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M6_T8",
+          "topic_name": "Solid Waste Management & Noise Pollution",
+          "primary_book": {
+            "chapter": 39,
+            "name": "Waste Management Comprehensive"
+          },
+          "ncert_reference": "Class 12 Chemistry - Waste Management",
+          "key_concepts": [
+            "SWM Rules 2016 - Solid Waste Management comprehensive rules",
+            "Waste segregation - At source (dry, wet, hazardous)",
+            "Waste processing - Composting, incineration, landfilling, WTE",
+            "Biomedical waste - Hospital waste separate management",
+            "Construction waste - Debris management and reuse",
+            "Swachh Bharat Mission - Waste collection, processing infrastructure",
+            "Landfill design - Leachate management, gas capture, capping",
+            "Composting - Aerobic decomposition of organic waste",
+            "Incineration - 30% waste reduction, heat recovery potential",
+            "Waste-to-Energy (WTE) - Electricity generation from waste",
+            "Circular economy - Extend product life, reduce, reuse, recycle",
+            "Noise pollution - Sound >85 dB harmful to humans",
+            "Noise limits - Residential 55 dB day, 45 dB night (India)",
+            "Noise sources - Transport 80%, Industry 10%, Construction 5%, Others 5%",
+            "Health effects - Hearing loss, sleep disruption, stress, cardiovascular"
+          ],
+          "important_conventions": [
+            "Basel Convention - Hazardous waste",
+            "UNEP - Waste guidelines"
+          ],
+          "government_initiatives": [
+            "Swachh Bharat Mission 2.0 - Waste management infrastructure",
+            "SWM Rules 2016 - Regulatory framework",
+            "National Green Tribunal - Waste pollution cases"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": "M7",
+      "module_name": "Environmental Laws & Governance",
+      "topics": [
+        {
+          "topic_id": "M7_T1",
+          "topic_name": "Environment Protection Act 1986 & EIA Notification 2006",
+          "primary_book": {
+            "chapter": 40,
+            "name": "Primary Environmental Law"
+          },
+          "ncert_reference": "Class 12 Political Science - Indian Constitution & Environment",
+          "key_concepts": [
+            "EPA 1986 - Umbrella environmental law (sections 1-26)",
+            "Article 48A - Constitution directs government to protect environment",
+            "Article 51A(g) - Citizen duty to protect environment",
+            "EPA scope - Pollution control, hazardous substances, environmental management",
+            "Central Pollution Control Board (CPCB) - EPA enforcement authority",
+            "State Pollution Control Boards (SPCBs) - State enforcement",
+            "EIA 2006 - Environmental Impact Assessment notification",
+            "Category A - Large/sensitive projects, mandatory EIA",
+            "Category B - Medium projects, screening for EIA requirement",
+            "Scoping - Environmental issues identification",
+            "EIA study - Impact prediction, mitigation measures",
+            "Public consultation - Stakeholder engagement requirement",
+            "Environmental Management Plan - Mitigation and monitoring",
+            "30-year validity - EIA approval duration",
+            "MOEF - Ministry of Environment Forest & Climate Change oversight"
+          ],
+          "important_conventions": [
+            "UNEP - Environmental assessment guidelines",
+            "CBD - Impact assessment on biodiversity"
+          ],
+          "government_initiatives": [
+            "Standardized EIA format - Consistency across projects",
+            "Online portal - EIA submission and tracking"
+          ],
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T2",
+          "topic_name": "Water & Air Acts (1974 & 1981)",
+          "primary_book": {
+            "chapter": 41,
+            "name": "Sectoral Pollution Laws"
+          },
+          "ncert_reference": "Class 12 Political Science - Environmental Laws",
+          "key_concepts": [
+            "Water Act 1974 - Control of water pollution",
+            "Water Act objectives - Prevent water pollution, maintain water quality",
+            "State Pollution Control Boards - Primary enforcement agency (water)",
+            "Consent to Establish (CTE) - Necessary before construction",
+            "Consent to Operate (CTO) - Operational permit with conditions",
+            "Water quality standards - Schedule I-IV define limits by use (drinking, irrigation, industrial)",
+            "Discharge limits - BOD, TSS, metals, toxins standards",
+            "Water audit - Mandatory for high water-use industries",
+            "Water cess - Tax on water use for pollution control fund",
+            "Air Act 1981 - Air pollution control",
+            "Air Act amendments - 1987, 2012 (strengthened penalties)",
+            "Air quality standards - Schedule I-II, 24-hour and annual limits",
+            "Ambient air quality - SO2, NO2, PM10, PM2.5, CO, O3, Pb, NH3",
+            "Industrial emission standards - Technology-based standards",
+            "Motor vehicles - BS VI emission norm (2020 implementation)"
+          ],
+          "important_conventions": [
+            "UNFCCC - Air quality-climate linkage",
+            "UNEP - Pollution guidelines"
+          ],
+          "government_initiatives": [
+            "CPCB - National air/water quality monitoring",
+            "SWAT - Sewage Treatment Assessment Tool"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T3",
+          "topic_name": "Forest Conservation Act 1980 & Forest Rights Act 2006",
+          "primary_book": {
+            "chapter": 42,
+            "name": "Forest Laws"
+          },
+          "ncert_reference": "Class 12 Political Science - Land and Forest",
+          "key_concepts": [
+            "Forest Conservation Act 1980 - Restrict non-forest use of forest land",
+            "FCA objectives - Protect forests, prevent degradation",
+            "Scheduled areas - Tribal-inhabited forest regions (36% India)",
+            "Non-forest use - Agriculture, urbanization, industry (FCA approval required)",
+            "Forest clearance process - Environmental clearance, FCA approval, state approval",
+            "Compensatory Afforestation - Mandatory replanting equivalent area (2:1 ratio)",
+            "Forest Rights Act 2006 - Recognize tribal and forest dwelling rights",
+            "Community forest rights - Collective management authority",
+            "Individual forest rights - Livelihood (food, fuel, medicine)",
+            "Eligibility - Scheduled Tribes and OTFD (pre-2006 residents)",
+            "Gram Sabha - Village assembly approves rights claims",
+            "Title recognition - Patta/certificate issued after claim approval",
+            "Sustainable forest use - Non-destructive extraction (NTFPs, honey, fuel)",
+            "Sacred groves - Community forest protection tradition"
+          ],
+          "important_conventions": [
+            "ILO Convention 169 - Indigenous land rights",
+            "CBD - Forest conservation"
+          ],
+          "government_initiatives": [
+            "FRA Implementation - Ministry of Tribal Affairs",
+            "CFR certification - Recognizing community rights"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T4",
+          "topic_name": "Biological Diversity Act 2002 (NBA, SBBs, BMCs, 2023 Amendment)",
+          "primary_book": {
+            "chapter": 43,
+            "name": "Biodiversity Governance"
+          },
+          "ncert_reference": "Class 12 Political Science - Biodiversity Management",
+          "key_concepts": [
+            "Biological Diversity Act 2002 - CBD implementation, genetic resource protection",
+            "National Biodiversity Authority (NBA) - Central regulatory body",
+            "NBA functions - Regulatory clearance, access and benefit-sharing (ABS)",
+            "State Biodiversity Boards (SBBs) - State-level implementation",
+            "SBB roles - Register biodiversity, issue approvals, monitor",
+            "Biological Management Committees (BMCs) - Local biodiversity management",
+            "Three-tier system - National (NBA), State (SBB), Local (BMC)",
+            "Genetic resources - Flora, fauna, microorganism genetic information",
+            "ABS - Access and Benefit Sharing of genetic resources",
+            "Benefit-sharing - Monetary/non-monetary benefits to communities",
+            "Traditional knowledge - Protection from unauthorized use",
+            "Prior Informed Consent (PIC) - Consultation before access",
+            "2023 Amendment - Strengthened provisions on genetic resources",
+            "Commercial use - Research/development profit-sharing obligations",
+            "Database - Biological Resource Information System (BRIS)"
+          ],
+          "important_conventions": [
+            "CBD 1992 - Access and benefit-sharing (Nagoya Protocol framework)",
+            "Nagoya Protocol - Genetic resource regulation"
+          ],
+          "government_initiatives": [
+            "NBA - Implementation and enforcement",
+            "SBBS - State coordination",
+            "AIBP - Biodiversity documentation"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T5",
+          "topic_name": "NGT Act 2010 (Jurisdiction, Landmark Orders)",
+          "primary_book": {
+            "chapter": 44,
+            "name": "Environmental Justice"
+          },
+          "ncert_reference": "Class 12 Political Science - Judicial System",
+          "key_concepts": [
+            "NGT - National Green Tribunal (2010)",
+            "Jurisdiction - Environmental matters, bio-diversity, pollution control",
+            "NGT structure - Principal bench Delhi, regional benches (5: Delhi, Pune, Kolkata, Chennai, Ahmedabad)",
+            "Original jurisdiction - Disputes below 5 crore value",
+            "Appellate jurisdiction - Against state decisions and orders",
+            "Fast-track - Expedited 3-month resolution",
+            "Standing - Liberal approach, any person can petition",
+            "Precautionary principle - Environmental protection priority",
+            "Polluter pays - Cost internalization of pollution",
+            "No-cost proceedings - Waived court fees for environment cases",
+            "Landmark orders - Mumbai coastal road, Jaipur fly-ash, Wildlife sanctuary violations",
+            "Bengaluru e-waste - Major fine for illegal e-waste disposal",
+            "Rivers as entities - Recognition of rivers (Gange, Yamuna) as living beings",
+            "Forest protection orders - Afforestation direction in multiple cases",
+            "Quantified damages - NGT awards for environmental harm"
+          ],
+          "important_conventions": [
+            "UNEP - Environmental justice principles",
+            "CBD - Access to justice"
+          ],
+          "government_initiatives": [
+            "NGT - Environmental remedy provision",
+            "CPCB - NGT-coordinated enforcement"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T6",
+          "topic_name": "Coastal Regulation Zone Notification 2019 & Wetlands Rules 2017",
+          "primary_book": {
+            "chapter": 45,
+            "name": "Coastal and Wetland Protection"
+          },
+          "ncert_reference": "Class 12 Political Science - Environmental Protection Measures",
+          "key_concepts": [
+            "CRZ Notification 2019 - Simplified coastal protection framework",
+            "Coastal regulation zone - <500m landward, entire water body seaward",
+            "CRZ categories - I (ecologically sensitive), II (developed), III (undeveloped), IV (aquaculture)",
+            "Prohibited activities - Hazardous industry, mining in CRZ I",
+            "Permitted activities - Agriculture, fisheries, amenities in CRZ III",
+            "Development plan - Master plan coordination with coastal zone",
+            "Mangrove forests - Strict protection (CRZ I equivalent)",
+            "Coral reefs - Protected, fishing restrictions in CRZ",
+            "Turtle nesting sites - Protected breeding grounds",
+            "Wetlands Rules 2017 - Comprehensive wetland protection",
+            "Ramsar sites - Highest protection level",
+            "Non-Ramsar wetlands - Regulatory framework (restoration funds)",
+            "Activities restricted - Discharge, dumping, dredging in all wetlands",
+            "Wetland conservation committee - Inter-agency coordination",
+            "ESZ - Eco-sensitive zones (2 km buffer around protected areas)"
+          ],
+          "important_conventions": [
+            "Ramsar Convention - Wetland sites",
+            "CBD - Coastal and wetland ecosystems"
+          ],
+          "government_initiatives": [
+            "CRZ clearance process - Simplified state/district approval",
+            "Wetland conservation fund - Restoration financing"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M7_T7",
+          "topic_name": "CPCB & SPCBs - Functions and Structure",
+          "primary_book": {
+            "chapter": 46,
+            "name": "Pollution Control Administration"
+          },
+          "ncert_reference": "Class 12 Political Science - Environmental Administration",
+          "key_concepts": [
+            "CPCB - Central Pollution Control Board (1974, under EPA 1986)",
+            "CPCB chairperson - Appointed by central government",
+            "CPCB headquarters - Delhi (environmental quality assurance)",
+            "CPCB functions - Standard setting, monitoring, compliance assessment",
+            "Air quality monitoring - National Ambient Air Quality Monitoring (NAAQM)",
+            "Water quality monitoring - National Water Quality Monitoring Programme (NWQMP)",
+            "Emission standards - Stack emissions for industry",
+            "Technology-based standards - Equipment requirement specifications",
+            "SPCBs - State Pollution Control Boards (28 states + 3 UTs)",
+            "SPCB structure - Chairperson, member-secretary, members (technical/administrative)",
+            "SPCB powers - Consent granting, enforcement, monitoring",
+            "CTE & CTO - Consent to Establish and Consent to Operate",
+            "Compliance assessment - Self-Monitoring Report (SMR) by industries",
+            "Environmental audit - Annual audit requirement for scheduled industries",
+            "Coordination - CPCB-SPCB liaison for national programs"
+          ],
+          "important_conventions": [
+            "EPA 1986 - Authority framework",
+            "UNEP - Pollution control guidelines"
+          ],
+          "government_initiatives": [
+            "CPCB - Capacity building and research",
+            "Environmental compliance - Facilitation centers"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.0
+        }
+      ]
+    },
+    {
+      "module_id": "M8",
+      "module_name": "Disaster Management & New Issues",
+      "topics": [
+        {
+          "topic_id": "M8_T1",
+          "topic_name": "Natural Disasters (Earthquakes, Tsunamis, Cyclones, Floods, Droughts, Landslides)",
+          "primary_book": {
+            "chapter": 47,
+            "name": "Natural Hazards and Disasters"
+          },
+          "ncert_reference": "Class 11 Geography Chapter 7 - Natural Hazards",
+          "key_concepts": [
+            "Earthquakes - Plate tectonics, tectonic stress release",
+            "Richter scale - Magnitude 0-10, logarithmic",
+            "Modified Mercalli - Intensity I-XII (damage assessment)",
+            "India earthquakes - 2004 Sumatra (9.1, 230k deaths), 2015 Nepal (7.8)",
+            "Tsunamis - Submarine earthquakes, under-water landslides",
+            "2004 Indian Ocean tsunami - 227k deaths in India",
+            "Cyclones - Tropical storms, wind speeds >118 km/h",
+            "Saffir-Simpson scale - Categories 1-5 intensity",
+            "India cyclones - Bay of Bengal, Arabian Sea (monsoon season)",
+            "Cyclone Amphan - 2020, highest impact",
+            "Floods - Excessive water inundation (monsoon, glacial melt)",
+            "Flash floods - Sudden, fast-moving water (hill areas, urban)",
+            "Droughts - Prolonged water deficit (meteorological, hydrological, agricultural)",
+            "Landslides - Downslope soil/rock movement (gravity-driven)",
+            "Human-triggered - Mining, deforestation, construction destabilization"
+          ],
+          "important_conventions": [
+            "UNDRR - Disaster Risk Reduction",
+            "Sendai Framework - Global disaster framework"
+          ],
+          "government_initiatives": [
+            "NDMA - National Disaster Management Authority",
+            "Early warning systems - Cyclone, earthquake, flood alerts"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T2",
+          "topic_name": "Sendai Framework 2015-2030 (4 Priorities, 7 Targets)",
+          "primary_book": {
+            "chapter": 48,
+            "name": "Disaster Risk Reduction Strategy"
+          },
+          "ncert_reference": "Class 12 Political Science - Global Cooperation",
+          "key_concepts": [
+            "Sendai Framework - 2015 UNDRR, replacing Hyogo Framework",
+            "4 Priorities - (1) Understanding DRR, (2) Strengthening governance, (3) Investing in resilience, (4) Enhancing recovery/preparedness",
+            "Priority 1 - DRR understanding (hazard identification, vulnerability assessment)",
+            "Priority 2 - Governance (DRR laws, policies, institutions)",
+            "Priority 3 - Investment (infrastructure resilience, early warning systems, capacity building)",
+            "Priority 4 - Build Back Better (reconstruction with resilience)",
+            "Target 1 - 50% reduction in disaster mortality by 2030",
+            "Target 2 - 50% reduction in affected people by 2030",
+            "Target 3 - Reduce economic loss relative to GDP",
+            "Target 4 - Reduce critical infrastructure damage and service disruption",
+            "Target 5 - Increase number of countries with DRR strategies",
+            "Target 6 - Increase international cooperation for developing countries",
+            "Target 7 - Increase availability and access to early warning systems",
+            "7 targets - Implementable, time-bound (2030), measurable"
+          ],
+          "important_conventions": [
+            "UNDRR - Framework implementation",
+            "SDGs - Alignment with sustainable development"
+          ],
+          "government_initiatives": [
+            "NDMA - Sendai Framework implementation",
+            "State DM plans - Aligned with Sendai priorities"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T3",
+          "topic_name": "NDMA (National Disaster Management Authority) & Disaster Management Act",
+          "primary_book": {
+            "chapter": 49,
+            "name": "Disaster Management Governance"
+          },
+          "ncert_reference": "Class 12 Political Science - Administrative Bodies",
+          "key_concepts": [
+            "Disaster Management Act 2005 - Primary DM legislation",
+            "NDMA - National Disaster Management Authority (2005)",
+            "PM as NDMA chair - Apex authority for disaster management",
+            "NDMA mandate - Policy formulation, planning, response coordination",
+            "National DM Plan - Strategic disaster management document",
+            "State DM Authority (SDMA) - State-level DM coordination",
+            "District DM Authority (DDMA) - District-level planning and response",
+            "Emergency operations center (EOC) - Command center for response",
+            "Early warning system - Real-time hazard monitoring and alerts",
+            "Preparedness - Drills, training, evacuation plans",
+            "Response - Immediate post-disaster actions (search, rescue, relief)",
+            "Recovery - Reconstruction and rehabilitation",
+            "Mitigation - Long-term risk reduction (infrastructure, planning)",
+            "Community-based DRR - Grassroots preparedness programs",
+            "Building codes - Earthquake, cyclone-resistant construction standards"
+          ],
+          "important_conventions": [
+            "Sendai Framework - DM act alignment",
+            "UNDRR - Guidance and coordination"
+          ],
+          "government_initiatives": [
+            "NDMA - Policy and guideline issuance",
+            "SDMA, DDMA - Implementation at state and district level"
+          ],
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T4",
+          "topic_name": "Glacier-Related Hazards (GLOFs, India's Vulnerability)",
+          "primary_book": {
+            "chapter": 50,
+            "name": "Mountain Disaster Risks"
+          },
+          "ncert_reference": "Class 11 Geography Chapter 7 - Mountain Disasters",
+          "key_concepts": [
+            "GLOF - Glacial Lake Outburst Flood",
+            "Mechanism - Moraine dam failure, glacier retreat pond release",
+            "India vulnerability - Hindu Kush Himalayan region (3,000+ glacial lakes)",
+            "Himachal Pradesh - High GLOF risk (Chandra, Sutlej basins)",
+            "Uttarakhand - Kedarnath 2013 disaster (3000+ deaths from cloudburst/debris)",
+            "Ladakh - Himalayan glacial lakes (Lake Tso Moriri, Tso Lhamar)",
+            "Sikkim - Teesta basin GLOF threats",
+            "Glacier retreat - Climate change-driven acceleration (1-2 km retreat/decade)",
+            "Moraine dam - Unstable, low freeboard (height above water)",
+            "Warning signs - Lake level rise, outburst sounds, air temperature surge",
+            "Downstream impacts - Debris flows, flash floods, infrastructure damage",
+            "Preparation - Early warning systems, evacuation routes, downstream monitoring",
+            "Mitigation - Moraine drain, lower lake level artificially",
+            "Research - GLOFs are difficult to predict precisely"
+          ],
+          "important_conventions": [
+            "IPCC - Glacier loss projections",
+            "Sendai Framework - Mountain disaster adaptation"
+          ],
+          "government_initiatives": [
+            "UNDP GLOF project - Himachal, Uttarakhand monitoring",
+            "GSI - Geological Survey of India glacier monitoring"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T5",
+          "topic_name": "Desertification & UNCCD (Land Degradation Neutrality Targets)",
+          "primary_book": {
+            "chapter": 51,
+            "name": "Land Degradation and Desertification"
+          },
+          "ncert_reference": "Class 12 Geography - Desertification",
+          "key_concepts": [
+            "Desertification - Arid/semi-arid land degradation (decreased productivity)",
+            "Primary drivers - Overgrazing (35%), agriculture (30%), deforestation (20%), urbanization (10%), climate (5%)",
+            "India desertification - 30-32% of land area affected",
+            "UNCCD - United Nations Convention to Combat Desertification (1994)",
+            "UNCCD objectives - Prevent desertification, restore degraded land, mitigate drought",
+            "LDN - Land Degradation Neutrality target (SDG 15.3)",
+            "LDN definition - No net loss of healthy land by 2030",
+            "Thar Desert - 1% global area, expanding in Rajasthan",
+            "Rajasthan - 60% desertification affected area in India",
+            "Soil conservation - Terracing, contour bunding, check dams",
+            "Afforestation - Casuarina, acacia plantation in dryland regions",
+            "Pastoralist support - Sustainable grazing management",
+            "Drought resilience - Rainwater harvesting, crop diversification",
+            "Community participation - Local land management restoration"
+          ],
+          "important_conventions": [
+            "UNCCD - Desertification specific convention",
+            "SDG 15 - Land degradation neutrality"
+          ],
+          "government_initiatives": [
+            "PMKSY-WC - Water conservation scheme",
+            "Desert Afforestation - Degradation reversal programs"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T6",
+          "topic_name": "UN Decade on Ecosystem Restoration 2021-2030",
+          "primary_book": {
+            "chapter": 52,
+            "name": "Ecosystem Restoration"
+          },
+          "ncert_reference": "Class 12 Biology Chapter 16 - Conservation and Restoration",
+          "key_concepts": [
+            "UN Decade 2021-2030 - Global restoration mobilization campaign",
+            "Goals - Restore 1 billion hectares by 2030 (forest, dryland, wetland, marine, agricultural)",
+            "Dryland restoration - Desertification reversal, grassland recovery",
+            "Forest restoration - Afforestation, reforestation, natural regeneration",
+            "Wetland restoration - Hydrological restoration, water quality improvement",
+            "Marine restoration - Mangrove, seagrass, coral reef recovery",
+            "Agricultural restoration - Soil health, crop diversity, sustainable practices",
+            "Urban restoration - Green spaces, urban forests, rooftop gardens",
+            "India's restoration targets - Aligned with NDC (10 Mha afforestation)",
+            "Economic benefits - Job creation, food security, carbon sequestration",
+            "Co-benefits - Biodiversity, water, climate, livelihood security",
+            "Knowledge gaps - Restoration techniques, effectiveness assessment",
+            "Funding mechanisms - Climate finance, GEF, bilateral support",
+            "Private sector - CSR tree-planting programs, corporate restoration"
+          ],
+          "important_conventions": [
+            "UNEP - Decade coordination",
+            "CBD - Habitat restoration targets",
+            "UNCCD - Dryland restoration"
+          ],
+          "government_initiatives": [
+            "Van Mahotsav - Annual tree-planting campaign",
+            "India Restoration Mission - National restoration framework"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T7",
+          "topic_name": "Blue Economy & Ocean Conservation",
+          "primary_book": {
+            "chapter": 53,
+            "name": "Ocean and Coastal Economics"
+          },
+          "ncert_reference": "Class 12 Geography - Ocean Resources",
+          "key_concepts": [
+            "Blue Economy - Ocean and coastal resource sustainable use",
+            "Components - Fisheries, aquaculture, tourism, shipping, renewable energy",
+            "Global value - $1.5 trillion annually, 3 billion livelihoods dependent",
+            "India's coastline - 7,517 km (peninsula + islands), 2.3M sq km EEZ",
+            "Fisheries - 8-10 million tons annual production, 15M dependent population",
+            "Aquaculture - Shrimp farming (80% blue economy value), fish farming",
+            "Coastal tourism - Beach, heritage tourism revenue generation",
+            "Shipping - 95% India's trade volume transported by sea",
+            "Renewable energy - Offshore wind, tidal, wave potential",
+            "Ocean health - Pollution, overfishing, warming, acidification threats",
+            "Sustainable fisheries - Quota systems, gear restrictions, seasonal closure",
+            "Marine Protected Areas - Network of reserves, no-take zones",
+            "Illegal Unreported Unregulated (IUU) fishing - Trade ban requirement",
+            "Climate adaptation - Mangrove protection, livelihood diversification"
+          ],
+          "important_conventions": [
+            "UNCLOS - Ocean governance",
+            "CBD - Marine biodiversity",
+            "FAO Code of Conduct - Sustainable fisheries"
+          ],
+          "government_initiatives": [
+            "Sagarmala - Coastal development program",
+            "Marine Spatial Planning - Ocean zoning for multiple uses"
+          ],
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "M8_T8",
+          "topic_name": "Dark Sky Reserves & Light Pollution",
+          "primary_book": {
+            "chapter": 54,
+            "name": "Emerging Environmental Issues"
+          },
+          "ncert_reference": "Class 12 Physics - Light and Optics (Light pollution concept)",
+          "key_concepts": [
+            "Light pollution - Artificial light excess, night sky degradation",
+            "Sources - Street lights, building illumination, advertising, sports fields",
+            "Impact - Star visibility reduction, circadian rhythm disruption, wildlife effects",
+            "Ecological effects - Insect attraction (LED mortality), bird disorientation (migration, collision)",
+            "Human health - Sleep disruption, melatonin suppression, potential cancer link",
+            "Energy waste - 30% streetlight electricity wasted (upward scatter)",
+            "Dark Sky Reserves - IUCN protected areas, pristine night sky preservation",
+            "Global dark sky sites - 200+ designated reserves worldwide",
+            "India's dark sky potential - Limited designated reserves, potential in Himalayas",
+            "Light management - Full-cutoff fixtures, color temperature control (warm <3000K)",
+            "Circadian-safe lighting - Blue light reduction evening",
+            "Mitigation - Lighting code adoption, awareness campaigns",
+            "Research - Wildlife behavioral studies in dark sky areas",
+            "Astronomy value - Ground-based telescope site quality depends on light pollution"
+          ],
+          "important_conventions": [
+            "IUCN - Dark Sky Reserve designation",
+            "IAU - Astronomy site protection"
+          ],
+          "government_initiatives": [
+            "IDA - International Dark-Sky Association partnership potential",
+            "State lighting codes - Light pollution management"
+          ],
+          "pyq_frequency": "low",
+          "prelims_importance": 5,
+          "mains_importance": 5,
+          "daily_target_hours": 1.0
+        }
+      ]
+    }
+  ],
+  "study_guide": {
+    "total_topics": 54,
+    "daily_study_schedule_standard_track": {
+      "hours_per_day": "3-4 hours",
+      "days_per_week": 6,
+      "completion_timeline_months": 5,
+      "daily_structure": {
+        "morning_theory": "1.5-2 hours - Read topic, understand concepts",
+        "afternoon_pyq_practice": "1-1.5 hours - Solve previous year questions",
+        "evening_revision": "0.5-1 hour - Concept review, diagram drawing"
+      }
+    },
+    "pyq_patterns": {
+      "prelims_questions_annual": "10-12 questions (5-10 marks)",
+      "mains_gs3_marks": "30-40 marks (1-2 questions)",
+      "high_frequency_topics": [
+        "Biogeochemical cycles (N, C, P)",
+        "Ecosystem pyramids",
+        "Project Tiger and conservation",
+        "Biodiversity hotspots",
+        "Climate change and international agreements",
+        "Pollution types and solutions",
+        "Environmental laws",
+        "Climate finance and NDCs"
+      ],
+      "question_types": {
+        "prelims": "MCQ with 4 options, diagram-based, data-based questions",
+        "mains": "Essay (10 marks), short notes (7 marks), case study analysis (15 marks)"
+      }
+    },
+    "resources": {
+      "primary_text": "Shankar IAS Environment (Latest Edition)",
+      "ncert_references": "Class 12 Biology Chapters 13-16, Class 12 Chemistry Chapter 16",
+      "supplementary": "PYQ analysis (last 10 years), UPSC Archives, Magazine articles (Yojana, Kurukshetra)",
+      "online_platforms": "UPSC website, AIBP, Ministry of Environment websites"
+    },
+    "exam_tips": {
+      "prelims": [
+        "Time management - 20-25 seconds per question",
+        "Elimination strategy - Rules out obviously wrong options",
+        "Diagram familiarity - Ecological pyramids, food chains, biogeochemical cycles",
+        "Scheme awareness - Project names, state-wise locations, year of launch"
+      ],
+      "mains": [
+        "Structure - Introduction, body paragraphs with examples, conclusion",
+        "Contemporary linkage - Connect to recent policies, climate changes, disasters",
+        "Case studies - Real examples (Project Tiger success, Sundarbans tigers, Namami Gange progress)",
+        "Data integration - Statistics on carbon, biodiversity loss, temperature rise",
+        "GS interconnect - Link Environment to Economy, Governance, Social issues"
+      ]
+    }
+  }
+}

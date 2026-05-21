@@ -1,0 +1,2221 @@
+{
+  "syllabus_metadata": {
+    "title": "UPSC GS Mains Paper 1 - Indian Society Complete Syllabus",
+    "exam": "UPSC Civil Services Mains",
+    "subject": "General Studies Paper 1",
+    "topic": "Indian Society",
+    "marks_weightage": "40-60 marks",
+    "last_updated": "2026-05-20",
+    "prepared_for": "MentorsDaily UPSC Portal",
+    "total_modules": 8,
+    "total_topics": 48,
+    "coverage": "100% NCERT Sociology Class 11 & 12"
+  },
+  "primary_sources": {
+    "ncert_class_11_book1": {
+      "title": "Introducing Sociology",
+      "chapters": 5,
+      "topics": ["Society", "Social Change", "Research Methods", "Culture", "Socialization"]
+    },
+    "ncert_class_11_book2": {
+      "title": "Understanding Society",
+      "chapters": 5,
+      "topics": ["Understanding Social Institutions", "Understanding Social Structure", "Understanding Social Processes", "Society and State", "Social Thinkers"]
+    },
+    "ncert_class_12_book1": {
+      "title": "Indian Society",
+      "chapters": 6,
+      "topics": ["Introducing Indian Society", "Demographic Structure", "Social Institutions", "Market as Social Institution", "Social Inequality", "Cultural Diversity"]
+    },
+    "ncert_class_12_book2": {
+      "title": "Social Change and Development in India",
+      "chapters": 8,
+      "topics": ["Structural Change", "Cultural Change", "Democracy", "Rural Society", "Industrial Society", "Globalisation", "Mass Media", "Social Movements"]
+    }
+  },
+  "key_thinkers": {
+    "western_sociologists": [
+      {"name": "Emile Durkheim", "contribution": "Mechanical vs Organic Solidarity, Division of Labour"},
+      {"name": "Max Weber", "contribution": "Rationalization, Bureaucracy, Verstehen"},
+      {"name": "Karl Marx", "contribution": "Class, Surplus Value, Historical Materialism"},
+      {"name": "Talcott Parsons", "contribution": "Structural Functionalism, AGIL Framework"},
+      {"name": "Robert K. Merton", "contribution": "Manifest vs Latent Functions, Strain Theory"},
+      {"name": "Louis Dumont", "contribution": "Homo Hierarchicus, Hierarchy vs Equality, Caste System Analysis"}
+    ],
+    "indian_sociologists": [
+      {"name": "M.N. Srinivas", "contribution": "Dominant Caste, Sanskritization, Westernization, Village Studies"},
+      {"name": "Andre Beteille", "contribution": "Social Stratification, Caste-Class Debate, Agrarian Society"},
+      {"name": "Yogendra Singh", "contribution": "Modernization of Indian Tradition, Syncretism"},
+      {"name": "D.P. Mukerji", "contribution": "Caste in Modern India"},
+      {"name": "K.M. Kapadia", "contribution": "Family and Marriage in India"},
+      {"name": "Ishwar Modi", "contribution": "Social Structure"},
+      {"name": "B.R. Ambedkar", "contribution": "Annihilation of Caste, Dalit Perspective, Social Equality"},
+      {"name": "Ranajit Guha", "contribution": "Subaltern Studies, History from Below"},
+      {"name": "Gayatri Chakravorty Spivak", "contribution": "Subaltern Critique, 'Can the Subaltern Speak'"},
+      {"name": "Arvind Panagariya", "contribution": "Modern Indian Economy"},
+      {"name": "Verrier Elwin", "contribution": "Tribal Studies, Integration vs Isolation"}
+    ]
+  },
+  "modules": [
+    {
+      "module_id": "MOD001",
+      "module_name": "Salient Features of Indian Society",
+      "module_order": 1,
+      "estimated_study_hours": 18,
+      "ncert_mapping": {
+        "class_11": ["Introducing Sociology: Chapters 1-2", "Understanding Society: Chapter 1"],
+        "class_12": ["Indian Society: Chapter 1"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD001_TOP001",
+          "topic_name": "Unity in Diversity - Concept and Manifestations",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 1: Introducing Indian Society",
+          "ncert_reference": {
+            "class_11": ["Introducing Sociology Chapter 1", "Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 1"]
+          },
+          "key_concepts": [
+            "Unity in Diversity - definition as simultaneous existence of multiple identities",
+            "Religious pluralism - Hinduism, Islam, Christianity, Sikhism, Buddhism, Jainism coexistence",
+            "Linguistic diversity - 22 scheduled languages, hundreds of dialects, multilingual identity",
+            "Caste heterogeneity - thousands of castes across regions and communities",
+            "Regional variation - North, South, East, West Indian societies distinct yet interconnected",
+            "Festival plurality - common festivals with regional variations celebrating diversity",
+            "Philosophical traditions - Vedanta, Yoga, Samkhya, Buddhism coexisting",
+            "Constitutional recognition - recognition of diversity in Preamble, Fundamental Rights",
+            "Social movements transcending divisions - Nationalist movement, Independence struggle",
+            "Syncretism - blending of different traditions in Indian civilization",
+            "Historical continuity - maintaining diversity across millennia without fragmentation",
+            "National identity - shared political identity transcending religious/linguistic boundaries",
+            "Pluralistic outlook - acceptance and accommodation of different worldviews",
+            "Cultural festivals - Durga Puja in Bengal, Onam in Kerala, Pongal in Tamil Nadu showing regional unity",
+            "Joint struggle against colonialism - diverse groups united in independence movement"
+          ],
+          "thinkers_referenced": ["Durkheim - Organic Solidarity", "Marx - Historical Materialism", "Yogendra Singh - Syncretism"],
+          "current_affairs_connect": [
+            "Communal harmony efforts post-religious conflicts",
+            "Secular Constitution vs Majoritarian politics debate",
+            "Regional movements and federalism - Separate statehood demands",
+            "Linguistic nationalism and Three-language formula",
+            "Inter-faith dialogues and composite culture initiatives"
+          ],
+          "mains_answer_angles": [
+            "Unity in Diversity as foundational principle - constitutional and cultural dimensions",
+            "Mechanisms maintaining cohesion despite heterogeneity - shared history, constitutional framework",
+            "Challenges to unity - communalism, separatism, regionalism, recent polarization",
+            "Role of syncretic traditions in maintaining plurality - Bhakti movement example",
+            "Secular state model as framework for managing diversity"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine how India maintains unity despite significant religious, linguistic and caste diversity.",
+            "Critically analyze the concept of 'Unity in Diversity' in Indian society.",
+            "How has the Indian constitution enabled the coexistence of diverse communities?"
+          ]
+        },
+        {
+          "topic_id": "MOD001_TOP002",
+          "topic_name": "Salient Features of Indian Society - Agrarian Base and Rural Character",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 1: Introducing Indian Society",
+          "ncert_reference": {
+            "class_11": ["Introducing Sociology Chapter 2"],
+            "class_12": ["Indian Society Chapter 1", "Social Change Chapter 4: Rural Society"]
+          },
+          "key_concepts": [
+            "Agricultural base of Indian economy - 58% rural population, agriculture backbone despite industrialization",
+            "Land as primary resource - ownership patterns, landlessness, tenant farming",
+            "Village as social unit - self-sufficient economies, panchayat system traditionally",
+            "Agrarian relations - zamindar system (pre-independence), jagirdar, tenant farmers",
+            "Feudal remnants in agriculture - semi-feudal land relations persisting in many regions",
+            "Green Revolution - technological transformation of agriculture, regional disparities (Punjab)",
+            "Land reform policies - zamindari abolition, tenancy laws, ceiling acts, implementation failures",
+            "Agricultural distress - farmers' suicides, debt cycles, minimum support prices",
+            "Seasonal migration - rural-urban movement, labour exploitation",
+            "Agricultural diversification - from mono-crop to horticulture, dairy, floriculture",
+            "Water security - irrigation systems, groundwater depletion, watershed management",
+            "Agro-climatic diversity - monsoon dependency, regional crop patterns"
+          ],
+          "thinkers_referenced": ["Andre Beteille - Agrarian Structure", "M.N. Srinivas - Village Studies", "Yogendra Singh - Rural Modernization"],
+          "current_affairs_connect": [
+            "Farm laws 2020 controversy and farmer protests - MSP guarantee, mandis",
+            "Agricultural distress and farmer suicides - Maharashtra, Punjab examples",
+            "Climate change impact on agriculture - irregular monsoons, crop patterns",
+            "Food security and public distribution system",
+            "Corporate farming and land acquisition"
+          ],
+          "mains_answer_angles": [
+            "Agrarian character as defining feature - structural position of villages and farming",
+            "Land relations and inequality - ownership concentration, landlessness issues",
+            "Agricultural transformation - traditional to modern, green revolution impact",
+            "Agrarian unrest - causes, manifestations, farmer movements",
+            "Policy challenges - land reform effectiveness, agricultural modernization"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine the agrarian base of Indian society and its implications for social structure.",
+            "How have land reforms shaped rural society in India?",
+            "Analyze the persistence of feudal elements in Indian agriculture."
+          ]
+        },
+        {
+          "topic_id": "MOD001_TOP003",
+          "topic_name": "Caste Hierarchy - Purity-Pollution Concept and Indology Approach",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Caste as hierarchical system - ordering of communities by ritual status not economic wealth",
+            "Purity-pollution concept - Louis Dumont's analysis, ritual purity as organizing principle",
+            "Brahminical ideology - ritualism, karma theory justifying hierarchy",
+            "Varna system - Brahmin, Kshatriya, Vaishya, Shudra classification theoretical model",
+            "Jati multiplicity - thousands of castes with regional variation, endogamous groups",
+            "Ritual hierarchy - Brahmin priest role, untouchability bottom layers",
+            "Occupational heredity - traditional caste occupations, restrictions on occupation change",
+            "Endogamy principle - marriage within caste, maintenance of ritual status",
+            "Dumont's Homo Hierarchicus - modern critique of Western egalitarianism through Hindu hierarchy",
+            "Holism vs individualism - Dumont's distinction between Indian and Western societies",
+            "Indological perspective - understanding caste through Hindu texts and philosophy",
+            "Orientalism debate - Said's critique of Western construction of 'Orient', Indology as colonial knowledge",
+            "Religious foundation - caste legitimized through religious texts, karma doctrine",
+            "Segmentary nature - horizontal segmentation into castes, vertical hierarchy",
+            "Brahminical dominance - ritually supreme position, non-economic power"
+          ],
+          "thinkers_referenced": ["Louis Dumont - Homo Hierarchicus", "Edward Said - Orientalism", "Srinivas - Dominant Caste", "Ambedkar - Caste Critique"],
+          "current_affairs_connect": [
+            "Dalit rights and dignity - violence against Dalits, atrocities",
+            "Caste discrimination in rural areas - forced labor, social boycotts",
+            "Inter-caste marriages and honor killings",
+            "Educational access and caste discrimination",
+            "Caste in online spaces - matrimonial sites practicing discrimination"
+          ],
+          "mains_answer_angles": [
+            "Purity-pollution hierarchy as organizing principle of caste system",
+            "Brahminical ideology and religious legitimation of inequality",
+            "Indological vs colonial perspectives on understanding caste",
+            "Persistence and transformation of caste hierarchy in modern India",
+            "Critique of hierarchy and assertion of equality movements"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Explain Louis Dumont's concept of purity and pollution in understanding the caste system.",
+            "Critically examine the Indological approach to Indian society.",
+            "How does Brahminical ideology justify and perpetuate the caste hierarchy?"
+          ]
+        },
+        {
+          "topic_id": "MOD001_TOP004",
+          "topic_name": "Structural Functionalism and Marxist Approaches to Indian Society",
+          "difficulty": "high",
+          "priority": "high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 11 - Understanding Society - Chapter 5: Social Thinkers",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 5", "Introducing Sociology Chapter 1"],
+            "class_12": ["Indian Society Chapter 1"]
+          },
+          "key_concepts": [
+            "Structural Functionalism - Parsons AGIL framework, society as system maintaining integration",
+            "Srinivas' structural-functional approach - village studies, understanding local institutions",
+            "Functionalist analysis of caste - performance of social functions despite inequality",
+            "Manifest and latent functions - Merton's distinction, applied to Indian institutions",
+            "Critique of functionalism - ignoring conflict, justifying status quo, change underemphasized",
+            "Marxist historical materialism - economic base determining social superstructure",
+            "Class analysis in Indian context - landowners, peasants, urban working class",
+            "Surplus value and exploitation - extracting labor surplus, applicable to colonial and feudal India",
+            "Feudalism to capitalism transition - Indian history through Marxist lens",
+            "Colonial mode of production - drain of resources, deindustrialization analysis",
+            "Marxist critique of caste - caste as masking class relations, false consciousness",
+            "Mode of production specific to India - debate on Asiatic mode, feudal elements",
+            "Revolutionary potential - working class and peasantry as agents of change",
+            "Gramsci and hegemony - cultural domination and consent in Indian context",
+            "Limitations of Marxism - overemphasis on class, underestimating other identities"
+          ],
+          "thinkers_referenced": ["Talcott Parsons - Functionalism", "Robert Merton - AGIL", "Karl Marx - Historical Materialism", "Srinivas - Structural Functional Village Studies"],
+          "current_affairs_connect": [
+            "Class analysis of farmer protests - peasant class struggle",
+            "Urban working class and labor movements - unions, worker rights",
+            "Reservation as addressing class and status inequality",
+            "Economic inequality and wealth concentration",
+            "Feudal elements persisting in labor relations"
+          ],
+          "mains_answer_angles": [
+            "Functionalist understanding of how institutions maintain social order",
+            "Marxist critique of inequality and class exploitation",
+            "Application of both approaches to understand Indian social structure",
+            "Strengths and limitations of structural-functional analysis in Indian context",
+            "Strengths and limitations of Marxist analysis in understanding Indian inequality"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Compare structural-functionalist and Marxist approaches to understanding Indian society.",
+            "How can functionalist analysis explain the persistence of caste despite its dysfunctional nature?",
+            "Critically analyze the applicability of Marxist theory to Indian social structure."
+          ]
+        },
+        {
+          "topic_id": "MOD001_TOP005",
+          "topic_name": "Subaltern Studies and History from Below",
+          "difficulty": "high",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 3: The Story of Indian Democracy",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Social Change Chapter 3"]
+          },
+          "key_concepts": [
+            "Subaltern studies definition - focusing on voices of common people, marginalized groups",
+            "Ranajit Guha - pioneering subaltern studies, rewriting Indian history",
+            "Elementary aspects of peasant insurgency - understanding peasant consciousness",
+            "Gayatri Spivak - 'Can the Subaltern Speak' - issue of representation and voice",
+            "Critique of nationalist historiography - elitist accounts ignoring masses",
+            "History from below - peasant movements, tribal uprisings, workers' struggles",
+            "Colonial archives and reconstruction - extracting subaltern voices from colonial records",
+            "Everyday resistance - weapons of weak, hidden transcripts",
+            "Peasant consciousness - how ordinary people understood their exploitation",
+            "Dalit autobiographies - personal narratives challenging dominant narratives",
+            "Women's history - overlooked contributions, agency in social movements",
+            "Indigenous knowledge systems - alternative ways of knowing suppressed by colonial knowledge",
+            "Democratic participation - previously excluded groups demanding representation",
+            "Memory and oral history - preserving subaltern experiences",
+            "Limitations - overemphasis on resistance, essentialization of subaltern identity"
+          ],
+          "thinkers_referenced": ["Ranajit Guha - Subaltern Studies", "Gayatri Spivak - Postcolonial Critique", "Antonio Gramsci - Hegemony and Counter-hegemony"],
+          "current_affairs_connect": [
+            "Dalit and tribal movements asserting historical agency and dignity",
+            "Feminist historical revisionism - recovering women's roles",
+            "Museum representations - whose history is told",
+            "Indigenous languages and knowledge systems revival",
+            "Oral history projects documenting marginalized experiences"
+          ],
+          "mains_answer_angles": [
+            "Subaltern studies as historiographic intervention - rewriting Indian history",
+            "Challenging elite-centric nationalist narratives with mass participation focus",
+            "Issue of voice and representation - can the subaltern speak?",
+            "Everyday resistance and agency of marginalized groups",
+            "Decolonizing knowledge - challenging colonial and Western interpretations"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Explain the significance of subaltern studies in understanding Indian history.",
+            "How does Ranajit Guha's approach differ from traditional Indian historiography?",
+            "Critically analyze Spivak's argument 'Can the Subaltern Speak'."
+          ]
+        },
+        {
+          "topic_id": "MOD001_TOP006",
+          "topic_name": "Continuity and Change in Indian Society",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 1: Introducing Indian Society & Class 12 Social Change - Chapter 1: Structural Change",
+          "ncert_reference": {
+            "class_11": ["Introducing Sociology Chapter 2", "Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 1", "Social Change Chapter 1"]
+          },
+          "key_concepts": [
+            "Tradition and modernity - not binary opposition but continuous interaction",
+            "Continuity in diversity - maintaining ancient civilization while changing",
+            "Sanskritization as change mechanism - Srinivas concept, lower castes adopting Brahminical practices",
+            "Westernization as modernization - Srinivas distinction between two processes",
+            "Colonial impact - disruption and transformation of pre-existing structures",
+            "Constitutional reform - legal changes transforming social relations",
+            "Technology and social change - railways, print media, internet transforming society",
+            "Urbanization - rural to urban migration, new social relations emerging",
+            "Education expansion - literacy changes consciousness and social mobility",
+            "Economic development - transition from agrarian to industrial and service economy",
+            "Gender relations evolution - women's education, employment, legal rights changes",
+            "Religious reform movements - 19th century adaptations to modern world",
+            "Independence and nation-building - conscious effort to modernize while preserving identity",
+            "Democracy and social change - political participation enabling social assertion",
+            "Resistance and persistence - certain traditions maintaining despite modernization"
+          ],
+          "thinkers_referenced": ["M.N. Srinivas - Sanskritization and Westernization", "Yogendra Singh - Modernization of Tradition", "Durkheim - Social Transformation"],
+          "current_affairs_connect": [
+            "Digital transformation and social media impact on traditional institutions",
+            "Climate change forcing agricultural adaptation",
+            "Pandemic disrupting traditional gatherings and practices",
+            "Women's movement demanding gender equality in tradition-bound areas",
+            "Youth movements for social change"
+          ],
+          "mains_answer_angles": [
+            "Understanding change and continuity as dialectical process not linear",
+            "Mechanisms of social change - sanskritization, westernization, education, urbanization",
+            "Resistance and adaptation - how societies accommodate change while preserving identity",
+            "Role of agency and structure in social transformation",
+            "Modern Indian society as synthesis of tradition and modernity"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Analyze the process of continuity and change in Indian society since independence.",
+            "How have sanskritization and westernization influenced Indian society?",
+            "Examine the relationship between tradition and modernity in contemporary India."
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD002",
+      "module_name": "Demographic Structure of Indian Society",
+      "module_order": 2,
+      "estimated_study_hours": 15,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 2"],
+        "class_12": ["Indian Society: Chapter 2"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD002_TOP001",
+          "topic_name": "Population Growth and Demographic Transition",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 2: The Demographic Structure of Indian Society",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 2"]
+          },
+          "key_concepts": [
+            "Population growth rate - India's position, historical trends, annual percentage increase",
+            "Demographic transition model - pre-transition, transition, post-transition stages",
+            "Stage 1 - high birth and death rates, low growth (pre-modern period)",
+            "Stage 2 - declining death rates due to development, high birth rates continue (1900-1970s India)",
+            "Stage 3 - declining birth and death rates both (post-1980s India)",
+            "Stage 4 - low birth and death rates, low growth (developed nations)",
+            "Fertility decline - reasons, regional variation, education role",
+            "Mortality decline - health improvements, child mortality reduction, life expectancy increase",
+            "Population momentum - continuing growth despite fertility decline, young population",
+            "Demographic dividend - young working-age population advantage, economic potential",
+            "Census 2011 data - India's population 1.21 billion, density variations",
+            "State variation - demographic transition speeds differing by state",
+            "Birth rate and death rate - absolute figures and trends",
+            "National Population Policy 2000 - replacing population control with population stabilization",
+            "Challenges - aging population, youth unemployment, resource pressure"
+          ],
+          "thinkers_referenced": ["Notestein - Demographic Transition Model", "Malthus - Population Theory"],
+          "current_affairs_connect": [
+            "India becoming world's most populous country surpassing China",
+            "Demographic dividend utilization - job creation needs",
+            "Population stabilization vs growth debate in policy",
+            "Regional demographic variations - South Indian states having lower fertility",
+            "Census 2021 delayed, population estimates and projections"
+          ],
+          "mains_answer_angles": [
+            "Demographic transition trajectory of India and its stages",
+            "Relationship between development and fertility decline",
+            "Demographic dividend - opportunities and challenges",
+            "Regional variations in demographic indicators",
+            "Policy responses to population growth and stabilization"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Explain the demographic transition model with reference to India.",
+            "Analyze India's demographic dividend and the challenges in utilizing it.",
+            "Examine regional variations in population growth rates in India."
+          ]
+        },
+        {
+          "topic_id": "MOD002_TOP002",
+          "topic_name": "Sex Ratio and Gender Imbalance",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 2: The Demographic Structure of Indian Society",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 2"]
+          },
+          "key_concepts": [
+            "Overall sex ratio - females per 1000 males, India's ratio declining till 2001, improving post-2001",
+            "Child sex ratio - 0-6 years age group, concerning decline, indicator of gender-biased practices",
+            "State-wise variation - highest in Kerala and NE states, lowest in Punjab and Haryana",
+            "Historical trends - sex ratio deterioration since 1901",
+            "Causes of skewed ratio - prenatal sex determination, female infanticide, differential care",
+            "Selective abortion - sex-selective practices post-ultrasound technology",
+            "Female infanticide - historical practice in certain communities, continuing in pockets",
+            "Differential mortality - higher female mortality in childhood, reproductive years",
+            "Nutritional discrimination - girls receiving less food and healthcare access",
+            "Educational disadvantage - girls' education neglected, impacting life chances",
+            "Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act - regulation of sex selection",
+            "Regional patterns - North Indian states more gender-imbalanced than South",
+            "Socio-economic factors - patriarchal values, dowry system, son preference",
+            "Cultural practices - joint family preference for sons, inheritance patterns",
+            "Policy interventions - schemes promoting girl child, awareness campaigns"
+          ],
+          "thinkers_referenced": ["Amartya Sen - Missing Women", "Gender studies scholars"],
+          "current_affairs_connect": [
+            "Skewed sex ratios creating social problems - crime against women, marriage market issues",
+            "Beti Bachao Beti Padhao campaign - government initiative",
+            "Maharashtra, Gujarat implementing stricter sex selection laws",
+            "Girl child schemes - providing education and economic incentives",
+            "Violence related to skewed sex ratio - women safety concerns"
+          ],
+          "mains_answer_angles": [
+            "Causes of unfavorable sex ratio - biological, social, cultural, economic factors",
+            "Consequences of skewed sex ratio - social instability, human rights violations",
+            "State and regional variations - explaining geographic patterns",
+            "Gender discrimination mechanisms - prenatal, infanticide, differential care",
+            "Policy effectiveness in addressing gender imbalance"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine the declining sex ratio in India and its social implications.",
+            "Discuss the causes and consequences of child sex ratio imbalance.",
+            "How effective have policies like PCPNDT Act been in addressing sex ratio issues?"
+          ]
+        },
+        {
+          "topic_id": "MOD002_TOP003",
+          "topic_name": "Literacy, Education and Human Development Indicators",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 2: The Demographic Structure of Indian Society",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 2"]
+          },
+          "key_concepts": [
+            "Literacy rate definition - ability to read and write with understanding",
+            "Literacy in India - 2011 census 74.04%, continuing improvements",
+            "Gender gap in literacy - female literacy significantly lower than male, narrowing gap",
+            "Rural-urban literacy gap - urban areas having much higher literacy rates",
+            "State variation - Kerala highest literacy, Bihar and Rajasthan lower",
+            "Educational structure - primary, secondary, higher education progression",
+            "Dropout rates - high school dropout, gender-wise variations",
+            "Quality of education - beyond enrollment, learning outcomes focus",
+            "Women's education - historically neglected, now increasing access",
+            "Caste discrimination in education - Dalit and tribal children facing barriers",
+            "Urban poverty and education - slum children's access to schooling",
+            "Linguistic diversity in education - mother tongue education importance",
+            "Digital divide - access to online education, rural-urban and class gaps",
+            "Higher education expansion - universities, colleges growth, enrollment rates",
+            "Skill gap - technical skills mismatch in labor market"
+          ],
+          "thinkers_referenced": ["Amartya Sen - Capability Approach", "Paulo Freire - Critical Pedagogy"],
+          "current_affairs_connect": [
+            "NEP 2020 - National Education Policy changes to curriculum and structure",
+            "Pandemic impact on education - school closures, digital divide exposure",
+            "Girls' education schemes - Sukanya Samriddhi, Beti Bachao initiatives",
+            "Mid-day meal scheme - nutrition and enrollment link",
+            "Skilling India - vocational education emphasis"
+          ],
+          "mains_answer_angles": [
+            "Literacy patterns and disparities - gender, rural-urban, state variations",
+            "Education's role in social mobility and reducing inequality",
+            "Barriers to education - poverty, caste discrimination, gender bias, geographical remoteness",
+            "Education quality and learning outcomes focus",
+            "Human development through education and capability development"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Analyze gender disparities in literacy and education in India.",
+            "Examine the relationship between education and social development.",
+            "How can rural education gaps be addressed for inclusive development?"
+          ]
+        },
+        {
+          "topic_id": "MOD002_TOP004",
+          "topic_name": "Religious Composition and Linguistic Diversity",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 2: The Demographic Structure of Indian Society & Chapter 6: The Challenges of Cultural Diversity",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 2, Chapter 6"]
+          },
+          "key_concepts": [
+            "Religion in census - Hindu, Muslim, Christian, Sikh, Buddhist, Jain classifications",
+            "Hindu majority - 79.8% of population, diverse schools within Hinduism",
+            "Muslim population - 14.2%, second largest, regional concentration variations",
+            "Other religions - Christianity, Sikhism, Buddhism, Jainism, Zoroastrianism minority communities",
+            "Growth rates - differential fertility rates between religions, urban-rural variations",
+            "Census classification - religion as identity category, not doctrinal belief system",
+            "Syncretism - shared practices across religions, pilgrimage sites, festival celebrations",
+            "Languages scheduled - 22 official languages, hundreds of mother tongues",
+            "Language families - Indo-Aryan, Dravidian, Austro-Asiatic, Sino-Tibetan",
+            "Three-language formula - regional, national, international language learning",
+            "Language and identity - linguistic nationalism movements, separate state demands",
+            "Dialect continuum - gradual differences between speech varieties",
+            "Mother tongue education - importance and challenges",
+            "Code-switching - mixing languages in communication, multilingualism",
+            "Language loss - minority language endangerment, globalization impact"
+          ],
+          "thinkers_referenced": ["Linguistic anthropologists", "Religious studies scholars"],
+          "current_affairs_connect": [
+            "Religious polarization and communal tensions",
+            "Language politics - Hindi imposition debate, regional language protection",
+            "Linguistic minorities rights - minority language instruction demand",
+            "Religious minorities' concerns - minority rights, appeasement debate",
+            "Census classification debates - religion categories, census politics"
+          ],
+          "mains_answer_angles": [
+            "Religious plurality and syncretic traditions in Indian society",
+            "Linguistic diversity as feature of Indian civilization",
+            "Language and identity relationship - linguistic nationalism",
+            "Constitutional provisions for minority rights and language protection",
+            "Challenges to maintaining religious and linguistic diversity"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the religious composition of Indian society and its implications.",
+            "Analyze the linguistic diversity of India and its role in national identity.",
+            "How does the three-language formula balance national integration with linguistic diversity?"
+          ]
+        },
+        {
+          "topic_id": "MOD002_TOP005",
+          "topic_name": "Migration and Urbanization Patterns",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 2: The Demographic Structure of Indian Society",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 2"]
+          },
+          "key_concepts": [
+            "Rural-urban migration - push and pull factors, economic motivations",
+            "Inter-state migration - labor migration between states, regional patterns",
+            "Seasonal migration - harvest seasons, construction work migration",
+            "Circular migration - temporary movements with return to origin",
+            "Permanent migration - families relocating from rural to urban",
+            "Push factors - agricultural unemployment, landlessness, poverty, limited opportunities",
+            "Pull factors - urban employment, higher wages, education, services",
+            "Urbanization - rise of cities, urban population growth, metropolitan expansion",
+            "Slum formation - migration exceeding housing, informal settlements",
+            "Urban services gap - education, healthcare, sanitation, employment in informal sectors",
+            "Remittances - money sent home by migrants, economic importance",
+            "Brain drain - skilled migration, international emigration",
+            "Migrant vulnerability - exploitation, low wages, unsafe work, discrimination",
+            "Transnational migration - International emigration, diaspora communities",
+            "COVID impact - reverse migration, workers returning to villages"
+          ],
+          "thinkers_referenced": ["Harris-Todaro Model - Rural-Urban Migration"],
+          "current_affairs_connect": [
+            "Pandemic reverse migration - millions returning to villages, 2020 exodus",
+            "Migrant worker welfare - fair wages act, social security, organized vs informal",
+            "Urban housing crisis - affordable housing shortage, right to housing",
+            "Slum rehabilitation - resettlement policies, displacement issues",
+            "International migration - brain drain, NRI contributions"
+          ],
+          "mains_answer_angles": [
+            "Rural-urban migration as response to economic inequality",
+            "Urbanization patterns and urban sprawl challenges",
+            "Migrant workers' contributions and vulnerabilities",
+            "Urban poverty and informal sector growth",
+            "Policy responses - affordable housing, migrant worker protection, urban planning"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Analyze the patterns and causes of rural-urban migration in India.",
+            "Examine the relationship between urbanization and slum formation.",
+            "What are the challenges and opportunities created by migration in urban areas?"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD003",
+      "module_name": "Caste System - History, Structure and Transformations",
+      "module_order": 3,
+      "estimated_study_hours": 20,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 2"],
+        "class_12": ["Indian Society: Chapter 5"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD003_TOP001",
+          "topic_name": "Origin of Caste System - Theories and Debates",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Brahmanical theory - caste origin in Purushastava myth, division of labor by birth",
+            "Racial theory - discredited theory attributing caste to Aryan-Dravidian racial differences",
+            "Occupational theory - caste originating from hereditary occupational divisions",
+            "Religious theory - caste legitimated through karma and samsara doctrines",
+            "Conflict theory - caste as mechanism of domination and exploitation",
+            "Varna system - theoretical four-fold classification in ancient texts",
+            "Jati system - actual practice of thousands of endogamous castes",
+            "Varna-Jati distinction - theoretical model vs actual social practice",
+            "Historical development - changing caste structure over centuries",
+            "Colonial categorization - British census fixing and simplifying caste",
+            "Hindu scripture references - Rigveda, Purusha Sukta, Manusmriti on caste",
+            "Debate on caste origins - indigenous vs external, religious vs social structural explanations",
+            "Caste as system - interconnected hierarchy, ritual status determining position",
+            "Continuity and change - adaptations over time while maintaining hierarchy",
+            "Scholarly disagreements - different theories explaining caste emergence and persistence"
+          ],
+          "thinkers_referenced": ["B.R. Ambedkar - Caste Origins", "M.N. Srinivas - Caste Structure", "Louis Dumont - Hierarchical System"],
+          "current_affairs_connect": [
+            "Caste in dating apps - matrimonial sites and caste matching",
+            "Caste and consumption patterns - status markers in modern context",
+            "Caste in social media - algorithms and caste identity",
+            "Corporate sector caste discrimination - workplace hierarchies reflecting caste"
+          ],
+          "mains_answer_angles": [
+            "Various theories explaining caste origin - strengths and weaknesses",
+            "Brahmanical ideology and religious legitimation",
+            "Varna-Jati relationship - theoretical framework vs lived reality",
+            "Historical development of caste system over time",
+            "Colonial influence on caste classification and rigidification"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Discuss various theories explaining the origin of the caste system in India.",
+            "Explain the distinction between varna and jati in Indian society.",
+            "How has the colonial period influenced the understanding and practice of caste?"
+          ]
+        },
+        {
+          "topic_id": "MOD003_TOP002",
+          "topic_name": "Features of Caste System - Endogamy, Heredity, Hierarchy and Occupation",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Endogamy principle - marriage within caste group, maintaining ritual purity",
+            "Exogamy within caste - marriage outside clan but within caste",
+            "Hypergamy practice - woman marrying into higher caste, rare and stigmatized",
+            "Hypogamy prohibition - woman marrying into lower caste, severe punishment",
+            "Hereditary occupation - occupations determined by birth, restrictions on occupation change",
+            "Occupational monopoly - specific castes controlling certain professions",
+            "Jajmani system - patron-client relations, economic aspect of caste hierarchy",
+            "Ritual purity rules - restrictions on interaction, food sharing, physical contact",
+            "Untouchability - lowest caste considered polluting, segregation and discrimination",
+            "Hierarchy and ranking - ritual status determining social standing",
+            "Brahminical supremacy - priests at top, untouchables at bottom",
+            "Interdependence - castes dependent on each other despite hierarchy",
+            "Pollution beliefs - occupational pollution (leather work, scavenging), menstrual pollution",
+            "Food restrictions - vegetarianism and non-vegetarianism marking status",
+            "Dress and ornamentation - markers of caste identity and status"
+          ],
+          "thinkers_referenced": ["M.N. Srinivas - Jajmani System", "Louis Dumont - Purity and Hierarchy"],
+          "current_affairs_connect": [
+            "Caste-based violence - attacks on Dalit families, honor killing",
+            "Caste discrimination in workplaces - wage gaps, exclusion",
+            "Endogamy and inter-caste marriages - family violence and honor killings",
+            "Occupational segregation - certain castes in specific low-status jobs",
+            "Caste symbols and identity - marking and recognition"
+          ],
+          "mains_answer_angles": [
+            "Endogamy as mechanism for maintaining caste purity and separation",
+            "Hereditary occupation and caste-based labor division",
+            "Ritual hierarchy and purity-pollution beliefs as caste organizing principle",
+            "Jajmani system - economic dimensions of caste hierarchy",
+            "Untouchability as extreme expression of caste discrimination"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Analyze the key features of the caste system in Indian society.",
+            "Examine the practice of endogamy in maintaining caste boundaries.",
+            "How does the jajmani system reflect the hierarchical nature of caste?"
+          ]
+        },
+        {
+          "topic_id": "MOD003_TOP003",
+          "topic_name": "Dominant Caste, Sanskritization and Westernization",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Dominant caste concept - M.N. Srinivas, numerical strength and land control, political power",
+            "Numerical preponderance - large numbers giving voting and physical strength",
+            "Economic dominance - land ownership, agricultural resources control",
+            "Political power - representation, influence over local institutions",
+            "Regional variation - different castes dominant in different regions",
+            "Changes in dominance - shifts due to education, urbanization, political mobilization",
+            "Sanskritization definition - imitation of Sanskrit or Brahminical practices by lower castes",
+            "Mechanism of mobility - adopting vegetarianism, ritual practices, dress codes",
+            "Ritual upgrading - changing status through ritual behavior modification",
+            "Cultural imitation - lifestyle changes to appear more 'cultured'",
+            "Limitations of sanskritization - ritual cannot change fundamental caste status",
+            "Ambiguities - some practices sanskritization, some westernization in same community",
+            "Westernization definition - adoption of Western values, education, consumption",
+            "Westernization vs modernization - distinction, not same process",
+            "Modern values - rationalism, education, science adoption, secularism"
+          ],
+          "thinkers_referenced": ["M.N. Srinivas - Dominant Caste, Sanskritization, Westernization", "Yogendra Singh - Modernization"],
+          "current_affairs_connect": [
+            "Dominant castes and power structures - local government domination",
+            "Educational uplift as new sanskritization - status acquisition through degrees",
+            "Westernization and consumption - upper class lifestyle markers",
+            "Intercaste marriages as rejection of sanskritization",
+            "Digital media and caste identity - new forms of sanskritization online"
+          ],
+          "mains_answer_angles": [
+            "Concept of dominant caste and its significance in Indian villages",
+            "Sanskritization as form of social mobility and its limitations",
+            "Westernization and modernization as different processes",
+            "Interaction between sanskritization and westernization in Indian society",
+            "Social change through ritual and cultural imitation vs structural transformation"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Explain M.N. Srinivas's concept of dominant caste and its role in village society.",
+            "Analyze sanskritization as a form of social mobility in India.",
+            "Compare sanskritization and westernization as processes of social change."
+          ]
+        },
+        {
+          "topic_id": "MOD003_TOP004",
+          "topic_name": "Untouchability, Dalit Movements and Constitutional Protections",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Untouchability definition - exclusion and discrimination of lowest castes",
+            "Untouchables - those outside caste hierarchy, considered polluting",
+            "Occupational stigma - scavenging, leatherwork, hide handling, garbage collection",
+            "Social segregation - separate water sources, utensils, seating, touching restrictions",
+            "Educational exclusion - denied access to schooling and learning",
+            "Economic exploitation - lowest wages, debt bondage, sharecropping",
+            "Violence and brutality - physical punishment, sexual violence, humiliation",
+            "Legal abolition - Article 17 of Constitution prohibiting untouchability",
+            "Removal of Disabilities Act - addressing specific disabilities of untouchables",
+            "Ground reality - persistence despite legal abolition, continued discrimination",
+            "B.R. Ambedkar - leader of Dalit movement, Annihilation of Caste",
+            "Self-respect movement - dignity and equality assertion",
+            "Political mobilization - political parties representing Dalit interests",
+            "Dalit Panthers - militant movement in Maharashtra, assertive ideology",
+            "Republican Party of India - Ambedkar's party for Dalit representation"
+          ],
+          "thinkers_referenced": ["B.R. Ambedkar - Dalit Thought", "Periyar - Self-Respect", "Kancha Ilaiah - Dalit Sociology"],
+          "current_affairs_connect": [
+            "Atrocities against Dalits - violence, rape, discrimination, 2019 SC/ST Atrocities Act amendments",
+            "Dalit representation in politics - increasing political assertion",
+            "Caste discrimination in education - Dalit student suicides, institutional exclusion",
+            "Dalit rights movement - assertions and resistance",
+            "Caste discrimination in employment - job market segregation"
+          ],
+          "mains_answer_angles": [
+            "Historical practice of untouchability and its forms",
+            "Constitutional and legal measures against untouchability",
+            "Persistence of untouchability despite legal abolition - implementation gap",
+            "Dalit movements and assertion of dignity and equality",
+            "Contemporary challenges and remedies for caste-based discrimination"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Analyze the practice of untouchability and its impact on Indian society.",
+            "Examine B.R. Ambedkar's contribution to the Dalit movement.",
+            "How effective have constitutional and legal measures been in eliminating untouchability?"
+          ]
+        },
+        {
+          "topic_id": "MOD003_TOP005",
+          "topic_name": "Reservation System, Mandal Commission and OBC Representation",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Constitutional provisions - Articles 15, 16, 17, 46 for social justice",
+            "Scheduled Castes (SC) and Scheduled Tribes (ST) - constitutional definitions",
+            "SC/ST reservation - 15% and 7.5% respectively in education and government jobs",
+            "Other Backward Classes (OBC) - socially and educationally backward communities",
+            "Mandal Commission 1980 - commissioned to identify OBCs, report in 1989",
+            "Mandal recommendations - 27% reservation for OBCs in central government jobs",
+            "OBC definition - socially and educationally disadvantaged groups",
+            "Creamy layer - exclusion of economically advanced OBC members",
+            "General category - non-SC/ST/OBC, competing without reservation",
+            "Reservation debate - merit vs social justice, efficiency vs equity",
+            "Mandal agitation - 1990 national stir against OBC reservation",
+            "Affirmative action rationale - historical discrimination remedying",
+            "Effectiveness debate - whether reservation achieves its goals",
+            "Caste certification - issues, forgery, verification mechanisms",
+            "Post-reservation persistence - social discrimination continuing despite legal protection"
+          ],
+          "thinkers_referenced": ["B.R. Ambedkar - Justice and Equality", "Yogendra Singh - Social Stratification"],
+          "current_affairs_connect": [
+            "Reservation controversy - debate between merit and social justice",
+            "EWS reservation - 10% for economically weaker sections, 2019 constitutional amendment",
+            "Dalit and OBC representation in higher positions - glass ceiling persistence",
+            "Caste certification forgery and verification issues",
+            "Creamy layer revisit - debates about income limits and inclusion"
+          ],
+          "mains_answer_angles": [
+            "Constitutional basis and rationale for reservation system",
+            "Mandal Commission and its impact on OBC representation",
+            "Debate on reservation - social justice vs merit arguments",
+            "Effectiveness of reservation in addressing historical discrimination",
+            "Challenges and future of reservation policy"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine the constitutional provisions for reservation and their implementation.",
+            "Analyze the impact of Mandal Commission on Indian society.",
+            "Debate the merits and limitations of the reservation system."
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD004",
+      "module_name": "Tribal Communities - Issues and Policies",
+      "module_order": 4,
+      "estimated_study_hours": 12,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 2"],
+        "class_12": ["Indian Society: Chapter 5"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD004_TOP001",
+          "topic_name": "Definition of Scheduled Tribes and Tribal Distribution",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Scheduled Tribes definition - tribes notified in Constitution Fifth Schedule",
+            "Constitutional criteria - primitive way of life, distinct culture, geographical isolation, shyness",
+            "Population - 104 million STs according to 2011 census, 8.6% of population",
+            "Central India concentration - Chhattisgarh, Madhya Pradesh, Jharkhand major states",
+            "Northeast concentration - Assam, Meghalaya, Mizoram, Nagaland significant tribal population",
+            "Andaman and Nicobar - indigenous tribes, high degree of isolation",
+            "Tribal-non-tribal distinction - endogamous groups, distinct languages, practices",
+            "Internal diversity - thousands of tribal groups with different cultures and languages",
+            "Nomenclature - terms tribe, adivasi, indigenous peoples used differently",
+            "List of Scheduled Tribes - official constitutional list, additions through amendments",
+            "Anthropological vs administrative definitions - differences in conceptualization",
+            "Tribal identity - self-identification, community recognition, official notification",
+            "Regional variations - tribes of Plains, Forests, Hills having different characteristics",
+            "Historical occupation - hunting, gathering, agriculture, pastoralism",
+            "Contemporary occupations - diversification, occupational change ongoing"
+          ],
+          "thinkers_referenced": ["Verrier Elwin - Tribal Studies", "Christoph von Fürer-Haimendorf - Tribal Anthropology"],
+          "current_affairs_connect": [
+            "Tribal representation in politics - increasing tribal leaders",
+            "Tribal movement for rights - self-determination demands",
+            "Tribal heritage conservation - language preservation, cultural festivals",
+            "Identity assertion - pride in tribal heritage, rejecting derogatory terms"
+          ],
+          "mains_answer_angles": [
+            "Definition and identification of scheduled tribes",
+            "Geographical distribution and regional variations",
+            "Internal diversity within tribal communities",
+            "Anthropological understanding of tribe vs administrative classification",
+            "Tribal identity as contested and evolving concept"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Define scheduled tribes and discuss their distribution in India.",
+            "Examine the criteria used for identifying scheduled tribes.",
+            "Analyze the regional variations in tribal population and characteristics."
+          ]
+        },
+        {
+          "topic_id": "MOD004_TOP002",
+          "topic_name": "Tribal Issues - Land Alienation, Displacement and Poverty",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Land alienation - tribes losing land to non-tribals through exploitative practices",
+            "Colonial policies - disrupting traditional land use, introducing private property concepts",
+            "Debt bondage - tribal indebtedness forcing land sale or bonded labor",
+            "Moneylender exploitation - usurious interest rates trapping tribals",
+            "Displacement - forced removal for development projects, dams, mines, factories",
+            "Large dams - Narmada Valley Project, Sardar Sarovar displacing thousands",
+            "Mining projects - bauxite, iron ore, coal mining disrupting tribal areas",
+            "Industrial development - factories and manufacturing in tribal regions",
+            "Inadequate rehabilitation - compensation insufficient, promised rehabilitation not delivered",
+            "Poverty depth - tribal poverty exceeding national averages, extreme deprivation",
+            "Educational deprivation - low literacy, school access, quality education lacking",
+            "Health disparities - high mortality, malnutrition, disease burden",
+            "Agricultural poverty - small and marginal holdings, low productivity",
+            "Forest dependency - livelihood reliance on forests threatened by conservation policies",
+            "Marginalization - exclusion from development processes, powerless in decision-making"
+          ],
+          "thinkers_referenced": ["Verrier Elwin - Tribal Welfare", "Virginius Xaxa - Tribal Society"],
+          "current_affairs_connect": [
+            "Land acquisition for development - farmer and tribal land loss, protests",
+            "Narmada Valley Project - dam construction displacing tribal populations",
+            "Mining and tribal lands - Chhattisgarh, Odisha mining controversy",
+            "Rehabilitation and resettlement failures - inadequate measures",
+            "Forest Rights Act 2006 - attempt to address tribal forest dependency"
+          ],
+          "mains_answer_angles": [
+            "Historical and contemporary causes of tribal land alienation",
+            "Development-induced displacement and inadequate rehabilitation",
+            "Interplay of poverty, landlessness, and tribal marginalization",
+            "Colonial legacy in tribal dispossession",
+            "Policy challenges in balancing development and tribal rights"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine the issue of land alienation among scheduled tribes.",
+            "Analyze the impact of development projects on tribal communities.",
+            "Discuss the measures needed to address tribal poverty and marginalization."
+          ]
+        },
+        {
+          "topic_id": "MOD004_TOP003",
+          "topic_name": "Tribal Policy - Assimilation vs Integration vs Isolation Debate",
+          "difficulty": "high",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Assimilation approach - tribals adopting mainstream culture, losing tribal identity",
+            "Integration approach - tribals becoming part of larger society while maintaining identity",
+            "Isolation approach - preserving tribal independence, limited external contact",
+            "Verrier Elwin - integration advocate, tribal welfare approach",
+            "G.S. Ghurye - assimilationist view, tribes as 'backward Hindus'",
+            "Elwin-Ghurye debate - fundamental disagreement on tribal development strategy",
+            "Nehru's tribal panchsheel - five principles of tribal policy (1956)",
+            "Panchsheel principles - no force, respect self-rule, gradual social change, justice, service",
+            "Acculturation - gradual cultural change through contact",
+            "Cultural preservation - maintaining tribal languages, art, traditions",
+            "Autonomy concerns - tribal self-determination vs mainstream integration pressure",
+            "Education role - tribal education in mother tongue vs mainstream education",
+            "Land protection - laws restricting tribal land transfer to non-tribals",
+            "Reservation benefits - preferential access to education and government jobs",
+            "Ongoing tensions - balancing development with cultural preservation"
+          ],
+          "thinkers_referenced": ["Verrier Elwin - Integration", "G.S. Ghurye - Assimilation", "Pandit Nehru - Tribal Panchsheel"],
+          "current_affairs_connect": [
+            "Tribal education in mother tongue - language preservation efforts",
+            "Fifth and Sixth Schedule areas - tribal autonomy and self-governance",
+            "PESA 1996 - Panchayat extension, tribal self-governance",
+            "Naxalism in tribal areas - tribal alienation and militant movements",
+            "Tribal resistance to assimilation pressures - cultural assertion"
+          ],
+          "mains_answer_angles": [
+            "Different approaches to tribal development - assimilation, integration, isolation",
+            "Elwin-Ghurye debate and its implications",
+            "Nehru's tribal panchsheel and its contemporary relevance",
+            "Tension between development and cultural preservation",
+            "Tribal autonomy and self-determination in policy frameworks"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Compare assimilationist and integrationist approaches to tribal development.",
+            "Examine the Elwin-Ghurye debate on tribal policy.",
+            "Analyze Nehru's tribal panchsheel and its implementation."
+          ]
+        },
+        {
+          "topic_id": "MOD004_TOP004",
+          "topic_name": "Forest Rights Act 2006, PESA 1996 and Tribal Self-Governance",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Forest Rights Act 2006 - recognizing tribal forest rights, reversing exclusion",
+            "Individual rights - tribal individuals claiming forest land for cultivation",
+            "Community rights - communal forest resource use and management",
+            "Livelihood rights - NTFP collection, hunting, pastoral rights",
+            "Settlement of rights - recognition and title assignment to forest dwellers",
+            "Implementation challenges - bureaucratic delays, forest department resistance",
+            "Verification process - issues in verifying tribal presence and rights claims",
+            "Encroachment definitions - tribal cultivation vs illegal encroachment distinction",
+            "PESA 1996 - Panchayat Extension to Scheduled Areas Act",
+            "PESA provision - extending panchayat provisions to scheduled areas with modifications",
+            "Tribal self-governance - gram sabhas with enhanced powers in PESA areas",
+            "Consultation requirement - development projects requiring tribal approval",
+            "Land and resource control - tribes' management of forest and natural resources",
+            "Fifth Schedule - constitutional protection for scheduled areas",
+            "Sixth Schedule - provisions for tribal areas in Northeast, greater autonomy"
+          ],
+          "thinkers_referenced": ["Tribal rights advocates", "Development scholars"],
+          "current_affairs_connect": [
+            "Forest Rights Act implementation - slow progress, pending claims",
+            "Mining vs forest rights - conflicts in mineral-rich tribal areas",
+            "PESA effectiveness - gram sabha empowerment vs ground reality",
+            "Tribal forest management - community forest initiative success stories",
+            "Environmental conservation vs tribal rights - balancing concerns"
+          ],
+          "mains_answer_angles": [
+            "Forest Rights Act as recognition of tribal forest dependency",
+            "Implementation challenges and bureaucratic resistance",
+            "PESA's role in tribal self-governance and autonomy",
+            "Integration of environment conservation with tribal rights",
+            "Effectiveness of legal provisions in ensuring tribal welfare"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the provisions and implementation of the Forest Rights Act 2006.",
+            "Analyze PESA 1996 and its role in tribal self-governance.",
+            "How effectively do legal provisions address tribal land and resource rights?"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD005",
+      "module_name": "Family, Marriage, Gender and LGBTQ+ Rights",
+      "module_order": 5,
+      "estimated_study_hours": 18,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 3", "Understanding Society: Chapter 4"],
+        "class_12": ["Indian Society: Chapter 3"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD005_TOP001",
+          "topic_name": "Family Types, Functions and Changes",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Family definition - kinship-based group unit, primary social institution",
+            "Nuclear family - parents and children, modern urban family form",
+            "Joint family - extended kinship, multiple generations under one roof",
+            "Extended family - nuclear plus extended kin but separate households",
+            "Patrilineal family - descent traced through father",
+            "Matrilineal family - descent traced through mother (Kerala tradition)",
+            "Patrilocal residence - wife moves to husband's household",
+            "Matrilocal residence - husband moves to wife's household",
+            "Patriarchal structure - male authority in family decisions",
+            "Bilineal descent - both sides recognized (modern trend)",
+            "Functions - socialization, economic cooperation, reproduction, emotional support",
+            "Socialization role - transmission of values, culture, norms",
+            "Economic cooperation - collective resource management and livelihood",
+            "Status ascription - determining social position through birth",
+            "Emotional support - psychological wellbeing and security provision"
+          ],
+          "thinkers_referenced": ["K.M. Kapadia - Family Structure in India", "Talcott Parsons - Family Functions"],
+          "current_affairs_connect": [
+            "Nuclear family rise - urbanization and industrialization impact",
+            "Joint family decline or transformation - retaining bonds while living separately",
+            "Single-parent families - increasing due to divorce and choice",
+            "Live-in relationships - challenging traditional family forms",
+            "Same-sex couples and family - LGBTQ+ family rights demands"
+          ],
+          "mains_answer_angles": [
+            "Family as social institution with specific functions",
+            "Typology of families - forms and variations in India",
+            "Functions of family in society and individual wellbeing",
+            "Changes in family structure due to modernization",
+            "Continuity and change in family institution"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Classify the different types of families found in Indian society.",
+            "Discuss the functions of family as a social institution.",
+            "Analyze the changes in family structure in contemporary Indian society."
+          ]
+        },
+        {
+          "topic_id": "MOD005_TOP002",
+          "topic_name": "Marriage - Types, Forms and Rules",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Monogamy - one spouse at a time (legally prevalent in India)",
+            "Polygamy - multiple spouses simultaneously (Hinduism allows, Muslim practice varies)",
+            "Polygyny - one man with multiple wives (legally restricted in India)",
+            "Polyandry - one woman with multiple men (rare, Kerala Nair community practiced)",
+            "Endogamy - marriage within caste/community (caste system enforcement)",
+            "Exogamy - marriage outside caste but within clan/village",
+            "Hypergamy - woman marrying into higher status family",
+            "Hypogamy - woman marrying into lower status (condemned in patriarchal societies)",
+            "Arranged marriage - family-arranged, still prevalent in India",
+            "Love marriage - individual choice based (increasing trend)",
+            "Bride price - payment from groom's family (parts of India and Africa)",
+            "Dowry - payment from bride's family (Indian practice, legally prohibited)",
+            "Consanguinity - marriage between relatives, varying degrees of restriction",
+            "Age at marriage - child marriage continuing despite legal prohibition",
+            "Divorce - dissolution of marriage, culturally stigmatized but legally available"
+          ],
+          "thinkers_referenced": ["K.M. Kapadia - Marriage Practices"],
+          "current_affairs_connect": [
+            "Dowry and bride burning - continuing violence despite legal prohibition",
+            "Inter-caste marriages - families' violent reactions, honor killings",
+            "Child marriage persistence - rural areas, legal prohibition evasion",
+            "Same-sex marriage debate - legal recognition demands",
+            "Marriage age and women's agency - education and consent"
+          ],
+          "mains_answer_angles": [
+            "Forms of marriage - monogamous, polygamous, polyandrous varieties",
+            "Rules regulating marriage - endogamy, exogamy, hypergamy norms",
+            "Dowry as gender inequality marker - bride's devaluation",
+            "Divorce laws and stigma - gendered impact on women",
+            "Contemporary changes in marriage practices and norms"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Classify and explain different forms of marriage in Indian society.",
+            "Examine the persistence of dowry despite legal prohibition.",
+            "Analyze the changing patterns of marriage in contemporary India."
+          ]
+        },
+        {
+          "topic_id": "MOD005_TOP003",
+          "topic_name": "Gender, Patriarchy and Women's Status",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3, Chapter 4"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Sex vs gender distinction - biological vs socially constructed differences",
+            "Gender roles - socially prescribed behaviors, characteristics for men and women",
+            "Gender stereotypes - fixed beliefs about gender capabilities and nature",
+            "Patriarchy - system of male authority and control",
+            "Patrilineal descent - property and name transmitted through males",
+            "Patrilocal residence - wife moving to husband's household",
+            "Patriarchal authority - father/husband making major family decisions",
+            "Women's status - measured by education, employment, health, autonomy",
+            "Historical status - restrictive practices, limited freedom and choices",
+            "Sati practice - widow self-immolation, now abolished",
+            "Pardah system - female seclusion and veiling practices",
+            "Guardianship norms - women under male guardianship at different life stages",
+            "Legal changes - property rights, divorce, guardianship law reforms",
+            "Women's education - expansion though gendered disparities persist",
+            "Employment and autonomy - increasing participation but occupational segregation",
+            "Intersectionality - gender combined with caste, class, religion effects"
+          ],
+          "thinkers_referenced": ["Simone de Beauvoir - Gender and Existence", "Indian feminist scholars"],
+          "current_affairs_connect": [
+            "Violence against women - domestic violence, rape, harassment epidemic",
+            "Women in politics - increasing representation, still male-dominated",
+            "Workplace harassment - #MeToo movement exposing patriarchy",
+            "Women's reproductive rights - abortion and contraception access",
+            "Women entrepreneurship - economic independence promotion"
+          ],
+          "mains_answer_angles": [
+            "Gender as socially constructed, not natural/biological category",
+            "Patriarchal structures and systems perpetuating gender inequality",
+            "Women's status changes through legal and educational reforms",
+            "Multiple forms of gender inequality - overlapping with caste, class",
+            "Women's agency and resistance against patriarchal systems"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Explain the distinction between sex and gender.",
+            "Analyze the factors contributing to gender inequality in Indian society.",
+            "Discuss measures for improving women's status and empowerment."
+          ]
+        },
+        {
+          "topic_id": "MOD005_TOP004",
+          "topic_name": "Violence Against Women and Women's Movement",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Domestic violence - intimate partner abuse, most common VAW form",
+            "Dowry violence - bride burning, harassment for inadequate dowry",
+            "Rape and sexual assault - assault, gang rape, marital rape issues",
+            "Child sexual abuse - children victimization, POCSO Act provisions",
+            "Honor killings - families killing women for love marriages or perceived shame",
+            "Harassment and intimidation - threatening, controlling behavior",
+            "Legal framework - PWDVA 2005, IPC provisions, POCSO Act 2012",
+            "Reporting barriers - shame, fear, economic dependence preventing complaint",
+            "Victim-blaming - social attitudes blaming women for violence",
+            "Patriarchal culture - violence normalized and accepted",
+            "Women's movement first wave - suffrage and legal rights movements",
+            "Women's movement second wave - consciousness-raising, social movements",
+            "Contemporary feminism - intersectionality, diverse feminist approaches",
+            "Key achievements - legal reforms, awareness raising, institutional changes",
+            "Ongoing challenges - implementation gaps, structural patriarchy persistence"
+          ],
+          "thinkers_referenced": ["Feminist scholars", "Women's rights advocates"],
+          "current_affairs_connect": [
+            "Nirbhaya case - 2012 Delhi rape and its aftermath",
+            "Rape law amendments - Criminal Law Amendment 2013",
+            "Sexual harassment at workplace - #MeToo movement in India",
+            "Marital rape - continuing legal lacuna despite demands",
+            "Female foeticide - sex-selective abortion and violence against girls"
+          ],
+          "mains_answer_angles": [
+            "Forms and prevalence of violence against women",
+            "Patriarchal culture and gender norms enabling violence",
+            "Legal and policy measures addressing violence",
+            "Barriers to justice and victim support",
+            "Social movements and women's agency in fighting violence"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the various forms of violence against women in Indian society.",
+            "Analyze the legal measures taken to address violence against women.",
+            "Discuss the role of women's movements in promoting gender justice."
+          ]
+        },
+        {
+          "topic_id": "MOD005_TOP005",
+          "topic_name": "LGBTQ+ Rights and Same-Sex Marriage Debate",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Sexual orientation - heterosexual, homosexual, bisexual identities",
+            "Gender identity - one's sense of gender, separate from biological sex",
+            "Transgender persons - gender identity different from assigned sex",
+            "Section 377 IPC - criminalized homosexual acts, pre-independence legacy",
+            "Section 377 reading down 2018 - partial decriminalization of consensual acts",
+            "Navtej Singh Johar case - Supreme Court reducing Section 377 scope",
+            "Remaining Section 377 provisions - non-consensual acts still criminalized",
+            "Marriage equality - same-sex couples' marriage right demands",
+            "Succession and inheritance - property rights for same-sex couples",
+            "Adoption rights - LGBTQ+ couple adoption of children",
+            "Workplace discrimination - employment equality measures",
+            "Social stigma - discrimination, violence, harassment of LGBTQ+ persons",
+            "Transgender rights - NALSA judgment recognizing gender identity",
+            "Transgender Persons Act 2019 - legal recognition and rights",
+            "Pride movements - assertion of LGBTQ+ identity and rights"
+          ],
+          "thinkers_referenced": ["Human rights scholars", "Queer theory advocates"],
+          "current_affairs_connect": [
+            "Same-sex marriage petitions - pending before courts",
+            "Transgender representation - increasing visibility in public life",
+            "Pride parades - celebrating LGBTQ+ identity despite controversies",
+            "Employment equality - workplace discrimination concerns",
+            "Education and LGBTQ+ students - safety and inclusion demands"
+          ],
+          "mains_answer_angles": [
+            "Section 377 and LGBTQ+ criminalization history and reform",
+            "Legal challenges to same-sex marriage recognition",
+            "Constitutional values of equality and liberty vs traditional marriage concept",
+            "Social attitudes and stigma against LGBTQ+ persons",
+            "International human rights standards and Indian law gap"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "medium",
+          "sample_questions": [
+            "Analyze the legal status of LGBTQ+ rights in India.",
+            "Examine the arguments for and against same-sex marriage.",
+            "Discuss the challenges faced by transgender persons in Indian society."
+          ]
+        },
+        {
+          "topic_id": "MOD005_TOP006",
+          "topic_name": "Child Marriage and POCSO Act",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 3: Social Institutions - Continuity and Change",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 3"],
+            "class_12": ["Indian Society Chapter 3"]
+          },
+          "key_concepts": [
+            "Child marriage definition - marriage before legal age, typically girls",
+            "Prevalence - India having significant child marriage despite legal prohibition",
+            "Reasons - poverty, gender discrimination, tradition, lack of education",
+            "Girls disproportionately affected - 40% girls in some states married before 18",
+            "Prohibition of Child Marriage Act 2006 - replacing 1929 act",
+            "Legal age - 18 for females, 21 for males in India",
+            "Impact on education - school dropout, limiting life opportunities",
+            "Health consequences - early pregnancy, complications, mortality risk",
+            "Psychological impact - trauma, reduced autonomy, limited choices",
+            "Marital rape - child brides unable to consent, domestic violence risk",
+            "POCSO Act 2012 - Protection of Children from Sexual Offences",
+            "POCSO provisions - defines child sexual abuse, strict punishment",
+            "Consent definition - young age children's inability to consent",
+            "Burden of proof - prosecution has burden, not victim proving non-consent",
+            "Implementation challenges - under-reporting, victim reluctance, police resistance"
+          ],
+          "thinkers_referenced": ["Child rights advocates"],
+          "current_affairs_connect": [
+            "Child marriage persistence in rural areas - education level correlation",
+            "COVID-19 impact - increased child marriage risk during lockdowns",
+            "Girls' education initiatives - educating girls reducing child marriage",
+            "POCSO case backlog - delays in justice delivery",
+            "Online child exploitation - POCSO application to digital abuse"
+          ],
+          "mains_answer_angles": [
+            "Child marriage as human rights violation and gender inequality manifestation",
+            "Socio-economic factors driving child marriage practice",
+            "Health and development impacts on child brides",
+            "Legal framework and implementation challenges",
+            "Role of education and women's empowerment in preventing child marriage"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "medium",
+          "sample_questions": [
+            "Examine the causes and consequences of child marriage in India.",
+            "Analyze the effectiveness of PCMA 2006 in preventing child marriage.",
+            "Discuss the POCSO Act and its role in protecting children from sexual abuse."
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD006",
+      "module_name": "Religion, Communalism and Secularism",
+      "module_order": 6,
+      "estimated_study_hours": 15,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 1"],
+        "class_12": ["Indian Society: Chapter 6", "Social Change: Chapter 3"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD006_TOP001",
+          "topic_name": "Religion in India - Pluralism, Syncretism and Secularism",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 6: The Challenges of Cultural Diversity",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 6", "Social Change Chapter 3"]
+          },
+          "key_concepts": [
+            "Pluralism - multiple religions coexisting, recognized and tolerated",
+            "Syncretism - blending of different religious traditions",
+            "Bhakti movement - Hindu-Muslim devotional synthesis",
+            "Sufi tradition - Islamic mysticism with Hindu influences",
+            "Composite culture - Hindu-Muslim shared traditions and practices",
+            "Sacred spaces - temples and mosques near each other, shared pilgrimage",
+            "Festivals - religious festivals celebrated across communities",
+            "Secularism definition - separation of religion and state",
+            "Indian secularism - different from Western model, accommodating multiple religions",
+            "Constitutional secularism - Preamble amendments, Articles 25-28",
+            "Secular state responsibility - protecting religious freedom and minority rights",
+            "Uniform Civil Code - secular law replacing religious personal laws",
+            "Minority rights protection - constitutional safeguards for religious minorities",
+            "Religious freedom - individual right to practice, propagate religion",
+            "Limitations on religious freedom - public order, morality, health concerns"
+          ],
+          "thinkers_referenced": ["Nehru - Indian Secularism", "Ambedkar - Constitutional Rights"],
+          "current_affairs_connect": [
+            "Communal polarization - increasing Hindu-Muslim tensions",
+            "Secularism debate - majoritarian vs minority rights",
+            "Uniform Civil Code demand - Hindu nationalist agenda",
+            "Temple-mosque controversies - Ayodhya, Mathura, Varanasi issues",
+            "Love jihad laws - interfaith marriage restrictions in some states"
+          ],
+          "mains_answer_angles": [
+            "Religious plurality as Indian civilization feature",
+            "Syncretism and composite culture in Indian history",
+            "Indian secularism model - accommodating vs separating religion",
+            "Constitutional secularism and religious freedom",
+            "Challenges to secularism - communalism and polarization"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Examine religious pluralism and syncretism in Indian society.",
+            "Explain the Indian model of secularism and its constitutional basis.",
+            "Analyze the challenges to secular democracy in contemporary India."
+          ]
+        },
+        {
+          "topic_id": "MOD006_TOP002",
+          "topic_name": "Communalism - Definition, Origins and Types",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 6: The Challenges of Cultural Diversity",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 6"]
+          },
+          "key_concepts": [
+            "Communalism definition - political ideology based on religious identity",
+            "Communal consciousness - identification with religious community above national identity",
+            "Colonial origins - British divide-and-rule strategy, census categorization",
+            "Colonial communalism - creating religious separateness, communal riots",
+            "Hindu communalism - Hindu nationalism, Hindutva ideology, identity assertion",
+            "Muslim communalism - Islamic identity politics, partition legacy",
+            "Majority communalism - majoritarian religious nationalism",
+            "Minority communalism - minority religious identity politics",
+            "Fundamentalism - religious orthodoxy, scriptural literalism",
+            "Hindu fundamentalism - Brahminical tradition assertion, Hindutva",
+            "Muslim fundamentalism - Islamic law implementation demands",
+            "Sikh fundamentalism - Khalistan movement, religious sovereignty demands",
+            "Communal violence - riots, massacres, pogroms targeting religious groups",
+            "Communal polarization - group consciousness and mutual suspicion increase",
+            "Political mobilization - communal politics, vote bank politics"
+          ],
+          "thinkers_referenced": ["Eric Hobsbawm - Communalism", "Ashis Nandy - Communalism Analysis"],
+          "current_affairs_connect": [
+            "Recent communal riots - Delhi 2020, Gujarat 2002, Mumbai 1992",
+            "Hate speech and communalism - political rhetoric polarizing communities",
+            "Mob lynching - communal violence against minorities",
+            "Cow vigilantism - communal violence linked to religious symbolism",
+            "Political parties and communalism - electoral politics polarization"
+          ],
+          "mains_answer_angles": [
+            "Communalism as modern phenomenon, not traditional religious conflict",
+            "Colonial role in creating communal consciousness and divisions",
+            "Communalism vs religion distinction - ideology vs spirituality",
+            "Types of communalism - majority and minority expressions",
+            "Mechanisms of communal mobilization and violence"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Define communalism and examine its origins in India.",
+            "Analyze the difference between religion and communalism.",
+            "Discuss the types and manifestations of communalism in Indian society."
+          ]
+        },
+        {
+          "topic_id": "MOD006_TOP003",
+          "topic_name": "Religious Reform Movements and Modernization",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 3: The Story of Indian Democracy",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 1"],
+            "class_12": ["Social Change Chapter 3"]
+          },
+          "key_concepts": [
+            "Reform movements definition - modernizing religious traditions",
+            "Brahmo Samaj - monotheism and social reform in Bengal",
+            "Raja Ram Mohan Roy - Brahmo Samaj founder, widow immolation abolition",
+            "Arya Samaj - Vedic Hinduism assertion, social reform",
+            "Swami Dayananda - Arya Samaj founder, caste inequality critique",
+            "Theosophical Society - mysticism and occult interest, Hindu revival",
+            "Christian missions - social service and conversion activities",
+            "Islamic modernization - Islamic reform movements, Islamic schools",
+            "Aligarh Movement - Muslim education modernization",
+            "Agha Khan - Muslim reform and westernization",
+            "Sikh modernization - Adi Granth reformation, Singh Sabha movement",
+            "Response to colonialism - modernization while asserting indigenous traditions",
+            "Women's status improvement - sati abolition, widow remarriage, education",
+            "Caste reform efforts - caste inequality challenging, though limited success",
+            "Contemporary revival - neo-traditionalism and revivalism movements"
+          ],
+          "thinkers_referenced": ["Raja Ram Mohan Roy - Brahmo Samaj", "Swami Dayananda - Arya Samaj", "Religious thinkers"],
+          "current_affairs_connect": [
+            "Religious resurgence - traditional values assertion in modern society",
+            "Hindu nationalism resurgence - Hindutva ideology expansion",
+            "Islamic revival movements - conservative Islamic ideology spread",
+            "Secularization vs retraditionalization - contemporary tensions",
+            "Youth and religious identity - digital age religious expression"
+          ],
+          "mains_answer_angles": [
+            "Reform movements as response to colonialism and modernization",
+            "Attempted synthesis of tradition and modernity",
+            "Social reforms - sati abolition, widow rights, education expansion",
+            "Religious nationalism and identity politics emergence",
+            "Tensions between modernization and religious orthodoxy"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the major religious reform movements in 19th century India.",
+            "Analyze the role of religious movements in social reform.",
+            "Discuss the relationship between religious modernization and nationalism."
+          ]
+        },
+        {
+          "topic_id": "MOD006_TOP004",
+          "topic_name": "Minority Rights and Constitutional Protections",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 6: The Challenges of Cultural Diversity",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 1"],
+            "class_12": ["Indian Society Chapter 6"]
+          },
+          "key_concepts": [
+            "Minorities definition - religious, linguistic, ethnic groups smaller than majority",
+            "Minority rights concept - protection for vulnerable groups",
+            "Article 25-28 - Constitutional religious freedom provisions",
+            "Article 29-30 - Minority cultural and educational rights",
+            "Right to propagate religion - subject to public order and morality",
+            "Personal law provision - minorities' own civil law application",
+            "Minority institutions - establishing schools and educational institutions",
+            "Right to use mother tongue - linguistic minority rights",
+            "Minority reservations - employment and education preferences",
+            "Minority commission - National Commission for Minorities, oversight body",
+            "Grievance redressal - mechanisms for minority complaints",
+            "Appeasement debate - allegations of minority favor, political controversy",
+            "Majority concerns - majority rights and concerns in minority-focused policies",
+            "Implementation challenges - minority rights protection in practice",
+            "Contemporary tensions - majoritarian politics challenging minority protections"
+          ],
+          "thinkers_referenced": ["Ambedkar - Minority Rights", "Constitutional scholars"],
+          "current_affairs_connect": [
+            "Minority safety concerns - communal violence and protection",
+            "Educational institution right - minority schools and colleges",
+            "Personal law issues - uniform civil code demands affecting minorities",
+            "Minority representation - political participation and power",
+            "Appeasement allegations - communal debates over minority policies"
+          ],
+          "mains_answer_angles": [
+            "Constitutional framework protecting minority rights",
+            "Different types of minorities - religious, linguistic, ethnic",
+            "Balance between majority and minority rights",
+            "Minority rights implementation challenges",
+            "Role of courts in protecting minority interests"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the constitutional provisions protecting minority rights.",
+            "Analyze the challenges in implementing minority rights protection.",
+            "Discuss the balance between majority and minority rights in democratic India."
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD007",
+      "module_name": "Social Inequality, Exclusion and Development",
+      "module_order": 7,
+      "estimated_study_hours": 16,
+      "ncert_mapping": {
+        "class_11": ["Understanding Society: Chapter 2"],
+        "class_12": ["Indian Society: Chapter 5"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD007_TOP001",
+          "topic_name": "Social Stratification and Social Mobility",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Social stratification - hierarchical arrangement of groups by status, power, resources",
+            "Dimensions of stratification - caste, class, gender, religion, ethnicity, region",
+            "Caste stratification - ritual hierarchy, endogamy, hereditary occupation",
+            "Class stratification - economic differences, ownership of means of production",
+            "Gender stratification - male authority, female subordination",
+            "Intersectionality - combined effects of multiple stratifications",
+            "Caste-class debate - whether caste disappears with class development",
+            "Beteille perspective - caste and class as distinct dimensions",
+            "Structured inequality - systems perpetuating inequality across generations",
+            "Social mobility definition - movement up or down social hierarchy",
+            "Vertical mobility - change in status rank",
+            "Horizontal mobility - change without status rank change",
+            "Intergenerational mobility - change from parents to children generation",
+            "Intra-generational mobility - change within individual's lifetime",
+            "Mobility barriers - caste, gender, education, resources limiting movement",
+            "Sanskritization and mobility - ritual upgrading enabling mobility"
+          ],
+          "thinkers_referenced": ["Andre Beteille - Caste and Class", "M.N. Srinivas - Mobility"],
+          "current_affairs_connect": [
+            "Reservation and upward mobility - beneficial impact on marginalized groups",
+            "Educational mobility - higher education enabling social advancement",
+            "Gender mobility barriers - patriarchal constraints on women's mobility",
+            "Urban-rural mobility - city migration as upward mobility avenue",
+            "Occupational change - economic growth enabling occupational diversification"
+          ],
+          "mains_answer_angles": [
+            "Multidimensional nature of social stratification in India",
+            "Caste and class as separate but interlinked dimensions",
+            "Barriers to social mobility - structural vs individual factors",
+            "Role of education and affirmative action in enabling mobility",
+            "Gender and mobility - patriarchy as constraint"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Define social stratification and explain its dimensions in Indian society.",
+            "Examine the relationship between caste and class in India.",
+            "Analyze the barriers to social mobility in Indian society."
+          ]
+        },
+        {
+          "topic_id": "MOD007_TOP002",
+          "topic_name": "Poverty, Marginalization and Social Exclusion",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Poverty definition - income below poverty line, multidimensional deprivation",
+            "Absolute poverty - inability to meet basic needs",
+            "Relative poverty - comparison with others, standard of living expectation",
+            "Multidimensional poverty - deprivation across education, health, housing",
+            "Poverty levels - 20-30% population below poverty line depending on measurement",
+            "Rural poverty - agricultural income inadequacy, landlessness",
+            "Urban poverty - informal sector, slums, wage inadequacy",
+            "Feminization of poverty - women disproportionately affected by poverty",
+            "Marginalization - exclusion from economic opportunities",
+            "Social exclusion concept - exclusion from social participation and benefits",
+            "Spatial exclusion - geographic remoteness from services and opportunities",
+            "Economic exclusion - lack of employment and income earning opportunities",
+            "Social exclusion mechanisms - discrimination, stigma, prejudice",
+            "Dalit exclusion - untouchability and discrimination",
+            "Tribal exclusion - land alienation and marginalization",
+            "Informal sector - unprotected workers, low wages, no benefits"
+          ],
+          "thinkers_referenced": ["Amartya Sen - Capability Approach", "Jean Dreze - Poverty"],
+          "current_affairs_connect": [
+            "COVID-19 impact on poverty - economic contraction and job losses",
+            "Public distribution system - food security for poor",
+            "MNREGA - employment guarantee in rural areas",
+            "Unemployment and underemployment - job shortage for poor",
+            "Informal sector worker protection - labor law enforcement gaps"
+          ],
+          "mains_answer_angles": [
+            "Measuring poverty - income, multidimensional approaches",
+            "Causes of poverty - structural and individual factors",
+            "Poverty and social exclusion relationship",
+            "Marginalized groups and intersecting deprivations",
+            "Policy responses - growth vs redistribution"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Define poverty and analyze the causes of persistent poverty in India.",
+            "Examine the concept of social exclusion and its forms.",
+            "Discuss the relationship between poverty and marginalization."
+          ]
+        },
+        {
+          "topic_id": "MOD007_TOP003",
+          "topic_name": "Disability, Elderly Care and Child Welfare",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Indian Society - Chapter 5: Patterns of Social Inequality and Exclusion",
+          "ncert_reference": {
+            "class_11": ["Understanding Society Chapter 2"],
+            "class_12": ["Indian Society Chapter 5"]
+          },
+          "key_concepts": [
+            "Disability definition - physical, sensory, intellectual, mental impairment",
+            "Social model vs medical model - disability as social barrier vs individual problem",
+            "Disability prevalence - 3-4% population, underreported in census",
+            "Discrimination against disabled - employment, education, social exclusion",
+            "RPWD Act 2016 - Rights of Persons with Disabilities Act",
+            "Accessibility provisions - ramps, Braille, sign language provisions",
+            "Inclusive education - disabled children in mainstream schools",
+            "Employment rights - non-discrimination, workplace accommodations",
+            "Elderly issues - poverty, health, social isolation, elder abuse",
+            "Aging population - demographic shift, age-related challenges",
+            "Maintenance of Parents Act - legal obligation of children to support parents",
+            "National Policy on Senior Citizens - comprehensive elderly welfare",
+            "Healthcare for elderly - affordable and accessible health services",
+            "Child rights - protection from abuse, exploitation, education access",
+            "POCSO Act - Protection of Children from Sexual Offences",
+            "Child labor - child labor prohibition, school enrollment"
+          ],
+          "thinkers_referenced": ["disability rights scholars", "child welfare advocates"],
+          "current_affairs_connect": [
+            "COVID-19 impact on elderly and disabled - vulnerability",
+            "Elderly care homes - increasing private establishments",
+            "Child protection mechanisms - implementation challenges",
+            "Mental health and disability - stigma and discrimination",
+            "School enrollment schemes - improving child education access"
+          ],
+          "mains_answer_angles": [
+            "Disability as social category and source of inequality",
+            "Barriers faced by persons with disabilities",
+            "Legal framework for protecting disability rights",
+            "Elderly care and intergenerational responsibility",
+            "Child welfare in India - protection, education, health"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "medium",
+          "sample_questions": [
+            "Examine the social model of disability and its implications.",
+            "Analyze the challenges faced by elderly persons in India.",
+            "Discuss the legal framework protecting children's rights."
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "MOD008",
+      "module_name": "Globalisation, Media and Social Movements",
+      "module_order": 8,
+      "estimated_study_hours": 18,
+      "ncert_mapping": {
+        "class_12": ["Social Change: Chapter 6, Chapter 7, Chapter 8"]
+      },
+      "topics": [
+        {
+          "topic_id": "MOD008_TOP001",
+          "topic_name": "Globalisation and Its Impact on Indian Society",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 2,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 6: Globalisation and Social Change",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 6"]
+          },
+          "key_concepts": [
+            "Globalization definition - increasing economic, cultural, political interconnection",
+            "Economic globalization - trade liberalization, capital flows, FDI",
+            "Cultural globalization - homogenization vs hybridization of cultures",
+            "Political globalization - international institutions, power diffusion",
+            "Liberalization policy - 1991 economic reforms opening Indian economy",
+            "Deregulation effects - removal of controls on business and trade",
+            "Foreign direct investment - multinational corporations entering India",
+            "Consumer culture - brand consciousness, consumerism increase",
+            "Cultural homogenization - Western culture spreading, local cultures challenged",
+            "Hybridization - blending of global and local cultures",
+            "Glocalization - adaptation of global to local contexts",
+            "Media globalization - satellite TV, internet enabling global cultural flow",
+            "Labor impact - outsourcing, job creation and displacement",
+            "Inequality effects - wealth concentration while some benefit",
+            "Environmental impact - resource extraction, pollution, climate change"
+          ],
+          "thinkers_referenced": ["Roland Robertson - Glocalization", "Arjun Appadurai - Globalization"],
+          "current_affairs_connect": [
+            "Make in India initiative - attracting foreign investment",
+            "Digital economy growth - tech companies and employment",
+            "Cultural preservation debate - protecting Indian traditions",
+            "Environmental concerns - pollution from factories and consumption",
+            "Outsourcing and job creation - IT sector growth"
+          ],
+          "mains_answer_angles": [
+            "Economic dimensions of globalization - liberalization and its effects",
+            "Cultural globalization - homogenization vs hybridization debate",
+            "Impact on traditional institutions - family, community changes",
+            "Consumerism and social values - materialism vs spiritual values",
+            "Environmental and sustainability challenges"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Analyze the impact of globalization on Indian society.",
+            "Examine the cultural implications of globalisation in India.",
+            "Discuss the advantages and disadvantages of economic liberalization."
+          ]
+        },
+        {
+          "topic_id": "MOD008_TOP002",
+          "topic_name": "Westernization vs Modernization in Contemporary India",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 6: Globalisation and Social Change",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 6"]
+          },
+          "key_concepts": [
+            "Modernization definition - scientific rationalism, efficiency, technological advancement",
+            "Westernization definition - adoption of Western culture and lifestyle",
+            "Srinivas distinction - modernization and westernization as different processes",
+            "Modernity characteristics - rationality, science, technology, institutions",
+            "Western culture - individualism, materialism, certain values and norms",
+            "Modernization universal - applicable to all societies, not culture-specific",
+            "Westernization particular - specific to Western cultural adoption",
+            "Technology and modernization - neutral tool for economic development",
+            "Western values - individualism vs Indian collectivism",
+            "Science and rationalism - secular worldview advancement",
+            "Industrialization - manufacturing and urban development",
+            "Contemporary tension - India modernizing without wholesale Westernization",
+            "Indian identity preservation - maintaining traditions while modernizing",
+            "Technology adoption - selective acceptance of technology",
+            "Neo-traditionalism - asserting traditional values in modern context"
+          ],
+          "thinkers_referenced": ["M.N. Srinivas - Modernization and Westernization", "Yogendra Singh - Syncretism"],
+          "current_affairs_connect": [
+            "Technology adoption - India developing own tech like UPI",
+            "Ancient knowledge systems revival - Ayurveda, yoga globalization",
+            "Festival modernization - traditional celebrations in modern forms",
+            "Education modernization - IITs and research institutions",
+            "Cultural nationalism - Hindu nationalism asserting Indian traditions"
+          ],
+          "mains_answer_angles": [
+            "Distinction between modernization and westernization",
+            "Possibility of modernization without full westernization",
+            "Role of technology in modernization",
+            "Cultural resistance and neo-traditionalism",
+            "Indian path to modernity - syncretism and synthesis"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "very_high",
+          "sample_questions": [
+            "Distinguish between modernization and westernization.",
+            "Analyze the process of modernization in Indian society.",
+            "Examine the debate on preserving Indian traditions while modernizing."
+          ]
+        },
+        {
+          "topic_id": "MOD008_TOP003",
+          "topic_name": "Mass Media, Communications and Social Change",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 7: Mass Media and Communications",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 7"]
+          },
+          "key_concepts": [
+            "Media types - print, broadcast (radio, TV), digital (internet, social media)",
+            "Print media - newspapers, magazines, books as information sources",
+            "Broadcast media - radio and television, mass reaching capability",
+            "Digital media - internet, social media platforms, interactive communication",
+            "Media role - information, education, entertainment, agenda setting",
+            "Agenda setting - media determines what issues are important",
+            "Media effects - shaping public opinion, influencing behavior",
+            "Digital divide - unequal access to internet and digital devices",
+            "Rural-urban divide - media access differences",
+            "Gender digital divide - women's lower internet and technology access",
+            "Social media - platforms enabling mass communication and community building",
+            "Misinformation - fake news and false information spread",
+            "Cultural imperialism - Western media dominance concern",
+            "Public sphere - media enabling democratic deliberation",
+            "Media independence - freedom from government and corporate pressure"
+          ],
+          "thinkers_referenced": ["Marshall McLuhan - Media Studies", "Noam Chomsky - Media Criticism"],
+          "current_affairs_connect": [
+            "Social media and elections - political messaging through digital media",
+            "Fake news epidemic - misinformation spread, WhatsApp factchecking",
+            "Digital divide during COVID - remote education access gaps",
+            "Journalism crisis - newspaper closures, journalist safety",
+            "OTT platforms - changing entertainment consumption patterns"
+          ],
+          "mains_answer_angles": [
+            "Media as institution shaping social consciousness",
+            "Digital divide and inclusive access challenges",
+            "Media representation and stereotype perpetuation",
+            "Social media's role in social mobilization",
+            "Media ethics and responsibility in democratic society"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Analyze the role of media in social change.",
+            "Examine the digital divide in Indian society.",
+            "Discuss the challenges of misinformation in media."
+          ]
+        },
+        {
+          "topic_id": "MOD008_TOP004",
+          "topic_name": "Environmental and Farmers' Movements",
+          "difficulty": "medium",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 8: Social Movements",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 8"]
+          },
+          "key_concepts": [
+            "Environmental movement - mobilization for ecological conservation",
+            "Chipko movement - tree-hugging protest against deforestation, 1970s",
+            "Vandana Shiva - environmental activism, seeds preservation",
+            "Sunderlal Bahuguna - Chipko leader, environmental advocacy",
+            "Narmada Bachao Andolan - dam project opposition, displacement concern",
+            "Medha Patkar - Narmada movement leader, valley people advocacy",
+            "Silent Valley movement - preventing dam construction for ecology",
+            "Biodiversity concerns - species extinction, habitat loss",
+            "Climate change activism - environmental justice movements",
+            "Farmer movements - agricultural labor organizing, land rights",
+            "Shetkari Sanghatna - farmer organization in Maharashtra",
+            "Debt and suicide - farmer distress, crop failure impacts",
+            "MSP (Minimum Support Price) - agricultural support mechanism",
+            "2020-2021 farm laws protests - massive farmer mobilization",
+            "Agricultural labor - landless laborers and rights struggles"
+          ],
+          "thinkers_referenced": ["Vandana Shiva - Environmental Activism", "Medha Patkar - Social Justice"],
+          "current_affairs_connect": [
+            "Farm laws 2020-2021 - massive farmer agitation",
+            "Agricultural suicides - farmer distress continuing",
+            "Climate change and agriculture - rainfall patterns, crop impact",
+            "Organic farming - sustainable agriculture promotion",
+            "Environmental protection vs development - balancing act"
+          ],
+          "mains_answer_angles": [
+            "Environmental movements as new social movements",
+            "Resource conservation vs development pressure",
+            "Farmer movements as class struggle and livelihood fight",
+            "Agricultural distress drivers - markets, climate, policy",
+            "Role of grassroots mobilization in policy change"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Examine the major environmental movements in India.",
+            "Analyze the causes and impact of farmer movements.",
+            "Discuss the tensions between environmental protection and development."
+          ]
+        },
+        {
+          "topic_id": "MOD008_TOP005",
+          "topic_name": "Women's, Dalit and RTI Movements",
+          "difficulty": "high",
+          "priority": "very_high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 8: Social Movements",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 8"]
+          },
+          "key_concepts": [
+            "Women's movement phases - pre-independence, post-independence, contemporary",
+            "SEWA (Self Employed Women's Association) - women worker organizing",
+            "Ela Bhatt - SEWA founder, women's economic rights",
+            "Self-help groups - women's financial and social empowerment",
+            "Women's consciousness - gender awareness and assertiveness",
+            "Dalit movements - Dalit assertion and equality struggle",
+            "Republican Party of India - Ambedkar's party for Dalit representation",
+            "Dalit Panthers - militant Dalit movement in Maharashtra",
+            "Caste assertion - Dalit pride and anti-caste struggle",
+            "RTI (Right to Information) - transparency and accountability movement",
+            "MKSS (Mazdoor Kisan Shakti Sangathan) - grassroots RTI movement",
+            "Aruna Roy - RTI movement leader",
+            "Transparency demands - corruption exposure and accountability",
+            "Anti-corruption movement - Jan Lokpal, Anna Hazare",
+            "Governance reform - responsiveness and democratic deepening"
+          ],
+          "thinkers_referenced": ["Ela Bhatt - Women's Empowerment", "Ambedkar - Dalit Movement", "Aruna Roy - RTI"],
+          "current_affairs_connect": [
+            "Women's empowerment schemes - MUDRA, PMMY",
+            "Dalit assertion in politics - Dalit party presence",
+            "Right to Information Act 2005 - access to government information",
+            "Anna Hazare's anti-corruption movement",
+            "Digital rights and freedom of information"
+          ],
+          "mains_answer_angles": [
+            "Women's movement as struggle for equality and empowerment",
+            "SEWA model of women's economic empowerment",
+            "Dalit movements as struggle against caste hierarchy",
+            "RTI movement as democratic accountability mechanism",
+            "Intersection of different social movements"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Analyze the role of SEWA in women's empowerment.",
+            "Examine the Dalit movement and its achievements.",
+            "Discuss the significance of RTI movement for democratic governance."
+          ]
+        },
+        {
+          "topic_id": "MOD008_TOP006",
+          "topic_name": "Social Movements Definition, Types and Characteristics",
+          "difficulty": "medium",
+          "priority": "high",
+          "daily_target_hours": 1.5,
+          "primary_book": "NCERT Class 12 - Social Change - Chapter 8: Social Movements",
+          "ncert_reference": {
+            "class_12": ["Social Change Chapter 8"]
+          },
+          "key_concepts": [
+            "Social movement definition - collective action for social change",
+            "Old social movements - labor, nationalist movements, class-based",
+            "New social movements - identity-based, post-material values",
+            "Characteristics - sustained action, organization, shared purpose",
+            "Collective identity - shared consciousness and common cause",
+            "Resources - organizational capacity, leadership, funding",
+            "Mobilization - activating people for cause, awareness building",
+            "Grievances - underlying discontent and injustice perception",
+            "Ideology - worldview and vision for change",
+            "Organization structure - centralized vs decentralized, hierarchical vs democratic",
+            "Tactics - protest, satyagraha, agitation, negotiation",
+            "Social change outcome - legislative, policy, cultural, consciousness changes",
+            "Limitations - cooptation, state repression, internal conflicts",
+            "Movement cycles - emergence, growth, stabilization, decline",
+            "Global movements - transnational social movements and solidarity"
+          ],
+          "thinkers_referenced": ["Charles Tilly - Social Movements", "Sidney Tarrow - Movement Theory"],
+          "current_affairs_connect": [
+            "Student movements - education activism, campus movements",
+            "Climate justice movements - environmental activism",
+            "Caste justice movements - Dalit assertion continuing",
+            "LGBTQ+ rights movement - identity assertion",
+            "Worker movements - unorganized sector organizing"
+          ],
+          "mains_answer_angles": [
+            "Social movements as manifestations of discontent and change demand",
+            "Distinction between old and new social movements",
+            "Resources and organization in movement effectiveness",
+            "Tactics and strategies - violent vs non-violent approaches",
+            "Impact of movements on social policy and consciousness"
+          ],
+          "mains_importance": "primary",
+          "pyq_frequency": "high",
+          "sample_questions": [
+            "Define social movements and classify them.",
+            "Compare old and new social movements.",
+            "Analyze the factors influencing the success or failure of social movements."
+          ]
+        }
+      ]
+    }
+  ],
+  "ncert_chapter_mapping": {
+    "class_11_introducing_sociology": {
+      "chapter_1": {"title": "Society", "topics": "MOD001_TOP001, MOD001_TOP006"},
+      "chapter_2": {"title": "Social Change", "topics": "MOD001_TOP001, MOD001_TOP006, MOD002_TOP001"},
+      "chapter_3": {"title": "Research Methods", "topics": "General methodology"},
+      "chapter_4": {"title": "Culture", "topics": "MOD001_TOP001, MOD006_TOP001"},
+      "chapter_5": {"title": "Socialization", "topics": "MOD005_TOP001"}
+    },
+    "class_11_understanding_society": {
+      "chapter_1": {"title": "Understanding Social Institutions", "topics": "MOD001_TOP001, MOD006_TOP001"},
+      "chapter_2": {"title": "Understanding Social Structure", "topics": "MOD002_TOP001-TOP005, MOD003_TOP001-TOP005, MOD004_TOP001-TOP004"},
+      "chapter_3": {"title": "Understanding Social Processes", "topics": "MOD005_TOP001-TOP006"},
+      "chapter_4": {"title": "Society and State", "topics": "MOD006_TOP001-TOP004"},
+      "chapter_5": {"title": "Social Thinkers", "topics": "MOD001_TOP003-TOP005"}
+    },
+    "class_12_indian_society": {
+      "chapter_1": {"title": "Introducing Indian Society", "topics": "MOD001_TOP001-TOP006"},
+      "chapter_2": {"title": "The Demographic Structure of Indian Society", "topics": "MOD002_TOP001-TOP005"},
+      "chapter_3": {"title": "Social Institutions - Continuity and Change", "topics": "MOD005_TOP001-TOP006"},
+      "chapter_4": {"title": "The Market as a Social Institution", "topics": "General economic topics"},
+      "chapter_5": {"title": "Patterns of Social Inequality and Exclusion", "topics": "MOD003_TOP001-TOP005, MOD004_TOP001-TOP004, MOD007_TOP001-TOP003"},
+      "chapter_6": {"title": "The Challenges of Cultural Diversity", "topics": "MOD006_TOP001-TOP004"}
+    },
+    "class_12_social_change_development": {
+      "chapter_1": {"title": "Structural Change", "topics": "MOD001_TOP006, MOD008_TOP001-TOP002"},
+      "chapter_2": {"title": "Cultural Change", "topics": "MOD001_TOP006, MOD008_TOP001-TOP002"},
+      "chapter_3": {"title": "The Story of Indian Democracy", "topics": "MOD006_TOP002-TOP003, MOD001_TOP005"},
+      "chapter_4": {"title": "Change and Development in Rural Society", "topics": "MOD001_TOP002, MOD008_TOP004"},
+      "chapter_5": {"title": "Change and Development in Industrial Society", "topics": "MOD008_TOP001-TOP002"},
+      "chapter_6": {"title": "Globalisation and Social Change", "topics": "MOD008_TOP001-TOP002"},
+      "chapter_7": {"title": "Mass Media and Communications", "topics": "MOD008_TOP003"},
+      "chapter_8": {"title": "Social Movements", "topics": "MOD008_TOP004-TOP006"}
+    }
+  },
+  "study_schedule": {
+    "total_days": 60,
+    "daily_hours": 4,
+    "breakdown": {
+      "module_1": {"days": 8, "hours": 18},
+      "module_2": {"days": 7, "hours": 15},
+      "module_3": {"days": 9, "hours": 20},
+      "module_4": {"days": 6, "hours": 12},
+      "module_5": {"days": 8, "hours": 18},
+      "module_6": {"days": 7, "hours": 15},
+      "module_7": {"days": 8, "hours": 16},
+      "module_8": {"days": 8, "hours": 18}
+    }
+  },
+  "exam_strategy": {
+    "paper": "General Studies Paper 1",
+    "marks": "60 marks",
+    "question_types": ["4-6 mark short answers", "10-12 mark medium answers"],
+    "high_frequency_topics": [
+      "Caste system and Dalit movements",
+      "Secularism and communalism",
+      "Gender and women's movements",
+      "Social inequality and stratification",
+      "Globalisation and modernization",
+      "Tribal issues",
+      "Poverty and social exclusion"
+    ],
+    "preparation_tips": [
+      "Map each topic to NCERT chapters and thinkers",
+      "Prepare current affairs connect for each topic",
+      "Practice answer writing with structure - introduction, points, conclusion",
+      "Use case studies and examples from different regions",
+      "Connect sociology with history, geography, politics, economics",
+      "Read standard sociology textbooks for depth",
+      "Follow current affairs related to social issues"
+    ]
+  },
+  "important_statistics": {
+    "population_2011": "1.21 billion",
+    "sex_ratio": "943 females per 1000 males",
+    "literacy_rate": "74.04%",
+    "rural_population": "68.8%",
+    "scheduled_castes": "16.6%",
+    "scheduled_tribes": "8.6%",
+    "obc_estimate": "27-40%",
+    "poverty_headcount": "20-25%",
+    "unemployment_rate": "3-4%"
+  },
+  "note": "This syllabus comprehensively covers all topics from NCERT Class 11 and Class 12 Sociology books with mapping to UPSC GS Paper 1 requirements. Each topic includes minimum 12-15 key concepts, thinkers referenced, current affairs connections, multiple answer angles, and PyQ frequency. Use this as blueprint for systematic study and answer preparation."
+}

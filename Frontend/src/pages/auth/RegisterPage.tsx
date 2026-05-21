@@ -43,6 +43,11 @@ export const RegisterPage = () => {
   });
 
   useEffect(() => {
+    const err = searchParams.get("error");
+    if (err) setError(decodeURIComponent(err).replace(/\+/g, " "));
+  }, [searchParams]);
+
+  useEffect(() => {
     if (!cooldown) return;
     const timer = window.setInterval(() => {
       setCooldown((prev) => Math.max(0, prev - 1));
@@ -170,7 +175,7 @@ export const RegisterPage = () => {
 
             <div className="mt-6 rounded-xl border border-blue-400/20 bg-[#0b1a3b] p-4 sm:p-5">
               <a
-                href={`${apiBaseURL}/api/auth/google`}
+                href={`${apiBaseURL}/api/auth/google?from=register`}
                 className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-[#111827] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1f2937]"
               >
                 <span className="absolute left-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow">
@@ -195,6 +200,9 @@ export const RegisterPage = () => {
                 </span>
                 Continue with Google
               </a>
+              <p className="mb-4 text-center text-xs text-slate-400">
+                Google sign-in works only after you complete email registration below.
+              </p>
               <div className="mb-4 flex items-center gap-3 text-xs text-slate-300">
                 <div className="h-px flex-1 bg-blue-200/25" />
                 <span>or register with email</span>

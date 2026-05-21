@@ -83,35 +83,30 @@ export const changeUserPassword = async (userId, newPassword) => {
   return user;
 };
 
+export const GOOGLE_LOGIN_NOT_REGISTERED =
+  "This email is not registered. Please register yourself first, then sign in with Google.";
+
 /**
- * Find or create user from Google profile (for OAuth login/register).
- * Returns { user, token }.
+ * Sign in with Google only if the user already registered (email exists in DB).
+ * Links googleId on first Google login for email/password accounts.
  */
-export const findOrCreateGoogleUser = async (profile) => {
-  const email = profile.emails?.[0]?.value?.toLowerCase();
-  const name = profile.displayName || profile.name?.givenName || email?.split("@")[0] || "User";
+export const loginGoogleUser = async (profile) => {
+  const email = profile.emails?.[0]?.value?.toLowerCase()?.trim();
   const googleId = profile.id;
 
   if (!email) {
     throw new Error("Google profile has no email");
   }
 
-  let user = await User.findOne({ $or: [{ googleId }, { email }] });
+  const user = await User.findOne({ $or: [{ googleId }, { email }] });
 
-  if (user) {
-    if (!user.googleId) {
-      user.googleId = googleId;
-      await user.save();
-    }
-  } else {
-    user = await User.create({
-      name,
-      email,
-      googleId,
-      accountType: "paid-user",
-      subscriptionStatus: "inactive",
-      isEmailVerified: true,
-    });
+  if (!user) {
+    throw new Error(GOOGLE_LOGIN_NOT_REGISTERED);
+  }
+
+  if (!user.googleId) {
+    user.googleId = googleId;
+    await user.save();
   }
 
   if (user.isActive === false || user.status === "suspended") {

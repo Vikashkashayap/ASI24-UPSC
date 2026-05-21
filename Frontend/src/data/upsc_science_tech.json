@@ -1,0 +1,854 @@
+{
+  "metadata": {
+    "portal": "MentorsDaily UPSC",
+    "subject": "Science & Technology",
+    "total_modules": 4,
+    "upsc_weightage": {
+      "prelims_questions_per_year": "8-10",
+      "mains_gs3_marks": "30-40",
+      "duration_months": 6
+    },
+    "primary_resources": {
+      "main_book": "Ravi P. Agrahari Science & Technology",
+      "supplementary": "NCERT Class 6-12 Science",
+      "current_affairs": "PIB, Press Information Bureau, ISRO, DRDO official releases"
+    },
+    "last_updated": "2024-12-31",
+    "creation_date": "2026-05-20"
+  },
+  "modules": [
+    {
+      "module_id": 3,
+      "module_name": "General Science — Biology",
+      "sequence": 3,
+      "module_number": 3,
+      "total_topics": 8,
+      "topics": [
+        {
+          "topic_id": "BIO_001",
+          "topic_name": "Cell Structure, Division & Genetics",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 11: Cell Biology",
+          "ncert_reference": {
+            "class": 11,
+            "book": "Biology",
+            "chapters": [
+              8,
+              9,
+              10
+            ]
+          },
+          "key_concepts": [
+            "Prokaryotic vs eukaryotic cells — structural differences",
+            "Cell organelles — nucleus, mitochondria, chloroplasts, ER, Golgi apparatus, lysosomes",
+            "Cell membrane — structure, transport mechanisms, selectively permeable",
+            "Mitosis — prophase, metaphase, anaphase, telophase, cytokinesis",
+            "Meiosis — reduction division, crossing over, genetic variation",
+            "DNA structure — double helix, base pairing, nucleotides",
+            "Chromosome structure — chromatids, centromere, telomeres",
+            "Mendelian inheritance — dominant, recessive traits, segregation law",
+            "Gene expression — transcription, translation, codon, tRNA, mRNA",
+            "Mutations — point mutations, frame shift, chromosomal aberrations",
+            "Cell cycle regulation — checkpoints, apoptosis, cancer development",
+            "Stem cells — types (embryonic, adult), differentiation, applications",
+            "Epigenetics — DNA methylation, histone modification, gene silencing"
+          ],
+          "india_specific": "Indian biomedical research on cancer cell division; Stem cell research at AIIMS; Applications in regenerative medicine; Indian agricultural biotechnology improving crop genetics",
+          "recent_developments": "CRISPR-based genetic treatments 2024; Single-cell sequencing advances; Synthetic biology developments; India's biomedical research funding expansion",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIO_002",
+          "topic_name": "DNA Fingerprinting, Blood Groups & Nutrition",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 12: Applied Biology",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              11,
+              15,
+              16
+            ]
+          },
+          "key_concepts": [
+            "DNA fingerprinting — restriction fragment length polymorphism (RFLP)",
+            "Variable number tandem repeats (VNTR) — individual identification",
+            "DNA profiling in forensic science — crime scene analysis",
+            "DNA fingerprinting applications — paternity testing, wildlife conservation",
+            "ABO blood group system — genetics of blood types",
+            "Rh factor — positive and negative blood types, hemolytic disease",
+            "Blood transfusion — compatibility, cross-matching, blood banking",
+            "Vitamins — fat-soluble (A, D, E, K) and water-soluble (B complex, C)",
+            "Vitamin deficiency diseases — scurvy, beriberi, pellagra, rickets",
+            "Minerals — calcium, iron, iodine, zinc — biological roles",
+            "Macronutrients — carbohydrates, proteins, lipids, metabolic functions",
+            "Micronutrients — trace elements, antioxidants, enzyme cofactors",
+            "Malnutrition — protein-energy malnutrition, micronutrient deficiencies in India"
+          ],
+          "india_specific": "DNA fingerprinting in Indian criminal justice system; Blood donation campaigns and blood bank management in India; Nutritional deficiency crisis in rural India; Fortified food programmes (Poshan Abhiyaan, NFSA)",
+          "recent_developments": "Advanced DNA sequencing for forensics; Micronutrient supplementation programmes; Food fortification standards (2020); India's nutrition mission expansion",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "BIO_003",
+          "topic_name": "Hormones, Immune System & Vaccines",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 13: Physiology",
+          "ncert_reference": {
+            "class": 11,
+            "book": "Biology",
+            "chapters": [
+              21,
+              22
+            ]
+          },
+          "key_concepts": [
+            "Endocrine glands — pituitary, thyroid, parathyroid, adrenal, pancreas",
+            "Hormone types — peptide hormones, steroid hormones, catecholamines",
+            "Hormone functions — regulation of metabolism, growth, reproduction",
+            "Thyroid disorders — hypothyroidism, hyperthyroidism, goiter",
+            "Diabetes mellitus — Type 1 (insulin-dependent), Type 2, gestational",
+            "Immune system components — innate and adaptive immunity",
+            "Lymphocytes — T cells, B cells, memory cells, function in immunity",
+            "Antibody structure — IgG, IgM, IgA, IgE, IgD — functions",
+            "Antigen presentation — MHC molecules, immune recognition",
+            "Inflammation — acute and chronic, inflammatory mediators",
+            "Vaccine types — live attenuated, inactivated, subunit, mRNA, viral vector",
+            "Vaccination schedule — childhood, adolescent, adult immunization",
+            "Allergies and autoimmunity — immune system dysfunction"
+          ],
+          "india_specific": "India's universal immunization programme (UIP); COVID-19 vaccines — Covaxin (inactivated), Covishield (viral vector), ZyCov-D (DNA); Thyroid disorders in India; Diabetes prevalence and management; ICMR vaccine research",
+          "recent_developments": "mRNA vaccine technology in India (iNNOVACC development); Rotavirus vaccine programme expansion; HPV vaccination for cervical cancer prevention; Monoclonal antibody therapies 2024",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIO_004",
+          "topic_name": "Human Diseases — Bacterial, Viral, Fungal & Parasitic",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 14: Disease Biology",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              8
+            ]
+          },
+          "key_concepts": [
+            "Bacterial diseases — tuberculosis (TB), typhoid, cholera, leprosy, plague",
+            "Transmission routes — respiratory, fecal-oral, contact, vector-borne",
+            "Viruses — structure, replication, pathogenesis mechanisms",
+            "Viral diseases — influenza, measles, polio, chickenpox, dengue, COVID-19, AIDS",
+            "Fungal infections — candidiasis, aspergillosis, cryptococcosis, dermatophytes",
+            "Protozoan diseases — malaria, dysentery, sleeping sickness, kala-azar",
+            "Helminthic infections — roundworms, hookworms, tapeworms — pathology",
+            "Pathogenesis — virulence factors, toxin production, tissue invasion",
+            "Epidemiology — endemic, epidemic, pandemic disease patterns",
+            "Disease surveillance — reporting systems, outbreak investigation",
+            "Prevention and control — sanitation, hygiene, quarantine, isolation",
+            "Treatment principles — antimicrobial selection, drug resistance",
+            "Nosocomial infections — hospital-acquired infections, infection control"
+          ],
+          "india_specific": "TB burden in India (highest globally) — RNTCP; Dengue and chikungunya outbreaks; Malaria endemic zones; Filaria eradication programme; COVID-19 pandemic management; Leprosy elimination; Polio eradication achievement",
+          "recent_developments": "Drug-resistant TB (MDR-TB, XDR-TB) crisis; Mpox outbreak response 2024; Long COVID research; Antimicrobial resistance action plan; One Health approach adoption",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIO_005",
+          "topic_name": "Antibiotic Resistance & Antimicrobial Stewardship",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 15: Microbial Resistance",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              8
+            ]
+          },
+          "key_concepts": [
+            "Mechanisms of antibiotic resistance — enzymatic inactivation, efflux pumps, target modification",
+            "Multidrug-resistant organisms — MRSA, ESBL, Carbapenem-resistant Enterobacteriaceae",
+            "Horizontal gene transfer — plasmids, transposons, conjugation",
+            "Selection pressure — overuse in medicine, agriculture, livestock",
+            "Global AMR threat — mortality projections, economic burden",
+            "Antibiotic classes — beta-lactams, aminoglycosides, quinolones, macrolides",
+            "Resistance patterns — geographical variations, nosocomial spread",
+            "Diagnostic tools — culture sensitivity testing, molecular detection",
+            "Stewardship strategies — rational prescribing, infection prevention",
+            "New antibiotics — development challenges, clinical trials, approvals",
+            "Alternative therapies — phage therapy, probiotics, immunotherapy",
+            "Surveillance systems — GLASS, EARS-Net, CAP reporting",
+            "One Health approach — coordination across human, animal, environmental health"
+          ],
+          "india_specific": "India's National Action Plan on AMR 2017-2021; High burden of antimicrobial resistance in Indian hospitals; Over-the-counter antibiotic sales; Agricultural use of antibiotics; ICMR guidelines on rational drug use",
+          "recent_developments": "India's AMR surveillance network expansion; Diagnostic stewardship initiatives; Antimicrobial use in poultry ban advocacy; Wound care guidelines update; Hospital infection control protocols",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 4,
+      "module_name": "Space Technology",
+      "sequence": 4,
+      "module_number": 4,
+      "total_topics": 8,
+      "topics": [
+        {
+          "topic_id": "SPACE_001",
+          "topic_name": "ISRO, Launch Vehicles & PSLV-GSLV Systems",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 16: Space Technology",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "ISRO establishment 1969 — organizational structure, budget allocation",
+            "Launch vehicle classification — PSLV (Polar Satellite Launch Vehicle)",
+            "PSLV variants — PSLV-G, PSLV-XL capacity differences",
+            "PSLV achievements — earth observation, research satellites, Mars Orbiter",
+            "GSLV (Geosynchronous Satellite Launch Vehicle) — indigenous cryogenic engine",
+            "GSLV Mark II/III — capability expansion, high-mass payloads",
+            "LVM3 (Launch Vehicle Mark 3) — super-heavy lift capability, role in Chandrayaan",
+            "Rocket propulsion — solid and liquid boosters, staging, efficiency",
+            "Orbital mechanics — escape velocity, orbital velocity, Hohmann transfer",
+            "Mission profiles — parking orbits, trans-lunar injection, lunar descent",
+            "Cost optimization — ISRO's lean technology, cost-per-kg comparison globally",
+            "Future plans — Reusable Launch Vehicle (RLV), small satellite vehicle",
+            "Space infrastructure — launch facilities at Sriharikota, Thumba, Balasore"
+          ],
+          "india_specific": "ISRO as world's cheapest space agency; PSLV launching foreign satellites for revenue; GSLV indigenous cryogenic engine development; Multi-mission constellations; Regional launch pad development",
+          "recent_developments": "LVM3-M4 successful launch 2024; Reusable launch vehicle test demonstrations; Small satellite launch vehicle (SSLV) development; ISRO's commercial arm expansion; Private space sector regulation",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "SPACE_002",
+          "topic_name": "Lunar Missions: Chandrayaan 1, 2, 3 & South Pole Landing",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 17: Lunar Exploration",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Chandrayaan-1 (2008) — India's first lunar mission, impact probe, scientific instruments",
+            "Moon Impact Probe (MIP) — crash landing, data transmission achievement",
+            "X-ray Spectrometer (C1XS) — elemental composition mapping",
+            "Chandrayaan-2 (2019) — orbiter, lander (hard landing), rover Pragyan",
+            "Chandrayaan-2 mission profile — lunar orbit insertion, soft landing attempt",
+            "Chandrayaan-3 (2023) — lander-rover mission, south polar region landing",
+            "South pole significance — water ice deposits, permanently shadowed craters",
+            "Vikram lander technology — sensors, communication systems, landing legs",
+            "Pragyan rover — mobility, scientific payload, spectroscopy capabilities",
+            "Scientific instruments — thermal infrared spectrometer, mass spectrometer, seismometer",
+            "Lunar geology — regolith composition, mineral identification, water signatures",
+            "International collaboration — ISRO, NASA, other space agencies cooperation",
+            "Future lunar plans — moon base concepts, LUPEX (lunar polar exploration)"
+          ],
+          "india_specific": "India's position as 4th nation to reach lunar surface; Chandrayaan-3's successful south pole landing August 2023; Water ice discovery implications for future bases; Scientific contributions to lunar knowledge",
+          "recent_developments": "Chandrayaan-3 south pole landing success 2023; Thermal data analysis from Vikram site; Pragyan rover discoveries; Lunar water composition research; International lunar exploration coordination",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "SPACE_003",
+          "topic_name": "Mars, Earth & Space Missions Beyond Moon",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 18: Planetary Missions",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Mangalyaan/Mars Orbiter Mission (MOM 2013) — first attempt success globally",
+            "MOM trajectory — earth orbit insertion, trans-Mars injection, Mars orbit capture",
+            "Instruments — methane sensor, thermal infrared spectrometer, color camera",
+            "Mars atmosphere and surface observations — dust storms, seasonal variations",
+            "Aditya-L1 mission (2023) — solar observation, Lagrange point L1 positioning",
+            "Lagrange points — gravitational equilibrium, mission advantages, continuous observation",
+            "Aditya-L1 instruments — coronagraph, spectrometer, particle detector",
+            "Solar wind and coronal mass ejection (CME) studies — space weather prediction",
+            "XPoSat (X-ray Polarimetry Satellite) 2024 — X-ray astronomy mission",
+            "Earth observation satellites — Cartosat, Resourcesat, RISAT series",
+            "Cartosat-3 capabilities — stereo imaging, disaster management, urban planning",
+            "RISAT (Radar Imaging Satellite) — synthetic aperture radar, all-weather operation",
+            "Gaganyaan programme — human spaceflight, Vyommitra robotic mission"
+          ],
+          "india_specific": "Mangalyaan's unprecedented success on first attempt; India's Mars exploration contribution; Aditya-L1 monitoring monsoon-influencing solar activity; Earth observation supporting disaster management, agriculture, water resources; Gaganyaan human spaceflight programme",
+          "recent_developments": "Aditya-L1 operational 2024; XPoSat mission launch success; Enhanced Cartosat capabilities; Gaganyaan's unmanned and manned flight preparation; ISS docking technology readiness",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "SPACE_004",
+          "topic_name": "Navigation Systems: NavIC/IRNSS & Space Applications",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 19: Navigation Technology",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "NavIC (Navigation Indian Constellation) system overview",
+            "IRNSS (Indian Regional Navigation Satellite System) — 7 satellites constellation",
+            "Coverage area — Indian subcontinent, Indian Ocean region, extending 1500 km beyond",
+            "Satellite constellation — 3 geostationary, 4 geosynchronous orbits",
+            "Frequency bands — L5, S1 bands, dual frequency capability",
+            "Accuracy — positioning accuracy 5-10 meters, timing accuracy nanoseconds",
+            "Advantages over GPS — regional focus, independent control, resilience",
+            "Applications — civilian (agriculture, transport, disaster management), military",
+            "Receivers — mobile phone integration, automobile navigation, surveying equipment",
+            "Compatibility — GPS interoperability, combined constellation benefits",
+            "Atomic clocks — satellite timekeeping, synchronization with ground stations",
+            "Ground infrastructure — tracking stations, control centers, upload stations",
+            "India's self-reliance — reducing GPS dependency, strategic autonomy"
+          ],
+          "india_specific": "NavIC fully operational constellation 2023; Applications in precision agriculture, fisheries management; Disaster response during natural calamities; Integration with Indian mobile phones; Strategic independence from foreign navigation systems",
+          "recent_developments": "NavIC receiver availability in smartphones 2024; Enhanced accuracy version deployment; Agricultural applications expansion; Emergency response improvements; International partnerships for constellation sharing",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "SPACE_005",
+          "topic_name": "Earth Observation & Remote Sensing Satellites",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 20: Remote Sensing",
+          "ncert_reference": {
+            "class": 11,
+            "book": "Geography",
+            "chapters": [
+              2
+            ]
+          },
+          "key_concepts": [
+            "Remote sensing principles — electromagnetic radiation, reflection, absorption",
+            "Spectral signatures — reflectance patterns, vegetation index (NDVI)",
+            "Satellite orbits — sun-synchronous orbits, timing, revisit periods",
+            "Spatial resolution — panchromatic, multispectral, hyperspectral bands",
+            "Cartosat series — stereo imaging, 1-meter resolution cartography",
+            "Resourcesat constellation — land use, agriculture, forest monitoring",
+            "RISAT synthetic aperture radar (SAR) — cloud penetration, night imaging",
+            "EOS (Earth Observation Satellites) series — multi-purpose missions",
+            "Scatterometer — wind speed and direction measurement over oceans",
+            "Data applications — urban planning, disaster management, crop monitoring",
+            "Water resource assessment — river monitoring, groundwater potential zones",
+            "Forest cover mapping — deforestation detection, conservation planning",
+            "Coastal zone monitoring — land-use changes, pollution tracking, fisheries"
+          ],
+          "india_specific": "ISRO's comprehensive earth observation network; Supporting crop insurance scheme (Pradhan Mantri Fasal Bima Yojana); Flood forecasting and disaster management; Urban development planning in Indian cities; Groundwater potential assessment",
+          "recent_developments": "Enhanced spatial resolution missions 2024; AI-based image processing; Climate monitoring integration; Agricultural yield prediction models; Real-time disaster alerting systems",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 5,
+      "module_name": "Defence Technology & Strategic Systems",
+      "sequence": 5,
+      "module_number": 5,
+      "total_topics": 8,
+      "topics": [
+        {
+          "topic_id": "DEF_001",
+          "topic_name": "DRDO, Missiles & Strategic Weapons Systems",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 21: Defence Technology",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Social Studies",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "DRDO organization — 52 laboratories, strategic importance",
+            "Missile systems — guided missile classification, ballistic vs cruise",
+            "Agni missile series — Agni I (700 km) through Agni VI (6000 km)",
+            "Agni V — MIRV capability, multiple warheads, range, accuracy",
+            "Prithvi missile — tactical, short-range (160-350 km), battlefield use",
+            "BrahMos — supersonic cruise missile, India-Russia joint venture",
+            "BrahMos-2 — hypersonic variant development, Mach 7+ speed",
+            "Akash surface-to-air missile (SAM) — air defense, indigenously developed",
+            "Nag anti-tank missile — fire-and-forget, imaging seeker, DRDO developed",
+            "Pralay missile — quasi-ballistic, 150-500 km range, boost-glide trajectory",
+            "Cruise missile technology — guidance systems, terrain contour matching (TERCOM)",
+            "Ballistic missile defense — interceptor systems, early warning radars",
+            "Naval weapons — naval cruise missiles, ship-based launch systems"
+          ],
+          "india_specific": "India's missile self-reliance programme; Agni series demonstrating indigenous capability; BrahMos providing Pakistan deterrence; Strategic balance in South Asia; Ballistic missile submarines operational",
+          "recent_developments": "Pralay missile successful tests 2024; Hypersonic glide vehicle development; Naval variants of strategic missiles; Extended-range capabilities; Integration with modern warfare systems",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "DEF_002",
+          "topic_name": "Hypersonic Weapons & Directed Energy Systems",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 22: Emerging Defence",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Hypersonic flight — Mach 5+ speeds, aerodynamic heating challenges",
+            "Hypersonic Cruise Vehicle (HCV) — scramjet propulsion, sustained flight",
+            "Hypersonic Technology Demonstrator Vehicle (HSTDV) — India's test programme",
+            "HCV-X1 test flight 2023 — validation of technology, operational feasibility",
+            "Boost-glide vehicles — ballistic ascent, hypersonic descent, evasion capability",
+            "Global hypersonic race — USA, Russia, China, India competing programs",
+            "Directed Energy Weapons (DEW) — lasers, particle beams, microwave systems",
+            "High-energy laser (HEL) systems — DRDO development, tactical applications",
+            "Laser-guided systems — target designation, precision strike capability",
+            "Microwave weapons — electromagnetic pulse (EMP), area effect",
+            "Plasma physics — ionization, electromagnetic interactions, weapon applications",
+            "Defense implications — air defense, anti-satellite, counter-drone systems",
+            "Technological challenges — thermal management, guidance at hypersonic speeds"
+          ],
+          "india_specific": "India's HSTDV test success 2023 — entering hypersonic club; Strategic significance for defence; Comparison with Chinese DF-ZF hypersonic glider; Technological breakthrough in propulsion",
+          "recent_developments": "HSTDV successful validation flights 2023-2024; Integration plans with missile systems; Advanced guidance system development; Test range expansions; International collaboration limited by sanctions",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "DEF_003",
+          "topic_name": "Aircraft, Naval & Conventional Warfare Systems",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 23: Modern Warfare",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Social Studies",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Tejas Light Combat Aircraft (LCA) — indigenous development, single-engine design",
+            "Tejas Mark II — enhanced avionics, increased payload, air-to-air refueling",
+            "Tejas production rate — HAL manufacturing, operational induction timeline",
+            "Arjun Main Battle Tank (MBT) — indigenous design, armor protection, firepower",
+            "Arjun characteristics — thermal imaging, fire control system, mobility",
+            "INS Vikrant — indigenously designed aircraft carrier, 40,000 ton displacement",
+            "Vikrant capabilities — capacity for 30+ aircraft, indigenous design achievement",
+            "Naval helicopters — Dhruv ALH, light combat helicopters (LCH)",
+            "Anti-ship missiles — naval variant BrahMos, supersonic threat",
+            "Submarine systems — Scorpene submarines with AIP (Air Independent Propulsion)",
+            "Naval strategy — blue water capability, Indian Ocean dominance",
+            "AK-203 rifle — Russia-India joint venture, 7.62mm assault rifle",
+            "Defence production — transfer of technology, Make in India initiatives"
+          ],
+          "india_specific": "Tejas operational squadron induction; Arjun tank production and deployment; INS Vikrant commissioning 2023; Submarine induction, Kilo-class modernization; Make in India defence production",
+          "recent_developments": "INS Vikrant's full operational status 2024; Tejas production acceleration; Arjun tank Mark I and II variants; Scorpene advanced variants; Naval modernization expansion",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "DEF_004",
+          "topic_name": "Nuclear Policy, Deterrence & Strategic Arms",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 24: Nuclear Strategy",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Civics",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "India's No First Use (NFU) policy — declared doctrine, strategic restraint",
+            "Nuclear triad — air force, navy, ground-based delivery systems",
+            "Submarine-launched ballistic missiles (SLBM) — K-series development",
+            "K-4 missile — 3,500 km range, sea-based deterrence",
+            "K-5 missile — development phase, enhanced range, future capability",
+            "Arihant class submarines — INS Arihant operational, INS Arighat commissioned",
+            "Arsenal size — estimated 150-160 nuclear warheads (estimate)",
+            "Strategic Force Command (SFC) — operational control of nuclear arsenal",
+            "Minimum Credible Deterrence (MCD) — doctrine principle, cost-effective",
+            "Nuclear Command Authority (NCA) — civilian control, Pakistan-India equivalence",
+            "Non-Proliferation Treaty (NPT) — India's status, Indian perspective",
+            "Comprehensive Test Ban Treaty (CTBT) — India signed but not ratified",
+            "Fissile Material Cut-off Treaty (FMCT) — negotiations, India's position"
+          ],
+          "india_specific": "India's nuclear policy emphasis on credible deterrence; No first use commitment; Submarine leg of triad operational; Strategic autonomy motivation; Pakistan threat assessment",
+          "recent_developments": "K-5 missile development progress 2024; Advanced warhead designs; Submarine fleet expansion plans; SSBN patrol readiness; Strategic modernization ongoing",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "DEF_005",
+          "topic_name": "Anti-Satellite, Mission Shakti & Space Defence",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 25: Space Defence",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Science",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Mission Shakti 2019 — ASAT test, low-earth orbit satellite destruction",
+            "ASAT missile — vehicle launch from ground, altitude 300+ km interception",
+            "Space debris creation — satellite fragmentation, orbital debris concerns",
+            "India's position — 4th country with confirmed ASAT capability",
+            "Strategic implications — space warfare capability, deterrence factor",
+            "International response — UNSC debate, space weapons regulation",
+            "Outer Space Treaty 1967 — arms control in space, peaceful use principle",
+            "Space debris mitigation — Active Removal of Debris (ARD) proposals",
+            "Anti-satellite weapon effectiveness — target tracking, propulsion, guidance",
+            "Space situational awareness — satellite surveillance, tracking systems",
+            "Counter-space operations — jamming, blinding, fragmentation weapons",
+            "Satellite constellation vulnerability — multiple target elimination",
+            "Space law development — emerging international frameworks, liability"
+          ],
+          "india_specific": "Mission Shakti 2019 as strategic achievement; India as space military power; Space weapons regulation participation; Peaceful uses commitment with capability",
+          "recent_developments": "Continued space domain monitoring capability; Integration with air defence systems; International discussions on space code of conduct; Technology advancement in tracking systems",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 8,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "DEF_006",
+          "topic_name": "Cyber Warfare & Information Security",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 26: Cyber Defence",
+          "ncert_reference": {
+            "class": 10,
+            "book": "IT",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Cyber threats — malware, ransomware, DDoS attacks, data breaches",
+            "Critical infrastructure vulnerability — power grids, water systems, finance",
+            "Nation-state cyber attacks — espionage, sabotage, election interference",
+            "National Cybersecurity Centre (NCIIPC) — threat monitoring, response",
+            "CERT-In (Computer Emergency Response Team) — incident reporting, advisories",
+            "IT Act 2000 — amended 2008, cybercrime provisions, punishment",
+            "Information Technology Rules 2021 — social media regulation, intermediary rules",
+            "Data protection — personal data, security standards, privacy concerns",
+            "Cybersecurity standards — ISO 27001, CIS controls, framework adoption",
+            "Zero-day vulnerabilities — undisclosed exploits, patch management",
+            "Advanced Persistent Threats (APT) — state-sponsored attacks, long-duration compromise",
+            "Cyber espionage — intellectual property theft, corporate secrets",
+            "Indian cyber defense posture — capability enhancement, resilience building"
+          ],
+          "india_specific": "Increased cybersecurity investments by government and industry; Protection against cross-border cyber attacks; Critical infrastructure hardening; Cyber warfare capability development",
+          "recent_developments": "CERT-In advisory system expansion 2024; Data Protection Bill passage (now DPDP Act 2023); Cybersecurity talent shortage initiatives; Government cyber incident response drills",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "DEF_007",
+          "topic_name": "Make in India Defence & iDEX Programme",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 27: Defence Manufacturing",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Social Studies",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Make in India initiative — manufacturing focus, indigenization targets",
+            "Positive Indigenisation List (PIL) — defence items to be produced domestically",
+            "Offset policy — foreign equipment purchases with domestic production",
+            "DPSUs (Defence Public Sector Undertakings) — HAL, BEL, Mazagon Dock, Bharat Dynamics",
+            "Private sector participation — relaxed FDI norms, licensing reforms",
+            "iDEX (Innovations for Defence Excellence) — startup ecosystem, innovation hub",
+            "iDEX Grand Challenge — problem-solving competitions, technology development",
+            "Transfer of Technology (ToT) — Russian, Israeli, French partnerships",
+            "Defence corridors — development zones in Gujarat, Tamil Nadu",
+            "Skill development — training programmes for manufacturing excellence",
+            "Quality standards — indigenously produced equipment meeting international standards",
+            "Cost reduction — domestic production cheaper than imports",
+            "Atma Nirbhar Bharat — strategic autonomy, reduced import dependency"
+          ],
+          "india_specific": "India's goal of $25 billion defence manufacturing by 2025; Reduction of defence import bill; Indigenous ecosystem building; Private sector defence manufacturing emergence",
+          "recent_developments": "Private shipyards expanding naval capability 2024; iDEX startups scaling to production; DPSUs modernizing production facilities; FDI approval for defence sector expansion",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        }
+      ]
+    },
+    {
+      "module_id": 6,
+      "module_name": "Biotechnology & Genetic Engineering",
+      "sequence": 6,
+      "module_number": 6,
+      "total_topics": 8,
+      "topics": [
+        {
+          "topic_id": "BIOTECH_001",
+          "topic_name": "Genetic Engineering Tools & Recombinant DNA Technology",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 28: Biotechnology",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              12
+            ]
+          },
+          "key_concepts": [
+            "Recombinant DNA (rDNA) — DNA from different sources, genetic engineering",
+            "Restriction enzymes — specific DNA cutting, recognition sequences",
+            "DNA ligase — joining DNA fragments, phosphodiester bond formation",
+            "Vectors — plasmids, bacteriophages, viral vectors, DNA transfer",
+            "Polymerase Chain Reaction (PCR) — DNA amplification, three-step cycle",
+            "DNA sequencing — Sanger method, next-generation sequencing (NGS)",
+            "Gene cloning — insertion, transformation, expression in host cells",
+            "Electrophoresis — DNA/protein separation, size determination",
+            "Gel electrophoresis — agarose, polyacrylamide matrices",
+            "Cell culture techniques — mammalian cells, plant cells, microbial culture",
+            "Fermentation — large-scale protein production, bioreactor technology",
+            "Protein purification — chromatography methods, immunoprecipitation",
+            "Quality control — protein characterization, purity assessment"
+          ],
+          "india_specific": "India's biotechnology sector growth; Enzyme production industries; Pharmaceutical grade protein manufacturing; CSIR and ICMR biotechnology initiatives",
+          "recent_developments": "Advanced NGS platforms adoption in India; CRISPR technology localization; Biotech startup ecosystem growth; Pharmaceutical fermentation capacity expansion",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "BIOTECH_002",
+          "topic_name": "Genetically Modified Crops, Regulation & Controversies",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 29: Agri-biotech",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              12
+            ]
+          },
+          "key_concepts": [
+            "Bt cotton — Bacillus thuringiensis toxin genes, insect resistance",
+            "Bt cotton success in India — area expansion, yield increase, farmer adoption",
+            "Bt brinjal — Bt gene insertion, biofortification potential, regulatory controversy",
+            "Bt brinjal rejection 2010 — moratorium, environmental concerns, public opposition",
+            "GM mustard (Dhara Mustri) — herbicide tolerance, oleic acid content",
+            "GM mustard approval 2022 — GEAC clearance, regulatory milestone",
+            "Genetic Modification Appraisal Committee (GEAC) — regulatory body, approval process",
+            "Environmental implications — gene flow, non-target organism impact",
+            "Allergenicity and toxicity testing — FDA approval requirements, safety standards",
+            "Bt resistance development — insect adaptation, refuge strategy",
+            "Biosafety Regulation — Department of Biotechnology (DBT) oversight",
+            "Public perception — acceptance, resistance, ethical concerns",
+            "Golden Rice — beta-carotene enrichment, nutrition security potential"
+          ],
+          "india_specific": "Bt cotton transforming India's textile industry; GM mustard as national breakthrough; Regulatory challenges and public opposition; Farmer acceptance variability",
+          "recent_developments": "GM mustard commercial cultivation debates 2024; Expanded crop variety development; Food security focus; Public trust rebuilding efforts; International bio-safety cooperation",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIOTECH_003",
+          "topic_name": "CRISPR-Cas9 Gene Editing & Emerging Technologies",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 30: Advanced Biotech",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              12
+            ]
+          },
+          "key_concepts": [
+            "CRISPR-Cas9 system — RNA-guided DNA cutting, clustered regularly interspaced short palindromic repeats",
+            "Mechanism — guide RNA, target DNA binding, nuclease cleavage",
+            "Advantages — precision, efficiency, cost-effectiveness, speed",
+            "Off-target effects — unintended mutations, specificity limitations",
+            "Base editing — single nucleotide changes without double-strand breaks",
+            "Prime editing — targeted DNA modifications, enhanced precision",
+            "Applications — disease treatment, crop improvement, functional genomics",
+            "Gene therapy — somatic vs. germline editing, ethical distinctions",
+            "CAR-T cell therapy — engineered immune cells, cancer treatment",
+            "Therapeutic prospects — genetic diseases, cancer, infectious diseases",
+            "Ethical concerns — human germline editing, equity, informed consent",
+            "Regulatory landscape — FDA approval pathways, trial requirements",
+            "Alternative systems — TALEN, zinc finger nucleases, expanding toolkit"
+          ],
+          "india_specific": "CRISPR research at Indian institutes (AIIMS, IIT, ICMR); Gene therapy clinical trials beginning; Ethical framework development under DBT guidance",
+          "recent_developments": "First-in-human CRISPR trials expanding 2024; Prime editing development in India; Regulatory guidelines drafting; Clinical applications in cancer immunotherapy; Ethical oversight establishment",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIOTECH_004",
+          "topic_name": "Stem Cells, Regenerative Medicine & CAR-T Therapy",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 31: Regenerative Medicine",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              11
+            ]
+          },
+          "key_concepts": [
+            "Embryonic stem cells (ESCs) — pluripotency, self-renewal capacity",
+            "Adult/somatic stem cells — multipotency, tissue-specific differentiation",
+            "Induced pluripotent stem cells (iPSCs) — reprogrammed differentiated cells, ethical advantage",
+            "Differentiation pathways — tissue-specific factors, signaling molecules",
+            "Applications — tissue repair, organ regeneration, disease modeling",
+            "CAR-T cell therapy — chimeric antigen receptor, T cell engineering",
+            "CAR-T mechanism — tumor recognition, cytotoxic activation, proliferation",
+            "Hematologic cancers — leukemia and lymphoma treatment success",
+            "Solid tumor challenges — tumor microenvironment, CAR-T infiltration",
+            "Immunotherapy outcomes — remission rates, long-term survival data",
+            "Adverse effects — cytokine release syndrome, neurotoxicity management",
+            "Cost considerations — expensive therapy, accessibility, insurance coverage",
+            "Future directions — multi-antigen targeting, off-the-shelf therapies"
+          ],
+          "india_specific": "Stem cell research at Indian institutions (AIIMS, JIPMER); CAR-T trials initiating in India; Regenerative medicine potential for Indian patients; Bioethics framework development",
+          "recent_developments": "CAR-T cell therapy approvals for clinical trials 2024; Induced pluripotent stem cell research expansion; Regenerative medicine clinical applications; Ethical guidelines for stem cell research",
+          "pyq_frequency": "high",
+          "prelims_importance": 8,
+          "mains_importance": 8,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "BIOTECH_005",
+          "topic_name": "Vaccine Development, mRNA Technology & Immunology",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 32: Vaccine Biotechnology",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              8
+            ]
+          },
+          "key_concepts": [
+            "Vaccine types — live attenuated, inactivated, subunit, mRNA, viral vector",
+            "Live attenuated — weakened pathogens, strong immune response, contraindications",
+            "Inactivated — killed pathogens, safe, sometimes less immunogenic",
+            "Subunit vaccines — specific antigens, recombinant protein-based",
+            "mRNA vaccines — genetic instructions, in vivo antigen synthesis, rapid development",
+            "Viral vector vaccines — modified viruses as delivery vehicles, integration risk",
+            "Conjugate vaccines — linking antigens to carriers, enhanced immune response",
+            "Polysaccharide vaccines — bacterial capsule antigens, meningococcal, pneumococcal",
+            "Antibody response — IgM (primary), IgG (secondary), specificity",
+            "Cell-mediated immunity — T cell activation, cytotoxic response",
+            "Adjuvants — immune-enhancing additives, booster effect",
+            "Vaccine safety profile — adverse event monitoring, pharmacovigilance",
+            "Efficacy evaluation — clinical trials, real-world effectiveness data"
+          ],
+          "india_specific": "Covaxin (inactivated, indigenous) development and use; Covishield (viral vector, Oxford-AstraZeneca); ZyCov-D (DNA vaccine); iNNOVACC (mRNA in development); Universal Immunization Programme (UIP) expansion",
+          "recent_developments": "ZyCov-D DNA vaccine approval 2021; iNNOVACC mRNA vaccine development 2024; Enhanced vaccine coverage programmes; Pandemic preparedness improvement; Next-generation vaccine candidates in trials",
+          "pyq_frequency": "very_high",
+          "prelims_importance": 9,
+          "mains_importance": 9,
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "BIOTECH_006",
+          "topic_name": "Biosafety Levels, Regulations & International Frameworks",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 33: Biosafety",
+          "ncert_reference": {
+            "class": 12,
+            "book": "Biology",
+            "chapters": [
+              12
+            ]
+          },
+          "key_concepts": [
+            "Biosafety Level 1 (BSL-1) — minimal risk pathogens, standard precautions",
+            "Biosafety Level 2 (BSL-2) — moderate hazard, bloodborne pathogen risk",
+            "Biosafety Level 3 (BSL-3) — serious or potentially lethal diseases, respiratory transmission",
+            "Biosafety Level 4 (BSL-4) — dangerous/exotic agents, no known vaccine/cure",
+            "Containment measures — biological safety cabinets, laboratory design, PPE",
+            "Personnel training — standard operating procedures, incident response",
+            "Biological Weapons Convention (BWC) 1972 — treaty prohibiting biological weapons",
+            "Verification mechanisms — on-site inspections, transparency measures",
+            "India's BWC compliance — commitment to peaceful uses, research oversight",
+            "Dual-use research concerns — gain-of-function research, pandemic preparedness",
+            "Laboratory accreditation — CAP, NABH standards, quality assurance",
+            "Incident management — exposure protocols, medical surveillance",
+            "International cooperation — WHO guidelines, technical assistance"
+          ],
+          "india_specific": "India's BSL-3 and BSL-4 facilities; COVID-19 research infrastructure; ICMR biosafety guidelines; DBT regulatory oversight; International biosafety cooperation",
+          "recent_developments": "Enhanced laboratory capacity 2024; BSL-4 facility operational readiness; Pandemic preparedness infrastructure; International biosafety standard harmonization; Gain-of-function research regulations",
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        },
+        {
+          "topic_id": "BIOTECH_007",
+          "topic_name": "Biotechnology Institutions & Policy Frameworks in India",
+          "primary_book": "Ravi P. Agrahari S&T Chapter 34: Biotech Policy",
+          "ncert_reference": {
+            "class": 10,
+            "book": "Social Studies",
+            "chapters": [
+              1
+            ]
+          },
+          "key_concepts": [
+            "Department of Biotechnology (DBT) — nodal ministry, policy formulation",
+            "Biotechnology Research and Development Committee (BRDC) — scientific advisory body",
+            "BIRAC (Biotechnology Industry Research Assistance Council) — translational research support",
+            "Genetic Engineering Appraisal Committee (GEAC) — GM product approval",
+            "Institutional Biosafety Committee (IBSC) — laboratory-level safety oversight",
+            "National Institute of Plant Biology (NIPB) — plant biotech research",
+            "ICMR (Indian Council of Medical Research) — health research coordination, clinical trials",
+            "CSIR institutes — biotechnology research, technology development",
+            "Biotech parks — entrepreneurship ecosystem, incubation support",
+            "Patent framework — protection of biotech innovations, IP rights",
+            "Investment scenario — government funding, private sector growth",
+            "Startup ecosystem — angel investors, venture capital, scaling support",
+            "Skill development — training programmes, talent pipeline, workforce readiness"
+          ],
+          "india_specific": "DBT-BIRAC synergy for innovation commercialization; Indian biotech industry valued at $17 billion; Biotechnology parks in Bengaluru, Pune, Hyderabad; World's largest vaccine manufacturer (Serum Institute)",
+          "recent_developments": "Increased biotech funding allocations 2024; Startup ecosystem growth; Patent filing increases; International collaborations; R&D infrastructure expansion",
+          "pyq_frequency": "medium",
+          "prelims_importance": 7,
+          "mains_importance": 7,
+          "daily_target_hours": 1.5
+        }
+      ]
+    }
+  ]
+}
