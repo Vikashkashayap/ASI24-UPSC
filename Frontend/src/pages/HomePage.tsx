@@ -99,7 +99,7 @@ export const HomePage = () => {
         hours: String(hours).padStart(2, "0"),
         mins: String(mins).padStart(2, "0"),
         secs: String(secs).padStart(2, "0"),
-        progress,
+        progress,                                                                                        
       });
     };
 

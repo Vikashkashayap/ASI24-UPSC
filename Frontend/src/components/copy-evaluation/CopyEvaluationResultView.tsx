@@ -1,41 +1,15 @@
 import React from 'react';
-import {
-  Award,
-  CheckCircle2,
-  AlertTriangle,
-  Lightbulb,
-  Target,
-  FileText,
-  MessageSquare,
-  Layers,
-  PenLine,
-} from 'lucide-react';
+import { FileText, MapPin, Sparkles } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
-import { Progress } from '../ui/progress';
 import { CopyEvaluationAnswerPanel } from './CopyEvaluationAnswerPanel';
+import { EvaluationScoreHero } from './EvaluationScoreHero';
+import { VisionEvaluationResult } from '../../types/copyEvaluation';
+import { SuperKalamSectionBlock } from './superkalam/SuperKalamSectionBlock';
+import { SuperKalamMarksFooter } from './superkalam/SuperKalamMarksFooter';
+import { StrengthWeaknessGrid } from './superkalam/StrengthWeaknessGrid';
+import { FeedbackBulletList } from './superkalam/FeedbackBulletList';
 
-export interface VisionAnswerItem {
-  questionNumber: string;
-  questionText: string;
-  answerText: string;
-}
-
-export interface VisionEvaluationResult {
-  questionText?: string;
-  extractedAnswerText?: string;
-  answers?: VisionAnswerItem[];
-  overallMarks: number;
-  maxMarks: number;
-  summary: string;
-  strengths: string[];
-  weaknesses: string[];
-  missingDimensions: string[];
-  presentationFeedback: string;
-  contentFeedback: string;
-  suggestions: string[];
-  improvedConclusion: string;
-  examinerFeedback: string;
-}
+export type { VisionEvaluationResult } from '../../types/copyEvaluation';
 
 interface StoredPage {
   pageNumber: number;
@@ -49,6 +23,7 @@ interface CopyEvaluationResultViewProps {
   subject?: string;
   paper?: string;
   fileName?: string;
+  onDownload?: () => void;
 }
 
 export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> = ({
@@ -58,323 +33,235 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
   subject,
   paper,
   fileName,
+  onDownload,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const percentage = Math.round((result.overallMarks / result.maxMarks) * 100);
 
-  const sectionClass = isDark
-    ? 'rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 xs:p-5'
-    : 'rounded-xl border border-slate-200 bg-slate-50/80 p-4 xs:p-5';
+  const expectedPoints =
+    result.questionDemand?.expectedPoints?.length
+      ? result.questionDemand.expectedPoints
+      : result.missingDimensions || [];
+  const missingAreas = result.questionDemand?.missingAreas || [];
+  const hasDemand = expectedPoints.length > 0 || missingAreas.length > 0;
+
+  const globalStrengths = result.strengths?.filter(Boolean) || [];
+  const globalWeaknesses = result.weaknesses?.filter(Boolean) || [];
+  const showGlobalSummary =
+    globalStrengths.length > 0 || globalWeaknesses.length > 0;
+
+  const shellClass = isDark
+    ? 'rounded-2xl border border-slate-700/50 bg-slate-900/60 shadow-2xl shadow-black/20 backdrop-blur-sm'
+    : 'rounded-2xl border border-slate-200/80 bg-white shadow-xl shadow-slate-200/50';
 
   return (
-    <div className="space-y-5 xs:space-y-6">
-      {evaluationId && (
-        <CopyEvaluationAnswerPanel
-          evaluationId={evaluationId}
-          result={result}
-          storedPages={storedPages}
-        />
-      )}
+    <div className="space-y-5 eval-report-glow">
+      <EvaluationScoreHero
+        result={result}
+        subject={subject}
+        paper={paper}
+        fileName={fileName}
+      />
 
-      <h3
-        className={`text-sm font-semibold uppercase tracking-wider ${
-          isDark ? 'text-slate-400' : 'text-slate-500'
-        }`}
-      >
-        Examiner Feedback & Analysis
-      </h3>
-
-      {/* Marks hero card */}
-      <div
-        className={`relative overflow-hidden rounded-2xl p-5 xs:p-6 border-2 ${
-          isDark
-            ? 'bg-gradient-to-br from-purple-900/40 via-slate-900 to-emerald-900/20 border-purple-500/30'
-            : 'bg-gradient-to-br from-purple-50 via-white to-emerald-50/50 border-purple-200/60'
-        }`}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <div className={shellClass}>
+        {/* Report header */}
+        <div
+          className={`relative overflow-hidden px-5 py-4 border-b ${
+            isDark ? 'border-slate-700/60 bg-slate-800/40' : 'border-slate-200 bg-gradient-to-r from-slate-50 to-purple-50/40'
+          }`}
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 eval-shimmer-bar opacity-80" />
+          <div className="flex items-center gap-3">
             <div
-              className={`p-3 rounded-2xl ${
-                isDark ? 'bg-fuchsia-500/20' : 'bg-purple-100'
+              className={`p-2.5 rounded-xl ${
+                isDark
+                  ? 'bg-gradient-to-br from-purple-500/25 to-fuchsia-500/15 ring-1 ring-purple-500/30'
+                  : 'bg-gradient-to-br from-purple-100 to-fuchsia-50 ring-1 ring-purple-200/60'
               }`}
             >
-              <Award
-                className={`w-8 h-8 ${
-                  isDark ? 'text-fuchsia-400' : 'text-purple-600'
-                }`}
+              <FileText
+                className={`w-5 h-5 ${isDark ? 'text-purple-300' : 'text-purple-600'}`}
               />
             </div>
             <div>
+              <h2
+                className={`text-base font-bold tracking-tight ${
+                  isDark ? 'text-slate-100' : 'text-slate-900'
+                }`}
+              >
+                Examiner Report
+              </h2>
               <p
-                className={`text-xs font-medium uppercase tracking-wider ${
+                className={`text-xs flex items-center gap-1.5 mt-0.5 ${
                   isDark ? 'text-slate-400' : 'text-slate-500'
                 }`}
               >
-                Overall Score
+                <Sparkles className="w-3 h-3 text-fuchsia-500" />
+                Section-wise premium feedback
               </p>
-              <p className="text-3xl xs:text-4xl font-bold tabular-nums">
-                <span
-                  className={
-                    isDark
-                      ? 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-emerald-300'
-                      : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-emerald-600'
-                  }
+            </div>
+          </div>
+        </div>
+
+        {evaluationId &&
+          (storedPages?.length || result.extractedAnswerText || result.questionText) && (
+            <CopyEvaluationAnswerPanel
+              evaluationId={evaluationId}
+              result={result}
+              storedPages={storedPages}
+            />
+          )}
+
+        <div className="px-4 xs:px-6 py-1">
+          {hasDemand && (
+            <div
+              className={`my-6 rounded-xl border p-5 ${
+                isDark
+                  ? 'bg-gradient-to-br from-rose-950/20 to-slate-900/40 border-rose-500/20'
+                  : 'bg-gradient-to-br from-rose-50/80 to-white border-rose-200/60 shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 mb-4">
+                <div
+                  className={`p-1.5 rounded-lg ${
+                    isDark ? 'bg-rose-500/15' : 'bg-rose-100'
+                  }`}
                 >
-                  {result.overallMarks}
-                </span>
-                <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>
-                  {' '}
-                  / {result.maxMarks}
-                </span>
-              </p>
-              {(subject || paper || fileName) && (
-                <p
-                  className={`text-xs mt-1 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}
+                  <MapPin className="w-4 h-4 text-rose-500" />
+                </div>
+                <h3
+                  className={`text-sm font-bold ${
+                    isDark ? 'text-slate-100' : 'text-slate-900'
+                  }`}
                 >
-                  {[subject, paper, fileName].filter(Boolean).join(' · ')}
-                </p>
+                  Demand of the Question
+                </h3>
+              </div>
+              <ul className={`space-y-2.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                {expectedPoints.map((p, i) => (
+                  <li key={`e-${i}`} className="text-sm leading-relaxed flex gap-3">
+                    <span
+                      className={`mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                        isDark ? 'bg-purple-400' : 'bg-purple-500'
+                      }`}
+                    />
+                    <span>{p}</span>
+                  </li>
+                ))}
+                {missingAreas.map((p, i) => (
+                  <li key={`m-${i}`} className="text-sm leading-relaxed flex gap-3">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-orange-500" />
+                    <span>
+                      <span className="font-semibold text-orange-600 dark:text-orange-400">
+                        Gap:{' '}
+                      </span>
+                      {p}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {showGlobalSummary && (
+            <div
+              className={`py-6 border-b ${isDark ? 'border-slate-700/50' : 'border-slate-100'}`}
+            >
+              <StrengthWeaknessGrid
+                strengths={globalStrengths}
+                weaknesses={globalWeaknesses}
+              />
+              {(result.examplesDataSuggestions?.length ?? 0) > 0 && (
+                <div className="mt-6">
+                  <FeedbackBulletList
+                    variant="suggestions"
+                    items={result.examplesDataSuggestions!}
+                    title="Suggestions to improve"
+                  />
+                </div>
               )}
             </div>
-          </div>
-          <div className="sm:w-48 w-full">
-            <div className="flex justify-between text-xs mb-1.5">
-              <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-                Performance
-              </span>
-              <span className="font-semibold">{percentage}%</span>
-            </div>
-            <Progress value={percentage} className="h-2.5" />
-          </div>
-        </div>
-        {result.summary && (
-          <p
-            className={`mt-4 text-sm leading-relaxed ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
-            {result.summary}
-          </p>
-        )}
-      </div>
+          )}
 
-      {/* Strengths & Weaknesses */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={sectionClass}>
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-            <h3
-              className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-            >
-              Strengths
-            </h3>
-          </div>
-          <ul className="space-y-2">
-            {result.strengths?.length ? (
-              result.strengths.map((item, i) => (
-                <li
-                  key={i}
-                  className={`text-sm flex gap-2 ${
-                    isDark ? 'text-slate-300' : 'text-slate-600'
-                  }`}
-                >
-                  <span className="text-emerald-500 mt-0.5">•</span>
-                  {item}
-                </li>
-              ))
-            ) : (
-              <li className={`text-sm ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-                No strengths noted
-              </li>
-            )}
-          </ul>
-        </div>
-
-        <div className={sectionClass}>
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-5 h-5 text-amber-500" />
-            <h3
-              className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-            >
-              Weaknesses
-            </h3>
-          </div>
-          <ul className="space-y-2">
-            {result.weaknesses?.length ? (
-              result.weaknesses.map((item, i) => (
-                <li
-                  key={i}
-                  className={`text-sm flex gap-2 ${
-                    isDark ? 'text-slate-300' : 'text-slate-600'
-                  }`}
-                >
-                  <span className="text-amber-500 mt-0.5">•</span>
-                  {item}
-                </li>
-              ))
-            ) : (
-              <li className={`text-sm ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-                No weaknesses noted
-              </li>
-            )}
-          </ul>
-        </div>
-      </div>
-
-      {/* Missing dimensions */}
-      {result.missingDimensions?.length > 0 && (
-        <div className={sectionClass}>
-          <div className="flex items-center gap-2 mb-3">
-            <Layers className="w-5 h-5 text-orange-500" />
-            <h3
-              className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-            >
-              Missing Dimensions
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {result.missingDimensions.map((dim, i) => (
-              <span
-                key={i}
-                className={`text-xs px-3 py-1.5 rounded-full ${
-                  isDark
-                    ? 'bg-orange-500/15 text-orange-300 border border-orange-500/30'
-                    : 'bg-orange-50 text-orange-800 border border-orange-200'
-                }`}
-              >
-                {dim}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Content & Presentation feedback */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {result.contentFeedback && (
-          <div className={sectionClass}>
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="w-4 h-4 text-blue-500" />
-              <h4
-                className={`text-sm font-semibold ${
-                  isDark ? 'text-slate-200' : 'text-slate-800'
-                }`}
-              >
-                Content Feedback
-              </h4>
-            </div>
-            <p
-              className={`text-sm leading-relaxed ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}
-            >
-              {result.contentFeedback}
-            </p>
-          </div>
-        )}
-        {result.presentationFeedback && (
-          <div className={sectionClass}>
-            <div className="flex items-center gap-2 mb-2">
-              <PenLine className="w-4 h-4 text-violet-500" />
-              <h4
-                className={`text-sm font-semibold ${
-                  isDark ? 'text-slate-200' : 'text-slate-800'
-                }`}
-              >
-                Presentation Feedback
-              </h4>
-            </div>
-            <p
-              className={`text-sm leading-relaxed ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}
-            >
-              {result.presentationFeedback}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Suggestions */}
-      {result.suggestions?.length > 0 && (
-        <div className={sectionClass}>
-          <div className="flex items-center gap-2 mb-3">
-            <Lightbulb className="w-5 h-5 text-yellow-500" />
-            <h3
-              className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}
-            >
-              Suggestions for Improvement
-            </h3>
-          </div>
-          <ol className="space-y-2 list-decimal list-inside">
-            {result.suggestions.map((s, i) => (
-              <li
-                key={i}
-                className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
-              >
-                {s}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
-      {/* Improved conclusion */}
-      {result.improvedConclusion && (
-        <div
-          className={`rounded-xl border-2 p-4 xs:p-5 ${
-            isDark
-              ? 'border-emerald-500/30 bg-emerald-950/20'
-              : 'border-emerald-200 bg-emerald-50/50'
-          }`}
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="w-5 h-5 text-emerald-500" />
-            <h3
-              className={`font-semibold ${isDark ? 'text-emerald-300' : 'text-emerald-800'}`}
-            >
-              Better Conclusion (Model)
-            </h3>
-          </div>
-          <p
-            className={`text-sm leading-relaxed italic ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
-            {result.improvedConclusion}
-          </p>
-        </div>
-      )}
-
-      {/* Examiner feedback */}
-      {result.examinerFeedback && (
-        <div
-          className={`rounded-2xl p-5 xs:p-6 border-2 ${
-            isDark
-              ? 'bg-gradient-to-br from-slate-800/90 to-purple-900/30 border-fuchsia-500/25'
-              : 'bg-gradient-to-br from-slate-50 to-purple-50/30 border-purple-200/50'
-          }`}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <MessageSquare
-              className={`w-5 h-5 ${isDark ? 'text-fuchsia-400' : 'text-purple-600'}`}
+          {result.introduction && (
+            <SuperKalamSectionBlock
+              label="Introduction"
+              section={result.introduction}
+              showStrengthWeakness={false}
             />
-            <h3
-              className={`font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
+          )}
+
+          {result.body?.map((sec, i) => (
+            <SuperKalamSectionBlock
+              key={i}
+              label={sec.sectionTitle?.toUpperCase() || `Body ${i + 1}`}
+              section={sec}
+              showStrengthWeakness
+            />
+          ))}
+
+          {result.conclusion && (
+            <SuperKalamSectionBlock
+              label="Conclusion"
+              section={result.conclusion}
+              showStrengthWeakness={false}
+            />
+          )}
+
+          {(result.constitutionalReferences?.length ?? 0) > 0 && (
+            <div
+              className={`py-5 border-b ${isDark ? 'border-slate-700/50' : 'border-slate-100'}`}
             >
-              Examiner&apos;s Feedback
-            </h3>
+              <p
+                className={`text-[10px] font-semibold tracking-[0.2em] uppercase mb-3 ${
+                  isDark ? 'text-slate-500' : 'text-slate-400'
+                }`}
+              >
+                Constitutional references
+              </p>
+              <ul
+                className={`space-y-2 text-sm rounded-lg p-4 ${
+                  isDark
+                    ? 'bg-slate-800/40 text-slate-300 border border-slate-700/50'
+                    : 'bg-slate-50 text-slate-600 border border-slate-100'
+                }`}
+              >
+                {result.constitutionalReferences!.map((r, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="text-purple-500">•</span>
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {result.presentationNotes && (
+            <div
+              className={`py-5 border-b ${isDark ? 'border-slate-700/50' : 'border-slate-100'}`}
+            >
+              <p
+                className={`text-[10px] font-semibold tracking-[0.2em] uppercase mb-2 ${
+                  isDark ? 'text-slate-500' : 'text-slate-400'
+                }`}
+              >
+                Presentation
+              </p>
+              <p
+                className={`text-sm leading-relaxed italic ${
+                  isDark ? 'text-slate-400' : 'text-slate-600'
+                }`}
+              >
+                {result.presentationNotes}
+              </p>
+            </div>
+          )}
+
+          <div className="py-6">
+            <SuperKalamMarksFooter result={result} onDownload={onDownload} />
           </div>
-          <p
-            className={`text-sm leading-relaxed ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
-            {result.examinerFeedback}
-          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 };

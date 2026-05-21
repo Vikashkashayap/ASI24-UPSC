@@ -115,12 +115,51 @@ const storedPageSchema = new mongoose.Schema({
   fileName: { type: String, required: true },
 }, { _id: false });
 
+const sectionFeedbackSchema = new mongoose.Schema({
+  studentText: { type: String, default: '' },
+  analysis: [{ type: String }],
+  strengths: [{ type: String }],
+  weaknesses: [{ type: String }],
+  suggestions: [{ type: String }],
+}, { _id: false });
+
+const bodySectionSchema = new mongoose.Schema({
+  sectionTitle: { type: String, default: '' },
+  studentText: { type: String, default: '' },
+  strengths: [{ type: String }],
+  weaknesses: [{ type: String }],
+  suggestions: [{ type: String }],
+}, { _id: false });
+
+const questionDemandSchema = new mongoose.Schema({
+  expectedPoints: [{ type: String }],
+  missingAreas: [{ type: String }],
+}, { _id: false });
+
 const visionEvaluationResultSchema = new mongoose.Schema({
+  questionDemand: questionDemandSchema,
+  introduction: sectionFeedbackSchema,
+  body: [bodySectionSchema],
+  conclusion: sectionFeedbackSchema,
+  overallFeedback: { type: String, default: '' },
+  marks: { type: Number },
+  maxMarks: { type: Number, default: 15 },
+  wordCount: { type: Number, default: 0 },
+  wordLimitStatus: {
+    type: String,
+    enum: ['GOOD', 'SHORT', 'LONG', 'EXCESSIVE'],
+    default: 'GOOD',
+  },
+  examinerRemark: { type: String, default: '' },
+  improvementPriority: [{ type: String }],
+  modelAnswerSuggestions: [{ type: String }],
+  constitutionalReferences: [{ type: String }],
+  examplesDataSuggestions: [{ type: String }],
+  presentationNotes: { type: String, default: '' },
   questionText: { type: String, default: '' },
   extractedAnswerText: { type: String, default: '' },
   answers: [visionAnswerItemSchema],
-  overallMarks: { type: Number, required: true },
-  maxMarks: { type: Number, default: 15 },
+  overallMarks: { type: Number },
   summary: { type: String, default: '' },
   strengths: [{ type: String }],
   weaknesses: [{ type: String }],
@@ -267,7 +306,7 @@ copyEvaluationSchema.statics.getUserHistory = async function(userId, limit = 10)
   return this.find({ userId, status: 'completed' })
     .sort({ createdAt: -1 })
     .limit(limit)
-    .select('subject paper year finalSummary.overallScore visionResult.overallMarks visionResult.maxMarks evaluationMode createdAt pdfFileName fileName status');
+    .select('subject paper year finalSummary.overallScore visionResult.marks visionResult.overallMarks visionResult.maxMarks evaluationMode createdAt pdfFileName fileName status');
 };
 
 // Static method to get analytics

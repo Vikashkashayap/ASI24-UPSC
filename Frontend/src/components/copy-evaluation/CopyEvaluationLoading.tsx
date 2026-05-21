@@ -1,33 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, FileSearch, Brain, PenLine, ClipboardCheck } from 'lucide-react';
+import {
+  Sparkles,
+  Upload,
+  FileSearch,
+  Brain,
+  PenLine,
+  ClipboardCheck,
+  Target,
+  BookOpen,
+} from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 const LOADING_STEPS = [
-  { icon: FileSearch, text: 'Analyzing answer structure...' },
-  { icon: Brain, text: 'Evaluating content depth...' },
-  { icon: PenLine, text: 'Checking presentation...' },
+  { icon: Upload, text: 'Uploading answer copy...' },
+  { icon: FileSearch, text: 'Analyzing handwriting...' },
+  { icon: Target, text: 'Understanding question demand...' },
+  { icon: BookOpen, text: 'Evaluating introduction...' },
+  { icon: Brain, text: 'Checking answer structure...' },
+  { icon: PenLine, text: 'Reviewing body & conclusion...' },
   { icon: ClipboardCheck, text: 'Generating examiner feedback...' },
 ];
 
 interface CopyEvaluationLoadingProps {
   fileName?: string;
+  progress?: number;
 }
 
 export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
   fileName,
+  progress,
 }) => {
   const { theme } = useTheme();
   const [stepIndex, setStepIndex] = useState(0);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const interval = setInterval(() => {
       setStepIndex((i) => (i + 1) % LOADING_STEPS.length);
-    }, 2800);
+    }, 2400);
     return () => clearInterval(interval);
   }, []);
 
   const StepIcon = LOADING_STEPS[stepIndex].icon;
-  const isDark = theme === 'dark';
+  const displayProgress = progress ?? Math.min(95, 15 + stepIndex * 12);
 
   return (
     <div
@@ -73,59 +88,45 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
               isDark ? 'text-slate-100' : 'text-slate-800'
             }`}
           >
-            Evaluating Your Answer Copy
+            Premium Examiner Evaluation
           </h3>
           {fileName && (
-            <p
-              className={`text-xs truncate max-w-xs mx-auto ${
-                isDark ? 'text-slate-500' : 'text-slate-500'
-              }`}
-            >
+            <p className={`text-xs truncate max-w-xs mx-auto ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
               {fileName}
             </p>
           )}
         </div>
 
         <div
-          className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-500 ${
+          className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-500 min-w-[280px] ${
             isDark ? 'bg-slate-800/80 border border-slate-700/50' : 'bg-white border border-slate-200 shadow-sm'
           }`}
         >
           <StepIcon
-            className={`w-5 h-5 flex-shrink-0 ${
-              isDark ? 'text-fuchsia-400' : 'text-purple-600'
-            }`}
+            className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-fuchsia-400' : 'text-purple-600'}`}
           />
-          <p
-            className={`text-sm font-medium ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
-          >
+          <p className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
             {LOADING_STEPS[stepIndex].text}
           </p>
         </div>
 
-        <div className="w-full max-w-xs">
-          <div
-            className={`h-1.5 rounded-full overflow-hidden ${
-              isDark ? 'bg-slate-800' : 'bg-slate-200'
-            }`}
-          >
+        <div className="w-full max-w-sm">
+          <div className="flex justify-between text-xs mb-1.5">
+            <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Progress</span>
+            <span className="font-semibold tabular-nums">{displayProgress}%</span>
+          </div>
+          <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
             <div
-              className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 animate-[loading-bar_2.8s_ease-in-out_infinite]"
-              style={{ width: '40%' }}
+              className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 transition-all duration-700 ease-out"
+              style={{ width: `${displayProgress}%` }}
             />
           </div>
-          <p
-            className={`text-[10px] mt-2 ${
-              isDark ? 'text-slate-500' : 'text-slate-500'
-            }`}
-          >
-            AI is reading your handwritten answers directly — this may take 1–3 minutes
+          <p className={`text-[10px] mt-2 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+            Vision AI reads your handwriting directly — typically 1–3 minutes
           </p>
         </div>
 
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 flex-wrap justify-center max-w-xs">
           {LOADING_STEPS.map((_, i) => (
             <div
               key={i}
@@ -140,14 +141,6 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
           ))}
         </div>
       </div>
-
-      <style>{`
-        @keyframes loading-bar {
-          0% { transform: translateX(-100%); }
-          50% { transform: translateX(150%); }
-          100% { transform: translateX(-100%); }
-        }
-      `}</style>
     </div>
   );
 };

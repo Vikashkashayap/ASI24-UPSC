@@ -11,6 +11,7 @@ import {
   getEvaluationPageImage,
 } from "../controllers/copyEvaluationController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { copyEvalRateLimit } from "../middleware/copyEvalRateLimit.js";
 import { isAllowedUploadMime } from "../services/copyFileService.js";
 
 const router = express.Router();
@@ -48,7 +49,7 @@ const uploadMiddleware = (req, res, next) => {
 
 router.use(authMiddleware);
 
-router.post("/upload", uploadMiddleware, uploadAndEvaluateCopy);
+router.post("/upload", copyEvalRateLimit, uploadMiddleware, uploadAndEvaluateCopy);
 
 router.get("/history", getUserEvaluationHistory);
 router.get("/history/list", getUserEvaluationHistory);

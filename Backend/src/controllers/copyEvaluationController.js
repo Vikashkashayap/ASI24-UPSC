@@ -81,11 +81,14 @@ export const uploadAndEvaluateCopy = async (req, res) => {
 
     await evaluation.save();
 
+    const parsedMaxMarks = parseInt(maxMarks, 10) || 15;
+
     const visionResult = await evaluateCopyWithVision({
       pages: imageData.pages,
       metadata: { subject, paper, year },
       apiKey,
       model: VISION_MODEL,
+      maxMarks: parsedMaxMarks,
     });
 
     if (!visionResult.success) {
@@ -102,9 +105,11 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     }
 
     const result = visionResult.data;
-    if (maxMarks && !result.maxMarks) {
-      result.maxMarks = parseInt(maxMarks, 10) || 15;
+    if (!result.maxMarks) result.maxMarks = parsedMaxMarks;
+    if (result.marks == null && result.overallMarks != null) {
+      result.marks = result.overallMarks;
     }
+    result.overallMarks = result.marks;
 
     evaluation.visionResult = result;
     evaluation.aiModel = visionResult.model || VISION_MODEL;
@@ -119,17 +124,20 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     }
 
     evaluation.status = "completed";
+    const obtained = result.marks ?? result.overallMarks;
     evaluation.finalSummary = {
       overallScore: {
-        obtained: result.overallMarks,
+        obtained,
         maximum: result.maxMarks,
-        percentage: Math.round((result.overallMarks / result.maxMarks) * 100),
-        grade: getGrade(result.overallMarks, result.maxMarks),
+        percentage: Math.round((obtained / result.maxMarks) * 100),
+        grade: getGrade(obtained, result.maxMarks),
       },
       strengths: result.strengths,
       weaknesses: result.weaknesses,
-      improvementPlan: result.suggestions,
-      upscRange: getUpscRange(result.overallMarks, result.maxMarks),
+      improvementPlan: result.improvementPriority?.length
+        ? result.improvementPriority
+        : result.suggestions,
+      upscRange: getUpscRange(obtained, result.maxMarks),
       metadata: {
         subject,
         paper: paper || "Unknown",
@@ -278,6 +286,7 @@ export const getUserEvaluationHistory = async (req, res) => {
       evaluationMode: e.evaluationMode,
       createdAt: e.createdAt,
       overallMarks:
+        e.visionResult?.marks ??
         e.visionResult?.overallMarks ??
         e.finalSummary?.overallScore?.obtained,
       maxMarks:
@@ -409,15 +418,21 @@ export const getEvaluationStats = async (req, res) => {
 
     if (evaluation.visionResult) {
       const v = evaluation.visionResult;
+      const obtained = v.marks ?? v.overallMarks ?? 0;
       return res.status(200).json({
         success: true,
         data: {
-          overallMarks: v.overallMarks,
+          overallMarks: obtained,
+          marks: obtained,
           maxMarks: v.maxMarks,
-          percentage: Math.round((v.overallMarks / v.maxMarks) * 100),
+          percentage: Math.round((obtained / v.maxMarks) * 100),
+          wordCount: v.wordCount,
+          wordLimitStatus: v.wordLimitStatus,
           strengthsCount: v.strengths?.length || 0,
           weaknessesCount: v.weaknesses?.length || 0,
-          suggestionsCount: v.suggestions?.length || 0,
+          suggestionsCount:
+            v.improvementPriority?.length || v.suggestions?.length || 0,
+          bodySections: v.body?.length || 0,
         },
       });
     }
