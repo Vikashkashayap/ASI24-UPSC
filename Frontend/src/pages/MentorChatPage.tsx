@@ -24,7 +24,12 @@ export interface ChatItem {
   lastActivity: string;
 }
 
-export const MentorChatPage = () => {
+type MentorChatPageProps = {
+  /** Narrower layout for home-page side drawer */
+  embedded?: boolean;
+};
+
+export const MentorChatPage = ({ embedded = false }: MentorChatPageProps) => {
   const { theme } = useTheme();
   const [chats, setChats] = useState<ChatItem[]>([]);
   const [projects, setProjects] = useState<string[]>([]);
@@ -35,14 +40,16 @@ export const MentorChatPage = () => {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(!embedded);
   const [projectFilter, setProjectFilter] = useState<string | null>(null);
 
-  // On mobile, start with sidebar closed so user sees chat area first
   useEffect(() => {
     const m = window.matchMedia("(max-width: 767px)");
-    if (m.matches) setSidebarOpen(false);
-  }, []);
+    const apply = () => setSidebarOpen(!m.matches);
+    apply();
+    m.addEventListener("change", apply);
+    return () => m.removeEventListener("change", apply);
+  }, [embedded]);
   const [menuSessionId, setMenuSessionId] = useState<string | null>(null);
   const [newProjectName, setNewProjectName] = useState("");
   const [createProjectName, setCreateProjectName] = useState("");
@@ -221,7 +228,7 @@ export const MentorChatPage = () => {
     : chats;
 
   const sidebarBg = isDark
-    ? "bg-gradient-to-b from-[#0a0618] to-[#06021a] border-r border-slate-800"
+    ? "bg-gradient-to-b from-[#0f1e3d] to-[#0f172a] border-r border-slate-800"
     : "bg-slate-50 border-r border-slate-200";
 
   return (
@@ -239,7 +246,9 @@ export const MentorChatPage = () => {
       <aside
         className={`fixed md:relative inset-y-0 left-0 z-40 md:z-auto flex flex-col min-h-0 h-full overflow-hidden border-r transition-all duration-300 ${sidebarBg} flex-shrink-0 ${
           sidebarOpen
-            ? "translate-x-0 w-[280px] max-w-[85vw] md:w-64 md:max-w-none lg:w-72"
+            ? embedded
+              ? "translate-x-0 w-[min(220px,42vw)] max-w-[85vw] md:w-[220px] md:max-w-[220px]"
+              : "translate-x-0 w-[280px] max-w-[85vw] md:w-64 md:max-w-none lg:w-72"
             : "-translate-x-full md:translate-x-0 w-0 md:w-0 overflow-hidden"
         }`}
       >
@@ -247,7 +256,7 @@ export const MentorChatPage = () => {
         <div className="flex-shrink-0 p-3 space-y-2">
           <Button
             onClick={startNewChat}
-            className={`w-full justify-start gap-2 rounded-xl ${isDark ? "bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white" : "bg-white hover:bg-slate-100 text-slate-800 border border-slate-200"}`}
+            className={`w-full justify-start gap-2 rounded-xl ${isDark ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white" : "bg-blue-600 hover:bg-blue-500 text-white border border-blue-600"}`}
           >
             <Plus className="w-4 h-4" />
             New chat
@@ -294,7 +303,7 @@ export const MentorChatPage = () => {
                 className={`flex-1 rounded-xl px-3 py-2 text-sm border ${isDark ? "bg-slate-800/80 border-slate-700 text-slate-200 placeholder-slate-500" : "bg-white border-slate-200 text-slate-800 placeholder-slate-400"}`}
                 autoFocus
               />
-              <Button type="button" onClick={createProject} className="rounded-xl px-3 bg-purple-600 hover:bg-purple-500 text-white shrink-0">
+              <Button type="button" onClick={createProject} className="rounded-xl px-3 bg-blue-600 hover:bg-blue-500 text-white shrink-0">
                 Add
               </Button>
               <Button type="button" variant="ghost" size="icon" onClick={() => { setShowCreateProject(false); setCreateProjectName(""); }} className="shrink-0 rounded-xl">
@@ -312,7 +321,7 @@ export const MentorChatPage = () => {
               <div className="space-y-0.5">
                 <button
                   onClick={() => setProjectFilter(null)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${!projectFilter ? (isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${!projectFilter ? (isDark ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
                 >
                   <FolderOpen className="w-4 h-4 shrink-0" />
                   All chats
@@ -321,7 +330,7 @@ export const MentorChatPage = () => {
                   <button
                     key={p}
                     onClick={() => setProjectFilter(p)}
-                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${projectFilter === p ? (isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm ${projectFilter === p ? (isDark ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-800") : isDark ? "text-slate-400 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
                   >
                     <FolderOpen className="w-4 h-4 shrink-0" />
                     <span className="truncate">{p}</span>
@@ -391,7 +400,7 @@ export const MentorChatPage = () => {
       </aside>
 
       {/* Main content: header (fixed) + scrollable messages + input (fixed bottom) */}
-      <main className={`relative flex-1 flex flex-col min-w-0 min-h-0 ${isDark ? "bg-[#020012]" : "bg-slate-50"}`}>
+      <main className={`relative flex-1 flex flex-col min-w-0 min-h-0 ${isDark ? "bg-slate-950" : "bg-slate-50"}`}>
         {/* Toggle sidebar - touch-friendly on mobile */}
         <button
           type="button"
@@ -403,38 +412,40 @@ export const MentorChatPage = () => {
         </button>
 
         {/* Header - fixed; responsive padding and text */}
-        <header className={`flex-shrink-0 flex items-center justify-between gap-2 sm:gap-4 px-3 pl-14 sm:pl-14 md:px-6 md:pl-14 py-3 sm:py-3.5 border-b ${isDark ? "border-slate-800 bg-[#020012]/95" : "border-slate-200 bg-slate-50/95"}`}>
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl shrink-0 ${isDark ? "bg-purple-500/20" : "bg-purple-100"}`}>
-              <MessageCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+        {!embedded ? (
+          <header className={`flex-shrink-0 flex items-center justify-between gap-2 sm:gap-4 px-3 pl-14 sm:pl-14 md:px-6 md:pl-14 py-3 sm:py-3.5 border-b ${isDark ? "border-slate-800 bg-slate-950/95" : "border-slate-200 bg-slate-50/95"}`}>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl shrink-0 ${isDark ? "bg-blue-500/20" : "bg-blue-100"}`}>
+                <MessageCircle className={`w-4 h-4 sm:w-5 sm:h-5 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+              </div>
+              <div className="min-w-0">
+                <h1 className={`font-bold text-base sm:text-lg truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                  {currentTitle || "AI Mentor"}
+                </h1>
+                <p className={`text-[11px] sm:text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                  {currentSessionId ? "Ask follow-ups or open sidebar for more chats" : "Ask doubts, strategy, or next steps"}
+                </p>
+              </div>
+              {currentSessionId && (
+                <span className={`text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shrink-0 font-medium hidden sm:inline-flex ${isDark ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
+                  {messages.length} msgs
+                </span>
+              )}
             </div>
-            <div className="min-w-0">
-              <h1 className={`font-bold text-base sm:text-lg truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                {currentTitle || "AI Mentor"}
-              </h1>
-              <p className={`text-[11px] sm:text-xs truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                {currentSessionId ? "Ask follow-ups or open sidebar for more chats" : "Ask doubts, strategy, or next steps"}
-              </p>
-            </div>
-            {currentSessionId && (
-              <span className={`text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shrink-0 font-medium hidden sm:inline-flex ${isDark ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
-                {messages.length} msgs
-              </span>
-            )}
-          </div>
-        </header>
+          </header>
+        ) : null}
 
         {/* Scrollable area only - messages or empty state */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           {loadingChat ? (
             <div className="flex items-center justify-center h-full min-h-[200px]">
-              <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+              <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-blue-400" : "text-blue-600"}`} />
             </div>
           ) : !currentSessionId && messages.length === 0 ? (
             /* Empty state - responsive spacing and copy */
             <div className={`flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] px-4 sm:px-6 py-8 sm:py-12 text-center ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 ${isDark ? "bg-purple-500/10" : "bg-purple-100"}`}>
-                <MessageCircle className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 ${isDark ? "bg-blue-500/10" : "bg-blue-100"}`}>
+                <MessageCircle className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <h2 className={`text-lg sm:text-xl md:text-2xl font-bold mb-1.5 sm:mb-2 px-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                 Where should we begin?
@@ -457,10 +468,10 @@ export const MentorChatPage = () => {
                   <div
                     className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                       m.role === "user"
-                        ? "bg-emerald-500/20 text-emerald-400"
+                        ? "bg-blue-500/20 text-blue-400"
                         : isDark
-                        ? "bg-purple-500/20 text-purple-300"
-                        : "bg-purple-100 text-purple-600"
+                        ? "bg-blue-500/20 text-blue-300"
+                        : "bg-blue-100 text-blue-600"
                     }`}
                   >
                     {m.role === "user" ? (
@@ -472,7 +483,7 @@ export const MentorChatPage = () => {
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                       m.role === "user"
-                        ? "bg-emerald-600 text-white rounded-tr-md"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-md"
                         : isDark
                         ? "bg-slate-800/80 text-slate-100 border border-slate-700 rounded-tl-md"
                         : "bg-white border border-slate-200 text-slate-900 rounded-tl-md"
@@ -488,7 +499,7 @@ export const MentorChatPage = () => {
               ))}
               {loading && (
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div className={`rounded-2xl rounded-tl-md px-4 py-3 ${isDark ? "bg-slate-800/80 border border-slate-700" : "bg-white border border-slate-200"}`}>
@@ -505,13 +516,13 @@ export const MentorChatPage = () => {
         </div>
 
         {/* Input area - fixed at bottom, responsive padding */}
-        <div className={`flex-shrink-0 p-3 sm:p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-[#020012]" : "border-slate-200 bg-slate-50"}`}>
+        <div className={`flex-shrink-0 p-3 sm:p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
             <form ref={formRef} onSubmit={handleSubmit} className="max-w-3xl mx-auto">
               <div
                 className={`flex gap-2 rounded-2xl border-2 overflow-hidden transition-colors ${
                   isDark
-                    ? "bg-slate-900/80 border-slate-700 focus-within:border-purple-500/50"
-                    : "bg-white border-slate-200 focus-within:border-purple-400"
+                    ? "bg-slate-900/80 border-slate-700 focus-within:border-blue-500/50"
+                    : "bg-white border-slate-200 focus-within:border-blue-400"
                 }`}
               >
                 <textarea
@@ -532,7 +543,7 @@ export const MentorChatPage = () => {
                 <Button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className={`self-end m-2 rounded-xl px-4 bg-gradient-to-r from-purple-600 to-emerald-600 hover:from-purple-500 hover:to-emerald-500 text-white shrink-0`}
+                  className={`self-end m-2 rounded-xl px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shrink-0`}
                 >
                   {loading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

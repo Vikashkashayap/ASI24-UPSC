@@ -5,6 +5,8 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { ConfirmationDialog } from "../components/ui/dialog";
 import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
+import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
+import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -213,7 +215,7 @@ const TestPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading test...</p>
         </div>
       </div>
@@ -279,7 +281,7 @@ const TestPage: React.FC = () => {
           <div className="mt-4">
             <div className={`h-2 rounded-full overflow-hidden ${theme === "dark" ? "bg-slate-700" : "bg-slate-200"}`}>
               <div
-                className="h-full bg-gradient-to-r from-purple-600 to-indigo-600 transition-all duration-300"
+                className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -300,12 +302,22 @@ const TestPage: React.FC = () => {
                   </div>
                 )}
                 {/* Assertion–Reason block (do not repeat assertion in question text below) */}
-                {currentQuestion.assertionReason?.assertion != null && (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
-                  <div className={`mb-4 rounded-lg border p-3 sm:p-4 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
-                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
-                    <div className="mb-3">{currentQuestion.assertionReason.assertion}</div>
-                    <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Reason (R)</div>
-                    <div>{currentQuestion.assertionReason.reason}</div>
+                {currentQuestion.assertionReason?.assertion != null &&
+                  (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
+                  <div className="mb-4 space-y-5 sm:space-y-6">
+                    {hasDistinctHindiQuestion(currentQuestion) ? (
+                      <>
+                        <UpscFormattedQuestionStem text={getQuestionHindi(currentQuestion)} theme={theme} />
+                        <div
+                          className={`border-t border-dashed ${theme === "dark" ? "border-slate-600" : "border-slate-300"}`}
+                          aria-hidden
+                        />
+                      </>
+                    ) : null}
+                    <UpscFormattedQuestionStem
+                      text={`Assertion (A): ${currentQuestion.assertionReason.assertion}\nReason (R): ${currentQuestion.assertionReason.reason}`}
+                      theme={theme}
+                    />
                   </div>
                 )}
                 {/* Match columns: side-by-side (question text already shown above) */}
@@ -313,7 +325,7 @@ const TestPage: React.FC = () => {
                   <div className="overflow-x-auto mb-4">
                     <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-[280px]">
                       <div>
-                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-I</div>
+                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-I</div>
                         <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
                           {currentQuestion.matchColumns.columnA.map((item, i) => (
                             <li key={i}>{item}</li>
@@ -321,7 +333,7 @@ const TestPage: React.FC = () => {
                         </ul>
                       </div>
                       <div>
-                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-II</div>
+                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-II</div>
                         <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
                           {(currentQuestion.matchColumns.columnB || []).map((item, i) => (
                             <li key={i}>{item}</li>
@@ -394,7 +406,7 @@ const TestPage: React.FC = () => {
                       onClick={() => handleAnswerSelect(currentQuestion._id, option)}
                       className={`flex items-center justify-center gap-2 p-3 sm:p-4 min-h-[52px] rounded-xl border-2 transition-all active:scale-[0.99] touch-manipulation font-semibold text-base sm:text-lg ${
                         isSelected
-                          ? "border-purple-600 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300"
+                          ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
                           : theme === "dark"
                           ? "border-slate-700 bg-slate-800 hover:border-slate-600 text-slate-200"
                           : "border-slate-300 bg-white hover:border-slate-400 text-slate-800"
@@ -427,7 +439,7 @@ const TestPage: React.FC = () => {
           {currentIndex < test.questions.length - 1 ? (
             <Button
               onClick={handleNext}
-              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-purple-600 to-indigo-600 touch-manipulation"
+              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-blue-600 to-indigo-600 touch-manipulation"
             >
               <span className="hidden sm:inline">Next</span>
               <ChevronRight className="w-4 h-4" />
@@ -460,7 +472,7 @@ const TestPage: React.FC = () => {
                 onClick={() => setCurrentIndex(index)}
                 className={`min-w-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
                   index === currentIndex
-                    ? "bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 dark:ring-offset-slate-900"
+                    ? "bg-blue-600 text-white ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-slate-900"
                     : isAnswered
                     ? theme === "dark"
                       ? "bg-green-900/30 text-green-400 border border-green-700"

@@ -68,9 +68,9 @@ export const ModelAnswerPanel: React.FC<Props> = ({ suggestions }) => {
 
               isDark
 
-                ? 'bg-slate-900 border-purple-500/30 shadow-purple-900/30'
+                ? 'bg-slate-900 border-blue-500/30 shadow-blue-900/30'
 
-                : 'bg-white border-purple-200/60 shadow-purple-200/30'
+                : 'bg-white border-blue-200/60 shadow-blue-200/30'
 
             }`}
 
@@ -176,9 +176,9 @@ export const ModelAnswerPanel: React.FC<Props> = ({ suggestions }) => {
 
                       isDark
 
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-blue-500/20 text-blue-300'
 
-                        : 'bg-purple-100 text-purple-700'
+                        : 'bg-blue-100 text-blue-700'
 
                     }`}
 

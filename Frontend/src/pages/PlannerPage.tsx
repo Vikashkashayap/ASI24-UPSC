@@ -26,6 +26,7 @@ import { DailyTaskEngine } from "../components/advancedStudyPlanner/DailyTaskEng
 import { AIMentorChat } from "../components/advancedStudyPlanner/AIMentorChat";
 import { PomodoroTimer } from "../components/advancedStudyPlanner/PomodoroTimer";
 import { WeeklyGoalsCard } from "../components/advancedStudyPlanner/WeeklyGoalsCard";
+import { PlanSyllabusTimeline } from "../components/advancedStudyPlanner/PlanSyllabusTimeline";
 import { toDateString } from "../components/advancedStudyPlanner/plannerUtils";
 import { cn } from "../utils/cn";
 import { Bell, Target } from "lucide-react";
@@ -81,12 +82,12 @@ export const PlannerPage = () => {
   const handleGenerate = async (data: AdvancedPlannerSetup) => {
     setSetupLoading(true);
     try {
-      const res = await advancedStudyPlannerAPI.generatePlan(data);
+      const res = await advancedStudyPlannerAPI.generateSmartPlan(data);
       setPlan(res.data.plan);
       setProgress(res.data.progress);
       setDaysRemaining(res.data.daysRemaining ?? null);
       setShowRegenerateForm(false);
-      toast.success("Your AI study plan is ready!");
+      toast.success("Your AI study plan is ready — syllabus topics mapped to your timetable!");
       await fetchDashboard();
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -109,6 +110,30 @@ export const PlannerPage = () => {
     } finally {
       setLoadingTaskId(null);
     }
+  };
+
+  const handleCompleteTopic = async (taskId: string) => {
+    setLoadingTaskId(taskId);
+    try {
+      const res = await advancedStudyPlannerAPI.completeTopic(taskId);
+      setPlan(res.data.plan);
+      setProgress(res.data.progress);
+      await fetchDashboard();
+      return {
+        practiceRoute: res.data.practiceRoute,
+        mcqTask: res.data.mcqTask,
+      };
+    } catch {
+      toast.error("Could not complete topic");
+      throw new Error("complete failed");
+    } finally {
+      setLoadingTaskId(null);
+    }
+  };
+
+  const handleStartPractice = async (taskId: string) => {
+    const res = await advancedStudyPlannerAPI.startPractice(taskId);
+    return { routes: res.data.routes };
   };
 
   const handleReorder = async (taskIds: string[]) => {
@@ -166,11 +191,11 @@ export const PlannerPage = () => {
           className={cn(
             "rounded-3xl p-8 text-center border-2",
             theme === "dark"
-              ? "bg-gradient-to-br from-violet-950/50 to-indigo-950/30 border-violet-500/20"
-              : "bg-gradient-to-br from-violet-50 to-indigo-50 border-violet-200"
+              ? "bg-gradient-to-br from-blue-950/50 to-indigo-950/30 border-blue-500/20"
+              : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200"
           )}
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             AI Study Planner
           </h1>
           <p className="mt-2 text-sm opacity-80 max-w-md mx-auto">
@@ -267,7 +292,7 @@ export const PlannerPage = () => {
             <Card className={cn("border-2", theme === "dark" ? "bg-slate-900/80 border-slate-700" : "bg-white border-slate-200")}>
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  <Target className="text-violet-500 w-5 h-5" />
+                  <Target className="text-blue-500 w-5 h-5" />
                   <CardTitle className="text-lg">Daily tasks</CardTitle>
                 </div>
                 <CardDescription>Drag to reorder · Tap to complete</CardDescription>
@@ -277,6 +302,8 @@ export const PlannerPage = () => {
                   tasks={plan.tasks || []}
                   selectedDate={selectedDate}
                   onToggleComplete={handleToggleComplete}
+                  onCompleteTopic={handleCompleteTopic}
+                  onStartPractice={handleStartPractice}
                   onReorder={handleReorder}
                   loadingTaskId={loadingTaskId}
                 />
@@ -286,6 +313,11 @@ export const PlannerPage = () => {
               weeklyGoals={plan.weeklyGoals || []}
               monthlyTargets={plan.monthlyTargets || []}
               revisionStrategy={plan.revisionStrategy}
+            />
+            <PlanSyllabusTimeline
+              tasks={plan.tasks || []}
+              selectedDate={selectedDate}
+              weakSubjects={plan.weakSubjects}
             />
           </motion.div>
 

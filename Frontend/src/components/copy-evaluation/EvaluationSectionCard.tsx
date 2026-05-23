@@ -16,14 +16,14 @@ export const EvaluationSectionCard: React.FC<Props> = ({
   title,
   section,
   defaultOpen = true,
-  accent = 'purple',
+  accent = 'blue',
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [open, setOpen] = React.useState(defaultOpen);
 
   const accentMap = {
-    purple: isDark ? 'border-purple-500/30 bg-purple-950/20' : 'border-purple-200 bg-purple-50/40',
+    purple: isDark ? 'border-blue-500/30 bg-blue-950/20' : 'border-blue-200 bg-blue-50/40',
     blue: isDark ? 'border-blue-500/30 bg-blue-950/20' : 'border-blue-200 bg-blue-50/40',
     emerald: isDark ? 'border-emerald-500/30 bg-emerald-950/20' : 'border-emerald-200 bg-emerald-50/40',
     amber: isDark ? 'border-amber-500/30 bg-amber-950/20' : 'border-amber-200 bg-amber-50/40',

@@ -4,6 +4,8 @@ import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCirc
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
+import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
+import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -122,7 +124,7 @@ const TestResultPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading results...</p>
         </div>
       </div>
@@ -193,7 +195,7 @@ const TestResultPage: React.FC = () => {
       </div>
 
       {/* Score Summary Card - Mobile-first */}
-      <Card className="bg-gradient-to-br from-purple-600 to-indigo-600 text-white">
+      <Card className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white">
         <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
           <div className="text-center">
             <Award className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 opacity-90" />
@@ -318,12 +320,22 @@ const TestResultPage: React.FC = () => {
                                 </div>
                               )}
                               {/* Assertion–Reason block (no repeat of assertion in question text below) */}
-                              {question.assertionReason?.assertion != null && (question.assertionReason.assertion || question.assertionReason.reason) && (
-                                <div className={`mb-3 rounded-lg border p-2 sm:p-3 ${theme === "dark" ? "border-slate-600 bg-slate-800/50" : "border-slate-300 bg-slate-50"}`}>
-                                  <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Assertion (A)</div>
-                                  <div className="mb-2 text-sm">{question.assertionReason.assertion}</div>
-                                  <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>Reason (R)</div>
-                                  <div className="text-sm">{question.assertionReason.reason}</div>
+                              {question.assertionReason?.assertion != null &&
+                                (question.assertionReason.assertion || question.assertionReason.reason) && (
+                                <div className="mb-3 space-y-4">
+                                  {hasDistinctHindiQuestion(question) ? (
+                                    <>
+                                      <UpscFormattedQuestionStem text={getQuestionHindi(question)} theme={theme} />
+                                      <div
+                                        className={`border-t border-dashed ${theme === "dark" ? "border-slate-600" : "border-slate-300"}`}
+                                        aria-hidden
+                                      />
+                                    </>
+                                  ) : null}
+                                  <UpscFormattedQuestionStem
+                                    text={`Assertion (A): ${question.assertionReason.assertion}\nReason (R): ${question.assertionReason.reason}`}
+                                    theme={theme}
+                                  />
                                 </div>
                               )}
                               {/* Match columns (question text already shown above) */}
@@ -331,13 +343,13 @@ const TestResultPage: React.FC = () => {
                                 <div className="overflow-x-auto mb-3">
                                   <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
                                     <div>
-                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-I</div>
+                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-I</div>
                                       <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
                                         {question.matchColumns.columnA.map((item, i) => <li key={i}>{item}</li>)}
                                       </ul>
                                     </div>
                                     <div>
-                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-purple-400" : "text-purple-700"}`}>List-II</div>
+                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-II</div>
                                       <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
                                         {(question.matchColumns.columnB || []).map((item, i) => <li key={i}>{item}</li>)}
                                       </ul>
@@ -464,7 +476,7 @@ const TestResultPage: React.FC = () => {
                       <button
                         onClick={() => setExpandedQuestion(isExpanded ? null : question._id)}
                         className={`w-full text-left text-xs md:text-sm font-medium min-h-[44px] px-2 py-2 rounded touch-manipulation ${
-                          theme === "dark" ? "text-purple-400 hover:bg-purple-900/20" : "text-purple-600 hover:bg-purple-50"
+                          theme === "dark" ? "text-blue-400 hover:bg-blue-900/20" : "text-blue-600 hover:bg-blue-50"
                         } mb-2 transition-colors`}
                       >
                         {isExpanded ? "Hide" : "Show"} Explanation

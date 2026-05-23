@@ -100,8 +100,8 @@ export const QuestionEvaluationView: React.FC<QuestionEvaluationViewProps> = ({ 
               </span>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                 theme === "dark" 
-                  ? "bg-purple-900/50 text-purple-300 border border-purple-700" 
-                  : "bg-purple-100 text-purple-700"
+                  ? "bg-blue-900/50 text-blue-300 border border-blue-700" 
+                  : "bg-blue-100 text-blue-700"
               }`}>
                 {question.maxMarks} Marks
               </span>
@@ -404,7 +404,7 @@ export const QuestionEvaluationView: React.FC<QuestionEvaluationViewProps> = ({ 
             <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
               Actions
             </h3>
-            <Sparkles className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            <Sparkles className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Button
@@ -537,7 +537,7 @@ export const QuestionEvaluationView: React.FC<QuestionEvaluationViewProps> = ({ 
       </Card>
 
       {/* Next Steps & Recommendations */}
-      <Card className={`${theme === "dark" ? "bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700" : "bg-gradient-to-br from-purple-50/50 to-white border-purple-200"}`}>
+      <Card className={`${theme === "dark" ? "bg-gradient-to-br from-slate-900/50 to-slate-800/50 border-slate-700" : "bg-gradient-to-br from-blue-50/50 to-white border-blue-200"}`}>
         <CardHeader>
           <CardTitle className={`flex items-center gap-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
             <Target className="w-5 h-5" />
@@ -632,8 +632,8 @@ export const QuestionEvaluationView: React.FC<QuestionEvaluationViewProps> = ({ 
               >
                 <div className="flex items-center gap-3 w-full">
                   <div className="flex-1 text-left">
-                    <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"}`}>
-                      <Clock className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                    <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
+                      <Clock className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                     </div>
                     <div>
                       <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>

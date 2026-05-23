@@ -5,6 +5,8 @@ const taskSchema = new mongoose.Schema(
     date: { type: String, required: true }, // YYYY-MM-DD
     subject: { type: String, required: true },
     topic: { type: String, default: "" },
+    syllabusModule: { type: String, default: null },
+    syllabusTopicId: { type: String, default: null },
     taskType: {
       type: String,
       enum: ["subject_study", "current_affairs", "mcq_practice", "revision", "mock_test"],
@@ -27,6 +29,10 @@ const taskSchema = new mongoose.Schema(
     completed: { type: Boolean, default: false },
     completedAt: { type: Date, default: null },
     rescheduledFrom: { type: String, default: null }, // original date if rolled over
+    readingStartedAt: { type: Date, default: null },
+    practiceUnlocked: { type: Boolean, default: false },
+    parentTaskId: { type: String, default: null },
+    revisionDueDate: { type: String, default: null },
   },
   { _id: true }
 );
@@ -70,6 +76,7 @@ const revisionEntrySchema = new mongoose.Schema(
     studyDate: { type: String, required: true },
     revisionDates: [{ type: String }],
     cycle: { type: String, enum: ["1-day", "7-day", "30-day"], default: "7-day" },
+    completed: { type: Boolean, default: false },
   },
   { _id: true }
 );

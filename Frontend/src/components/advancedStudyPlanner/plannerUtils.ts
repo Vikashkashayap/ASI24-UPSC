@@ -28,3 +28,28 @@ export const DIFFICULTY_COLORS = {
   medium: "text-amber-600",
   hard: "text-rose-600",
 };
+
+/** Clean planner task label → topic for Prelims Test Generator */
+export function sanitizePlannerTopic(rawTopic: string, subject = ""): string {
+  let t = (rawTopic || "").trim();
+  t = t.replace(/^MCQs\s*[—–-]\s*/i, "");
+  t = t.replace(/^Revision\s*[—–-]\s*/i, "");
+  t = t.replace(/^Study\s+/i, "");
+  if (subject && new RegExp(`^${subject}\\s*`, "i").test(t)) {
+    t = t.replace(new RegExp(`^${subject}\\s*`, "i"), "").trim();
+  }
+  return t || subject;
+}
+
+export function buildPlannerPracticeUrl(
+  task: { subject: string; topic?: string; syllabusTopicId?: string | null },
+  pyq = false
+): string {
+  const params = new URLSearchParams();
+  params.set("from", "planner");
+  params.set("subject", task.subject || "");
+  params.set("topic", sanitizePlannerTopic(task.topic || "", task.subject));
+  if (task.syllabusTopicId) params.set("syllabusTopicId", task.syllabusTopicId);
+  if (pyq) params.set("pyq", "1");
+  return `/prelims-test?${params.toString()}`;
+}

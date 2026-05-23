@@ -1,0 +1,668 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 2 — Social Justice Comprehensive Syllabus",
+    "purpose": "Standalone Social Justice file for MentorsDaily UPSC portal — AI module generation",
+    "paper": "GS Paper 2",
+    "total_modules": 8,
+    "estimated_preparation_hours": 160,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Official Notification 2013 onwards",
+    "note": "Separated from Governance file — Social Justice is a distinct GS2 component covering welfare, rights, and inclusion"
+  },
+
+  "primary_books": {
+    "book_1": { "title": "Indian Society", "author": "NCERT Class 12 Sociology", "usage": "Social stratification, caste, gender, poverty frameworks" },
+    "book_2": { "title": "Economic Survey (Annual)", "usage": "Latest data on social sector spending, schemes performance" },
+    "book_3": { "title": "India Year Book", "publisher": "Ministry of Information & Broadcasting", "usage": "Scheme details, beneficiary data, ministry initiatives" },
+    "book_4": { "title": "2nd ARC Report 13", "title_full": "Separated and Marginalised Groups", "usage": "Policy framework for SC, ST, OBC, minorities, disabled" },
+    "book_5": { "title": "2nd ARC Report 14", "title_full": "Protecting Children", "usage": "Child rights, child labour, juvenile justice framework" }
+  },
+
+  "modules": [
+    {
+      "module_id": "SJ_MOD_001",
+      "module_name": "Welfare Schemes for Vulnerable Sections — Overview and Framework",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_001_T001",
+          "topic_name": "Welfare State Concept and India's Social Protection Architecture",
+          "primary_source": "2nd ARC Report 13; Economic Survey Social Sector chapter",
+          "ncert_reference": "NCERT Class 12 Sociology Ch 5 — Patterns of Social Inequality and Exclusion",
+          "key_concepts": [
+            "Welfare state defined — state responsibility for citizens' basic needs",
+            "Universal vs targeted welfare — debate on coverage vs cost efficiency",
+            "India's federal welfare structure — Centre, State, and Local Body roles",
+            "Centrally Sponsored Schemes (CSS) vs Central Sector Schemes distinction",
+            "Direct Benefit Transfer (DBT) — Aadhaar-linked benefit delivery, JAM trinity",
+            "JAM Trinity — Jan Dhan, Aadhaar, Mobile as delivery infrastructure",
+            "PFMS — Public Financial Management System for fund tracking",
+            "Social audit — MGNREGA model, community verification of works",
+            "Convergence approach — POSHAN, Mission Shakti integrating multiple schemes",
+            "Aspirational Districts Programme — 112 backward districts focus",
+            "PM-GATI SHAKTI — infrastructure for last-mile welfare delivery",
+            "Niti Aayog's role in scheme design vs old Planning Commission approach",
+            "Outcome-based monitoring — moving from input to output to outcome measurement",
+            "Decentralisation of welfare — PRIs as delivery vehicles under 73rd/74th Amendment",
+            "International benchmarks — SDG 1 (No Poverty), SDG 2 (Zero Hunger) India's position"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "PM-JAY (Ayushman Bharat)", "year": 2018, "objective": "Health insurance of Rs 5 lakh per family to bottom 40% households", "status": "Active — 55+ crore beneficiaries" },
+            "scheme_2": { "name": "PMAY-G (Pradhan Mantri Awas Yojana — Gramin)", "year": 2016, "objective": "2.95 crore pucca houses to rural homeless by 2024", "status": "Active — extended" },
+            "scheme_3": { "name": "MGNREGA", "year": 2005, "objective": "100 days guaranteed wage employment to rural households", "status": "Active — world's largest employment guarantee" }
+          },
+          "issues_challenges": [
+            "Leakages in welfare delivery despite DBT — ghost beneficiaries persist",
+            "Exclusion errors — genuine beneficiaries left out due to documentation",
+            "Low awareness among intended beneficiaries especially in remote areas",
+            "Scheme fatigue — too many overlapping schemes causing confusion",
+            "Inadequate grievance redressal for welfare scheme denials"
+          ],
+          "reforms_needed": [
+            "Universal Basic Income pilot — cash transfers replacing multiple schemes",
+            "Single beneficiary database — de-duplication across all schemes",
+            "Strengthen social audit institutions with independent statutory backing",
+            "Improve last-mile delivery through trained frontline workers",
+            "Regular impact evaluation by independent agencies"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "SJ_001_T002",
+          "topic_name": "Food Security — PDS, NFSA, Nutrition Schemes",
+          "primary_source": "Economic Survey; India Year Book; NFSA 2013 text",
+          "ncert_reference": "NCERT Class 9 Economics Ch 4 — Food Security in India",
+          "key_concepts": [
+            "NFSA 2013 — National Food Security Act — legal entitlement to subsidised food",
+            "Coverage: 75% rural, 50% urban population — 81+ crore beneficiaries",
+            "Antodaya Anna Yojana — poorest of poor — 35 kg per family per month",
+            "Priority Households — 5 kg per person per month at Re 1-3",
+            "PDS evolution — universal to targeted (TPDS) to rights-based (NFSA)",
+            "FCI — Food Corporation of India — procurement, storage, distribution",
+            "MSP and procurement — how food enters PDS system",
+            "Leakages in PDS — diversion of grain, ghost cards, quality issues",
+            "One Nation One Ration Card (ONORC) — portability for migrant workers",
+            "PM Garib Kalyan Anna Yojana — free grain during COVID and extended",
+            "Mid-Day Meal Scheme (PM POSHAN) — school nutrition, 12 crore children",
+            "ICDS (Integrated Child Development Services) — anganwadi nutrition",
+            "POSHAN Abhiyan (National Nutrition Mission) — stunting, wasting targets",
+            "Fortification of food — rice, wheat, oil fortification policy",
+            "Global Hunger Index — India's ranking and credibility debate"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "PM POSHAN (Mid-Day Meal)", "year": 1995, "objective": "Hot cooked meals to 11.8 crore school children", "status": "Active" },
+            "scheme_2": { "name": "POSHAN Abhiyan", "year": 2018, "objective": "Reduce stunting to 25%, undernutrition to 22% by 2022", "status": "Active — targets revised to 2025" },
+            "scheme_3": { "name": "ONORC", "year": 2019, "objective": "Ration card portability across states for migrants", "status": "Active — 36 states/UTs" }
+          },
+          "issues_challenges": [
+            "Malnutrition coexists with food surplus — storage and distribution failure",
+            "NFSA beneficiary list outdated — exclusions and inclusions errors",
+            "Nutritional diversity lacking — PDS provides calories not micronutrients",
+            "Mid-day meal quality variability — states with poor implementation",
+            "Anganwadis understaffed and under-resourced"
+          ],
+          "reforms_needed": [
+            "Expand NFSA to include eggs and millets for nutritional diversity",
+            "Modernise FCI warehousing — reduce storage losses",
+            "Strengthen ONORC by including all states and better beneficiary verification",
+            "Integrate ICDS with health system for convergent nutrition outcomes",
+            "Community-based management of acute malnutrition (CMAM) scale-up"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the role of the JAM Trinity in transforming welfare delivery in India. (10 marks)",
+          "Critically evaluate the National Food Security Act 2013. Has it achieved its objectives? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_002",
+      "module_name": "Women Empowerment and Gender Justice",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_002_T001",
+          "topic_name": "Women's Rights, Safety, and Legal Framework",
+          "primary_source": "India Year Book Women chapter; Economic Survey Gender section",
+          "ncert_reference": "NCERT Class 11 Sociology Ch 2 — Social Change and Social Order",
+          "key_concepts": [
+            "PWDVA 2005 — Protection of Women from Domestic Violence Act — civil and criminal remedies",
+            "IPC 498A — cruelty by husband and relatives — misuse debate",
+            "Sexual Harassment of Women at Workplace (POSH) Act 2013 — ICC mandate",
+            "Nirbhaya case 2012 — amendments, fast-track courts, death penalty for rape",
+            "Criminal Law Amendment Act 2013 — expanded definition of sexual assault",
+            "POCSO 2012 — child sexual abuse — gender-neutral provisions",
+            "Maternity Benefit Act 1961 amended 2017 — 26 weeks paid leave",
+            "Equal Remuneration Act 1976 — gender pay gap legal framework",
+            "Dowry Prohibition Act 1961 — persistent enforcement challenge",
+            "MTP Act 1971 amended 2021 — medical termination of pregnancy liberalised",
+            "Vishaka Guidelines 1997 — precursor to POSH Act",
+            "Triple Talaq criminalisation 2019 — Muslim Women Protection Act",
+            "Online safety for women — cyberstalking, revenge porn — IT Act provisions",
+            "Fast Track Special Courts (FTSCs) for POCSO and rape cases",
+            "Gender Budgeting — Gender Budget Statement in Union Budget since 2005"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "Mission Shakti", "year": 2021, "objective": "Umbrella scheme — Sambal (safety) + Samarthya (empowerment) sub-schemes", "status": "Active — merged multiple women schemes" },
+            "scheme_2": { "name": "Beti Bachao Beti Padhao", "year": 2015, "objective": "Address declining child sex ratio, girls' education", "status": "Active — expanded to all districts" },
+            "scheme_3": { "name": "One Stop Centres (Sakhi)", "year": 2015, "objective": "Integrated support for women victims of violence", "status": "Active — 700+ centres" }
+          },
+          "issues_challenges": [
+            "Low conviction rate in rape cases — secondary victimisation by system",
+            "POSH Act compliance poor in informal sector",
+            "Dowry deaths continue despite legal prohibition",
+            "Marital rape not criminalised — legal gap",
+            "Online violence against women rising rapidly"
+          ],
+          "reforms_needed": [
+            "Criminalise marital rape — Supreme Court reference pending",
+            "Strengthen witness protection for sexual assault survivors",
+            "Extend POSH Act coverage to domestic workers and informal workers",
+            "Increase women judges in fast-track courts",
+            "Digital literacy for online safety awareness"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "SJ_002_T002",
+          "topic_name": "Women's Economic Empowerment — SHGs, Labour Force Participation",
+          "primary_source": "Economic Survey; NRLM programme documents; World Bank India gender reports",
+          "key_concepts": [
+            "Female Labour Force Participation Rate (FLFPR) — India at ~24% vs world average 47%",
+            "FLFPR U-shaped hypothesis — declines with development then rises again",
+            "SHG movement — 89 lakh SHGs, 10 crore women members under DAY-NRLM",
+            "Bank linkage programme — SHGs as collateral-free credit channel",
+            "Kudumbashree (Kerala) vs SERP (Andhra) as SHG success models",
+            "Women entrepreneurship — MUDRA loans, Udyogini scheme",
+            "Gender pay gap — 19% gap (ILO data), causes and solutions",
+            "Occupational segregation — women concentrated in low-wage sectors",
+            "Unpaid care work — 8x more unpaid work by women (time use survey)",
+            "Maternity leave — 26 weeks vs global average, impact on employment",
+            "Flexi-work and work-from-home as gender equity tools",
+            "Women in agriculture — 80% of food production but land rights denied",
+            "Financial inclusion — PM Jan Dhan accounts — 55% women account holders",
+            "Skill India for women — PMKVY, Hunar Haat",
+            "Political representation — 33% reservation in local bodies vs Parliament gap"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "DAY-NRLM (Aajeevika)", "year": 2011, "objective": "Organise rural poor women into SHGs for sustainable livelihoods", "status": "Active — 89 lakh+ SHGs" },
+            "scheme_2": { "name": "PM Mudra Yojana", "year": 2015, "objective": "Collateral-free loans up to Rs 10 lakh for micro enterprises", "status": "Active — 68% women borrowers" }
+          },
+          "issues_challenges": [
+            "SHGs — credit reaching women but not always decision-making power",
+            "Women land rights — inheritance laws still discriminatory in practice",
+            "Childcare infrastructure absent — deters women workforce entry",
+            "Domestic violence inhibits economic participation",
+            "Digital gender divide — 40% less likely to own smartphone"
+          ],
+          "reforms_needed": [
+            "Universal childcare — creches at workplaces and public spaces",
+            "Joint land titling in rural housing schemes",
+            "Strengthen women's property rights in succession laws",
+            "Expand digital literacy for women entrepreneurs",
+            "Women's Reservation Bill passage in Parliament"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the role of Self-Help Groups in women's economic empowerment in India. (10 marks)",
+          "Critically analyse the legal framework for women's safety in India. Are laws sufficient? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_003",
+      "module_name": "Education and Social Justice",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_003_T001",
+          "topic_name": "Right to Education and NEP 2020",
+          "primary_source": "RTE Act 2009 text; NEP 2020 document; Economic Survey Education chapter",
+          "ncert_reference": "NCERT Class 11 Political Theory Ch 7 — Rights",
+          "key_concepts": [
+            "Right to Education Act 2009 — Article 21A — free and compulsory education 6-14 years",
+            "25% reservation in private schools for EWS/disadvantaged — Section 12(1)(c)",
+            "RTE implementation gaps — teacher vacancies, infrastructure, quality concerns",
+            "Gross Enrolment Ratio (GER) — Primary 100%+, Secondary 79%, Higher 28%",
+            "NEP 2020 — 5+3+3+4 structure replacing 10+2",
+            "Foundational literacy and numeracy — NIPUN Bharat target — Grade 3 by 2026-27",
+            "Mother tongue as medium of instruction till Class 5 (NEP 2020)",
+            "Multidisciplinary higher education — exit options, academic bank of credits",
+            "EKLAVYA Model Residential Schools — quality education for tribal children",
+            "Kasturba Gandhi Balika Vidyalayas — girls' residential schools",
+            "Samagra Shiksha Abhiyan — integrated school education programme",
+            "Annual Status of Education Report (ASER) — learning outcomes crisis data",
+            "Gender Parity Index — achieved at primary, gaps persist at secondary",
+            "NEET and higher education access — backward classes exclusion debate",
+            "Digital divide in education — post-COVID online learning inequity"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "Samagra Shiksha Abhiyan", "year": 2018, "objective": "Holistic school education — access, equity, quality integrated", "status": "Active — replaces SSA, RMSA, TE" },
+            "scheme_2": { "name": "NIPUN Bharat", "year": 2021, "objective": "Foundational literacy and numeracy for Grade 3 students by 2026-27", "status": "Active" },
+            "scheme_3": { "name": "EKLAVYA Schools", "year": 1997, "objective": "Quality residential education to tribal children in Schedule V areas", "status": "Active — 740 schools target" }
+          },
+          "issues_challenges": [
+            "Learning outcomes crisis — students in Class 5 cannot read Class 2 text",
+            "Teacher absenteeism and poor quality in government schools",
+            "Digital divide — 40% rural students lacked device access during COVID",
+            "Dropout rate at secondary level especially for girls and SC/ST",
+            "First-generation learners lack home support environment"
+          ],
+          "reforms_needed": [
+            "Full implementation of NEP 2020 with teacher retraining",
+            "Strengthen mother-tongue instruction with multilingual materials",
+            "Compulsory pre-school for all — universal ECCE by 2030",
+            "Reduce dropout through conditional cash transfers for secondary",
+            "Digital infrastructure in rural schools — PM e-VIDYA scale-up"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the key features of NEP 2020 and assess its potential to transform Indian education. (12.5 marks)",
+          "Despite high enrolment, learning outcomes remain poor in India. Analyse the causes and suggest remedies. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_004",
+      "module_name": "Health and Nutrition — Social Justice Dimension",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_004_T001",
+          "topic_name": "Universal Health Coverage and Health Schemes",
+          "primary_source": "NHM documents; Ayushman Bharat programme; NITI Aayog Health Index",
+          "ncert_reference": "NCERT Class 12 Sociology Ch 3 — Social Institutions: Continuity and Change",
+          "key_concepts": [
+            "Universal Health Coverage (UHC) — WHO definition — financial protection + quality services",
+            "India's public health expenditure — 2.1% of GDP (National Health Policy 2017 target: 2.5%)",
+            "NHM — National Health Mission — NHM-R (Rural) + NHM-U (Urban)",
+            "Ayushman Bharat — PM-JAY — Rs 5 lakh cover, secondary and tertiary hospitalisation",
+            "Health and Wellness Centres (HWCs) — 1.5 lakh comprehensive primary care centres",
+            "ASHA workers — community health link, 10 lakh workers",
+            "IMR, MMR, U5MR — India's progress and remaining gaps",
+            "IMR declined from 68 (2000) to 28 (2022); MMR from 254 to 97",
+            "Non-Communicable Diseases (NCDs) — diabetes, cancer, hypertension rising",
+            "Mental health — NMHP, mental health act 2017, huge treatment gap (83%)",
+            "Out-of-pocket expenditure (OOPE) — 47% of total health expenditure — financial catastrophe",
+            "India's doctor-population ratio — 1:834 vs WHO norm 1:1000",
+            "AYUSH integration — traditional medicine mainstreaming",
+            "National Digital Health Mission (ABDM) — health ID, health records",
+            "COVID-19 lessons — ICU capacity, oxygen shortage, vaccine equity"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "Ayushman Bharat PM-JAY", "year": 2018, "objective": "Rs 5 lakh health cover to 10.74 crore poor families", "status": "Active — 5+ crore hospitalisations" },
+            "scheme_2": { "name": "National Health Mission", "year": 2005, "objective": "Universal healthcare access through strengthened public health system", "status": "Active" },
+            "scheme_3": { "name": "POSHAN Abhiyan", "year": 2018, "objective": "Convergent nutrition actions — reduce stunting by 2%, wasting by 2% annually", "status": "Active" }
+          },
+          "issues_challenges": [
+            "High OOPE pushes 6 crore into poverty every year due to health costs",
+            "Urban-rural and state-level health infrastructure disparity",
+            "Health workforce shortage especially in primary care",
+            "Mental health neglect — less than 1% health budget",
+            "Rising NCD burden with inadequate lifestyle disease prevention infrastructure"
+          ],
+          "reforms_needed": [
+            "Increase public health spending to 2.5% GDP as per NHP 2017 target",
+            "Expand PM-JAY to primary care — not just hospitalisation",
+            "Compulsory rural posting for medical graduates",
+            "National mental health programme scale-up with community workers",
+            "Strengthen district hospitals as secondary care backbone"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Universal Health Coverage remains elusive in India. Analyse the challenges and suggest a roadmap. (12.5 marks)",
+          "What is Ayushman Bharat? Evaluate its impact on healthcare access for the poor. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_005",
+      "module_name": "Poverty, Social Exclusion and Vulnerability",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_005_T001",
+          "topic_name": "Poverty Measurement and Dimensions",
+          "primary_source": "Economic Survey Poverty chapter; NITI Aayog MPI 2023; World Bank India reports",
+          "ncert_reference": "NCERT Class 9 Economics Ch 3 — Poverty as Challenge",
+          "key_concepts": [
+            "Absolute poverty — income/consumption below subsistence level",
+            "Relative poverty — below societal average — used in developed countries",
+            "Multidimensional Poverty Index (MPI) — UNDP — health, education, living standards",
+            "India MPI 2023 — 415 million escaped poverty in 15 years (2005-2021)",
+            "Tendulkar Committee (2009) — poverty line based on consumption basket",
+            "Rangarajan Committee (2014) — higher poverty line — 29.5% BPL rural, 26.4% urban",
+            "SECC 2011 — Socio-Economic Caste Census — identifies BPL households for targeting",
+            "Human Poverty Index vs MPI — evolution of measurement",
+            "Social exclusion — not just income poverty but denial of rights, identity, voice",
+            "Feminisation of poverty — women disproportionately affected",
+            "Inter-generational poverty trap — poor children stay poor without education",
+            "Geographical concentration of poverty — BIMARU states, tribal districts",
+            "Urban poverty — slums, housing, sanitation, livelihoods",
+            "Vulnerable groups — SC, ST, minorities, disabled, single women, elderly",
+            "SDG 1 — end extreme poverty by 2030 — India's trajectory"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "MGNREGA", "year": 2005, "objective": "100-day employment guarantee as poverty safety net", "status": "Active" },
+            "scheme_2": { "name": "PM SVANidhi", "year": 2020, "objective": "Street vendors — collateral-free working capital loan", "status": "Active" },
+            "scheme_3": { "name": "Aspirational Districts Programme", "year": 2018, "objective": "Convergent development in 112 most backward districts", "status": "Active" }
+          },
+          "issues_challenges": [
+            "Poverty line controversy — politically determined vs needs-based",
+            "Urban poverty undercounted — slum dwellers invisible to official statistics",
+            "Poverty and caste correlation — SC/ST over-represented",
+            "Climate vulnerability increasing poverty — floods, droughts",
+            "Exclusion from formal welfare — undocumented migrants, nomadic tribes"
+          ],
+          "reforms_needed": [
+            "Adopt MPI as official measure alongside income poverty",
+            "Universal social registry — single database of vulnerable households",
+            "Strengthen urban safety nets — MGNREGA equivalent for urban poor",
+            "Climate-adaptive livelihoods for weather-dependent poor",
+            "Social protection portability across states for migrant workers"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the Multidimensional Poverty Index and how it improves upon income-based poverty measurement. (10 marks)",
+          "Social exclusion is more than income poverty. Discuss with reference to vulnerable groups in India. (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_006",
+      "module_name": "SC/ST Welfare, Anti-Discrimination and Tribal Rights",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_006_T001",
+          "topic_name": "Constitutional Safeguards and Reservation Policy",
+          "primary_source": "Constitution Articles 15-16, 46, 330-342; Indra Sawhney judgment 1992",
+          "ncert_reference": "NCERT Class 11 Political Theory Ch 5 — Rights",
+          "key_concepts": [
+            "Articles 15(4) and 16(4) — affirmative action provisions for SC/ST/OBC",
+            "Article 46 — DPSP — state to promote SC/ST educational and economic interests",
+            "Article 335 — maintaining efficiency while making reservations",
+            "Mandal Commission 1980 — OBC reservation 27% — implemented 1990",
+            "Indra Sawhney v Union of India 1992 — 50% cap, no reservation in promotions",
+            "M. Nagaraj case 2006 — data on inadequacy required for SC/ST promotion reservation",
+            "EWS reservation 2019 — 10% for economically weaker sections from unreserved",
+            "Creamy layer concept — excludes well-off OBC from benefits",
+            "National Commission for SC and ST — constitutional bodies under Articles 338, 338A",
+            "SC/ST (Prevention of Atrocities) Act 1989 amended 2015, 2018 — special courts",
+            "Scheduled Castes and Scheduled Tribes Orders — Presidential Orders",
+            "Manual scavenging — Prohibition of Manual Scavenging Act 2013",
+            "SCSP (SC Sub Plan) and TSP (Tribal Sub Plan) — 15%/7.5% budget allocation",
+            "Post-Matric Scholarship for SC/ST — education support",
+            "Rohith Vemula incident — caste discrimination in higher education debate"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "Pre-Matric and Post-Matric Scholarships", "year": 1977, "objective": "Educational support for SC/ST students", "status": "Active — 5 crore+ beneficiaries" },
+            "scheme_2": { "name": "PM Anusuchit Jati Abhyuday Yojana", "year": 2021, "objective": "Umbrella scheme for SC welfare — education, housing, livelihood", "status": "Active" },
+            "scheme_3": { "name": "Van Dhan Yojana", "year": 2018, "objective": "Tribal livelihood through value addition of Minor Forest Produce", "status": "Active — TRIFED" }
+          },
+          "issues_challenges": [
+            "Atrocities continue — NCRB data shows rising SC/ST crime rates",
+            "Manual scavenging persists despite prohibition — systemic failure",
+            "Creamy layer for SC/ST demanded by many — opposed by others",
+            "Reservation benefits concentrated among dominant sub-castes within SC/OBC",
+            "Caste discrimination in premier educational institutions"
+          ],
+          "reforms_needed": [
+            "Sub-categorisation within SC/ST — Supreme Court constitution bench decision 2024",
+            "Expand reservation to private sector — debate on constitutional amendment",
+            "Strengthen special courts for Atrocities Act — fast disposal",
+            "Full abolition of manual scavenging with alternative livelihood and rehabilitation",
+            "Data-driven review of reservation — census caste data needed"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "SJ_006_T002",
+          "topic_name": "Tribal Rights — Forest Rights, PESA, Land Acquisition",
+          "primary_source": "Forest Rights Act 2006; PESA 1996; LARR Act 2013",
+          "ncert_reference": "NCERT Class 12 Sociology Ch 5 — Patterns of Social Inequality and Exclusion",
+          "key_concepts": [
+            "Forest Rights Act 2006 — individual and community forest rights",
+            "CFR (Community Forest Rights) — gram sabha as rights-holding body",
+            "FRA implementation status — titles granted vs pending — 47 lakh titles",
+            "PESA 1996 — Panchayats Extension to Scheduled Areas — tribal self-governance",
+            "5th Schedule areas — Governor's special powers, Tribes Advisory Council",
+            "6th Schedule — autonomous district councils in tribal Northeast",
+            "Land acquisition of tribal land — safeguards in LARR 2013",
+            "Schedule V land alienation laws — restrictions on transfer to non-tribals",
+            "Displacement and rehabilitation — tribal population 40% of all displaced",
+            "Niyamgiri judgment 2013 — gram sabha consent in mining on tribal land",
+            "Vedanta case — industry vs tribal rights landmark",
+            "TRIFED — tribal cooperative for forest produce marketing",
+            "Particularly Vulnerable Tribal Groups (PVTGs) — 75 groups",
+            "PM JANMAN scheme 2023 — PVTGs development mission",
+            "Tribal education — Eklavya schools, Ashram schools quality concerns"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "PM JANMAN", "year": 2023, "objective": "Saturation of 11 critical interventions for 75 PVTG communities", "status": "Active — new scheme" },
+            "scheme_2": { "name": "Forest Rights Act Implementation", "year": 2006, "objective": "Recognise individual and community forest rights of tribals", "status": "Ongoing — implementation gaps" }
+          },
+          "issues_challenges": [
+            "FRA implementation — titles rejected arbitrarily, CFR underutilised",
+            "Mining displacement continues without proper rehabilitation",
+            "PESA states laws — most states yet to pass conformity legislation",
+            "Traditional knowledge of tribals unprotected against biopiracy",
+            "PVTGs face extinction risk — small population, high disease burden"
+          ],
+          "reforms_needed": [
+            "Complete FRA implementation — clear backlog of pending titles",
+            "Mandatory gram sabha consent for all projects in Schedule V areas",
+            "PESA conformity legislation in all 10 Fifth Schedule states",
+            "Dedicated tribal university in each tribal-heavy state",
+            "PM JANMAN full funding and timely implementation for PVTGs"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the Forest Rights Act 2006 as an instrument of social justice for tribal communities. (12.5 marks)",
+          "Discuss the constitutional safeguards for Scheduled Castes. Are they adequate to address caste discrimination? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_007",
+      "module_name": "Child Welfare and Protection",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_007_T001",
+          "topic_name": "Child Rights Framework — POCSO, JJ Act, Child Labour Laws",
+          "primary_source": "2nd ARC Report 14; NCPCR guidelines; Ministry of WCD reports",
+          "ncert_reference": "NCERT Class 11 Sociology Ch 3 — Social Institutions",
+          "key_concepts": [
+            "UNCRC 1989 — UN Convention on Rights of the Child — India ratified 1992",
+            "POCSO Act 2012 — Protection of Children from Sexual Offences — gender neutral",
+            "Juvenile Justice (Care and Protection) Act 2015 — amended 2021",
+            "JJ Act — child in conflict with law vs child in need of care distinction",
+            "JJBs (Juvenile Justice Boards) — quasi-judicial for children in conflict with law",
+            "CWCs (Child Welfare Committees) — administrative protection for children in need",
+            "Child Labour (Prohibition and Regulation) Amendment Act 2016",
+            "Complete ban on labour below 14; hazardous industry ban below 18",
+            "CHILDLINE 1098 — emergency helpline for children",
+            "ICPS — Integrated Child Protection Scheme",
+            "Missing children — TrackChild portal, Khoya Paya portal",
+            "Child trafficking — ITPA (Immoral Traffic Prevention Act) provisions",
+            "Adoption — CARA (Central Adoption Resource Authority) — Hague Convention",
+            "Street children — Smile Foundation, Bachpan Bachao Andolan",
+            "NCPCR — National Commission for Protection of Child Rights — statutory body"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "Mission Vatsalya (earlier ICPS)", "year": 2021, "objective": "Child protection — institutionalisation reduction, family-based care", "status": "Active" },
+            "scheme_2": { "name": "POCSO e-Box", "year": 2016, "objective": "Online complaint mechanism for child sexual abuse", "status": "Active" }
+          },
+          "issues_challenges": [
+            "Low conviction rate under POCSO — lengthy trials, hostile witnesses",
+            "Child labour in brick kilns, agriculture, domestic work — enforcement gap",
+            "Cybercrime against children rising — child pornography, online grooming",
+            "JJ homes — institutional abuse documented by NHRC, NCPCR",
+            "Child trafficking — weak inter-state coordination"
+          ],
+          "reforms_needed": [
+            "Fast-track POCSO courts in every district",
+            "Independent inspection of JJ homes and child care institutions",
+            "Mandatory reporting of child abuse by teachers, doctors",
+            "Child-friendly police stations and courts",
+            "Awareness campaigns on CHILDLINE in rural areas"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Evaluate the effectiveness of the POCSO Act in protecting children from sexual offences. (10 marks)",
+          "Despite legal prohibition, child labour persists in India. Analyse causes and suggest solutions. (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "SJ_MOD_008",
+      "module_name": "Social Security, Labour Welfare and Emerging Vulnerabilities",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "SJ_008_T001",
+          "topic_name": "Labour Laws, Gig Workers and Unorganised Sector",
+          "primary_source": "Code on Social Security 2020; Economic Survey Labour chapter; PLFS data",
+          "key_concepts": [
+            "Labour code consolidation — 4 Codes replace 29 central labour laws",
+            "Code on Wages 2019 — universal minimum wage, equal remuneration",
+            "Code on Social Security 2020 — extends ESIC, EPFO to gig workers",
+            "Code on Industrial Relations 2020 — trade union recognition, retrenchment",
+            "Code on Occupational Safety 2020 — factory safety, contract labour",
+            "EPFO — Employees Provident Fund — retirement security for organised sector",
+            "ESIC — Employees State Insurance — health insurance for organised sector",
+            "PM-SYM — Pradhan Mantri Shram Yogi Maan-dhan — unorganised worker pension",
+            "e-Shram portal — national database of unorganised workers — 30 crore registered",
+            "Gig economy workers — Ola, Swiggy, Zomato — no employer-employee relationship",
+            "Gig workers rights — Rajasthan Platform-Based Gig Workers Act 2023 — first state law",
+            "MGNREGA as unorganised sector safety net — 7-8 crore households annually",
+            "BOCW Act 1996 — Building and Other Construction Workers welfare cess",
+            "Migrant workers — ISMW Act 1979 — inter-state migration protections",
+            "Minimum wages Act — state variation, non-compliance in agriculture"
+          ],
+          "government_schemes": {
+            "scheme_1": { "name": "PM-SYM", "year": 2019, "objective": "Rs 3000/month pension at 60 for unorganised workers earning <Rs 15000/month", "status": "Active — slow uptake" },
+            "scheme_2": { "name": "e-Shram Portal", "year": 2021, "objective": "Universal social security registration for unorganised workers", "status": "Active — 30 crore+ registered" },
+            "scheme_3": { "name": "PMEGP", "year": 2008, "objective": "Credit-linked subsidy for micro-enterprise creation in non-farm sector", "status": "Active" }
+          },
+          "issues_challenges": [
+            "90% of workforce in informal sector with no social security",
+            "Gig workers classified as independent contractors — no benefits",
+            "PM-SYM poor uptake — irregular income workers cannot commit to premium",
+            "BOCW cess — 50,000 crore collected, poorly utilised for workers",
+            "Portability of social security across states — migrant worker gap"
+          ],
+          "reforms_needed": [
+            "Portable social security accounts — follow worker across jobs/states",
+            "Mandatory social security for gig platforms proportionate to ride/order value",
+            "Universal pension — Rs 500/month minimum to all 60+ without pension",
+            "MGNREGA wage revision — link to CPI inflation",
+            "Enforce BOCW cess utilisation for construction workers' welfare"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "What challenges do gig workers face in India's social security framework? Discuss recent legislative responses. (12.5 marks)",
+          "Evaluate the consolidation of labour laws into four Codes. Are they worker-friendly? (10 marks)"
+        ]
+      }
+    }
+  ],
+
+  "full_study_plan": {
+    "total_days": { "fast_pace": 70, "standard_pace": 102, "extended_pace": 153 },
+    "daily_routine": {
+      "reading": "1.5 hours — primary source + Economic Survey data",
+      "scheme_revision": "30 minutes — scheme name, year, objective flashcards",
+      "answer_writing": "1 hour — one 10-mark answer daily"
+    }
+  },
+
+  "ai_module_generator_schema": {
+    "input_params": {
+      "student_pace": "fast | standard | extended",
+      "start_date": "ISO date string",
+      "student_type": "mentorsdaily | self_study",
+      "focus_area": "welfare | gender | education | health | poverty | sc_st | child | labour"
+    },
+    "output_format": {
+      "daily_target": "topic_id + scheme list to memorise",
+      "answer_writing_prompt": "one question from topic",
+      "data_card": "3-5 statistics to remember for the topic",
+      "current_affairs_link": "recent news connecting to topic"
+    }
+  }
+}

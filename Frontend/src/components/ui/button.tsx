@@ -13,14 +13,14 @@ const buttonBase =
 
 const variants: Record<string, string> = {
   primary:
-    "bg-[#2563eb] text-white hover:bg-[#1d4ed8] shadow-md",
+    "md-btn-primary border-0",
   default:
-    "bg-[#2563eb] text-white hover:bg-[#1d4ed8] shadow-md",
+    "md-btn-primary border-0",
   destructive:
     "bg-red-600 text-white hover:bg-red-700",
   outline:
-    "border-2 border-[#2563eb] bg-white text-[#2563eb] hover:bg-blue-50",
-  ghost: "text-slate-600 hover:bg-slate-100",
+    "md-btn-outline border-2",
+  ghost: "text-slate-600 hover:bg-blue-50 hover:text-[#2563eb]",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

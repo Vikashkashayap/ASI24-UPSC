@@ -388,6 +388,8 @@ export interface StudyPlanTask {
   date: string;
   subject: string;
   topic: string;
+  syllabusModule?: string | null;
+  syllabusTopicId?: string | null;
   taskType: "subject_study" | "current_affairs" | "mcq_practice" | "revision" | "mock_test";
   duration: number;
   difficulty?: "easy" | "medium" | "hard";
@@ -398,6 +400,10 @@ export interface StudyPlanTask {
   completed: boolean;
   completedAt: string | null;
   rescheduledFrom?: string | null;
+  readingStartedAt?: string | null;
+  practiceUnlocked?: boolean;
+  parentTaskId?: string | null;
+  revisionDueDate?: string | null;
 }
 
 export interface StudyPlanBadge {
@@ -549,6 +555,40 @@ export const advancedStudyPlannerAPI = {
   aiChat: (message: string) => api.post<{ reply: string }>("/api/study-planner/ai-chat", { message }),
   refreshInsights: () => api.post<{ insights: StudyPlanInsight[] }>("/api/study-planner/refresh-insights"),
   regenerateMotivation: () => api.post<{ motivationalLine: string }>("/api/study-planner/regenerate-motivation"),
+  generateSmartPlan: (data: AdvancedPlannerSetup) =>
+    api.post<{ success: boolean; plan: StudyPlanType; progress: StudyPlanProgress; daysRemaining: number }>(
+      "/api/study-planner/generate-smart-plan",
+      data
+    ),
+  getDailyPlan: (date?: string) =>
+    api.get<PlannerDashboard | { plan: null }>("/api/study-planner/daily-plan", {
+      params: date ? { date } : undefined,
+    }),
+  completeTopic: (taskId: string) =>
+    api.post<{
+      success: boolean;
+      plan: StudyPlanType;
+      task: StudyPlanTask;
+      mcqTask?: StudyPlanTask;
+      practiceRoute: string;
+      progress: StudyPlanProgress;
+      readiness: { readinessScore: number; readinessBreakdown: StudyPlanType["readinessBreakdown"] };
+    }>("/api/study-planner/complete-topic", { taskId }),
+  startPractice: (taskId: string) =>
+    api.post<{
+      success: boolean;
+      task: StudyPlanTask;
+      routes: { mcq: string; pyq: string };
+      questionCount: number;
+    }>("/api/study-planner/practice-start", { taskId }),
+  getRevisionTasks: (date?: string) =>
+    api.get<{ date: string; tasks: StudyPlanTask[]; schedule: unknown[] }>("/api/study-planner/revision-tasks", {
+      params: date ? { date } : undefined,
+    }),
+  getReadinessScore: () =>
+    api.get<{ score: number; breakdown: StudyPlanType["readinessBreakdown"]; examType: string; targetYear?: string }>(
+      "/api/study-planner/readiness-score"
+    ),
 };
 
 // Student Profiler API

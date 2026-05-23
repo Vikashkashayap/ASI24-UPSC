@@ -15,8 +15,8 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const variants = {
     default: theme === "dark"
-      ? "bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-      : "bg-slate-900 text-white hover:bg-slate-800",
+      ? "bg-blue-600 text-white hover:bg-blue-700"
+      : "bg-blue-600 text-white hover:bg-blue-700",
     secondary: theme === "dark"
       ? "bg-slate-800 text-slate-200 hover:bg-slate-700"
       : "bg-slate-100 text-slate-900 hover:bg-slate-200",

@@ -41,14 +41,14 @@ export function PlannerHero({
       className={cn(
         "relative overflow-hidden rounded-3xl p-6 md:p-8 border",
         theme === "dark"
-          ? "bg-gradient-to-br from-slate-900/90 via-violet-950/40 to-indigo-950/50 border-violet-500/20 backdrop-blur-xl"
-          : "bg-gradient-to-br from-white/80 via-violet-50/50 to-indigo-50/40 border-violet-200/60 backdrop-blur-xl shadow-xl shadow-violet-500/5"
+          ? "bg-gradient-to-br from-slate-900/90 via-indigo-950/40 to-indigo-950/50 border-indigo-500/20 backdrop-blur-xl"
+          : "bg-gradient-to-br from-white/80 via-indigo-50/50 to-indigo-50/40 border-indigo-200/60 backdrop-blur-xl shadow-xl shadow-indigo-500/5"
       )}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-400/10 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-400/10 via-transparent to-transparent pointer-events-none" />
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div className="space-y-3 flex-1">
-          <p className={cn("text-sm font-medium", theme === "dark" ? "text-violet-300" : "text-violet-600")}>
+          <p className={cn("text-sm font-medium", theme === "dark" ? "text-indigo-300" : "text-indigo-600")}>
             {getGreeting()}{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
           </p>
           <h1 className={cn("text-2xl md:text-4xl font-bold tracking-tight", theme === "dark" ? "text-white" : "text-slate-900")}>
@@ -93,7 +93,7 @@ export function PlannerHero({
           </div>
           <div className={cn("h-2.5 rounded-full overflow-hidden", theme === "dark" ? "bg-slate-700" : "bg-slate-200")}>
             <motion.div
-              className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full"
+              className="h-full bg-gradient-to-r from-indigo-500 to-indigo-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${daily?.percent ?? 0}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -105,7 +105,7 @@ export function PlannerHero({
           <Button type="button" variant="outline" onClick={onRefreshMotivation} className="shrink-0 text-sm">
             New motivation
           </Button>
-          <Button type="button" onClick={onRegenerate} disabled={regenerating} className="shrink-0 bg-gradient-to-r from-violet-600 to-indigo-600 border-0">
+          <Button type="button" onClick={onRegenerate} disabled={regenerating} className="shrink-0 bg-gradient-to-r from-indigo-600 to-indigo-600 border-0">
             <RefreshCw className={cn("w-4 h-4 mr-2", regenerating && "animate-spin")} />
             Regenerate Smart Plan
           </Button>

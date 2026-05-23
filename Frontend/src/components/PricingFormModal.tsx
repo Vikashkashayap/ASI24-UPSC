@@ -107,7 +107,7 @@ export const PricingFormModal: React.FC<PricingFormModalProps> = ({
       <DialogContent
         className={`rounded-2xl border shadow-xl max-h-[90vh] overflow-y-auto ${
           isDark
-            ? "bg-slate-900/95 border-purple-800/60 shadow-purple-900/20"
+            ? "bg-slate-900/95 border-blue-800/60 shadow-blue-900/20"
             : "bg-white border-slate-200"
         }`}
       >
@@ -187,7 +187,7 @@ export const PricingFormModal: React.FC<PricingFormModalProps> = ({
               <button
                 type="button"
                 onClick={addFeature}
-                className={`text-xs font-medium px-2 py-1 rounded-lg ${isDark ? "text-fuchsia-400 hover:bg-fuchsia-500/20" : "text-purple-600 hover:bg-purple-100"}`}
+                className={`text-xs font-medium px-2 py-1 rounded-lg ${isDark ? "text-indigo-400 hover:bg-indigo-500/20" : "text-blue-600 hover:bg-blue-100"}`}
               >
                 + Add
               </button>
@@ -218,7 +218,7 @@ export const PricingFormModal: React.FC<PricingFormModalProps> = ({
                 type="checkbox"
                 checked={values.isPopular}
                 onChange={(e) => handleChange("isPopular", e.target.checked)}
-                className="rounded border-slate-400 text-fuchsia-600 focus:ring-fuchsia-500"
+                className="rounded border-slate-400 text-indigo-600 focus:ring-indigo-500"
               />
               <span className="text-sm font-medium">Mark as Most Popular</span>
             </label>
@@ -230,7 +230,7 @@ export const PricingFormModal: React.FC<PricingFormModalProps> = ({
                   name="status"
                   checked={values.status === "active"}
                   onChange={() => handleChange("status", "active")}
-                  className="text-fuchsia-600 focus:ring-fuchsia-500"
+                  className="text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-sm">Active</span>
               </label>
@@ -240,7 +240,7 @@ export const PricingFormModal: React.FC<PricingFormModalProps> = ({
                   name="status"
                   checked={values.status === "draft"}
                   onChange={() => handleChange("status", "draft")}
-                  className="text-fuchsia-600 focus:ring-fuchsia-500"
+                  className="text-indigo-600 focus:ring-indigo-500"
                 />
                 <span className="text-sm">Draft</span>
               </label>

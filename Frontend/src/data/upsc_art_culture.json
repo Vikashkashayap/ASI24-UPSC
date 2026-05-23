@@ -1,0 +1,1816 @@
+{
+  "metadata": {
+    "title": "UPSC Art & Culture (GS1) - Comprehensive Syllabus",
+    "purpose": "Complete preparation guide for UPSC General Studies Paper 1 - Art & Culture section covering painting, architecture, sculpture, performing arts, literature, and cultural heritage",
+    "total_modules": 12,
+    "estimated_preparation_hours": 315,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC GS1 - Art & Culture, NCERT Class 6-12, UNESCO Cultural Heritage Framework",
+    "full_study_plan": {
+      "standard_pace": {
+        "total_days": 105,
+        "daily_hours": 3,
+        "modules_per_week": 1.5
+      },
+      "fast_pace": {
+        "total_days": 75,
+        "daily_hours": 4.2,
+        "modules_per_week": 2
+      },
+      "extended_pace": {
+        "total_days": 140,
+        "daily_hours": 2.25,
+        "modules_per_week": 1
+      }
+    }
+  },
+  "primary_books": {
+    "book_1": {
+      "title": "Indian Art & Culture",
+      "author": "Nitin Singhania",
+      "edition": "Latest",
+      "coverage": "Primary textbook covering all painting traditions, architecture, sculpture, performing arts, and cultural heritage",
+      "chapters": "All relevant chapters for comprehensive coverage"
+    },
+    "book_2": {
+      "title": "NCERT Fine Arts",
+      "class": "11 & 12",
+      "coverage": "Visual arts, painting techniques, architectural principles, sculpture fundamentals",
+      "importance": "Essential for foundational concepts and standard definitions"
+    },
+    "book_3": {
+      "title": "NCERT History",
+      "class": "6-12",
+      "coverage": "Historical context of cultural developments, dynasties, kingdoms, and cultural periods",
+      "chapters": "Ancient, Medieval, and Modern India sections"
+    },
+    "book_4": {
+      "title": "An Introduction to Indian Art",
+      "publisher": "NCERT",
+      "class": "11",
+      "coverage": "Systematic introduction to major art forms and their historical evolution",
+      "importance": "Supplementary reference for art history and terminology"
+    }
+  },
+  "modules": [
+    {
+      "module_id": "ARC_MOD_001",
+      "module_name": "Indian Painting Traditions - Ancient to Contemporary",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_001_T001",
+          "topic_name": "Prehistoric & Ancient Rock Art",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Chapter 2",
+          "ncert_reference": "NCERT Class 11 Fine Arts - Early Indian Art",
+          "key_concepts": [
+            "Rock paintings at Bhimbetka (MP) - oldest known paintings dated 30,000-40,000 BCE",
+            "Petroglyph tradition across peninsular India",
+            "Ochre use in prehistoric art - iron oxide based pigments",
+            "Animal representations (bison, deer, elephant, rhinoceros)",
+            "Hunter-gatherer artistic expression and cultural significance",
+            "Connection to Paleolithic and Mesolithic periods",
+            "Rock shelter art traditions in Chhattisgarh and Odisha",
+            "Geometric patterns and symbolic representations",
+            "Climate and preservation factors affecting rock art",
+            "Archaeological dating methods (carbon dating, stratigraphic analysis)",
+            "Comparison with global prehistoric art traditions",
+            "Modern conservation challenges and UNESCO recognition",
+            "Tribal interpretations and living traditions of rock art sites"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "ARC_001_T002",
+          "topic_name": "Ajanta & Ellora Cave Paintings",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Ajanta Chapter",
+          "ncert_reference": "NCERT Class 6 History - Mauryan & Gupta Art",
+          "key_concepts": [
+            "Ajanta Caves - 30 rock-cut Buddhist caves in Maharashtra (2nd century BCE - 5th century CE)",
+            "Excavation and discovery by British officer John Smith (1819)",
+            "Bodhisattva paintings - Padmapani and Vajrapani frescoes (Cave 1)",
+            "Buddha's Jataka tales - Mahajanaka, Hamsa, Sisupala narratives",
+            "Fresco technique - lime plaster application and pigment blending",
+            "Narrative style - continuous narrative depicting multiple episodes",
+            "Gupta period artistic excellence and realism in figures",
+            "Ellora Caves - 34 Buddhist, Hindu, and Jain caves (6th-12th century)",
+            "Kailashnatha Temple (Cave 16) - monolithic Hindu temple architecture",
+            "Aesthetic principles - elongated eyes, symbolic hand gestures (mudras)",
+            "UNESCO World Heritage Site status (1983)",
+            "Decay and restoration challenges - pigment preservation",
+            "Comparison with Bamiyan paintings and global cave art traditions",
+            "Influence on later Indian and Southeast Asian art"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_001_T003",
+          "topic_name": "Mughal Painting Tradition",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Mughal Art Chapter",
+          "ncert_reference": "NCERT Class 7 History - Medieval India",
+          "key_concepts": [
+            "Akbar's patronage - establishment of Mughal painting school (16th century)",
+            "Persian and Central Asian artistic influences under Humayun",
+            "Miniature painting tradition - detailed, jewel-like compositions on paper/vellum",
+            "Court painters - Basawan, Dasavant, Manohar, Abul Hasan (Nadir-ul-Asr)",
+            "Subjects - court scenes, hunt scenes, historical narratives, flora/fauna",
+            "Technical mastery - lapis lazuli, gold leaf, natural pigments",
+            "Jahangir period - naturalism and wildlife paintings (ducks, pheasants, zebras)",
+            "Shah Jahan period - refinement and elegance in compositions",
+            "Muhammad Farishtah and historical chronicle illustrations",
+            "Distinctive features - detailed backgrounds, anatomical accuracy, perspective",
+            "Influence on European and Ottoman art traditions",
+            "Decline during Aurangzeb's reign due to religious orthodoxy",
+            "Later Mughal schools in Lucknow and Delhi (18th century)",
+            "Preservation in museums - Chester Beatty Library Dublin, Indian Museum Calcutta"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_001_T004",
+          "topic_name": "Rajput & Pahari Painting Schools",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Regional Schools Chapter",
+          "ncert_reference": "NCERT Class 11 Fine Arts - Indian Regional Art",
+          "key_concepts": [
+            "Rajput painting - Mewar, Marwar, Bundi, Kota schools (16th-18th centuries)",
+            "Mewar school - Maharaja Amar Singh's patronage, bold colors, thick outlines",
+            "Themes - Krishna's leelas (divine plays), Ragamala (musical ragas), court life",
+            "Distinctive style - flat perspective, vibrant colors (vermilion, indigo, gold)",
+            "Famous artists - Sahibdin (Mewar artist), creators of Gita Govinda illustrations",
+            "Pahari (Hill) painting schools - Kangra, Basohli, Guler, Chamba, Nurpur",
+            "Kangra school - delicate, graceful style influenced by Persian and Rajput traditions",
+            "Basohli paintings - bold patterns, use of gold and gems on painting surface",
+            "Ragamala series - musical mood representations through visual art",
+            "Subject matter diversity - mythology, nature, erotic poetry (Kama Sutra illustrations)",
+            "Patronage by hill rajas and interaction with Mughal styles",
+            "Decline due to British colonial period and changing aesthetic preferences",
+            "Revival efforts by modern artists and museum collections",
+            "UNESCO recognition of Pahari miniature painting traditions"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_001_T005",
+          "topic_name": "Folk & Tribal Painting Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Folk Arts Chapter",
+          "ncert_reference": "NCERT Class 11 Fine Arts - Indian Folk Art",
+          "key_concepts": [
+            "Madhubani painting - Bihar art form, women-centric tradition, geometric patterns",
+            "Madhubani themes - fertility symbols, marriage rituals, religious narratives",
+            "Color palette - natural pigments from flowers, leaves, minerals",
+            "UNESCO Geographical Indication (GI) status for Madhubani art",
+            "Warli painting - tribal art from Western Maharashtra, geometric abstraction",
+            "Warli symbolism - circle (sun/moon), triangle (mountain), square (home)",
+            "Simple narrative style - depicting daily life, social rituals, ceremonies",
+            "Pattachitra - Odisha scroll painting tradition, narrative form on cloth",
+            "Pattachitra themes - Krishna leelas, Jagannatha temple narratives",
+            "Natural dyes and rice paste technique - eco-friendly traditional materials",
+            "Phad painting - Rajasthan folk tradition, narrative scroll on cloth",
+            "Gond art - Central Indian tribal art, mythological and nature subjects",
+            "Recognition and market development through government initiatives",
+            "Contemporary artists - Jangarh Singh Shyam (Gond artist), international recognition"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        }
+      ],
+      "module_test": {
+        "questions": 15,
+        "marks": 60,
+        "duration_minutes": 120,
+        "sample_questions": [
+          "Ajanta paintings were discovered in which year and by whom? Describe the prominent Bodhisattva figures.",
+          "Compare and contrast Mughal miniature painting with Rajput painting traditions.",
+          "Discuss the cultural significance of Madhubani paintings and their UNESCO recognition.",
+          "What are the defining characteristics of Pahari school of painting? Name important centers and artists.",
+          "Explain the narrative techniques used in Warli and Pattachitra painting traditions.",
+          "Which pigments and materials were used in ancient Indian rock art and Mughal paintings?",
+          "Analyze the role of court patronage in the development of Mughal painting under Akbar and Jahangir.",
+          "Describe the geometric symbolism in Warli tribal painting.",
+          "What is the relationship between music (Ragamala) and visual representation in Indian painting?",
+          "Discuss the decline and modern revival of traditional Indian painting schools."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_002",
+      "module_name": "Architecture - Ancient & Medieval (Non-Islamic)",
+      "duration_days": {
+        "fast": 7,
+        "standard": 10,
+        "extended": 14
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_002_T001",
+          "topic_name": "Vedic & Indus Valley Architecture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Early Architecture",
+          "ncert_reference": "NCERT Class 11 History - Ancient India",
+          "key_concepts": [
+            "Indus Valley Civilization (3300-1300 BCE) - urban planning excellence",
+            "Harappa and Mohenjo-daro - grid-pattern streets, drainage systems",
+            "Granaries and warehouses - administrative and economic structures",
+            "Great Bath at Mohenjo-daro - public health infrastructure",
+            "Brick construction techniques - standardized size (40x20x10 cm ratio)",
+            "Absence of monumental palaces or temples - democratic settlements",
+            "Vedic period (1500-500 BCE) - wooden structures and yajnas",
+            "Fire altars - Vedic ritual architecture, geometric patterns",
+            "Transition from Indus to Vedic civilization - architectural evolution",
+            "Settlement patterns - adaptation to local geography and climate",
+            "Defensive structures - fortification walls at Kalibangan",
+            "Artistic elements - terracotta figurines, stamp seals",
+            "Archaeological evidence and chronological dating methods",
+            "Comparison with contemporary Mesopotamian architecture"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_002_T002",
+          "topic_name": "Buddhist Architecture & Stupas",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Buddhist Architecture Chapter",
+          "ncert_reference": "NCERT Class 6 History - Ancient India",
+          "key_concepts": [
+            "Great Stupa of Sanchi (Madhya Pradesh) - oldest existing stone structure (3rd-1st century BCE)",
+            "Stupa architecture - hemispherical dome, harmika (square railing), finial",
+            "Symbolism - cosmic structure representing Buddha's nirvana",
+            "Ashoka's role in stupa construction and propagation (3rd century BCE)",
+            "Four gateways (toranas) - carved with scenes from Buddha's life and Jataka tales",
+            "Sanchi gateway reliefs - narrative style, high sculptural quality",
+            "Nagarjunakonda stupas (Andhra Pradesh) - regional variations",
+            "Bharhut stupa - early sculptural tradition, stone railings",
+            "Bodh Gaya temple (Bihar) - Mahabodhi temple, brick construction",
+            "Rock-cut Buddhist caves - viharas (monasteries) and chaityas (prayer halls)",
+            "Chatiya hall design - barrel-vaulted roof, apsidal end, central nave",
+            "Buddhist architectural evolution - from Mauryan to Gupta period",
+            "Spread to Central Asia and Southeast Asia - architectural influence",
+            "UNESCO World Heritage Sites - Sanchi, Nalanda remains"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_002_T003",
+          "topic_name": "Nagara & Dravida Architectural Orders",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Hindu Temple Architecture",
+          "ncert_reference": "NCERT Class 7 History - Medieval India",
+          "key_concepts": [
+            "Nagara order - Northern Indian temple style, shikhara (spire) design",
+            "Characteristics - curvilinear tower, sanctum (garbhagriha), ambulatory",
+            "Khajuraho temples (Madhya Pradesh) - finest Nagara examples (10th-11th century)",
+            "Chandela dynasty patronage - 85 temples constructed, 25 remaining",
+            "Khajuraho sculptural program - erotic panels, mythological narratives",
+            "Lingaraja Temple, Bhubaneswar (Odisha) - classic Nagara features",
+            "Jagannatha Temple, Puri - major pilgrimage center, 4-part structure",
+            "Dravida order - Southern Indian temple style, gopuram (gateway tower)",
+            "Gopuram characteristics - pyramidal shape, intricate sculpture, ritual significance",
+            "Brihadeeshwara Temple, Thanjavur (Tamil Nadu) - Chola architecture (11th century)",
+            "Chola bronze casting tradition - integrated with temple architecture",
+            "Ranganathaswamy Temple, Srirangam - largest temple complex, concentric gopurams",
+            "Virupaksha Temple, Hampi - Hoysala and Vijayanagara contributions",
+            "Architectural proportions and mathematical principles in temple design"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3.5
+        },
+        {
+          "topic_id": "ARC_002_T004",
+          "topic_name": "Vesara & Regional Temple Architecture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Regional Temple Styles",
+          "ncert_reference": "NCERT Class 11 History - Indian Culture",
+          "key_concepts": [
+            "Vesara order - synthesis of Nagara and Dravida styles, Deccan region",
+            "Hoysala architecture - star-shaped temples, intricate stone carvings",
+            "Belur and Halebid temples (Karnataka) - Hoysala masterpieces (12th century)",
+            "Channakeshava Temple, Belur - sculptural excellence and architectural innovation",
+            "Hoysaleswara Temple, Halebid - complete ornamentation, narrative reliefs",
+            "Jain temple architecture - Dilwara temples (Mount Abu, Rajasthan)",
+            "Dilwara marble architecture - exquisite inlay work, 11th-13th century",
+            "Meenakshi Temple, Madurai - composite Dravidian style, processional gopurams",
+            "Pandya period contributions to South Indian temple architecture",
+            "Temple tank (water body) - integral architectural and ritual element",
+            "Mandapa (assembly hall) - columned structures, sculptural decoration",
+            "Pradakshina (circumambulatory) pathway - ritual circulation design",
+            "Regional variations - Bengal temples, Odia temples, Kerala temples",
+            "Architectural conservation - modern restoration and preservation efforts"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_002_T005",
+          "topic_name": "Rock-Cut Architecture & Caves",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Rock-Cut Architecture",
+          "ncert_reference": "NCERT Class 6-7 History - Rock-Cut Monuments",
+          "key_concepts": [
+            "Ajanta Caves - 30 Buddhist caves, monastery and chaitya halls (2nd century BCE - 5th century CE)",
+            "Ellora Caves - 34 caves combining Buddhist, Hindu, Jain traditions (6th-12th century)",
+            "Kailashnatha Temple, Ellora (Cave 16) - monolithic Hindu temple, largest single rock-cut structure",
+            "Kailashnatha dimensions - 183 x 110 meters, shaped from single rock outcrop",
+            "Elephant relief sculpture on Kailashnatha - symbolic and structural elements",
+            "Barabar Caves (Bihar) - Mauryan period (3rd century BCE), polished interiors",
+            "Karle Chaitya (Maharashtra) - largest rock-cut Buddhist assembly hall, 37-meter high ceiling",
+            "Karle sculptural decorations - narrative scenes, friezes",
+            "Udaigiri and Khandagiri Caves (Odisha) - Jain rock-cut architecture",
+            "Architectural challenges - ventilation, water management in rock-cut structures",
+            "Labor techniques - quarrying, shaping, finishing ancient rock architecture",
+            "UNESCO World Heritage designations - Ajanta, Ellora, Mahabalipuram",
+            "Rock-cut sculpture integration with architectural spaces",
+            "Conservation challenges - water seepage, pigment preservation, visitor management"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 15,
+        "marks": 60,
+        "duration_minutes": 120,
+        "sample_questions": [
+          "Describe the urban planning features of Indus Valley Civilization at Mohenjo-daro and Harappa.",
+          "What is a stupa? Explain its components and religious significance using Sanchi as an example.",
+          "Compare Nagara and Dravida architectural orders with specific temple examples.",
+          "Discuss the characteristics of Vesara architecture and its regional variations.",
+          "Explain the significance of Khajuraho temples in the context of Chandela dynasty and Nagara architecture.",
+          "Describe the construction and artistic features of Kailashnatha Temple at Ellora.",
+          "What architectural features distinguish Buddhist chaitya halls from viharas?",
+          "Analyze the sculptural programs found in South Indian Chola temples.",
+          "Discuss the role of water management in ancient Indian temple architecture.",
+          "How did Hindu temple architecture evolve from the Mauryan to the Medieval period?"
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_003",
+      "module_name": "Architecture - Medieval & Modern (Islamic & Colonial)",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_003_T001",
+          "topic_name": "Indo-Islamic Architecture - Delhi Sultanate Period",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Islamic Architecture",
+          "ncert_reference": "NCERT Class 7 History - Delhi Sultanate",
+          "key_concepts": [
+            "Indo-Islamic synthesis - blending Islamic and Indian architectural traditions",
+            "Qutb Minar, Delhi (1199 onwards) - 73-meter minaret built by Qutb-ud-din Aibak",
+            "Quwwat-ul-Islam Mosque - adjoining Qutb Minar, early Indo-Islamic mosque (1192)",
+            "Iron pillar of Delhi - 7-meter tall, Mauryan-period pillar incorporated into mosque",
+            "Arch and vault innovations - replacing Indian beam-and-lintel construction",
+            "Jami Masjid of Feroz Shah Kotla - Hindu temple repurposing for Islamic worship",
+            "Dome construction techniques - Islamic engineering innovation in India",
+            "Alai Darwaza (Gateway), Qutb complex - first domed gateway in India (1311)",
+            "Lodi architecture - Sayyid and Lodi dynasty contributions (15th-16th century)",
+            "Tomb architecture - increasing sophistication in Islamic burial structures",
+            "Humayun's Tomb, Delhi - symmetrical gardens, red sandstone, white marble inlay",
+            "Architectural vocabulary - dome, minaret, arches, courtyards",
+            "Regional variations - Bengal Sultanate, Gujarat Sultanate styles",
+            "Decorative elements - geometric patterns, Arabic calligraphy, floral motifs"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_003_T002",
+          "topic_name": "Mughal Architecture - Akbar to Aurangzeb",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Mughal Architecture",
+          "ncert_reference": "NCERT Class 7 History - Mughal Empire",
+          "key_concepts": [
+            "Akbar's patronage - architectural expansion and innovation",
+            "Fatehpur Sikri - Akbar's capital (1571-1585), red sandstone construction",
+            "Buland Darwaza (Gate of Magnificence) - 58-meter high, Gujarat victory monument",
+            "Palace complexes - Diwan-e-Aam, Diwan-e-Khas, Harem structures",
+            "Jahangir period - refinement and elegance in architectural style",
+            "Nur Jahan's influence - gardens and aesthetic preferences",
+            "Shalimar Gardens, Lahore - four-tiered terraced garden design",
+            "Shah Jahan era - pinnacle of Mughal architectural achievement",
+            "Taj Mahal (1632-1653) - world-renowned mausoleum, inlay marquetry",
+            "Taj Mahal dimensions - 73.5 x 73.5 meters, perfect symmetry",
+            "Pietra dura technique - semi-precious stones embedded in marble",
+            "Red Fort, Delhi - palace complex with defensive fortifications",
+            "Jami Masjid, Delhi - largest mosque in India, capacity 25,000 worshippers",
+            "Aurangzeb's austere architectural approach - departing from decorative traditions"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3.5
+        },
+        {
+          "topic_id": "ARC_003_T003",
+          "topic_name": "Colonial & Modern Indian Architecture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Modern Architecture",
+          "ncert_reference": "NCERT Class 10 Modern India - Colonial Period",
+          "key_concepts": [
+            "Colonial architecture in India - British Raj imprint (1757-1947)",
+            "Classical Revival style - St. Stephen's Church Delhi (1858)",
+            "Viceregal Lodge, Shimla - Tudor Revival architecture",
+            "Government House, Kolkata - Italian Renaissance design (1800-1803)",
+            "Victoria Memorial, Kolkata - Baroque-Art Nouveau fusion (1901-1921)",
+            "Indo-Saracenic Revival - synthesizing Islamic and European styles",
+            "Gateway of India, Mumbai - Indo-Saracenic masterpiece (1924)",
+            "Jai Singh II's Jaipur City Plan (1727) - geometric town planning (UNESCO heritage)",
+            "Rashtrapati Bhavan, Delhi - Presidential residence, blend of Indian and European styles",
+            "New Delhi planning - Edwin Lutyens and Herbert Baker (1911 onwards)",
+            "Post-independence modernism - Le Corbusier's influence",
+            "Chandigarh Capitol Complex - Brutalist style, innovative concrete architecture",
+            "National Museum, Delhi - Indian modernist design",
+            "Contemporary architecture - balancing tradition and modernity in Indian cities"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_003_T004",
+          "topic_name": "Decorative Arts & Architectural Ornamentation",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Decorative Traditions",
+          "ncert_reference": "NCERT Class 11 Fine Arts - Decorative Elements",
+          "key_concepts": [
+            "Inlay work (pietra dura) - semi-precious stone cutting and fitting technique",
+            "Floral and geometric patterns - stylized representations in Islamic art",
+            "Jali screens - perforated marble/stone walls for privacy and ventilation",
+            "Calligraphy - Arabic and Persian script as architectural decoration",
+            "Tile work - glazed ceramic tiles in Persian tradition",
+            "Stucco relief - plaster molding in decorative patterns",
+            "Glass inlay - colored glass embedded in architectural surfaces",
+            "Mirror work (Sheesh Mahal) - mirror fragments creating light play",
+            "Stone carving traditions - narrative reliefs and ornamental sculpture",
+            "Metal decorative elements - brass, copper, gold leaf applications",
+            "Enamel work - colored enamel on metal in jewelry and architectural pieces",
+            "Wood carving - intricate wooden screens and door panels",
+            "Ivory inlay - luxury material in royal palaces",
+            "Conservation challenges - preserving decorative elements in historic structures"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "Medium",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Describe the Indo-Islamic synthesis in architecture with examples from Delhi Sultanate.",
+          "Analyze the architectural features of Taj Mahal and explain its UNESCO World Heritage status.",
+          "Compare the architectural styles of Akbar, Jahangir, and Shah Jahan.",
+          "Discuss the role of Fatehpur Sikri in Mughal architectural history.",
+          "What is the Indo-Saracenic Revival style? Provide examples from colonial India.",
+          "Explain the pietra dura technique used in Mughal architecture.",
+          "Describe the urban planning principles of Jaipur City and New Delhi.",
+          "How did colonial architecture reflect British dominance while incorporating Indian elements?",
+          "Discuss the significance of the Gateway of India as an architectural symbol.",
+          "Explain the decorative techniques used in Islamic architectural ornamentation."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_004",
+      "module_name": "Indian Sculpture Traditions",
+      "duration_days": {
+        "fast": 7,
+        "standard": 10,
+        "extended": 14
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_004_T001",
+          "topic_name": "Indus Valley & Early Sculpture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Early Sculpture",
+          "ncert_reference": "NCERT Class 11 History - Ancient India",
+          "key_concepts": [
+            "Indus Valley terracotta figurines - animals and human forms (3rd-2nd century BCE)",
+            "Dancing girl of Mohenjo-daro - bronze figurine, dynamic posture, jewelry details",
+            "Bronze casting technique - lost-wax process development",
+            "Animal seals - buffalo, rhinoceros, elephant representations",
+            "Stamp seals - religious and administrative significance",
+            "Sculptural proportions - anatomical accuracy despite primitive tools",
+            "Mauryan sculpture period (320-185 BCE) - stone sculpture development",
+            "Polished stone ashlar masonry - architectural sculpture integration",
+            "Animal capitals - lion, elephant, horse representations",
+            "Sarnath Lion Capital - emblem of modern India (adopted for national insignia)",
+            "Chakra (wheel) - symbolic representation in sculpture",
+            "Yaksha and Yakshi figures - early human figurative sculpture",
+            "Didarganj Yakshi (Bihar) - finest early stone sculpture, sandstone",
+            "Scale and monumentality - shift from small objects to large stone structures"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_004_T002",
+          "topic_name": "Gandhara & Mathura Schools",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Buddhist Sculpture Schools",
+          "ncert_reference": "NCERT Class 6 History - Buddhist Art",
+          "key_concepts": [
+            "Gandhara school (1st-3rd century CE) - Graeco-Roman influence, Northwest India",
+            "Gandhara characteristics - naturalistic style, drapery, facial expressions",
+            "Buddha representations - shift from aniconic (no human form) to anthropomorphic",
+            "Greek influence - Apollo comparison, contrapositive stance",
+            "Schist stone medium - local material choice",
+            "Gandhara artistic reach - Central Asia, Silk Road influence",
+            "Mathura school (2nd century BCE - 2nd century CE) - indigenous Indian style",
+            "Mathura red sandstone - distinctive local material",
+            "Jain Tirthankaras - prominent in Mathura school",
+            "Mathura sensuality - rounded forms, ornamental features",
+            "Buddha imagery development - ideal beauty and spiritual transcendence",
+            "Bodhisattva representations - compassionate iconography",
+            "Yaksha and Yakshi sculptures - fertility and prosperity symbols",
+            "Regional synthesis - Graeco-Roman meets Indian aesthetic traditions"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_004_T003",
+          "topic_name": "Gupta & Classical Sculpture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Gupta Sculpture",
+          "ncert_reference": "NCERT Class 6 History - Gupta Period Art",
+          "key_concepts": [
+            "Gupta period (4th-6th century CE) - classical Indian sculpture zenith",
+            "Golden Age characteristics - balance, idealism, spiritual depth",
+            "Buddha sculptures - serene expressions, flowing drapery, introspective quality",
+            "Sarnath Buddha (5th century) - Gupta masterpiece, enlightenment representation",
+            "Alloying techniques - bronze and copper sculptures",
+            "Sculptural anatomy - perfect human proportions, divine beauty",
+            "Hariti and Pindola statues - maternal compassion and wisdom",
+            "Temple sculpture integration - decorative and narrative functions",
+            "Dancing Shiva - cosmic energy and divine movement representation",
+            "Varaha (Boar) avatar sculpture - mythological narratives",
+            "Devgarh temple sculptures - narrative relief panels",
+            "Udayagiri caves sculptures - Vishnu and Shiva representations",
+            "Artistic technique refinement - smooth surfaces, delicate features",
+            "Influence on Southeast Asian sculpture - regional spread and adaptation"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3.5
+        },
+        {
+          "topic_id": "ARC_004_T004",
+          "topic_name": "Medieval Temple Sculpture & Regional Schools",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Medieval Sculpture",
+          "ncert_reference": "NCERT Class 7 History - Medieval Indian Culture",
+          "key_concepts": [
+            "Chola bronze casting tradition (9th-13th century) - lost-wax technique perfection",
+            "Dancing Shiva Nataraja - cosmic dance representation, circular cosmic frame",
+            "Shiva Ardhanari - half-Shiva, half-Parvati, gender symbolism",
+            "Bronze Chandeshvara and attendant figures - narrative groupings",
+            "Pala school sculpture (8th-12th century, Bengal) - delicate, refined style",
+            "Buddhist iconography - complex deity representations",
+            "Limestone and black stone preference - regional material traditions",
+            "Odia (Odisha) sculpture - erotic panels and mythological narratives",
+            "Konark Sun Temple (13th century) - sculptural grandeur, chariot representation",
+            "Hoysala sculpture - narrative reliefs, intricate surface decoration",
+            "Dilwara temple Jain sculptures - marble finesse and delicate ornamentation",
+            "South Indian temple sculpture program - narrative friezes and processional figures",
+            "Stone surface quality - polishing and finishing techniques",
+            "Iconographic conventions - mudras, attributes, symbolic gestures"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_004_T005",
+          "topic_name": "Sculptural Techniques & Conservation",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Sculpture Techniques",
+          "ncert_reference": "NCERT Class 11 Fine Arts - Sculpture Methods",
+          "key_concepts": [
+            "Stone selection - sandstone, marble, granite, limestone properties",
+            "Carving techniques - chisel, hammer, abrasive stone tools",
+            "Lost-wax bronze casting (cire perdue) - ancient Indian technique",
+            "Mold preparation - clay negative forms for casting",
+            "Pouring and cooling - metal casting technical process",
+            "Surface finishing - polishing, inlay, painted details",
+            "Ivory carving - luxury medium for decorative sculptures",
+            "Wood carving techniques - temple door and screen traditions",
+            "Anatomical proportions - canonical measurements in Indian tradition",
+            "Iconographic attributes - symbolic items identifying deities",
+            "Preservation challenges - weathering, chemical deterioration, vandalism",
+            "Conservation methods - documentation, stabilization, display techniques",
+            "Museum collections - Indian Museum Calcutta, National Museum Delhi",
+            "Digital documentation - 3D scanning and virtual preservation"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "Medium",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 15,
+        "marks": 60,
+        "duration_minutes": 120,
+        "sample_questions": [
+          "Describe the Dancing Girl of Mohenjo-daro and its significance in Indus Valley sculpture.",
+          "Compare Gandhara and Mathura schools of sculpture with specific examples.",
+          "Discuss the characteristics of Gupta sculpture and its influence on Asian art traditions.",
+          "Analyze the Chola bronze casting tradition and the representation of Nataraja.",
+          "What techniques were used in ancient Indian sculpture? Explain lost-wax casting.",
+          "Describe the sculptural features of Konark Sun Temple and its religious significance.",
+          "Compare the sculptural styles of Pala and Odia schools.",
+          "Explain the iconographic elements and symbolic meanings in Hindu temple sculpture.",
+          "How did medieval temple sculpture contribute to narrative representation in Indian art?",
+          "Discuss the conservation challenges facing ancient Indian sculptural heritage."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_005",
+      "module_name": "Classical Dance Forms of India",
+      "duration_days": {
+        "fast": 8,
+        "standard": 11,
+        "extended": 15
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_005_T001",
+          "topic_name": "Bharatanatyam Dance Tradition",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Classical Dance Forms",
+          "ncert_reference": "NCERT Class 12 Fine Arts - Indian Dance",
+          "key_concepts": [
+            "Bharatanatyam origins - Tamil Nadu, temple dance tradition (devadasi system)",
+            "Geographical classification - Natya Shastra references",
+            "Geographical area - South India, Tamil and Karnataka regions",
+            "Structure - Alarippu, Jathiswaram, Shabdam, Varnam, Padam, Tillana",
+            "Alarippu - opening piece, rhythmic exploration, no lyrics",
+            "Varnam - highlight of performance, lyrical and rhythmic sections",
+            "Padam - lyrical love composition, emotional expression",
+            "Mudras (hand gestures) - 28 basic mudras and their meanings",
+            "Hastas - hand positions representing objects and emotions",
+            "Rasa (emotion) - nine emotional flavors in dance",
+            "Abhinaya - dramatic interpretation and storytelling",
+            "Tattoes tattoos and costumes - gold-bordered silk sarees, flowers",
+            "Ankle bells (ghungroo) - rhythmic accompaniment",
+            "Reformation - Rukmini Devi Arundale (1923-1986) revival",
+            "UNESCO Intangible Cultural Heritage recognition (2008)"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_005_T002",
+          "topic_name": "Kathak Dance Form",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - North Indian Dance",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Kathak",
+          "key_concepts": [
+            "Kathak origins - storytelling tradition, Sanskrit and Persian influences",
+            "Geographical area - North India, Uttar Pradesh (Lucknow, Varanasi)",
+            "Three major gharanas (schools) - Lucknow, Jaipur, Benares",
+            "Structure - Thaat, Banphod, Toda, Paran, Chakari, Tukda, Tarang",
+            "Thaat - introductory rhythmic recitation in raga",
+            "Bhaav (expression) - emotional and narrative content",
+            "Tukda - short rhythmic composition, dance phrase",
+            "Paran - complex rhythmic interaction with tabla",
+            "Footwork (tatkaar) - rapid foot movements, intricate patterns",
+            "Pirouettes - spinning movements, distinctive Kathak feature",
+            "Tabla accompaniment - rhythmic dialogue between dancer and drummer",
+            "Costume - longer skirt, chiffon, jewelry",
+            "Ghungroo (bells) - ankle bells creating rhythmic bells",
+            "Famous practitioners - Lachhu Maharaj, Damayanti Joshi, Birju Maharaj"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_005_T003",
+          "topic_name": "Odissi, Kuchipudi & Manipuri Dances",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Eastern Indian Dance Forms",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Indian Classical Dances",
+          "key_concepts": [
+            "Odissi (Odia) dance - Odisha, Lord Jagannatha worship tradition",
+            "Odissi characteristics - graceful movements, sinuous body lines",
+            "Tribhanga posture - triple bend, distinctive Odissi feature",
+            "Odissi structure - Mangalacharan, Alaripu, Batu, Pallavi, Abhinaya, Moksha",
+            "Mangalacharan - invocation to Ganesha",
+            "Mudras - specific to Odissi tradition",
+            "Odissi costumes - tube skirt (sambalpuri), ornate jewelry",
+            "Kuchipudi origin - Andhra Pradesh village and tradition",
+            "Kuchipudi evolution - religious (temple) to secular performances",
+            "Kuchipudi characteristics - blend of folk and classical elements",
+            "Tarangam (pot dance) - dancer performs on brass plate (recently)",
+            "Manipuri (Manipuri Raas) - Manipur dance, Lord Krishna tradition",
+            "Manipuri characteristics - gentle, lyrical, community participation",
+            "Ras Leela - Krishna and Radha mythology performances",
+            "Costume and jewelry - traditional Manipur silk and ornaments"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_005_T004",
+          "topic_name": "Kathakali, Mohiniyattam & Sattriya Dances",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Kerala Dance Traditions",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - South Indian Dances",
+          "key_concepts": [
+            "Kathakali origin - Kerala, dramatic form blending dance and theater",
+            "Geographical area - Kerala, South Indian classical tradition",
+            "Characteristics - elaborate makeup, costumes, masculine vigorous movements",
+            "Kathakali performance - storytelling from Hindu epics and Puranas",
+            "Makeup (mukhathezhuthu) - colored rice paste designs, character representation",
+            "Costumes - voluminous skirts, ornate headgear, metallic ornaments",
+            "Mudras - hand gesture vocabulary for narrative expression",
+            "Music - Chitraveena and drums (chenda, mridangam)",
+            "Famous stories - Mahabharata, Ramayana, Bhagavata Purana tales",
+            "Mohiniyattam origin - Kerala solo female dance form",
+            "Mohiniyattam characteristics - graceful, sensuous, devotional",
+            "Mohiniyattam structure - Varnam, Padam, Tillan",
+            "Sattriya dance origin - Assam, Vaishnavite monasteries (sattras)",
+            "Sattriya characteristics - vigorous footwork, swift movements",
+            "Sattriya costumes - dhoti, kurta, distinctive Assamese jewelry"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_005_T005",
+          "topic_name": "Dance Notation, Raga & Contemporary Perspectives",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Dance Theory & Practice",
+          "ncert_reference": "NCERT Class 12 Fine Arts - Dance Accompaniment",
+          "key_concepts": [
+            "Natya Shastra - ancient treatise on dance and theater",
+            "Raga system - melodic framework for dance accompaniment",
+            "Tala (rhythm) - rhythmic patterns and cycles in dance",
+            "Mata (tempo) - speed variations in performance",
+            "Layakari - rhythmic intricacy and sophistication",
+            "Dance notation systems - Labanotation and Benesh notation",
+            "Musical accompaniment - sitar, sarangi, flute, table instruments",
+            "Guru-shishya parampara - traditional teacher-student transmission",
+            "Chakra metaphor - energy centers and movement aesthetics",
+            "Contemporary classical dance - fusion with modern elements",
+            "Dance in cinema - Indian film industry integration of classical forms",
+            "Global performance - Indian classical dance on international stages",
+            "Preservation and documentation - video recording and archives",
+            "Contemporary practitioners - maintaining tradition while innovating"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 15,
+        "marks": 60,
+        "duration_minutes": 120,
+        "sample_questions": [
+          "Describe the structure and characteristic features of Bharatanatyam dance.",
+          "Compare the Kathak dance forms of Lucknow and Jaipur gharanas.",
+          "What is the significance of mudras in Indian classical dance? Provide examples from Bharatanatyam.",
+          "Explain the characteristics and origin of Odissi dance and the tribhanga posture.",
+          "Discuss the Kathakali tradition and its distinctive makeup and costumes.",
+          "How does the raga and tala system support Indian classical dance performances?",
+          "Compare the characteristics of Manipuri, Kuchipudi, and Sattriya dance forms.",
+          "Describe the UNESCO recognition of Indian classical dances.",
+          "What is the guru-shishya parampara and its role in preserving classical dance traditions?",
+          "Explain the contemporary evolution of classical Indian dance forms."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_006",
+      "module_name": "Indian Music Traditions - Classical & Folk",
+      "duration_days": {
+        "fast": 8,
+        "standard": 11,
+        "extended": 15
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_006_T001",
+          "topic_name": "Hindustani Classical Music System",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Music Traditions",
+          "ncert_reference": "NCERT Class 12 Fine Arts - Indian Music",
+          "key_concepts": [
+            "Hindustani music origin - North Indian classical tradition",
+            "Raga concept - melodic framework with specific rules and restrictions",
+            "Raga characteristics - notes (swaras), ascending and descending patterns (arohana/avarohana)",
+            "Vadi and Samvadi - principal and secondary notes in raga",
+            "Tala - rhythmic cycle and time measure in Hindustani music",
+            "Common talas - Tintal, Rupak, Ektal, Jhapthal",
+            "Tintal structure - 16-beat cycle in classical composition",
+            "Thaat system - framework grouping ragas by characteristics",
+            "Ten thaat system - Bhairav, Khayal, Kafi, Asavari, Bhairav, Kalyan, Marva, Purvi, Khamaj, Bilaval",
+            "Vocal forms - Khyal, Dhrupad, Thumri, Ghazal",
+            "Khyal - improvisational vocal form, primary classical form",
+            "Dhrupad - older vocal form, emphasis on sarangi accompaniment",
+            "Instrumental music - sitar, sarangi, tabla, bansuri",
+            "Gharana tradition - school/family style in Hindustani music"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_006_T002",
+          "topic_name": "Carnatic Classical Music System",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - South Indian Music",
+          "ncert_reference": "NCERT Class 12 Fine Arts - Carnatic Music",
+          "key_concepts": [
+            "Carnatic music origin - South Indian classical tradition (Tamil Nadu, Karnataka)",
+            "Raga system similarities and differences from Hindustani",
+            "Melakarta system - 72 parent ragas organizing Carnatic ragas",
+            "Swaras - seven notes (Sa, Ri, Ga, Ma, Pa, Dha, Ni) with variants",
+            "Tala system - 35 primary talas in Carnatic tradition",
+            "Adi tala - most common 8-beat cycle",
+            "Vocal forms - Kriti, Varnam, Padam, Javali, Tillana",
+            "Kriti - principal devotional form with three sections (pallavi, anupallavi, charanam)",
+            "Varnam - practice form combining rhythmic and melodic elements",
+            "Compositional technique - rhythmic complexity and solfege syllables",
+            "Instruments - vina (veena), violin, mridangam, kanjira, ghatam",
+            "Trinity of Carnatic music - Tyagaraja, Muthuswami Dikshitar, Syama Sastri",
+            "Famous composers and their contributions",
+            "Raga interpretation - melodic exploration within rule framework"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_006_T003",
+          "topic_name": "Indian Musical Instruments",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Musical Instruments",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Instruments",
+          "key_concepts": [
+            "String instruments (Taatvaadya) - sitar, sarod, sarangi, veena, vina, tabla",
+            "Sitar structure - gourd resonator, neck, sympathetic strings (tarabs)",
+            "Sitar origin - Amir Khusrau attribution (13th century)",
+            "Sarod - Afghan origin, metal surface, deep sound",
+            "Sarangi - bowed string instrument, North Indian vocal accompaniment",
+            "Veena (South Indian) - ancient stringed instrument, Saraswati association",
+            "Wind instruments (Sushirvadya) - flute (bansuri), shehnai, harmonica, pungi",
+            "Bansuri - bamboo flute, Krishna deity association",
+            "Shehnai - reedy wind instrument, ceremonial and classical use",
+            "Percussion instruments (Avanaddha vadya) - tabla, mridangam, dhol, dholak",
+            "Tabla - pair of drums, main percussion in Hindustani music",
+            "Mridangam - barrel drum, primary percussion in Carnatic music",
+            "Ghatam - clay pot drum, South Indian percussion",
+            "Kanjira - circular frame drum with metal discs, South Indian"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_006_T004",
+          "topic_name": "Gharana System & Master Musicians",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Gharana Tradition",
+          "ncert_reference": "NCERT Class 12 Fine Arts - Musical Traditions",
+          "key_concepts": [
+            "Gharana definition - school of music with distinctive style",
+            "Guru-shishya parampara - traditional teacher-disciple succession",
+            "Atrauli-Jaipur gharana - sarangi and khyal traditions",
+            "Agra gharana - Khyal style, Ustad Ghulam Ali Khan legacy",
+            "Gwalior gharana - structured khyal, Tansen influence (16th century)",
+            "Kirana gharana - flexible khyal style, female vocalists prominence",
+            "Banaras (Varanasi) gharana - semi-classical and thumri tradition",
+            "Lucknow gharana - Kathak-influenced music",
+            "Tansen (1500s) - legendary musician, raga composition",
+            "Niyamat Khan - dhrupad tradition founder",
+            "Ustad Zakir Hussain - tabla maestro and innovator",
+            "Pandit Ravi Shankar - sitar virtuoso, international recognition",
+            "Bismillah Khan - shehnai master, classical tradition",
+            "Contemporary maestros - preserving and evolving traditions"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_006_T005",
+          "topic_name": "Folk & Regional Music Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Folk Music",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Folk Traditions",
+          "key_concepts": [
+            "Folk music categories - work songs, seasonal songs, devotional music",
+            "Baul music (Bengal) - wandering minstrels, mystical devotion",
+            "Sufi qawwali tradition - devotional Islamic music (Nusrat Fateh Ali Khan)",
+            "Qat - gathering for qawwali performance and spiritual experience",
+            "Bhangra (Punjab) - harvest celebration music and dance",
+            "Garba (Gujarat) - circular dance form with folk music",
+            "Dandiya (Gujarat) - stick dance accompanied by folk songs",
+            "Ghoomar (Rajasthan) - women's twirling folk dance with music",
+            "Koligal (Maharashtra) - folk tradition with acrobatic elements",
+            "Lavani (Maharashtra) - sensuous dance form with rhythmic music",
+            "Samba (Karnataka/Andhra Pradesh) - standing dance tradition",
+            "Jhumair, Domkach (Jharkhand) - tribal music traditions",
+            "Bihu (Assam) - spring festival music and dance",
+            "Living traditions - community participation and cultural continuity"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        }
+      ],
+      "module_test": {
+        "questions": 15,
+        "marks": 60,
+        "duration_minutes": 120,
+        "sample_questions": [
+          "Explain the raga and tala systems in Hindustani classical music.",
+          "Compare the Hindustani and Carnatic classical music systems.",
+          "Describe the structure of a khyal composition and its improvisational elements.",
+          "What is a gharana? Provide examples from Hindustani music tradition.",
+          "Discuss the role of major instruments in Indian classical music.",
+          "Explain the melakarta system in Carnatic music and its classification of ragas.",
+          "Describe the contribution of Tansen to Indian music tradition.",
+          "What is the significance of the guru-shishya parampara in music transmission?",
+          "Explain the folk music traditions of India and their cultural contexts.",
+          "How have Indian classical musicians gained international recognition and influence?"
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_007",
+      "module_name": "Theatre, Puppetry & Folk Performance Arts",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_007_T001",
+          "topic_name": "Classical Sanskrit Theatre & Natya Shastra",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Classical Theatre",
+          "ncert_reference": "NCERT Class 6-7 History - Ancient Literature & Performance",
+          "key_concepts": [
+            "Natya Shastra - ancient treatise on drama (500 BCE - 500 CE, traditionally attributed)",
+            "Natya Shastra author - Bharata muni (legendary)",
+            "Contents - performance theory, emotions, costumes, movements",
+            "Rasa doctrine - nine emotions (navarasas) in dramatic performance",
+            "Navarasas - Sringara, Hasya, Karuna, Raudra, Vira, Bhayanaka, Bibhatsa, Adbhuta, Santa",
+            "Bhava - emotional expression and internal state of character",
+            "Abhinaya - four-fold dramatic interpretation (angika, vachika, aharya, sattvika)",
+            "Mudra system - hand gesture vocabulary for storytelling",
+            "Classical Sanskrit playwrights - Kalidasa, Bhasa, Bhavabhuti",
+            "Kalidasa works - Sakuntala, Vikramorvashiyam, Malvikagnimitra",
+            "Abhinaya Darpana - Nandikesvara's 13th century codification",
+            "Natya performance convention - prologue, acts (angka), narrative structure",
+            "Pratimukha and vimarsha - plot complications and reflective pause",
+            "Theatre stage design - mandapa, backdrops, symbolic representations"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_007_T002",
+          "topic_name": "Regional Theatre Forms - Yakshagana, Nautanki, Jatra",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Folk Theatre",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Theatre Traditions",
+          "key_concepts": [
+            "Yakshagana (Karnataka) - night-long performance art form",
+            "Yakshagana characteristics - elaborate costumes, face makeup, energy",
+            "Yakshagana themes - mythological narratives from Ramayana and Mahabharata",
+            "Yakshagana music - traditional Kannada folk compositions",
+            "Nautanki (North India) - open-air folk theatre tradition",
+            "Nautanki content - romantic and historical tales",
+            "Nautanki performance - dialogue-based with musical interludes",
+            "Jatra (Bengal) - processional theatre form with social themes",
+            "Jatra characteristics - mobile theatre, common people as audience",
+            "Jatra evolution - traditional mythological to contemporary social issues",
+            "Tamasha (Maharashtra) - folk theatre with comic elements",
+            "Ramlila (North India) - Ram's life enactment, community participation",
+            "Ramlila tradition - Ram Lila of Varanasi, UNESCO recognition (2008)",
+            "Theatre in common language - accessibility and social messaging"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_007_T003",
+          "topic_name": "Indian Puppetry Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Puppetry Arts",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Performing Arts",
+          "key_concepts": [
+            "Puppet theatre - ancient Indian performance tradition",
+            "Shadow puppet theatre (Kathputli) - silhouette storytelling",
+            "Wayang Kulit (South) - leather puppet shadow theatre",
+            "Puppet characters - traditional hero-villain archetypes",
+            "String puppetry (Kathputli) - manipulated wooden figures",
+            "Rajasthani puppet tradition - historic rulers and folklore",
+            "Tolu Bommalata (Andhra Pradesh) - leather puppet folk tradition",
+            "Tolu themes - Mahabharata and Ramayana episodes",
+            "Togalu Gombeyata (Karnataka) - leather puppet artistry",
+            "Puppetry techniques - carving, painting, articulation",
+            "Music and narration - supporting puppet movements",
+            "Gender roles - traditionally male puppeteers",
+            "UNESCO recognition - Indian puppetry traditions",
+            "Contemporary puppetry - educational and entertainment applications"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        },
+        {
+          "topic_id": "ARC_007_T004",
+          "topic_name": "Mask, Costume & Theatrical Elements",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Theatre Design",
+          "ncert_reference": "NCERT Class 11-12 Fine Arts - Theatre Elements",
+          "key_concepts": [
+            "Mask-making tradition - classical and folk theatre",
+            "Chhau dance (Eastern India) - silk and paper masks",
+            "Chhau mask characteristics - painted animals and mythological figures",
+            "Chhau theatrical form - abstract movement with mask symbolism",
+            "Costume tradition - elaborate dress indicating character type",
+            "Court costumes - silk, brocade, precious stones",
+            "Color symbolism - colors indicating character roles",
+            "Jeweled ornaments - religious and status significance",
+            "Headgear (mukuta) - crown and headdress designs",
+            "Makeup tradition - natural pigments and mineral colors",
+            "Beards and mustaches - character differentiation",
+            "Props and symbolic objects - weapons, flowers, instruments",
+            "Stage design simplicity - minimal sets, imagination dependence",
+            "Light and sound effects - creation of atmosphere and mood"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "Medium",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Explain the Natya Shastra and its significance in Indian theatre tradition.",
+          "What are the navarasas? Discuss their representation in classical drama.",
+          "Describe the characteristics and content of Yakshagana and Jatra theatre forms.",
+          "Explain the shadow puppet theatre tradition in India with regional examples.",
+          "What is the significance of masks and costumes in Indian theatre?",
+          "Compare classical Sanskrit theatre with regional folk theatre forms.",
+          "Discuss the role of music and narration in traditional puppet theatre.",
+          "How does the Ramlila tradition reflect cultural and religious values?",
+          "Explain the UNESCO recognition of Indian theatre and puppetry traditions.",
+          "What are the defining features of Chhau dance and its theatrical significance?"
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_008",
+      "module_name": "Literature - Classical, Medieval & Regional",
+      "duration_days": {
+        "fast": 7,
+        "standard": 10,
+        "extended": 14
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_008_T001",
+          "topic_name": "Sanskrit Literature & Classical Works",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Sanskrit Literature",
+          "ncert_reference": "NCERT Class 6-12 History - Ancient Indian Literature",
+          "key_concepts": [
+            "Vedas - oldest Sanskrit literature (1500-1200 BCE)",
+            "Rigveda, Yajurveda, Samaveda, Atharvaveda - four Vedas",
+            "Vedic hymns - religious and philosophical content",
+            "Upanishads - philosophical treatises on ultimate reality (Brahman)",
+            "Ramayana - epic by Valmiki, 24,000 verses",
+            "Mahabharata - epic by Vyasa, 100,000 verses, Bhagavad Gita inclusion",
+            "Puranas - mythological narratives, 18 major Puranas",
+            "Kalidasa (4th-5th century) - celebrated playwright and poet",
+            "Kalidasa works - Abhijnana Sakuntalam, Vikramorvashiyam, Kumara Sambhava",
+            "Bhasa - ancient playwright, dramatic compositions",
+            "Bhavabhuti (8th century) - Natya Shastra interpreter",
+            "Harivamsa - Krishna-focused epic supplement to Mahabharata",
+            "Smriti texts - dharma, ethics, and social conduct",
+            "Artistic and spiritual significance - foundational to Indian culture"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_008_T002",
+          "topic_name": "Sangam Literature & Tamil Classical Tradition",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Regional Literatures",
+          "ncert_reference": "NCERT Class 11 History - South Indian Literature",
+          "key_concepts": [
+            "Sangam Age (3rd century BCE - 4th century CE) - Tamil literary golden age",
+            "Sangam texts - Ettuthokai (Eight Anthologies), Pattuppattu (Ten Idylls)",
+            "Tolkappiyam - Tamil grammar treatise (oldest extant Tamil text)",
+            "Silappatikaram - epic poem by Ilango Adigal (5th-6th century)",
+            "Manimekalai - sequel epic, Buddhist didactic narrative",
+            "Cilappatikaram structure - Pattupppattu collection of ten long poems",
+            "Poetry themes - love (akam), war (puram), nature, social customs",
+            "Poet communities - Academy (Sangam) gatherings",
+            "Language development - early Tamil script (Brahmi adaptation)",
+            "Social reflection - Sangam literature capturing Chola society",
+            "Women poets - Avvaiyar and female voices in Sangam texts",
+            "Classical Tamil aesthetics - lyrical beauty and philosophical depth",
+            "Revival - Sangam tradition influence on modern Tamil literature",
+            "UNESCO recognition - Sangam literature's significance"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_008_T003",
+          "topic_name": "Bhakti & Sufi Poetry Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Medieval Poetry",
+          "ncert_reference": "NCERT Class 7-8 History - Medieval India & Culture",
+          "key_concepts": [
+            "Bhakti movement (6th century onwards) - devotional reform movement",
+            "Bhakti poets - Kabir, Guru Nanak, Tulsidas, Sur Das, Meerabai",
+            "Kabir (15th century) - saint-poet, Hindu-Muslim synthesis",
+            "Kabir's poetry - vernacular Hindi, social criticism, mystical devotion",
+            "Guru Nanak (1469-1539) - Sikhism founder, devotional philosophy",
+            "Tulsidas (16th century) - Ramcharitmanas composer",
+            "Ramcharitmanas - vernacular Ramayana, popular devotional text",
+            "Meerabai (16th-17th century) - Krishna devotee poet",
+            "Sufi poetry tradition - Islamic mystical poetry",
+            "Amir Khusrau (13th-14th century) - Sufi poet and musician",
+            "Hazrat Inayat Khan - Sufi philosophy integration",
+            "Devotional themes - love, surrender, individual-divine relationship",
+            "Vernacular language adoption - accessibility and populist reach",
+            "Cultural and religious impact - spiritual democratization"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_008_T004",
+          "topic_name": "Regional Literature & Folk Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Regional Traditions",
+          "ncert_reference": "NCERT Class 6-12 History - Regional Cultures",
+          "key_concepts": [
+            "Bengali literature - Chandimangal, Mangal Kavya traditions",
+            "Bankimchandra Chattopadhyay (19th century) - modern Bengali novelist",
+            "Marathi literature - Jnaneshwar, Mukundraj medieval poets",
+            "Marathi Bhakti - Sant tradition emergence",
+            "Kannada literature - Kalidasa's influence, Jain canonical texts",
+            "Telugu literature - Andhra Mahabharata, Nannaya's contributions",
+            "Malayalam literature - Cherusseri Neelakantha, Kumaran Asan",
+            "Odia (Oriya) literature - Jayadeva's Gita Govinda",
+            "Assamese literature - Srimanta Shankaradeva's Ankiya Nat",
+            "Rajasthani folk literature - Dhola-Maru, Pabuji ki Phad",
+            "Pabuji epic tradition - folk narrative on painted cloth",
+            "Ballads and folk tales - oral tradition preservation",
+            "Caste and gender perspectives - folk literature representation",
+            "Contemporary documentation - anthropological preservation efforts"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Describe the major Sanskrit literary works and their cultural significance.",
+          "What is the Sangam Age? Discuss its literary contributions and themes.",
+          "Explain the Bhakti movement and the role of major Bhakti poets.",
+          "Compare the contributions of Kabir and Tulsidas to Hindi literature.",
+          "Discuss the Sufi poetry tradition and notable Sufi poets like Amir Khusrau.",
+          "What is the significance of Meerabai in the Bhakti tradition?",
+          "Describe regional literature traditions across India with specific examples.",
+          "How did vernacular literature impact medieval Indian society?",
+          "Explain the themes and characteristics of Sangam Tamil poetry.",
+          "What is Ramcharitmanas and its cultural importance?"
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_009",
+      "module_name": "Modern Indian Literature & Languages",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_009_T001",
+          "topic_name": "Modern Indian Literature & Renaissance Movements",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Modern Literature",
+          "ncert_reference": "NCERT Class 10-12 Modern India - Cultural Renaissance",
+          "key_concepts": [
+            "Indian Renaissance - 19th century social and intellectual movement",
+            "Bengal Renaissance (19th-20th century) - reformist intellectual awakening",
+            "Ram Mohan Roy - social reform and rationalist thought",
+            "Rabindranath Tagore (1861-1941) - Nobel laureate in Literature (1913)",
+            "Tagore works - Gora, Chakra, Sadhana, Jana Gana Mana (national anthem)",
+            "Bankimchandra Chattopadhyay - pioneering Bengali novelist (Anandamath)",
+            "Premchand (Munshi Premchand) - Hindi literature giant",
+            "Premchand works - Godaan, Gaban, Chandrakanta",
+            "Jyotiba Phule - social reformer and writer",
+            "Savitribai Phule - women's education and social reform",
+            "Swami Vivekananda - philosophical and cultural thought",
+            "Sri Aurobindo - spiritual philosopher and poet",
+            "Literary renaissance response to colonialism - cultural affirmation",
+            "Nationalism and cultural pride - literature as resistance tool"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_009_T002",
+          "topic_name": "20th Century Indian Literature & Nobel Laureates",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Contemporary Literature",
+          "ncert_reference": "NCERT Class 12 Modern India - 20th Century Culture",
+          "key_concepts": [
+            "Indian Nobel Prize in Literature - Rabindranath Tagore (1913)",
+            "20th century literary movements - modernism and regional traditions",
+            "Subramania Bharati (Tamil) - patriotic and devotional poet",
+            "Muhammad Iqbal (Urdu) - poet-philosopher of Islamic thought",
+            "Vidyapati (revival) - medieval poet rediscovery",
+            "Jaishankar Prasad - Hindi playwright and novelist",
+            "Jaishankar Prasad works - Chandrakanta, Anand Kandak",
+            "Mahadevi Varma - Hindi poet and women's voice",
+            "Sumitranandan Pant - nature poet and progressive thought",
+            "Amitav Ghosh - contemporary novelist, international recognition",
+            "Arundhati Roy - Booker Prize winner (1997)",
+            "Salman Rushdie - magical realism and Indian English literature",
+            "Mulk Raj Anand - socially conscious novelist",
+            "Literary independence - post-colonial identity expression"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_009_T003",
+          "topic_name": "Constitutional Languages & Eighth Schedule",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Languages & Diversity",
+          "ncert_reference": "NCERT - Indian Constitution & Languages",
+          "key_concepts": [
+            "Eight Schedule of Indian Constitution - 22 recognized official languages",
+            "Hindi - official language (along with English)",
+            "Regional languages - state official language status",
+            "Language list - Hindi, Sanskrit, Assamese, Bengali, Gujarati, Kannada, Kashmiri, Konkani, Malayalam, Marathi, Manipuri, Nepali, Odia, Punjabi, Tamil, Telugu, Urdu, Sindhi, Maithili, Santali, Bodo, Dogri",
+            "Sanskrit - classical language status, constitutional significance",
+            "Linguistic diversity - 1,600+ languages spoken across India",
+            "Language families - Indo-European, Dravidian, Sino-Tibetan, Austroasiatic",
+            "Official language policy - Three-language formula in education",
+            "Language preservation - government initiatives and cultural importance",
+            "UNESCO recognition - endangered language protection",
+            "Code-switching and multilingualism - Indian linguistic reality",
+            "Language and identity - linguistic minorities protection",
+            "Modern Indian writing - translation and regional literature accessibility",
+            "Global perspective - Indian literature in international platforms"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_009_T004",
+          "topic_name": "Contemporary Indian Literature & Global Recognition",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Contemporary Authors",
+          "ncert_reference": "NCERT Class 12 Literature - Modern Indian Writing",
+          "key_concepts": [
+            "Salman Rushdie (Midnight's Children) - magical realism pioneer",
+            "Arundhati Roy (The God of Small Things) - 1997 Booker Prize",
+            "Amitav Ghosh (Shadow Lines) - transnational narratives",
+            "Khaled Hosseini (Indian diaspora themes) - global readership",
+            "Chetan Bhagat (3 Idiots) - popular fiction and youth literature",
+            "Kiran Desai - Booker Prize (2006, The Inheritance of Loss)",
+            "Jhumpa Lahiri - identity and diaspora explorations",
+            "Shashi Tharoor - political fiction and essays",
+            "Sudha Murty - women-centered narratives and social issues",
+            "Anita Desai - psychological complexity in characterization",
+            "Desai's works - Clear Light of Day, Fire on the Mountain",
+            "Literature and cinema - adaptation of Indian literature",
+            "International platforms - Indian authors on world stage",
+            "Publishing industry growth - Indian literature accessibility globally"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Discuss the Bengal Renaissance and its key figures and contributions.",
+          "What is the significance of Rabindranath Tagore's works and his Nobel Prize?",
+          "Explain Premchand's contribution to Hindi literature and social reform.",
+          "Describe the Eight Schedule languages and India's language policy.",
+          "How did 20th century Indian literature reflect post-colonial identity?",
+          "Discuss the international recognition of contemporary Indian authors.",
+          "What are the themes in Arundhati Roy's The God of Small Things?",
+          "Explain the role of regional literature in Indian cultural diversity.",
+          "How has Indian literature engaged with themes of identity and diaspora?",
+          "Discuss the preservation of endangered languages in India."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_010",
+      "module_name": "Religion & Philosophy - Cultural Aspects",
+      "duration_days": {
+        "fast": 7,
+        "standard": 10,
+        "extended": 14
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_010_T001",
+          "topic_name": "Hinduism - Sacred Texts, Deities & Practices",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Religious Traditions",
+          "ncert_reference": "NCERT Class 6-12 History - Hindu Traditions",
+          "key_concepts": [
+            "Vedas - earliest Hindu scriptures (1500-1200 BCE)",
+            "Upanishads - philosophical treatises on Brahman and Atman",
+            "Brahmanas and Aranyakas - Vedic interpretive texts",
+            "Epics - Ramayana and Mahabharata, including Bhagavad Gita",
+            "Bhagavad Gita - Krishna's teachings to Arjuna, yoga and dharma",
+            "Puranas - mythological narratives (18 major Puranas)",
+            "Smriti texts - dharma-shastra (ethical-legal) and gṛhya-sūtra (domestic rituals)",
+            "Trinity (Trimurti) - Brahma, Vishnu, Shiva",
+            "Brahma - creator deity (rarely worshipped)",
+            "Vishnu - preserver deity, ten avatars (Dashavatara)",
+            "Krishna and Rama - major avatars, cultural importance",
+            "Shiva - destroyer/transformer deity, ascetic tradition",
+            "Goddess traditions - Shakti, Durga, Kali, Saraswati, Lakshmi",
+            "Pilgrimage sites - Varanasi, Mathura, Ayodhya, Badrinath, Kedarnath"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_010_T002",
+          "topic_name": "Buddhism, Jainism & Sikhism in India",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Dharmic Religions",
+          "ncert_reference": "NCERT Class 6-12 History - Non-Hindu Religions",
+          "key_concepts": [
+            "Buddhism origin - Siddhartha Gautama (563-483 BCE)",
+            "Four Noble Truths - suffering and path to liberation",
+            "Eightfold Path - ethical and philosophical framework",
+            "Buddhist schools - Theravada, Mahayana, Vajrayana",
+            "Bodhisattva concept - enlightened beings assisting others",
+            "Buddhist monasticism - Sangha (monastic community)",
+            "Major Buddhist sites - Bodh Gaya, Nalanda, Sarnath",
+            "Jainism - ascetic tradition, Mahavira (599-527 BCE)",
+            "Jain philosophy - non-violence (ahimsa), karma, anekantavada",
+            "Tirthankara concept - 24 enlightened teachers in Jainism",
+            "Jain monastic orders - monks and nuns traditions",
+            "Sikhism - Guru Nanak (1469-1539) founder",
+            "Sikh beliefs - one God (Ik Onkar), equality, community (Sangat)",
+            "Guru Granth Sahib - Sikh holy scripture and authority"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "ARC_010_T003",
+          "topic_name": "Islam & Christianity in Indian Culture",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Islam in India",
+          "ncert_reference": "NCERT Class 7-8 History - Islamic Period in India",
+          "key_concepts": [
+            "Islam in India - 7th century Arab traders onwards",
+            "Islamic sultanates - Delhi, Bengal, Deccan, Gujarat",
+            "Mughal dynasty - Islamic culture integration (16th-18th century)",
+            "Sufi tradition - Islamic mysticism and bhakti synthesis",
+            "Qawwali tradition - devotional Islamic music",
+            "Islamic architecture - mosque design, dome and minaret styles",
+            "Urdu language - Hindi-Persian synthesis",
+            "Islamic art traditions - calligraphy, geometric patterns, illumination",
+            "Christianity in India - early communities (St. Thomas tradition)",
+            "Christian denominations - Catholic, Orthodox, Protestant",
+            "Christian cultural contributions - education, healthcare",
+            "Syncretism - religious practice blending across traditions",
+            "Religious pluralism - Indian religious diversity accommodation",
+            "Sacred geography - temples, mosques, churches, gurudwaras significance"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_010_T004",
+          "topic_name": "Philosophy & Spiritual Traditions",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Philosophy",
+          "ncert_reference": "NCERT Class 11-12 Philosophy - Indian Traditions",
+          "key_concepts": [
+            "Six schools (Shad Darshan) of Hindu philosophy",
+            "Samkhya - dualism and matter-consciousness distinction",
+            "Yoga - Patanjali's yoga sutras and meditation practice",
+            "Nyaya - logic and epistemology (knowledge methods)",
+            "Vaisheshika - atomic theory and metaphysics",
+            "Mimamsa - ritual interpretation and hermeneutics",
+            "Vedanta - non-duality (Advaita) and Brahman realization",
+            "Advaita Vedanta - Adi Shankara (8th century) philosopher",
+            "Yoga as spiritual path - Bhakti yoga, Karma yoga, Jnana yoga",
+            "Tantra - esoteric spiritual practices",
+            "Aesthetics (Rasa Shastra) - emotional and artistic philosophy",
+            "Ethics (Niti Shastra) - dharma and social conduct",
+            "Moksha concept - liberation and ultimate goal",
+            "Contemporary spiritual movements - adaptation of classical traditions"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Describe the major Hindu scriptures and their cultural significance.",
+          "Explain the concepts of karma and dharma in Hindu philosophy.",
+          "Compare Buddhism and Jainism in terms of philosophy and practices.",
+          "What is the significance of Sikhism in Indian religious and cultural history?",
+          "Discuss the role of Islam in shaping medieval Indian culture.",
+          "Explain the Sufi tradition and its influence on Indian spirituality.",
+          "Describe the Six Schools of Hindu philosophy with examples.",
+          "What is Advaita Vedanta and its key philosophical concepts?",
+          "How has religious pluralism shaped Indian cultural traditions?",
+          "Discuss the sacred geography of major pilgrimage sites in India."
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_011",
+      "module_name": "Fairs, Festivals & Cultural Practices",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_011_T001",
+          "topic_name": "Major Hindu Festivals & Celebrations",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Festivals",
+          "ncert_reference": "NCERT Class 6-12 History - Indian Festivals",
+          "key_concepts": [
+            "Diwali (Deepavali) - festival of lights (October-November)",
+            "Diwali significance - evil's defeat over good, Lord Rama's return",
+            "Holi - spring festival of colors, Holika Dahan ritual",
+            "Holi symbolism - renewal, love, and joyful gathering",
+            "Navratri - nine nights celebration, Goddess worship",
+            "Durga Puja - Bengali festival, goddess victory narrative",
+            "Ramnavami - Lord Rama's birth celebration (March-April)",
+            "Janmashtami - Krishna's birth, midnight celebrations",
+            "Makar Sankranti - sun transit festival, harvest significance",
+            "Pongal (Tamil) - harvest thanksgiving, regional variation",
+            "Onam - Kerala harvest festival, boat races and cultural events",
+            "Baisakhi - Punjab spring festival, harvest and Sikh significance",
+            "Ganesh Chaturthi - elephant deity worship (August-September)",
+            "Festival calendar - lunar and solar variations across regions"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_011_T002",
+          "topic_name": "Religious Fairs & Sacred Journeys",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Religious Fairs",
+          "ncert_reference": "NCERT Class 11-12 History - Cultural Practices",
+          "key_concepts": [
+            "Kumbh Mela - world's largest pilgrimage gathering",
+            "Kumbh locations - Haridwar, Allahabad, Ujjain, Nashik (12-year cycle)",
+            "Ardh Kumbh - half-yearly celebrations at selected sites",
+            "Kumbh significance - immortality nectar (Amrit) mythology",
+            "Magh Mela - Allahabad January gathering (annual)",
+            "Pushkar Fair - Rajasthan camel fair and religious gathering",
+            "Ajmer Sharif - Sufi saint pilgrimage (Khwaja Moinuddin Chishti)",
+            "Varanasi pilgrimage - moksha (liberation) pursuit site",
+            "Banaras Hindu University - spiritual and educational center",
+            "Amritsar Golden Temple - Sikh pilgrimage destination",
+            "Tirupati Temple - Hindu pilgrimage major site",
+            "Meenakshi Temple Fair - Tamil Nadu religious gathering",
+            "Rath Yatra - Puri Jagannatha chariot procession (June-July)",
+            "Pilgrimage practices - ritual immersion and spiritual experiences"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_011_T003",
+          "topic_name": "UNESCO Intangible Cultural Heritage of India",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Cultural Heritage",
+          "ncert_reference": "NCERT Class 11-12 History - UNESCO Recognition",
+          "key_concepts": [
+            "UNESCO Intangible Cultural Heritage List - 2003 Convention",
+            "Indian recognitions - Ramlila, Kumbh Mela, Vedic chanting",
+            "Ramlila of Varanasi (2008) - Lord Rama's life enactment",
+            "Kumbh Mela (2017) - pilgrimage gathering practices",
+            "Vedic chanting (2009) - Vedic recitation tradition",
+            "Nowruz - Parsi New Year celebration",
+            "Nangal Ritual - mourning ceremony (Parsi tradition)",
+            "Chhau dance - masked dance form (Eastern India)",
+            "Kalari Payattu - martial art form (Kerala)",
+            "Jodha tradition - flower garland making (Tamil Nadu)",
+            "Ajrakh printing - block printing tradition (Rajasthan)",
+            "Traditional brass and copper casting - metal craft tradition",
+            "Neem tree knowledge - Ayurvedic medicinal practice",
+            "Living traditions documentation and preservation importance"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_011_T004",
+          "topic_name": "Tribal Arts, Customs & Contemporary Celebrations",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Tribal Cultures",
+          "ncert_reference": "NCERT Class 6-12 History - Tribal Societies",
+          "key_concepts": [
+            "Tribal festivals - regional and community-specific celebrations",
+            "Hornbill Festival (Nagaland) - tribal culture showcase",
+            "Bi-Month Bhil festival - adivasi harvest celebration",
+            "Sohrai festival (Jharkhand) - tribal art and music tradition",
+            "Tribal body art - tattoo traditions and cultural significance",
+            "Face painting traditions - ritual and aesthetic purposes",
+            "Tribal music instruments - drums, flutes, regional variations",
+            "Adivasi (tribal) arts - paintings, sculptures, craft traditions",
+            "Warli painting - geometric tribal art (Maharashtra)",
+            "Santhal tribal traditions - art, music, social practices",
+            "Gender roles in tribal celebrations - women's participation",
+            "Contemporary tribal representation - film, literature, advocacy",
+            "Ecological practices - tribal sustainable living traditions",
+            "Cultural commodification - balancing tradition and market"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Describe the cultural significance of Diwali and Holi festivals.",
+          "What is the Kumbh Mela and its role in Hindu pilgrimage traditions?",
+          "Explain the UNESCO recognition of Indian intangible cultural heritage with examples.",
+          "Discuss the Ramlila tradition and its cultural importance.",
+          "Describe the pilgrimage practices and sacred sites in Indian religions.",
+          "What is the significance of Navratri and Durga Puja?",
+          "Explain tribal art and cultural practices with specific examples.",
+          "How do festivals reflect religious and social values in Indian culture?",
+          "Discuss contemporary celebrations and their relationship to traditional practices.",
+          "What is the role of pilgrimage in Indian spiritual traditions?"
+        ]
+      }
+    },
+    {
+      "module_id": "ARC_MOD_012",
+      "module_name": "Indian Crafts, Textiles & Geographical Indications",
+      "duration_days": {
+        "fast": 6,
+        "standard": 9,
+        "extended": 12
+      },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "ARC_012_T001",
+          "topic_name": "Textile Traditions & Handloom Heritage",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Textile Arts",
+          "ncert_reference": "NCERT Class 6-12 History - Indian Crafts",
+          "key_concepts": [
+            "Handloom tradition - ancient Indian textile production",
+            "Banarasi silk - Varanasi silk weaving, UNESCO GI status",
+            "Banarasi characteristics - brocade, gold thread, elaborate patterns",
+            "Kanchipuram silk - Tamil Nadu traditional sarees",
+            "Chanderi cotton - Madhya Pradesh lightweight fabric",
+            "Maheshwari - Madhya Pradesh traditional cotton-silk blend",
+            "Pashmina shawls - Kashmir woolens, luxury tradition",
+            "Pashmina production - high altitude pashmina goat wool",
+            "Patola silk - double ikat Gujarat tradition",
+            "Ikat technique - tie-dye dyeing method",
+            "Jamdani - Bengali muslin with figural patterns",
+            "Ajrakh - block-printed textiles (Rajasthan, Sindh)",
+            "Ajrakh technique - resist-dyeing and printing",
+            "Handloom revival - Khadi (Gandhi) and contemporary movements"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_012_T002",
+          "topic_name": "Geographical Indications (GI) in Indian Crafts & Art",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - GI Recognition",
+          "ncert_reference": "NCERT Class 11-12 Commerce - Intellectual Property",
+          "key_concepts": [
+            "Geographical Indication (GI) - legal protection for place-linked products",
+            "GI benefits - brand identity, quality assurance, market premium",
+            "Banarasi sarees - 2009 GI registration",
+            "Darjeeling tea - 2004 first Indian GI",
+            "Chanderi textiles - 2008 GI status",
+            "Madhubani paintings - 2009 GI recognition",
+            "Kanchipuram silk sarees - GI protection",
+            "Kashmir shawls - 2005 GI registration",
+            "Mysore paintings - 2013 GI status",
+            "Tirupati temple statues - traditional sculpture GI",
+            "Paithani sarees (Maharashtra) - 2015 GI",
+            "Nagpur orange - GI agricultural product",
+            "Moradabad brass ware - GI metal craft",
+            "Protection and marketing benefits - artisan livelihoods"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_012_T003",
+          "topic_name": "Traditional Craft Forms & Techniques",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Craft Traditions",
+          "ncert_reference": "NCERT Class 6-12 History - Crafts & Artisans",
+          "key_concepts": [
+            "Pottery tradition - terracotta and ceramic arts",
+            "Blue pottery (Jaipur) - Persian-influenced ceramic craft",
+            "Ceramic production techniques - wheel-throwing and hand-molding",
+            "Glass work - Firozabad and Murano glass traditions",
+            "Metal craft - brass, copper, aluminum casting and beating",
+            "Moradabad brass ware - embossed and engraved metalwork",
+            "Dhaka muslin - fine cotton weaving (historical, currently revived)",
+            "Bamboo craft - northeastern India basketry and furniture",
+            "Stone carving - Agra stone inlay and Jaipur marble work",
+            "Wood carving - Kashmir walnut and Kerala wood traditions",
+            "Ivory carving - historical tradition (now restricted)",
+            "Brocade weaving - gold and silver thread integration",
+            "Lacquer ware - Banaras furniture and decorative items",
+            "Weaving tools and techniques - loom types and operations"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2.5
+        },
+        {
+          "topic_id": "ARC_012_T004",
+          "topic_name": "Craft Clusters, Tourism & Contemporary Artistry",
+          "primary_source": "Nitin Singhania: Indian Art & Culture - Craft Economy",
+          "ncert_reference": "NCERT Class 11-12 Economics - Handicraft Industry",
+          "key_concepts": [
+            "Craft clusters - geographic concentration of artisans",
+            "Agra cluster - marble inlay and handicrafts",
+            "Jaipur cluster - blue pottery and traditional arts",
+            "Varanasi cluster - textiles and brassware",
+            "Moradabad cluster - brass and copper metalwork",
+            "Khimjee Craft Cluster (Gujarat) - block printing",
+            "Govt initiatives - DDUGKY, National Handicraft Mission",
+            "Museum collections - craft preservation and showcasing",
+            "Craft tourism - heritage tourism and artisan experience",
+            "Design innovation - traditional crafts with contemporary aesthetics",
+            "Digital marketing - online platforms for craft sales",
+            "Youth involvement - modern generation artisan engagement",
+            "Sustainable practices - eco-friendly craft production",
+            "Global market access - international craft recognition"
+          ],
+          "pyq_frequency": "Medium",
+          "prelims_importance": "Medium",
+          "mains_importance": "Medium",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 12,
+        "marks": 48,
+        "duration_minutes": 100,
+        "sample_questions": [
+          "Describe the major textile traditions of India with geographic origins.",
+          "What is a Geographical Indication (GI)? Provide examples of Indian products with GI status.",
+          "Explain the significance of Banarasi sarees and their production process.",
+          "Discuss the traditional craft techniques and their regional variations.",
+          "What is the importance of preserving India's handicraft heritage?",
+          "Describe the craft clusters in India and their economic significance.",
+          "Explain the ikat and block-printing techniques in Indian textiles.",
+          "How has Geographical Indication status benefited Indian artisans?",
+          "Discuss the role of government initiatives in craft preservation.",
+          "What are the contemporary challenges and opportunities for traditional Indian crafts?"
+        ]
+      }
+    }
+  ],
+  "ai_module_generator_schema": {
+    "input_params": {
+      "module_id": "string (e.g., ARC_MOD_001)",
+      "module_name": "string",
+      "num_topics": "integer (default: 5)",
+      "difficulty_level": "string (easy/medium/advanced)",
+      "focus_area": "string (e.g., 'Bharatanatyam dance', 'Mughal architecture')",
+      "include_pyq_analysis": "boolean (default: true)",
+      "include_mains_essay_guidance": "boolean (default: true)"
+    },
+    "output_format": {
+      "module_structure": {
+        "module_id": "string",
+        "module_name": "string",
+        "topics_generated": "array of topic objects",
+        "difficulty_assessment": "string",
+        "estimated_hours": "number",
+        "key_takeaways": "array of strings"
+      },
+      "topic_structure": {
+        "topic_id": "string",
+        "topic_name": "string",
+        "key_concepts": "array of 12-15 strings",
+        "pyq_analysis": "array of past year question references",
+        "mains_guidance": "string with essay direction",
+        "prelims_importance": "string (Very High/High/Medium/Low)",
+        "mains_importance": "string (Very High/High/Medium/Low)",
+        "daily_target_hours": "number"
+      }
+    }
+  }
+}

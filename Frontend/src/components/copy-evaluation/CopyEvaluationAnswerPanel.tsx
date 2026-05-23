@@ -85,8 +85,8 @@ export const CopyEvaluationAnswerPanel: React.FC<CopyEvaluationAnswerPanelProps>
       className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-full transition-all ${
         tab === id
           ? isDark
-            ? 'bg-gradient-to-r from-fuchsia-600/30 to-purple-600/30 text-fuchsia-200 border border-fuchsia-500/40 shadow-lg shadow-fuchsia-900/20'
-            : 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white border-0 shadow-md shadow-purple-200/50'
+            ? 'bg-gradient-to-r from-indigo-600/30 to-blue-600/30 text-indigo-200 border border-indigo-500/40 shadow-lg shadow-indigo-900/20'
+            : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-md shadow-blue-200/50'
           : isDark
             ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
             : 'text-slate-600 hover:text-slate-800 hover:bg-white border border-slate-200/80'
@@ -102,7 +102,7 @@ export const CopyEvaluationAnswerPanel: React.FC<CopyEvaluationAnswerPanelProps>
       {result.questionText && (
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <BookOpen className="w-4 h-4 text-purple-500" />
+            <BookOpen className="w-4 h-4 text-blue-500" />
             <h3 className={`text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
               Question
             </h3>
@@ -184,7 +184,7 @@ export const CopyEvaluationAnswerPanel: React.FC<CopyEvaluationAnswerPanelProps>
                     onClick={() => setActivePage(i)}
                     className={`px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all ${
                       activePage === i
-                        ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                         : isDark
                           ? 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -235,10 +235,10 @@ export const CopyEvaluationAnswerPanel: React.FC<CopyEvaluationAnswerPanelProps>
                 isDark ? 'border-slate-700/50' : 'border-slate-200'
               }`}
             >
-              <AlignLeft className="w-4 h-4 text-purple-600" />
+              <AlignLeft className="w-4 h-4 text-blue-600" />
               <span
                 className={`text-sm font-semibold ${
-                  isDark ? 'text-purple-300' : 'text-purple-800'
+                  isDark ? 'text-blue-300' : 'text-blue-800'
                 }`}
               >
                 Answer Text
@@ -254,10 +254,10 @@ export const CopyEvaluationAnswerPanel: React.FC<CopyEvaluationAnswerPanelProps>
                 isDark ? 'border-slate-700/50' : 'border-slate-200'
               }`}
             >
-              <FileImage className="w-4 h-4 text-purple-600" />
+              <FileImage className="w-4 h-4 text-blue-600" />
               <span
                 className={`text-sm font-semibold ${
-                  isDark ? 'text-purple-300' : 'text-purple-800'
+                  isDark ? 'text-blue-300' : 'text-blue-800'
                 }`}
               >
                 Uploaded Pages

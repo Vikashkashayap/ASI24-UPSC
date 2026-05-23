@@ -229,7 +229,7 @@ export const PrelimsImportTestPage: React.FC = () => {
                   onClick={() => setAnswer(key)}
                   className={`w-full text-left px-4 py-3.5 rounded-xl border-2 transition-all ${
                     isSelected
-                      ? "border-purple-500 bg-purple-50 text-purple-900 dark:border-purple-400 dark:bg-purple-500/25 dark:text-purple-100"
+                      ? "border-blue-500 bg-blue-50 text-blue-900 dark:border-blue-400 dark:bg-blue-500/25 dark:text-blue-100"
                       : isDark
                         ? "border-slate-600 bg-slate-700/50 text-slate-200 hover:border-slate-500 hover:bg-slate-700"
                         : "border-slate-200 bg-slate-50 text-slate-800 hover:border-slate-300 hover:bg-slate-100"
@@ -253,8 +253,8 @@ export const PrelimsImportTestPage: React.FC = () => {
               currentIndex === 0
                 ? "opacity-50 cursor-not-allowed bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
                 : isDark
-                  ? "bg-purple-600 text-white hover:bg-purple-500"
-                  : "bg-purple-600 text-white hover:bg-purple-700"
+                  ? "bg-blue-600 text-white hover:bg-blue-500"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
             }`}
           >
             <ChevronLeft className="w-4 h-4" />
@@ -264,7 +264,7 @@ export const PrelimsImportTestPage: React.FC = () => {
             type="button"
             onClick={() => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1))}
             disabled={currentIndex === questions.length - 1}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-purple-600 to-emerald-500 hover:from-purple-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-400 transition shadow-md"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-medium text-white bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-400 transition shadow-md"
           >
             Next
             <ChevronRight className="w-4 h-4" />
@@ -291,7 +291,7 @@ export const PrelimsImportTestPage: React.FC = () => {
                   onClick={() => setCurrentIndex(i)}
                   className={`w-9 h-9 rounded-lg text-sm font-medium transition ${
                     isCurrent
-                      ? "bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 dark:ring-offset-slate-900"
+                      ? "bg-blue-600 text-white ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-slate-900"
                       : hasAnswer
                         ? isDark
                           ? "bg-slate-600 text-slate-200 hover:bg-slate-500"

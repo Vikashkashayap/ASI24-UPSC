@@ -9,6 +9,13 @@ export default {
         primary: {
           DEFAULT: "#2563eb",
           foreground: "#ffffff",
+          dark: "#1d4ed8",
+          light: "#3b82f6",
+        },
+        brand: {
+          navy: "#0f1e3d",
+          "navy-soft": "#1a3366",
+          indigo: "#6366f1",
         },
         "royal-blue": "#2563eb",
         "royal-blue-dark": "#1d4ed8",

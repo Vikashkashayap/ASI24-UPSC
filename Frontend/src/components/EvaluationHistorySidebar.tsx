@@ -110,7 +110,7 @@ export const EvaluationHistorySidebar: React.FC = () => {
           <button
             onClick={viewAllHistory}
             className={`text-xs px-2 py-1 rounded hover:bg-slate-800/50 transition-colors ${
-              theme === "dark" ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+              theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
             }`}
             title="View all history"
           >
@@ -121,8 +121,8 @@ export const EvaluationHistorySidebar: React.FC = () => {
           onClick={startNewEvaluation}
           className={`w-full border-2 font-medium ${
             theme === "dark" 
-              ? "bg-slate-800 border-purple-500 text-white hover:bg-slate-700 hover:border-purple-400" 
-              : "bg-white border-purple-500 text-purple-700 hover:bg-purple-50"
+              ? "bg-slate-800 border-blue-500 text-white hover:bg-slate-700 hover:border-blue-400" 
+              : "bg-white border-blue-500 text-blue-700 hover:bg-blue-50"
           }`}
           variant="outline"
         >

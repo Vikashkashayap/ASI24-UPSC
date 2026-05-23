@@ -121,11 +121,11 @@ export const AdminPricingPage: React.FC = () => {
         </div>
       )}
 
-      <Card className={`rounded-2xl ${isDark ? "border-purple-800/60 bg-slate-900/50" : ""}`}>
+      <Card className={`rounded-2xl ${isDark ? "border-blue-800/60 bg-slate-900/50" : ""}`}>
         <CardContent className="p-0">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="w-8 h-8 animate-spin text-fuchsia-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
             </div>
           ) : plans.length === 0 ? (
             <div className={`flex flex-col items-center justify-center py-16 px-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
@@ -194,7 +194,7 @@ export const AdminPricingPage: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         {plan.isPopular && (
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-fuchsia-500/20 text-fuchsia-300`}>
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300`}>
                             Most Popular
                           </span>
                         )}

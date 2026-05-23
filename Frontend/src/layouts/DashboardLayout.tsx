@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Sun, Moon, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
 import { DartFormModal } from "../components/dart/DartFormModal";
 import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
 import logoImg from "../LOGO/mentorsdaily.png";
@@ -173,7 +173,7 @@ const formatExpiryDate = (dateStr: string | null | undefined) => {
 
 export const DashboardLayout = () => {
   const { user, logout, refreshUser } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -210,7 +210,7 @@ export const DashboardLayout = () => {
 
       {/* Fixed Sidebar - Mobile-first: hidden by default, shown on desktop */}
       <aside
-        className={`${sidebarCollapsed ? "w-16 md:w-20" : "w-[260px]"} flex flex-col border-r fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`${sidebarCollapsed ? "w-[72px]" : "w-[248px]"} flex flex-col border-r fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 ${theme === "dark"
             ? "border-slate-800/80 bg-[#0F172A] shadow-xl shadow-black/20"
             : "border-slate-200/80 bg-white shadow-xl shadow-slate-200/40"
@@ -583,7 +583,7 @@ export const DashboardLayout = () => {
       </aside>
 
       {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
-      <div className={`flex-1 flex flex-col h-screen min-w-0 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-16 lg:ml-20" : "md:ml-[260px]"}`}>
+      <div className={`flex-1 flex flex-col h-screen min-w-0 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-[72px]" : "md:ml-[248px]"}`}>
         {/* Fixed Header - equal alignment, better UI */}
         <header
           className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
@@ -618,7 +618,7 @@ export const DashboardLayout = () => {
             </div>
           </div>
 
-          {/* Right: DART (student only) + theme toggle + motivation + avatar */}
+          {/* Right: DART (student only) + motivation + avatar */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0 max-w-[55%] sm:max-w-none">
             {isStudent && (
               <button
@@ -634,16 +634,6 @@ export const DashboardLayout = () => {
                 <span className="hidden sm:inline">DART</span>
               </button>
             )}
-            <button
-              onClick={toggleTheme}
-              className={`inline-flex items-center justify-center w-9 h-9 md:w-9 md:h-9 rounded-full border transition-all duration-200 touch-manipulation active:scale-95 shrink-0 ${theme === "dark"
-                  ? "border-blue-700/60 bg-black/30 text-slate-200 hover:bg-blue-950/60 hover:border-blue-600/80 shadow-sm shadow-blue-900/20"
-                  : "border-blue-300 bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-400 shadow-sm shadow-blue-200/50"
-                }`}
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
-            </button>
             <button
               onClick={() => navigate("/profile")}
               className={`md:hidden inline-flex items-center justify-center w-9 h-9 min-h-[44px] min-w-[44px] rounded-full transition-colors touch-manipulation active:scale-95 shrink-0 ${theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}

@@ -67,7 +67,7 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
         {/* Report header */}
         <div
           className={`relative overflow-hidden px-5 py-4 border-b ${
-            isDark ? 'border-slate-700/60 bg-slate-800/40' : 'border-slate-200 bg-gradient-to-r from-slate-50 to-purple-50/40'
+            isDark ? 'border-slate-700/60 bg-slate-800/40' : 'border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50/40'
           }`}
         >
           <div className="absolute inset-x-0 top-0 h-0.5 eval-shimmer-bar opacity-80" />
@@ -75,12 +75,12 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
             <div
               className={`p-2.5 rounded-xl ${
                 isDark
-                  ? 'bg-gradient-to-br from-purple-500/25 to-fuchsia-500/15 ring-1 ring-purple-500/30'
-                  : 'bg-gradient-to-br from-purple-100 to-fuchsia-50 ring-1 ring-purple-200/60'
+                  ? 'bg-gradient-to-br from-blue-500/25 to-indigo-500/15 ring-1 ring-blue-500/30'
+                  : 'bg-gradient-to-br from-blue-100 to-indigo-50 ring-1 ring-blue-200/60'
               }`}
             >
               <FileText
-                className={`w-5 h-5 ${isDark ? 'text-purple-300' : 'text-purple-600'}`}
+                className={`w-5 h-5 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}
               />
             </div>
             <div>
@@ -96,7 +96,7 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
                   isDark ? 'text-slate-400' : 'text-slate-500'
                 }`}
               >
-                <Sparkles className="w-3 h-3 text-fuchsia-500" />
+                <Sparkles className="w-3 h-3 text-indigo-500" />
                 Section-wise premium feedback
               </p>
             </div>
@@ -142,7 +142,7 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
                   <li key={`e-${i}`} className="text-sm leading-relaxed flex gap-3">
                     <span
                       className={`mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                        isDark ? 'bg-purple-400' : 'bg-purple-500'
+                        isDark ? 'bg-blue-400' : 'bg-blue-500'
                       }`}
                     />
                     <span>{p}</span>
@@ -228,7 +228,7 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
               >
                 {result.constitutionalReferences!.map((r, i) => (
                   <li key={i} className="flex gap-2">
-                    <span className="text-purple-500">•</span>
+                    <span className="text-blue-500">•</span>
                     {r}
                   </li>
                 ))}

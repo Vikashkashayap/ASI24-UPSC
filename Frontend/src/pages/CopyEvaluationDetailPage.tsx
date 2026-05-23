@@ -96,7 +96,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
     return (
       <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-slate-950" : "bg-slate-50"}`}>
         <div className="text-center">
-          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${theme === "dark" ? "border-purple-600" : "border-purple-600"}`}></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${theme === "dark" ? "border-blue-600" : "border-blue-600"}`}></div>
           <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading evaluation...</p>
         </div>
       </div>
@@ -142,7 +142,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-xl md:text-2xl font-semibold ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`}>
+            <div className={`text-xl md:text-2xl font-semibold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
               {evaluation.finalSummary.overallScore.obtained.toFixed(1)}/{evaluation.finalSummary.overallScore.maximum}
             </div>
             <div className={`text-xs md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
@@ -170,8 +170,8 @@ const CopyEvaluationDetailPage: React.FC = () => {
                       className={`w-full text-left p-3 rounded-lg transition-all ${
                         selectedQuestion === idx
                           ? theme === "dark"
-                            ? 'bg-purple-900/50 border-2 border-purple-600'
-                            : 'bg-purple-100 border-2 border-purple-600'
+                            ? 'bg-blue-900/50 border-2 border-blue-600'
+                            : 'bg-blue-100 border-2 border-blue-600'
                           : theme === "dark"
                           ? 'bg-slate-800/50 border border-slate-700 hover:bg-slate-700/50'
                           : 'bg-white border border-slate-200 hover:bg-slate-50'
@@ -289,7 +289,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
             {/* Marks Breakdown */}
             <Card className="p-4 md:p-6">
               <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 flex items-center gap-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
-                <Target className={`w-4 h-4 md:w-5 md:h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <Target className={`w-4 h-4 md:w-5 md:h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 Marks Breakdown
               </h3>
               <div className="grid grid-cols-5 gap-2 md:gap-3">
@@ -301,7 +301,7 @@ const CopyEvaluationDetailPage: React.FC = () => {
                   return (
                     <div key={key} className={`p-2 md:p-3 rounded-lg text-center ${theme === "dark" ? "bg-slate-800/50" : "bg-slate-50"}`}>
                       <div className={`text-[10px] md:text-xs font-medium mb-1 md:mb-2 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>{shortKey}</div>
-                      <div className={`text-base md:text-lg font-semibold px-2 md:px-3 py-1 md:py-2 rounded ${theme === "dark" ? "bg-purple-900/30 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
+                      <div className={`text-base md:text-lg font-semibold px-2 md:px-3 py-1 md:py-2 rounded ${theme === "dark" ? "bg-blue-900/30 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
                         {value}
                       </div>
                     </div>
@@ -355,12 +355,12 @@ const CopyEvaluationDetailPage: React.FC = () => {
             {currentQuestion.diagramAnalysis && (
               <Card className="p-4 md:p-6">
                 <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>Diagram Analysis</h3>
-                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-purple-950/30" : "bg-purple-50"}`}>
+                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-blue-950/30" : "bg-blue-50"}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className={`font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                       Diagram Present: {currentQuestion.diagramAnalysis.present ? 'Yes' : 'No'}
                     </span>
-                    <span className={`text-xl font-bold ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`}>
+                    <span className={`text-xl font-bold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                       {currentQuestion.diagramAnalysis.marksAwarded} marks
                     </span>
                   </div>
@@ -404,11 +404,11 @@ const CopyEvaluationDetailPage: React.FC = () => {
 
             {/* Improvements */}
             <Card className="p-4 md:p-6">
-              <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-purple-300" : "text-purple-800"}`}>How to Improve This Answer</h3>
+              <h3 className={`text-sm md:text-base font-semibold mb-3 md:mb-4 ${theme === "dark" ? "text-blue-300" : "text-blue-800"}`}>How to Improve This Answer</h3>
               <ol className="space-y-2">
                 {currentQuestion.improvements.map((improvement, idx) => (
                   <li key={idx} className={`flex items-start gap-2 md:gap-3 text-xs md:text-sm ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                    <span className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-[10px] md:text-xs font-semibold">
+                    <span className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] md:text-xs font-semibold">
                       {idx + 1}
                     </span>
                     <span>{improvement}</span>

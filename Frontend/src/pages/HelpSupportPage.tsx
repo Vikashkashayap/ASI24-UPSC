@@ -10,21 +10,21 @@ export default function HelpSupportPage() {
       {/* Enhanced Header - compact on mobile */}
       <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 border-2 transition-all duration-300 ${
         theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
-          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
+          ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10" 
+          : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
       }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex items-center gap-2 md:gap-4">
           <div className={`p-2 md:p-3 rounded-lg md:rounded-xl shrink-0 ${
-            theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+            theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
           }`}>
-            <LifeBuoy className={`w-6 h-6 md:w-8 md:h-8 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            <LifeBuoy className={`w-6 h-6 md:w-8 md:h-8 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
           </div>
           <div className="min-w-0">
             <h1 className={`text-xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
               theme === "dark" 
-                ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
-                : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
+                ? "from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent" 
+                : "from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent"
             }`}>
               Help & Support
             </h1>
@@ -37,16 +37,16 @@ export default function HelpSupportPage() {
 
       <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
         theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-          : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+          : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
       }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <CardHeader className="pb-4 relative z-10">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+              theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
             }`}>
-              <LifeBuoy className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <LifeBuoy className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
             <div>
               <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -61,12 +61,12 @@ export default function HelpSupportPage() {
               theme === "dark" ? "bg-slate-800/50 hover:bg-slate-800/70" : "bg-slate-50 hover:bg-slate-100"
             }`}>
               <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
               }`}>
-                <HelpCircle className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <HelpCircle className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <div>
-                <span className={`font-bold text-base ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+                <span className={`font-bold text-base ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>
                   Knowledge Base:
                 </span>
                 <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>

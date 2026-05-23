@@ -1,5 +1,6 @@
 import React from "react";
 import { SafeQuestionHtml } from "./SafeQuestionHtml";
+import { UpscFormattedQuestionStem } from "./UpscFormattedQuestionStem";
 import {
   BilingualQuestionFields,
   getOptionEnglish,
@@ -34,7 +35,7 @@ function renderQuestionBody(
       />
     );
   }
-  return <div className={className}>{text}</div>;
+  return <UpscFormattedQuestionStem text={text} theme={theme} className={className} />;
 }
 
 interface BilingualQuestionTextProps {

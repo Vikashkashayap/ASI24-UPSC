@@ -64,7 +64,7 @@ export default function CurrentAffairDetailPage() {
     return (
       <section className={sectionClass}>
         <div className="w-full max-w-3xl mx-auto px-3 py-8 flex justify-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
         </div>
       </section>
     );
@@ -97,7 +97,7 @@ export default function CurrentAffairDetailPage() {
         to=".."
         relative="path"
         className={`inline-flex items-center gap-2 text-sm font-medium ${
-          isDark ? "text-slate-300 hover:text-purple-400" : "text-slate-600 hover:text-purple-600"
+          isDark ? "text-slate-300 hover:text-blue-400" : "text-slate-600 hover:text-blue-600"
         }`}
       >
         <ArrowLeft className="w-4 h-4" />
@@ -107,11 +107,11 @@ export default function CurrentAffairDetailPage() {
       <Card
         className={`relative overflow-hidden border-2 ${
           isDark
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20"
-            : "bg-gradient-to-br from-white to-purple-50/30 border-purple-200/50"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20"
+            : "bg-gradient-to-br from-white to-blue-50/30 border-blue-200/50"
         }`}
       >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <CardHeader className="relative z-10">
           <div className="flex flex-wrap gap-2 mb-2">
             <span
@@ -208,7 +208,7 @@ export default function CurrentAffairDetailPage() {
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-2 text-sm font-medium ${
-                isDark ? "text-purple-400 hover:text-purple-300" : "text-purple-600 hover:text-purple-700"
+                isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
               }`}
             >
               <ExternalLink className="w-4 h-4" />

@@ -69,10 +69,10 @@ export function SmartSetupForm({
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-      <Card className={cn("border-2 overflow-hidden", theme === "dark" ? "bg-slate-900/80 border-violet-500/20" : "bg-white/90 border-violet-200/60 backdrop-blur-xl")}>
+      <Card className={cn("border-2 overflow-hidden", theme === "dark" ? "bg-slate-900/80 border-indigo-500/20" : "bg-white/90 border-indigo-200/60 backdrop-blur-xl")}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg shadow-violet-500/25">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/25">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -88,7 +88,7 @@ export function SmartSetupForm({
                 <label className="text-sm font-medium mb-1.5 block">Exam Type</label>
                 <div className="flex gap-2">
                   {(["UPSC", "MPPSC"] as const).map((t) => (
-                    <button key={t} type="button" onClick={() => setExamType(t)} className={cn("flex-1 py-2 rounded-lg text-sm font-medium border transition-all", examType === t ? "bg-violet-600 text-white border-violet-600" : "border-slate-300")}>
+                    <button key={t} type="button" onClick={() => setExamType(t)} className={cn("flex-1 py-2 rounded-lg text-sm font-medium border transition-all", examType === t ? "bg-indigo-600 text-white border-indigo-600" : "border-slate-300")}>
                       {t}
                     </button>
                   ))}
@@ -153,7 +153,7 @@ export function SmartSetupForm({
               <label className="text-sm font-medium mb-2 block">Preparation Level</label>
               <div className="flex flex-wrap gap-2">
                 {PREP_LEVELS.map((l) => (
-                  <button key={l} type="button" onClick={() => setPreparationLevel(l)} className={cn("px-4 py-2 rounded-lg text-sm capitalize", preparationLevel === l ? "bg-violet-600 text-white" : "bg-slate-100")}>
+                  <button key={l} type="button" onClick={() => setPreparationLevel(l)} className={cn("px-4 py-2 rounded-lg text-sm capitalize", preparationLevel === l ? "bg-indigo-600 text-white" : "bg-slate-100")}>
                     {l}
                   </button>
                 ))}
@@ -171,7 +171,7 @@ export function SmartSetupForm({
               </div>
             </div>
 
-            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 border-0">
+            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-indigo-600 hover:from-indigo-700 hover:to-indigo-700 border-0">
               {isLoading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />AI is crafting your plan…</> : <><Sparkles className="w-4 h-4 mr-2" />{submitLabel}</>}
             </Button>
           </form>

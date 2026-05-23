@@ -178,22 +178,22 @@ const EvaluationHistoryPage: React.FC = () => {
       {/* Enhanced Header */}
       <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
         theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10" 
-          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
+          ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10" 
+          : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
       }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
           <div className="flex items-center gap-3 md:gap-4">
             <div className={`p-2.5 md:p-3 rounded-xl ${
-              theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+              theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
             }`}>
-              <FileText className={`w-6 h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <FileText className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
             <div className="flex flex-col gap-1 md:gap-2">
               <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
                 theme === "dark" 
-                  ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent" 
-                  : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
+                  ? "from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent" 
+                  : "from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent"
               }`}>
                 Evaluation History
               </h1>
@@ -204,7 +204,7 @@ const EvaluationHistoryPage: React.FC = () => {
           </div>
           <Button
             onClick={startNewEvaluation}
-            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg shadow-purple-500/30"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30"
           >
             <Upload className="w-4 h-4 mr-2" />
             New Evaluation
@@ -215,10 +215,10 @@ const EvaluationHistoryPage: React.FC = () => {
       {/* Search Bar */}
       <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
         theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-          : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+          : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
       }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <CardContent className="p-4 md:p-6 relative z-10">
           <div className="relative">
             <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
@@ -233,7 +233,7 @@ const EvaluationHistoryPage: React.FC = () => {
                 theme === "dark"
                   ? "bg-slate-800 border-slate-700 text-slate-200 placeholder-slate-500"
                   : "bg-white border-slate-300 text-slate-900 placeholder-slate-400"
-              } focus:outline-none focus:ring-2 focus:ring-purple-500`}
+              } focus:outline-none focus:ring-2 focus:ring-blue-500`}
             />
           </div>
         </CardContent>
@@ -243,7 +243,7 @@ const EvaluationHistoryPage: React.FC = () => {
       {loadingHistory ? (
         <Card className={theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}>
           <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             <p className={`mt-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Loading evaluations...</p>
           </CardContent>
         </Card>
@@ -265,7 +265,7 @@ const EvaluationHistoryPage: React.FC = () => {
             {!searchQuery && (
               <Button
                 onClick={startNewEvaluation}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Upload First Evaluation
@@ -281,18 +281,18 @@ const EvaluationHistoryPage: React.FC = () => {
               onClick={() => handleEvaluationClick(evaluation._id)}
               className={`cursor-pointer transition-all hover:shadow-lg ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700 hover:border-purple-500/50"
-                  : "bg-white border-slate-200 hover:border-purple-300"
+                  ? "bg-slate-900 border-slate-700 hover:border-blue-500/50"
+                  : "bg-white border-slate-200 hover:border-blue-300"
               }`}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className={`p-2 rounded-lg ${
-                      theme === "dark" ? "bg-slate-800" : "bg-purple-50"
+                      theme === "dark" ? "bg-slate-800" : "bg-blue-50"
                     }`}>
                       <FileText className={`w-5 h-5 ${
-                        theme === "dark" ? "text-purple-400" : "text-purple-600"
+                        theme === "dark" ? "text-blue-400" : "text-blue-600"
                       }`} />
                     </div>
                     <div className="flex-1 min-w-0">

@@ -223,7 +223,7 @@ const TestHistoryPage: React.FC = () => {
               placeholder="Search by topic, subject, or difficulty..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 theme === "dark"
                   ? "bg-slate-800 border-slate-700 text-slate-200"
                   : "border-slate-300 bg-white"
@@ -236,7 +236,7 @@ const TestHistoryPage: React.FC = () => {
       {/* History List */}
       {loadingHistory ? (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : filteredHistory.length === 0 ? (
         <Card>
@@ -251,7 +251,7 @@ const TestHistoryPage: React.FC = () => {
             {!searchQuery && (
               <Button
                 onClick={() => navigate('/test-generator')}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               >
                 <Target className="mr-2 h-4 w-4" />
                 Generate Test
@@ -267,8 +267,8 @@ const TestHistoryPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"}`}>
-                        <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                      <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
+                        <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                       </div>
                       <div className="flex-1">
                         <h3 className={`font-semibold text-lg ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
@@ -332,7 +332,7 @@ const TestHistoryPage: React.FC = () => {
                       ) : (
                         <Button
                           onClick={() => navigate(`/test/${test._id}`)}
-                          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
+                          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
                         >
                           <Play className="mr-2 h-4 w-4" />
                           Continue Test
@@ -431,7 +431,7 @@ const TestHistoryPage: React.FC = () => {
                 <Card>
                   <CardContent className="pt-4">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                      <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                       <div>
                         <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                           Correct Answers

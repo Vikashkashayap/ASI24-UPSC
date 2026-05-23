@@ -116,7 +116,7 @@ export const OfferBanner = () => {
       role="banner"
       aria-label="Offer"
     >
-      <div className="banner-strip bg-gradient-to-r from-blue-600 via-blue-700 to-purple-700 text-white flex items-center overflow-hidden">
+      <div className="banner-strip bg-gradient-to-r from-blue-600 via-blue-700 to-blue-700 text-white flex items-center overflow-hidden">
         {/* Scrolling marquee – moves right */}
         <div className="flex-1 min-w-0 overflow-hidden flex items-center">
           <div className="flex items-center animate-marquee-right whitespace-nowrap w-max h-full">
@@ -126,7 +126,7 @@ export const OfferBanner = () => {
           </div>
         </div>
         {/* Fixed CTA + close on the right */}
-        <div className="flex items-center gap-2 shrink-0 pl-4 pr-2 h-full bg-gradient-to-l from-purple-700/80 to-transparent">
+        <div className="flex items-center gap-2 shrink-0 pl-4 pr-2 h-full bg-gradient-to-l from-blue-700/80 to-transparent">
           {offer.redirectUrl && (
             <button
               type="button"

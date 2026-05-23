@@ -1,0 +1,632 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 1 — Post-Independence India Comprehensive Syllabus",
+    "purpose": "Standalone Post-Independence India file for MentorsDaily UPSC portal — AI module generation",
+    "paper": "GS Paper 1",
+    "total_modules": 10,
+    "estimated_preparation_hours": 160,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Official Notification 2013 onwards",
+    "note": "Covers 1947 onwards — distinct from Modern History (colonial period). NCERT Class 12 Politics in India Since Independence is the backbone.",
+    "time_period": "1947 to present"
+  },
+
+  "primary_books": {
+    "book_1": { "title": "India Since Independence", "author": "Bipan Chandra", "publisher": "Penguin", "usage": "Comprehensive post-independence political and economic history" },
+    "book_2": { "title": "Politics in India Since Independence", "publisher": "NCERT Class 12", "usage": "Primary textbook — Nehru era, Emergency, coalition politics, regional parties" },
+    "book_3": { "title": "India After Gandhi", "author": "Ramachandra Guha", "publisher": "Macmillan", "usage": "Narrative history — partition, integration, democracy building" },
+    "book_4": { "title": "India: Social Change and Development", "publisher": "NCERT Class 12 Sociology", "usage": "Social transformation, caste, land reforms, urbanisation post-independence" }
+  },
+
+  "modules": [
+    {
+      "module_id": "PI_MOD_001",
+      "module_name": "Partition, Independence and Integration of Princely States (1947-1950)",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_001_T001",
+          "topic_name": "Partition of India — Causes, Violence and Refugee Crisis",
+          "primary_source": "Bipan Chandra Ch 1-2; Ramachandra Guha Part 1; NCERT Class 12 Ch 1",
+          "ncert_reference": "NCERT Class 12 Politics in India Since Independence — Ch 1: Challenges of Nation Building",
+          "key_concepts": [
+            "Two-Nation Theory — Jinnah's demand for separate Muslim homeland",
+            "Cabinet Mission Plan 1946 — grouping scheme rejected by Congress",
+            "Mountbatten Plan (June 3 Plan) 1947 — partition and transfer of power framework",
+            "Radcliffe Line — Sir Cyril Radcliffe drew boundaries in 5 weeks",
+            "Punjab partition — worst violence — 2 million dead, 14 million displaced",
+            "Bengal partition — Calcutta riots, Noakhali violence, Gandhi's fast",
+            "Refugee crisis — largest voluntary migration in human history",
+            "Rehabilitation Ministry — Nehru government managing 8 million refugees",
+            "Communal violence patterns — urban vs rural, pre-partition vs post",
+            "Secular India's founding — Nehru's rejection of Hindu Rashtra option",
+            "Nehru-Liaquat Pact 1950 — minority protection in both countries",
+            "Economic division — canal headworks, railways, military assets split",
+            "Pakistan gets West Punjab, Sindh, Baluchistan, NWFP (Pakistan) + East Bengal",
+            "India gets rest — undivided majority of territory and population",
+            "Long-term legacy — Kashmir dispute, water sharing, trade barriers"
+          ],
+          "key_personalities": [
+            "Mountbatten — last Viceroy, partition architect",
+            "Cyril Radcliffe — boundary demarcation",
+            "Jinnah — Pakistan founder, two-nation theory",
+            "Nehru — first PM, secular India vision",
+            "Gandhi — inter-community peace, opposed partition emotionally"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "PI_001_T002",
+          "topic_name": "Integration of Princely States — Sardar Patel's Achievement",
+          "primary_source": "Ramachandra Guha Ch 2-4; V.P. Menon — Integration of the Indian States",
+          "ncert_reference": "NCERT Class 12 Politics Ch 1 — Challenges of Nation Building",
+          "key_concepts": [
+            "562 princely states — varying in size from tiny to Hyderabad (Nizam's dominion)",
+            "Doctrine of Lapse — historical precedent, but not used in 1947",
+            "Instrument of Accession — legal mechanism for states to join India",
+            "Sardar Vallabhbhai Patel — Deputy PM, Home Minister — Iron Man of India",
+            "V.P. Menon — key bureaucrat who structured the integration process",
+            "Stand-still agreement — trade and communications during transition",
+            "Junagadh — Muslim ruler, Hindu majority — Pakistani accession reversed by plebiscite",
+            "Hyderabad — Operation Polo September 1948 — police action — Nizam surrendered",
+            "Kashmir — Maharaja Hari Singh's accession after Pakistani tribal invasion",
+            "Instrument of Accession signed October 26, 1947 — Indian troops airlifted",
+            "Travancore, Bhopal, Jodhpur — resistance to accession overcome by negotiation",
+            "Privy Purses — constitutional guarantee to rulers in exchange for accession",
+            "Privy Purses abolished 1971 — 26th Constitutional Amendment",
+            "Linguistic reorganisation of states — 1956 — Fazal Ali Commission",
+            "Success of integration — India remained unified unlike fears of balkanisation"
+          ],
+          "key_personalities": [
+            "Sardar Patel — master strategist of integration, threat and negotiation mix",
+            "V.P. Menon — draftsman of Instruments of Accession",
+            "Nizam of Hyderabad — last holdout, Operation Polo forced accession",
+            "Hari Singh — Kashmir's Maharaja whose delay caused the conflict",
+            "Sheikh Abdullah — Kashmir PM, aligned with India"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the role of Sardar Vallabhbhai Patel in the integration of princely states. (10 marks)",
+          "How was the Kashmir problem created and what has been its long-term impact on India-Pakistan relations? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_002",
+      "module_name": "Constitution Making and the Indian Republic (1946-1952)",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_002_T001",
+          "topic_name": "Constituent Assembly — Debates and Constitution Adoption",
+          "primary_source": "Bipan Chandra Ch 3; Granville Austin — The Indian Constitution; NCERT Cl 12 Politics Ch 1",
+          "ncert_reference": "NCERT Class 11 Political Science — Indian Constitution at Work",
+          "key_concepts": [
+            "Constituent Assembly — elected 1946, 299 members, chaired by Dr Rajendra Prasad",
+            "Objectives Resolution 1946 — moved by Nehru — framing vision for Constitution",
+            "Drafting Committee — chaired by B.R. Ambedkar — 7 members",
+            "2 years, 11 months, 18 days — time taken to draft Constitution",
+            "Debates on UCC (Uniform Civil Code) — not made mandatory, put in DPSP",
+            "Reservation debate — Ambedkar's insistence, Nehru's support for limited period",
+            "Language controversy — Hindi vs. regional languages — Article 343-351",
+            "President vs parliamentary system — why India chose Westminster model",
+            "Fundamental Rights modelled on US Bill of Rights",
+            "DPSP inspired by Irish Constitution",
+            "Federal with unitary bias — strong Centre design",
+            "Constitution adopted November 26, 1949 — came into effect January 26, 1950",
+            "Jan 26, 1950 significance — INC 1930 Purna Swaraj resolution",
+            "Dr Rajendra Prasad — first President of India",
+            "Granville Austin's assessment — Constitution: The Cornerstone of a Nation"
+          ],
+          "key_personalities": [
+            "B.R. Ambedkar — Chairman, Drafting Committee — 'Father of the Constitution'",
+            "Jawaharlal Nehru — Objectives Resolution, parliamentary system advocate",
+            "Sardar Patel — Fundamental Rights sub-committee",
+            "K.M. Munshi — key contributor to fundamental rights drafting",
+            "Alladi Krishnaswami Ayyar — constitutional legal expertise"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Discuss the major debates in the Constituent Assembly. How did they shape the Indian Constitution? (12.5 marks)",
+          "Why did India adopt a parliamentary system of government? Critically evaluate its functioning. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_003",
+      "module_name": "Nehru Era — Domestic Policies (1947-1964)",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_003_T001",
+          "topic_name": "Nehruvian Economic Model — Planning, PSUs, Mixed Economy",
+          "primary_source": "Bipan Chandra Ch 5-7; NCERT Class 12 Ch 3 — Politics of Planned Development",
+          "ncert_reference": "NCERT Class 12 Politics in India — Ch 3: Politics of Planned Development",
+          "key_concepts": [
+            "Nehruvian socialism — state-led development, not Marxist but inspired by Fabian socialism",
+            "Mixed economy — public sector for commanding heights, private sector for rest",
+            "Planning Commission established 1950 — Nehru as de facto chairman",
+            "Five Year Plans — First (1951-56) agriculture focus; Second (1956-61) heavy industry",
+            "Mahalanobis model — P.C. Mahalanobis — Second FYP — steel, machinery priority",
+            "Critique of Mahalanobis — agriculture neglect, capital goods imbalance",
+            "PSU creation — Steel Authority, BHEL, ONGC, HAL — commanding heights strategy",
+            "Industrial Policy Resolution 1956 — Schedule A (state monopoly), B (mixed), C (private)",
+            "Licence Raj — industrial licensing system — Entrepreneurs needed permits",
+            "Land reforms — abolition of zamindari — varied success across states",
+            "Community Development Programme 1952 — rural development through extension",
+            "Failure of CPD — elite capture, poor implementation — led to Panchayati Raj",
+            "Balwant Rai Mehta Committee 1957 — recommended Panchayati Raj institutions",
+            "Green Revolution seeds (Borlaug varieties) — introduced late 1960s after Nehru",
+            "Nehru's legacy — industrial base, IITs, IIMs, AIIMS, Bhabha Atomic Research Centre"
+          ],
+          "key_personalities": [
+            "P.C. Mahalanobis — Planning Commission architect, Mahalanobis model",
+            "V.K.R.V. Rao — national income data, planning economics",
+            "Nehru — vision of scientific socialism",
+            "B.R. Shenoy — lone critic of planning model, predicted inflation"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "PI_003_T002",
+          "topic_name": "States Reorganisation, Language Policy and National Integration",
+          "primary_source": "Bipan Chandra Ch 8-9; NCERT Class 12 Ch 7 — Regional Aspirations",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 7: Regional Aspirations and Ch 8: Recent Developments",
+          "key_concepts": [
+            "Linguistic states demand — Potti Sriramulu's fast unto death 1952 for Telugu state",
+            "Andhra Pradesh created 1953 — first linguistic state",
+            "States Reorganisation Commission 1953 — Fazal Ali, Hridaynath Kunzru, K.M. Panikkar",
+            "SRC Report 1955 — linguistic principle accepted, 14 states and 6 UTs",
+            "States Reorganisation Act 1956 — major redrawing of state boundaries",
+            "Bombay controversy — Maharashtra vs Gujarat vs Bombay city — solved 1960",
+            "Punjabi Suba demand — Akali Dal — Punjab divided 1966 — Punjab, Haryana, HP",
+            "Official Language controversy — Hindi as sole official language — South India protests",
+            "Official Languages Act 1963 — English continued indefinitely for official use",
+            "Northeast reorganisation — small states carved out from Assam 1970s",
+            "Mizoram and Arunachal Pradesh — full statehood from UTs 1987",
+            "Jharkhand, Uttarakhand, Chhattisgarh — new states 2000",
+            "Telangana — 29th state 2014 — bifurcation of Andhra Pradesh",
+            "Demands for statehood — Vidharbha, Gorkhaland, Coorg, Bodoland (ongoing)",
+            "Constitutional provisions — Article 3 — Parliament can create/change/merge states"
+          ],
+          "key_personalities": [
+            "Potti Sriramulu — martyr for Telugu linguistic state",
+            "Fazal Ali — SRC chairman",
+            "Nehru — initially opposed linguistic states, later pragmatically accepted",
+            "Gobind Ballabh Pant — Home Minister, managed states reorganisation"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Evaluate the Nehruvian model of economic development. Was it the right choice for India? (12.5 marks)",
+          "Examine the basis of states reorganisation in India. Should it be done on linguistic or administrative grounds? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_004",
+      "module_name": "Nehru Era — Foreign Policy and Early Conflicts (1947-1964)",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_004_T001",
+          "topic_name": "Non-Alignment Movement and Nehru's Foreign Policy Vision",
+          "primary_source": "Bipan Chandra Ch 10-11; NCERT Class 12 Ch 4 — India's External Relations",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 4: India's External Relations",
+          "key_concepts": [
+            "Non-Alignment — not neutrality — independent foreign policy rejecting Cold War blocs",
+            "Panchsheel — Five Principles of Peaceful Coexistence — India-China 1954",
+            "NAM founding — Nehru, Nasser, Tito — Belgrade Summit 1961",
+            "Bandung Conference 1955 — Afro-Asian solidarity, India's central role",
+            "Hindi-Chini Bhai Bhai — India-China friendship slogan — illusion shattered 1962",
+            "Sino-Indian War October-November 1962 — China's sudden attack",
+            "McMahon Line — 1914 — China never accepted; NEFA (now Arunachal) territory",
+            "India's military unpreparedness — civilian interference in military strategy",
+            "Nehru's health declined after 1962 — died May 27, 1964",
+            "Indo-Pakistan War 1947-48 — Kashmir — ceasefire January 1, 1949 — UN mediation",
+            "Nehru referred Kashmir to UN — later regretted — bilateral preferred",
+            "Goa liberation 1961 — Operation Vijay — Portuguese expelled by military",
+            "Nuclear policy — Nehru opposed nuclear weapons, promoted peaceful use",
+            "India-US relations — tensions over NAM, Pakistan alignment of US",
+            "Nehru's legacy in foreign policy — autonomy doctrine, strong influence in developing world"
+          ],
+          "key_personalities": [
+            "Nehru — architect of NAM and Panchsheel",
+            "K.S. Bajpai — first Secretary-General, Ministry of External Affairs",
+            "Krishna Menon — Defence Minister during 1962 defeat — resigned",
+            "Marshal Ayub Khan — Pakistan President, proxy war on Kashmir"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Explain the policy of Non-Alignment. Is it still relevant in today's world? (12.5 marks)",
+          "Analyse the causes and consequences of the Sino-Indian War of 1962. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_005",
+      "module_name": "Political Transition and Indira Gandhi Era (1964-1977)",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_005_T001",
+          "topic_name": "Lal Bahadur Shastri, Green Revolution and 1965 War",
+          "primary_source": "Bipan Chandra Ch 12; NCERT Class 12 Ch 2 — Era of One-Party Dominance",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 5: Challenges to and Restoration of Congress System",
+          "key_concepts": [
+            "Lal Bahadur Shastri — PM June 1964 to January 1966",
+            "Shastri's simplicity — austerity, personal integrity as leadership style",
+            "Jai Jawan Jai Kisan — slogan combining military and agricultural priority",
+            "Indo-Pakistan War 1965 — triggered by Pakistan's Operation Gibraltar",
+            "Battle of Asal Uttar — India's tank victory — turning point",
+            "Tashkent Agreement January 1966 — USSR mediation — Shastri died that night",
+            "Green Revolution — Norman Borlaug wheat varieties — Punjab, Haryana, UP",
+            "IARI (Indian Agricultural Research Institute) — M.S. Swaminathan — HYV seeds",
+            "Food security achieved — India moved from ship-to-mouth to buffer stocks",
+            "Social consequences — Green Revolution benefited large farmers, bypassed poor",
+            "Indira Gandhi — PM 1966 — Congress old guard vs her 'syndicate' conflict",
+            "1967 elections — Congress weakened in states — coalition era beginning",
+            "Bank nationalisation 1969 — 14 major banks — populist move",
+            "Abolition of Privy Purses 1971 — 26th Amendment",
+            "Garibi Hatao slogan — 1971 elections — Congress landslide"
+          ],
+          "key_personalities": [
+            "Lal Bahadur Shastri — moral leadership, 1965 war",
+            "M.S. Swaminathan — Green Revolution architect in India",
+            "Indira Gandhi — Congress president, PM from 1966",
+            "Morarji Desai — Deputy PM, Congress old guard leader"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "PI_005_T002",
+          "topic_name": "1971 Bangladesh Liberation War and Emergency (1975-77)",
+          "primary_source": "Bipan Chandra Ch 13-14; Ramachandra Guha Ch 24-26; NCERT Class 12 Ch 6",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 6: The Crisis of Democratic Order",
+          "key_concepts": [
+            "Operation Searchlight March 1971 — Pakistan army brutality in East Pakistan",
+            "10 million refugees into India — massive humanitarian and security burden",
+            "Indira-Brezhnev Treaty August 1971 — India-Soviet Friendship Treaty",
+            "India-Pakistan War December 1971 — 13-day war",
+            "General Sam Manekshaw — COAS — India's decisive military victory",
+            "Surrender of 93,000 Pakistani soldiers — December 16, 1971 — Vijay Diwas",
+            "Bangladesh created — Sheikh Mujibur Rahman — Mujib's release from prison",
+            "Simla Agreement 1972 — bilateral resolution, PoW return, Shimla Accord",
+            "JP Movement 1974 — Jayaprakash Narayan — Bihar students, Total Revolution",
+            "Allahabad HC 1975 — found Indira guilty of electoral malpractice",
+            "Emergency June 25, 1975 — Article 352 internal Emergency declared",
+            "MISA — Maintenance of Internal Security Act — mass arrests",
+            "Press censorship — darkest chapter of Indian democracy",
+            "Forced sterilisation programme — Sanjay Gandhi — compulsory family planning",
+            "End of Emergency March 1977 — elections called — Congress lost — Janata victory"
+          ],
+          "key_personalities": [
+            "Indira Gandhi — Emergency declaration, authoritarian phase",
+            "Jayaprakash Narayan — Total Revolution, Janata coalition architect",
+            "Sam Manekshaw — military genius of 1971 war",
+            "Sanjay Gandhi — Emergency inner circle, forced sterilisation",
+            "Justice J.C. Shah — Shah Commission Report on Emergency excesses"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the causes and consequences of the Emergency (1975-77). What lessons does it hold for Indian democracy? (12.5 marks)",
+          "Assess India's role in the liberation of Bangladesh in 1971. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_006",
+      "module_name": "Janata Era, Indira's Return and Rajiv Gandhi (1977-1991)",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_006_T001",
+          "topic_name": "Janata Government, Indira's Return and Punjab Crisis",
+          "primary_source": "Ramachandra Guha Ch 27-30; NCERT Class 12 Ch 6-7",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 5, 7: Recent Developments in Indian Politics",
+          "key_concepts": [
+            "Janata Party victory 1977 — first non-Congress government — Morarji Desai PM",
+            "44th Constitutional Amendment 1978 — restoring fundamental rights, limiting Emergency powers",
+            "Shah Commission 1977 — investigated Emergency excesses",
+            "Janata collapse 1979 — internal contradictions, Charan Singh brief PM",
+            "Indira Gandhi returned 1980 — Congress(I) landslide — Indira the comeback",
+            "Anandpur Sahib Resolution 1973 — Sikh autonomy demands — Akali Dal",
+            "Bhindranwale — Jarnail Singh Bhindranwale — Sikh militant, Punjab crisis",
+            "Operation Blue Star June 1984 — army entered Golden Temple to flush out militants",
+            "Deaths including Bhindranwale — Akal Takht damaged — Sikh outrage",
+            "Indira Gandhi assassination October 31, 1984 — by Sikh bodyguards",
+            "Anti-Sikh riots November 1984 — 3,000 killed in Delhi — Congress leaders implicated",
+            "Rajiv Gandhi PM — sympathy wave — 1984 elections — Congress 404 seats",
+            "Bofors scandal — kickbacks in howitzer deal — tarnished Rajiv",
+            "IPKF — Indian Peacekeeping Force — Sri Lanka — Tamil Eelam conflict 1987-90",
+            "Rajiv Gandhi assassination May 1991 — LTTE suicide bomb — election campaign"
+          ],
+          "key_personalities": [
+            "Morarji Desai — PM 1977-79, principled conservative",
+            "Bhindranwale — Punjab militant symbol",
+            "Indira Gandhi — assassination October 31, 1984",
+            "Rajiv Gandhi — computer revolution, IPKF, Bofors",
+            "Sam Pitroda — technology advisor to Rajiv, telecom revolution"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the Punjab crisis and Operation Blue Star. What were its long-term implications for national integrity? (12.5 marks)",
+          "How did Rajiv Gandhi's tenure both modernise and damage India's democratic fabric? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_007",
+      "module_name": "Economic Liberalisation and Coalition Politics (1991-2004)",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_007_T001",
+          "topic_name": "1991 Economic Reforms — LPG and Narasimha Rao Government",
+          "primary_source": "Bipan Chandra Ch 20-21; NCERT Class 12 Ch 9 — Recent Developments",
+          "ncert_reference": "NCERT Class 12 Indian Economics — Ch 2: Indian Economy 1950-1990",
+          "key_concepts": [
+            "1991 Balance of Payments crisis — gold pledged to Bank of England",
+            "IMF conditionality — structural adjustment — forced liberalisation",
+            "P.V. Narasimha Rao — PM — Congress minority government, bold reform",
+            "Manmohan Singh — Finance Minister — architect of 1991 reforms",
+            "LPG — Liberalisation, Privatisation, Globalisation — reform package",
+            "Industrial delicensing — most industries freed from Licence Raj",
+            "Trade liberalisation — import quotas removed, tariffs reduced",
+            "FDI liberalisation — automatic route for most sectors",
+            "Disinvestment — partial privatisation of PSUs",
+            "SEBI — Securities and Exchange Board of India — capital markets reform",
+            "Exchange rate — rupee made convertible on current account",
+            "Mandal Commission implementation 1990 — V.P. Singh — OBC reservation 27%",
+            "Babri Masjid demolition December 6, 1992 — communal polarisation",
+            "Kargil War 1999 — under PM Atal Bihari Vajpayee — infiltration from Pakistan",
+            "Pokhran II (Operation Shakti) May 1998 — India declared nuclear state — sanctions"
+          ],
+          "key_personalities": [
+            "P.V. Narasimha Rao — architect of 1991 reforms from political side",
+            "Manmohan Singh — technocratic reform execution",
+            "Montek Singh Ahluwalia — Planning Commission — reform design",
+            "Atal Bihari Vajpayee — coalition PM, Pokhran II, Kargil, Vajpayee Doctrine"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Critically evaluate the 1991 economic reforms. Were they a necessity or a choice? (12.5 marks)",
+          "Analyse the Kargil War 1999. What were its diplomatic and military lessons? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_008",
+      "module_name": "UPA Era — Rights-Based Governance (2004-2014)",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_008_T001",
+          "topic_name": "UPA Government — Rights Revolution and Economic Growth",
+          "primary_source": "NCERT Class 12 Ch 9; Economic Survey 2004-14 editions; India After Gandhi Part 3",
+          "ncert_reference": "NCERT Class 12 Politics — Ch 9: Recent Developments in Indian Politics",
+          "key_concepts": [
+            "UPA-1 (2004-2009) — Congress + Left Support — Common Minimum Programme",
+            "NAC — National Advisory Council — Sonia Gandhi — rights-based legislation",
+            "MGNREGA 2005 — 100-day employment guarantee — largest social protection",
+            "RTI Act 2005 — transparency revolution — thousands of information requests",
+            "Forest Rights Act 2006 — tribal land rights",
+            "NFSA 2013 — food as legal right — 5 kg grain at subsidised price",
+            "India-US Civil Nuclear Deal 2008 — 123 Agreement — Left withdrew support",
+            "Manmohan Singh saved deal — trust vote won with alleged horse-trading",
+            "8-9% GDP growth 2004-08 — India's golden decade",
+            "Global Financial Crisis 2008 — India's stimulus, V-shaped recovery",
+            "UPA-2 (2009-2014) — scam era — 2G spectrum, CWG, Coalgate",
+            "Anna Hazare movement 2011 — Lokpal demand — massive public support",
+            "Lokpal Act 2013 — finally passed after anti-corruption movement",
+            "AAP formation 2012 — Arvind Kejriwal — new political entrant",
+            "UPA-2 lost popular mandate — 2014 elections — Congress historic defeat"
+          ],
+          "key_personalities": [
+            "Manmohan Singh — PM, liberaliser turned welfare-state architect",
+            "Sonia Gandhi — NAC chair, rights-based approach advocate",
+            "Aruna Roy — MKSS — RTI and MGNREGA civil society push",
+            "Anna Hazare — anti-corruption movement leader",
+            "A. Raja — 2G spectrum scam",
+            "Arvind Kejriwal — emerged from Anna movement, founded AAP"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the rights-based approach of the UPA government. Was it a paradigm shift in governance? (12.5 marks)",
+          "What led to the anti-corruption movement of 2011? Assess its impact on Indian democracy. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_009",
+      "module_name": "NDA Era — Modi Government and Transformations (2014-2024)",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_009_T001",
+          "topic_name": "Modi Government — Policy Initiatives and Controversies",
+          "primary_source": "Economic Survey 2014-24; MoSPI data; PIB releases",
+          "ncert_reference": "Current Affairs — Economic Survey, Budget documents, Ministry Annual Reports",
+          "key_concepts": [
+            "2014 elections — BJP 282 seats — first single-party majority in 30 years",
+            "Jan Dhan Yojana 2014 — financial inclusion — 51 crore accounts",
+            "Swachh Bharat Mission 2014 — ODF India declared 2019 — 11 crore toilets",
+            "Make in India 2014 — manufacturing sector push",
+            "Demonetisation November 8, 2016 — Rs 500/1000 notes banned — disruption vs benefit debate",
+            "GST July 1, 2017 — One Nation One Tax — unified indirect tax",
+            "RERA 2016 — Real Estate Regulatory Authority — housing sector reform",
+            "Ayushman Bharat 2018 — largest health insurance scheme",
+            "PM-KISAN 2019 — Rs 6000/year income support to farmers",
+            "Article 370 abrogation August 5, 2019 — J&K divided into two UTs",
+            "CAA 2019 — Citizenship Amendment Act — Muslim exclusion controversy",
+            "COVID-19 response 2020 — national lockdown, Vaccine Maitri",
+            "Atmanirbhar Bharat — self-reliance economic vision post-COVID",
+            "2024 election — NDA returned but BJP below majority — coalition dependent",
+            "Interim Budget 2024 — fiscal consolidation, infrastructure push"
+          ],
+          "key_personalities": [
+            "Narendra Modi — PM from 2014, BJP leader",
+            "Amit Shah — Home Minister — J&K, CAA",
+            "Nirmala Sitharaman — Finance Minister from 2019",
+            "Raghuram Rajan — RBI Governor 2013-16 — monetary policy reform"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Evaluate the impact of demonetisation on the Indian economy. (10 marks)",
+          "Examine the key features of GST. Has it fulfilled its objectives? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "PI_MOD_010",
+      "module_name": "Social Transformation in Post-Independence India",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "PI_010_T001",
+          "topic_name": "Social Movements, Caste Transformation and Urbanisation",
+          "primary_source": "NCERT Class 12 Sociology — Social Change and Development; Bipan Chandra Ch 22",
+          "ncert_reference": "NCERT Class 12 Sociology — Ch 4: Change and Development in Rural Society; Ch 5: Change and Development in Industrial Society",
+          "key_concepts": [
+            "Dalit movement post-Ambedkar — Republican Party, BSP, rise of Dalit politics",
+            "OBC politics — Mandal mobilisation — backward class assertion 1990s onwards",
+            "Women's movement — anti-dowry 1980s, anti-rape 1980s-2013, #MeToo 2018",
+            "Environmental movements — Chipko (1973), Narmada Bachao (1985), Silent Valley",
+            "Tribal rights movements — Jharkhand movement, FRA campaign",
+            "Green Revolution social impact — class differentiation in rural areas",
+            "Land reforms — zamindari abolition success, tenancy reform partial, ceiling laws weak",
+            "Urbanisation — 27% (2001) to 34% (2011) to 36% (2021) — slow but accelerating",
+            "Migration — rural-urban, inter-state — economic and social consequences",
+            "Middle class expansion — post-liberalisation — consumption economy driver",
+            "Right to Information Act 2005 — democratisation of information",
+            "Hindu nationalism — RSS, BJP — Ayodhya movement — transformation of political Hinduism",
+            "Minority politics — Muslim Personal Law Board, Shah Bano controversy 1986",
+            "LGBTQ+ rights — Section 377 struck down 2018 — social transformation marker",
+            "Social media and politics — 2014 onwards — new political communication"
+          ],
+          "key_personalities": [
+            "Kanshi Ram — BSP founder, Dalit political mobilisation",
+            "Medha Patkar — Narmada Bachao Andolan",
+            "Baba Amte — social service, leprosy work",
+            "Ela Bhatt — SEWA — women's informal worker organisation"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the impact of the Mandal Commission implementation on Indian society and politics. (12.5 marks)",
+          "Discuss the major social movements in post-independence India and their contribution to social transformation. (10 marks)"
+        ]
+      }
+    }
+  ],
+
+  "full_study_plan": {
+    "total_days": { "fast_pace": 92, "standard_pace": 122, "extended_pace": 183 },
+    "daily_routine": {
+      "reading": "1.5 hours — Bipan Chandra + NCERT Politics Class 12",
+      "current_affairs_integration": "30 minutes — link historical events to contemporary issues",
+      "answer_writing": "1 hour — one 10-mark answer daily"
+    }
+  },
+
+  "ai_module_generator_schema": {
+    "input_params": {
+      "student_pace": "fast | standard | extended",
+      "start_date": "ISO date string",
+      "student_type": "mentorsdaily | self_study",
+      "era_focus": "nehru | indira | coalition | liberalisation | upa | nda | social"
+    },
+    "output_format": {
+      "daily_target": "topic_id + key dates and personalities flashcard",
+      "answer_writing_prompt": "one question from module",
+      "timeline_card": "key events in chronological order for the era"
+    }
+  }
+}

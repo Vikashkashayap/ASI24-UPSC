@@ -176,7 +176,7 @@ const colorIcon = (c: (typeof features)[0]["color"], dark: boolean) => {
     cyan: dark ? "text-cyan-400" : "text-cyan-600",
     indigo: dark ? "text-indigo-400" : "text-indigo-600",
     emerald: dark ? "text-blue-400" : "text-[#2563eb]",
-    violet: dark ? "text-violet-400" : "text-violet-600",
+    violet: dark ? "text-blue-400" : "text-blue-600",
     amber: dark ? "text-amber-400" : "text-amber-600",
     sky: dark ? "text-sky-400" : "text-sky-600",
     rose: dark ? "text-rose-400" : "text-rose-600",

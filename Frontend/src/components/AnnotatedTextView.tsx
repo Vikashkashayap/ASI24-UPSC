@@ -270,9 +270,9 @@ const AnnotatedTextView: React.FC<AnnotatedTextViewProps> = ({
         <CardContent className="space-y-4">
           {/* Score Display */}
           <div className={`p-4 rounded-lg text-center ${
-            theme === "dark" ? "bg-purple-900/30" : "bg-purple-50"
+            theme === "dark" ? "bg-blue-900/30" : "bg-blue-50"
           }`}>
-            <div className={`text-2xl font-bold mb-1 ${theme === "dark" ? "text-purple-300" : "text-purple-700"}`}>
+            <div className={`text-2xl font-bold mb-1 ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>
               {totalMarks.toFixed(1)} / {maxMarks}
             </div>
             <div className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>

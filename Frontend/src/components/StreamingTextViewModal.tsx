@@ -139,7 +139,7 @@ const StreamingTextViewModal: React.FC<StreamingTextViewModalProps> = ({
           theme === "dark" ? "border-slate-700" : "border-slate-200"
         }`}>
           <div className="flex items-center gap-3">
-            <FileText className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            <FileText className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             <div>
               <h2 className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                 {pdfFileName}
@@ -215,7 +215,7 @@ const StreamingTextViewModal: React.FC<StreamingTextViewModalProps> = ({
                     <div className="flex items-center justify-center h-full">
                       <div className="text-center">
                         <div className={`animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4 ${
-                          theme === "dark" ? "border-purple-600" : "border-purple-600"
+                          theme === "dark" ? "border-blue-600" : "border-blue-600"
                         }`}></div>
                         <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>
                           Preparing text extraction...
@@ -227,7 +227,7 @@ const StreamingTextViewModal: React.FC<StreamingTextViewModalProps> = ({
                   {/* Streaming cursor */}
                   {isStreaming && (
                     <span className={`inline-block w-2 h-5 ml-1 animate-pulse ${
-                      theme === "dark" ? "bg-purple-500" : "bg-purple-600"
+                      theme === "dark" ? "bg-blue-500" : "bg-blue-600"
                     }`}></span>
                   )}
                 </div>
@@ -247,7 +247,7 @@ const StreamingTextViewModal: React.FC<StreamingTextViewModalProps> = ({
                 Words: {displayedText.split(/\s+/).filter(Boolean).length.toLocaleString()}
               </span>
               {isStreaming && (
-                <span className={`font-semibold ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`}>
+                <span className={`font-semibold ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
                   Streaming... {((displayedText.length / (rawText?.length || 1)) * 100).toFixed(1)}%
                 </span>
               )}
@@ -256,7 +256,7 @@ const StreamingTextViewModal: React.FC<StreamingTextViewModalProps> = ({
             {isComplete && (
               <Button
                 onClick={onClose}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
               >
                 Continue to Evaluation
               </Button>

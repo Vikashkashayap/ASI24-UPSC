@@ -10,7 +10,7 @@ export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 
   const base =
     theme === "dark"
-      ? "bg-slate-950/80 rounded-2xl border border-fuchsia-500/20 shadow-[0_24px_80px_rgba(15,23,42,0.9)] backdrop-blur-sm"
+      ? "bg-slate-950/80 rounded-2xl border border-blue-500/20 shadow-[0_24px_80px_rgba(15,23,42,0.9)] backdrop-blur-sm"
       : "bg-white rounded-2xl shadow-lg border border-slate-200 backdrop-blur-sm";
 
   return <div className={cn(base, className)} {...props} />;

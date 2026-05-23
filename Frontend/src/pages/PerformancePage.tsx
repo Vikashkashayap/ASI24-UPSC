@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 
 const COLORS = [
-  "#8b5cf6", // purple
+  "#2563eb", // purple
   "#06b6d4", // cyan
   "#14b8a6", // teal
   "#f59e0b", // amber
@@ -48,12 +48,12 @@ const COLORS = [
 
 const GRADIENT_COLORS = {
   dark: {
-    primary: "rgba(139, 92, 246, 0.3)",
+    primary: "rgba(37, 99, 235, 0.3)",
     secondary: "rgba(6, 182, 212, 0.3)",
     success: "rgba(20, 184, 166, 0.3)"
   },
   light: {
-    primary: "rgba(139, 92, 246, 0.1)",
+    primary: "rgba(37, 99, 235, 0.1)",
     secondary: "rgba(6, 182, 212, 0.1)",
     success: "rgba(20, 184, 166, 0.1)"
   }
@@ -113,7 +113,7 @@ export const PerformancePage = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Users className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <Users className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               <span className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
                 {data.aggregateStats?.totalStudents || 0} Students
               </span>
@@ -124,11 +124,11 @@ export const PerformancePage = () => {
         {/* Aggregate Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-2xl" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-2xl" />
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-                <Users className="w-4 h-4 text-purple-400" />
+                <Users className="w-4 h-4 text-blue-400" />
               </div>
             </CardHeader>
             <CardContent>
@@ -192,8 +192,8 @@ export const PerformancePage = () => {
                     key={student.studentId}
                     className={`p-4 rounded-xl border transition-all hover:shadow-lg ${
                       theme === "dark"
-                        ? "bg-slate-900/50 border-purple-900/50 hover:border-purple-700/50"
-                        : "bg-slate-50 border-slate-200 hover:border-purple-300"
+                        ? "bg-slate-900/50 border-blue-900/50 hover:border-blue-700/50"
+                        : "bg-slate-50 border-slate-200 hover:border-blue-300"
                     }`}
                   >
                     <div className="flex items-center justify-between flex-wrap gap-4">
@@ -207,7 +207,7 @@ export const PerformancePage = () => {
                       </div>
                       <div className="flex items-center gap-6 flex-wrap">
                         <div className="text-center">
-                          <div className={`text-2xl font-bold ${theme === "dark" ? "text-purple-300" : "text-purple-600"}`}>
+                          <div className={`text-2xl font-bold ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`}>
                             {student.averageScore || 0}%
                           </div>
                           <div className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
@@ -289,8 +289,8 @@ export const PerformancePage = () => {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   selectedTimeframe === 'week'
                     ? theme === "dark"
-                      ? "bg-purple-500/20 text-purple-200 border border-purple-500/50"
-                      : "bg-purple-100 text-purple-700 border border-purple-300"
+                      ? "bg-blue-500/20 text-blue-200 border border-blue-500/50"
+                      : "bg-blue-100 text-blue-700 border border-blue-300"
                     : theme === "dark"
                     ? "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
                     : "bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200"
@@ -303,8 +303,8 @@ export const PerformancePage = () => {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   selectedTimeframe === 'month'
                     ? theme === "dark"
-                      ? "bg-purple-500/20 text-purple-200 border border-purple-500/50"
-                      : "bg-purple-100 text-purple-700 border border-purple-300"
+                      ? "bg-blue-500/20 text-blue-200 border border-blue-500/50"
+                      : "bg-blue-100 text-blue-700 border border-blue-300"
                     : theme === "dark"
                     ? "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
                     : "bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200"
@@ -317,8 +317,8 @@ export const PerformancePage = () => {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   selectedTimeframe === 'all'
                     ? theme === "dark"
-                      ? "bg-purple-500/20 text-purple-200 border border-purple-500/50"
-                      : "bg-purple-100 text-purple-700 border border-purple-300"
+                      ? "bg-blue-500/20 text-blue-200 border border-blue-500/50"
+                      : "bg-blue-100 text-blue-700 border border-blue-300"
                     : theme === "dark"
                     ? "bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700"
                     : "bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200"
@@ -334,11 +334,11 @@ export const PerformancePage = () => {
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <Card className="relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xs md:text-sm font-medium">Average Score</CardTitle>
-              <Target className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <Target className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
           </CardHeader>
           <CardContent>
@@ -421,14 +421,14 @@ export const PerformancePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Marks Trend - Enhanced */}
         <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base md:text-lg font-semibold">Performance Trend</CardTitle>
                 <CardDescription className="text-xs md:text-sm">Your score progression over time</CardDescription>
               </div>
-              <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
           </CardHeader>
           <CardContent className="h-64 md:h-80">
@@ -441,8 +441,8 @@ export const PerformancePage = () => {
                 <AreaChart data={filteredHistory} margin={{ left: -10, right: 10, top: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
@@ -471,10 +471,10 @@ export const PerformancePage = () => {
                   <Area 
                     type="monotone" 
                     dataKey="score" 
-                    stroke="#8b5cf6" 
+                    stroke="#2563eb" 
                     strokeWidth={2}
                     fill="url(#colorScore)"
-                    dot={{ fill: "#8b5cf6", r: 4 }}
+                    dot={{ fill: "#2563eb", r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </AreaChart>
@@ -720,14 +720,14 @@ export const PerformancePage = () => {
 
       {/* Answer History Table */}
       <Card className="relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base md:text-lg font-semibold">Complete Answer History</CardTitle>
               <CardDescription className="text-xs md:text-sm">All your evaluated attempts in detail</CardDescription>
             </div>
-            <Sparkles className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+            <Sparkles className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
           </div>
         </CardHeader>
         <CardContent>

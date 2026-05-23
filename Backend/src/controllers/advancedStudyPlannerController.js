@@ -9,6 +9,12 @@ import {
   mentorChat,
   regenerateMotivation,
 } from "../services/advancedStudyPlannerService.js";
+import {
+  completeTopic,
+  startPractice,
+  getRevisionTasksForUser,
+  getReadinessForUser,
+} from "../services/smartDailyPlannerService.js";
 
 export const generatePlan = async (req, res) => {
   try {
@@ -176,5 +182,53 @@ export const regenerateMotivationLine = async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message || "Failed" });
+  }
+};
+
+export const generateSmartPlan = async (req, res) => generatePlan(req, res);
+
+export const getDailyPlan = async (req, res) => getDailyTasks(req, res);
+
+export const completeTopicHandler = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const { taskId } = req.body;
+    if (!taskId) return res.status(400).json({ message: "taskId is required" });
+    const result = await completeTopic(userId, taskId);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Failed to complete topic" });
+  }
+};
+
+export const practiceStart = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const { taskId } = req.body;
+    if (!taskId) return res.status(400).json({ message: "taskId is required" });
+    const result = await startPractice(userId, taskId);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Failed to start practice" });
+  }
+};
+
+export const getRevisionTasks = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const result = await getRevisionTasksForUser(userId, req.query.date);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Failed to load revision tasks" });
+  }
+};
+
+export const getReadinessScore = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const result = await getReadinessForUser(userId);
+    res.json(result);
+  } catch (error) {
+    res.status(400).json({ message: error.message || "Failed to load readiness" });
   }
 };

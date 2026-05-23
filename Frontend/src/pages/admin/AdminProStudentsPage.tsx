@@ -106,7 +106,7 @@ export const AdminProStudentsPage = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-2">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-300 to-fuchsia-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-300 to-indigo-400 bg-clip-text text-transparent">
               Pro Subscribers
             </h1>
             <p
@@ -163,7 +163,7 @@ export const AdminProStudentsPage = () => {
             }`}
           >
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-fuchsia-500/10 text-fuchsia-400">
+              <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400">
                 <TrendingUp className="h-6 w-6" />
               </div>
               <div>
@@ -298,7 +298,7 @@ export const AdminProStudentsPage = () => {
                     : "bg-white border-slate-100"
                 }`}
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-fuchsia-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                 <CardContent className="px-5 py-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">

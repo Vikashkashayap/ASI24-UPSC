@@ -48,14 +48,14 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
     <div
       className={`relative overflow-hidden rounded-2xl border-2 p-8 xs:p-10 text-center ${
         isDark
-          ? 'bg-gradient-to-br from-slate-900 via-purple-950/40 to-slate-900 border-purple-500/30'
-          : 'bg-gradient-to-br from-white via-purple-50/50 to-white border-purple-200/60'
+          ? 'bg-gradient-to-br from-slate-900 via-blue-950/40 to-slate-900 border-blue-500/30'
+          : 'bg-gradient-to-br from-white via-blue-50/50 to-white border-blue-200/60'
       }`}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl ${
-            isDark ? 'bg-purple-500/20' : 'bg-purple-300/30'
+            isDark ? 'bg-blue-500/20' : 'bg-blue-300/30'
           } animate-pulse`}
         />
         <div
@@ -70,16 +70,16 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
         <div className="relative">
           <div
             className={`w-20 h-20 rounded-2xl flex items-center justify-center ${
-              isDark ? 'bg-purple-500/20' : 'bg-purple-100'
+              isDark ? 'bg-blue-500/20' : 'bg-blue-100'
             }`}
           >
             <Sparkles
               className={`w-10 h-10 animate-pulse ${
-                isDark ? 'text-fuchsia-400' : 'text-purple-600'
+                isDark ? 'text-indigo-400' : 'text-blue-600'
               }`}
             />
           </div>
-          <div className="absolute -inset-2 rounded-3xl border-2 border-fuchsia-500/30 animate-ping opacity-40" />
+          <div className="absolute -inset-2 rounded-3xl border-2 border-indigo-500/30 animate-ping opacity-40" />
         </div>
 
         <div>
@@ -103,7 +103,7 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
           }`}
         >
           <StepIcon
-            className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-fuchsia-400' : 'text-purple-600'}`}
+            className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-indigo-400' : 'text-blue-600'}`}
           />
           <p className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
             {LOADING_STEPS[stepIndex].text}
@@ -117,7 +117,7 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
           </div>
           <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
             <div
-              className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 transition-all duration-700 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700 ease-out"
               style={{ width: `${displayProgress}%` }}
             />
           </div>
@@ -132,7 +132,7 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
               key={i}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 i === stepIndex
-                  ? 'bg-fuchsia-500 scale-125'
+                  ? 'bg-indigo-500 scale-125'
                   : isDark
                     ? 'bg-slate-600'
                     : 'bg-slate-300'

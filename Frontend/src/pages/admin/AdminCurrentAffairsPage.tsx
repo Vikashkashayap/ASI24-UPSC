@@ -191,7 +191,7 @@ export default function AdminCurrentAffairsPage() {
         <CardContent>
           {loading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
             </div>
           ) : items.length === 0 ? (
             <div className="py-8 text-center">

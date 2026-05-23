@@ -50,7 +50,7 @@ export function PomodoroTimer({ focusMode, onFocusModeChange }: Props) {
       animate={{ opacity: 1 }}
       className={cn(
         "rounded-2xl p-4 border",
-        focusMode ? "ring-2 ring-violet-500 shadow-xl shadow-violet-500/20" : "",
+        focusMode ? "ring-2 ring-blue-500 shadow-xl shadow-blue-500/20" : "",
         theme === "dark" ? "bg-slate-900/80 border-slate-700" : "bg-white border-slate-200"
       )}
     >
@@ -60,7 +60,7 @@ export function PomodoroTimer({ focusMode, onFocusModeChange }: Props) {
         transition={{ repeat: focusMode ? Infinity : 0, duration: 2 }}
       >
         <span className="text-sm font-semibold flex items-center gap-1">
-          <Focus className="w-4 h-4 text-violet-500" />
+          <Focus className="w-4 h-4 text-blue-500" />
           Pomodoro
         </span>
         <span className="text-xs opacity-60">{isBreak ? "Break" : "Focus"}</span>
@@ -73,7 +73,7 @@ export function PomodoroTimer({ focusMode, onFocusModeChange }: Props) {
             cy="50"
             r="42"
             fill="none"
-            stroke="#8b5cf6"
+            stroke="#2563eb"
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={2 * Math.PI * 42}
@@ -101,7 +101,7 @@ export function PomodoroTimer({ focusMode, onFocusModeChange }: Props) {
           <Button
             type="button"
             variant={focusMode ? "primary" : "outline"}
-            className={cn("!min-h-9 !px-3", focusMode ? "bg-violet-600" : "")}
+            className={cn("!min-h-9 !px-3", focusMode ? "bg-blue-600" : "")}
             onClick={() => onFocusModeChange(!focusMode)}
           >
             Focus

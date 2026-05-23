@@ -96,7 +96,7 @@ export const MentorDashboardPage: React.FC = () => {
           <Card className={theme === "dark" ? "border-slate-700 bg-slate-900/50" : ""}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-violet-500" />
+                <BarChart3 className="w-4 h-4 text-blue-600" />
                 Mains evaluations
               </CardTitle>
             </CardHeader>

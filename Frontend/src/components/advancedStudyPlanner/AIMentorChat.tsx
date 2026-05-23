@@ -56,11 +56,11 @@ export function AIMentorChat({ onSend }: Props) {
       animate={{ opacity: 1 }}
       className={cn(
         "rounded-2xl border flex flex-col h-[420px]",
-        theme === "dark" ? "bg-slate-900/90 border-violet-500/20" : "bg-white border-slate-200 shadow-lg"
+        theme === "dark" ? "bg-slate-900/90 border-blue-500/20" : "bg-white border-slate-200 shadow-lg"
       )}
     >
       <div className={cn("px-4 py-3 border-b flex items-center gap-2", theme === "dark" ? "border-slate-700" : "border-slate-100")}>
-        <div className="p-1.5 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600">
+        <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600">
           <Bot className="w-4 h-4 text-white" />
         </div>
         <span className="font-semibold text-sm">AI Mentor</span>
@@ -76,17 +76,17 @@ export function AIMentorChat({ onSend }: Props) {
               className={cn("flex gap-2", msg.role === "user" ? "flex-row-reverse" : "")}
             >
               <motion.div
-                className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0", msg.role === "user" ? "bg-violet-600" : "bg-slate-200")}
+                className={cn("w-7 h-7 rounded-full flex items-center justify-center shrink-0", msg.role === "user" ? "bg-blue-600" : "bg-slate-200")}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
               >
-                {msg.role === "user" ? <User className="w-3.5 h-3.5 text-white" /> : <Bot className="w-3.5 h-3.5 text-violet-600" />}
+                {msg.role === "user" ? <User className="w-3.5 h-3.5 text-white" /> : <Bot className="w-3.5 h-3.5 text-blue-600" />}
               </motion.div>
               <motion.div
                 className={cn(
                   "rounded-2xl px-3 py-2 text-sm max-w-[85%]",
                   msg.role === "user"
-                    ? "bg-violet-600 text-white"
+                    ? "bg-blue-600 text-white"
                     : theme === "dark"
                       ? "bg-slate-800 text-slate-200"
                       : "bg-slate-100 text-slate-800"

@@ -1,0 +1,615 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 3 — Internal Security Comprehensive Syllabus",
+    "purpose": "Standalone Internal Security file for MentorsDaily UPSC portal — AI module generation",
+    "paper": "GS Paper 3",
+    "total_modules": 9,
+    "estimated_preparation_hours": 150,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Official Notification 2013 onwards",
+    "note": "Internal Security is dynamic — current affairs integration essential. Update schemes and incidents annually."
+  },
+
+  "primary_books": {
+    "book_1": { "title": "Internal Security and Disaster Management", "author": "Ashok Kumar & Vipul", "publisher": "TMH / Orient BlackSwan", "usage": "Comprehensive theory coverage" },
+    "book_2": { "title": "2nd ARC Report 8 — Combating Terrorism", "usage": "Institutional framework, intelligence, legal measures" },
+    "book_3": { "title": "2nd ARC Report 9 — Public Order", "usage": "Police reforms, public order management" },
+    "book_4": { "title": "Ministry of Home Affairs Annual Report", "usage": "Latest data on insurgency, security forces, schemes" },
+    "book_5": { "title": "IDSA Reports", "publisher": "Institute for Defence Studies and Analyses", "usage": "Strategic and analytical perspectives" }
+  },
+
+  "modules": [
+    {
+      "module_id": "IS_MOD_001",
+      "module_name": "Linkages Between Development and Extremism — Left Wing Extremism",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_001_T001",
+          "topic_name": "Left Wing Extremism — Causes, Geography, and Ideology",
+          "primary_source": "MHA Annual Report; Ashok Kumar Ch 4 — LWE; IDSA LWE reports",
+          "key_concepts": [
+            "LWE defined — Naxalite/Maoist insurgency inspired by Charu Mazumdar (1967 Naxalbari uprising)",
+            "Ideological roots — Marxism-Leninism-Maoism, peasant revolution theory",
+            "CPI (Maoist) — formed 2004 merger of PWG and MCC — primary Maoist outfit",
+            "Red Corridor — 90 districts in 10 states — Jharkhand, Chhattisgarh, Odisha, Telangana, AP core",
+            "Peak 2009-2010 — 2000+ incidents, declined to 400-500 range by 2023",
+            "Root causes: land alienation, forest rights denial, tribal displacement, development deficit",
+            "Development deprivation link — aspirational districts overlap with LWE districts",
+            "Salwa Judum — state-sponsored counter-militia — SC declared unconstitutional 2011",
+            "People's Liberation Guerrilla Army (PLGA) — Maoist armed wing",
+            "Jan Adalats — parallel governance structures in Maoist territory",
+            "Extortion from contractors, forest produce — economic sustenance",
+            "Recruitment from marginalised communities — tribals, landless labourers",
+            "Urban Maoist network — Bhima Koregaon case — alleged urban support structure",
+            "LWE states: Jharkhand, Chhattisgarh, Odisha, Maharashtra, Telangana, AP, Bihar, MP, Kerala, West Bengal",
+            "SAMADHAN strategy 2017 — Smart leadership, Aggressive strategy, Motivation, Action plan, Dashboard, Human terrain mapping, Action plans for each theatre, No access for LWE to financing"
+          ],
+          "related_laws_acts": [
+            "UAPA 1967 amended 2019 — Unlawful Activities Prevention Act — designating organisations and individuals",
+            "CSPSA — Chhattisgarh Special Public Security Act — state-level anti-Naxal law",
+            "Forest Rights Act 2006 — addressing tribal grievance underlying LWE",
+            "Scheduled Tribes and Other Traditional Forest Dwellers Act — overlaps with LWE area"
+          ],
+          "current_affairs_peg": [
+            "CRPF anti-LWE operations — Bastar region — declining Maoist violence 2022-2024",
+            "Encounter killings in Chhattisgarh — transparency and accountability debate",
+            "Surrender and rehabilitation policy — results in key states"
+          ],
+          "pyq_frequency": "Very High — asked in GS3 every 2 years",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "IS_001_T002",
+          "topic_name": "Counter-LWE Strategy — SAMADHAN, Development, Intelligence",
+          "primary_source": "MHA Annual Report; SAMADHAN policy document; Ashok Kumar Ch 5",
+          "key_concepts": [
+            "SAMADHAN doctrine — 8-point strategy for LWE eradication",
+            "Security grid — CRPF, CoBRA battalions, state police coordination",
+            "CoBRA (Commando Battalion for Resolute Action) — CRPF specialised jungle warfare unit",
+            "Bastariya Battalion — local tribal recruitment into CRPF for LWE areas",
+            "Road connectivity — PMGSY roads in LWE districts — breaking isolation",
+            "Mobile connectivity — towers in LWE-affected villages",
+            "PVTG mission — addressing tribal grievance in most vulnerable areas",
+            "Surrender and rehabilitation policy — state-specific schemes",
+            "Intelligence grid — IB, state intelligence, technical surveillance integration",
+            "Riverine policing — water body surveillance in Maoist movement areas",
+            "LWE security related expenditure scheme — central assistance to states",
+            "Special Infrastructure Scheme — police stations, outposts in LWE areas",
+            "Civic action programmes — building trust between security forces and tribals",
+            "Media management in LWE areas — counter-narrative to Maoist propaganda",
+            "Post-surrender rehabilitation — education, skill training, employment"
+          ],
+          "related_laws_acts": [
+            "UAPA — legal framework for prosecution of LWE cadre",
+            "AFSPA not applicable in LWE areas — key distinction from Northeast insurgency"
+          ],
+          "current_affairs_peg": [
+            "2024 operations — multiple encounters, top Maoist leadership neutralised",
+            "District-wise reduction in LWE violence — MHA quarterly data"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the linkage between development deficit and Left Wing Extremism in India. (10 marks)",
+          "Critically evaluate the SAMADHAN strategy for countering LWE. Has it been effective? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_002",
+      "module_name": "Terrorism — Types, Threats and Counter-Terrorism Framework",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_002_T001",
+          "topic_name": "Terrorism — Types, Causes and Ideological Basis",
+          "primary_source": "2nd ARC Report 8; Ashok Kumar Ch 2 — Terrorism; IDSA terrorism reports",
+          "key_concepts": [
+            "Terrorism defined — use of violence to instil fear for political, ideological, religious ends",
+            "Types: Ethno-nationalist, religious, ideological (LWE), lone-wolf, state-sponsored",
+            "Cross-border terrorism — Pakistan-based outfits — LeT, JeM, HM operating in J&K",
+            "Islamic radicalisation — SIMI (banned 2001), ISIS-inspired lone wolves, PFI",
+            "Right-wing extremism — cow vigilantism, anti-minority violence — emerging concern",
+            "Domestic vs transnational terrorism distinction",
+            "Funding sources — hawala, narco-terrorism, kidnapping for ransom, diaspora",
+            "Recruitment — online radicalisation, social media, local grievances",
+            "FATF — Financial Action Task Force — grey-listing impact on Pakistan",
+            "Counter-terrorism architecture — NIA, NSG, NTRO, IB, RAW coordination",
+            "NIA Act 2008 — National Investigation Agency — post 26/11 creation",
+            "UAPA 1967 amended 2012, 2019 — bail provisions, individual designation",
+            "NSG — National Security Guard — anti-hijacking, counter-terror rapid response",
+            "26/11 Mumbai attacks — intelligence failure analysis, lessons for architecture",
+            "Pulwama 2019 and Balakot air strike — cross-border terrorism response doctrine"
+          ],
+          "related_laws_acts": [
+            "UAPA 2019 amendment — individual designation as terrorist without trial",
+            "NIA Act 2008 — federal terrorism investigation agency",
+            "NDPS Act — narco-terrorism link",
+            "Prevention of Money Laundering Act (PMLA) — terror financing"
+          ],
+          "current_affairs_peg": [
+            "Pahalgam attack 2025 — cross-border terrorism escalation",
+            "FATF review of terror financing globally",
+            "Online radicalisation — NIA chargesheeting of ISIS-inspired youth"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the nature and sources of funding for terrorist organisations in India. (10 marks)",
+          "Discuss the challenges in countering cross-border terrorism. What institutional mechanisms has India developed? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_003",
+      "module_name": "North-East India — Insurgency and Peace Process",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_003_T001",
+          "topic_name": "North-East Insurgency — Causes, Groups and Peace Accords",
+          "primary_source": "Ashok Kumar Ch 6 — Northeast; MHA Annual Report NE section",
+          "key_concepts": [
+            "Historical roots — partition, demographic change, neglect of distinct cultures",
+            "ULFA (United Liberation Front of Asom) — Assam independence demand, 1979",
+            "NSCN-IM vs NSCN-K — Naga insurgency split — Framework Agreement 2015 with IM",
+            "Bodo insurgency — NDFB factions — Bodoland demand — peace accord 2020",
+            "Manipur insurgency — Meitei-Kuki-Naga ethnic conflict, PREPAK, UNLF",
+            "Mizo peace accord 1986 — Laldenga — model for peace negotiation",
+            "Tripura — NLFT, ATTF — largely resolved through development",
+            "Meghalaya — Garo and Khasi militant groups — lower intensity",
+            "AFSPA 1958 — Armed Forces Special Powers Act — controversial in NE",
+            "Irom Sharmila — 16-year fast against AFSPA — symbol of civil protest",
+            "Supreme Court Extrajudicial Execution Probe — fake encounter accountability",
+            "Look East/Act East policy — economic integration as security dividend",
+            "Inner Line Permit (ILP) — demographic protection mechanism",
+            "6th Schedule — Autonomous District Councils in Assam, Meghalaya, Tripura, Mizoram",
+            "Article 371 special provisions — various Northeast states protections"
+          ],
+          "related_laws_acts": [
+            "AFSPA 1958 — disturbed area declaration, search and arrest powers for military",
+            "Article 371 (A-J) — special provisions for NE states",
+            "6th Schedule — ADC powers over tribal areas"
+          ],
+          "current_affairs_peg": [
+            "Manipur ethnic violence 2023-24 — Meitei-Kuki conflict, AFSPA withdrawal",
+            "Naga peace talks — Framework Agreement implementation stalled",
+            "Assam-Meghalaya border dispute resolution process"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the root causes of insurgency in North-East India. How has India addressed them? (12.5 marks)",
+          "Critically evaluate the Armed Forces Special Powers Act. Should it be repealed? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_004",
+      "module_name": "Jammu and Kashmir — Security Challenges",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_004_T001",
+          "topic_name": "J&K — Cross-Border Terrorism, Radicalisation and Security Grid",
+          "primary_source": "MHA Annual Report; 2nd ARC Report 8; Ashok Kumar Ch 7",
+          "key_concepts": [
+            "Article 370 abrogation August 2019 — J&K to two UTs: J&K and Ladakh",
+            "Cross-border terrorism — ISI-backed groups: LeT, JeM, Hizbul Mujahideen",
+            "LOC infiltration — barrier fencing, floodlights, integrated surveillance system",
+            "Proxy war doctrine — Pakistan-sponsored terrorism without direct warfare",
+            "Home-grown militancy — local Kashmiri joining militant ranks",
+            "Online radicalisation — social media recruitment by Pakistan-based handlers",
+            "Stone-pelting — hybrid warfare combining mass protest and terrorism cover",
+            "Hybrid militants — ordinary citizens moonlighting as overground workers",
+            "J&K Police — central role, Surrendered Militant Policy",
+            "Army's Rashtriya Rifles — counter-insurgency grid in J&K",
+            "CASO — Cordon and Search Operations — standard counter-insurgency tool",
+            "Pulwama 2019 CRPF convoy attack — 40 soldiers killed — JeM responsibility",
+            "Balakot strike 2019 — first cross-border air strike post-independence",
+            "Targeted killings 2021-22 — Hindu and Kashmiri Pandit migrants",
+            "Pahalgam terrorist attack April 2025 — 26 tourists killed — escalation"
+          ],
+          "related_laws_acts": [
+            "J&K Public Safety Act 1978 — preventive detention up to 2 years",
+            "UAPA — primary law for J&K terrorism cases",
+            "AFSPA applicable in J&K — Disturbed Areas Act"
+          ],
+          "current_affairs_peg": [
+            "Pahalgam attack April 2025 and India's response — Operation Sindoor May 2025",
+            "Restoration of statehood to J&K — SC direction, electoral process",
+            "Return of Kashmiri Pandits — PM package implementation"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Analyse the security challenges in Jammu and Kashmir after the abrogation of Article 370. (12.5 marks)",
+          "What is proxy war? How has Pakistan used it against India? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_005",
+      "module_name": "Organised Crime, Narco-Terrorism and Money Laundering",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_005_T001",
+          "topic_name": "Organised Crime, Drug Trafficking and Terror Financing",
+          "primary_source": "Ashok Kumar Ch 8; UNODC reports; NIA annual report",
+          "key_concepts": [
+            "Organised crime defined — structured criminal enterprise for profit",
+            "D-Company (Dawood Ibrahim) — Mumbai underworld, ISI nexus",
+            "Hawala networks — informal money transfer for terror financing",
+            "Narco-terrorism — drug profits funding terrorist groups",
+            "Golden Crescent (Afghanistan-Pakistan-Iran) — heroin supply to India",
+            "Golden Triangle (Myanmar-Laos-Thailand) — methamphetamine supply",
+            "Punjab drug problem — cross-border smuggling via Pakistan",
+            "NDPS Act 1985 — Narcotic Drugs and Psychotropic Substances Act",
+            "NCB — Narcotics Control Bureau — apex drug law enforcement",
+            "FATF grey-listing of Pakistan — global financing framework",
+            "Cryptocurrency for terror financing — dark web, VPN use",
+            "Money laundering — placement, layering, integration stages",
+            "PMLA 2002 — Prevention of Money Laundering Act — ED jurisdiction",
+            "UNODC — UN Office on Drugs and Crime — international cooperation",
+            "India's extradition treaties — bringing fugitives back"
+          ],
+          "related_laws_acts": [
+            "NDPS Act 1985 — mandatory minimum sentences for drug offences",
+            "PMLA 2002 — attachment, prosecution of money laundering",
+            "UAPA — terror financing provisions",
+            "Foreign Exchange Management Act (FEMA) — hawala monitoring"
+          ],
+          "current_affairs_peg": [
+            "ED operations against hawala networks linked to terrorism",
+            "Drug seizures at India-Pakistan border — record hauls",
+            "Cryptocurrency terror financing — NIA investigations"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Explain the linkage between drug trafficking and terrorism with reference to India. (10 marks)",
+          "What is hawala? How does it facilitate terror financing and what measures exist to counter it? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_006",
+      "module_name": "Cyber Security and Digital Threats",
+      "duration_days": { "fast": 10, "standard": 14, "extended": 21 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_006_T001",
+          "topic_name": "Cyber Security Architecture and Threats",
+          "primary_source": "Ashok Kumar Ch 10 — Cyber Security; NCSC reports; CERT-In advisories",
+          "key_concepts": [
+            "Cyber security dimensions — confidentiality, integrity, availability (CIA triad)",
+            "Cyber threats: hacking, phishing, malware, ransomware, DDoS, APTs",
+            "Critical Information Infrastructure (CII) — power, banking, telecom, defence",
+            "NCIIPC — National Critical Information Infrastructure Protection Centre",
+            "CERT-In — Computer Emergency Response Team India — nodal agency",
+            "IT Act 2000 — amended 2008 — cyber crime provisions (Sections 66, 66A struck down)",
+            "Cyber warfare — state-sponsored attacks on infrastructure (China, Pakistan on India)",
+            "Dark web — anonymous networks for terrorism, drugs, child pornography",
+            "Social media manipulation — disinformation, fake news in security context",
+            "Pegasus spyware — surveillance of activists and journalists — civil liberties debate",
+            "Deepfakes — AI-generated videos for disinformation",
+            "Internet shutdown — use for security vs economic and rights cost",
+            "5G security concerns — Chinese equipment (Huawei/ZTE) in telecom infrastructure",
+            "National Cyber Security Policy 2013 — updated framework needed",
+            "India-specific: RBI cyber security framework for banks, NPCI digital security"
+          ],
+          "related_laws_acts": [
+            "IT Act 2000 and 2008 amendment — cyber crime provisions",
+            "Digital Personal Data Protection Act 2023 — data sovereignty",
+            "IT (Amendment) Rules 2021 — social media intermediary obligations",
+            "NCIIPC Guidelines — CII protection framework"
+          ],
+          "current_affairs_peg": [
+            "AIIMS ransomware attack 2022 — critical health infrastructure vulnerability",
+            "Chinese hacking attempts on Indian power grid — Ladakh standoff context",
+            "New cyber security rules 2023 — 6-hour reporting mandate to CERT-In"
+          ],
+          "pyq_frequency": "Very High — dynamic topic asked frequently",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "What are the major cyber security challenges facing India? Examine the institutional architecture to address them. (12.5 marks)",
+          "Critically examine the role of social media in internal security threats. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_007",
+      "module_name": "Border Management — Land and Maritime",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_007_T001",
+          "topic_name": "Land Border Management — India's Multiple Frontiers",
+          "primary_source": "Ashok Kumar Ch 11 — Border Management; MHA Annual Report",
+          "key_concepts": [
+            "India's land borders — 15,106 km with 7 countries",
+            "Indo-Pakistan border — 3,323 km — LOC + International Boundary — BSF primary",
+            "Indo-China border — 3,488 km — LAC — ITBP primary, Army support",
+            "Indo-Bangladesh border — 4,096 km — fencing challenge, migration, cattle smuggling",
+            "Indo-Nepal border — 1,751 km — open border — people-to-people ties",
+            "Indo-Bhutan border — 699 km — friendly, security cooperation",
+            "Indo-Myanmar border — 1,643 km — FCMA (Free Movement Regime) — now restricted",
+            "Border fencing — IB with Pakistan largely fenced; Bangladesh ongoing",
+            "Border Area Development Programme (BADP) — development in border villages",
+            "Vibrant Villages Programme — 663 border villages — countering China in Arunachal, Ladakh",
+            "Integrated Check Posts (ICPs) — single-window border crossing",
+            "CIBMS — Comprehensive Integrated Border Management System — smart surveillance",
+            "Tunnel detection technology — anti-infiltration at Pakistan border",
+            "Sealing borders vs open borders — trade-off in Nepal and Bangladesh context",
+            "Doklam 2017 and Galwan 2020 — LAC standoff management lessons"
+          ],
+          "related_laws_acts": [
+            "Foreigners Act 1946 — deportation of illegal migrants",
+            "Citizenship Amendment Act 2019 — religion-based citizenship, border migration nexus",
+            "BSF Act 1968 — jurisdiction expanded to 50 km in 2021"
+          ],
+          "current_affairs_peg": [
+            "Galwan Valley standoff 2020 — infrastructure race on LAC",
+            "Bangladesh border fence completion — illegal migration control",
+            "Myanmar junta instability — refugee influx through Mizoram and Manipur"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "IS_007_T002",
+          "topic_name": "Coastal and Maritime Security",
+          "primary_source": "Ashok Kumar Ch 12 — Maritime Security; MHA Coastal Security Scheme",
+          "key_concepts": [
+            "India's coastline — 7,516 km — 13 coastal states and UTs",
+            "26/11 sea route — weakness that led to complete coastal security overhaul",
+            "Multi-tier coastal security: Coast Guard, Navy, Marine Police, Customs",
+            "NCSMCS — National Committee for Strengthening Maritime and Coastal Security",
+            "Coastal Security Scheme — police stations, boats, infrastructure",
+            "SOP for coastal security — information sharing matrix",
+            "Vessel Monitoring System — AIS (Automatic Identification System) mandatory",
+            "Fishing community — eyes and ears — coastal community policing",
+            "ISAC — Information Sharing and Analysis Centre for maritime",
+            "IOR — Indian Ocean Region — India's strategic maritime interests",
+            "Piracy — Gulf of Aden, Strait of Malacca — Indian Navy anti-piracy",
+            "Blue economy vs security — reconciling fishing, shipping, security",
+            "Island security — A&N Islands, Lakshadweep — strategic importance",
+            "Maritime terrorism — sea-based infiltration, weapons smuggling",
+            "SAGAR doctrine — Security and Growth for All in the Region"
+          ],
+          "related_laws_acts": [
+            "Suppression of Unlawful Acts Against Safety of Maritime Navigation and Fixed Platforms Act 2002",
+            "Maritime Zones Act 1976 — EEZ, continental shelf jurisdiction",
+            "Coast Guard Act 1978 — powers and jurisdiction"
+          ],
+          "current_affairs_peg": [
+            "Red Sea attacks by Houthis — impact on India's trade and naval response",
+            "Indian Navy anti-piracy operations 2024 — INS deployment in Indian Ocean",
+            "Sri Lanka fishing disputes — maritime boundary management"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Critically evaluate India's coastal security architecture after the 26/11 attacks. (12.5 marks)",
+          "Examine the challenges in managing India's land borders. Which border is most difficult to manage and why? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_008",
+      "module_name": "Security Forces — Structure, Role and Police Reforms",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_008_T001",
+          "topic_name": "Central Armed Police Forces and Intelligence Agencies",
+          "primary_source": "MHA Annual Report; Ashok Kumar Ch 13-14 — Security Forces",
+          "key_concepts": [
+            "CAPF under MHA — CRPF, BSF, CISF, ITBP, SSB, NSG, AR (Assam Rifles)",
+            "CRPF — Central Reserve Police Force — largest, anti-insurgency (LWE + J&K)",
+            "BSF — Border Security Force — India-Pakistan and India-Bangladesh borders",
+            "CISF — Central Industrial Security Force — airports, PSUs, nuclear installations",
+            "ITBP — Indo-Tibetan Border Police — India-China LAC deployment",
+            "SSB — Sashastra Seema Bal — India-Nepal and India-Bhutan borders",
+            "NSG — National Security Guard — anti-hijacking, counter-terror, VVIP protection",
+            "Assam Rifles — oldest paramilitary — Northeast deployment under Army operational control",
+            "IB — Intelligence Bureau — domestic intelligence, counter-espionage",
+            "RAW — Research and Analysis Wing — foreign intelligence, India's external spy agency",
+            "NIA — National Investigation Agency — federal terror investigation",
+            "NTRO — National Technical Research Organisation — technical intelligence",
+            "DIA — Defence Intelligence Agency — military intelligence coordination",
+            "Dual control problem — Assam Rifles under MHA but Army command",
+            "CAPF modernisation — weapons, bulletproof vests, UAVs, communication"
+          ],
+          "related_laws_acts": [
+            "NIA Act 2008 — establishment and powers of NIA",
+            "CRPF Act 1949 — governing CRPF",
+            "BSF Act 1968 — border security powers"
+          ],
+          "current_affairs_peg": [
+            "CDS position — Chief of Defence Staff — unified military command",
+            "Agnipath scheme — armed forces recruitment changes and security implications",
+            "CAPF vacancy crisis — thousands of posts unfilled"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "IS_008_T002",
+          "topic_name": "Police Reforms — Prakash Singh Case, Model Police Act",
+          "primary_source": "2nd ARC Report 9; Prakash Singh judgment 2006; BPRD Model Police Act",
+          "key_concepts": [
+            "Prakash Singh v Union of India 2006 — landmark SC direction for police reforms",
+            "7 directives: Security of tenure, police establishment board, police complaints authority, NSC, separation of investigation from law & order, SGPS",
+            "Model Police Act 2006 — draft replacing Police Act 1861 — few states adopted",
+            "Police Act 1861 — colonial legacy — designed for control not service",
+            "State Police — subject under Entry 2 List II — Centre-State tension",
+            "Police-public relations — NPA data, poor trust especially among SC/ST/minorities",
+            "Custodial deaths — NHRC data — accountability gaps",
+            "Third degree torture — prevalent, legally prohibited",
+            "Encounter killings debate — fake encounters vs genuine operations",
+            "Police modernisation scheme — weapons, vehicles, communication",
+            "Smart policing — predictive policing, data analytics, CCTVs",
+            "Community policing — Janamaithri (Kerala), Mitra Dala (Odisha) models",
+            "Women in police — 10% target, currently 12.5% — representation matters for reporting",
+            "Criminal justice reforms — linked to police reform — fast courts, forensics",
+            "Forensic Science — forensic labs modernisation, digital forensics capacity"
+          ],
+          "related_laws_acts": [
+            "Police Act 1861 — colonial law still governing most state police forces",
+            "CrPC 1973 — procedural law governing police investigation and arrest",
+            "BNSS 2023 — Bharatiya Nagarik Suraksha Sanhita — replaces CrPC"
+          ],
+          "current_affairs_peg": [
+            "SC's repeated push for Prakash Singh compliance — most states defiant",
+            "New criminal laws (BNS, BNSS, BSA) — 2023 — police powers redefined",
+            "Delhi Police encounters — accountability and oversight debate"
+          ],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the key recommendations of the Prakash Singh judgment on police reforms. Why have they not been implemented? (12.5 marks)",
+          "Discuss the role and functions of India's intelligence agencies in internal security. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "IS_MOD_009",
+      "module_name": "Role of External State and Non-State Actors in Insurgency",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "IS_009_T001",
+          "topic_name": "External Support to Insurgency — Pakistan, China, Non-State Actors",
+          "primary_source": "IDSA reports; Ashok Kumar Ch 15-16 — External threats",
+          "key_concepts": [
+            "ISI (Inter-Services Intelligence) — Pakistan's agency supporting terrorism in India",
+            "ISI-terrorist nexus — LeT, JeM — training, funding, logistics",
+            "Pakistan's strategy — bleed India by a thousand cuts — proxy war doctrine",
+            "China's support to Northeast insurgencies — historical (NSCN-IM weapons, ULFA links)",
+            "China's current strategy — grey zone warfare, disinformation, economic leverage",
+            "CPEC and strategic encirclement concern — Gwadar, Sri Lanka, Bangladesh",
+            "Bangladesh — Hasina government cooperation vs post-coup Yunus government uncertainty",
+            "Nepal — Chinese influence, Madhesi question, open border exploitation",
+            "Sri Lanka — Tamil diaspora funding historical — LTTE external support model",
+            "ISIS global network — recruitment from India — Kerala, Hyderabad cases",
+            "Diaspora funding — Khalistani movement in Canada, UK, Australia",
+            "Khalistan — resurgence of Sikh separatism among diaspora post-2020",
+            "Non-state actors — international jihadi networks, Al-Qaeda in Indian Subcontinent",
+            "Grey zone warfare — short of armed conflict but destabilising",
+            "India's response — diplomatic pressure, counter-intelligence, surgical strikes"
+          ],
+          "related_laws_acts": [
+            "UAPA — designation of foreign terrorist organisations",
+            "FCRA — Foreign Contribution (Regulation) Act — prevent foreign funding of NGOs for insurgency",
+            "Extradition treaties and INTERPOL red notices"
+          ],
+          "current_affairs_peg": [
+            "Hardeep Singh Nijjar killing (Canada) — Khalistan and India-Canada diplomatic crisis",
+            "Pannun assassination plot — US warning to India — cross-border operations legality",
+            "Operation Sindoor May 2025 — India's response to Pahalgam attack"
+          ],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine Pakistan's role in sponsoring terrorism in India. What diplomatic and security tools has India used to counter it? (12.5 marks)",
+          "Discuss the role of the diaspora in funding insurgency movements in India. (10 marks)"
+        ]
+      }
+    }
+  ],
+
+  "full_study_plan": {
+    "total_days": { "fast_pace": 80, "standard_pace": 116, "extended_pace": 174 },
+    "daily_routine": {
+      "reading": "1.5 hours — Ashok Kumar primary + MHA Annual Report for data",
+      "current_affairs_integration": "30 minutes — link daily news to Internal Security modules",
+      "answer_writing": "1 hour — one 10-mark answer daily"
+    },
+    "current_affairs_note": "Internal Security questions are increasingly current-affairs based. Read The Hindu/Indian Express security correspondents daily."
+  },
+
+  "ai_module_generator_schema": {
+    "input_params": {
+      "student_pace": "fast | standard | extended",
+      "start_date": "ISO date string",
+      "student_type": "mentorsdaily | self_study"
+    },
+    "output_format": {
+      "daily_target": "topic_id + key acts to memorise + current affairs link",
+      "answer_writing_prompt": "one question from module",
+      "news_link_of_day": "recent event connecting to today's topic"
+    }
+  }
+}

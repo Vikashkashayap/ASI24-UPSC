@@ -1,8 +1,18 @@
 import { StudyPlan } from "../models/StudyPlan.js";
 import { MockResult } from "../models/MockResult.js";
+import { WeakTopic } from "../models/WeakTopic.js";
 import { callOpenRouterAPI, parseJSONFromResponse } from "./openRouterService.js";
 import { generateTasks, getProgress, getDaysRemaining, toggleTaskComplete, recalculateStreak } from "./studyPlanService.js";
 import { getPerformanceSummary } from "./performanceService.js";
+import { applySyllabusToTasks } from "./syllabusTopicPool.js";
+import {
+  prioritizeWeakSubjectsInTasks,
+  syncRevisionSchedules,
+  cachePlannerAnalytics,
+} from "./smartDailyPlannerService.js";
+import { calculateReadinessFromPlan } from "./readinessService.js";
+
+export { calculateReadinessFromPlan };
 import {
   STUDY_PLAN_GENERATION_SYSTEM,
   WEAKNESS_ANALYSIS_SYSTEM,
@@ -102,41 +112,11 @@ function buildFallbackPlanMeta(profile, performance) {
       "Improve mock average by 10%",
       "Build 20+ day consistency streak",
     ],
-    revisionStrategy: "Use 1-3-7 spaced revision: revise each studied topic on day +3 and +7, with a monthly consolidation on day +30.",
+    revisionStrategy: "Use 1-7-30 spaced revision: revise each studied topic after 1 day, 7 days, and 30 days.",
     insights: [
       { type: "tip", title: "Weak area focus", message: `Allocate extra time to ${weak} this week.`, priority: "high", subject: weak },
       { type: "success", title: "Daily CA", message: "20 min current affairs keeps Prelims GS updated.", priority: "medium" },
     ],
-  };
-}
-
-function calculateReadiness(plan, mockAvg) {
-  const tasks = plan.tasks || [];
-  const completed = tasks.filter((t) => t.completed).length;
-  const total = tasks.length || 1;
-  const completion = Math.round((completed / total) * 100);
-  const revisionTasks = tasks.filter((t) => t.taskType === "revision");
-  const revisionDone = revisionTasks.filter((t) => t.completed).length;
-  const revision = revisionTasks.length ? Math.round((revisionDone / revisionTasks.length) * 100) : 50;
-  const streak = plan.currentStreak || 0;
-  const consistency = Math.min(100, streak * 12);
-  const studyHours = Math.min(100, (plan.dailyHours || 6) * 10);
-  const mockScores = mockAvg || plan.mockTestAverageScore || 0;
-  const score =
-    mockScores * 0.3 +
-    completion * 0.25 +
-    revision * 0.15 +
-    consistency * 0.15 +
-    studyHours * 0.15;
-  return {
-    readinessScore: Math.round(Math.min(100, Math.max(0, score))),
-    readinessBreakdown: {
-      mockScores: Math.round(mockScores),
-      completion,
-      revision,
-      consistency,
-      studyHours: Math.round(studyHours),
-    },
   };
 }
 
@@ -221,6 +201,8 @@ export async function generateAdvancedPlan(userId, profile) {
   if (!aiMeta) aiMeta = buildFallbackPlanMeta(mergedProfile, performance);
 
   let tasks = generateTasks(examDate, profile.dailyHours ?? 6, profile.preparationLevel ?? "intermediate");
+  tasks = prioritizeWeakSubjectsInTasks(tasks, weakSubjects);
+  tasks = applySyllabusToTasks(tasks, weakSubjects);
   tasks = enrichTasksWithMeta(tasks, mergedProfile);
 
   if (aiMeta.recommendedTasks?.length > 0) {
@@ -253,7 +235,7 @@ export async function generateAdvancedPlan(userId, profile) {
     });
   }
 
-  const readiness = calculateReadiness(
+  const readiness = calculateReadinessFromPlan(
     { tasks, dailyHours: profile.dailyHours, currentStreak: 0, mockTestAverageScore: profile.mockTestAverageScore },
     profile.mockTestAverageScore
   );
@@ -306,6 +288,18 @@ export async function generateAdvancedPlan(userId, profile) {
     { new: true, upsert: true, setDefaultsOnInsert: true }
   ).lean();
 
+  await WeakTopic.deleteMany({ userId, source: "planner" });
+  if (weakSubjects?.length) {
+    await WeakTopic.insertMany(
+      weakSubjects.map((subject) => ({
+        userId,
+        subject,
+        source: "planner",
+        priority: "high",
+      }))
+    );
+  }
+
   return {
     plan,
     progress: getProgress(plan),
@@ -317,7 +311,7 @@ function buildRevisionSchedule(tasks) {
   const studyTasks = (tasks || []).filter((t) => t.taskType === "subject_study").slice(0, 20);
   return studyTasks.map((t) => {
     const d = new Date(t.date);
-    const revDates = [3, 7, 30].map((offset) => {
+    const revDates = [1, 7, 30].map((offset) => {
       const rd = new Date(d);
       rd.setDate(rd.getDate() + offset);
       return toDateString(rd);
@@ -335,12 +329,15 @@ export async function getDashboard(userId, date) {
     .filter((t) => t.date === dateStr)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0) || (a.startTime || "").localeCompare(b.startTime || ""));
 
+  const analytics = await buildAnalytics(userId, plan);
+  await cachePlannerAnalytics(userId, analytics).catch(() => {});
+
   return {
     plan,
     progress: getProgress(plan, dateStr),
     daysRemaining: getDaysRemaining(plan),
     dailyTasks: dayTasks,
-    analytics: await buildAnalytics(userId, plan),
+    analytics,
     insights: plan.aiInsights || [],
     streak: {
       current: plan.currentStreak ?? 0,
@@ -364,11 +361,15 @@ export async function completeTaskAdvanced(userId, taskId) {
     if (result.task?.completed) {
       planDoc.totalStudyMinutes = (planDoc.totalStudyMinutes || 0) + (result.task.duration || 0);
       planDoc.xpPoints = (planDoc.xpPoints || 0) + 15;
+      if (result.task.taskType === "subject_study") {
+        result.task.practiceUnlocked = true;
+        await syncRevisionSchedules(userId, planDoc, result.task).catch(() => {});
+      }
     }
     const { badges, xpPoints } = awardBadgesAndXp(planDoc);
     planDoc.badges = badges;
     planDoc.xpPoints = xpPoints;
-    const readiness = calculateReadiness(planDoc, planDoc.mockTestAverageScore);
+    const readiness = calculateReadinessFromPlan(planDoc, planDoc.mockTestAverageScore);
     planDoc.readinessScore = readiness.readinessScore;
     planDoc.readinessBreakdown = readiness.readinessBreakdown;
     await planDoc.save();
@@ -440,7 +441,7 @@ export async function analyzeMockTest(userId, mockData) {
       }
     );
     const updated = await StudyPlan.findOne({ userId });
-    const readiness = calculateReadiness(updated, avg);
+    const readiness = calculateReadinessFromPlan(updated, avg);
     updated.readinessScore = readiness.readinessScore;
     updated.readinessBreakdown = readiness.readinessBreakdown;
     await updated.save();

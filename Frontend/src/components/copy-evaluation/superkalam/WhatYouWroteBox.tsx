@@ -57,8 +57,8 @@ export const WhatYouWroteBox: React.FC<Props> = ({ text }) => {
           onClick={() => setExpanded(!expanded)}
           className={`inline-flex items-center gap-1 text-sm font-medium transition-colors ${
             isDark
-              ? 'text-purple-400 hover:text-purple-300'
-              : 'text-purple-600 hover:text-purple-700'
+              ? 'text-blue-400 hover:text-blue-300'
+              : 'text-blue-600 hover:text-blue-700'
           }`}
         >
           {expanded ? (

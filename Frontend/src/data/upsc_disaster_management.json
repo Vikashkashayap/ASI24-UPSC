@@ -1,0 +1,567 @@
+{
+  "metadata": {
+    "title": "UPSC Mains GS Paper 3 — Disaster Management Comprehensive Syllabus",
+    "purpose": "Standalone Disaster Management file for MentorsDaily UPSC portal — AI module generation",
+    "paper": "GS Paper 3",
+    "total_modules": 8,
+    "estimated_preparation_hours": 120,
+    "creation_date": "2026-05-21",
+    "curriculum_standards": "UPSC Mains Official Notification 2013 onwards",
+    "note": "Disaster Management is GS3 topic linked to internal security. DM Act 2005 and Sendai Framework 2015-2030 are central references."
+  },
+
+  "primary_books": {
+    "book_1": { "title": "Internal Security and Disaster Management", "author": "Ashok Kumar & Vipul", "publisher": "TMH / Orient BlackSwan", "usage": "Primary theory — DM cycle, hazard types, response mechanisms" },
+    "book_2": { "title": "Disaster Management Act 2005", "usage": "Legal framework — NDMA, SDMA, DDMA structure and powers" },
+    "book_3": { "title": "Sendai Framework for Disaster Risk Reduction 2015-2030", "publisher": "UNDRR", "usage": "International framework — 4 priorities, 7 global targets" },
+    "book_4": { "title": "NDMA Guidelines", "publisher": "National Disaster Management Authority", "usage": "Hazard-specific guidelines — floods, earthquakes, cyclones, chemical disasters" },
+    "book_5": { "title": "Fundamentals of Physical Geography", "publisher": "NCERT Class 11", "usage": "Natural hazards — atmospheric, geological, hydrological processes" }
+  },
+
+  "key_frameworks": {
+    "dm_act_2005": {
+      "key_bodies": {
+        "NDMA": "National Disaster Management Authority — PM as chairperson — policy and guidelines",
+        "SDMA": "State Disaster Management Authority — CM as chairperson — state level",
+        "DDMA": "District Disaster Management Authority — Collector + elected representative",
+        "NDRF": "National Disaster Response Force — 16 battalions — rapid response",
+        "SDRF": "State Disaster Response Force — state-level rapid response",
+        "NDMA_secretariat": "NDMA Secretariat — administrative support",
+        "NEC": "National Executive Committee — Secretary-level coordination",
+        "SEC": "State Executive Committee — Chief Secretary level"
+      },
+      "key_provisions": [
+        "Section 6 — NDMA powers: policies, plans, guidelines",
+        "Section 14 — SDMA functions",
+        "Section 25 — DDMA — district planning",
+        "Section 44 — National Disaster Response Fund",
+        "Section 48 — State Disaster Response Fund",
+        "Section 51 — Punishment for obstruction"
+      ]
+    },
+    "sendai_framework": {
+      "period": "2015-2030",
+      "predecessor": "Hyogo Framework for Action 2005-2015",
+      "4_priorities": [
+        "Priority 1: Understanding disaster risk",
+        "Priority 2: Strengthening disaster risk governance",
+        "Priority 3: Investing in DRR for resilience",
+        "Priority 4: Enhancing disaster preparedness for effective response"
+      ],
+      "7_global_targets": [
+        "Substantially reduce global disaster mortality by 2030",
+        "Reduce number of affected people globally by 2030",
+        "Reduce direct disaster economic loss in relation to GDP",
+        "Substantially reduce disaster damage to critical infrastructure",
+        "Increase number of countries with national/local DRR strategies",
+        "Substantially enhance international cooperation to developing countries",
+        "Increase availability of multi-hazard early warning systems"
+      ],
+      "india_role": "India championed CDRI — Coalition for Disaster Resilient Infrastructure — 2019"
+    }
+  },
+
+  "modules": [
+    {
+      "module_id": "DM_MOD_001",
+      "module_name": "Disaster Management — Concepts, Framework and Institutional Structure",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_001_T001",
+          "topic_name": "Disaster Management Concepts — Hazard, Vulnerability, Risk and Resilience",
+          "primary_source": "Ashok Kumar Ch 17 — DM Concepts; NDMA guidelines introduction",
+          "ncert_reference": "NCERT Class 11 Physical Geography Ch 7 — Geomorphic Processes; Class 11 Geography Ch 8 — Natural Hazards",
+          "key_concepts": [
+            "Hazard — potentially damaging natural or human-induced event (earthquake, flood, cyclone)",
+            "Vulnerability — conditions determining susceptibility to hazard impacts",
+            "Exposure — people, assets, systems in hazard zones",
+            "Risk = Hazard × Vulnerability × Exposure ÷ Capacity",
+            "Disaster — serious disruption of community functioning exceeding local capacity",
+            "Disaster vs Emergency — scale and capacity to cope distinction",
+            "DRR — Disaster Risk Reduction — ex-ante approach vs ex-post response",
+            "DM Cycle — Prevention → Mitigation → Preparedness → Response → Recovery → Rehabilitation",
+            "Mitigation — structural (dams, embankments) vs non-structural (zoning, EWS, insurance)",
+            "Preparedness — plans, training, stockpiling, exercises",
+            "Response — search and rescue, relief, medical",
+            "Recovery — restoration of livelihoods, housing, services",
+            "Rehabilitation — long-term reconstruction, building back better",
+            "Resilience — capacity to absorb shock and recover",
+            "Build Back Better (BBB) — post-disaster reconstruction improving on pre-disaster standards"
+          ],
+          "government_agencies": ["NDMA — policy and guidelines", "SDMA — state level", "NDRF — rapid response operations"],
+          "international_frameworks": ["Sendai Framework 2015-2030 — 4 priorities", "Hyogo Framework 2005-2015 — predecessor"],
+          "case_studies_india": ["Odisha cyclone preparedness model — zero mortality goal", "Uttarakhand floods 2013 — poor DM response vs Kerala 2018 better response"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "DM_001_T002",
+          "topic_name": "DM Act 2005 — Institutional Architecture and Funding Mechanisms",
+          "primary_source": "Disaster Management Act 2005 — full text; Ashok Kumar Ch 18",
+          "key_concepts": [
+            "DM Act 2005 — enacted after Gujarat earthquake 2001 and Indian Ocean Tsunami 2004",
+            "NDMA — National Disaster Management Authority — PM as Chairperson",
+            "8 members — Cabinet Minister rank — apex policy body",
+            "SDMA — CM Chairperson — state disaster plans and policies",
+            "DDMA — District Collector + elected district representative",
+            "National Executive Committee (NEC) — Home Secretary heads — operational coordination",
+            "State Executive Committee (SEC) — Chief Secretary heads",
+            "NDRF — 16 battalions — deployed from CRPF, BSF, CISF, ITBP, SSB, CISF",
+            "NDRF specialisations — flood rescue, USAR (Urban Search and Rescue), CBRN",
+            "SDRF — State Disaster Response Force — state funding, state deployment",
+            "NDMF — National Disaster Mitigation Fund — long-term risk reduction",
+            "NDRF (Fund) — National Disaster Response Fund — quick release for response",
+            "SDRF (Fund) — State Disaster Response Fund — 75% Central + 25% State funding",
+            "Anomaly: NDRF (Force) vs NDRF (Fund) — same abbreviation, different entities",
+            "Post-disaster needs assessment — internationally standardised PDNA methodology"
+          ],
+          "government_agencies": ["NDMA — Section 6 powers", "NDRF — 16 battalions under NDMA", "State CMOs — state emergency operations"],
+          "international_frameworks": ["DM Act 2005 — inspired by IDNDR and Hyogo Framework"],
+          "case_studies_india": ["NDRF deployment during Uttarakhand floods 2013, Chennai floods 2015, COVID-19 national response"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Explain the institutional structure for disaster management under the DM Act 2005. (10 marks)",
+          "Distinguish between disaster mitigation and preparedness. Why is pre-disaster investment more cost-effective? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_002",
+      "module_name": "Geological Disasters — Earthquakes, Volcanoes and Tsunamis",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_002_T001",
+          "topic_name": "Earthquakes — Seismic Zones, Risk and Preparedness",
+          "primary_source": "Ashok Kumar Ch 19; NDMA Earthquake Guidelines; NCERT Class 11 Geomorphic Processes",
+          "ncert_reference": "NCERT Class 11 Physical Geography Ch 3 — Interior of the Earth; Ch 5 — Minerals and Rocks",
+          "key_concepts": [
+            "Plate tectonics — Indian plate collision with Eurasian plate — Himalayan seismicity",
+            "Seismic zones in India — BIS (Bureau of Indian Standards) Zones II-V",
+            "Zone V (Very High risk): J&K, Himachal, Uttarakhand, Sikkim, NE states, Andaman",
+            "Zone IV (High risk): Jammu region, Gangetic plain, Delhi, North Bihar",
+            "Zone III (Moderate): Kerala, Goa, Lakshadweep, Maharashtra parts",
+            "Zone II (Low risk): Rest of India — Peninsular shield stable",
+            "Richter Scale vs Moment Magnitude Scale (Mw) — Mw now standard",
+            "Bhuj earthquake January 26, 2001 — 7.7 Mw — 20,000 dead — trigger for DM Act",
+            "Epicentre, focus/hypocenter — surface expression vs origin",
+            "P waves, S waves, Love waves, Rayleigh waves — earthquake wave types",
+            "Seismograph network — IMD — National Seismological Network (NSN)",
+            "Earthquake-resistant construction — IS codes — importance in Zone IV and V",
+            "NDMA guidelines — site selection, building codes, retrofit of old buildings",
+            "Community awareness — Drop-Cover-Hold — international earthquake preparedness",
+            "NDRF USAR — Urban Search and Rescue — specialised earthquake response"
+          ],
+          "government_agencies": ["IMD — seismological monitoring", "NDRF — USAR teams", "BIS — seismic zone mapping and building codes"],
+          "international_frameworks": ["UNDRR Sendai — reducing disaster mortality and losses", "USGS — international seismic cooperation"],
+          "case_studies_india": ["Bhuj 2001 — worst post-independence earthquake", "Uttarkashi 1991, Latur 1993", "Sikkim 2011 — 6.8 Mw — NDRF rapid deployment"],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "DM_002_T002",
+          "topic_name": "Tsunamis and Landslides — Early Warning and Prevention",
+          "primary_source": "Ashok Kumar Ch 20; INCOIS tsunami warning; NDMA Landslide Guidelines",
+          "ncert_reference": "NCERT Class 11 Physical Geography Ch 3; Class 7 Geography Ch 3 — Our Changing Earth",
+          "key_concepts": [
+            "Tsunami — seismic sea wave — submarine earthquake, landslide or volcanic eruption",
+            "Indian Ocean Tsunami December 26, 2004 — 9.1 Mw Sumatra — 2.3 lakh dead worldwide",
+            "India's death toll 2004 — 12,000+ — Tamil Nadu, Andaman, Kerala, Andhra",
+            "ITEWS — Indian Tsunami Early Warning System — INCOIS Hyderabad — 2007",
+            "INCOIS — Indian National Centre for Ocean Information Services — 24/7 monitoring",
+            "Pacific Tsunami Warning System — PTWS — global coordination",
+            "Tsunameter (Deep-ocean Assessment and Reporting of Tsunamis — DART buoys)",
+            "Warning dissemination — SMS, sirens, media, police — last mile challenge",
+            "Landslides — rapid mass movement of soil, rock, debris",
+            "Landslide-prone states: Uttarakhand, Himachal, J&K, Sikkim, NE states, Kerala, Karnataka",
+            "Causes: heavy rainfall, deforestation, construction on slopes, seismic activity",
+            "NLRMP — National Landslide Risk Management Policy 2019",
+            "GSI — Geological Survey of India — landslide hazard zonation mapping",
+            "Bio-engineering — slope stabilisation through vegetation",
+            "Kedarnath 2013 — cloudburst + glacial lake outburst flood + landslide — 5,700+ dead"
+          ],
+          "government_agencies": ["INCOIS — tsunami warning", "GSI — landslide mapping", "NDRF — rescue in landslide areas"],
+          "international_frameworks": ["IOC-UNESCO — Indian Ocean Tsunami Warning System coordination", "Sendai Priority 1 — understanding risk"],
+          "case_studies_india": ["Indian Ocean Tsunami 2004 — India's response", "Kedarnath disaster 2013 — NDRF's largest rescue operation", "Idukki landslides Kerala 2020"],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Discuss India's seismic vulnerability. What measures have been taken to reduce earthquake risk? (10 marks)",
+          "Examine the Indian Tsunami Early Warning System. How effective is it in saving lives? (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_003",
+      "module_name": "Hydrological Disasters — Floods and Droughts",
+      "duration_days": { "fast": 8, "standard": 12, "extended": 18 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_003_T001",
+          "topic_name": "Floods — Risk, Management and Mitigation",
+          "primary_source": "Ashok Kumar Ch 21; CWC Flood Management Documents; NDMA Flood Guidelines",
+          "ncert_reference": "NCERT Class 7 Geography Ch 3 — Our Changing Earth; Class 11 Physical Geography Ch 13 — Water",
+          "key_concepts": [
+            "Flood-prone areas — 12% of India's geographic area — 40 million hectares",
+            "Most flood-prone basins: Brahmaputra, Ganga, Mahanadi, Godavari, Krishna, Kaveri",
+            "Types of floods: riverine, flash floods, coastal, urban flooding",
+            "Flash floods — rapid onset — cloudburst, GLOF (Glacial Lake Outburst Flood)",
+            "Urban flooding — impervious surfaces, blocked drains — Chennai 2015, Mumbai 2005",
+            "CWC — Central Water Commission — flood forecasting, warning dissemination",
+            "Flood forecasting stations — 325 stations across India",
+            "Embankments (levees) — linear flood protection — failure leads to catastrophic flooding",
+            "Flood plain zoning — land use planning to keep floodplains free",
+            "Integrated Flood Management — holistic approach beyond structural measures",
+            "NDMA Flood Guidelines 2008 — state DM Plans, early warning, evacuation",
+            "Role of forests in flood mitigation — watershed management",
+            "Bihar and Assam annual floods — governance and structural challenge",
+            "NDRF pre-positioning before monsoon — proactive flood response",
+            "Community flood preparedness — Odisha model of zero-mortality cyclone/flood response"
+          ],
+          "government_agencies": ["CWC — flood forecasting", "NDRF — flood rescue", "State irrigation departments — embankment maintenance"],
+          "international_frameworks": ["Sendai Target C — reduce disaster economic loss", "Integrated Flood Management — WMO and GWP"],
+          "case_studies_india": ["Assam floods 2022 — annual crisis", "Kerala floods 2018 — dam mismanagement debate", "Bihar floods — Kosi river challenge"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "DM_003_T002",
+          "topic_name": "Droughts — Types, Impact and Management",
+          "primary_source": "Ashok Kumar Ch 22; IMD Drought Monitoring; NDMA Drought Management",
+          "ncert_reference": "NCERT Class 10 Geography Ch 3 — Water Resources; Class 9 Economics Ch 4 — Food Security",
+          "key_concepts": [
+            "Drought types: Meteorological (rainfall deficit), Hydrological (groundwater/stream), Agricultural (soil moisture), Socio-economic",
+            "India drought-prone area — 16% of territory — 50 million people affected",
+            "IMD drought classification — <75% of normal rainfall = drought",
+            "ENSO (El Niño-Southern Oscillation) — primary driver of Indian monsoon variability",
+            "Drought monitoring — NDVI (Normalised Difference Vegetation Index) via satellite",
+            "Soil moisture deficit — SPI (Standardised Precipitation Index) — drought indicator",
+            "MGNREGA as drought relief — employment guarantee in distress years",
+            "PMFBY — Pradhan Mantri Fasal Bima Yojana — crop insurance as drought mitigation",
+            "National Drought Management Policy 2016 — drought declaration criteria",
+            "State governments declare drought — SDRF funds released",
+            "Drought-resistant crop varieties — millets, sorghum promotion",
+            "Watershed development — Integrated Watershed Management Programme",
+            "Groundwater depletion — drought intensifier — ATAL BHUJAL Yojana",
+            "Farmer suicides in drought years — Maharashtra, Vidarbha — social impact",
+            "Climate change — droughts becoming more intense and frequent — adaptation needed"
+          ],
+          "government_agencies": ["IMD — drought monitoring and forecasting", "Ministry of Agriculture — PMFBY administration", "CWC — reservoir monitoring"],
+          "international_frameworks": ["UNCCD — UN Convention to Combat Desertification", "Sendai Priority 3 — investing in DRR"],
+          "case_studies_india": ["Maharashtra drought 2015-16 — Marathwada water trains", "Bundelkhand drought — chronic underdevelopment and water stress", "Vidarbha farmer suicides"],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the causes and management of floods in India. Why do floods occur every year despite existing infrastructure? (12.5 marks)",
+          "Discuss drought management in India. Is the existing framework adequate? (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_004",
+      "module_name": "Meteorological Disasters — Cyclones, Heat Waves and Cold Waves",
+      "duration_days": { "fast": 7, "standard": 10, "extended": 15 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_004_T001",
+          "topic_name": "Cyclones — Risk, Early Warning and Response",
+          "primary_source": "Ashok Kumar Ch 23; IMD Cyclone Warning; NDMA Cyclone Guidelines",
+          "ncert_reference": "NCERT Class 11 Physical Geography Ch 10 — Atmospheric Circulation; Class 7 Ch 8 — Winds, Storms and Cyclones",
+          "key_concepts": [
+            "Tropical cyclones — low-pressure systems — warm ocean (>26°C) fuel",
+            "India's cyclone exposure — Bay of Bengal + Arabian Sea — 10% global cyclones",
+            "Bay of Bengal more active — warmer, shallow, funnel shape",
+            "IMD cyclone classification: Depression → Deep Depression → Cyclone → VSCS → ESCS",
+            "Cyclone naming — WMO regional committee — India started 2004",
+            "IMD Cyclone Warning Division — 5-day track prediction — +48-hour landfall accuracy",
+            "CWRC — Cyclone Warning Research Centre, Chennai",
+            "Odisha Model — zero-casualty cyclone preparedness — Phailin 2013 vs 1999 Super Cyclone",
+            "Odisha 1999 Super Cyclone — 10,000 dead; Phailin 2013 — 0.9 million evacuated, <50 dead",
+            "NDRF pre-positioning — before cyclone landfall — rapid response",
+            "Storm surge — most deadly effect of tropical cyclone — coastal inundation",
+            "Coastal Cyclone Shelters — multi-purpose buildings — Gujarat, Odisha, AP, TN",
+            "Amphan 2020 — West Bengal, Odisha — COVID complication in evacuation",
+            "Biparjoy 2023 — Gujarat — successful zero-casualty evacuation model",
+            "Arabian Sea cyclones increasing — climate change — Oman, Gujarat, Maharashtra threat"
+          ],
+          "government_agencies": ["IMD — cyclone tracking and warning", "NDRF — pre-positioning and response", "State Revenue and Relief Departments — evacuation management"],
+          "international_frameworks": ["RSMCS — Regional Specialised Meteorological Centre — WMO designated for North Indian Ocean", "Sendai Priority 4 — preparedness"],
+          "case_studies_india": ["Odisha cyclone preparedness model — global learning", "Amphan 2020 — COVID + cyclone dual challenge", "Biparjoy 2023 — Gujarat success"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        },
+        {
+          "topic_id": "DM_004_T002",
+          "topic_name": "Heat Waves and Cold Waves — India's Emerging Threats",
+          "primary_source": "IMD Heat Wave Guidelines; NDMA Heat Wave Action Plan; WHO heat health reports",
+          "key_concepts": [
+            "IMD Heat Wave definition — departure of max temp >4.5°C from normal for 2+ days",
+            "Severe heat wave — departure >6.4°C — NDMA alert threshold",
+            "Heat wave deaths — 25,000+ between 1992-2015 (MHA data)",
+            "Andhra Pradesh 2015 heat wave — 2,500 dead — wakeup call for action",
+            "Ahmedabad Heat Action Plan 2013 — first city-level heat wave plan in South Asia",
+            "Ahmedabad model — WHO collaboration — colour-coded alerts, cooling centres",
+            "Urban Heat Island effect — cities 3-5°C hotter than surroundings",
+            "Vulnerable groups — outdoor workers, elderly, homeless, slum dwellers",
+            "Adaptive cooling — whitewashing roofs, cool roof materials",
+            "NDMA Heat Wave Action Plan 2016 — national guideline",
+            "Early Warning System — IMD forecast + state response plan trigger",
+            "Cold waves — Himachal, J&K, UP, Bihar, Delhi — fog disruption",
+            "Cold wave deaths — mostly among homeless, migrant workers, elderly",
+            "Night shelter network — urban local bodies — cold wave prevention",
+            "Climate change — heat waves becoming more frequent, intense, longer"
+          ],
+          "government_agencies": ["IMD — heat/cold wave forecasting", "State Health Departments — medical response", "Urban Local Bodies — cooling centres and shelters"],
+          "international_frameworks": ["WHO Heat Health Action Plans — global framework", "Lancet Countdown on Climate and Health — heat mortality tracking"],
+          "case_studies_india": ["Ahmedabad Heat Action Plan — global model", "Andhra Pradesh 2015 heat wave — policy trigger", "Delhi fog and cold wave disruption annually"],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 2
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Examine the Odisha model of cyclone preparedness. What lessons can other states learn? (12.5 marks)",
+          "Heat waves are becoming India's deadliest disaster. Discuss the measures needed for adaptation. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_005",
+      "module_name": "Industrial and Chemical Disasters",
+      "duration_days": { "fast": 6, "standard": 9, "extended": 13 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_005_T001",
+          "topic_name": "Industrial Disasters — Bhopal Lessons and HAZMAT Management",
+          "primary_source": "Ashok Kumar Ch 24; Factories Act 1948; NDMA Industrial Disaster Guidelines",
+          "ncert_reference": "NCERT Class 12 Chemistry Ch 14 — Biomolecules (toxic chemical basics)",
+          "key_concepts": [
+            "Bhopal Gas Tragedy December 2-3, 1984 — Union Carbide India Ltd — MIC gas leak",
+            "Methyl Isocyanate (MIC) — most toxic industrial gas — immediate 3,787 dead, 15,000+ eventual",
+            "Lessons: poor site selection (near slums), no community awareness, no emergency plan",
+            "SERC (Safety and Environment Resource Centre) — post-Bhopal toxic monitoring",
+            "Factories Act 1948 amended — safety provisions for hazardous industries",
+            "Environment Protection Act 1986 — enacted after Bhopal — comprehensive environmental law",
+            "Public Liability Insurance Act 1991 — mandatory insurance for hazardous industry",
+            "CAMEO — Computer-Aided Management of Emergency Operations — US EPA tool",
+            "HAZMAT — Hazardous Materials — NDRF specialised HAZMAT response teams",
+            "Nuclear disaster — Atomic Energy Regulatory Board (AERB) — safety oversight",
+            "NDMA Chemical Disaster Guidelines 2007 — industrial accident response",
+            "ERDMP — Emergency Response and Disaster Management Plan — mandatory for hazardous units",
+            "Mock drills — NDRF HAZMAT training with industry",
+            "Petrochemical complex disasters — Vizag gas leak 2020 — styrene vapour — LG Polymers",
+            "Chemical disaster zones — industrial clusters like Ankleshwar, Panoli, Naroda"
+          ],
+          "government_agencies": ["NDRF HAZMAT teams", "AERB — nuclear safety", "CPCB — chemical pollution monitoring", "Factory Inspectorates — state level safety inspection"],
+          "international_frameworks": ["ILO Convention 174 — Prevention of Major Industrial Accidents", "UNEP APELL — Awareness and Preparedness for Emergencies at Local Level"],
+          "case_studies_india": ["Bhopal Gas Tragedy 1984 — worst industrial disaster", "Vizag LG Polymers gas leak 2020", "ONGC well blowout incidents — oil and gas sector"],
+          "pyq_frequency": "High",
+          "prelims_importance": "High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "What lessons does the Bhopal Gas Tragedy offer for industrial disaster management in India? (12.5 marks)",
+          "Discuss the legal and institutional framework for managing chemical disasters in India. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_006",
+      "module_name": "Disaster Response — NDRF, Armed Forces and Civil Administration",
+      "duration_days": { "fast": 7, "standard": 10, "extended": 15 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_006_T001",
+          "topic_name": "NDRF — Structure, Operations and Coordination with Civil Administration",
+          "primary_source": "Ashok Kumar Ch 25; NDMA NDRF Deployment SOP; MHA Annual Report",
+          "key_concepts": [
+            "NDRF — 16 battalions — deputed from CRPF (6), BSF (2), CISF (2), ITBP (2), SSB (2), Assam Rifles (2)",
+            "NDRF headquarters — New Delhi; 12 locations across India for deployment",
+            "Specialised capabilities: Flood rescue, USAR (Urban Search and Rescue), CBRN, landslide",
+            "24/7 readiness — pre-positioned before cyclone/flood season",
+            "USAR — Urban Search and Rescue — heavy machinery, sniffer dogs, advanced tools",
+            "CBRN — Chemical, Biological, Radiological, Nuclear — specialised decontamination",
+            "Incident Command System (ICS) — unified command structure in field",
+            "Unified Command — NDRF + state SDRF + police + district administration",
+            "Cluster approach — UN coordination model adopted in India",
+            "EOC — Emergency Operations Centre — state and district level — 24x7",
+            "IDRN — India Disaster Resource Network — online resource inventory",
+            "Community First Responders — trained volunteers — 72-hour window",
+            "Armed Forces Disaster Relief — Army, Navy, Air Force — Op Madad activation",
+            "Role of IAF — air evacuation, relief dropping in inaccessible areas",
+            "Civilian-military coordination SOPs — DM Act provisions"
+          ],
+          "government_agencies": ["NDRF — rapid response force", "Army/Navy/IAF — heavy rescue and evacuation", "District Administration — first responder and coordination"],
+          "international_frameworks": ["INSARAG — International Search and Rescue Advisory Group — USAR standards", "Sendai Priority 4 — preparedness and response"],
+          "case_studies_india": ["NDRF in Kedarnath 2013 — 110,000 rescued", "COVID-19 NDRF support to hospitals", "NDRF in Turkey earthquake 2023 — international deployment"],
+          "pyq_frequency": "High",
+          "prelims_importance": "Very High",
+          "mains_importance": "High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Discuss the role and capabilities of the National Disaster Response Force. How can it be made more effective? (10 marks)",
+          "Examine the coordination challenges between civilian and military authorities during disaster response. (12.5 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_007",
+      "module_name": "International Frameworks — Sendai, CDRI and India's Global Role",
+      "duration_days": { "fast": 6, "standard": 9, "extended": 13 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_007_T001",
+          "topic_name": "Sendai Framework 2015-2030 and India's Implementation",
+          "primary_source": "Sendai Framework text; UNDRR India country reports; NDMA Sendai implementation",
+          "key_concepts": [
+            "Sendai Framework 2015-2030 — adopted at 3rd UN World Conference on DRR, Sendai Japan",
+            "Replaces Hyogo Framework for Action 2005-2015",
+            "Scope — expanded to manmade risks, not just natural",
+            "Goal — substantial reduction in disaster risk and losses by 2030",
+            "4 Priorities for Action: (1) Understanding risk, (2) Governance, (3) Investment in DRR, (4) Preparedness",
+            "7 Global Targets — A to G — mortality, affected people, economic losses, infrastructure, strategies, cooperation, EWS",
+            "India's progress — National DRR Plan 2019, State/District DM Plans, EWS expansion",
+            "SFDRR monitoring — Sendai Monitor — data submission by countries",
+            "Hyogo Framework legacy — lessons: risk governance, local implementation gaps",
+            "Sustainable Development Goals linkage — SDG 11 (resilient cities), SDG 13 (climate action)",
+            "Paris Agreement + Sendai — climate and disaster risk integration",
+            "CDRI — Coalition for Disaster Resilient Infrastructure — India launched 2019 at UNGA",
+            "CDRI membership — 40+ countries — building resilient infrastructure standards",
+            "India's leadership — disaster resilient infrastructure as development agenda",
+            "InDRR — India national DRR plan aligned with Sendai targets"
+          ],
+          "government_agencies": ["NDMA — Sendai implementation", "MHA — national DRR plan", "CDRI secretariat — New Delhi"],
+          "international_frameworks": ["Sendai Framework 2015-2030 — primary global DRR framework", "UNDRR — United Nations Office for Disaster Risk Reduction — oversight", "CDRI — Coalition for Disaster Resilient Infrastructure"],
+          "case_studies_india": ["India's Sendai Monitor reporting — progress tracking", "CDRI's role in island states resilient infrastructure", "India hosting CDRI secretariat"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "Very High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "Discuss the key features of the Sendai Framework for Disaster Risk Reduction 2015-2030. How is India implementing it? (12.5 marks)",
+          "What is CDRI? Examine India's role in promoting disaster resilient infrastructure globally. (10 marks)"
+        ]
+      }
+    },
+    {
+      "module_id": "DM_MOD_008",
+      "module_name": "Climate Change and Disaster Risk — Emerging Challenges",
+      "duration_days": { "fast": 6, "standard": 9, "extended": 13 },
+      "daily_target_hours": 3,
+      "topics": [
+        {
+          "topic_id": "DM_008_T001",
+          "topic_name": "Climate Change — Compound Disasters and Adaptation",
+          "primary_source": "IPCC AR6 India-relevant findings; IPCC-UNDRR joint report; NDMA climate disaster guidelines",
+          "ncert_reference": "NCERT Class 12 Biology Ch 16 — Environmental Issues; Class 11 Geography Ch 12 — World Climate",
+          "key_concepts": [
+            "Climate change amplifying disaster risk — frequency and intensity increasing",
+            "Compound events — multiple disasters simultaneously (cyclone + flood, drought + heatwave)",
+            "Extreme precipitation events — cloudbursts, 100-year floods becoming 10-year events",
+            "Sea level rise — 3.3mm/year globally — coastal and island community risk",
+            "Glacial retreat — Himalayan cryosphere — GLOF risk increasing",
+            "GLOF — Glacial Lake Outburst Flood — Kedarnath 2013, Chamoli 2021",
+            "Chamoli disaster February 2021 — Nanda Devi glacier — flash flood — 200+ dead",
+            "Drought-flood extreme oscillation — climate non-linearity",
+            "Loss and Damage — climate negotiation concept — compensation for climate disasters",
+            "Santiago Network — technology transfer for adaptation — COP26 outcome",
+            "Green Climate Fund — financing climate adaptation in developing countries",
+            "National Action Plan on Climate Change (NAPCC) — 8 National Missions",
+            "National Mission for Sustaining the Himalayan Ecosystem (NMSHE) — disaster link",
+            "Disaster risk informed development — integrating DRR into development planning",
+            "Heat Island mitigation — urban forests, cool roofs, wetlands — city resilience"
+          ],
+          "government_agencies": ["NDMA — climate disaster adaptation", "MoEFCC — NAPCC implementation", "TERI, IITs — research on climate disaster linkage"],
+          "international_frameworks": ["IPCC AR6 — scientific basis", "Paris Agreement NDC — mitigation and adaptation", "Loss and Damage Fund — COP27-28 outcome"],
+          "case_studies_india": ["Chamoli 2021 — GLOF — early warning gap", "Chennai 2015 floods — urban climate adaptation failure", "Kerala 2018 — extreme rainfall event climate attribution"],
+          "pyq_frequency": "Very High",
+          "prelims_importance": "High",
+          "mains_importance": "Very High",
+          "daily_target_hours": 3
+        }
+      ],
+      "module_test": {
+        "questions": 3, "marks": 50, "duration_minutes": 60,
+        "sample_questions": [
+          "How is climate change increasing disaster risk in India? Discuss with specific examples. (12.5 marks)",
+          "What are compound disasters? How should India's disaster management framework address them? (10 marks)"
+        ]
+      }
+    }
+  ],
+
+  "full_study_plan": {
+    "total_days": { "fast_pace": 56, "standard_pace": 81, "extended_pace": 118 },
+    "daily_routine": {
+      "reading": "1.5 hours — Ashok Kumar primary + NDMA guidelines for specific hazards",
+      "current_affairs_integration": "30 minutes — recent disaster events and government response",
+      "answer_writing": "1 hour — one 10-mark answer daily"
+    },
+    "current_affairs_note": "DM questions are heavily current-affairs driven — study every major disaster response and critique."
+  },
+
+  "ai_module_generator_schema": {
+    "input_params": {
+      "student_pace": "fast | standard | extended",
+      "start_date": "ISO date string",
+      "student_type": "mentorsdaily | self_study",
+      "hazard_focus": "geological | hydrological | meteorological | industrial | all"
+    },
+    "output_format": {
+      "daily_target": "topic_id + key acts and bodies to memorise",
+      "answer_writing_prompt": "one question from module",
+      "disaster_data_card": "3-5 statistics or case study facts for the topic",
+      "current_affairs_link": "recent disaster event connecting to today's topic"
+    }
+  }
+}

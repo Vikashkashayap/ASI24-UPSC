@@ -53,7 +53,7 @@ import {
 
 // Shared color palette for charts (same as student dashboard)
 const COLORS = [
-  "#8b5cf6", // purple
+  "#2563eb", // purple
   "#06b6d4", // cyan
   "#14b8a6", // teal
   "#f59e0b", // amber
@@ -429,7 +429,7 @@ export const StudentDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -470,10 +470,10 @@ export const StudentDetailPage = () => {
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${
-                  theme === "dark" ? "bg-purple-500/10" : "bg-purple-50"
+                  theme === "dark" ? "bg-blue-500/10" : "bg-blue-50"
                 }`}>
                   <User className={`h-6 w-6 ${
-                    theme === "dark" ? "text-purple-400" : "text-purple-600"
+                    theme === "dark" ? "text-blue-400" : "text-blue-600"
                   }`} />
                 </div>
                 <div>
@@ -649,8 +649,8 @@ export const StudentDetailPage = () => {
           }`}>Time Period:</span>
           <Badge variant="outline" className={`px-3 py-1 ${
             theme === "dark"
-              ? "border-purple-500/50 text-purple-300 bg-purple-500/10"
-              : "border-purple-300 text-purple-700 bg-purple-50"
+              ? "border-blue-500/50 text-blue-300 bg-blue-500/10"
+              : "border-blue-300 text-blue-700 bg-blue-50"
           }`}>
             {timeFilter === "today" && "📅 Today"}
             {timeFilter === "week" && "📊 This Week"}
@@ -664,8 +664,8 @@ export const StudentDetailPage = () => {
               className={`px-3 py-2 text-sm ${
                 timeFilter === "today"
                   ? theme === "dark"
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "bg-purple-600 text-white shadow-sm"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-blue-600 text-white shadow-sm"
                   : theme === "dark"
                     ? "text-slate-300 hover:bg-slate-700"
                     : "text-slate-700 hover:bg-slate-200"
@@ -680,8 +680,8 @@ export const StudentDetailPage = () => {
               className={`px-3 py-2 text-sm ${
                 timeFilter === "week"
                   ? theme === "dark"
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "bg-purple-600 text-white shadow-sm"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-blue-600 text-white shadow-sm"
                   : theme === "dark"
                     ? "text-slate-300 hover:bg-slate-700"
                     : "text-slate-700 hover:bg-slate-200"
@@ -696,8 +696,8 @@ export const StudentDetailPage = () => {
               className={`px-3 py-2 text-sm ${
                 timeFilter === "month"
                   ? theme === "dark"
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "bg-purple-600 text-white shadow-sm"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-blue-600 text-white shadow-sm"
                   : theme === "dark"
                     ? "text-slate-300 hover:bg-slate-700"
                     : "text-slate-700 hover:bg-slate-200"
@@ -712,8 +712,8 @@ export const StudentDetailPage = () => {
               className={`px-3 py-2 text-sm ${
                 timeFilter === "all"
                   ? theme === "dark"
-                    ? "bg-purple-600 text-white shadow-sm"
-                    : "bg-purple-600 text-white shadow-sm"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-blue-600 text-white shadow-sm"
                   : theme === "dark"
                     ? "text-slate-300 hover:bg-slate-700"
                     : "text-slate-700 hover:bg-slate-200"
@@ -762,16 +762,16 @@ export const StudentDetailPage = () => {
             </div>
             <div className={`p-4 rounded-xl border ${
               theme === "dark"
-                ? "bg-purple-500/10 border-purple-500/20"
-                : "bg-purple-50 border-purple-200"
+                ? "bg-blue-500/10 border-blue-500/20"
+                : "bg-blue-50 border-blue-200"
             }`}>
               <div className={`text-2xl font-bold ${
-                theme === "dark" ? "text-purple-400" : "text-purple-600"
+                theme === "dark" ? "text-blue-400" : "text-blue-600"
               }`}>
                 {activityData?.totalActivities || 0}
               </div>
               <div className={`text-sm ${
-                theme === "dark" ? "text-purple-300" : "text-purple-700"
+                theme === "dark" ? "text-blue-300" : "text-blue-700"
               }`}>
                 Total Activities
               </div>
@@ -805,8 +805,8 @@ export const StudentDetailPage = () => {
             className={`${
               activeTab === "overview"
                 ? theme === "dark"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-purple-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-blue-600 text-white shadow-sm"
                 : theme === "dark"
                   ? "text-slate-300 hover:bg-slate-700"
                   : "text-slate-700 hover:bg-slate-200"
@@ -821,8 +821,8 @@ export const StudentDetailPage = () => {
             className={`${
               activeTab === "prelims"
                 ? theme === "dark"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-purple-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-blue-600 text-white shadow-sm"
                 : theme === "dark"
                   ? "text-slate-300 hover:bg-slate-700"
                   : "text-slate-700 hover:bg-slate-200"
@@ -837,8 +837,8 @@ export const StudentDetailPage = () => {
             className={`${
               activeTab === "mains"
                 ? theme === "dark"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-purple-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-blue-600 text-white shadow-sm"
                 : theme === "dark"
                   ? "text-slate-300 hover:bg-slate-700"
                   : "text-slate-700 hover:bg-slate-200"
@@ -853,8 +853,8 @@ export const StudentDetailPage = () => {
             className={`${
               activeTab === "activity"
                 ? theme === "dark"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-purple-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-blue-600 text-white shadow-sm"
                 : theme === "dark"
                   ? "text-slate-300 hover:bg-slate-700"
                   : "text-slate-700 hover:bg-slate-200"
@@ -869,8 +869,8 @@ export const StudentDetailPage = () => {
             className={`${
               activeTab === "analytics"
                 ? theme === "dark"
-                  ? "bg-purple-600 text-white shadow-sm"
-                  : "bg-purple-600 text-white shadow-sm"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-blue-600 text-white shadow-sm"
                 : theme === "dark"
                   ? "text-slate-300 hover:bg-slate-700"
                   : "text-slate-700 hover:bg-slate-200"
@@ -1012,7 +1012,7 @@ export const StudentDetailPage = () => {
                           border: `1px solid ${theme === "dark" ? "#475569" : "#e2e8f0"}`,
                           color: theme === "dark" ? "#e2e8f0" : "#1e293b"
                         }} />
-                        <Line type="monotone" dataKey="score" stroke="#8b5cf6" strokeWidth={2} name="Score" />
+                        <Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={2} name="Score" />
                         <Line type="monotone" dataKey="accuracy" stroke="#10b981" strokeWidth={2} name="Accuracy %" />
                       </LineChart>
                     </ResponsiveContainer>
@@ -1075,7 +1075,7 @@ export const StudentDetailPage = () => {
                             border: `1px solid ${theme === "dark" ? "#475569" : "#e2e8f0"}`,
                             color: theme === "dark" ? "#e2e8f0" : "#1e293b"
                           }} />
-                          <Bar dataKey="averageScore" fill="#8b5cf6" name="Avg Score" />
+                          <Bar dataKey="averageScore" fill="#2563eb" name="Avg Score" />
                           <Bar dataKey="averageAccuracy" fill="#10b981" name="Avg Accuracy %" />
                         </BarChart>
                       </ResponsiveContainer>
@@ -1484,7 +1484,7 @@ export const StudentDetailPage = () => {
           <div className="space-y-6">
             {!dartAnalytics ? (
               <div className={`flex items-center justify-center py-16 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
               </div>
             ) : (
               <>
@@ -1520,7 +1520,7 @@ export const StudentDetailPage = () => {
                       <button
                         onClick={handleDownloadStudentDartReport}
                         disabled={dartReportDownloading}
-                        className={`text-sm font-medium px-3 py-2 rounded-lg ${theme === "dark" ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30" : "bg-purple-100 text-purple-700 hover:bg-purple-200"}`}
+                        className={`text-sm font-medium px-3 py-2 rounded-lg ${theme === "dark" ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30" : "bg-blue-100 text-blue-700 hover:bg-blue-200"}`}
                       >
                         {dartReportDownloading ? "Generating..." : "Download 20-Day Report"}
                       </button>
@@ -1597,7 +1597,7 @@ export const StudentDetailPage = () => {
                             <Line
                               type="monotone"
                               dataKey="studyHours"
-                              stroke="#8b5cf6"
+                              stroke="#2563eb"
                               strokeWidth={2}
                               name="Study (hrs)"
                             />
@@ -1647,7 +1647,7 @@ export const StudentDetailPage = () => {
                               }}
                             />
                             <Bar dataKey="target" fill="#94a3b8" name="Target (hrs)" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="actual" fill="#8b5cf6" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="actual" fill="#2563eb" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -1745,7 +1745,7 @@ export const StudentDetailPage = () => {
                     <CardContent>
                       <div
                         className={`text-3xl font-bold ${
-                          theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"
+                          theme === "dark" ? "text-blue-400" : "text-blue-600"
                         }`}
                       >
                         {dartAnalytics.answerWritingWeeklyCount ?? 0} days
@@ -1890,7 +1890,7 @@ export const StudentDetailPage = () => {
                         <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
                           activity.type === 'mains_evaluation'
                             ? theme === "dark" ? 'bg-green-500' : 'bg-green-600'
-                            : theme === "dark" ? 'bg-purple-500' : 'bg-purple-600'
+                            : theme === "dark" ? 'bg-blue-500' : 'bg-blue-600'
                         }`}>
                           <div className={`w-2 h-2 rounded-full bg-white`} />
                         </div>

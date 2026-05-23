@@ -29,7 +29,7 @@ export const Progress: React.FC<ProgressProps> = ({
       <div
         className={cn(
           "h-full w-full flex-1 transition-all",
-          theme === "dark" ? "bg-fuchsia-600" : "bg-slate-900"
+          "bg-gradient-to-r from-blue-600 to-indigo-600"
         )}
         style={{
           transform: `translateX(-${100 - percentage}%)`,

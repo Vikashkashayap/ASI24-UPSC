@@ -44,13 +44,13 @@ export const SuperKalamSectionBlock: React.FC<Props> = ({
         <div
           className={`w-1 h-7 rounded-full ${
             isDark
-              ? 'bg-gradient-to-b from-fuchsia-400 to-purple-600'
-              : 'bg-gradient-to-b from-fuchsia-500 to-purple-600'
+              ? 'bg-gradient-to-b from-indigo-400 to-blue-600'
+              : 'bg-gradient-to-b from-indigo-500 to-blue-600'
           }`}
         />
         <p
           className={`text-xs font-bold tracking-[0.15em] uppercase ${
-            isDark ? 'text-purple-300/90' : 'text-purple-700'
+            isDark ? 'text-blue-300/90' : 'text-blue-700'
           }`}
         >
           {label}

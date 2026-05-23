@@ -57,7 +57,7 @@ export const SubjectToggle: React.FC<SubjectToggleProps> = ({
               disabled={disabled}
               className={`min-w-0 min-h-[44px] sm:min-h-0 px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg border transition-colors touch-manipulation text-xs sm:text-sm font-medium
                 ${isSelected
-                  ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white border-purple-600 shadow-md"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white border-blue-600 shadow-md"
                   : theme === "dark"
                     ? "bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 active:bg-slate-700"
                     : "border-slate-300 bg-white hover:bg-slate-50 text-slate-800 active:bg-slate-100"

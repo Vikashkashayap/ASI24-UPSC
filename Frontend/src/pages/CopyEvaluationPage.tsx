@@ -163,27 +163,27 @@ const CopyEvaluationPage: React.FC = () => {
       <div
         className={`relative overflow-hidden rounded-2xl p-4 xs:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${
           theme === 'dark'
-            ? 'bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10'
-            : 'bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30'
+            ? 'bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10'
+            : 'bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30'
         }`}
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col gap-2">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div
-                className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'}`}
+                className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'}`}
               >
                 <FileText
-                  className={`w-6 h-6 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}
+                  className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
                 />
               </div>
               <div>
                 <h1
                   className={`text-xl xs:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
                     theme === 'dark'
-                      ? 'from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent'
-                      : 'from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent'
+                      ? 'from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent'
+                      : 'from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent'
                   }`}
                 >
                   Copy Evaluation
@@ -200,7 +200,7 @@ const CopyEvaluationPage: React.FC = () => {
             {!hasResult && !isUploading && (
               <Button
                 onClick={() => navigate('/evaluation-history')}
-                className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white"
+                className="bg-gradient-to-r from-indigo-500 to-emerald-400 hover:from-indigo-400 hover:to-emerald-300 text-white"
               >
                 <History className="w-4 h-4 mr-2" />
                 History
@@ -217,7 +217,7 @@ const CopyEvaluationPage: React.FC = () => {
           <Card
             className={`h-full min-h-[400px] ${
               theme === 'dark'
-                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50'
+                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-blue-900/50'
                 : 'bg-white border-slate-200'
             } shadow-xl`}
           >
@@ -225,12 +225,12 @@ const CopyEvaluationPage: React.FC = () => {
               <div className="max-w-md">
                 <div
                   className={`p-6 rounded-full mx-auto mb-6 w-fit ${
-                    theme === 'dark' ? 'bg-fuchsia-500/10' : 'bg-purple-100'
+                    theme === 'dark' ? 'bg-indigo-500/10' : 'bg-blue-100'
                   }`}
                 >
                   <FileText
                     className={`w-16 h-16 mx-auto ${
-                      theme === 'dark' ? 'text-fuchsia-400' : 'text-purple-600'
+                      theme === 'dark' ? 'text-indigo-400' : 'text-blue-600'
                     }`}
                   />
                 </div>
@@ -250,7 +250,7 @@ const CopyEvaluationPage: React.FC = () => {
                 </p>
                 <Button
                   onClick={() => setShowUploadModal(true)}
-                  className="bg-gradient-to-r from-fuchsia-500 to-emerald-400 hover:from-fuchsia-400 hover:to-emerald-300 text-white"
+                  className="bg-gradient-to-r from-indigo-500 to-emerald-400 hover:from-indigo-400 hover:to-emerald-300 text-white"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Answer Copy
@@ -262,7 +262,7 @@ const CopyEvaluationPage: React.FC = () => {
           <Card
             className={`shadow-xl ${
               theme === 'dark'
-                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-purple-900/50'
+                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-blue-900/50'
                 : 'bg-white border-slate-200'
             }`}
           >

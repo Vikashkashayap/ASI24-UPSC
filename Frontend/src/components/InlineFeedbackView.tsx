@@ -203,8 +203,8 @@ const InlineFeedbackView: React.FC<InlineFeedbackViewProps> = ({
                         className={`p-3 rounded border-l-4 transition-all ${
                           hasFeedback
                             ? theme === "dark"
-                              ? "border-purple-500 bg-purple-950/20"
-                              : "border-purple-400 bg-purple-50"
+                              ? "border-blue-500 bg-blue-950/20"
+                              : "border-blue-400 bg-blue-50"
                             : theme === "dark"
                             ? "border-slate-700 bg-slate-800/30"
                             : "border-slate-200 bg-white"
@@ -269,7 +269,7 @@ const InlineFeedbackView: React.FC<InlineFeedbackViewProps> = ({
                     key={idx}
                     className={`p-4 rounded-lg border-l-4 transition-all cursor-pointer ${
                       selectedFeedback === feedback
-                        ? 'ring-2 ring-purple-500'
+                        ? 'ring-2 ring-blue-500'
                         : ''
                     } ${getFeedbackColor(feedback.severity)}`}
                     onMouseEnter={() => setSelectedFeedback(feedback)}

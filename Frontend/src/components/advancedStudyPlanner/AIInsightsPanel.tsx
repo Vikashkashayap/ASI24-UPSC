@@ -14,7 +14,7 @@ const icons = {
 const styles = {
   warning: "border-rose-200 bg-rose-50/80 text-rose-800",
   success: "border-emerald-200 bg-emerald-50/80 text-emerald-800",
-  tip: "border-violet-200 bg-violet-50/80 text-violet-800",
+  tip: "border-blue-200 bg-blue-50/80 text-blue-800",
 };
 
 interface Props {
@@ -33,7 +33,7 @@ export function AIInsightsPanel({ insights, onRefresh, loading }: Props) {
         animate={{ opacity: 1 }}
         className={cn("rounded-2xl p-6 border text-center", theme === "dark" ? "bg-slate-900/80 border-slate-700" : "bg-white border-slate-200")}
       >
-        <Lightbulb className="w-10 h-10 mx-auto mb-2 text-violet-400 opacity-50" />
+        <Lightbulb className="w-10 h-10 mx-auto mb-2 text-blue-400 opacity-50" />
         <p className="text-sm opacity-70">Complete tasks to unlock AI insights.</p>
         {onRefresh && (
           <Button type="button" variant="outline" className="mt-3" onClick={onRefresh} disabled={loading}>
@@ -54,7 +54,7 @@ export function AIInsightsPanel({ insights, onRefresh, loading }: Props) {
       >
         <h3 className={cn("font-semibold", theme === "dark" ? "text-white" : "text-slate-900")}>AI Insights</h3>
         {onRefresh && (
-          <button type="button" onClick={onRefresh} disabled={loading} className="text-xs text-violet-600 hover:underline flex items-center gap-1">
+          <button type="button" onClick={onRefresh} disabled={loading} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
             <RefreshCw className={cn("w-3 h-3", loading && "animate-spin")} /> Refresh
           </button>
         )}

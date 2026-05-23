@@ -45,7 +45,7 @@ import {
 } from "lucide-react";
 
 const COLORS = [
-  "#8b5cf6", // purple
+  "#2563eb", // purple
   "#06b6d4", // cyan
   "#14b8a6", // teal
   "#f59e0b", // amber
@@ -57,12 +57,12 @@ const COLORS = [
 
 const GRADIENT_COLORS = {
   dark: {
-    primary: "rgba(139, 92, 246, 0.3)",
+    primary: "rgba(37, 99, 235, 0.3)",
     secondary: "rgba(6, 182, 212, 0.3)",
     success: "rgba(20, 184, 166, 0.3)"
   },
   light: {
-    primary: "rgba(139, 92, 246, 0.1)",
+    primary: "rgba(37, 99, 235, 0.1)",
     secondary: "rgba(6, 182, 212, 0.1)",
     success: "rgba(20, 184, 166, 0.1)"
   }
@@ -200,28 +200,28 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg shadow-purple-500/10" 
-            : "bg-gradient-to-br from-white to-purple-50/30 border-purple-200/50 shadow-lg shadow-purple-100/50"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg shadow-blue-500/10" 
+            : "bg-gradient-to-br from-white to-blue-50/30 border-blue-200/50 shadow-lg shadow-blue-100/50"
         } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/30 via-purple-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 via-blue-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <CardHeader className="pb-3 relative z-10">
             <div className="flex items-center justify-between">
               <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                 Overall Average
               </CardTitle>
               <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
               }`}>
-                <Target className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <Target className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
             <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
               theme === "dark" 
-                ? "from-purple-300 to-purple-500 bg-clip-text text-transparent" 
-                : "from-purple-600 to-purple-800 bg-clip-text text-transparent"
+                ? "from-blue-300 to-blue-500 bg-clip-text text-transparent" 
+                : "from-blue-600 to-blue-800 bg-clip-text text-transparent"
             }`}>
               {loading ? "..." : `${combinedMetrics.overallAverage}%`}
             </div>
@@ -335,16 +335,16 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-            : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+            : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
         }`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <CardHeader className="relative z-10 pb-4">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
               }`}>
-                <BarChart3 className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <BarChart3 className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <div>
                 <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -360,7 +360,7 @@ export const PerformanceDashboardPage = () => {
                 <PieChart>
                   <Pie
                     data={[
-                      { name: 'Copy Evaluations', value: combinedMetrics.copyEvaluations, color: '#8b5cf6' },
+                      { name: 'Copy Evaluations', value: combinedMetrics.copyEvaluations, color: '#2563eb' },
                       { name: 'Prelims Tests', value: combinedMetrics.prelimsTests, color: '#06b6d4' }
                     ]}
                     dataKey="value"
@@ -378,7 +378,7 @@ export const PerformanceDashboardPage = () => {
                   </Pie>
                   <defs>
                     <linearGradient id="colorPurple" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1}/>
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity={1}/>
                       <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8}/>
                     </linearGradient>
                     <linearGradient id="colorCyan" x1="0" y1="0" x2="0" y2="1">
@@ -436,14 +436,14 @@ export const PerformanceDashboardPage = () => {
             <ResponsiveContainer width="100%" height={250}>
               <BarChart
                 data={[
-                  { name: 'Copy Evaluations', score: copyPerformanceData?.averageScore || 0, color: '#8b5cf6' },
+                  { name: 'Copy Evaluations', score: copyPerformanceData?.averageScore || 0, color: '#2563eb' },
                   { name: 'Prelims Tests', score: prelimsPerformanceData?.averageScore || 0, color: '#06b6d4' }
                 ]}
                 margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
               >
                 <defs>
                   <linearGradient id="barGradientPurple" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={1}/>
+                    <stop offset="0%" stopColor="#2563eb" stopOpacity={1}/>
                     <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8}/>
                   </linearGradient>
                   <linearGradient id="barGradientCyan" x1="0" y1="0" x2="0" y2="1">
@@ -493,13 +493,13 @@ export const PerformanceDashboardPage = () => {
           ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 shadow-lg" 
           : "bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg"
       }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/5 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full blur-3xl" />
         <CardHeader className="relative z-10 pb-4">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+              theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
             }`}>
-              <Zap className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <Zap className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
             <div>
               <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -515,16 +515,16 @@ export const PerformanceDashboardPage = () => {
               onClick={() => setActiveTab('copy-evaluation')}
               className={`group relative p-5 rounded-xl border-2 transition-all duration-300 text-left overflow-hidden hover:scale-[1.02] ${
                 theme === "dark"
-                  ? "border-purple-700/50 bg-gradient-to-br from-purple-900/30 to-purple-800/20 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20"
-                  : "border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100/50 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-200/50"
+                  ? "border-blue-700/50 bg-gradient-to-br from-blue-900/30 to-blue-800/20 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20"
+                  : "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200/50"
               }`}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative flex items-start gap-4">
                 <div className={`p-3 rounded-lg ${
-                  theme === "dark" ? "bg-purple-500/20 group-hover:bg-purple-500/30" : "bg-purple-100 group-hover:bg-purple-200"
+                  theme === "dark" ? "bg-blue-500/20 group-hover:bg-blue-500/30" : "bg-blue-100 group-hover:bg-blue-200"
                 } transition-colors`}>
-                  <FileText className={`w-6 h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  <FileText className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 </div>
                 <div className="flex-1">
                   <h3 className={`font-bold text-base mb-1 ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -535,7 +535,7 @@ export const PerformanceDashboardPage = () => {
                   </p>
                 </div>
                 <ArrowUpRight className={`w-5 h-5 mt-1 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 ${
-                  theme === "dark" ? "text-purple-400" : "text-purple-600"
+                  theme === "dark" ? "text-blue-400" : "text-blue-600"
                 }`} />
               </div>
             </button>
@@ -577,7 +577,7 @@ export const PerformanceDashboardPage = () => {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-purple-500/20" : "bg-white border-purple-200/50"
+              theme === "dark" ? "bg-slate-800/90 border-blue-500/20" : "bg-white border-blue-200/50"
             }`}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">Daily Time Distribution</CardTitle>
@@ -625,7 +625,7 @@ export const PerformanceDashboardPage = () => {
                       <XAxis dataKey="day" tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
                       <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
                       <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                      <Line type="monotone" dataKey="studyHours" stroke="#8b5cf6" strokeWidth={2} name="Study (hrs)" />
+                      <Line type="monotone" dataKey="studyHours" stroke="#2563eb" strokeWidth={2} name="Study (hrs)" />
                       <Line type="monotone" dataKey="targetHours" stroke="#06b6d4" strokeWidth={2} name="Target (hrs)" strokeDasharray="4 4" />
                     </LineChart>
                   </ResponsiveContainer>
@@ -655,7 +655,7 @@ export const PerformanceDashboardPage = () => {
                       <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
                       <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
                       <Bar dataKey="target" fill="#94a3b8" name="Target (hrs)" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="actual" fill="#8b5cf6" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="actual" fill="#2563eb" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
@@ -722,13 +722,13 @@ export const PerformanceDashboardPage = () => {
               </CardContent>
             </Card>
             <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-fuchsia-500/20" : "bg-white border-fuchsia-200/50"
+              theme === "dark" ? "bg-slate-800/90 border-indigo-500/20" : "bg-white border-indigo-200/50"
             }`}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">Answer Writing (Last 7 Days)</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold ${theme === "dark" ? "text-fuchsia-400" : "text-fuchsia-600"}`}>
+                <div className={`text-3xl font-bold ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}>
                   {dartAnalytics.answerWritingWeeklyCount ?? 0} days
                 </div>
                 <p className="text-sm text-slate-500 mt-1">Days with answer writing done</p>
@@ -783,28 +783,28 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg shadow-purple-500/10" 
-            : "bg-gradient-to-br from-white to-purple-50/30 border-purple-200/50 shadow-lg shadow-purple-100/50"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg shadow-blue-500/10" 
+            : "bg-gradient-to-br from-white to-blue-50/30 border-blue-200/50 shadow-lg shadow-blue-100/50"
         } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/30 via-purple-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 via-blue-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <CardHeader className="pb-3 relative z-10">
             <div className="flex items-center justify-between">
               <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                 Average Score
               </CardTitle>
               <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
               }`}>
-                <Target className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <Target className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
             <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
               theme === "dark" 
-                ? "from-purple-300 to-purple-500 bg-clip-text text-transparent" 
-                : "from-purple-600 to-purple-800 bg-clip-text text-transparent"
+                ? "from-blue-300 to-blue-500 bg-clip-text text-transparent" 
+                : "from-blue-600 to-blue-800 bg-clip-text text-transparent"
             }`}>
               {loading ? "..." : `${copyPerformanceData?.averageScore || 0}%`}
             </div>
@@ -929,17 +929,17 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-            : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+            : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
         }`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <CardHeader className="pb-4 relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${
-                  theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                  theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
                 }`}>
-                  <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 </div>
                 <div>
                   <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -960,8 +960,8 @@ export const PerformanceDashboardPage = () => {
                 <AreaChart data={copyFilteredHistory} margin={{ left: -10, right: 10, top: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorCopyScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
@@ -990,10 +990,10 @@ export const PerformanceDashboardPage = () => {
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="#8b5cf6"
+                    stroke="#2563eb"
                     strokeWidth={2}
                     fill="url(#colorCopyScore)"
-                    dot={{ fill: "#8b5cf6", r: 4 }}
+                    dot={{ fill: "#2563eb", r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </AreaChart>
@@ -1043,7 +1043,7 @@ export const PerformanceDashboardPage = () => {
                   <XAxis dataKey="subject" tick={{ fontSize: 10 }} />
                   <YAxis domain={[0, 100]} />
                   <Tooltip formatter={(value: any) => [`${value}%`, "Average Score"]} />
-                  <Bar dataKey="average" fill="#8b5cf6" />
+                  <Bar dataKey="average" fill="#2563eb" />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -1064,7 +1064,7 @@ export const PerformanceDashboardPage = () => {
       {/* Pre-lims Readiness Overview */}
       {prelimsPerformanceData?.preLimsReadiness && (
         <Card className={`relative overflow-hidden border-2 mb-6 ${getReadinessBg(prelimsPerformanceData.preLimsReadiness.overallReadiness)}`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
@@ -1137,28 +1137,28 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg shadow-purple-500/10" 
-            : "bg-gradient-to-br from-white to-purple-50/30 border-purple-200/50 shadow-lg shadow-purple-100/50"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg shadow-blue-500/10" 
+            : "bg-gradient-to-br from-white to-blue-50/30 border-blue-200/50 shadow-lg shadow-blue-100/50"
         } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/30 via-purple-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 via-blue-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <CardHeader className="pb-3 relative z-10">
             <div className="flex items-center justify-between">
               <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                 Average Score
               </CardTitle>
               <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
               }`}>
-                <Target className={`w-4 h-4 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                <Target className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
             </div>
           </CardHeader>
           <CardContent className="relative z-10">
             <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
               theme === "dark" 
-                ? "from-purple-300 to-purple-500 bg-clip-text text-transparent" 
-                : "from-purple-600 to-purple-800 bg-clip-text text-transparent"
+                ? "from-blue-300 to-blue-500 bg-clip-text text-transparent" 
+                : "from-blue-600 to-blue-800 bg-clip-text text-transparent"
             }`}>
               {loading ? "..." : `${prelimsPerformanceData?.averageScore || 0}%`}
             </div>
@@ -1283,17 +1283,17 @@ export const PerformanceDashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
           theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-            : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+            : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
         }`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
           <CardHeader className="pb-4 relative z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${
-                  theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                  theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
                 }`}>
-                  <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 </div>
                 <div>
                   <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -1314,8 +1314,8 @@ export const PerformanceDashboardPage = () => {
                 <AreaChart data={prelimsFilteredHistory} margin={{ left: -10, right: 10, top: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorPrelimsScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
@@ -1344,10 +1344,10 @@ export const PerformanceDashboardPage = () => {
                   <Area
                     type="monotone"
                     dataKey="score"
-                    stroke="#8b5cf6"
+                    stroke="#2563eb"
                     strokeWidth={2}
                     fill="url(#colorPrelimsScore)"
-                    dot={{ fill: "#8b5cf6", r: 4 }}
+                    dot={{ fill: "#2563eb", r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </AreaChart>
@@ -1419,21 +1419,21 @@ export const PerformanceDashboardPage = () => {
     <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 px-3 md:px-0 overflow-x-hidden pb-2">
       {/* Welcome + DART Performance Score & Consistency */}
       <div className={`rounded-xl md:rounded-2xl p-4 md:p-6 border-2 ${
-        theme === "dark" ? "bg-slate-800/80 border-purple-500/20" : "bg-white border-purple-200/50"
+        theme === "dark" ? "bg-slate-800/80 border-blue-500/20" : "bg-white border-blue-200/50"
       }`}>
         <h2 className={`text-lg md:text-xl font-bold mb-4 flex items-center gap-2 ${
           theme === "dark" ? "text-slate-100" : "text-slate-900"
         }`}>
-          <Sparkles className="w-5 h-5 text-purple-500" />
+          <Sparkles className="w-5 h-5 text-blue-500" />
           Welcome, {enrollmentName}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card className={`${
-            theme === "dark" ? "bg-slate-900/80 border-purple-500/30" : "bg-purple-50/50 border-purple-200"
+            theme === "dark" ? "bg-slate-900/80 border-blue-500/30" : "bg-blue-50/50 border-blue-200"
           } border-2`}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Target className="w-4 h-4 text-purple-500" />
+                <Target className="w-4 h-4 text-blue-500" />
                 Performance Score
               </CardTitle>
             </CardHeader>
@@ -1544,23 +1544,23 @@ export const PerformanceDashboardPage = () => {
       {/* Header Section - compact on mobile */}
       <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 mb-4 md:mb-6 border-2 transition-all duration-300 ${
         theme === "dark"
-          ? "bg-gradient-to-br from-slate-800/90 via-purple-900/20 to-slate-900/90 border-purple-500/20 shadow-xl shadow-purple-500/10"
-          : "bg-gradient-to-br from-white via-purple-50/30 to-white border-purple-200/50 shadow-xl shadow-purple-100/30"
+          ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10"
+          : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
       }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
         <div className="relative z-10 flex flex-col gap-3 md:gap-5">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 md:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
                 <div className={`p-2 md:p-2.5 rounded-lg md:rounded-xl shrink-0 ${
-                  theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                  theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
                 }`}>
-                  <BarChart3 className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  <BarChart3 className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 </div>
                 <h1 className={`text-xl md:text-4xl font-bold tracking-tight bg-gradient-to-r truncate ${
                   theme === "dark"
-                    ? "from-purple-200 via-purple-300 to-purple-400 bg-clip-text text-transparent"
-                    : "from-purple-600 via-purple-700 to-purple-800 bg-clip-text text-transparent"
+                    ? "from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent"
+                    : "from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent"
                 }`}>
                   Performance Dashboard
                 </h1>
@@ -1578,8 +1578,8 @@ export const PerformanceDashboardPage = () => {
                   className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
                     selectedTimeframe === 'week'
                       ? theme === "dark"
-                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
-                        : "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
+                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
                       : theme === "dark"
                       ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
                       : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
@@ -1592,8 +1592,8 @@ export const PerformanceDashboardPage = () => {
                   className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
                     selectedTimeframe === 'month'
                       ? theme === "dark"
-                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
-                        : "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
+                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
                       : theme === "dark"
                       ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
                       : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
@@ -1606,8 +1606,8 @@ export const PerformanceDashboardPage = () => {
                   className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
                     selectedTimeframe === 'all'
                       ? theme === "dark"
-                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
-                        : "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md shadow-purple-500/30"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
+                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
                       : theme === "dark"
                       ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
                       : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
@@ -1632,8 +1632,8 @@ export const PerformanceDashboardPage = () => {
           className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
             activeTab === 'overview'
               ? theme === "dark"
-                ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
-                : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
+                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
               : theme === "dark"
               ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white'
@@ -1649,8 +1649,8 @@ export const PerformanceDashboardPage = () => {
           className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
             activeTab === 'copy-evaluation'
               ? theme === "dark"
-                ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
-                : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
+                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
               : theme === "dark"
               ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white'
@@ -1666,8 +1666,8 @@ export const PerformanceDashboardPage = () => {
           className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
             activeTab === 'prelims'
               ? theme === "dark"
-                ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
-                : 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg shadow-purple-500/30'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
+                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
               : theme === "dark"
               ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
               : 'text-slate-600 hover:text-slate-900 hover:bg-white'

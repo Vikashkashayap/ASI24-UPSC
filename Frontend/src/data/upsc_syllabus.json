@@ -88,25 +88,6 @@
                 { "id": "pre_hist_mod_11", "name": "Partition, Independence & Integration of Princely States", "hours": 3 },
                 { "id": "pre_hist_mod_12", "name": "Press, Education, Peasant & Tribal Movements", "hours": 2 }
               ]
-            },
-            {
-              "id": "pre_hist_world",
-              "name": "World History",
-              "estimated_hours": 15,
-              "difficulty": "medium",
-              "importance": "medium",
-              "revision_sessions": 2,
-              "subtopics": [
-                { "id": "pre_hist_wld_01", "name": "Renaissance & Reformation", "hours": 1 },
-                { "id": "pre_hist_wld_02", "name": "Industrial Revolution", "hours": 2 },
-                { "id": "pre_hist_wld_03", "name": "French Revolution & Napoleon", "hours": 2 },
-                { "id": "pre_hist_wld_04", "name": "American Revolution & US History", "hours": 1 },
-                { "id": "pre_hist_wld_05", "name": "World War I — Causes, Events, Treaty of Versailles", "hours": 2 },
-                { "id": "pre_hist_wld_06", "name": "Russian Revolution & Rise of Communism", "hours": 2 },
-                { "id": "pre_hist_wld_07", "name": "World War II — Causes, Events, Aftermath", "hours": 2 },
-                { "id": "pre_hist_wld_08", "name": "Cold War & Decolonization", "hours": 2 },
-                { "id": "pre_hist_wld_09", "name": "Post-Cold War World Order", "hours": 1 }
-              ]
             }
           ]
         },
@@ -175,19 +156,6 @@
                 { "id": "pre_geo_wld_06", "name": "Important Straits, Canals, Water Bodies", "hours": 2 },
                 { "id": "pre_geo_wld_07", "name": "Regional Geography — Africa, Europe, Americas, SE Asia", "hours": 4 },
                 { "id": "pre_geo_wld_08", "name": "Economic Geography — Trade Routes, Ports, SEZs", "hours": 2 }
-              ]
-            },
-            {
-              "id": "pre_geo_mapping",
-              "name": "Map Work & Places in News",
-              "estimated_hours": 10,
-              "difficulty": "easy",
-              "importance": "high",
-              "revision_sessions": 2,
-              "subtopics": [
-                { "id": "pre_geo_map_01", "name": "Indian Map — States, Capitals, Districts, Rivers", "hours": 3 },
-                { "id": "pre_geo_map_02", "name": "World Map — Countries, Capitals, Borders", "hours": 3 },
-                { "id": "pre_geo_map_03", "name": "Current Affairs Map-Based Questions", "hours": 4 }
               ]
             }
           ]
@@ -535,6 +503,37 @@
                 { "id": "pre_sci_hea_03", "name": "National Health Mission, Ayushman Bharat, AIIMS", "hours": 2 },
                 { "id": "pre_sci_hea_04", "name": "WHO, Pandemic Preparedness, Vaccine Policy", "hours": 2 },
                 { "id": "pre_sci_hea_05", "name": "Medical Ethics, Clinical Trials, Drug Regulation (CDSCO)", "hours": 2 }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "pre_art_culture",
+          "name": "Art & Culture",
+          "estimated_hours": 45,
+          "prelims_weightage_percent": 6,
+          "difficulty": "medium",
+          "importance": "high",
+          "topics": [
+            {
+              "id": "pre_art_overview",
+              "name": "Indian Art, Architecture & Heritage",
+              "estimated_hours": 45,
+              "difficulty": "medium",
+              "importance": "high",
+              "revision_sessions": 2,
+              "subtopics": [
+                { "id": "pre_art_01", "name": "Classical Dances — Bharatanatyam, Kathak, Odissi, Kuchipudi, etc.", "hours": 4 },
+                { "id": "pre_art_02", "name": "Classical Music — Hindustani vs Carnatic, Instruments, Gharanas", "hours": 4 },
+                { "id": "pre_art_03", "name": "Paintings — Miniature, Ajanta, Mughal, Rajput, Madhubani, Warli", "hours": 5 },
+                { "id": "pre_art_04", "name": "Architecture — Temple Styles (Nagara, Dravidian), Cave Art, Stupas", "hours": 5 },
+                { "id": "pre_art_05", "name": "UNESCO Heritage Sites in India", "hours": 4 },
+                { "id": "pre_art_06", "name": "Intangible Cultural Heritage, GI Tags", "hours": 4 },
+                { "id": "pre_art_07", "name": "Fairs, Festivals, Folk Arts of India", "hours": 4 },
+                { "id": "pre_art_08", "name": "Languages — Scheduled Languages, Classical Language Status", "hours": 4 },
+                { "id": "pre_art_09", "name": "Literature, Philosophy & Religious Traditions", "hours": 6 },
+                { "id": "pre_art_10", "name": "Performing Arts — Theatre, Puppetry, Folk Traditions", "hours": 5 }
               ]
             }
           ]

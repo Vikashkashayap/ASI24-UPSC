@@ -156,7 +156,7 @@ export const StudentsListPage = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-2">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
               Student Management
             </h1>
             <p className={`mt-2 text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
@@ -171,7 +171,7 @@ export const StudentsListPage = () => {
                 setCreatedStudent(null);
                 setNewStudentData({ name: "", email: "" });
               }}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-6 h-auto rounded-2xl shadow-lg shadow-purple-500/20 transition-all hover:scale-[1.02] flex items-center gap-2 group"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-6 h-auto rounded-2xl shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] flex items-center gap-2 group"
             >
               <UserPlus className="h-5 w-5 transition-transform group-hover:scale-110" />
               <span className="font-semibold">Add New Student</span>
@@ -211,7 +211,7 @@ export const StudentsListPage = () => {
           </Card>
           <Card className={`${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-md" : "bg-white border-slate-100"} rounded-3xl overflow-hidden border-2`}>
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500">
+              <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500">
                 <BookOpen className="h-6 w-6" />
               </div>
               <div>
@@ -301,14 +301,14 @@ export const StudentsListPage = () => {
             {students.map((student) => (
               <Card
                 key={student._id}
-                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-500/40 ${
+                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/40 ${
                   theme === "dark"
                     ? "bg-slate-900/60 border-slate-800"
                     : "bg-white border-slate-100"
                 }`}
               >
                 <div
-                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
+                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
                 ></div>
 
                 <CardContent className="px-5 py-4">
@@ -318,14 +318,14 @@ export const StudentsListPage = () => {
                       <div
                         className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-black transition-transform group-hover:scale-110 duration-300 ${
                           theme === "dark"
-                            ? "bg-purple-500/20 text-purple-300"
-                            : "bg-purple-100 text-purple-700"
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-blue-100 text-blue-700"
                         }`}
                       >
                         {getInitials(student.name)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold truncate leading-tight group-hover:text-purple-400 transition-colors">
+                        <h3 className="text-sm font-semibold truncate leading-tight group-hover:text-blue-400 transition-colors">
                           {student.name}
                         </h3>
                         <p className={`text-xs truncate mt-0.5 opacity-60`}>
@@ -398,7 +398,7 @@ export const StudentsListPage = () => {
                       <Link to={`/admin/students/${student._id}`}>
                         <Button
                           variant="ghost"
-                          className="rounded-xl h-8 px-3 hover:bg-purple-500/10 hover:text-purple-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
+                          className="rounded-xl h-8 px-3 hover:bg-blue-500/10 hover:text-blue-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
                         >
                           Profile
                           <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
@@ -432,7 +432,7 @@ export const StudentsListPage = () => {
                       key={page}
                       variant={currentPage === page ? "default" : "ghost"}
                       onClick={() => setCurrentPage(page)}
-                      className={`h-9 w-9 p-0 rounded-xl font-bold ${currentPage === page ? "bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/20" : ""
+                      className={`h-9 w-9 p-0 rounded-xl font-bold ${currentPage === page ? "bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20" : ""
                         }`}
                     >
                       {page}
@@ -458,7 +458,7 @@ export const StudentsListPage = () => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020012]/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
             <Card className={`w-full max-w-lg rounded-[3rem] border-2 shadow-2xl ${theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200"
               } overflow-hidden`}>
-              <div className="h-2 w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500"></div>
+              <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-pink-500 to-blue-500"></div>
               <CardHeader className="flex flex-row items-center justify-between p-8 pb-4">
                 <CardTitle className="text-3xl font-black tracking-tight">
                   {createdStudent ? "Student Profile Ready" : "Onboard New Student"}
@@ -514,7 +514,7 @@ export const StudentsListPage = () => {
                         required
                         value={newStudentData.name}
                         onChange={(e) => setNewStudentData({ ...newStudentData, name: e.target.value })}
-                        className={`w-full p-5 px-6 rounded-3xl border-2 focus:outline-none focus:ring-4 focus:ring-purple-500/20 transition-all ${theme === "dark" ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-600" : "bg-white border-slate-200 text-slate-900"
+                        className={`w-full p-5 px-6 rounded-3xl border-2 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all ${theme === "dark" ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-600" : "bg-white border-slate-200 text-slate-900"
                           }`}
                         placeholder="Rahul Sharma"
                       />
@@ -526,7 +526,7 @@ export const StudentsListPage = () => {
                         required
                         value={newStudentData.email}
                         onChange={(e) => setNewStudentData({ ...newStudentData, email: e.target.value })}
-                        className={`w-full p-5 px-6 rounded-3xl border-2 focus:outline-none focus:ring-4 focus:ring-purple-500/20 transition-all ${theme === "dark" ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-600" : "bg-white border-slate-200 text-slate-900"
+                        className={`w-full p-5 px-6 rounded-3xl border-2 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all ${theme === "dark" ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-600" : "bg-white border-slate-200 text-slate-900"
                           }`}
                         placeholder="rahul@mentorsdaily.com"
                       />
@@ -539,7 +539,7 @@ export const StudentsListPage = () => {
                     </div>
                     <Button
                       type="submit"
-                      className="w-full py-7 rounded-[2rem] bg-purple-600 hover:bg-purple-700 text-white text-lg font-black shadow-xl shadow-purple-500/20 transition-transform active:scale-[0.98]"
+                      className="w-full py-7 rounded-[2rem] bg-blue-600 hover:bg-blue-700 text-white text-lg font-black shadow-xl shadow-blue-500/20 transition-transform active:scale-[0.98]"
                       disabled={isCreating}
                     >
                       {isCreating ? (

@@ -197,8 +197,8 @@ export const StudentProfilerPage = () => {
                 </div>
                 <div className={`px-3 py-1 rounded-full text-xs md:text-sm ${
                   theme === "dark" 
-                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
-                    : "bg-purple-100 text-purple-700 border border-purple-300"
+                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30" 
+                    : "bg-blue-100 text-blue-700 border border-blue-300"
                 }`}>
                   Load: {plan.summary.dailyLoadType}
                 </div>
@@ -209,16 +209,16 @@ export const StudentProfilerPage = () => {
           {/* Daily Plan */}
           <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
             theme === "dark" 
-              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-purple-500/20 shadow-lg" 
-              : "bg-gradient-to-br from-white to-purple-50/20 border-purple-200/50 shadow-lg"
+              ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
+              : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
           }`}>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
             <CardHeader className="relative z-10 pb-4">
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-lg ${
-                  theme === "dark" ? "bg-purple-500/20" : "bg-purple-100"
+                  theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
                 }`}>
-                  <Calendar className={`w-5 h-5 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+                  <Calendar className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
                 </div>
                 <div>
                   <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
@@ -257,7 +257,7 @@ export const StudentProfilerPage = () => {
                         <div className={`text-xs md:text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
                           {day.durationHours}h
                         </div>
-                        <div className={`text-[10px] md:text-xs mt-1 ${theme === "dark" ? "text-purple-300" : "text-purple-600"}`}>
+                        <div className={`text-[10px] md:text-xs mt-1 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`}>
                           {day.activity}
                         </div>
                       </div>
@@ -352,7 +352,7 @@ export const StudentProfilerPage = () => {
                       <div className={`text-xs md:text-sm mb-1 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
                         {rev.topic}
                       </div>
-                      <div className={`text-[10px] md:text-xs ${theme === "dark" ? "text-purple-300" : "text-purple-600"}`}>
+                      <div className={`text-[10px] md:text-xs ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`}>
                         Revise after: {rev.revisionDaysAfter.join(", ")} days
                       </div>
                     </div>

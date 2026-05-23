@@ -8,7 +8,7 @@ export const TopBanner = () => {
       href={BANNER_LINK}
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full max-w-full min-h-[2.75rem] md:min-h-[3.5rem] bg-gradient-to-r from-blue-600 via-blue-700 to-purple-800 text-white overflow-hidden focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent banner-strip shrink-0"
+      className="block w-full max-w-full min-h-[2.75rem] md:min-h-[3.5rem] bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white overflow-hidden focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent banner-strip shrink-0"
       aria-label="Book your free mentorship session at MentorsDaily"
     >
       <div className="relative flex items-center justify-center h-full w-full overflow-hidden">

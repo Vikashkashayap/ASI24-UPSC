@@ -15,8 +15,13 @@ import environmentData from "../data/upsc_environment.json";
 import scienceTechData from "../data/upsc_science_tech.json";
 import societyData from "../data/upsc_society.json";
 import governanceData from "../data/upsc_governance_social_justice.json";
+import socialJusticeData from "../data/upsc_social_justice.json";
 import ethicsData from "../data/upsc_ethics_gs4.json";
 import internationalRelationsData from "../data/upsc_international_relations.json";
+import internalSecurityData from "../data/upsc_internal_security.json";
+import postIndependenceData from "../data/upsc_post_independence.json";
+import disasterManagementData from "../data/upsc_disaster_management.json";
+import artCultureData from "../data/upsc_art_culture.json";
 
 type Subtopic = { id: string; name: string; hours?: number };
 type Topic = {
@@ -298,10 +303,10 @@ function normalizeScienceTechTopic(raw: Record<string, unknown>): PolityTopic {
   const ncert = raw.ncert_reference;
   let ncertRef: PolityTopic["ncert_reference"];
   if (typeof ncert === "string") {
-    ncertRef = ncert;
+    ncertRef = [ncert];
   } else if (ncert && typeof ncert === "object" && !Array.isArray(ncert)) {
     const formatted = formatNcertRef(ncert as PolityTopic["ncert_reference"]);
-    ncertRef = formatted ?? (ncert as PolityTopic["ncert_reference"]);
+    ncertRef = formatted ? [formatted] : (ncert as PolityTopic["ncert_reference"]);
   } else {
     ncertRef = ncert as PolityTopic["ncert_reference"];
   }
@@ -398,16 +403,64 @@ function normalizeGovernanceTopic(raw: Record<string, unknown>): PolityTopic {
   if (Array.isArray(raw.mains_answer_angles)) {
     extraConcepts.push(...(raw.mains_answer_angles as string[]).map((x) => `Mains angle: ${x}`));
   }
+  if (Array.isArray(raw.related_laws_acts)) {
+    extraConcepts.push(...(raw.related_laws_acts as string[]).map((x) => `Law/Act: ${x}`));
+  }
+  if (Array.isArray(raw.current_affairs_peg)) {
+    extraConcepts.push(...(raw.current_affairs_peg as string[]).map((x) => `Current affairs: ${x}`));
+  }
+  if (Array.isArray(raw.government_agencies)) {
+    extraConcepts.push(...(raw.government_agencies as string[]).map((x) => `Agency: ${x}`));
+  }
+  if (Array.isArray(raw.international_frameworks)) {
+    extraConcepts.push(...(raw.international_frameworks as string[]).map((x) => `Framework: ${x}`));
+  }
+  if (Array.isArray(raw.case_studies_india)) {
+    extraConcepts.push(...(raw.case_studies_india as string[]).map((x) => `Case study: ${x}`));
+  }
+  if (Array.isArray(raw.key_personalities)) {
+    extraConcepts.push(...(raw.key_personalities as string[]).map((x) => `Personality: ${x}`));
+  }
   const existing = (raw.key_concepts as string[] | undefined) ?? [];
+  const ncertLines =
+    typeof raw.ncert_reference === "string"
+      ? [raw.ncert_reference]
+      : flattenSocietyNcert(raw.ncert_reference);
   return {
     topic_id: String(raw.topic_id ?? ""),
     topic_name: String(raw.topic_name ?? ""),
     primary_book: typeof raw.primary_source === "string" ? raw.primary_source : undefined,
+    ncert_reference: ncertLines.length > 0 ? ncertLines : undefined,
     key_concepts: extraConcepts.length > 0 ? [...existing, ...extraConcepts] : existing,
     pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    prelims_importance: raw.prelims_importance as string | number | undefined,
     mains_importance: raw.mains_importance as string | number | undefined,
     daily_target_hours: raw.daily_target_hours as number | undefined,
   };
+}
+
+function buildGsModulesFromJson(
+  data: unknown,
+  defaultImportance: PolityModule["importance"] = "high",
+): PolityModule[] {
+  return (
+    (((data as unknown) as { modules?: PolityModule[] }).modules ?? []).map((m, index) => {
+      const topics = (m.topics ?? []).map((t) => normalizeGovernanceTopic(t as unknown as Record<string, unknown>));
+      const estimatedHours = Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10;
+      const moduleNum = Number(String(m.module_id).replace(/\D/g, "")) || index + 1;
+      return {
+        ...m,
+        sequence: m.sequence ?? moduleNum,
+        module_number: m.module_number ?? moduleNum,
+        estimated_hours: m.estimated_hours ?? estimatedHours,
+        estimated_days: m.estimated_days ?? Math.max(1, Math.ceil(estimatedHours / 3)),
+        importance: m.importance ?? defaultImportance,
+        topics,
+      };
+    }) as PolityModule[]
+  ).sort((a, b) =>
+    String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
+  );
 }
 
 const societyModules = (
@@ -433,24 +486,56 @@ const societyModules = (
   })
 ).sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
 
-const governanceModules = (
-  (((governanceData as unknown) as { modules?: PolityModule[] }).modules ?? []).map((m, index) => {
-    const topics = (m.topics ?? []).map((t) => normalizeGovernanceTopic(t as unknown as Record<string, unknown>));
-    const estimatedHours = Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10;
-    const moduleNum = Number(String(m.module_id).replace(/\D/g, "")) || index + 1;
+const governanceModules = buildGsModulesFromJson(governanceData, "critical");
+const socialJusticeModules = buildGsModulesFromJson(socialJusticeData, "critical");
+const internalSecurityModules = buildGsModulesFromJson(internalSecurityData, "high");
+const postIndependenceModules = buildGsModulesFromJson(postIndependenceData, "high");
+const disasterManagementModules = buildGsModulesFromJson(disasterManagementData, "high");
+
+function normalizeArtCultureTopic(raw: Record<string, unknown>): PolityTopic {
+  const ncertLines =
+    typeof raw.ncert_reference === "string"
+      ? [raw.ncert_reference]
+      : flattenSocietyNcert(raw.ncert_reference);
+  return {
+    topic_id: String(raw.topic_id ?? ""),
+    topic_name: String(raw.topic_name ?? ""),
+    primary_book: typeof raw.primary_source === "string" ? raw.primary_source : undefined,
+    ncert_reference: ncertLines.length > 0 ? ncertLines : undefined,
+    key_concepts: (raw.key_concepts as string[] | undefined) ?? undefined,
+    pyq_frequency: raw.pyq_frequency as string | number | undefined,
+    prelims_importance: raw.prelims_importance as string | number | undefined,
+    mains_importance: raw.mains_importance as string | number | undefined,
+    daily_target_hours: raw.daily_target_hours as number | undefined,
+  };
+}
+
+const artCultureModules = (
+  (((artCultureData as unknown) as { modules?: Record<string, unknown>[] }).modules ?? []).map((m, index) => {
+    const raw = m as Record<string, unknown>;
+    const topics = ((raw.topics as unknown[]) ?? []).map((t) =>
+      normalizeArtCultureTopic(t as Record<string, unknown>),
+    );
+    const durationDays = raw.duration_days as { standard?: number; fast?: number; extended?: number } | undefined;
+    const estDays =
+      durationDays?.standard ??
+      Math.max(1, Math.ceil((topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) || 18) / 3));
+    const estHours =
+      Math.round(topics.reduce((sum, t) => sum + (t.daily_target_hours ?? 0), 0) * 10) / 10 ||
+      estDays * (Number(raw.daily_target_hours) || 3);
+    const moduleNum = Number(String(raw.module_id).replace(/\D/g, "")) || index + 1;
     return {
-      ...m,
-      sequence: m.sequence ?? moduleNum,
-      module_number: m.module_number ?? moduleNum,
-      estimated_hours: m.estimated_hours ?? estimatedHours,
-      estimated_days: m.estimated_days ?? Math.max(1, Math.ceil(estimatedHours / 3)),
-      importance: m.importance ?? "critical",
+      module_id: String(raw.module_id ?? ""),
+      module_name: String(raw.module_name ?? ""),
+      sequence: moduleNum,
+      module_number: moduleNum,
+      estimated_hours: estHours,
+      estimated_days: estDays,
+      importance: "high",
       topics,
-    };
-  }) as PolityModule[]
-).sort((a, b) =>
-  String(a.module_id).localeCompare(String(b.module_id), undefined, { numeric: true, sensitivity: "base" }),
-);
+    } as PolityModule;
+  })
+).sort((a, b) => (a.sequence ?? 0) - (b.sequence ?? 0));
 
 function normalizeEthicsTopic(raw: Record<string, unknown>): PolityTopic {
   const extraConcepts: string[] = [];
@@ -566,6 +651,27 @@ type HistoryPart = "ancient_history" | "medieval_history" | "modern_history" | "
 
 type GeographyPart = "geography_physical" | "geography_india" | "geography_world";
 
+type PrelimsSubject =
+  | "overview"
+  | "polity"
+  | "history"
+  | "geography"
+  | "economy"
+  | "environment"
+  | "science_tech"
+  | "art_culture";
+
+const PRELIMS_SUBJECT_TABS: readonly { id: PrelimsSubject; label: string }[] = [
+  { id: "overview", label: "All Topics" },
+  { id: "polity", label: "Polity" },
+  { id: "history", label: "History" },
+  { id: "geography", label: "Geography" },
+  { id: "economy", label: "Economy" },
+  { id: "environment", label: "Environment" },
+  { id: "science_tech", label: "S&T" },
+  { id: "art_culture", label: "Art & Culture" },
+] as const;
+
 type Segment =
   | "prelims"
   | "mains"
@@ -579,8 +685,13 @@ type Segment =
   | "science_tech"
   | "society"
   | "governance"
+  | "social_justice"
   | "ethics"
-  | "international_relations";
+  | "international_relations"
+  | "internal_security"
+  | "post_independence"
+  | "disaster_management"
+  | "art_culture";
 
 const HISTORY_PERIOD_TABS: readonly { id: HistoryPart; label: string }[] = [
   { id: "ancient_history", label: "Ancient" },
@@ -588,6 +699,8 @@ const HISTORY_PERIOD_TABS: readonly { id: HistoryPart; label: string }[] = [
   { id: "modern_history", label: "Modern" },
   { id: "world_history", label: "World" },
 ] as const;
+
+const PRELIMS_HISTORY_TABS = HISTORY_PERIOD_TABS.filter((t) => t.id !== "world_history");
 
 const GEOGRAPHY_SCOPE_TABS: readonly { id: GeographyPart; label: string }[] = [
   { id: "geography_physical", label: "Geo Physical" },
@@ -730,12 +843,7 @@ function PrelimsSection() {
                     <div className="sd-syll-nested">
                       {(subject.topics ?? []).map((topic) => (
                         <details key={topic.id} className="sd-syll-block sd-syll-inner">
-                          <summary>
-                            {topic.name}
-                            {topic.estimated_hours != null ? (
-                              <span className="sd-syll-meta"> ~{topic.estimated_hours}h</span>
-                            ) : null}
-                          </summary>
+                          <summary>{topic.name}</summary>
                           <div className="sd-syll-leaves">
                             {(topic.subtopics ?? []).map((st) => (
                               <TaskRow
@@ -762,12 +870,7 @@ function PrelimsSection() {
               <div className="sd-syll-nested">
                 {paper.topics.map((topic) => (
                   <details key={topic.id} className="sd-syll-block sd-syll-inner">
-                    <summary>
-                      {topic.name}
-                      {topic.estimated_hours != null ? (
-                        <span className="sd-syll-meta"> ~{topic.estimated_hours}h</span>
-                      ) : null}
-                    </summary>
+                    <summary>{topic.name}</summary>
                     <div className="sd-syll-leaves">
                       {(topic.subtopics ?? []).map((st) => (
                         <TaskRow
@@ -788,6 +891,31 @@ function PrelimsSection() {
       })}
     </div>
   );
+}
+
+function PrelimsSubjectContent(props: {
+  subject: PrelimsSubject;
+  historyPart: HistoryPart;
+  geographyPart: GeographyPart;
+}) {
+  const { subject, historyPart, geographyPart } = props;
+  if (subject === "overview") return <PrelimsSection />;
+  if (subject === "polity") return <PolitySection />;
+  if (subject === "history") {
+    if (historyPart === "ancient_history") return <AncientHistorySection />;
+    if (historyPart === "medieval_history") return <MedievalHistorySection />;
+    if (historyPart === "modern_history") return <ModernHistorySection />;
+    return <AncientHistorySection />;
+  }
+  if (subject === "geography") {
+    if (geographyPart === "geography_physical") return <GeographyPhysicalSection />;
+    if (geographyPart === "geography_india") return <GeographyIndiaSection />;
+    return <GeographyWorldSection />;
+  }
+  if (subject === "economy") return <EconomySection />;
+  if (subject === "environment") return <EnvironmentSection />;
+  if (subject === "science_tech") return <ScienceTechSection />;
+  return <ArtCultureSection />;
 }
 
 function MainsSection() {
@@ -894,29 +1022,25 @@ function getTopicSubtitle(topic: PolityTopic, fallback: string) {
   return fallback;
 }
 
+function moduleDisplayNumber(module: PolityModule, index: number): number {
+  const fromMeta = module.sequence ?? module.module_number;
+  if (fromMeta != null && Number.isFinite(Number(fromMeta))) return Number(fromMeta);
+  const fromId = Number(String(module.module_id).replace(/\D/g, ""));
+  if (fromId > 0) return fromId;
+  return index + 1;
+}
+
 function GenericSyllabusSection(props: { modules: PolityModule[] }) {
   const { modules } = props;
   return (
     <div className="sd-syll-scroll">
-      {modules.map((module) => (
+      {modules.map((module, index) => (
         <details key={String(module.module_id)} className="sd-syll-block">
           <summary>
             <div className="sd-p-module-summary">
-              <span className="sd-p-module-title">
-                {module.module_name}
-                {module.estimated_hours != null ? <span className="sd-syll-meta"> ~{module.estimated_hours}h</span> : null}
-              </span>
+              <span className="sd-p-module-title">{module.module_name}</span>
               <span className="sd-p-module-pills">
-                {(module.sequence ?? module.module_number) != null ? (
-                  <span className="sd-p-pill">Module #{module.sequence ?? module.module_number}</span>
-                ) : null}
-                {module.period ? <span className="sd-p-pill">{module.period}</span> : null}
-                {(module.estimated_days_standard ?? module.estimated_days) != null ? (
-                  <span className="sd-p-pill">{module.estimated_days_standard ?? module.estimated_days} days</span>
-                ) : null}
-                {module.estimated_hours != null ? <span className="sd-p-pill">{module.estimated_hours} hrs</span> : null}
-                {module.importance ? <span className="sd-p-pill">Importance: {module.importance}</span> : null}
-                {module.upsc_prelims_weightage ? <span className="sd-p-pill">Prelims: {module.upsc_prelims_weightage}</span> : null}
+                <span className="sd-p-pill">Module #{moduleDisplayNumber(module, index)}</span>
               </span>
             </div>
           </summary>
@@ -1109,6 +1233,26 @@ function GovernanceSection() {
   return <GenericSyllabusSection modules={governanceModules} />;
 }
 
+function SocialJusticeSection() {
+  return <GenericSyllabusSection modules={socialJusticeModules} />;
+}
+
+function InternalSecuritySection() {
+  return <GenericSyllabusSection modules={internalSecurityModules} />;
+}
+
+function PostIndependenceSection() {
+  return <GenericSyllabusSection modules={postIndependenceModules} />;
+}
+
+function DisasterManagementSection() {
+  return <GenericSyllabusSection modules={disasterManagementModules} />;
+}
+
+function ArtCultureSection() {
+  return <GenericSyllabusSection modules={artCultureModules} />;
+}
+
 function EthicsSection() {
   return <GenericSyllabusSection modules={ethicsModules} />;
 }
@@ -1121,6 +1265,7 @@ type Props = { todayLabel: string };
 
 export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { studentProfile?: StudentProfile }) {
   const [segment, setSegment] = useState<Segment>(recommendedSegmentByBackground(studentProfile?.educationBackground));
+  const [prelimsSubject, setPrelimsSubject] = useState<PrelimsSubject>("overview");
   const [historyPart, setHistoryPart] = useState<HistoryPart>(() => defaultHistoryPartForProfile(studentProfile?.educationBackground));
   const [geographyPart, setGeographyPart] = useState<GeographyPart>(() =>
     defaultGeographyPartForProfile(studentProfile?.educationBackground),
@@ -1162,6 +1307,40 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     gs2_weightage_marks?: string;
     estimated_preparation_hours?: number;
   };
+  const socialJusticeMeta = socialJusticeData.metadata as {
+    title?: string;
+    paper?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+  };
+  const internalSecurityMeta = internalSecurityData.metadata as {
+    title?: string;
+    paper?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+  };
+  const postIndependenceMeta = postIndependenceData.metadata as {
+    title?: string;
+    paper?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+  };
+  const disasterManagementMeta = disasterManagementData.metadata as {
+    title?: string;
+    paper?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+  };
+  const artCultureMeta = artCultureData.metadata as {
+    title?: string;
+    creation_date?: string;
+    total_modules?: number;
+    estimated_preparation_hours?: number;
+  };
   const ethicsMeta = ethicsData.metadata as {
     title?: string;
     paper?: string;
@@ -1187,7 +1366,16 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
   const dailyTargetsCount = Math.max(2, Math.min(6, Math.round(dailyHours)));
 
   const subtitle = useMemo(() => {
-    if (segment === "prelims") return "Prelims — GS Paper I & CSAT (full topic tree)";
+    if (segment === "prelims") {
+      if (prelimsSubject === "overview") return "Prelims — GS Paper I & CSAT (full topic tree)";
+      if (prelimsSubject === "polity") return "Prelims — Indian Polity & Governance (module-wise)";
+      if (prelimsSubject === "history") return `Prelims — ${historySubtitle(historyPart).replace(" — module-wise full syllabus view", "")} (module-wise)`;
+      if (prelimsSubject === "geography") return `Prelims — ${geographySubtitle(geographyPart).replace(" — module-wise full syllabus view", "")} (module-wise)`;
+      if (prelimsSubject === "economy") return "Prelims — Indian Economy (module-wise)";
+      if (prelimsSubject === "environment") return "Prelims — Environment & Ecology (module-wise)";
+      if (prelimsSubject === "science_tech") return "Prelims — Science & Technology (module-wise)";
+      if (prelimsSubject === "art_culture") return "Prelims — Art & Culture (module-wise)";
+    }
     if (segment === "mains") return "Mains — GS I–IV & Essay (official-style modules)";
     if (segment === "polity") return "Polity — Prelims + GS II mapped for quick access";
     if (segment === "history") return historySubtitle(historyPart);
@@ -1197,12 +1385,17 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     if (segment === "environment") return "Environment & Ecology (GS 3) — module-wise full syllabus view";
     if (segment === "science_tech") return "Science & Technology (GS 3) — module-wise full syllabus view";
     if (segment === "society") return "Indian Society (GS 1) — NCERT Sociology mapped module-wise";
-    if (segment === "governance") return "Governance & Social Justice (GS 2) — 2nd ARC & schemes module-wise";
+    if (segment === "governance") return "Governance (GS 2) — 2nd ARC, e-governance & public administration module-wise";
+    if (segment === "social_justice") return "Social Justice (GS 2) — welfare schemes, rights & inclusion module-wise";
     if (segment === "ethics") return "Ethics, Integrity & Aptitude (GS 4) — theory + case studies module-wise";
     if (segment === "international_relations")
       return "International Relations (GS 2) — Pavneet Singh & NCERT Contemporary World Politics";
+    if (segment === "internal_security") return "Internal Security (GS 3) — LWE, terrorism, border & cyber security module-wise";
+    if (segment === "post_independence") return "Post-Independence India (GS 1) — 1947 onwards political & economic history";
+    if (segment === "disaster_management") return "Disaster Management (GS 3) — DM Act, Sendai Framework & hazard response";
+    if (segment === "art_culture") return "Art & Culture (GS 1) — Nitin Singhania & NCERT Fine Arts module-wise";
     return "Popular optionals — Paper I & II outlines";
-  }, [segment, historyPart, geographyPart]);
+  }, [segment, prelimsSubject, historyPart, geographyPart]);
 
   const planHint = useMemo(() => {
     return `Plan: ${dailyTargetsCount} focus targets/day (${dailyHours.toFixed(1)}h) • ${preparationMode}`;
@@ -1221,7 +1414,21 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
 
       <div className="sd-syll-meta-bar">
         <span>
-          {segment === "polity"
+          {segment === "prelims" && prelimsSubject === "polity"
+            ? `Polity v${polityMeta.version ?? "1.x"}`
+            : segment === "prelims" && prelimsSubject === "history"
+              ? historyMetaSnippet(historyPart, ancientMeta, medievalMeta, modernMeta, worldMeta)
+              : segment === "prelims" && prelimsSubject === "geography"
+                ? geographyMetaSnippet(geographyPart, geographyPhysicalMeta, geographyIndiaMeta, geographyWorldMeta)
+                : segment === "prelims" && prelimsSubject === "economy"
+                  ? `${economyMeta.subject ?? "Indian Economy"}${economyMeta.last_updated ? ` · ${economyMeta.last_updated}` : ""}`
+                  : segment === "prelims" && prelimsSubject === "environment"
+                    ? `${environmentMeta.subject ?? "Environment & Ecology"}${environmentMeta.creation_date ? ` · ${environmentMeta.creation_date}` : ""}${environmentMeta.total_modules ? ` · ${environmentMeta.total_modules} modules` : ""}`
+                    : segment === "prelims" && prelimsSubject === "science_tech"
+                      ? `${scienceTechMeta.subject ?? "Science & Technology"}${scienceTechMeta.last_updated ? ` · ${scienceTechMeta.last_updated}` : scienceTechMeta.creation_date ? ` · ${scienceTechMeta.creation_date}` : ""}${scienceTechMeta.total_modules ? ` · ${scienceTechMeta.total_modules} modules` : ""}`
+                      : segment === "prelims" && prelimsSubject === "art_culture"
+                        ? `Art & Culture${artCultureMeta.creation_date ? ` · ${artCultureMeta.creation_date}` : ""}${artCultureMeta.total_modules ? ` · ${artCultureMeta.total_modules} modules` : ""}${artCultureMeta.estimated_preparation_hours ? ` · ${artCultureMeta.estimated_preparation_hours}h` : ""}`
+                        : segment === "polity"
             ? `Polity v${polityMeta.version ?? "1.x"}`
             : segment === "history"
               ? historyMetaSnippet(historyPart, ancientMeta, medievalMeta, modernMeta, worldMeta)
@@ -1238,8 +1445,18 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
                             : segment === "society"
                               ? `${societyMeta.topic ?? societyMeta.subject ?? "Indian Society"}${societyMeta.marks_weightage ? ` · ${societyMeta.marks_weightage}` : ""}${societyMeta.last_updated ? ` · ${societyMeta.last_updated}` : ""}${societyMeta.total_modules ? ` · ${societyMeta.total_modules} modules` : ""}`
                               : segment === "governance"
-                                ? `Governance & Social Justice${governanceMeta.creation_date ? ` · ${governanceMeta.creation_date}` : ""}${governanceMeta.total_modules ? ` · ${governanceMeta.total_modules} modules` : ""}${governanceMeta.gs2_weightage_marks ? ` · ${governanceMeta.gs2_weightage_marks}` : ""}`
-                                : segment === "ethics"
+                                ? `Governance${governanceMeta.creation_date ? ` · ${governanceMeta.creation_date}` : ""}${governanceMeta.total_modules ? ` · ${governanceMeta.total_modules} modules` : ""}${governanceMeta.gs2_weightage_marks ? ` · ${governanceMeta.gs2_weightage_marks}` : ""}`
+                                : segment === "social_justice"
+                                  ? `Social Justice${socialJusticeMeta.paper ? ` · ${socialJusticeMeta.paper}` : ""}${socialJusticeMeta.creation_date ? ` · ${socialJusticeMeta.creation_date}` : ""}${socialJusticeMeta.total_modules ? ` · ${socialJusticeMeta.total_modules} modules` : ""}`
+                                  : segment === "internal_security"
+                                    ? `Internal Security${internalSecurityMeta.paper ? ` · ${internalSecurityMeta.paper}` : ""}${internalSecurityMeta.creation_date ? ` · ${internalSecurityMeta.creation_date}` : ""}${internalSecurityMeta.total_modules ? ` · ${internalSecurityMeta.total_modules} modules` : ""}`
+                                    : segment === "post_independence"
+                                      ? `Post-Independence${postIndependenceMeta.paper ? ` · ${postIndependenceMeta.paper}` : ""}${postIndependenceMeta.creation_date ? ` · ${postIndependenceMeta.creation_date}` : ""}${postIndependenceMeta.total_modules ? ` · ${postIndependenceMeta.total_modules} modules` : ""}`
+                                      : segment === "disaster_management"
+                                        ? `Disaster Management${disasterManagementMeta.paper ? ` · ${disasterManagementMeta.paper}` : ""}${disasterManagementMeta.creation_date ? ` · ${disasterManagementMeta.creation_date}` : ""}${disasterManagementMeta.total_modules ? ` · ${disasterManagementMeta.total_modules} modules` : ""}`
+                                        : segment === "art_culture"
+                                          ? `Art & Culture${artCultureMeta.creation_date ? ` · ${artCultureMeta.creation_date}` : ""}${artCultureMeta.total_modules ? ` · ${artCultureMeta.total_modules} modules` : ""}${artCultureMeta.estimated_preparation_hours ? ` · ${artCultureMeta.estimated_preparation_hours}h` : ""}`
+                                          : segment === "ethics"
                                   ? `${ethicsMeta.paper ?? "GS Paper 4"}${ethicsMeta.creation_date ? ` · ${ethicsMeta.creation_date}` : ""}${ethicsMeta.total_modules ? ` · ${ethicsMeta.total_modules} modules` : ""}${ethicsMeta.total_marks ? ` · ${ethicsMeta.total_marks} marks` : ""}`
                                   : segment === "international_relations"
                                     ? `${irMeta.subject ?? "International Relations"}${irMeta.weightage_marks ? ` · ${irMeta.weightage_marks}` : ""}${irMeta.prelims_questions ? ` · Prelims ${irMeta.prelims_questions}` : ""}${irMeta.total_modules ? ` · ${irMeta.total_modules} modules` : ""}`
@@ -1267,8 +1484,13 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
             ["science_tech", "S&T"],
             ["society", "Society"],
             ["governance", "Governance"],
+            ["social_justice", "Social Justice"],
             ["ethics", "Ethics"],
             ["international_relations", "IR"],
+            ["internal_security", "Int. Security"],
+            ["post_independence", "Post-1947"],
+            ["disaster_management", "Disaster Mgmt"],
+            ["art_culture", "Art & Culture"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -1311,7 +1533,7 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
         </div>
       ) : null}
 
-      {segment === "geography" ? (
+      {segment === "geography" || (segment === "prelims" && prelimsSubject === "geography") ? (
         <div className="sd-syll-history-group">
           <div className="sd-syll-history-label" id="geography-scope-label">
             Geography — choose scope (all three below)
@@ -1338,7 +1560,68 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
         </div>
       ) : null}
 
-      {segment === "prelims" ? <PrelimsSection /> : null}
+      {segment === "prelims" ? (
+        <div className="sd-syll-history-group">
+          <div className="sd-syll-history-label" id="prelims-subject-label">
+            Prelims GS — pick a subject
+          </div>
+          <div
+            className="sd-syll-history-pills"
+            role="tablist"
+            aria-labelledby="prelims-subject-label"
+            aria-label="Prelims subject"
+          >
+            {PRELIMS_SUBJECT_TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={prelimsSubject === id}
+                className={prelimsSubject === id ? "active" : ""}
+                onClick={() => {
+                  setPrelimsSubject(id);
+                  if (id === "history" && historyPart === "world_history") {
+                    setHistoryPart("ancient_history");
+                  }
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {segment === "prelims" && prelimsSubject === "history" ? (
+        <div className="sd-syll-history-group">
+          <div className="sd-syll-history-label" id="prelims-history-period-label">
+            History — Ancient, Medieval & Modern (Prelims)
+          </div>
+          <div
+            className="sd-syll-history-pills"
+            role="tablist"
+            aria-labelledby="prelims-history-period-label"
+            aria-label="Prelims history period"
+          >
+            {PRELIMS_HISTORY_TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={historyPart === id}
+                className={historyPart === id ? "active" : ""}
+                onClick={() => setHistoryPart(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {segment === "prelims" ? (
+        <PrelimsSubjectContent subject={prelimsSubject} historyPart={historyPart} geographyPart={geographyPart} />
+      ) : null}
       {segment === "mains" ? <MainsSection /> : null}
       {segment === "optionals" ? <OptionalsSection /> : null}
       {segment === "polity" ? <PolitySection /> : null}
@@ -1355,8 +1638,13 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
       {segment === "science_tech" ? <ScienceTechSection /> : null}
       {segment === "society" ? <SocietySection /> : null}
       {segment === "governance" ? <GovernanceSection /> : null}
+      {segment === "social_justice" ? <SocialJusticeSection /> : null}
       {segment === "ethics" ? <EthicsSection /> : null}
       {segment === "international_relations" ? <InternationalRelationsSection /> : null}
+      {segment === "internal_security" ? <InternalSecuritySection /> : null}
+      {segment === "post_independence" ? <PostIndependenceSection /> : null}
+      {segment === "disaster_management" ? <DisasterManagementSection /> : null}
+      {segment === "art_culture" ? <ArtCultureSection /> : null}
     </>
   );
 }

@@ -48,15 +48,15 @@ export function PerformanceAnalytics({ analytics, loading }: Props) {
             <AreaChart data={analytics.consistency}>
               <defs>
                 <linearGradient id="consistencyGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#2563eb" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
               <XAxis dataKey="label" tick={{ fontSize: 10 }} stroke={theme === "dark" ? "#94a3b8" : "#64748b"} />
               <YAxis tick={{ fontSize: 10 }} stroke={theme === "dark" ? "#94a3b8" : "#64748b"} />
               <Tooltip />
-              <Area type="monotone" dataKey="percent" stroke="#8b5cf6" fill="url(#consistencyGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="percent" stroke="#2563eb" fill="url(#consistencyGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
@@ -92,7 +92,7 @@ export function PerformanceAnalytics({ analytics, loading }: Props) {
             <RadarChart data={radarData}>
               <PolarGrid stroke={theme === "dark" ? "#475569" : "#cbd5e1"} />
               <PolarAngleAxis dataKey="subject" tick={{ fontSize: 9 }} />
-              <Radar dataKey="strength" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.4} />
+              <Radar dataKey="strength" stroke="#2563eb" fill="#2563eb" fillOpacity={0.4} />
             </RadarChart>
           </ResponsiveContainer>
         </motion.div>
@@ -115,7 +115,7 @@ export function PerformanceAnalytics({ analytics, loading }: Props) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl p-3 bg-violet-500/10 border border-violet-500/20 text-center">
+    <div className="rounded-xl p-3 bg-blue-500/10 border border-blue-500/20 text-center">
       <p className="text-xs opacity-70">{label}</p>
       <p className="font-bold text-sm truncate">{value}</p>
     </div>

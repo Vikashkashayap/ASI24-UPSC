@@ -84,7 +84,7 @@ const CopyEvaluationAnalyticsPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${theme === "dark" ? "border-purple-600" : "border-purple-600"}`}></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4 ${theme === "dark" ? "border-blue-600" : "border-blue-600"}`}></div>
           <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading analytics...</p>
         </div>
       </div>
@@ -132,7 +132,7 @@ const CopyEvaluationAnalyticsPage: React.FC = () => {
                   {analytics.totalEvaluations}
                 </p>
               </div>
-              <BarChart3 className={`w-8 h-8 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <BarChart3 className={`w-8 h-8 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
             </div>
           </CardContent>
         </Card>

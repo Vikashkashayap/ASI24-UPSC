@@ -121,7 +121,7 @@ export const AdminDashboardPage = () => {
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
         theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
       }`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -162,8 +162,8 @@ export const AdminDashboardPage = () => {
       title: "Pending Evaluations",
       value: stats?.totalMains || 0,
       icon: ClipboardCheck,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
     },
     {
       title: "Average Score",
@@ -238,8 +238,8 @@ export const AdminDashboardPage = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`flex-1 transition-colors duration-200 ${
                     theme === "dark"
-                      ? "bg-slate-800 border-slate-600 text-slate-200 focus:ring-purple-500"
-                      : "bg-white border-slate-300 text-slate-900 focus:ring-purple-500"
+                      ? "bg-slate-800 border-slate-600 text-slate-200 focus:ring-blue-500"
+                      : "bg-white border-slate-300 text-slate-900 focus:ring-blue-500"
                   }`}
                 />
                 <Button

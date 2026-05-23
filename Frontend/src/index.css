@@ -2,6 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
+/* MentorsDaily brand — matches home dashboard (blue + indigo) */
+:root {
+  --md-navy: #0f1e3d;
+  --md-navy-soft: #1a3366;
+  --md-blue: #2563eb;
+  --md-blue-dark: #1d4ed8;
+  --md-blue-light: #3b82f6;
+  --md-indigo: #6366f1;
+  --md-border: #e2e8f0;
+  --md-text: #0f172a;
+  --md-muted: #64748b;
+  --md-card: #ffffff;
+  --md-page-bg: #f0f9ff;
+  --md-gradient: linear-gradient(135deg, #2563eb, #6366f1);
+  --md-gradient-hover: linear-gradient(135deg, #1d4ed8, #4f46e5);
+  --md-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+@layer components {
+  .md-btn-primary {
+    color: #fff;
+    font-weight: 600;
+    background: var(--md-gradient);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+    transition: filter 0.15s ease, transform 0.15s ease;
+  }
+
+  .md-btn-primary:hover {
+    filter: brightness(1.06);
+  }
+
+  .md-btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .md-btn-outline {
+    color: var(--md-blue);
+    background: #fff;
+    border: 1px solid #bfdbfe;
+    font-weight: 600;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .md-btn-outline:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+
+  .md-bg-gradient {
+    background: var(--md-gradient);
+  }
+
+  .md-text-gradient {
+    background: var(--md-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .md-card-surface {
+    background: var(--md-card);
+    border: 1px solid var(--md-border);
+    box-shadow: var(--md-shadow);
+  }
+}
+
 /* ============================================
    MOBILE-FIRST BASE STYLES
    ============================================ */
@@ -42,7 +108,7 @@ html {
 
 body {
   @apply text-slate-900 antialiased;
-  background-color: #f0f9ff;
+  background-color: var(--md-page-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 1rem;
@@ -273,15 +339,15 @@ html {
 
 /* Copy evaluation — premium report shell */
 .eval-report-glow {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.12), transparent 70%);
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.14), transparent 70%);
 }
 
 .dark .eval-report-glow {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(192, 132, 252, 0.15), transparent 70%);
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.18), transparent 70%);
 }
 
 .eval-shimmer-bar {
-  background: linear-gradient(90deg, #a855f7, #d946ef, #10b981, #a855f7);
+  background: linear-gradient(90deg, #2563eb, #6366f1, #10b981, #2563eb);
   background-size: 200% 100%;
   animation: eval-shimmer 4s ease infinite;
 }

@@ -86,7 +86,7 @@ export const MentorStudentsPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-2">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
               Students Management
             </h1>
             <p className={`mt-2 text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
@@ -142,7 +142,7 @@ export const MentorStudentsPage: React.FC = () => {
             } rounded-3xl overflow-hidden border-2`}
           >
             <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500">
+              <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500">
                 <BookOpen className="h-6 w-6" />
               </div>
               <div>
@@ -232,17 +232,17 @@ export const MentorStudentsPage: React.FC = () => {
             {filtered.map((student) => (
               <Card
                 key={student._id}
-                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-500/40 ${
+                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/40 ${
                   theme === "dark" ? "bg-slate-900/60 border-slate-800" : "bg-white border-slate-100"
                 }`}
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                 <CardContent className="px-5 py-4">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 min-w-0">
                       <div
                         className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-black transition-transform group-hover:scale-110 duration-300 shrink-0 ${
-                          theme === "dark" ? "bg-purple-500/20 text-purple-300" : "bg-purple-100 text-purple-700"
+                          theme === "dark" ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
                         }`}
                       >
                         {getInitials(student.name)}
@@ -250,7 +250,7 @@ export const MentorStudentsPage: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <Link
                           to={`/mentor-dashboard/students/${student._id}`}
-                          className="text-sm font-semibold truncate leading-tight group-hover:text-purple-400 transition-colors block hover:underline"
+                          className="text-sm font-semibold truncate leading-tight group-hover:text-blue-400 transition-colors block hover:underline"
                         >
                           {student.name}
                         </Link>
@@ -292,7 +292,7 @@ export const MentorStudentsPage: React.FC = () => {
                       <Link to={`/mentor-dashboard/students/${student._id}`}>
                         <Button
                           variant="ghost"
-                          className="rounded-xl h-8 px-3 hover:bg-purple-500/10 hover:text-purple-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
+                          className="rounded-xl h-8 px-3 hover:bg-blue-500/10 hover:text-blue-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
                         >
                           Profile
                           <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />

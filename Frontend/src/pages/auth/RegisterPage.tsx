@@ -174,7 +174,7 @@ export const RegisterPage = () => {
             </div>
 
             <div className="mt-6 rounded-xl border border-blue-400/20 bg-[#0b1a3b] p-4 sm:p-5">
-              <a
+              {/* <a
                 href={`${apiBaseURL}/api/auth/google?from=register`}
                 className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-[#111827] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1f2937]"
               >
@@ -199,7 +199,7 @@ export const RegisterPage = () => {
                   </svg>
                 </span>
                 Continue with Google
-              </a>
+              </a> */}
               <p className="mb-4 text-center text-xs text-slate-400">
                 Google sign-in works only after you complete email registration below.
               </p>

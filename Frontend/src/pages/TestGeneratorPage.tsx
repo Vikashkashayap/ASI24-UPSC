@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2, BookOpen, Target, TrendingUp, History } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
@@ -12,18 +12,51 @@ import {
   CSAT_CATEGORIES,
   type ExamType,
 } from "../constants/testGenerator";
+import { sanitizePlannerTopic } from "../components/advancedStudyPlanner/plannerUtils";
+
+function matchSubjectFromUrl(raw: string): string {
+  const decoded = decodeURIComponent(raw).trim();
+  const hit = SUBJECTS.find((s) => s.toLowerCase() === decoded.toLowerCase());
+  return hit || decoded;
+}
 
 const TestGeneratorPage: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
   const [subjects, setSubjects] = useState<string[]>(["Polity"]);
   const [topic, setTopic] = useState("");
+  const [fromPlanner, setFromPlanner] = useState(false);
   const [difficulty, setDifficulty] = useState("Moderate");
   const [questionCount, setQuestionCount] = useState(20);
+
+  useEffect(() => {
+    const sub = searchParams.get("subject");
+    const top = searchParams.get("topic");
+    const pyq = searchParams.get("pyq");
+    const from = searchParams.get("from");
+
+    if (from === "planner" || sub || top) setFromPlanner(true);
+
+    if (sub) {
+      const matched = matchSubjectFromUrl(sub);
+      if (SUBJECTS.includes(matched as (typeof SUBJECTS)[number])) {
+        setSubjects([matched]);
+      } else {
+        setSubjects([sub]);
+      }
+    }
+
+    if (top) {
+      const cleaned = sanitizePlannerTopic(decodeURIComponent(top), sub || "");
+      setTopic(cleaned);
+    }
+
+    if (pyq === "1") setDifficulty("Hard");
+  }, [searchParams]);
   const [csatCategories, setCsatCategories] = useState<string[]>([]);
   // Current Affairs: optional month/year (future ready)
   const [currentAffairsMonth, setCurrentAffairsMonth] = useState<string>("");
@@ -74,12 +107,17 @@ const TestGeneratorPage: React.FC = () => {
     setIsGenerating(true);
     setError(null);
 
+    const allowedCounts = [5, 10, 20] as const;
+    const safeQuestionCount = allowedCounts.includes(questionCount as (typeof allowedCounts)[number])
+      ? questionCount
+      : 20;
+
     try {
       const response = await testAPI.generateTest({
         subjects,
         topic: topic.trim(),
         examType,
-        questionCount,
+        questionCount: safeQuestionCount,
         ...(showGsOptions && { difficulty }),
         ...(examType === "CSAT" && { csatCategories }),
         ...(showCurrentAffairsOptions && (currentAffairsMonth || currentAffairsYear) && {
@@ -142,6 +180,20 @@ const TestGeneratorPage: React.FC = () => {
         </div>
       </div>
 
+      {fromPlanner && topic && (
+        <div
+          className={`rounded-xl px-4 py-3 text-sm border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ${
+            theme === "dark" ? "bg-blue-950/40 border-blue-500/30 text-blue-200" : "bg-blue-50 border-blue-200 text-blue-800"
+          }`}
+        >
+          <span>
+            Practice from Study Planner — <strong>{subjects[0]}</strong>: <strong>{topic}</strong>
+            {searchParams.get("pyq") === "1" ? " (PYQ)" : ""}
+          </span>
+          <span className="text-xs opacity-80">Subject & topic pre-filled · tap Generate Test</span>
+        </div>
+      )}
+
       <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl rounded-2xl ${theme === "dark"
         ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg"
         : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
@@ -195,18 +247,27 @@ const TestGeneratorPage: React.FC = () => {
             <div>
               <label className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
                 Topic <span className="text-red-500">*</span>
+                {fromPlanner && topic && (
+                  <span className="ml-2 text-xs font-normal text-blue-600">(from your study plan)</span>
+                )}
               </label>
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="e.g., Fundamental Rights, Ancient History, Climate Change"
-                className={`w-full px-4 py-3 md:py-2 rounded-lg border focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base touch-manipulation ${theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-slate-200"
-                  : "border-slate-300 bg-white"
-                  }`}
+                className={`w-full px-4 py-3 md:py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base touch-manipulation ${
+                  fromPlanner && topic
+                    ? theme === "dark"
+                      ? "bg-blue-950/30 border-blue-500/50 text-slate-100 ring-1 ring-blue-500/30"
+                      : "bg-blue-50/80 border-blue-400 text-slate-900 ring-1 ring-blue-300"
+                    : theme === "dark"
+                      ? "bg-slate-800 border-slate-700 text-slate-200"
+                      : "border-slate-300 bg-white"
+                }`}
                 disabled={isGenerating}
                 required
+                autoFocus={fromPlanner && !!topic}
               />
             </div>
 
@@ -273,7 +334,7 @@ const TestGeneratorPage: React.FC = () => {
               disabled={isGenerating || !canSubmit}
               className={`w-full px-6 py-4 md:py-4 text-base font-semibold min-h-[48px] touch-manipulation ${isGenerating || !canSubmit
                 ? "bg-slate-400 border-slate-400 text-slate-200 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white hover:shadow-lg transform hover:scale-[1.01] active:scale-[0.99]"
+                : "bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white hover:shadow-lg transform hover:scale-[1.01] active:scale-[0.99]"
                 }`}
             >
               {isGenerating ? (
@@ -284,7 +345,7 @@ const TestGeneratorPage: React.FC = () => {
               ) : (
                 <>
                   <Target className="mr-2 h-5 w-5" />
-                  Generate Test
+                  {fromPlanner && topic ? `Practice MCQs — ${topic}` : "Generate Test"}
                 </>
               )}
             </Button>
@@ -297,8 +358,8 @@ const TestGeneratorPage: React.FC = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-purple-900/30" : "bg-purple-100"}`}>
-                <BookOpen className={`w-6 h-6 ${theme === "dark" ? "text-purple-400" : "text-purple-600"}`} />
+              <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
+                <BookOpen className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <div>
                 <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>

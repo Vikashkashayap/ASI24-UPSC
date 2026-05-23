@@ -52,8 +52,8 @@ export const LineByLineFeedbackPanel: React.FC<Props> = ({ items }) => {
               <span
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                   isDark
-                    ? 'bg-purple-500/25 text-purple-200'
-                    : 'bg-purple-600 text-white'
+                    ? 'bg-blue-500/25 text-blue-200'
+                    : 'bg-blue-600 text-white'
                 }`}
               >
                 {i + 1}

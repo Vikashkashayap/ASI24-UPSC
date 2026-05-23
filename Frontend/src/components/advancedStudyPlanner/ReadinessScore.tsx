@@ -35,7 +35,7 @@ export function ReadinessScore({ score, examType = "UPSC", breakdown }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
         "rounded-2xl p-5 border",
-        theme === "dark" ? "bg-slate-900/80 border-violet-500/20" : "bg-white border-slate-200 shadow-lg"
+        theme === "dark" ? "bg-slate-900/80 border-blue-500/20" : "bg-white border-slate-200 shadow-lg"
       )}
     >
       <h3 className={cn("text-sm font-semibold mb-4", theme === "dark" ? "text-slate-200" : "text-slate-800")}>
@@ -64,7 +64,7 @@ export function ReadinessScore({ score, examType = "UPSC", breakdown }: Props) {
           />
           <defs>
             <linearGradient id="readinessGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#8b5cf6" />
+              <stop offset="0%" stopColor="#2563eb" />
               <stop offset="100%" stopColor="#6366f1" />
             </linearGradient>
           </defs>
@@ -94,7 +94,7 @@ export function ReadinessScore({ score, examType = "UPSC", breakdown }: Props) {
               </div>
               <div className={cn("h-1.5 rounded-full overflow-hidden", theme === "dark" ? "bg-slate-700" : "bg-slate-100")}>
                 <motion.div
-                  className="h-full bg-violet-500 rounded-full"
+                  className="h-full bg-blue-500 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${f.value}%` }}
                   transition={{ duration: 0.6 }}

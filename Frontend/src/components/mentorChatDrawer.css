@@ -1,0 +1,121 @@
+.sd-mentor-drawer-root {
+  --sd-drawer-border: #e2e8f0;
+  --sd-drawer-text: #0f172a;
+  --sd-drawer-muted: #64748b;
+  --sd-drawer-blue: #2563eb;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.sd-mentor-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: sd-drawer-fade-in 0.2s ease-out;
+}
+
+.sd-mentor-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: clamp(360px, 68vw, 780px);
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-left: 1px solid var(--sd-drawer-border);
+  box-shadow: -12px 0 40px rgba(15, 23, 42, 0.18);
+  pointer-events: auto;
+  animation: sd-drawer-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sd-mentor-drawer-hd {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sd-drawer-border);
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+}
+
+.sd-mentor-drawer-hd h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--sd-drawer-text);
+  line-height: 1.2;
+}
+
+.sd-mentor-drawer-hd p {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--sd-drawer-muted);
+}
+
+.sd-mentor-drawer-close {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--sd-drawer-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--sd-drawer-muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sd-mentor-drawer-close:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: var(--sd-drawer-blue);
+}
+
+.sd-mentor-drawer-close-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sd-mentor-drawer-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@keyframes sd-drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sd-drawer-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .sd-mentor-drawer {
+    width: 100vw;
+  }
+}

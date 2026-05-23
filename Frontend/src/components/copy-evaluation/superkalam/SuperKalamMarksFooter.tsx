@@ -114,9 +114,9 @@ export const SuperKalamMarksFooter: React.FC<Props> = ({ result, onDownload }) =
 
             isDark
 
-              ? 'bg-gradient-to-b from-fuchsia-400 to-emerald-400'
+              ? 'bg-gradient-to-b from-indigo-400 to-emerald-400'
 
-              : 'bg-gradient-to-b from-fuchsia-500 to-emerald-500'
+              : 'bg-gradient-to-b from-indigo-500 to-emerald-500'
 
           }`}
 
@@ -168,9 +168,9 @@ export const SuperKalamMarksFooter: React.FC<Props> = ({ result, onDownload }) =
 
             isDark
 
-              ? 'bg-purple-950/25 border-purple-500/20'
+              ? 'bg-blue-950/25 border-blue-500/20'
 
-              : 'bg-purple-50/60 border-purple-200/60'
+              : 'bg-blue-50/60 border-blue-200/60'
 
           }`}
 
@@ -180,7 +180,7 @@ export const SuperKalamMarksFooter: React.FC<Props> = ({ result, onDownload }) =
 
             className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
 
-              isDark ? 'text-purple-400' : 'text-purple-600'
+              isDark ? 'text-blue-400' : 'text-blue-600'
 
             }`}
 

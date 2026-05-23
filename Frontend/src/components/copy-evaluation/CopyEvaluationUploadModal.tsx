@@ -88,7 +88,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
       <Card
         className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl ${
           isDark
-            ? 'bg-gradient-to-br from-slate-950/95 to-slate-900/95 border-purple-900/50'
+            ? 'bg-gradient-to-br from-slate-950/95 to-slate-900/95 border-blue-900/50'
             : 'bg-white border-slate-200'
         }`}
       >
@@ -121,9 +121,9 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {selectedFile.type.startsWith('image/') ? (
-                      <ImageIcon className="w-6 h-6 text-fuchsia-400 flex-shrink-0" />
+                      <ImageIcon className="w-6 h-6 text-indigo-400 flex-shrink-0" />
                     ) : (
-                      <FileText className="w-6 h-6 text-purple-600 flex-shrink-0" />
+                      <FileText className="w-6 h-6 text-blue-600 flex-shrink-0" />
                     )}
                     <span className={`text-sm truncate ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                       {selectedFile.name}
@@ -149,11 +149,11 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                   className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
                     dragOver
                       ? isDark
-                        ? 'border-fuchsia-500 bg-fuchsia-500/10'
-                        : 'border-purple-500 bg-purple-50'
+                        ? 'border-indigo-500 bg-indigo-500/10'
+                        : 'border-blue-500 bg-blue-50'
                       : isDark
-                        ? 'border-slate-700/50 bg-slate-800/30 hover:border-fuchsia-500/50'
-                        : 'border-slate-300 bg-slate-50/50 hover:border-purple-400'
+                        ? 'border-slate-700/50 bg-slate-800/30 hover:border-indigo-500/50'
+                        : 'border-slate-300 bg-slate-50/50 hover:border-blue-400'
                   }`}
                 >
                   <input
@@ -167,7 +167,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                   <label htmlFor="copy-upload-input" className="cursor-pointer block">
                     <Upload
                       className={`w-10 h-10 mx-auto mb-3 ${
-                        isDark ? 'text-fuchsia-400' : 'text-purple-600'
+                        isDark ? 'text-indigo-400' : 'text-blue-600'
                       }`}
                     />
                     <p className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
@@ -189,7 +189,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                 </div>
                 <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
                   <div
-                    className="h-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -254,7 +254,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
             <Button
               onClick={handleSubmit}
               disabled={!selectedFile || isUploading}
-              className="w-full bg-gradient-to-r from-fuchsia-500 to-emerald-400 text-white disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-indigo-500 to-emerald-400 text-white disabled:opacity-50"
             >
               {isUploading ? (
                 'Evaluating with Vision AI...'

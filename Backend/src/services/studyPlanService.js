@@ -173,7 +173,7 @@ export function generateTasks(examDate, dailyHours, preparationLevel = "intermed
   const revisionByDate = {}; // dateStr -> [{ subject }]
   for (const { studyDate, subject } of revisionQueue) {
     const studyD = new Date(studyDate);
-    for (const offset of [3, 7]) {
+    for (const offset of [1, 7, 30]) {
       const revD = addDays(studyD, offset);
       const revStr = toDateString(revD);
       if (revStr > endStr) continue;

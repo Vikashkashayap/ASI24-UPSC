@@ -101,8 +101,8 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
   const isWorking = category === "working_professional";
   const isDark = theme === "dark";
   const inputClass = isDark
-    ? "bg-slate-800/80 border-slate-600 text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
-    : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400";
+    ? "bg-slate-800/80 border-slate-600 text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500"
+    : "bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400";
   const sectionBg = isDark ? "bg-slate-800/40 border-slate-700" : "bg-slate-50/80 border-slate-200";
   const labelClass = `block text-sm font-medium mb-1.5 ${isDark ? "text-slate-300" : "text-slate-700"}`;
   const sectionTitleClass = `text-xs font-semibold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-500"}`;
@@ -112,8 +112,8 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
       <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto p-0 ${isDark ? "bg-gradient-to-b from-slate-900 to-slate-900" : "bg-slate-50/95"}`}>
         <DialogHeader className={`sticky top-0 z-10 ${isDark ? "bg-slate-900/95 backdrop-blur border-slate-700" : "bg-white/95 backdrop-blur border-slate-200"}`}>
           <DialogTitle className="flex items-center gap-3">
-            <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${isDark ? "bg-purple-500/20" : "bg-purple-100"}`}>
-              <Calendar className={`w-5 h-5 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+            <div className={`flex items-center justify-center w-10 h-10 rounded-xl ${isDark ? "bg-blue-500/20" : "bg-blue-100"}`}>
+              <Calendar className={`w-5 h-5 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
             </div>
             <div>
               <span className={`block text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>DART</span>
@@ -131,9 +131,9 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
         </DialogHeader>
 
         {user?.name && (
-          <div className={`px-6 py-3 flex items-center gap-2 ${isDark ? "bg-purple-500/10 border-b border-slate-800" : "bg-purple-50/80 border-b border-slate-200"}`}>
+          <div className={`px-6 py-3 flex items-center gap-2 ${isDark ? "bg-blue-500/10 border-b border-slate-800" : "bg-blue-50/80 border-b border-slate-200"}`}>
             <span className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>Logging as</span>
-            <span className={`px-2.5 py-0.5 rounded-full text-sm font-semibold ${isDark ? "bg-purple-500/30 text-purple-300" : "bg-purple-200/80 text-purple-800"}`}>
+            <span className={`px-2.5 py-0.5 rounded-full text-sm font-semibold ${isDark ? "bg-blue-500/30 text-blue-300" : "bg-blue-200/80 text-blue-800"}`}>
               {user.name}
             </span>
           </div>
@@ -275,7 +275,7 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
             <p className={`text-xs mb-3 ${isDark ? "text-slate-500" : "text-slate-500"}`}>Select all that apply</p>
             <div className="space-y-4">
               <div>
-                <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${isDark ? "text-purple-400/80" : "text-purple-600/90"}`}>Prelims</p>
+                <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${isDark ? "text-blue-400/80" : "text-blue-600/90"}`}>Prelims</p>
                 <div className="flex flex-wrap gap-2">
                   {(DART_PRELIMS_SUBJECTS as readonly string[]).map((sub) => {
                     const checked = subjectStudied.includes(sub);
@@ -286,8 +286,8 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
                         onClick={() => toggleSubject(sub)}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                           checked
-                            ? isDark ? "bg-purple-500/40 text-purple-200 ring-1 ring-purple-400/50" : "bg-purple-600 text-white shadow-sm"
-                            : isDark ? "bg-slate-700/60 text-slate-300 hover:bg-slate-600/80" : "bg-white border border-slate-200 text-slate-700 hover:border-purple-300 hover:bg-purple-50/50"
+                            ? isDark ? "bg-blue-500/40 text-blue-200 ring-1 ring-blue-400/50" : "bg-blue-600 text-white shadow-sm"
+                            : isDark ? "bg-slate-700/60 text-slate-300 hover:bg-slate-600/80" : "bg-white border border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/50"
                         }`}
                       >
                         {sub}
@@ -297,7 +297,7 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
                 </div>
               </div>
               <div>
-                <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${isDark ? "text-purple-400/80" : "text-purple-600/90"}`}>Mains & more</p>
+                <p className={`text-[11px] font-medium uppercase tracking-wider mb-2 ${isDark ? "text-blue-400/80" : "text-blue-600/90"}`}>Mains & more</p>
                 <div className="flex flex-wrap gap-2">
                   {(DART_MAINS_SUBJECTS as readonly string[]).map((sub) => {
                     const checked = subjectStudied.includes(sub);
@@ -308,8 +308,8 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
                         onClick={() => toggleSubject(sub)}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                           checked
-                            ? isDark ? "bg-purple-500/40 text-purple-200 ring-1 ring-purple-400/50" : "bg-purple-600 text-white shadow-sm"
-                            : isDark ? "bg-slate-700/60 text-slate-300 hover:bg-slate-600/80" : "bg-white border border-slate-200 text-slate-700 hover:border-purple-300 hover:bg-purple-50/50"
+                            ? isDark ? "bg-blue-500/40 text-blue-200 ring-1 ring-blue-400/50" : "bg-blue-600 text-white shadow-sm"
+                            : isDark ? "bg-slate-700/60 text-slate-300 hover:bg-slate-600/80" : "bg-white border border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/50"
                         }`}
                       >
                         {sub}
@@ -347,8 +347,8 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
                   onClick={() => set(!checked)}
                   className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 transition-all duration-200 ${
                     checked
-                      ? isDark ? "bg-purple-500/30 border-purple-500/60 text-purple-200" : "bg-purple-50 border-purple-400 text-purple-800"
-                      : isDark ? "border-slate-600 bg-slate-800/40 text-slate-400 hover:border-slate-500" : "border-slate-200 bg-white text-slate-600 hover:border-purple-200 hover:bg-purple-50/30"
+                      ? isDark ? "bg-blue-500/30 border-blue-500/60 text-blue-200" : "bg-blue-50 border-blue-400 text-blue-800"
+                      : isDark ? "border-slate-600 bg-slate-800/40 text-slate-400 hover:border-slate-500" : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50/30"
                   }`}
                 >
                   <Icon className="w-4 h-4 shrink-0" />
@@ -414,7 +414,7 @@ export const DartFormModal: React.FC<DartFormModalProps> = ({
             <Button
               type="submit"
               disabled={loading}
-              className={`flex-1 sm:flex-none rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg shadow-purple-500/25 min-h-[44px] ${isDark ? "bg-purple-600 hover:bg-purple-500" : ""}`}
+              className={`flex-1 sm:flex-none rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-500/25 min-h-[44px] ${isDark ? "bg-blue-600 hover:bg-blue-500" : ""}`}
             >
               {loading ? (
                 <>

@@ -32,7 +32,7 @@ export const TestimonialsSection = () => {
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="text-center">
           <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${
-            theme === "dark" ? "text-purple-300" : "text-purple-600"
+            theme === "dark" ? "text-blue-300" : "text-blue-600"
           }`}>
             Testimonials
           </p>

@@ -96,9 +96,9 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
         isDark
 
-          ? 'bg-gradient-to-br from-purple-950/50 via-slate-900/90 to-emerald-950/30 border-purple-500/25 shadow-2xl shadow-purple-900/20'
+          ? 'bg-gradient-to-br from-blue-950/50 via-slate-900/90 to-emerald-950/30 border-blue-500/25 shadow-2xl shadow-blue-900/20'
 
-          : 'bg-gradient-to-br from-purple-50/90 via-white to-emerald-50/40 border-purple-200/50 shadow-xl shadow-purple-100/25'
+          : 'bg-gradient-to-br from-blue-50/90 via-white to-emerald-50/40 border-blue-200/50 shadow-xl shadow-blue-100/25'
 
       }`}
 
@@ -108,7 +108,7 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
         className={`absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl pointer-events-none ${
 
-          isDark ? 'bg-fuchsia-500/15' : 'bg-purple-300/25'
+          isDark ? 'bg-indigo-500/15' : 'bg-blue-300/25'
 
         }`}
 
@@ -136,9 +136,9 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
               isDark
 
-                ? 'bg-gradient-to-br from-fuchsia-500/25 to-purple-600/20 ring-fuchsia-500/30'
+                ? 'bg-gradient-to-br from-indigo-500/25 to-blue-600/20 ring-indigo-500/30'
 
-                : 'bg-gradient-to-br from-purple-100 to-fuchsia-50 ring-purple-200/60'
+                : 'bg-gradient-to-br from-blue-100 to-indigo-50 ring-blue-200/60'
 
             }`}
 
@@ -148,7 +148,7 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
               className={`w-8 h-8 ${
 
-                isDark ? 'text-fuchsia-300' : 'text-purple-600'
+                isDark ? 'text-indigo-300' : 'text-blue-600'
 
               }`}
 
@@ -162,7 +162,7 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
               className={`text-[10px] font-bold uppercase tracking-[0.2em] ${
 
-                isDark ? 'text-purple-300/80' : 'text-purple-600'
+                isDark ? 'text-blue-300/80' : 'text-blue-600'
 
               }`}
 
@@ -180,9 +180,9 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
                   isDark
 
-                    ? 'text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 via-purple-300 to-emerald-300'
+                    ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-blue-300 to-emerald-300'
 
-                    : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-fuchsia-600 to-emerald-600'
+                    : 'text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600'
 
                 }
 
@@ -322,9 +322,9 @@ export const EvaluationScoreHero: React.FC<Props> = ({
 
             isDark
 
-              ? 'border-purple-500/20 text-slate-300'
+              ? 'border-blue-500/20 text-slate-300'
 
-              : 'border-purple-100 text-slate-700'
+              : 'border-blue-100 text-slate-700'
 
           }`}
 
