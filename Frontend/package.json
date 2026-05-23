@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "node --max-old-space-size=768 ./node_modules/vite/bin/vite.js build",
-    "build:low-mem": "node --max-old-space-size=512 ./node_modules/vite/bin/vite.js build",
-    "build:prod": "NODE_OPTIONS=--max-old-space-size=768 vite build",
+    "build": "cross-env VITE_LOW_MEM=1 node --max-old-space-size=512 ./node_modules/vite/bin/vite.js build",
+    "build:low-mem": "cross-env VITE_LOW_MEM=1 node --max-old-space-size=448 ./node_modules/vite/bin/vite.js build",
+    "build:terser": "node --max-old-space-size=768 ./node_modules/vite/bin/vite.js build",
+    "build:prod": "cross-env VITE_LOW_MEM=1 NODE_OPTIONS=--max-old-space-size=512 vite build",
     "preview": "vite preview",
     "copy-syllabus": "node ../scripts/copy-upsc-syllabus.mjs"
   },
@@ -14,10 +15,8 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@headlessui/react": "^2.1.8",
     "@radix-ui/react-slot": "^1.0.2",
     "axios": "^1.7.7",
-    "classnames": "^2.5.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.441.0",
     "papaparse": "^5.5.3",
@@ -36,8 +35,10 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
+    "terser": "^5.36.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.21"
   }

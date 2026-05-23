@@ -14,7 +14,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { prelimsMockAPI } from "../../services/api";
-import Papa from "papaparse";
 
 interface ResultRow {
   rank: number;
@@ -115,7 +114,7 @@ export const MockResultsPage: React.FC = () => {
     return filteredAndSorted.slice(start, start + PAGE_SIZE);
   }, [filteredAndSorted, page]);
 
-  const handleDownloadCSV = () => {
+  const handleDownloadCSV = async () => {
     if (!data?.results?.length) return;
     const rows = data.results.map((r) => ({
       Rank: r.rank,
@@ -127,6 +126,7 @@ export const MockResultsPage: React.FC = () => {
       Score: r.score,
       Accuracy: `${r.accuracy}%`,
     }));
+    const { default: Papa } = await import("papaparse");
     const csv = Papa.unparse(rows);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);

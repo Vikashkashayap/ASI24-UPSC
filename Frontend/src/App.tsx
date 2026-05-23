@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./hooks/useAuth";
 import { ThemeProvider } from "./hooks/useTheme";
-import { DashboardLayout } from "./layouts/DashboardLayout";
-import { LandingLayout } from "./layouts/LandingLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
 import { MentorRoute } from "./components/MentorRoute";
@@ -17,6 +15,10 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { AuthCallbackPage } from "./pages/auth/AuthCallbackPage";
+
+// Shell layouts (~900 lines + nav icons) — separate chunks from the router shell
+const LandingLayout = lazyPage(() => import("./layouts/LandingLayout"), "LandingLayout");
+const DashboardLayout = lazyPage(() => import("./layouts/DashboardLayout"), "DashboardLayout");
 
 // Landing
 const LandingPage = lazyPage(() => import("./pages/LandingPage"), "LandingPage");

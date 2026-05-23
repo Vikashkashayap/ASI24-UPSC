@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -21,9 +21,20 @@ import { PlannerHero } from "../components/advancedStudyPlanner/PlannerHero";
 import { ReadinessScore } from "../components/advancedStudyPlanner/ReadinessScore";
 import { StudyStreakPanel } from "../components/advancedStudyPlanner/StudyStreakPanel";
 import { AIInsightsPanel } from "../components/advancedStudyPlanner/AIInsightsPanel";
-import { PerformanceAnalytics } from "../components/advancedStudyPlanner/PerformanceAnalytics";
-import { DailyTaskEngine } from "../components/advancedStudyPlanner/DailyTaskEngine";
-import { AIMentorChat } from "../components/advancedStudyPlanner/AIMentorChat";
+import { lazyNamed } from "../utils/lazyRoute";
+
+const PerformanceAnalytics = lazyNamed(
+  () => import("../components/advancedStudyPlanner/PerformanceAnalytics"),
+  "PerformanceAnalytics"
+);
+const DailyTaskEngine = lazyNamed(
+  () => import("../components/advancedStudyPlanner/DailyTaskEngine"),
+  "DailyTaskEngine"
+);
+const AIMentorChat = lazyNamed(
+  () => import("../components/advancedStudyPlanner/AIMentorChat"),
+  "AIMentorChat"
+);
 import { PomodoroTimer } from "../components/advancedStudyPlanner/PomodoroTimer";
 import { WeeklyGoalsCard } from "../components/advancedStudyPlanner/WeeklyGoalsCard";
 import { PlanSyllabusTimeline } from "../components/advancedStudyPlanner/PlanSyllabusTimeline";
@@ -298,15 +309,17 @@ export const PlannerPage = () => {
                 <CardDescription>Drag to reorder · Tap to complete</CardDescription>
               </CardHeader>
               <CardContent>
-                <DailyTaskEngine
-                  tasks={plan.tasks || []}
-                  selectedDate={selectedDate}
-                  onToggleComplete={handleToggleComplete}
-                  onCompleteTopic={handleCompleteTopic}
-                  onStartPractice={handleStartPractice}
-                  onReorder={handleReorder}
-                  loadingTaskId={loadingTaskId}
-                />
+                <Suspense fallback={<div className="h-48 animate-pulse rounded-xl bg-slate-200/40 dark:bg-slate-800/40" />}>
+                  <DailyTaskEngine
+                    tasks={plan.tasks || []}
+                    selectedDate={selectedDate}
+                    onToggleComplete={handleToggleComplete}
+                    onCompleteTopic={handleCompleteTopic}
+                    onStartPractice={handleStartPractice}
+                    onReorder={handleReorder}
+                    loadingTaskId={loadingTaskId}
+                  />
+                </Suspense>
               </CardContent>
             </Card>
             <WeeklyGoalsCard
@@ -324,11 +337,15 @@ export const PlannerPage = () => {
           {/* Right */}
           <motion.div className="lg:col-span-4 space-y-4" variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>
             <AIInsightsPanel insights={insights} onRefresh={handleRefreshInsights} loading={insightsLoading} />
-            <AIMentorChat onSend={handleMentorChat} />
+            <Suspense fallback={<div className="h-64 animate-pulse rounded-2xl bg-slate-200/40 dark:bg-slate-800/40" />}>
+              <AIMentorChat onSend={handleMentorChat} />
+            </Suspense>
           </motion.div>
         </motion.div>
 
-        <PerformanceAnalytics analytics={analytics} />
+        <Suspense fallback={<div className="h-64 animate-pulse rounded-2xl bg-slate-200/40 dark:bg-slate-800/40" />}>
+          <PerformanceAnalytics analytics={analytics} />
+        </Suspense>
 
         <Dialog open={showRegenerateForm} onOpenChange={setShowRegenerateForm}>
           <DialogContent className="max-w-2xl p-0 max-h-[90vh] overflow-y-auto">

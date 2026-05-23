@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
-import { DartFormModal } from "../components/dart/DartFormModal";
-import { EvaluationHistorySidebar } from "../components/EvaluationHistorySidebar";
+import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
+
+const DartFormModal = lazyNamed(
+  () => import("../components/dart/DartFormModal"),
+  "DartFormModal"
+);
 
 // Mobile-first nav link: minimum 44px height for touch targets
 const navLinkClass = ({ isActive, theme, collapsed, muted }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean; muted?: boolean }) =>
@@ -900,11 +904,13 @@ export const DashboardLayout = () => {
 
       {/* DART form modal – student daily activity entry */}
       {isStudent && (
-        <DartFormModal
-          open={dartModalOpen}
-          onOpenChange={setDartModalOpen}
-          onSuccess={() => {}}
-        />
+        <Suspense fallback={null}>
+          <DartFormModal
+            open={dartModalOpen}
+            onOpenChange={setDartModalOpen}
+            onSuccess={() => {}}
+          />
+        </Suspense>
       )}
     </div>
   );

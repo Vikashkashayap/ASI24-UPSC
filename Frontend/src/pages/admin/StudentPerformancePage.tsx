@@ -29,7 +29,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { adminAPI } from "../../services/api";
-import Papa from "papaparse";
 
 interface TestRow {
   testId: string;
@@ -154,7 +153,7 @@ export const StudentPerformancePage: React.FC = () => {
     }));
   }, [data?.subjectAnalysis]);
 
-  const handleDownloadCSV = () => {
+  const handleDownloadCSV = async () => {
     if (!data?.tests?.length) return;
     const rows = data.tests.map((t) => ({
       Test: t.mockTitle,
@@ -165,6 +164,7 @@ export const StudentPerformancePage: React.FC = () => {
       Correct: t.correct,
       Wrong: t.wrong,
     }));
+    const { default: Papa } = await import("papaparse");
     const csv = Papa.unparse(rows);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
