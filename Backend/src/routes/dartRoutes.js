@@ -4,7 +4,8 @@ import {
   submitDartEntry,
   listDartEntries,
   getAnalytics,
-  download20DayReport,
+  downloadDartReport,
+  download15DayReport,
 } from "../controllers/dartController.js";
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.use(authMiddleware);
 router.post("/", submitDartEntry);
 router.get("/entries", listDartEntries);
 router.get("/analytics", getAnalytics);
-router.get("/report-20day", download20DayReport);
+router.get("/report", downloadDartReport);
+router.get("/report-15day", download15DayReport);
 
 export default router;

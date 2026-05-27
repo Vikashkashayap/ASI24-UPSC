@@ -1,5 +1,8 @@
 import { DartEntry } from "../models/DartEntry.js";
 
+/** Local testing only: set DART_REPORT_BYPASS_15_DAY=true in .env to unlock download without 15 entries. */
+const bypass15DayReportLock = () => process.env.DART_REPORT_BYPASS_15_DAY === "true";
+
 /** Parse "HH:mm" to minutes since midnight for early wake-up check (before 6 AM) */
 function isWakeUpBefore6AM(wakeUpTime) {
   if (!wakeUpTime || typeof wakeUpTime !== "string") return false;
@@ -104,6 +107,74 @@ export async function getDartEntries(enrollmentId, fromDate, toDate) {
   }));
 }
 
+/** Chart datasets for PDF report (matches dashboard analytics shape). */
+export function buildChartDataFromEntries(entries) {
+  if (!entries?.length) return null;
+
+  const last7 = entries.slice(-7);
+  const lastEntry = entries[entries.length - 1];
+  const forPie = last7.length ? last7 : [lastEntry];
+  const avg = (fn) => forPie.reduce((s, e) => s + fn(e), 0) / forPie.length;
+
+  const dailyTimeDistribution = [
+    { name: "Study", value: Math.round(avg((e) => e.totalStudyHours || 0) * 10) / 10, color: "#8b5cf6" },
+    { name: "Sleep", value: Math.round(avg((e) => e.sleepHours || 0) * 10) / 10, color: "#06b6d4" },
+    { name: "Work", value: Math.round(avg((e) => e.officialWorkHours || 0) * 10) / 10, color: "#f59e0b" },
+    { name: "Waste", value: Math.round(avg((e) => computeWasteTime(e) || 0) * 10) / 10, color: "#64748b" },
+  ].filter((d) => d.value > 0);
+
+  const subjectCount = {};
+  entries.forEach((e) => {
+    (e.subjectStudied || []).forEach((s) => {
+      subjectCount[s] = (subjectCount[s] || 0) + 1;
+    });
+  });
+
+  const emotionalCount = {};
+  entries.forEach((e) => {
+    const status = e.emotionalStatus || "Not set";
+    emotionalCount[status] = (emotionalCount[status] || 0) + 1;
+  });
+
+  const scores = entries.map((e) => e.dailyScore ?? computeDailyScore(e));
+  const performanceScore = scores.length ? scores[scores.length - 1] : 0;
+  const consistentDays = entries.filter((e) => (e.totalStudyHours || 0) >= 6).length;
+  const totalStudy = entries.reduce((s, e) => s + (e.totalStudyHours || 0), 0);
+  const totalWaste = entries.reduce((s, e) => s + (computeWasteTime(e) || 0), 0);
+
+  return {
+    dailyTimeDistribution: dailyTimeDistribution.length
+      ? dailyTimeDistribution
+      : [{ name: "No data", value: 1, color: "#64748b" }],
+    sevenDayStudyTrend: last7.map((e) => ({
+      day: new Date(e.date).toLocaleDateString("en-IN", { weekday: "short" }),
+      studyHours: e.totalStudyHours || 0,
+      targetHours: e.targetStudyHours || 0,
+    })),
+    targetVsActual: last7.map((e) => ({
+      date: new Date(e.date).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }),
+      target: e.targetStudyHours || 0,
+      actual: e.totalStudyHours || 0,
+    })),
+    subjectFrequency: Object.entries(subjectCount)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count),
+    wakeUpConsistency: last7.map((e) => ({
+      date: new Date(e.date).toLocaleDateString("en-IN", { weekday: "short" }),
+      wakeUpTime: e.wakeUpTime || "—",
+      before6: isWakeUpBefore6AM(e.wakeUpTime),
+    })),
+    answerWritingWeeklyCount: last7.filter((e) => e.answerWritingDone).length,
+    emotionalStatusPie: Object.entries(emotionalCount).map(([name, value]) => ({ name, value })),
+    performanceScore,
+    performanceScoreLevel: getScoreLevel(performanceScore),
+    performanceScoreAverage: scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0,
+    consistencyIndex: entries.length ? Math.round((consistentDays / entries.length) * 100) : 0,
+    avgStudyHours: Math.round((totalStudy / entries.length) * 10) / 10,
+    avgWasteTime: Math.round((totalWaste / entries.length) * 10) / 10,
+  };
+}
+
 /**
  * Analytics for dashboard: charts and summary.
  * Returns data needed for all DART charts and performance score.
@@ -113,31 +184,43 @@ export async function getDartAnalytics(enrollmentId, days = 30) {
   const from = new Date();
   from.setDate(from.getDate() - Math.max(1, Number(days) || 30));
 
-  // Find very first DART entry for this enrollment (lifetime),
-  // so that we can compute how many days the student has been
-  // using DART and whether the 20-day report should be unlocked.
+  // We use a rolling window for the "15-day report":
+  // the report unlocks only when the user has filled DART
+  // for 15 distinct days in the last 15-day window.
   const firstEntryDoc = await DartEntry.findOne({ enrollmentId })
     .sort({ date: 1 })
     .lean();
 
   const firstDartDate = firstEntryDoc?.date || null;
 
-  // Inclusive day difference between today and first entry date
-  const daysSinceFirstDart = firstDartDate
-    ? Math.max(
-        0,
-        Math.floor(
-          (to.setHours(0, 0, 0, 0) - new Date(firstDartDate).setHours(0, 0, 0, 0)) /
-            (1000 * 60 * 60 * 24)
-        ) + 1
-      )
-    : 0;
+  // For the "15-day report", we require the user to have filled
+  // DART for 15 distinct calendar days in the last 15-day window.
+  // (So if they have only ~15 entries, the 15-day PDF should unlock only at 15.)
+  const last15From = new Date();
+  last15From.setDate(last15From.getDate() - 14); // inclusive => 15 days including today
+  last15From.setUTCHours(0, 0, 0, 0);
+  const last15Entries = await getDartEntries(enrollmentId, last15From, new Date());
 
-  const daysUntil20DayReport = firstDartDate
-    ? Math.max(0, 20 - daysSinceFirstDart)
-    : 20;
+  const last7From = new Date();
+  last7From.setDate(last7From.getDate() - 6);
+  last7From.setUTCHours(0, 0, 0, 0);
+  const last30From = new Date();
+  last30From.setDate(last30From.getDate() - 29);
+  last30From.setUTCHours(0, 0, 0, 0);
 
-  const canDownload20DayReport = daysSinceFirstDart >= 20;
+  const [last7Entries, last30Entries] = await Promise.all([
+    getDartEntries(enrollmentId, last7From, new Date()),
+    getDartEntries(enrollmentId, last30From, new Date()),
+  ]);
+
+  const daysSinceFirstDart = last15Entries.length; // used by frontend display "/15 days"
+  const daysUntil15DayReport = Math.max(0, 15 - daysSinceFirstDart);
+  const entriesCountLast7 = last7Entries.length;
+  const entriesCountLast15 = last15Entries.length;
+  const entriesCountLast30 = last30Entries.length;
+  const canDownload7DayReport = bypass15DayReportLock() || entriesCountLast7 >= 7;
+  const canDownload15DayReport = bypass15DayReportLock() || entriesCountLast15 >= 15;
+  const canDownload30DayReport = bypass15DayReportLock() || entriesCountLast30 >= 30;
 
   // Now load entries only for the requested analytics range
   const entries = await getDartEntries(enrollmentId, from, new Date());
@@ -145,8 +228,13 @@ export async function getDartAnalytics(enrollmentId, days = 30) {
     return getEmptyAnalytics(from, new Date(), {
       firstDartDate,
       daysSinceFirstDart,
-      daysUntil20DayReport,
-      canDownload20DayReport,
+      daysUntil15DayReport,
+      canDownload7DayReport,
+      canDownload15DayReport,
+      canDownload30DayReport,
+      entriesCountLast7,
+      entriesCountLast15,
+      entriesCountLast30,
     });
   }
 
@@ -254,11 +342,16 @@ export async function getDartAnalytics(enrollmentId, days = 30) {
     performanceScoreLevel: getScoreLevel(latestScore),
     performanceScoreAverage: avgScore,
     consistencyIndex,
-    // 20-day report unlock information
+    // Report download meta
     firstDartDate,
     daysSinceFirstDart,
-    daysUntil20DayReport,
-    canDownload20DayReport,
+    daysUntil15DayReport,
+    canDownload7DayReport,
+    canDownload15DayReport,
+    canDownload30DayReport,
+    entriesCountLast7,
+    entriesCountLast15,
+    entriesCountLast30,
     // Today's summary (last entry)
     todaySummary: lastEntry,
   };
@@ -283,48 +376,84 @@ function getEmptyAnalytics(from, to, reportMeta = {}) {
     consistencyIndex: 0,
     firstDartDate: reportMeta.firstDartDate || null,
     daysSinceFirstDart: reportMeta.daysSinceFirstDart || 0,
-    daysUntil20DayReport: reportMeta.daysUntil20DayReport ?? 20,
-    canDownload20DayReport: reportMeta.canDownload20DayReport || false,
+    daysUntil15DayReport: reportMeta.daysUntil15DayReport ?? 15,
+    canDownload7DayReport: reportMeta.canDownload7DayReport || false,
+    canDownload15DayReport: reportMeta.canDownload15DayReport || false,
+    canDownload30DayReport: reportMeta.canDownload30DayReport || false,
+    entriesCountLast7: reportMeta.entriesCountLast7 ?? 0,
+    entriesCountLast15: reportMeta.entriesCountLast15 ?? 0,
+    entriesCountLast30: reportMeta.entriesCountLast30 ?? 0,
     todaySummary: null,
   };
 }
 
-/**
- * 20-day report: last 20 days summary for PDF.
- */
-export async function getDart20DayReport(enrollmentId) {
-  const to = new Date();
-
-  // Make sure the student has at least 20 calendar days
-  // since their first-ever DART entry before allowing the
-  // report to be generated.
-  const firstEntryDoc = await DartEntry.findOne({ enrollmentId })
-    .sort({ date: 1 })
-    .lean();
-
-  if (!firstEntryDoc) {
-    throw new Error("Please fill the DART form daily. 20-day report will unlock after 20 days of entries.");
+/** Resolve report window from preset days or custom from/to (YYYY-MM-DD). */
+export function parseReportDateRange({ days, from: fromStr, to: toStr }) {
+  const presetDays = Number(days);
+  if (presetDays === 7 || presetDays === 15 || presetDays === 30) {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - (presetDays - 1));
+    from.setUTCHours(0, 0, 0, 0);
+    to.setUTCHours(23, 59, 59, 999);
+    return {
+      from,
+      to,
+      presetDays,
+      reportTitle: `DART – ${presetDays} Day Performance Report`,
+      filenameSuffix: `${presetDays}-Day`,
+    };
   }
 
-  const firstDate = new Date(firstEntryDoc.date);
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const firstDateStart = new Date(firstDate);
-  firstDateStart.setHours(0, 0, 0, 0);
-  const daysSinceFirstDart =
-    Math.floor((todayStart.getTime() - firstDateStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  if (fromStr && toStr) {
+    const from = new Date(fromStr);
+    const to = new Date(toStr);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
+      throw new Error("Invalid date range. Use YYYY-MM-DD for from and to.");
+    }
+    from.setUTCHours(0, 0, 0, 0);
+    to.setUTCHours(23, 59, 59, 999);
+    if (from > to) {
+      throw new Error("Start date must be before or equal to end date.");
+    }
+    const spanMs = to.getTime() - from.getTime();
+    const maxSpan = 90 * 24 * 60 * 60 * 1000;
+    if (spanMs > maxSpan) {
+      throw new Error("Custom range cannot exceed 90 days.");
+    }
+    const labelFrom = from.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    const labelTo = to.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    return {
+      from,
+      to,
+      presetDays: null,
+      reportTitle: `DART – Custom Report (${labelFrom} – ${labelTo})`,
+      filenameSuffix: "Custom",
+    };
+  }
 
-  if (daysSinceFirstDart < 20) {
-    const remaining = 20 - daysSinceFirstDart;
+  throw new Error("Provide days (7, 15, or 30) or both from and to dates.");
+}
+
+/**
+ * DART report for a date range (preset 7/15/30 days or custom from–to).
+ */
+export async function getDartReport(enrollmentId, rangeOptions) {
+  const { from, to, presetDays, reportTitle, filenameSuffix } = parseReportDateRange(rangeOptions);
+
+  const entriesInWindow = await getDartEntries(enrollmentId, from, to);
+  if (entriesInWindow.length === 0) {
+    throw new Error("No DART entries found for this period. Fill your DART form to generate a report.");
+  }
+
+  if (presetDays && !bypass15DayReportLock() && entriesInWindow.length < presetDays) {
+    const remaining = presetDays - entriesInWindow.length;
     throw new Error(
-      `20-day report will be available after ${remaining} more day${remaining === 1 ? "" : "s"} of DART entries.`
+      `${presetDays}-day report will be available after ${remaining} more day${remaining === 1 ? "" : "s"} of DART entries.`
     );
   }
 
-  const from = new Date();
-  from.setDate(from.getDate() - 20);
-
-  const entries = await getDartEntries(enrollmentId, from, to);
+  const entries = entriesInWindow;
   const firstEntry = entries[0];
   const enrollmentName = firstEntry?.enrollmentName || "Student";
 
@@ -352,18 +481,29 @@ export async function getDart20DayReport(enrollmentId) {
     ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
     : 0;
 
+  const charts = buildChartDataFromEntries(entries);
+
   return {
     enrollmentId: String(enrollmentId),
     enrollmentName,
     dateRange: { from, to },
-    avgStudyHours: Math.round(avgStudyHours * 10) / 10,
-    avgWasteTime: Math.round(avgWasteTime * 10) / 10,
+    reportTitle,
+    filenameSuffix,
+    presetDays,
+    avgStudyHours: charts?.avgStudyHours ?? Math.round(avgStudyHours * 10) / 10,
+    avgWasteTime: charts?.avgWasteTime ?? Math.round(avgWasteTime * 10) / 10,
     subjectDistribution,
-    consistencyPercent,
-    performanceScoreAverage,
+    consistencyPercent: charts?.consistencyIndex ?? consistencyPercent,
+    performanceScoreAverage: charts?.performanceScoreAverage ?? performanceScoreAverage,
     totalDays: entries.length,
+    charts,
     improvementSuggestions: generateImprovementSuggestions(entries, performanceScoreAverage, consistencyPercent),
   };
+}
+
+/** @deprecated Use getDartReport(enrollmentId, { days: 15 }) */
+export async function getDart15DayReport(enrollmentId) {
+  return getDartReport(enrollmentId, { days: 15 });
 }
 
 function generateImprovementSuggestions(entries, avgScore, consistencyPercent) {
@@ -381,67 +521,4 @@ function generateImprovementSuggestions(entries, avgScore, consistencyPercent) {
   return suggestions.length ? suggestions : ["Keep up the good work. Maintain consistency."];
 }
 
-/**
- * Build 20-day report PDF buffer from report object (shared by student + admin).
- */
-export async function build20DayReportPdf(report) {
-  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
-  const pdfDoc = await PDFDocument.create();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const page = pdfDoc.addPage([595, 842]);
-  const { height } = page.getSize();
-  let y = height - 50;
-  const lineHeight = 18;
-  const margin = 50;
-
-  const drawText = (text, x, size = 11, bold = false) => {
-    const f = bold ? fontBold : font;
-    page.drawText(String(text).substring(0, 100), { x: margin + x, y, size, font: f, color: rgb(0.1, 0.1, 0.2) });
-  };
-
-  drawText("DART – 20 Day Performance Report", 0, 18, true);
-  y -= lineHeight;
-  drawText(`Student: ${report.enrollmentName}`, 0, 12);
-  y -= lineHeight;
-  drawText(`Enrollment ID: ${report.enrollmentId}`, 0, 12);
-  y -= lineHeight;
-  drawText(
-    `Date Range: ${report.dateRange.from.toLocaleDateString()} - ${report.dateRange.to.toLocaleDateString()}`,
-    0,
-    12
-  );
-  y -= lineHeight * 1.5;
-
-  drawText("Performance Summary", 0, 14, true);
-  y -= lineHeight;
-  drawText(`Average Study Hours: ${report.avgStudyHours}`, 0, 11);
-  y -= lineHeight;
-  drawText(`Average Waste Time (hrs): ${report.avgWasteTime}`, 0, 11);
-  y -= lineHeight;
-  drawText(`Consistency % (days with 6+ hrs study): ${report.consistencyPercent}%`, 0, 11);
-  y -= lineHeight;
-  drawText(`Performance Score Average: ${report.performanceScoreAverage}`, 0, 11);
-  y -= lineHeight * 1.5;
-
-  if (report.subjectDistribution && report.subjectDistribution.length > 0) {
-    drawText("Subject Distribution (days studied)", 0, 14, true);
-    y -= lineHeight;
-    report.subjectDistribution.slice(0, 15).forEach((s) => {
-      drawText(`  ${s.name}: ${s.count} days`, 0, 10);
-      y -= lineHeight * 0.8;
-    });
-    y -= lineHeight * 0.5;
-  }
-
-  drawText("Improvement Suggestions", 0, 14, true);
-  y -= lineHeight;
-  (report.improvementSuggestions || []).forEach((s) => {
-    const line = String(s).substring(0, 80);
-    drawText(`  • ${line}`, 0, 10);
-    y -= lineHeight * 0.8;
-  });
-
-  const pdfBytes = await pdfDoc.save();
-  return Buffer.from(pdfBytes);
-}
+export { build15DayReportPdf } from "./dartReportPdf.js";

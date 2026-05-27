@@ -1030,8 +1030,11 @@ function moduleDisplayNumber(module: PolityModule, index: number): number {
   return index + 1;
 }
 
-function GenericSyllabusSection(props: { modules: PolityModule[] }) {
-  const { modules } = props;
+function GenericSyllabusSection(props: {
+  modules: PolityModule[];
+  showPrelimsImportance?: boolean;
+}) {
+  const { modules, showPrelimsImportance = true } = props;
   return (
     <div className="sd-syll-scroll">
       {modules.map((module, index) => (
@@ -1157,7 +1160,7 @@ function GenericSyllabusSection(props: { modules: PolityModule[] }) {
 
                   <div className="sd-p-meta-wrap">
                     {topic.pyq_frequency != null ? <span className="sd-p-pill">PYQ: {String(topic.pyq_frequency)}</span> : null}
-                    {topic.prelims_importance != null ? (
+                    {showPrelimsImportance && topic.prelims_importance != null ? (
                       <span className="sd-p-pill">Prelims: {String(topic.prelims_importance)}</span>
                     ) : null}
                     {topic.mains_importance != null ? (
@@ -1230,23 +1233,23 @@ function SocietySection() {
 }
 
 function GovernanceSection() {
-  return <GenericSyllabusSection modules={governanceModules} />;
+  return <GenericSyllabusSection modules={governanceModules} showPrelimsImportance={false} />;
 }
 
 function SocialJusticeSection() {
-  return <GenericSyllabusSection modules={socialJusticeModules} />;
+  return <GenericSyllabusSection modules={socialJusticeModules} showPrelimsImportance={false} />;
 }
 
 function InternalSecuritySection() {
-  return <GenericSyllabusSection modules={internalSecurityModules} />;
+  return <GenericSyllabusSection modules={internalSecurityModules} showPrelimsImportance={false} />;
 }
 
 function PostIndependenceSection() {
-  return <GenericSyllabusSection modules={postIndependenceModules} />;
+  return <GenericSyllabusSection modules={postIndependenceModules} showPrelimsImportance={false} />;
 }
 
 function DisasterManagementSection() {
-  return <GenericSyllabusSection modules={disasterManagementModules} />;
+  return <GenericSyllabusSection modules={disasterManagementModules} showPrelimsImportance={false} />;
 }
 
 function ArtCultureSection() {
@@ -1254,11 +1257,11 @@ function ArtCultureSection() {
 }
 
 function EthicsSection() {
-  return <GenericSyllabusSection modules={ethicsModules} />;
+  return <GenericSyllabusSection modules={ethicsModules} showPrelimsImportance={false} />;
 }
 
 function InternationalRelationsSection() {
-  return <GenericSyllabusSection modules={internationalRelationsModules} />;
+  return <GenericSyllabusSection modules={internationalRelationsModules} showPrelimsImportance={false} />;
 }
 
 type Props = { todayLabel: string };

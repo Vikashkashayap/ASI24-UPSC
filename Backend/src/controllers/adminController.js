@@ -7,7 +7,7 @@ import PrelimsMock from "../models/PrelimsMock.js";
 import { MeetingRoom } from "../models/MeetingRoom.js";
 import { MentorChat } from "../models/MentorChat.js";
 import { MentorFeedback } from "../models/MentorFeedback.js";
-import { getDartAnalytics, getDart20DayReport, build20DayReportPdf } from "../services/dartService.js";
+import { getDartAnalytics, getDart15DayReport, build15DayReportPdf } from "../services/dartService.js";
 
 export const getAllStudents = async (req, res) => {
   try {
@@ -1066,18 +1066,18 @@ export const getStudentDartAnalytics = async (req, res) => {
   }
 };
 
-/** GET /api/admin/students/:id/dart-report-20day – Download 20-day DART report PDF for student (admin). */
-export const getStudentDart20DayReport = async (req, res) => {
+/** GET /api/admin/students/:id/dart-report-15day – Download 15-day DART report PDF for student (admin). */
+export const getStudentDart15DayReport = async (req, res) => {
   try {
     const { id } = req.params;
     const student = await User.findById(id).select("name").lean();
     if (!student) {
       return res.status(404).json({ success: false, message: "Student not found" });
     }
-    const report = await getDart20DayReport(id);
+    const report = await getDart15DayReport(id);
     if (student?.name) report.enrollmentName = student.name;
-    const pdfBuffer = await build20DayReportPdf(report);
-    const filename = `DART-20-Day-Report-${String(report.enrollmentName || student?.name || id).replace(/\s+/g, "-")}.pdf`;
+    const pdfBuffer = await build15DayReportPdf(report);
+    const filename = `DART-15-Day-Report-${String(report.enrollmentName || student?.name || id).replace(/\s+/g, "-")}.pdf`;
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.send(pdfBuffer);

@@ -19,6 +19,7 @@ import studyPlanRoutes from "./routes/studyPlanRoutes.js";
 import advancedStudyPlannerRoutes from "./routes/advancedStudyPlannerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import prelimsMockRoutes from "./routes/prelimsMockRoutes.js";
+import dartRoutes from "./routes/dartRoutes.js";
 import pricingRoutes from "./routes/pricingRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import offersRoutes from "./routes/offersRoutes.js";
@@ -111,6 +112,7 @@ app.use("/api/pricing", pricingRoutes);
 app.use("/api/payment", paymentRoutes);
 
 app.use("/api/prelims-mock", authMiddleware, prelimsMockRoutes);
+app.use("/api/dart", authMiddleware, dartRoutes);
 
 /* -------------------- CRON -------------------- */
 

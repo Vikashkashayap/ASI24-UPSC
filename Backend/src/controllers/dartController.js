@@ -1,6 +1,7 @@
 import {
-  getDart20DayReport,
-  build20DayReportPdf,
+  getDartReport,
+  getDart15DayReport,
+  build15DayReportPdf,
   upsertDartEntry,
   getDartEntries,
   getDartAnalytics,
@@ -66,18 +67,32 @@ export const getAnalytics = async (req, res) => {
 };
 
 /**
- * GET /api/dart/report-20day – Download 20-day report as PDF.
+ * GET /api/dart/report – Download DART report PDF.
+ * Query: days=7|15|30 OR from & to (YYYY-MM-DD).
  */
-export const download20DayReport = async (req, res) => {
+export const downloadDartReport = async (req, res) => {
   try {
     const enrollmentId = req.user._id;
-    const report = await getDart20DayReport(enrollmentId);
-    const pdfBuffer = await build20DayReportPdf(report);
+    const { days, from, to } = req.query;
+    const report = await getDartReport(enrollmentId, { days, from, to });
+    const pdfBuffer = await build15DayReportPdf(report);
+    const suffix = report.filenameSuffix || "Report";
+    const safeName = String(report.enrollmentName).replace(/\s+/g, "-");
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="DART-20-Day-Report-${String(report.enrollmentName).replace(/\s+/g, "-")}.pdf"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="DART-${suffix}-Report-${safeName}.pdf"`
+    );
     res.send(pdfBuffer);
   } catch (error) {
-    console.error("DART 20-day report PDF error:", error);
-    res.status(500).json({ success: false, message: error.message || "Failed to generate report" });
+    console.error("DART report PDF error:", error);
+    const status = error.message?.includes("Provide days") || error.message?.includes("Invalid") ? 400 : 500;
+    res.status(status).json({ success: false, message: error.message || "Failed to generate report" });
   }
+};
+
+/** GET /api/dart/report-15day – Legacy alias for 15-day report. */
+export const download15DayReport = async (req, res) => {
+  req.query.days = "15";
+  return downloadDartReport(req, res);
 };

@@ -9,7 +9,7 @@ import {
   getStudentMains,
   getStudentActivity,
   getStudentDartAnalytics,
-  getStudentDart20DayReport,
+  getStudentDart15DayReport,
   updateStudentStatus,
   resetStudentPassword,
   createStudent,
@@ -132,7 +132,7 @@ router.get("/students/:id/prelims", getStudentPrelims);
 router.get("/students/:id/mains", getStudentMains);
 router.get("/students/:id/activity", getStudentActivity);
 router.get("/students/:id/dart-analytics", getStudentDartAnalytics);
-router.get("/students/:id/dart-report-20day", getStudentDart20DayReport);
+router.get("/students/:id/dart-report-15day", getStudentDart15DayReport);
 router.patch("/students/:id/status", updateStudentStatus);
 router.post("/students/:id/reset-password", resetStudentPassword);
 

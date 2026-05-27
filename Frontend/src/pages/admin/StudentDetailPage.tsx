@@ -330,12 +330,12 @@ export const StudentDetailPage = () => {
     setDartReportDownloading(true);
     try {
       const dartBase = isMentorView ? `/api/mentor/students/${id}` : `/api/admin/students/${id}`;
-      const res = await api.get(`${dartBase}/dart-report-20day`, { responseType: "blob" });
+      const res = await api.get(`${dartBase}/dart-report-15day`, { responseType: "blob" });
       const blob = new Blob([res.data], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `DART-20-Day-Report-${student?.name || id}.pdf`;
+      a.download = `DART-15-Day-Report-${student?.name || id}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -1522,7 +1522,7 @@ export const StudentDetailPage = () => {
                         disabled={dartReportDownloading}
                         className={`text-sm font-medium px-3 py-2 rounded-lg ${theme === "dark" ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30" : "bg-blue-100 text-blue-700 hover:bg-blue-200"}`}
                       >
-                        {dartReportDownloading ? "Generating..." : "Download 20-Day Report"}
+                        {dartReportDownloading ? "Generating..." : "Download 15-Day Report"}
                       </button>
                     </CardContent>
                   </Card>

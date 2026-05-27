@@ -5,6 +5,7 @@ import { useTheme } from "../hooks/useTheme";
 import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
+import { AnimatePresence, motion } from "framer-motion";
 
 const DartFormModal = lazyNamed(
   () => import("../components/dart/DartFormModal"),
@@ -198,29 +199,42 @@ export const DashboardLayout = () => {
     if (user) refreshUser().catch(() => {});
   }, []);
 
+  const sidebarSurface =
+    theme === "dark"
+      ? "border-slate-800/80 bg-[#0B1220] text-slate-50"
+      : "border-gray-200 bg-white text-slate-900";
+
   return (
     <div
-      className={`dashboard-scroll min-h-screen h-screen flex overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020617] text-slate-50" : "bg-slate-50 text-slate-900"
+      className={`dashboard-scroll min-h-[100dvh] h-[100dvh] flex flex-col overflow-hidden overflow-x-hidden ${theme === "dark" ? "bg-[#020617] text-slate-50" : "bg-slate-50 text-slate-900"
         }`}
-      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+      {/* Mobile Menu Overlay (animated) */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/45 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Fixed Sidebar - Mobile-first: hidden by default, shown on desktop */}
+      <div className="flex flex-1 min-h-0 overflow-hidden pt-[env(safe-area-inset-top,0px)]">
+      {/* Sidebar — flush with header (no floating card gap) */}
       <aside
-        className={`${sidebarCollapsed ? "w-[72px]" : "w-[248px]"} flex flex-col border-r fixed left-0 top-0 bottom-0 z-50 transition-all duration-300 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 ${theme === "dark"
-            ? "border-slate-800/80 bg-[#0F172A] shadow-xl shadow-black/20"
-            : "border-slate-200/80 bg-white shadow-xl shadow-slate-200/40"
-          }`}
+        className={`${sidebarCollapsed ? "w-[76px]" : "w-[260px]"} fixed left-0 bottom-0 z-50 flex flex-col shrink-0 border-r transition-transform duration-300 top-[env(safe-area-inset-top,0px)] ${
+          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } md:static md:top-auto md:bottom-auto md:translate-x-0 ${sidebarSurface}`}
       >
-        <div className={`${sidebarCollapsed ? "px-2" : "px-4"} h-14 md:h-16 border-b flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"} gap-2 flex-shrink-0 ${theme === "dark" ? "border-slate-800/80" : "border-slate-200"}`}>
+        <div
+          className={`${sidebarCollapsed ? "px-2" : "px-4"} h-14 md:h-[72px] border-b flex items-center ${
+            sidebarCollapsed ? "justify-center" : "justify-between"
+          } gap-2 flex-shrink-0 ${theme === "dark" ? "border-slate-800/80" : "border-gray-200"}`}
+        >
           {!sidebarCollapsed && (
             <div className="flex items-center gap-1.5 min-w-0 shrink-0">
               <img src={logoImg} alt="MentorsDaily" className="h-10 md:h-11 w-auto object-contain object-center flex-shrink-0" />
@@ -234,7 +248,7 @@ export const DashboardLayout = () => {
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className={`hidden md:flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${theme === "dark"
                   ? "hover:bg-white/[0.06] text-[#D1D5DB]"
-                  : "hover:bg-slate-100 text-slate-700"
+                  : "hover:bg-gray-50 text-slate-700"
                 }`}
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
@@ -551,7 +565,7 @@ export const DashboardLayout = () => {
         </nav>
 
         {/* Bottom Actions Section */}
-        <div className={`${sidebarCollapsed ? "px-2" : "px-3"} py-3 border-t flex-shrink-0 ${theme === "dark" ? "border-slate-800/80 bg-slate-900/30" : "border-slate-200 bg-slate-50/50"}`}>
+        <div className={`${sidebarCollapsed ? "px-2" : "px-3"} py-3 border-t flex-shrink-0 ${theme === "dark" ? "border-slate-800/80 bg-slate-900/30" : "border-gray-200 bg-gray-50/50"}`}>
           <div className="space-y-0.5">
             <SidebarNavItem
               to="/profile"
@@ -586,13 +600,12 @@ export const DashboardLayout = () => {
         </div>
       </aside>
 
-      {/* Main content area - mobile-first: full width on mobile, margin on desktop */}
-      <div className={`flex-1 flex flex-col h-screen min-w-0 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "md:ml-[72px]" : "md:ml-[248px]"}`}>
-        {/* Fixed Header - equal alignment, better UI */}
+      {/* Main content — flex column; no left margin on desktop (sidebar is in-flow) */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         <header
-          className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl sticky top-0 z-30 shadow-sm ${theme === "dark"
-              ? "border-blue-900/50 bg-[#020617]/95 shadow-blue-900/10"
-              : "border-slate-200 bg-white/95 shadow-slate-200/50"
+          className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl shrink-0 z-30 ${theme === "dark"
+              ? "border-slate-800/80 bg-[#0B1220]/95"
+              : "border-gray-200 bg-white/95"
             }`}
         >
           {/* Left: mobile menu | desktop: page pill only */}
@@ -609,8 +622,8 @@ export const DashboardLayout = () => {
             </button>
             {/* Page title pill - icon + text, equal height with row */}
             <div className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-xl min-h-[40px] ${theme === "dark"
-                ? "bg-blue-900/40 ring-1 ring-blue-600/50 text-slate-50"
-                : "bg-blue-100/80 ring-1 ring-blue-200/80 text-slate-900"
+                ? "bg-white/[0.04] ring-1 ring-slate-800/80 text-slate-50"
+                : "bg-gray-50 ring-1 ring-gray-200 text-slate-900"
               }`}>
               <span className="flex items-center justify-center w-5 h-5 shrink-0 [&>svg]:w-5 [&>svg]:h-5">
                 {pageInfo.icon}
@@ -645,7 +658,7 @@ export const DashboardLayout = () => {
             >
               <MoreVertical className="w-5 h-5" />
             </button>
-            <div className={`hidden lg:flex items-center gap-2 min-w-0 max-w-[min(420px,50vw)] ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+            <div className={`hidden lg:flex items-center gap-2 min-w-0 max-w-[min(420px,50vw)] ${theme === "dark" ? "text-slate-300" : "text-gray-600"}`}>
               {hasActiveSubscription ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#2563eb] text-white shadow-sm min-w-0 max-w-full">
@@ -726,12 +739,13 @@ export const DashboardLayout = () => {
           ) : (
             /* Full-width scroll wrapper so scroll works even over empty side space */
             <div className="flex-1 min-h-0 w-full min-w-0 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide">
-              <div className="w-full max-w-full min-w-0 min-h-full px-3 md:px-4 lg:px-8 py-4 md:py-6 pb-20 md:pb-6 box-border">
+              <div className="w-full max-w-full min-w-0 min-h-full px-2 sm:px-3 md:px-4 lg:px-6 py-4 md:py-6 pb-20 md:pb-6 box-border">
                 <Outlet />
               </div>
             </div>
           )}
         </main>
+      </div>
       </div>
 
       {/* Bottom Navigation Bar - Mobile Only (students only; mentors use sidebar) */}

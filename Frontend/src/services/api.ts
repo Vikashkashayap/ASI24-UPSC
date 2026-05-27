@@ -354,15 +354,17 @@ export const dartAPI = {
     api.get("/api/dart/entries", { params }),
   getAnalytics: (params?: { days?: number }) =>
     api.get("/api/dart/analytics", { params }),
-  download20DayReport: () =>
-    api.get("/api/dart/report-20day", { responseType: "blob" }),
+  downloadReport: (params: { days?: number; from?: string; to?: string }) =>
+    api.get("/api/dart/report", { params, responseType: "blob" }),
+  download15DayReport: () =>
+    api.get("/api/dart/report-15day", { responseType: "blob" }),
   // Admin: view student DART analytics
   getStudentAnalytics: (studentId: string, days?: number) =>
     api.get(`/api/admin/students/${studentId}/dart-analytics`, {
       params: days ? { days } : undefined,
     }),
   getStudentReport20Day: (studentId: string) =>
-    api.get(`/api/admin/students/${studentId}/dart-report-20day`, {
+    api.get(`/api/admin/students/${studentId}/dart-report-15day`, {
       responseType: "blob",
     }),
 };

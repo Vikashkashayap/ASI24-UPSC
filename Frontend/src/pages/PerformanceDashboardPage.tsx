@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, dartAPI } from "../services/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LineChart,
   Line,
@@ -39,10 +40,10 @@ import {
   Lightbulb,
   CheckCircle,
   AlertTriangle,
-  Download,
   Sunrise,
   Smile
 } from "lucide-react";
+import { DartReportCard } from "../components/dart/DartReportCard";
 
 const COLORS = [
   "#2563eb", // purple
@@ -74,11 +75,17 @@ interface DartAnalytics {
   performanceScore?: number;
   performanceScoreLevel?: string;
   consistencyIndex?: number;
-  // 20-day report unlock meta
+  // Report download meta
   firstDartDate?: string | null;
   daysSinceFirstDart?: number;
-  daysUntil20DayReport?: number;
-  canDownload20DayReport?: boolean;
+  daysUntil15DayReport?: number;
+  canDownload7DayReport?: boolean;
+  canDownload15DayReport?: boolean;
+  canDownload30DayReport?: boolean;
+  entriesCount?: number;
+  entriesCountLast7?: number;
+  entriesCountLast15?: number;
+  entriesCountLast30?: number;
   dailyTimeDistribution?: { name: string; value: number; color: string }[];
   sevenDayStudyTrend?: { day: string; studyHours: number; targetHours: number }[];
   targetVsActual?: { date: string; target: number; actual: number }[];
@@ -98,8 +105,6 @@ export const PerformanceDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'all' | 'month' | 'week'>('all');
   const [activeTab, setActiveTab] = useState<'overview' | 'copy-evaluation' | 'prelims'>('overview');
-  const [reportDownloading, setReportDownloading] = useState(false);
-
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -119,28 +124,6 @@ export const PerformanceDashboardPage = () => {
     };
     loadData();
   }, []);
-
-  const handleDownload20DayReport = async () => {
-    setReportDownloading(true);
-    try {
-      const res = await dartAPI.download20DayReport();
-      const blob = new Blob([res.data], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `DART-20-Day-Report-${user?.name || "Student"}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.message ||
-        "20-day report is not available yet. Please continue filling your DART entries.";
-      // Simple, universal feedback
-      window.alert(message);
-    } finally {
-      setReportDownloading(false);
-    }
-  };
 
   // Filter data based on timeframe
   const getFilteredHistory = (data: any) => {
@@ -1416,128 +1399,100 @@ export const PerformanceDashboardPage = () => {
   const enrollmentName = dartAnalytics?.enrollmentName || user?.name || "Student";
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 px-3 md:px-0 overflow-x-hidden pb-2">
-      {/* Welcome + DART Performance Score & Consistency */}
-      <div className={`rounded-xl md:rounded-2xl p-4 md:p-6 border-2 ${
-        theme === "dark" ? "bg-slate-800/80 border-blue-500/20" : "bg-white border-blue-200/50"
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6 lg:space-y-8 overflow-x-hidden">
+      {/* Welcome + compact metric strip */}
+      <div className={`rounded-xl p-3 md:p-4 border ${
+        theme === "dark" ? "bg-slate-800/80 border-slate-700/60" : "bg-white border-slate-200/80 shadow-sm"
       }`}>
-        <h2 className={`text-lg md:text-xl font-bold mb-4 flex items-center gap-2 ${
+        <h2 className={`text-sm md:text-base font-semibold mb-3 flex items-center gap-1.5 ${
           theme === "dark" ? "text-slate-100" : "text-slate-900"
         }`}>
-          <Sparkles className="w-5 h-5 text-blue-500" />
+          <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
           Welcome, {enrollmentName}
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card className={`${
-            theme === "dark" ? "bg-slate-900/80 border-blue-500/30" : "bg-blue-50/50 border-blue-200"
-          } border-2`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-500" />
-                Performance Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl md:text-3xl font-bold ${
-                (dartAnalytics?.performanceScore ?? 0) >= 80 ? "text-green-500" :
-                (dartAnalytics?.performanceScore ?? 0) >= 60 ? "text-blue-500" :
-                (dartAnalytics?.performanceScore ?? 0) >= 40 ? "text-amber-500" : "text-slate-500"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {/* Performance Score */}
+          <div className={`rounded-xl border p-3 flex items-center gap-3 ${
+            theme === "dark"
+              ? "bg-slate-900/60 border-blue-500/20"
+              : "bg-blue-50/40 border-blue-100"
+          }`}>
+            <div className={`shrink-0 p-2 rounded-lg ${
+              theme === "dark" ? "bg-blue-500/15" : "bg-blue-100"
+            }`}>
+              <Target className="w-4 h-4 text-blue-500" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className={`text-[10px] font-medium uppercase tracking-wide ${
+                theme === "dark" ? "text-slate-500" : "text-slate-500"
               }`}>
-                {dartAnalytics?.performanceScore ?? 0}
-              </div>
-              <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
-                {dartAnalytics?.performanceScoreLevel ?? "Needs Improvement"}
+                Performance Score
               </p>
-            </CardContent>
-          </Card>
-          <Card className={`${
-            theme === "dark" ? "bg-slate-900/80 border-cyan-500/30" : "bg-cyan-50/50 border-cyan-200"
-          } border-2`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-cyan-500" />
-                Consistency Index
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3">
-                <div className="relative w-16 h-16 rounded-full flex items-center justify-center">
-                  <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-cyan-500/20 stroke-[3]"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeDasharray="100"
-                      d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
-                    />
-                    <path
-                      className="text-cyan-500 stroke-[3] transition-all duration-500"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeDasharray="100"
-                      strokeDashoffset={100 - (dartAnalytics?.consistencyIndex ?? 0)}
-                      d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
-                    />
-                  </svg>
-                  <span className="absolute text-sm font-bold text-cyan-500">
-                    {dartAnalytics?.consistencyIndex ?? 0}%
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Days with 6+ hrs study
-                </p>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className={`text-xl font-bold leading-none ${
+                  (dartAnalytics?.performanceScore ?? 0) >= 80 ? "text-green-500" :
+                  (dartAnalytics?.performanceScore ?? 0) >= 60 ? "text-blue-500" :
+                  (dartAnalytics?.performanceScore ?? 0) >= 40 ? "text-amber-500" : "text-slate-500"
+                }`}>
+                  {dartAnalytics?.performanceScore ?? 0}
+                </span>
+                <span className={`text-[11px] truncate ${
+                  theme === "dark" ? "text-slate-400" : "text-slate-500"
+                }`}>
+                  {dartAnalytics?.performanceScoreLevel ?? "Needs Improvement"}
+                </span>
               </div>
-            </CardContent>
-          </Card>
-          <Card className={`sm:col-span-2 lg:col-span-1 ${
-            theme === "dark" ? "bg-slate-900/80 border-amber-500/30" : "bg-amber-50/50 border-amber-200"
-          } border-2`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Download className="w-4 h-4 text-amber-500" />
-                20 Day Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <button
-                onClick={handleDownload20DayReport}
-              disabled={reportDownloading || !dartAnalytics?.canDownload20DayReport}
-                className={`text-sm font-medium px-3 py-2 rounded-lg ${
-                  theme === "dark"
-                    ? `text-amber-400 ${
-                        dartAnalytics?.canDownload20DayReport
-                          ? "bg-amber-500/20 hover:bg-amber-500/30"
-                          : "bg-slate-800/70 cursor-not-allowed"
-                      }`
-                    : `text-amber-800 ${
-                        dartAnalytics?.canDownload20DayReport
-                          ? "bg-amber-100 hover:bg-amber-200"
-                          : "bg-amber-50 cursor-not-allowed"
-                      }`
-                }`}
-              >
-                {reportDownloading
-                  ? "Generating..."
-                  : dartAnalytics?.canDownload20DayReport
-                  ? "Download 20-Day Report"
-                  : `Available after 20 days`}
-              </button>
-              {dartAnalytics && (
-                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                  {dartAnalytics.daysSinceFirstDart && dartAnalytics.daysSinceFirstDart > 0
-                    ? `You have filled DART for ${dartAnalytics.daysSinceFirstDart}/20 days.`
-                    : "Start filling your DART form daily to unlock the 20-day report."}
-                  {dartAnalytics.daysUntil20DayReport !== undefined &&
-                    dartAnalytics.daysUntil20DayReport > 0 &&
-                    dartAnalytics.daysSinceFirstDart !== undefined &&
-                    dartAnalytics.daysSinceFirstDart > 0 && (
-                      <> {`(${dartAnalytics.daysUntil20DayReport} more day${dartAnalytics.daysUntil20DayReport === 1 ? "" : "s"} remaining)`}</>
-                    )}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Consistency Index */}
+          <div className={`rounded-xl border p-3 flex items-center gap-3 ${
+            theme === "dark"
+              ? "bg-slate-900/60 border-cyan-500/20"
+              : "bg-cyan-50/40 border-cyan-100"
+          }`}>
+            <div className="relative w-11 h-11 shrink-0">
+              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
+                <path
+                  className="text-cyan-500/20 stroke-[3]"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeDasharray="100"
+                  d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
+                />
+                <path
+                  className="text-cyan-500 stroke-[3] transition-all duration-500"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray="100"
+                  strokeDashoffset={100 - (dartAnalytics?.consistencyIndex ?? 0)}
+                  d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-cyan-500">
+                {dartAnalytics?.consistencyIndex ?? 0}%
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className={`text-[10px] font-medium uppercase tracking-wide ${
+                theme === "dark" ? "text-slate-500" : "text-slate-500"
+              }`}>
+                Consistency
+              </p>
+              <p className={`text-[11px] mt-0.5 leading-snug ${
+                theme === "dark" ? "text-slate-400" : "text-slate-600"
+              }`}>
+                Days with 6+ hrs study
+              </p>
+            </div>
+          </div>
+
+          <DartReportCard
+            analytics={dartAnalytics}
+            studentName={enrollmentName}
+            className="sm:col-span-2 lg:col-span-1"
+          />
         </div>
       </div>
 
@@ -1681,10 +1636,21 @@ export const PerformanceDashboardPage = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">
-        {activeTab === 'overview' && renderOverviewTab()}
-        {activeTab === 'copy-evaluation' && renderCopyEvaluationTab()}
-        {activeTab === 'prelims' && renderPrelimsTab()}
+      <div className="mt-6 min-w-0">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="min-w-0"
+          >
+            {activeTab === 'overview' && renderOverviewTab()}
+            {activeTab === 'copy-evaluation' && renderCopyEvaluationTab()}
+            {activeTab === 'prelims' && renderPrelimsTab()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

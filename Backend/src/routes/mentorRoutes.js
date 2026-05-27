@@ -27,7 +27,7 @@ import {
   getStudentMains,
   getStudentActivity,
   getStudentDartAnalytics,
-  getStudentDart20DayReport,
+  getStudentDart15DayReport,
 } from "../controllers/adminController.js";
 import { mentorStudentAccessMiddleware } from "../middleware/mentorStudentAccessMiddleware.js";
 
@@ -53,7 +53,7 @@ router.get("/students/:studentId/prelims", ...mentorScopedStudent, getStudentPre
 router.get("/students/:studentId/mains", ...mentorScopedStudent, getStudentMains);
 router.get("/students/:studentId/activity", ...mentorScopedStudent, getStudentActivity);
 router.get("/students/:studentId/dart-analytics", ...mentorScopedStudent, getStudentDartAnalytics);
-router.get("/students/:studentId/dart-report-20day", ...mentorScopedStudent, getStudentDart20DayReport);
+router.get("/students/:studentId/dart-report-15day", ...mentorScopedStudent, getStudentDart15DayReport);
 
 /** Summary + mentor feedback thread (must be after specific :studentId/* routes) */
 router.get("/students/:studentId", ...requireMentor, getMentorStudentDetail);
