@@ -145,7 +145,6 @@ export const HomePage = () => {
       <div className="sd-layout">
         <div className="sd-main">
           <section className="sd-hero">
-            <span className={`sd-phase-badge ${phaseMeta.tone}`}>{phaseMeta.label}</span>
             <h1>
               {greeting},{" "}
               <span className="sd-name-highlight">{firstName}</span>
@@ -281,7 +280,6 @@ export const HomePage = () => {
             <span className="sd-session-label">Upcoming Session</span>
             <h3>{upcomingSession.title}</h3>
             <p>{upcomingSession.meta}</p>
-            <span className={`sd-phase-badge ${phaseMeta.tone} sd-phase-badge-light`}>{phaseMeta.label}</span>
           </div>
         </aside>
       </div>

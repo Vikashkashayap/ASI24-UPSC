@@ -226,7 +226,7 @@ export const PlannerPage = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className={cn(
-          "max-w-7xl mx-auto space-y-6 md:space-y-8 px-1 pb-12",
+          "max-w-6xl mx-auto space-y-5 md:space-y-6 px-1 pb-10",
           focusMode && "relative"
         )}
       >
