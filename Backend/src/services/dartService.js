@@ -405,6 +405,8 @@ export function parseReportDateRange({ days, from: fromStr, to: toStr }) {
     };
   }
 
+  
+
   if (fromStr && toStr) {
     const from = new Date(fromStr);
     const to = new Date(toStr);
