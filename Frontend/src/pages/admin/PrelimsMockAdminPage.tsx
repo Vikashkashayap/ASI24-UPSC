@@ -158,7 +158,9 @@ export const PrelimsMockAdminPage: React.FC = () => {
   };
 
   const handleGoLive = async (id: string) => {
+    if (goLiveId) return;
     setError(null);
+    setSuccess(null);
     setGoLiveId(id);
     try {
       const res = await prelimsMockAPI.goLive(id);

@@ -1,16 +1,55 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { getFrontendOrigin } from "../config/urlConfig.js";
-import { enrichQuestionsWithHindi } from "./questionTranslationService.js";
+import {
+  getTestGenerationModel,
+  getMaxTokensForTestGeneration,
+  getMixBatchSize,
+  getMixGenerateBuffer,
+} from "../config/openRouterConfig.js";
+import { ensureEnglishBilingualFields } from "./questionTranslationService.js";
 
-/** Apply Hindi translations after English generation (non-blocking fallback on failure). */
-async function finalizeGeneratedQuestions(questions) {
-  try {
-    return await enrichQuestionsWithHindi(questions, 4);
-  } catch (error) {
-    console.error("finalizeGeneratedQuestions:", error.message);
-    return questions;
-  }
+function usesFullBilingualExplanations() {
+  return process.env.TEST_GEN_FULL_BILINGUAL_EXPLANATIONS === "true";
+}
+
+/** Compact prompts for admin Prelims Mock (default). Set TEST_GEN_FULL_MOCK_VERBOSE=true for legacy long prompts. */
+function usesCompactFullMockPrompts() {
+  return process.env.TEST_GEN_FULL_MOCK_VERBOSE !== "true";
+}
+
+const PRELIMS_COMPACT_JSON_RULES = `
+JSON array only. Each object (no extra text):
+- question_en, question_hi (Devanagari, same meaning)
+- options_en, options_hi: { "A","B","C","D" }
+- answer: A|B|C|D
+- explanation: one short English sentence why the correct option is right (max 25 words). Do NOT include explanation_hi.`;
+
+const BILINGUAL_JSON_RULES_FULL = `
+BILINGUAL OUTPUT (English + Hindi in the SAME object):
+- question_en, question_hi, options_en, options_hi (same meaning in Hindi)
+- explanation_en, explanation_hi: { "A","B","C","D" } — one brief sentence per option
+- answer: A|B|C|D`;
+
+/** Full bilingual schema for full-mock generators. */
+const BILINGUAL_JSON_RULES = BILINGUAL_JSON_RULES_FULL;
+
+function getPrelimsJsonRules() {
+  return usesFullBilingualExplanations() ? BILINGUAL_JSON_RULES_FULL : PRELIMS_COMPACT_JSON_RULES;
+}
+
+/**
+ * Normalize bilingual fields from the generation prompt (no separate Hindi translation API).
+ */
+function finalizeGeneratedQuestions(questions) {
+  const normalized = questions.map(ensureEnglishBilingualFields);
+  const withHindi = normalized.filter(
+    (q) => String(q.question_hi || "").trim() && String(q.options_hi?.A || "").trim()
+  ).length;
+  console.log(
+    `✅ ${normalized.length} question(s) ready (${withHindi} with Hindi from single API call, no translation pass)`
+  );
+  return normalized;
 }
 
 /** Generate unique question ID for deduplication (hash of normalized question text). */
@@ -115,6 +154,92 @@ export function dedupeQuestionsByStem(questions) {
 }
 
 /**
+ * Compact system prompt for Prelims test generator only (~low token input).
+ */
+function buildPrelimsGSSystemPrompt(subjects, topic, difficulty, currentAffairsPeriod) {
+  const subjectsText = Array.isArray(subjects) ? subjects.join(", ") : subjects;
+  let extra = "";
+  if (subjects.includes("Current Affairs")) {
+    extra += " Include current-affairs linkage where relevant.";
+    if (currentAffairsPeriod?.month || currentAffairsPeriod?.year) {
+      extra += ` Period hint: ${[currentAffairsPeriod.month, currentAffairsPeriod.year].filter(Boolean).join("/")}.`;
+    }
+  }
+  if (subjects.includes("Art & Culture")) {
+    extra += " Art & Culture: architecture, heritage, literature, performing arts.";
+  }
+
+  const explLine = usesFullBilingualExplanations()
+    ? "Include explanation_en and explanation_hi for all four options (one short sentence each)."
+    : 'Include "explanation": one short English sentence for why the correct option is right.';
+
+  return `UPSC Prelims GS Paper-I MCQ generator. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}.${extra}
+
+Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–3 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, which correct/incorrect. Concise stems.
+
+${getPrelimsJsonRules()}
+${explLine}
+Return ONLY a JSON array. No markdown. No duplicate questions.`;
+}
+
+function buildPrelimsCSATSystemPrompt(csatCategories, topic) {
+  const categoriesText =
+    Array.isArray(csatCategories) && csatCategories.length > 0
+      ? csatCategories.join(", ")
+      : "Quantitative Aptitude, Logical Reasoning, Reading Comprehension, Data Interpretation";
+
+  const explLine = usesFullBilingualExplanations()
+    ? "Include explanation_en and explanation_hi per option."
+    : 'Include "explanation": one short English sentence for the correct option.';
+
+  return `UPSC Prelims CSAT MCQ generator. Categories: ${categoriesText}. Topic: ${topic}.
+
+Rules: 4 options, single correct answer, clear exam-style wording.
+
+${getPrelimsJsonRules()}
+${explLine}
+Return ONLY a JSON array. No markdown.`;
+}
+
+function buildPrelimsBatchUserPrompt({ examType, need, topic, subjectsText, difficulty }) {
+  const jsonNote = usesFullBilingualExplanations()
+    ? "Bilingual question, options, and explanations. JSON array only."
+    : "Bilingual question and options (EN+HI). English explanation only. JSON array only.";
+
+  if (examType === "CSAT") {
+    return `Generate EXACTLY ${need} UPSC Prelims CSAT MCQs. Topic: ${topic}. ${jsonNote}`;
+  }
+  return `Generate EXACTLY ${need} UPSC Prelims GS MCQs. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}. ${jsonNote}`;
+}
+
+/**
+ * Map compact or full explanation fields to option-wise explanation object for DB/UI.
+ */
+function normalizePrelimsExplanation(raw, correctAnswer) {
+  if (usesFullBilingualExplanations()) {
+    return normalizeExplanation(raw);
+  }
+
+  const empty = { A: "—", B: "—", C: "—", D: "—" };
+  const key = ["A", "B", "C", "D"].includes(correctAnswer) ? correctAnswer : null;
+
+  if (typeof raw === "string" && raw.trim()) {
+    if (key) return { ...empty, [key]: raw.trim() };
+    return { A: raw.trim(), B: raw.trim(), C: raw.trim(), D: raw.trim() };
+  }
+
+  if (typeof raw === "object" && raw !== null) {
+    const obj = normalizeExplanation(raw);
+    const filledKeys = ["A", "B", "C", "D"].filter((k) => obj[k] && obj[k] !== "—");
+    if (filledKeys.length === 1) return obj;
+    if (filledKeys.length > 1) return obj;
+    if (key && obj[key]?.trim()) return obj;
+  }
+
+  return empty;
+}
+
+/**
  * Build GS Paper 1 system prompt with optional Current Affairs and Art & Culture emphasis.
  * @param {string[]} subjects
  * @param {string} topic
@@ -169,22 +294,25 @@ DIFFICULTY CONTROL:
 - Moderate: Mixed statements + elimination
 - Hard: Closely worded statements, high confusion
 
-OUTPUT FORMAT (STRICT – JSON ONLY):
-Return ONLY valid JSON. For each question:
+OUTPUT FORMAT (STRICT – JSON array only):
+${BILINGUAL_JSON_RULES}
+Each object:
 {
   "pattern": "STATEMENT_BASED | ASSERTION_REASON | HOW_MANY_CORRECT | MATCH | WHICH_CORRECT | CONCEPT_CURRENT",
-  "question": "Question text",
-  "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
+  "question_en": "English question text",
+  "question_hi": "Hindi question text (Devanagari)",
+  "options_en": { "A": "", "B": "", "C": "", "D": "" },
+  "options_hi": { "A": "", "B": "", "C": "", "D": "" },
   "answer": "A | B | C | D",
-  "explanation": { "A": "", "B": "", "C": "", "D": "" },
+  "explanation_en": { "A": "", "B": "", "C": "", "D": "" },
+  "explanation_hi": { "A": "", "B": "", "C": "", "D": "" },
   "subject": "One of: ${subjectsText}"
 }
 
-EXPLANATION (OPTION-WISE, MANDATORY – same as CSAT):
-- explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
-- For the CORRECT option: write "correct statement" — WHY it is correct (reason, fact, concept). User should see sahi hai toh kyu.
-- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong fact, trap, common mistake). User should see galat hai toh kyu.
-- At least 1–2 sentences per option. No empty explanation for any option.
+EXPLANATION (OPTION-WISE, MANDATORY in both languages):
+- explanation_en and explanation_hi MUST be objects { "A", "B", "C", "D" }.
+- CORRECT option: one short sentence why it is right. INCORRECT: one short sentence why it is wrong.
+- Keep each explanation brief (1 sentence) to save tokens.
 
 IMPORTANT:
 - Do NOT add any introductory or closing text.
@@ -217,22 +345,23 @@ RULES:
 - Reading Comprehension: short passages with inference and factual questions.
 - Data Interpretation: tables, graphs, caselets with calculation and inference.
 
-OUTPUT FORMAT (STRICT – JSON ONLY):
-Return ONLY valid JSON. For each question:
+OUTPUT FORMAT (STRICT – JSON array only):
+${BILINGUAL_JSON_RULES}
+Each object:
 {
   "pattern": "QUANTITATIVE | LOGICAL_REASONING | READING_COMPREHENSION | DATA_INTERPRETATION",
-  "question": "Question text (include passage for RC/DI if needed)",
-  "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
+  "question_en": "English (passage + question for RC/DI if needed)",
+  "question_hi": "Hindi (same content)",
+  "options_en": { "A": "", "B": "", "C": "", "D": "" },
+  "options_hi": { "A": "", "B": "", "C": "", "D": "" },
   "answer": "A | B | C | D",
-  "explanation": { "A": "", "B": "", "C": "", "D": "" },
+  "explanation_en": { "A": "", "B": "", "C": "", "D": "" },
+  "explanation_hi": { "A": "", "B": "", "C": "", "D": "" },
   "subject": "CSAT"
 }
 
-EXPLANATION (OPTION-WISE, MANDATORY):
-- explanation MUST be an object: { "A": "...", "B": "...", "C": "...", "D": "..." }.
-- For the CORRECT option: write "correct statement" — WHY it is correct (reason, logic, fact).
-- For EACH INCORRECT option: write "wrong statement" — WHY it is wrong (wrong step, trap, common mistake).
-- At least 1–2 sentences per option. No empty explanation for any option.
+EXPLANATION (OPTION-WISE, MANDATORY in both languages):
+- explanation_en and explanation_hi as { "A", "B", "C", "D" }; one brief sentence per option.
 
 IMPORTANT:
 - Do NOT add any introductory or closing text.
@@ -347,6 +476,200 @@ const PATTERN_LABELS = {
   odd_one_out: "Odd one out",
   multi_statement_elimination: "Multi-statement elimination",
 };
+
+/**
+ * Compact system prompt for admin Prelims Mock GS Mix (~low tokens).
+ */
+function buildCompactFullMockMixSystemPrompt(
+  difficulty = "moderate",
+  excludeSnippets = [],
+  patternsToInclude = []
+) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nAvoid repeating:\n${excludeSnippets.slice(0, 5).map((s) => `- ${String(s).slice(0, 60)}`).join("\n")}\n`
+      : "";
+  const difficultyMix =
+    difficulty === "moderate"
+      ? "50% moderate, 35% hard, 15% easy"
+      : difficulty === "hard"
+        ? "80% hard, 20% moderate"
+        : "50% easy, 50% moderate";
+  const patterns =
+    Array.isArray(patternsToInclude) && patternsToInclude.length > 0
+      ? patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join(", ")
+      : "statement, match, assertion, pair, chronology, map, direct";
+  const explLine = usesFullBilingualExplanations()
+    ? "explanation_en + explanation_hi per option (brief)."
+    : '"explanation": one short English sentence for the correct option only.';
+
+  return `UPSC GS Paper 1 full-mock batch generator.${avoidLine}
+Subjects: Polity, History, Geography, Economy, Environment, Science & Tech, Art & Culture + Current Affairs.
+Patterns (balanced): ${patterns}. Difficulty: ${difficultyMix}.
+${getPrelimsJsonRules()}
+Per question also: subject, questionType (statement|match|assertion|chronology|pair|map|direct). Use matchColumns or assertionReason only when needed.
+${explLine}
+Return ONLY JSON: { "examTitle": "...", "questions": [ ... ] } or a raw array. No markdown.`;
+}
+
+function buildCompactFullMockCsatSystemPrompt(excludeSnippets = []) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nAvoid repeating:\n${excludeSnippets.slice(0, 5).map((s) => `- ${String(s).slice(0, 60)}`).join("\n")}\n`
+      : "";
+  const explLine = usesFullBilingualExplanations()
+    ? "explanation_en/hi per option."
+    : '"explanation": one short English sentence (correct option).';
+  return `UPSC CSAT Paper 2 batch generator. Mix RC, logical reasoning, numeracy, DI.${avoidLine}
+For RC: each item must include the passage plus a distinct sub-question (do not output multiple MCQs with identical question text).
+${getPrelimsJsonRules()}
+${explLine}
+Return ONLY JSON with "test_name" and "questions" array.`;
+}
+
+/** CSAT papers use passage-based sets; stem-only dedupe would drop valid RC siblings. */
+function dedupeMockPaperQuestions(questions, { csat = false } = {}) {
+  const base = dedupeQuestions(questions);
+  if (csat) return base;
+  return dedupeQuestionsByStem(base);
+}
+
+function bilingualBatchJsonNote() {
+  return usesFullBilingualExplanations()
+    ? "Bilingual Q/options/explanations."
+    : "Bilingual Q/options (EN+HI). English explanation only.";
+}
+
+/**
+ * Shared generate → dedupe → refill → top-up loop (GS Mix, CSAT, PYQ, subject mocks).
+ */
+async function runFullMockPaperGenerationLoop({
+  apiKey,
+  model,
+  displayCount,
+  csatPaper = false,
+  logPrefix,
+  generateBatch,
+}) {
+  const perBatch = getMixBatchSize();
+  const generateCount = displayCount + getMixGenerateBuffer();
+  const batches = Math.ceil(generateCount / perBatch);
+  const all = [];
+  let testName = null;
+
+  for (let b = 1; b <= batches; b += 1) {
+    const rollingExclude = [
+      ...new Set(
+        dedupeMockPaperQuestions(all, { csat: csatPaper })
+          .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
+          .filter(Boolean)
+      ),
+    ].slice(0, 5);
+    console.log(
+      `📝 ${logPrefix}: batch ${b}/${batches} (${perBatch} Q, max_tokens≈${getMaxTokensForTestGeneration(perBatch)})...`
+    );
+    const { questions: batchQuestions, testName: batchTestName } = await generateBatch(
+      apiKey,
+      model,
+      perBatch,
+      `Part ${b}`,
+      rollingExclude
+    );
+    if (batchTestName) testName = batchTestName;
+    if (batchQuestions?.length) all.push(...batchQuestions);
+  }
+
+  let deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
+  const maxRefills = getMixMaxRefillBatches();
+  let refill = 0;
+  let stallRounds = 0;
+
+  while (deduped.length < displayCount && refill < maxRefills) {
+    const beforeCount = deduped.length;
+    const need = Math.max(1, Math.min(perBatch, displayCount - deduped.length));
+    const snippetPool = deduped
+      .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
+      .filter(Boolean)
+      .slice(0, 5);
+    console.log(
+      `📝 ${logPrefix}: refill ${refill + 1}/${maxRefills} (unique ${deduped.length}/${displayCount}, requesting ${need})...`
+    );
+    const { questions: batchQuestions, testName: batchTestName } = await generateBatch(
+      apiKey,
+      model,
+      need,
+      `Refill ${refill + 1}`,
+      snippetPool
+    );
+    if (batchTestName) testName = batchTestName;
+    if (batchQuestions?.length) all.push(...batchQuestions);
+    deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
+    refill += 1;
+    if (deduped.length === beforeCount) stallRounds += 1;
+    else stallRounds = 0;
+    if (stallRounds >= 4) {
+      console.warn(`📝 ${logPrefix}: stopping refill after ${stallRounds} rounds with no new unique questions`);
+      break;
+    }
+  }
+
+  let finalQuestions = deduped.slice(0, displayCount);
+
+  if (finalQuestions.length < displayCount) {
+    const gap = displayCount - finalQuestions.length;
+    console.log(`📝 ${logPrefix}: short by ${gap}, running up to ${gap + 2} micro top-up batches...`);
+    for (let t = 0; t < gap + 2 && finalQuestions.length < displayCount; t += 1) {
+      const need = displayCount - finalQuestions.length;
+      const snippets = finalQuestions
+        .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
+        .filter(Boolean)
+        .slice(0, 8);
+      const { questions: extra } = await generateBatch(apiKey, model, need, `Top-up ${t + 1}`, snippets);
+      if (extra?.length) {
+        all.push(...extra);
+        deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
+        finalQuestions = deduped.slice(0, displayCount);
+      }
+    }
+  }
+
+  return { deduped, finalQuestions, testName };
+}
+
+function buildCompactFullMockSubjectSystemPrompt(subjectsList, excludeSnippets = [], patternsToInclude = []) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nAvoid repeating:\n${excludeSnippets.slice(0, 5).map((s) => `- ${String(s).slice(0, 60)}`).join("\n")}\n`
+      : "";
+  const subjects = subjectsList.join(", ");
+  const patterns =
+    Array.isArray(patternsToInclude) && patternsToInclude.length > 0
+      ? patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join(", ")
+      : "statement, match, assertion, pair, chronology, map, direct";
+  const explLine = usesFullBilingualExplanations()
+    ? "explanation_en + explanation_hi per option (brief)."
+    : '"explanation": one short English sentence for the correct option only.';
+  return `UPSC GS Paper 1 subject mock (${subjects}).${avoidLine}
+Patterns (balanced): ${patterns}. Difficulty: 50% moderate, 35% hard, 15% easy.
+${getPrelimsJsonRules()}
+Per question: subject, questionType. Use matchColumns or assertionReason only when needed.
+${explLine}
+Return ONLY JSON: { "examTitle": "...", "questions": [ ... ] } or a raw array. No markdown.`;
+}
+
+function buildCompactFullMockPyoSystemPrompt(yearFrom, yearTo, excludeSnippets = []) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nAvoid repeating:\n${excludeSnippets.slice(0, 5).map((s) => `- ${String(s).slice(0, 60)}`).join("\n")}\n`
+      : "";
+  const explLine = usesFullBilingualExplanations()
+    ? "explanation_en/hi per option."
+    : '"explanation": one short English sentence (correct option).';
+  return `UPSC PYQ-style (${yearFrom}–${yearTo}) batch generator. Multi-statement heavy. Do not copy exact PYQs.${avoidLine}
+${getPrelimsJsonRules()}
+${explLine}
+Return ONLY JSON with "test_name" and "questions" array.`;
+}
 
 /**
  * Build system prompt for FULL-LENGTH UPSC Prelims GS Paper 1 MIX.
@@ -605,92 +928,85 @@ CRITICAL INSTRUCTIONS
 /**
  * Generate one batch of CSAT Paper 2 questions (20 per batch).
  */
-async function generateFullMockCsatBatch(apiKey, model, batchSize, batchLabel) {
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC CSAT Paper 2 questions. This is ${batchLabel}. Mix sections: Reading Comprehension (25-30%), Logical Reasoning (15-20%), Analytical Ability (10-15%), Basic Numeracy (10-15%), Data Interpretation (5-10%). Return ONLY valid JSON with "test_name", "questions" array. Each question: question_number, section, question, options (A,B,C,D), correct_answer, explanation as object { "A": "why A correct or wrong", "B": "...", "C": "...", "D": "..." } — for correct option say why it is right, for each wrong option say why it is wrong.`;
+async function generateFullMockCsatBatch(apiKey, model, batchSize, batchLabel, excludeSnippets = []) {
+  const systemPrompt = usesCompactFullMockPrompts()
+    ? buildCompactFullMockCsatSystemPrompt(excludeSnippets)
+    : buildFullMockCsatSystemPrompt();
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC CSAT Paper 2 questions (${batchLabel}). Mix RC, LR, numeracy, DI. ${bilingualBatchJsonNote()} JSON only.`;
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "UPSC Mentor - CSAT Mock Generator",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: buildFullMockCsatSystemPrompt() },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.35,
-      max_tokens: 8000,
-    }),
+  const maxTokens = getMaxTokensForTestGeneration(batchSize);
+  const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    maxTokens,
+    apiTitle: "UPSC Mentor - CSAT Mock",
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+  if (finishReason === "length") {
+    console.warn(`⚠️ Full mock CSAT batch truncated (max_tokens=${maxTokens}, need=${batchSize})`);
   }
-
-  const data = await response.json();
-  const aiContent = data?.choices?.[0]?.message?.content?.trim();
-  if (!aiContent) throw new Error("No response from AI");
 
   try {
     const { validatedQuestions, testName } = parseFullMockResponse(aiContent);
-    return { questions: validatedQuestions, testName };
+    if (validatedQuestions.length > 0) {
+      return { questions: validatedQuestions, testName, finishReason };
+    }
+    console.warn(`Full mock CSAT: parseFullMockResponse returned 0 valid questions (finish=${finishReason}); trying compact array parser`);
   } catch (parseErr) {
-    try {
-      const validated = parseAndValidateQuestions(aiContent, batchSize);
-      if (validated && validated.length > 0) {
-        return { questions: validated, testName: "UPSC CSAT Full Mock" };
-      }
-    } catch (_) {}
-    console.error("Full mock CSAT batch parse failed. Raw (first 500 chars):", aiContent.slice(0, 500));
-    throw parseErr;
+    console.warn("Full mock CSAT: parseFullMockResponse failed:", parseErr.message);
   }
+
+  const validated = parseAndValidateQuestions(aiContent, batchSize);
+  if (validated.length > 0) {
+    return { questions: validated, testName: "UPSC CSAT Full Mock", finishReason };
+  }
+
+  console.error("Full mock CSAT batch: no valid questions. Raw (first 600 chars):", aiContent.slice(0, 600));
+  return { questions: [], testName: "UPSC CSAT Full Mock", finishReason };
 }
 
-/** Display count for CSAT: we generate more to avoid duplicates, then show only this many. */
 const CSAT_DISPLAY_COUNT = 80;
-/** Generate this many CSAT questions; after dedupe we take first CSAT_DISPLAY_COUNT for the paper. */
-const CSAT_GENERATE_COUNT = 100;
 
 /**
- * Generate full-length (80 questions) CSAT Paper 2 mock: generate 100 (5 batches of 20), show 80. Gemini 2.0.
+ * Generate full-length (80 questions) CSAT Paper 2 mock with refill/top-up (same pattern as GS Mix).
  * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
  */
 export const generateFullMockCsatTestQuestions = async () => {
+  const displayCount = CSAT_DISPLAY_COUNT;
+
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+    const model = getTestGenerationModel();
 
     if (!apiKey) {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = Math.ceil(CSAT_GENERATE_COUNT / 20);
-    const perBatch = 20;
-    const all = [];
-    let testName = "UPSC CSAT Full Mock";
-
-    for (let b = 1; b <= batches; b++) {
-      console.log(`📝 Full mock CSAT: generating batch ${b}/${batches} (${perBatch} questions)...`);
-      const { questions: batchQuestions, testName: batchTestName } = await generateFullMockCsatBatch(apiKey, model, perBatch, `Part ${b}`);
-      if (batchTestName) testName = batchTestName;
-      if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
-    }
-
-    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
-    const finalQuestions = deduped.slice(0, CSAT_DISPLAY_COUNT);
+    const { deduped, finalQuestions, testName } = await runFullMockPaperGenerationLoop({
+      apiKey,
+      model,
+      displayCount,
+      csatPaper: true,
+      logPrefix: "Full mock CSAT",
+      generateBatch: (key, m, size, label, exclude) =>
+        generateFullMockCsatBatch(key, m, size, label, exclude),
+    });
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid CSAT questions generated. Please try again.");
     }
 
-    console.log(`✅ Full mock CSAT: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
+    if (finalQuestions.length < displayCount) {
+      throw new Error(
+        `Full mock CSAT: only ${finalQuestions.length} unique questions (need ${displayCount}). Try Go Live again.`
+      );
+    }
 
-    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+    console.log(`✅ Full mock CSAT: ${deduped.length} unique generated, showing ${finalQuestions.length} questions`);
+
+    const translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
 
     return {
       success: true,
@@ -711,55 +1027,47 @@ export const generateFullMockCsatTestQuestions = async () => {
 /**
  * Generate one batch of PYQ-style questions (20 per batch).
  */
-async function generateFullMockPyoBatch(apiKey, model, batchSize, batchLabel, yearFrom, yearTo) {
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims PYQ-style questions for ${yearFrom}–${yearTo}. This is ${batchLabel}. Recreate based on trends and themes; do not copy exact PYQs. Mix subjects like real UPSC. Include real UPSC question types: statement-based, assertion-reason, match the following, pair-based, which correct/incorrect. For each question give explanation as object { "A": "...", "B": "...", "C": "...", "D": "..." }: for correct option explain why it is right, for each wrong option explain why it is wrong. Return ONLY valid JSON with "test_name", "questions" array.`;
+async function generateFullMockPyoBatch(apiKey, model, batchSize, batchLabel, yearFrom, yearTo, excludeSnippets = []) {
+  const systemPrompt = usesCompactFullMockPrompts()
+    ? buildCompactFullMockPyoSystemPrompt(yearFrom, yearTo, excludeSnippets)
+    : buildFullMockPyoSystemPrompt(yearFrom, yearTo);
+  const userPrompt = `Generate EXACTLY ${batchSize} PYQ-style questions (${yearFrom}–${yearTo}, ${batchLabel}). ${bilingualBatchJsonNote()} JSON only.`;
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "UPSC Mentor - PYQ Mock Generator",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: buildFullMockPyoSystemPrompt(yearFrom, yearTo) },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.35,
-      max_tokens: 8000,
-    }),
+  const maxTokens = getMaxTokensForTestGeneration(batchSize);
+  const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    maxTokens,
+    apiTitle: "UPSC Mentor - PYQ Mock",
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+  if (finishReason === "length") {
+    console.warn(`⚠️ Full mock PYQ batch truncated (max_tokens=${maxTokens}, need=${batchSize})`);
   }
 
-  const data = await response.json();
-  const aiContent = data?.choices?.[0]?.message?.content?.trim();
-  if (!aiContent) throw new Error("No response from AI");
-
+  const defaultName = `UPSC PYQ Style Mock ${yearFrom}–${yearTo}`;
   try {
     const { validatedQuestions, testName } = parseFullMockResponse(aiContent);
-    return { questions: validatedQuestions, testName };
+    if (validatedQuestions.length > 0) {
+      return { questions: validatedQuestions, testName: testName || defaultName, finishReason };
+    }
+    console.warn(`Full mock PYQ: parseFullMockResponse returned 0 (finish=${finishReason}); trying compact parser`);
   } catch (parseErr) {
-    try {
-      const validated = parseAndValidateQuestions(aiContent, batchSize);
-      if (validated && validated.length > 0) {
-        return { questions: validated, testName: `UPSC PYQ Style Mock ${yearFrom}–${yearTo}` };
-      }
-    } catch (_) {}
-    console.error("Full mock PYQ batch parse failed. Raw (first 500 chars):", aiContent.slice(0, 500));
-    throw parseErr;
+    console.warn("Full mock PYQ: parseFullMockResponse failed:", parseErr.message);
   }
+
+  const validated = parseAndValidateQuestions(aiContent, batchSize);
+  if (validated.length > 0) {
+    return { questions: validated, testName: defaultName, finishReason };
+  }
+
+  console.error("Full mock PYQ batch: no valid questions. Raw (first 600 chars):", aiContent.slice(0, 600));
+  return { questions: [], testName: defaultName, finishReason };
 }
 
-/** Display count for PYQ full mock; we generate more to avoid duplicates. */
 const PYQ_DISPLAY_COUNT = 100;
-const PYQ_GENERATE_COUNT = 120;
 
 /**
  * Generate full-length (100 questions) PYQ-style mock: generate 120 (6 batches of 20), show 100. Gemini 2.0.
@@ -768,36 +1076,39 @@ const PYQ_GENERATE_COUNT = 120;
  * @param {number} params.yearTo - e.g. 2025
  */
 export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => {
+  const displayCount = PYQ_DISPLAY_COUNT;
+
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+    const model = getTestGenerationModel();
 
     if (!apiKey) {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = Math.ceil(PYQ_GENERATE_COUNT / 20);
-    const perBatch = 20;
-    const all = [];
-    let testName = `UPSC PYQ Style Mock ${yearFrom}–${yearTo}`;
-
-    for (let b = 1; b <= batches; b++) {
-      console.log(`📝 Full mock PYQ: generating batch ${b}/${batches} (${perBatch} questions)...`);
-      const { questions: batchQuestions, testName: batchTestName } = await generateFullMockPyoBatch(apiKey, model, perBatch, `Part ${b}`, yearFrom, yearTo);
-      if (batchTestName) testName = batchTestName;
-      if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
-    }
-
-    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
-    const finalQuestions = deduped.slice(0, PYQ_DISPLAY_COUNT);
+    const { deduped, finalQuestions, testName } = await runFullMockPaperGenerationLoop({
+      apiKey,
+      model,
+      displayCount,
+      csatPaper: false,
+      logPrefix: "Full mock PYQ",
+      generateBatch: (key, m, size, label, exclude) =>
+        generateFullMockPyoBatch(key, m, size, label, yearFrom, yearTo, exclude),
+    });
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for PYQ mock. Please try again.");
     }
 
-    console.log(`✅ Full mock PYQ: generated ${deduped.length}, showing ${finalQuestions.length} questions (no duplicates in paper)`);
+    if (finalQuestions.length < displayCount) {
+      throw new Error(
+        `Full mock PYQ: only ${finalQuestions.length} unique questions (need ${displayCount}). Try Go Live again.`
+      );
+    }
 
-    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+    console.log(`✅ Full mock PYQ: ${deduped.length} unique generated, showing ${finalQuestions.length} questions`);
+
+    const translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
 
     return {
       success: true,
@@ -820,74 +1131,56 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
  * @param {string[]} [patternsToInclude] - If provided, use only these question patterns in balanced proportion.
  */
 async function generateFullMockMixBatch(apiKey, model, batchSize, batchLabel, difficulty = "moderate", excludeSnippets = [], totalQuestions = 100, patternsToInclude = []) {
-  const isSectional = totalQuestions === 50;
-  const contextLine = isSectional
-    ? `This is ${batchLabel} of a 50-question SECTIONAL mock. Use the SAME format as full-length: same question types (statement, match, assertion, chronology, pair, map, direct), same structured JSON (questionText, tableData, matchColumns, assertionReason, options array, explanation per option). Generate exactly ${batchSize} questions.`
-    : `This is ${batchLabel} of a 100-question full-length mock. Generate exactly ${batchSize} questions.`;
-  const typeMixLine =
-    Array.isArray(patternsToInclude) && patternsToInclude.length > 0
-      ? `Use ONLY these question patterns in balanced proportion: ${patternsToInclude.map((id) => PATTERN_LABELS[id] || id).join(", ")}.`
-      : "Question type mix: ~60% statement, ~12% match, ~6% assertion, ~8% pair, ~4% chronology, ~5% map, ~5% direct.";
-  const userPrompt = `Generate EXACTLY ${batchSize} UPSC Prelims GS Paper 1 questions. ${contextLine}
+  const systemPrompt = usesCompactFullMockPrompts()
+    ? buildCompactFullMockMixSystemPrompt(difficulty, excludeSnippets, patternsToInclude)
+    : buildFullMockMixSystemPrompt(difficulty, excludeSnippets, patternsToInclude);
 
-Subject mix in this batch (scale to batch size): Polity, History, Geography, Economy, Environment, Science & Tech, Art & Culture; integrate Current Affairs where relevant.
-${typeMixLine}
-Difficulty mix: 50% moderate, 35% hard, 15% easy.
+  const jsonNote = usesFullBilingualExplanations()
+    ? "Bilingual Q/options/explanations."
+    : "Bilingual Q/options (EN+HI). English explanation only.";
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC GS Paper 1 questions (${batchLabel}, ${totalQuestions}Q mock). ${jsonNote} JSON only.`;
 
-For each question: option-wise explanation (explanation.A/B/C/D), at least 120 words total per question; eliminationLogic; conceptualSource (e.g. NCERT, standard text).
-Return ONLY valid JSON with "examTitle" or "test_name", "questions" array. Each question: id/question_number, subject, questionType, difficulty, questionText/question, tableData (if needed), matchColumns (if match), assertionReason (if assertion), options as [ { "key": "A", "text": "..." }, ... ], correctAnswer (A|B|C|D), explanation as { "A": "", "B": "", "C": "", "D": "" }, eliminationLogic, conceptualSource.`;
-
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "UPSC Mentor - Full Mock Mix Generator",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: buildFullMockMixSystemPrompt(difficulty, excludeSnippets, patternsToInclude) },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.35,
-      max_tokens: 8000,
-    }),
+  const maxTokens = getMaxTokensForTestGeneration(batchSize);
+  const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    maxTokens,
+    apiTitle: "UPSC Mentor - Full Mock Mix",
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+  if (finishReason === "length") {
+    console.warn(`⚠️ Full mock MIX batch truncated (max_tokens=${maxTokens}, need=${batchSize})`);
   }
-
-  const data = await response.json();
-  const aiContent = data?.choices?.[0]?.message?.content?.trim();
-  if (!aiContent) throw new Error("No response from AI");
 
   try {
     const { validatedQuestions, testName } = parseFullMockResponse(aiContent);
-    return { questions: validatedQuestions, testName };
+    if (validatedQuestions.length > 0) {
+      return { questions: validatedQuestions, testName, finishReason };
+    }
+    console.warn(
+      `Full mock MIX: parseFullMockResponse returned 0 valid questions (finish=${finishReason}); trying compact array parser`
+    );
   } catch (parseErr) {
-    // Fallback: model may return raw array or different JSON shape
-    try {
-      const validated = parseAndValidateQuestions(aiContent, batchSize);
-      if (validated && validated.length > 0) {
-        return { questions: validated, testName: "UPSC Real Prelims Mock" };
-      }
-    } catch (_) {}
-    console.error("Full mock MIX batch parse failed. Raw (first 500 chars):", aiContent.slice(0, 500));
-    throw parseErr;
+    console.warn("Full mock MIX: parseFullMockResponse failed:", parseErr.message);
   }
+
+  const validated = parseAndValidateQuestions(aiContent, batchSize);
+  if (validated.length > 0) {
+    return { questions: validated, testName: "UPSC Real Prelims Mock", finishReason };
+  }
+
+  console.error("Full mock MIX batch: no valid questions. Raw (first 600 chars):", aiContent.slice(0, 600));
+  return { questions: [], testName: "UPSC Real Prelims Mock", finishReason };
 }
 
-/** For 100Q mock we generate 120 first; refill batches run until 100 UNIQUE questions (dedupe drops dupes). 50Q: 60 then refill to 50. */
-const MIX_GENERATE_100 = 120;
-const MIX_GENERATE_50 = 60;
 const MIX_DISPLAY_100 = 100;
 const MIX_DISPLAY_50 = 50;
-/** Max extra API batches if dedupe leaves us short of display count (each batch = 20 questions). */
-const MIX_MAX_REFILL_BATCHES = 35;
+/** Max extra API batches if dedupe leaves us short of display count. */
+function getMixMaxRefillBatches() {
+  return Math.max(5, Math.min(25, parseInt(process.env.MIX_MAX_REFILL_BATCHES, 10) || 15));
+}
 
 /**
  * Generate full-length or sectional UPSC Prelims GS Paper 1 MIX mock (100 or 50 questions).
@@ -900,7 +1193,7 @@ const MIX_MAX_REFILL_BATCHES = 35;
 export const generateFullMockMixTestQuestions = async (opts = {}) => {
   const displayCount = Math.min(100, Math.max(50, parseInt(opts.totalQuestions, 10) || 100));
   const isSectional = displayCount === 50;
-  const generateCount = isSectional ? MIX_GENERATE_50 : MIX_GENERATE_100;
+  const generateCount = displayCount + getMixGenerateBuffer();
   const difficulty = ["easy", "moderate", "hard"].includes(String(opts.difficulty || "").toLowerCase())
     ? String(opts.difficulty).toLowerCase()
     : "moderate";
@@ -909,23 +1202,25 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
 
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+    const model = getTestGenerationModel();
 
     if (!apiKey) {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const batches = Math.ceil(generateCount / (isSectional ? 20 : 20));
-    const perBatch = 20;
+    const perBatch = getMixBatchSize();
+    const batches = Math.ceil(generateCount / perBatch);
     const all = [];
     let testName = isSectional ? "UPSC GS Sectional Mock (50 Q)" : "UPSC Real Prelims Mock";
 
     for (let b = 1; b <= batches; b++) {
       const fromAll = dedupeQuestionsByStem(dedupeQuestions(all))
-        .map((q) => String(q.question || q.questionText || "").trim().slice(0, 120))
+        .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
         .filter(Boolean);
-      const rollingExclude = [...new Set([...excludeSnippets, ...fromAll])].slice(0, 40);
-      console.log(`📝 Full mock MIX: generating batch ${b}/${batches} (${perBatch} questions, difficulty=${difficulty})...`);
+      const rollingExclude = [...new Set([...excludeSnippets, ...fromAll])].slice(0, 5);
+      console.log(
+        `📝 Full mock MIX: batch ${b}/${batches} (${perBatch} Q, max_tokens≈${getMaxTokensForTestGeneration(perBatch)}, difficulty=${difficulty})...`
+      );
       const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(
         apiKey,
         model,
@@ -941,19 +1236,24 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
     }
 
     let deduped = dedupeQuestionsByStem(dedupeQuestions(all));
+    const maxRefills = getMixMaxRefillBatches();
     let refill = 0;
-    while (deduped.length < displayCount && refill < MIX_MAX_REFILL_BATCHES) {
+    let stallRounds = 0;
+
+    while (deduped.length < displayCount && refill < maxRefills) {
+      const beforeCount = deduped.length;
+      const need = Math.max(1, Math.min(perBatch, displayCount - deduped.length));
       const fromDeduped = deduped
-        .map((q) => String(q.question || q.questionText || "").trim().slice(0, 120))
+        .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
         .filter(Boolean);
-      const snippetPool = [...new Set([...excludeSnippets, ...fromDeduped])].slice(0, 40);
+      const snippetPool = [...new Set([...excludeSnippets, ...fromDeduped])].slice(0, 5);
       console.log(
-        `📝 Full mock MIX: refill ${refill + 1}/${MIX_MAX_REFILL_BATCHES} (unique so far ${deduped.length}/${displayCount}, need ${displayCount - deduped.length} more)...`
+        `📝 Full mock MIX: refill ${refill + 1}/${maxRefills} (unique ${deduped.length}/${displayCount}, requesting ${need})...`
       );
       const { questions: batchQuestions, testName: batchTestName } = await generateFullMockMixBatch(
         apiKey,
         model,
-        perBatch,
+        need,
         `Refill ${refill + 1}`,
         difficulty,
         snippetPool,
@@ -964,22 +1264,56 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
       if (batchQuestions && batchQuestions.length) all.push(...batchQuestions);
       deduped = dedupeQuestionsByStem(dedupeQuestions(all));
       refill += 1;
+      if (deduped.length === beforeCount) stallRounds += 1;
+      else stallRounds = 0;
+      if (stallRounds >= 4) {
+        console.warn(`📝 Full mock MIX: stopping refill after ${stallRounds} rounds with no new unique questions`);
+        break;
+      }
     }
 
-    const finalQuestions = deduped.slice(0, displayCount);
+    let finalQuestions = deduped.slice(0, displayCount);
 
     if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for full mock mix. Please try again.");
     }
+
+    if (finalQuestions.length < displayCount) {
+      const gap = displayCount - finalQuestions.length;
+      console.log(`📝 Full mock MIX: short by ${gap}, running up to ${gap + 2} micro top-up batches...`);
+      for (let t = 0; t < gap + 2 && finalQuestions.length < displayCount; t += 1) {
+        const need = displayCount - finalQuestions.length;
+        const snippets = finalQuestions
+          .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
+          .filter(Boolean)
+          .slice(0, 8);
+        const { questions: extra } = await generateFullMockMixBatch(
+          apiKey,
+          model,
+          need,
+          `Top-up ${t + 1}`,
+          difficulty,
+          snippets,
+          displayCount,
+          patternsToInclude
+        );
+        if (extra && extra.length) {
+          all.push(...extra);
+          deduped = dedupeQuestionsByStem(dedupeQuestions(all));
+          finalQuestions = deduped.slice(0, displayCount);
+        }
+      }
+    }
+
     if (finalQuestions.length < displayCount) {
       throw new Error(
-        `Full mock MIX: only ${finalQuestions.length} unique questions after ${batches + refill} batches (need ${displayCount}). Try again or increase MIX_MAX_REFILL_BATCHES.`
+        `Full mock MIX: only ${finalQuestions.length} unique questions after ${batches + refill} batches (need ${displayCount}). Try Go Live again.`
       );
     }
 
     console.log(`✅ Full mock MIX: ${deduped.length} unique generated, showing ${finalQuestions.length} questions (no duplicates in paper)`);
 
-    const translatedQuestions = await finalizeGeneratedQuestions(finalQuestions);
+    const translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
 
     return {
       success: true,
@@ -1014,21 +1348,44 @@ function normalizeExplanation(raw) {
 }
 
 /**
- * Normalize options from either array [{ key, text }] or object { A, B, C, D }.
+ * Normalize options from options_en, options (object/array), or [{ key, text }].
  */
 function normalizeOptions(q) {
   const optionsObj = { A: "", B: "", C: "", D: "" };
+
+  const fillFromObject = (obj) => {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
+    optionsObj.A = String(obj.A ?? obj.a ?? "").trim();
+    optionsObj.B = String(obj.B ?? obj.b ?? "").trim();
+    optionsObj.C = String(obj.C ?? obj.c ?? "").trim();
+    optionsObj.D = String(obj.D ?? obj.d ?? "").trim();
+    return Boolean(optionsObj.A && optionsObj.B && optionsObj.C && optionsObj.D);
+  };
+
+  const fillFromStringArray = (arr) => {
+    if (!Array.isArray(arr) || arr.length < 4 || typeof arr[0] !== "string") return false;
+    optionsObj.A = String(arr[0] ?? "").trim();
+    optionsObj.B = String(arr[1] ?? "").trim();
+    optionsObj.C = String(arr[2] ?? "").trim();
+    optionsObj.D = String(arr[3] ?? "").trim();
+    return Boolean(optionsObj.A && optionsObj.B && optionsObj.C && optionsObj.D);
+  };
+
+  if (fillFromObject(q.options_en)) return optionsObj;
+  if (fillFromObject(q.options)) return optionsObj;
+  if (fillFromStringArray(q.options_en)) return optionsObj;
+  if (fillFromStringArray(q.options)) return optionsObj;
+
   if (Array.isArray(q.options) && q.options.length >= 4) {
     q.options.forEach((opt) => {
+      if (typeof opt === "string") return;
       const key = (opt.key || opt.Key || "").toUpperCase().charAt(0);
-      if (["A", "B", "C", "D"].includes(key)) optionsObj[key] = String(opt.text ?? opt.value ?? "").trim();
+      if (["A", "B", "C", "D"].includes(key)) {
+        optionsObj[key] = String(opt.text ?? opt.value ?? "").trim();
+      }
     });
-  } else if (typeof q.options === "object" && q.options !== null) {
-    optionsObj.A = String(q.options.A ?? q.options.a ?? "").trim();
-    optionsObj.B = String(q.options.B ?? q.options.b ?? "").trim();
-    optionsObj.C = String(q.options.C ?? q.options.c ?? "").trim();
-    optionsObj.D = String(q.options.D ?? q.options.d ?? "").trim();
   }
+
   return optionsObj;
 }
 
@@ -1040,23 +1397,56 @@ function normalizeFullMockQuestions(questions) {
   if (!Array.isArray(questions)) return [];
   return questions
     .map((q) => {
-      const questionText = q.questionText ?? q.question ?? "";
+      const questionEn = String(q.question_en ?? q.questionText ?? q.question ?? "").trim();
+      const questionHi = String(q.question_hi ?? "").trim();
       const optionsObj = normalizeOptions(q);
+      const optionsHi = { A: "", B: "", C: "", D: "" };
+      const sourceHi = q.options_hi;
+      if (sourceHi && typeof sourceHi === "object" && !Array.isArray(sourceHi)) {
+        optionsHi.A = String(sourceHi.A ?? sourceHi.a ?? "").trim();
+        optionsHi.B = String(sourceHi.B ?? sourceHi.b ?? "").trim();
+        optionsHi.C = String(sourceHi.C ?? sourceHi.c ?? "").trim();
+        optionsHi.D = String(sourceHi.D ?? sourceHi.d ?? "").trim();
+      } else if (Array.isArray(sourceHi) && sourceHi.length >= 4) {
+        optionsHi.A = String(sourceHi[0] ?? "").trim();
+        optionsHi.B = String(sourceHi[1] ?? "").trim();
+        optionsHi.C = String(sourceHi[2] ?? "").trim();
+        optionsHi.D = String(sourceHi[3] ?? "").trim();
+      }
+      if (!optionsObj.A && optionsHi.A) {
+        optionsObj.A = optionsHi.A;
+        optionsObj.B = optionsHi.B;
+        optionsObj.C = optionsHi.C;
+        optionsObj.D = optionsHi.D;
+      }
       const correct = (q.correct_answer || q.correctAnswer || q.answer || "").toUpperCase().charAt(0);
       const difficulty = ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
         ? String(q.difficulty).toLowerCase()
         : "moderate";
       const questionType = q.questionType || q.type || "direct";
-      const base = {
+      const correctKey = ["A", "B", "C", "D"].includes(correct) ? correct : null;
+      const explanationEn = normalizePrelimsExplanation(
+        q.explanation_en ?? q.explanation,
+        correctKey
+      );
+      const base = ensureEnglishBilingualFields({
         subject: q.subject != null && String(q.subject).trim() ? String(q.subject).trim() : undefined,
         difficulty,
-        question: questionText,
+        question: questionEn,
+        question_en: questionEn,
+        question_hi: questionHi,
         options: optionsObj,
-        correctAnswer: ["A", "B", "C", "D"].includes(correct) ? correct : null,
-        explanation: normalizeExplanation(q.explanation),
+        options_en: optionsObj,
+        options_hi: optionsHi,
+        correctAnswer: correctKey,
+        explanation: explanationEn,
+        explanation_en: explanationEn,
+        ...(usesFullBilingualExplanations() && q.explanation_hi
+          ? { explanation_hi: normalizeExplanation(q.explanation_hi) }
+          : {}),
         patternType: questionType,
         questionType,
-      };
+      });
       if (q.tableData && typeof q.tableData === "object" && (q.tableData.headers?.length || q.tableData.rows?.length)) {
         base.tableData = { headers: q.tableData.headers || [], rows: q.tableData.rows || [] };
       }
@@ -1069,8 +1459,14 @@ function normalizeFullMockQuestions(questions) {
           reason: String(q.assertionReason.reason ?? "").trim(),
         };
       }
-      if (q.eliminationLogic != null && String(q.eliminationLogic).trim()) base.eliminationLogic = String(q.eliminationLogic).trim();
-      if (q.conceptualSource != null && String(q.conceptualSource).trim()) base.conceptualSource = String(q.conceptualSource).trim();
+      if (!usesCompactFullMockPrompts()) {
+        if (q.eliminationLogic != null && String(q.eliminationLogic).trim()) {
+          base.eliminationLogic = String(q.eliminationLogic).trim();
+        }
+        if (q.conceptualSource != null && String(q.conceptualSource).trim()) {
+          base.conceptualSource = String(q.conceptualSource).trim();
+        }
+      }
       base.questionId = hashQuestion(canonicalDedupeKey(base));
       return base;
     })
@@ -1161,57 +1557,58 @@ function parseFullMockResponse(aiContent) {
 }
 
 /**
- * Generate 20 questions per batch using GS prompt (array format). Used for full-mock.
- * @param {string[]} [patternsToInclude] - If provided, use only these question patterns in balanced proportion.
+ * One batch for subject-based Prelims mock (same bilingual + parse path as GS Mix).
  */
-async function generateFullMockBatch(apiKey, model, subject, batchLabel, patternsToInclude = []) {
+async function generateFullMockSubjectBatch(
+  apiKey,
+  model,
+  subject,
+  batchLabel,
+  batchSize,
+  excludeSnippets = [],
+  patternsToInclude = []
+) {
   const subjectsList = typeof subject === "string" ? subject.split(",").map((s) => s.trim()) : [subject];
-  const systemPrompt = buildGSSystemPrompt(subjectsList, `Full Mock - ${batchLabel}`, "Moderate", null, patternsToInclude);
-  const userPrompt = `Generate EXACTLY 20 UPSC Prelims GS Paper 1 MCQs. Subjects: ${subjectsList.join(", ")}. Topic: Full Mock - ${batchLabel}. Difficulty: Moderate.
+  const systemPrompt = usesCompactFullMockPrompts()
+    ? buildCompactFullMockSubjectSystemPrompt(subjectsList, excludeSnippets, patternsToInclude)
+    : buildGSSystemPrompt(subjectsList, `Full Mock - ${batchLabel}`, "Moderate", null, patternsToInclude);
+  const userPrompt = `Generate EXACTLY ${batchSize} UPSC GS questions (${batchLabel}, subjects: ${subjectsList.join(", ")}). ${bilingualBatchJsonNote()} JSON only.`;
 
-Output ONLY a valid JSON array of 20 objects. No markdown, no code fences, no explanation before or after.
-Each object must have: "question" (string), "options" (array of 4 strings in order A,B,C,D), "answer" (one of "A","B","C","D"), "explanation" (object { "A": "", "B": "", "C": "", "D": "" } — for correct option write correct statement (why right), for each wrong option write wrong statement (why wrong)). Optional: "pattern", "subject".
-Example: [{"question":"...","options":["opt A","opt B","opt C","opt D"],"answer":"B","explanation":{"A":"wrong because...","B":"correct because...","C":"wrong because...","D":"wrong because..."}}, ...]`;
-
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "UPSC Mentor - Full Mock Generator",
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0.35,
-      max_tokens: 8000,
-    }),
+  const maxTokens = getMaxTokensForTestGeneration(batchSize);
+  const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    maxTokens,
+    apiTitle: "UPSC Mentor - Full Mock Subject",
   });
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`API error: ${response.status} ${errText.slice(0, 200)}`);
+  if (finishReason === "length") {
+    console.warn(`⚠️ Full mock Subject batch truncated (max_tokens=${maxTokens}, need=${batchSize})`);
   }
 
-  const data = await response.json();
-  const aiContent = data?.choices?.[0]?.message?.content?.trim();
-  if (!aiContent) throw new Error("No response from AI");
-
+  const defaultName = `Prelims Mock - ${subjectsList.join(", ")}`;
   try {
-    return parseAndValidateQuestions(aiContent, 20);
+    const { validatedQuestions, testName } = parseFullMockResponse(aiContent);
+    if (validatedQuestions.length > 0) {
+      return { questions: validatedQuestions, testName: testName || defaultName, finishReason };
+    }
+    console.warn(`Full mock Subject: parseFullMockResponse returned 0 (finish=${finishReason}); trying compact parser`);
   } catch (parseErr) {
-    console.error(`Full mock batch "${batchLabel}" parse failed. Raw response (first 600 chars):`, aiContent.slice(0, 600));
-    throw parseErr;
+    console.warn("Full mock Subject: parseFullMockResponse failed:", parseErr.message);
   }
+
+  const validated = parseAndValidateQuestions(aiContent, batchSize);
+  if (validated.length > 0) {
+    return { questions: validated, testName: defaultName, finishReason };
+  }
+
+  console.error("Full mock Subject batch: no valid questions. Raw (first 600 chars):", aiContent.slice(0, 600));
+  return { questions: [], testName: defaultName, finishReason };
 }
 
-/** Subject-based full mock: generate 120, show 100 to avoid duplicates in paper. */
 const SUBJECT_FULL_DISPLAY_COUNT = 100;
-const SUBJECT_FULL_GENERATE_COUNT = 120;
 
 /**
  * Generate full-length (100 questions) UPSC Prelims GS Paper 1 mock: 6 batches of 20 (120 generated), show 100.
@@ -1220,39 +1617,46 @@ const SUBJECT_FULL_GENERATE_COUNT = 120;
  * @returns {Promise<Object>} - { success, questions?, count?, testName?, error? }
  */
 export const generateFullMockTestQuestions = async ({ subject, patternsToInclude = [] }) => {
+  const displayCount = SUBJECT_FULL_DISPLAY_COUNT;
+  const patterns = Array.isArray(patternsToInclude) && patternsToInclude.length > 0 ? patternsToInclude : [];
+
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+    const model = getTestGenerationModel();
 
     if (!apiKey) {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
-    const patterns = Array.isArray(patternsToInclude) && patternsToInclude.length > 0 ? patternsToInclude : [];
-    const batches = Math.ceil(SUBJECT_FULL_GENERATE_COUNT / 20);
-    const perBatch = 20;
-    const all = [];
-    for (let b = 1; b <= batches; b++) {
-      console.log(`📝 Full mock: generating batch ${b}/${batches} (${perBatch} questions)...`);
-      const batch = await generateFullMockBatch(apiKey, model, subject, `Part ${b}`, patterns);
-      if (batch && batch.length) all.push(...batch);
-    }
-    const deduped = dedupeQuestionsByStem(dedupeQuestions(all));
-    const questions = deduped.slice(0, SUBJECT_FULL_DISPLAY_COUNT);
+    const { deduped, finalQuestions, testName } = await runFullMockPaperGenerationLoop({
+      apiKey,
+      model,
+      displayCount,
+      csatPaper: false,
+      logPrefix: "Full mock Subject",
+      generateBatch: (key, m, size, label, exclude) =>
+        generateFullMockSubjectBatch(key, m, subject, label, size, exclude, patterns),
+    });
 
-    if (questions.length === 0) {
+    if (finalQuestions.length === 0) {
       throw new Error("No valid UPSC questions generated for full mock. Please try again.");
     }
 
-    console.log(`✅ Full mock: generated ${deduped.length}, showing ${questions.length} questions (no duplicates in paper)`);
+    if (finalQuestions.length < displayCount) {
+      throw new Error(
+        `Full mock Subject: only ${finalQuestions.length} unique questions (need ${displayCount}). Try Go Live again.`
+      );
+    }
 
-    const translatedQuestions = await finalizeGeneratedQuestions(questions);
+    console.log(`✅ Full mock Subject: ${deduped.length} unique generated, showing ${finalQuestions.length} questions`);
+
+    const translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
 
     return {
       success: true,
       questions: translatedQuestions,
       count: translatedQuestions.length,
-      testName: `Prelims Mock - ${subject}`,
+      testName: testName || `Prelims Mock - ${subject}`,
     };
   } catch (error) {
     console.error("Error generating full mock questions:", error);
@@ -1374,15 +1778,26 @@ function parseAndValidateQuestions(aiContent, count) {
   }
 
   if (!Array.isArray(questions) || questions.length === 0) {
-    const preview = content.slice(0, 400);
-    console.error("parseAndValidateQuestions: no array found. Preview:", preview);
-    throw new Error("AI response did not contain a valid JSON questions list");
+    console.warn(
+      "parseAndValidateQuestions: no parseable questions (truncated or invalid JSON). Preview:",
+      content.slice(0, 200)
+    );
+    return [];
   }
 
   const validatedQuestions = questions
     .map((q) => {
       const optionsObj = {};
-      if (Array.isArray(q.options) && q.options.length >= 4) {
+      const optionsHi = { A: "", B: "", C: "", D: "" };
+      const sourceEn = q.options_en ?? (Array.isArray(q.options) ? null : q.options);
+      const sourceHi = q.options_hi;
+
+      if (sourceEn && typeof sourceEn === "object" && !Array.isArray(sourceEn)) {
+        optionsObj.A = String(sourceEn.A ?? sourceEn.a ?? "").trim();
+        optionsObj.B = String(sourceEn.B ?? sourceEn.b ?? "").trim();
+        optionsObj.C = String(sourceEn.C ?? sourceEn.c ?? "").trim();
+        optionsObj.D = String(sourceEn.D ?? sourceEn.d ?? "").trim();
+      } else if (Array.isArray(q.options) && q.options.length >= 4) {
         optionsObj.A = String(q.options[0] ?? "").trim();
         optionsObj.B = String(q.options[1] ?? "").trim();
         optionsObj.C = String(q.options[2] ?? "").trim();
@@ -1393,22 +1808,48 @@ function parseAndValidateQuestions(aiContent, count) {
         optionsObj.C = String(q.options.C ?? q.options.c ?? "").trim();
         optionsObj.D = String(q.options.D ?? q.options.d ?? "").trim();
       }
+
+      if (sourceHi && typeof sourceHi === "object" && !Array.isArray(sourceHi)) {
+        optionsHi.A = String(sourceHi.A ?? sourceHi.a ?? "").trim();
+        optionsHi.B = String(sourceHi.B ?? sourceHi.b ?? "").trim();
+        optionsHi.C = String(sourceHi.C ?? sourceHi.c ?? "").trim();
+        optionsHi.D = String(sourceHi.D ?? sourceHi.d ?? "").trim();
+      } else if (Array.isArray(sourceHi) && sourceHi.length >= 4) {
+        optionsHi.A = String(sourceHi[0] ?? "").trim();
+        optionsHi.B = String(sourceHi[1] ?? "").trim();
+        optionsHi.C = String(sourceHi[2] ?? "").trim();
+        optionsHi.D = String(sourceHi[3] ?? "").trim();
+      }
+
       let correct = q.answer ?? q.correctAnswer ?? q.correct_answer ?? "";
       correct = String(correct).toUpperCase().trim().charAt(0);
       if (["1", "2", "3", "4"].includes(correct)) correct = ["A", "B", "C", "D"][parseInt(correct, 10) - 1];
       if (!["A", "B", "C", "D"].includes(correct)) correct = null;
-      const questionText = String(q.question ?? q.questionText ?? "").trim();
+      const questionEn = String(q.question_en ?? q.question ?? q.questionText ?? "").trim();
+      const questionHi = String(q.question_hi ?? "").trim();
       const difficulty = ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
         ? String(q.difficulty).toLowerCase()
         : "moderate";
-      const row = {
+      const explanationEn = normalizePrelimsExplanation(
+        q.explanation_en ?? q.explanation,
+        correct
+      );
+      const explanationHiRaw = usesFullBilingualExplanations() ? q.explanation_hi : null;
+      const row = ensureEnglishBilingualFields({
         difficulty,
-        question: questionText,
+        question: questionEn,
+        question_en: questionEn,
+        question_hi: questionHi,
         options: optionsObj,
+        options_en: optionsObj,
+        options_hi: optionsHi,
         correctAnswer: correct,
-        explanation: normalizeExplanation(q.explanation),
+        explanation: explanationEn,
+        explanation_en: explanationEn,
+        ...(explanationHiRaw ? { explanation_hi: normalizeExplanation(explanationHiRaw) } : {}),
         patternType: q.pattern || "GENERAL",
-      };
+        subject: q.subject,
+      });
       row.questionId = hashQuestion(canonicalDedupeKey(row));
       return row;
     })
@@ -1424,6 +1865,114 @@ function parseAndValidateQuestions(aiContent, count) {
     .slice(0, parseInt(count, 10) || 999);
 
   return validatedQuestions;
+}
+
+/**
+ * One OpenRouter chat completion for prelims MCQ JSON.
+ */
+async function callOpenRouterTestGeneration({
+  apiKey,
+  model,
+  systemPrompt,
+  userPrompt,
+  maxTokens,
+  apiTitle = "UPSC Mentor - Prelims Test Generator",
+}) {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": getFrontendOrigin(),
+      "X-Title": apiTitle,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.4,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error(`OpenRouter API error: ${response.status}`, errorBody);
+    throw new Error(`API error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const aiContent = data?.choices?.[0]?.message?.content?.trim();
+  const finishReason = data?.choices?.[0]?.finish_reason;
+  const usage = data?.usage;
+
+  if (usage) {
+    console.log(
+      `📊 OpenRouter usage: prompt=${usage.prompt_tokens ?? "?"} completion=${usage.completion_tokens ?? "?"} total=${usage.total_tokens ?? "?"} finish=${finishReason ?? "?"} max_tokens=${maxTokens}`
+    );
+  }
+
+  if (!aiContent) {
+    throw new Error("No response received from AI model");
+  }
+
+  return { aiContent, finishReason, usage };
+}
+
+/**
+ * Fetch one batch of MCQs; top-up within the batch if the response was truncated.
+ */
+async function fetchQuestionBatch({
+  apiKey,
+  model,
+  systemPrompt,
+  userPrompt,
+  need,
+  avoidSnippets = [],
+  csatPaper = false,
+}) {
+  let apiCalls = 0;
+  const avoidBlock =
+    avoidSnippets.length > 0
+      ? `\nDo not repeat or closely paraphrase these stems:\n${avoidSnippets.map((s) => `- ${s}`).join("\n")}`
+      : "";
+
+  const runOnce = async (prompt, n) => {
+    const maxTokens = getMaxTokensForTestGeneration(n);
+    const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+      apiKey,
+      model,
+      systemPrompt,
+      userPrompt: prompt,
+      maxTokens,
+    });
+    apiCalls += 1;
+    if (finishReason === "length") {
+      console.warn(`⚠️ Batch response truncated (max_tokens=${maxTokens}, need=${n})`);
+    }
+    const questions = parseAndValidateQuestions(aiContent, n);
+    return { questions, finishReason };
+  };
+
+  let { questions: batch, finishReason: lastFinish } = await runOnce(`${userPrompt}${avoidBlock}`, need);
+
+  if (batch.length < need && lastFinish === "length") {
+    const missing = need - batch.length;
+    const stems = batch
+      .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
+      .filter(Boolean);
+    const topUpPrompt = `${userPrompt}${avoidBlock}\n\nGenerate EXACTLY ${missing} ADDITIONAL questions (not ${need} total). Return ONLY a JSON array of ${missing} new objects.${stems.length ? `\nAvoid repeating:\n${stems.map((s) => `- ${s}`).join("\n")}` : ""}`;
+    const { questions: more } = await runOnce(topUpPrompt, missing);
+    batch = dedupeMockPaperQuestions([...batch, ...more], { csat: csatPaper }).slice(0, need);
+  } else if (batch.length < need) {
+    console.warn(
+      `⚠️ Batch parsed ${batch.length}/${need} questions (finish_reason=${lastFinish ?? "unknown"}); skipping top-up`
+    );
+  }
+
+  return { questions: batch, apiCalls };
 }
 
 /**
@@ -1449,68 +1998,84 @@ export const generateTestQuestions = async ({
 }) => {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+    const model = getTestGenerationModel();
 
     if (!apiKey) {
       throw new Error("Missing OPENROUTER_API_KEY in environment variables");
     }
 
     const count = parseInt(questionCount, 10) || 20;
-    let systemPrompt;
-    let userPrompt;
+    const subjectsList = Array.isArray(subjects) ? subjects : [subjects];
+    const subjectsText = subjectsList.join(", ");
 
-    if (examType === "CSAT") {
-      systemPrompt = buildCSATSystemPrompt(csatCategories || [], topic);
-      userPrompt = `Generate EXACTLY ${count} UPSC Prelims CSAT MCQs. Topic/Focus: ${topic}. Return EXACTLY ${count} questions in a JSON array as specified.`;
-    } else {
-      const subjectsList = Array.isArray(subjects) ? subjects : [subjects];
-      systemPrompt = buildGSSystemPrompt(subjectsList, topic, difficulty, currentAffairsPeriod);
-      const subjectsText = subjectsList.join(", ");
-      userPrompt = `Generate EXACTLY ${count} UPSC Prelims GS Paper 1 MCQs. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}. Return EXACTLY ${count} questions in a JSON array as specified.`;
-    }
+    const systemPrompt =
+      examType === "CSAT"
+        ? buildPrelimsCSATSystemPrompt(csatCategories || [], topic)
+        : buildPrelimsGSSystemPrompt(subjectsList, topic, difficulty, currentAffairsPeriod);
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": getFrontendOrigin(),
-        "X-Title": "UPSC Mentor - Prelims Test Generator",
-      },
-      body: JSON.stringify({
+    const batchSize = Math.min(
+      count,
+      Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8)
+    );
+    let validatedQuestions = [];
+    let apiCalls = 0;
+    const maxBatchRounds = Math.ceil(count / batchSize) + 2;
+
+    for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
+      const need = Math.min(batchSize, count - validatedQuestions.length);
+      const avoidSnippets = validatedQuestions
+        .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
+        .filter(Boolean)
+        .slice(0, 5);
+
+      const batchUserPrompt = buildPrelimsBatchUserPrompt({
+        examType,
+        need,
+        topic,
+        subjectsText,
+        difficulty,
+      });
+
+      console.log(
+        `📝 Prelims batch ${round + 1}: requesting ${need} question(s) (${validatedQuestions.length}/${count} so far)...`
+      );
+
+      const { questions: batchQuestions, apiCalls: batchCalls } = await fetchQuestionBatch({
+        apiKey,
         model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.4,
-        max_tokens: count <= 5 ? 2000 : count <= 10 ? 4000 : 8000,
-      }),
-    });
+        systemPrompt,
+        userPrompt: batchUserPrompt,
+        need,
+        avoidSnippets,
+        csatPaper: examType === "CSAT",
+      });
+      apiCalls += batchCalls;
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`OpenRouter API error: ${response.status}`, errorBody);
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+      if (batchQuestions.length === 0) {
+        console.warn(`⚠️ Batch ${round + 1} returned 0 parseable questions`);
+        continue;
+      }
+
+      validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...batchQuestions], {
+        csat: examType === "CSAT",
+      }).slice(0, count);
     }
-
-    const data = await response.json();
-    const aiContent = data?.choices?.[0]?.message?.content?.trim();
-
-    if (!aiContent) {
-      throw new Error("No response received from AI model");
-    }
-
-    const validatedQuestions = parseAndValidateQuestions(aiContent, count);
 
     if (validatedQuestions.length === 0) {
-      console.error("No valid questions after mapping. Raw content:", aiContent.substring(0, 500));
       throw new Error("No valid UPSC questions generated. Please try again.");
     }
 
-    console.log(`✅ Generated ${validatedQuestions.length} ${examType} questions`);
+    if (validatedQuestions.length < count) {
+      throw new Error(
+        `Only ${validatedQuestions.length} of ${count} questions were generated. Please try again.`
+      );
+    }
 
-    const translatedQuestions = await finalizeGeneratedQuestions(validatedQuestions);
+    console.log(
+      `✅ Generated ${validatedQuestions.length} ${examType} questions (model: ${model}, ${apiCalls} API call(s), batchSize=${batchSize})`
+    );
+
+    const translatedQuestions = finalizeGeneratedQuestions(validatedQuestions);
 
     return {
       success: true,

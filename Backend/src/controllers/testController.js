@@ -313,7 +313,7 @@ export const generateTest = async (req, res) => {
       examType,
       topic,
       ...(examType === "GS" && difficulty && { difficulty }),
-      questions: generationResult.questions,
+      questions: generationResult.questions.map((q) => pickBilingualQuestionFields(q)),
       totalQuestions: generationResult.questions.length,
     });
 

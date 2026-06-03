@@ -493,7 +493,11 @@ const TestResultPage: React.FC = () => {
                             <span className={`font-semibold text-xs md:text-sm ${
                               theme === "dark" ? "text-blue-300" : "text-blue-800"
                             }`}>
-                              Explanation:
+                              Explanation
+                              {!question.explanation_hi && (
+                                <span className="font-normal opacity-70"> (English)</span>
+                              )}
+                              :
                             </span>
                           </div>
                           {question.explanation &&

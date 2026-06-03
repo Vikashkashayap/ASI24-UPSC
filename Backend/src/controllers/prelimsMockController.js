@@ -371,7 +371,17 @@ export const goLivePrelimsMock = async (req, res) => {
       });
     }
     if (mock.status === "generating") {
-      return res.status(400).json({ success: false, message: "Generation already in progress" });
+      const updatedMs = mock.updatedAt ? new Date(mock.updatedAt).getTime() : 0;
+      const staleGenerating = updatedMs > 0 && Date.now() - updatedMs > 3 * 60 * 1000;
+      if (!staleGenerating) {
+        return res.status(400).json({
+          success: false,
+          message: "Generation already in progress. Please wait until it finishes.",
+        });
+      }
+      console.warn(`goLivePrelimsMock: resetting stale generating status for mock ${id}`);
+      mock.status = "scheduled";
+      await mock.save();
     }
 
     mock.status = "generating";
@@ -715,7 +725,9 @@ export const startPrelimsMockAttempt = async (req, res) => {
     }
 
     const rawPlain = (mock.questions || []).map(toPlainPrelimsQuestion);
-    let uniqueQuestions = dedupeQuestionsByStem(dedupeQuestions(rawPlain));
+    let uniqueQuestions = mock.isCsat
+      ? dedupeQuestions(rawPlain)
+      : dedupeQuestionsByStem(dedupeQuestions(rawPlain));
 
     if (!uniqueQuestions?.length && rawPlain.length) {
       console.warn(

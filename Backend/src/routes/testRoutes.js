@@ -10,6 +10,7 @@ import {
   deleteTest,
 } from "../controllers/testController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { testGenerationDedup } from "../middleware/testGenerationDedup.js";
 
 const router = express.Router();
 
@@ -31,8 +32,8 @@ router.get("/test-connection", (req, res) => {
   });
 });
 
-// Generate new test
-router.post("/generate", generateTest);
+// Generate new test (dedup prevents parallel duplicate OpenRouter runs)
+router.post("/generate", testGenerationDedup, generateTest);
 
 // Generate full-length UPSC Prelims GS Paper 1 mock (100 questions); subject from admin/body
 router.post("/generate-full-mock", generateFullMockTest);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2, BookOpen, Target, TrendingUp, History } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -26,6 +26,7 @@ const TestGeneratorPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const generateInFlightRef = useRef(false);
 
   const [subjects, setSubjects] = useState<string[]>(["Polity"]);
   const [topic, setTopic] = useState("");
@@ -85,6 +86,7 @@ const TestGeneratorPage: React.FC = () => {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (generateInFlightRef.current || isGenerating) return;
     setError(null);
 
     if (!topic.trim()) {
@@ -104,6 +106,7 @@ const TestGeneratorPage: React.FC = () => {
       return;
     }
 
+    generateInFlightRef.current = true;
     setIsGenerating(true);
     setError(null);
 
@@ -135,8 +138,14 @@ const TestGeneratorPage: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Error generating test:", err);
-      setError(err.response?.data?.message || "Failed to generate test. Please try again.");
+      const msg = err.response?.data?.message;
+      if (err.response?.status === 429) {
+        setError(msg || "Test generation is already running. Please wait.");
+      } else {
+        setError(msg || "Failed to generate test. Please try again.");
+      }
     } finally {
+      generateInFlightRef.current = false;
       setIsGenerating(false);
     }
   };

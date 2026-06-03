@@ -1,7 +1,11 @@
 import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
+import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 
-const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.0-flash-001";
+const DEFAULT_MODEL =
+  process.env.OPENROUTER_TRANSLATION_MODEL ||
+  process.env.OPENROUTER_MODEL ||
+  "google/gemini-2.5-flash-lite";
 
 /**
  * Translate a single English string to Hindi (Devanagari).
@@ -13,7 +17,7 @@ export async function translateToHindi(text) {
   const source = String(text ?? "").trim();
   if (!source) return "";
 
-  if (process.env.ENABLE_HINDI_TRANSLATION === "false") {
+  if (!isSeparateHindiTranslationEnabled()) {
     return source;
   }
 

@@ -1,6 +1,14 @@
+import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 import { translateToHindi, translateManyToHindi } from "./translateToHindi.js";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
+
+/** True when Hindi stem and all four Hindi options are present. */
+export function questionHasBilingualContent(rawQuestion) {
+  const q = ensureEnglishBilingualFields(rawQuestion);
+  if (!String(q.question_hi || "").trim()) return false;
+  return OPTION_KEYS.every((key) => String(q.options_hi?.[key] || "").trim());
+}
 
 function normalizeOptionsObject(raw) {
   const options = { A: "", B: "", C: "", D: "" };
@@ -41,7 +49,9 @@ export function ensureEnglishBilingualFields(question) {
     question_en,
     options: options_en,
     options_en,
+    explanation: explanation_en ?? question.explanation,
     ...(explanation_en ? { explanation_en } : {}),
+    ...(question.explanation_hi ? { explanation_hi: question.explanation_hi } : {}),
   };
 }
 
@@ -52,11 +62,11 @@ export function ensureEnglishBilingualFields(question) {
 export async function enrichQuestionWithHindi(rawQuestion) {
   const question = ensureEnglishBilingualFields(rawQuestion);
 
-  if (process.env.ENABLE_HINDI_TRANSLATION === "false") {
+  if (!isSeparateHindiTranslationEnabled()) {
     return {
       ...question,
       question_hi: question.question_hi || "",
-      options_hi: normalizeOptionsObject(question.options_hi),
+      options_hi: normalizeOptionsObject(question.options_hi ?? question.options_en),
     };
   }
 
@@ -105,6 +115,9 @@ export async function enrichQuestionWithHindi(rawQuestion) {
  * Translate an array of questions with limited concurrency.
  */
 export async function enrichQuestionsWithHindi(questions, concurrency = 4) {
+  if (!isSeparateHindiTranslationEnabled()) {
+    return (questions || []).map(ensureEnglishBilingualFields);
+  }
   if (!Array.isArray(questions) || questions.length === 0) return [];
 
   const poolSize = Math.max(1, Math.min(concurrency, questions.length));
