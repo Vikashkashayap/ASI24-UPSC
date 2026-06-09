@@ -165,6 +165,7 @@ export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({ question, co
   );
 };
 
+
 interface ExamOptionRowProps {
   optionKey: "A" | "B" | "C" | "D";
   question: BilingualQuestionFields;
