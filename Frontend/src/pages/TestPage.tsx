@@ -1,13 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import {
+  Clock,
+  AlertCircle,
+  Flag,
+  ChevronRight,
+  ChevronLeft,
+  Maximize2,
+  Minimize2,
+  Send,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
 import { ConfirmationDialog } from "../components/ui/dialog";
-import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
-import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
-import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
-import { useTheme } from "../hooks/useTheme";
+import { ExamQuestionBody, ExamOptionRow, examPaletteCols } from "../components/exam/ExamQuestionBody";
 import { testAPI } from "../services/api";
 
 interface Question {
@@ -15,24 +20,9 @@ interface Question {
   question: string;
   question_en?: string;
   question_hi?: string;
-  options: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  options_en?: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  options_hi?: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
+  options: { A: string; B: string; C: string; D: string };
+  options_en?: { A: string; B: string; C: string; D: string };
+  options_hi?: { A: string; B: string; C: string; D: string };
   userAnswer?: string | null;
   questionType?: string;
   tableData?: { headers: string[]; rows: string[][] } | null;
@@ -48,35 +38,133 @@ interface TestData {
   difficulty?: string;
   totalQuestions: number;
   durationMinutes?: number;
+  totalMarks?: number;
   questions: Question[];
   isSubmitted: boolean;
+}
+
+type PaletteStatus = "not-visited" | "answered" | "marked" | "answered-marked" | "current";
+
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function PalettePanel({
+  paletteStats,
+  paletteCols,
+  paletteBtnH,
+  test,
+  getPaletteStatus,
+  paletteBtnClass,
+  goToQuestion,
+  onSubmit,
+  isSubmitting,
+  compact = false,
+}: {
+  paletteStats: { done: number; marked: number; left: number };
+  paletteCols: number;
+  paletteBtnH: string;
+  test: TestData;
+  getPaletteStatus: (i: number) => PaletteStatus;
+  paletteBtnClass: (s: PaletteStatus) => string;
+  goToQuestion: (i: number) => void;
+  onSubmit: () => void;
+  isSubmitting: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <>
+      {!compact && (
+        <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100">
+          <h2 className="font-bold text-slate-800 text-xs">Question Palette</h2>
+          <div className="flex gap-2 mt-1 text-[10px] font-medium">
+            <span className="text-emerald-600">{paletteStats.done} done</span>
+            <span className="text-amber-500">{paletteStats.marked} marked</span>
+            <span className="text-slate-400">{paletteStats.left} left</span>
+          </div>
+        </div>
+      )}
+      {compact && (
+        <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100">
+          <div className="flex gap-3 text-[11px] font-medium">
+            <span className="text-emerald-600">{paletteStats.done} done</span>
+            <span className="text-amber-500">{paletteStats.marked} marked</span>
+            <span className="text-slate-400">{paletteStats.left} left</span>
+          </div>
+        </div>
+      )}
+      <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100 grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] sm:text-[10px] text-slate-500">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded border border-slate-300 bg-white shrink-0" /> Not visited
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0" /> Answered
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded bg-amber-400 shrink-0" /> Marked
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded bg-violet-600 shrink-0" /> Ans+Marked
+        </div>
+      </div>
+      <div className="flex-1 min-h-0 px-2 sm:px-3 py-2 overflow-y-auto">
+        <div
+          className="w-full grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${paletteCols}, minmax(0, 1fr))` }}
+        >
+          {test.questions.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => goToQuestion(index)}
+              className={`${paletteBtnH} rounded text-[10px] sm:text-[11px] font-semibold border transition-colors ${paletteBtnClass(getPaletteStatus(index))}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex-shrink-0 p-2 sm:p-3 border-t border-slate-100">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={isSubmitting}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs sm:text-sm transition-colors"
+        >
+          <Send className="w-4 h-4" />
+          Submit Test
+        </button>
+      </div>
+    </>
+  );
 }
 
 const TestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const [test, setTest] = useState<TestData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [markedIds, setMarkedIds] = useState<Set<string>>(new Set());
+  const [visitedIndices, setVisitedIndices] = useState<Set<number>>(new Set([0]));
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
-  const [questionTimeSpent, setQuestionTimeSpent] = useState<{ [key: string]: number }>({});
+  const [questionTimeSpent, setQuestionTimeSpent] = useState<Record<string, number>>({});
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const questionStartTimeRef = useRef(Date.now());
 
   useEffect(() => {
-    if (id) {
-      loadTest();
-    }
+    if (id) loadTest();
   }, [id]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeElapsed((prev) => prev + 1);
-    }, 1000);
+    const interval = setInterval(() => setTimeElapsed((p) => p + 1), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -84,45 +172,61 @@ const TestPage: React.FC = () => {
     if (test) questionStartTimeRef.current = Date.now();
   }, [test, currentIndex]);
 
+  useEffect(() => {
+    setVisitedIndices((prev) => new Set(prev).add(currentIndex));
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const onFs = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
   const loadTest = async () => {
     try {
       setIsLoading(true);
       const response = await testAPI.getTest(id!);
-      
       if (response.data.success) {
         const testData = response.data.data;
-        
-        // If already submitted, redirect to results
         if (testData.isSubmitted) {
           navigate(`/result/${id}`);
           return;
         }
-
         setTest(testData);
-        
-        // Initialize answers from existing user answers
-        const initialAnswers: { [key: string]: string } = {};
+        const initial: Record<string, string> = {};
         testData.questions.forEach((q: Question) => {
-          if (q.userAnswer) {
-            initialAnswers[q._id] = q.userAnswer;
-          }
+          if (q.userAnswer) initial[q._id] = q.userAnswer;
         });
-        setAnswers(initialAnswers);
+        setAnswers(initial);
       } else {
         setError("Failed to load test");
       }
-    } catch (err: any) {
-      console.error("Error loading test:", err);
-      setError(err.response?.data?.message || "Failed to load test");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to load test");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const recordTimeForCurrentQuestion = () => {
+    if (!test) return;
+    const q = test.questions[currentIndex];
+    if (!q) return;
+    const elapsed = (Date.now() - questionStartTimeRef.current) / 1000;
+    setQuestionTimeSpent((prev) => ({ ...prev, [q._id]: (prev[q._id] || 0) + elapsed }));
+  };
+
+  const goToQuestion = (index: number) => {
+    if (!test || index < 0 || index >= test.questions.length) return;
+    recordTimeForCurrentQuestion();
+    setCurrentIndex(index);
+    setPaletteOpen(false);
+  };
+
   const handleAnswerSelect = (questionId: string, option: string) => {
     setAnswers((prev) => {
-      const current = prev[questionId];
-      if (current === option) {
+      if (prev[questionId] === option) {
         const next = { ...prev };
         delete next[questionId];
         return next;
@@ -131,92 +235,107 @@ const TestPage: React.FC = () => {
     });
   };
 
-  const recordTimeForCurrentQuestion = () => {
+  const toggleMarkReview = () => {
     if (!test) return;
-    const q = test.questions[currentIndex];
-    if (!q) return;
-    const elapsed = (Date.now() - questionStartTimeRef.current) / 1000;
-    setQuestionTimeSpent((prev) => ({
-      ...prev,
-      [q._id]: (prev[q._id] || 0) + elapsed,
-    }));
+    const qid = test.questions[currentIndex]._id;
+    setMarkedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(qid)) next.delete(qid);
+      else next.add(qid);
+      return next;
+    });
   };
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      recordTimeForCurrentQuestion();
-      setCurrentIndex(currentIndex - 1);
+  const handlePrevious = () => goToQuestion(currentIndex - 1);
+
+  const handleSaveAndNext = () => {
+    if (test && currentIndex < test.questions.length - 1) goToQuestion(currentIndex + 1);
+  };
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    } catch {
+      /* ignore */
     }
-  };
-
-  const handleNext = () => {
-    if (test && currentIndex < test.questions.length - 1) {
-      recordTimeForCurrentQuestion();
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!test) return;
-    setShowSubmitDialog(true);
   };
 
   const handleConfirmSubmit = async () => {
     if (!test) return;
-
     setShowSubmitDialog(false);
     setIsSubmitting(true);
     setError(null);
-
     const currentQ = test.questions[currentIndex];
     const timeForCurrent = currentQ ? (Date.now() - questionStartTimeRef.current) / 1000 : 0;
-    const finalTimeSpent: { [key: string]: number } = { ...questionTimeSpent };
+    const finalTimeSpent = { ...questionTimeSpent };
     if (currentQ) {
       finalTimeSpent[currentQ._id] = (finalTimeSpent[currentQ._id] || 0) + timeForCurrent;
     }
-
     try {
-      const answersObject: { [key: string]: string } = {};
+      const answersObject: Record<string, string> = {};
       test.questions.forEach((q) => {
-        if (answers[q._id]) {
-          answersObject[q._id] = answers[q._id];
-        }
+        if (answers[q._id]) answersObject[q._id] = answers[q._id];
       });
-
       const response = await testAPI.submitTest(id!, {
         answers: answersObject,
         questionTimeSpent: finalTimeSpent,
       });
-
-      if (response.data.success) {
-        navigate(`/result/${id}`);
-      } else {
-        setError(response.data.message || "Failed to submit test");
-      }
-    } catch (err: any) {
-      console.error("Error submitting test:", err);
-      setError(err.response?.data?.message || "Failed to submit test");
+      if (response.data.success) navigate(`/result/${id}`);
+      else setError(response.data.message || "Failed to submit test");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to submit test");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancelSubmit = () => {
-    setShowSubmitDialog(false);
+  const attemptedCount = Object.keys(answers).length;
+  const totalMarks = test?.totalMarks ?? (test ? test.totalQuestions * 2 : 0);
+  const durationSec = (test?.durationMinutes ?? 60) * 60;
+  const timeRemaining = Math.max(0, durationSec - timeElapsed);
+
+  const paletteStats = useMemo(() => {
+    if (!test) return { done: 0, marked: 0, left: 0 };
+    const done = test.questions.filter((q) => answers[q._id]).length;
+    const marked = test.questions.filter((q) => markedIds.has(q._id)).length;
+    return { done, marked, left: test.totalQuestions - done };
+  }, [test, answers, markedIds]);
+
+  const getPaletteStatus = (index: number): PaletteStatus => {
+    if (!test) return "not-visited";
+    const q = test.questions[index];
+    const answered = Boolean(answers[q._id]);
+    const marked = markedIds.has(q._id);
+    if (index === currentIndex) return "current";
+    if (answered && marked) return "answered-marked";
+    if (answered) return "answered";
+    if (marked) return "marked";
+    return visitedIndices.has(index) ? "not-visited" : "not-visited";
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  const paletteBtnClass = (status: PaletteStatus) => {
+    switch (status) {
+      case "current":
+        return "border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold";
+      case "answered":
+        return "bg-emerald-500 text-white border-emerald-500";
+      case "marked":
+        return "bg-amber-400 text-white border-amber-400";
+      case "answered-marked":
+        return "bg-violet-600 text-white border-violet-600";
+      default:
+        return "bg-white text-slate-600 border-slate-200 hover:border-slate-300";
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center h-full min-h-[50vh] bg-slate-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading test...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3" />
+          <p className="text-slate-600 text-sm">Loading test...</p>
         </div>
       </div>
     );
@@ -224,18 +343,12 @@ const TestPage: React.FC = () => {
 
   if (error && !test) {
     return (
-      <div className="max-w-2xl mx-auto px-3">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <p className={theme === "dark" ? "text-red-300" : "text-red-800"}>{error}</p>
-              <Button onClick={() => navigate("/prelims-test")} className="mt-4 min-h-[44px] touch-manipulation">
-                Go Back
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center h-full min-h-[50vh] bg-slate-100 p-4">
+        <div className="text-center max-w-sm">
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+          <p className="text-red-800 mb-4">{error}</p>
+          <Button onClick={() => navigate("/prelims-test")}>Go Back</Button>
+        </div>
       </div>
     );
   }
@@ -243,278 +356,231 @@ const TestPage: React.FC = () => {
   if (!test) return null;
 
   const currentQuestion = test.questions[currentIndex];
-  const attemptedCount = Object.keys(answers).length;
-  const progress = (attemptedCount / test.totalQuestions) * 100;
+  const isMarked = markedIds.has(currentQuestion._id);
+  const paletteColsDesktop = examPaletteCols(test.totalQuestions, false);
+  const paletteColsMobile = examPaletteCols(test.totalQuestions, true);
+  const paletteBtnH =
+    test.totalQuestions > 75 ? "h-[22px] sm:h-[24px]" : "h-[24px] sm:h-[26px]";
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 pb-6 sm:pb-8 px-3 sm:px-4 overflow-x-hidden">
-      {/* Header with Progress */}
-      <Card>
-        <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-            <div className="min-w-0">
-              <h2 className={`text-base sm:text-lg font-semibold truncate ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`} title={test.topic}>
-                {test.topic}
-              </h2>
-              <p className={`text-xs sm:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                {test.subject} {test.examType === "CSAT" ? "| CSAT" : `| Difficulty: ${test.difficulty ?? "—"}`} | Q {currentIndex + 1}/{test.totalQuestions}
-              </p>
+    <div className="h-[100dvh] flex flex-col bg-[#eef2f7] text-slate-900 overflow-hidden">
+      {/* Top exam bar */}
+      <header className="flex-shrink-0 bg-white border-b border-slate-200 px-2 sm:px-4 py-2 shadow-sm safe-area-inset-top">
+        <div className="flex items-start sm:items-center justify-between gap-2 max-w-[1600px] mx-auto w-full">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[11px] sm:text-sm font-bold text-slate-900 truncate leading-tight">
+              {test.topic}
+            </h1>
+            <p className="text-[9px] sm:text-[11px] text-slate-500 leading-tight mt-0.5 flex flex-wrap gap-x-1.5 gap-y-0">
+              <span>Q {currentIndex + 1}/{test.totalQuestions}</span>
+              <span className="text-slate-300 hidden sm:inline">·</span>
+              <span className="text-emerald-600 font-medium">+2 marks</span>
+              <span className="text-slate-300 hidden sm:inline">·</span>
+              <span className="text-red-500 font-medium">-0.66 wrong</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <span className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tabular-nums">
+              {attemptedCount}/{test.totalQuestions}
+            </span>
+            <div
+              className={`flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[11px] sm:text-xs font-bold ${
+                timeRemaining < 300 ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-700"
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              {formatCountdown(timeRemaining)}
             </div>
-            <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="hidden md:flex p-1.5 rounded-md hover:bg-slate-100 text-slate-500"
+              title="Fullscreen"
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSubmitDialog(true)}
+              className="hidden sm:inline-flex px-2.5 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white text-[10px] sm:text-xs font-bold"
+            >
+              Submit
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="xl:hidden inline-flex px-2 py-1 rounded-md bg-slate-100 text-[10px] font-semibold text-slate-700"
+            >
+              Palette
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main + palette */}
+      <div className="flex-1 min-h-0 flex overflow-hidden max-w-[1600px] mx-auto w-full">
+        {/* Question area */}
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-1.5 sm:p-2 md:p-3">
+          <div className="flex-1 min-h-0 flex flex-col bg-white rounded-lg sm:rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="flex-shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1.5 sm:py-2 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
               <div className="flex items-center gap-2">
-                <Clock className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`} />
-                <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`} title={test.durationMinutes ? `${Math.floor(timeElapsed / 60)}:${String(timeElapsed % 60).padStart(2, "0")} / ${test.durationMinutes} min` : undefined}>
-                  {formatTime(timeElapsed)}
-                  {test.durationMinutes != null && (
-                    <span className={`ml-1 ${theme === "dark" ? "text-slate-500" : "text-slate-500"}`}>
-                      / {test.durationMinutes} min
-                    </span>
-                  )}
+                <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white text-[10px] sm:text-xs font-bold shadow-sm">
+                  {currentIndex + 1}
+                </span>
+                <span className="font-semibold text-slate-800 text-[11px] sm:text-sm">
+                  Question {currentIndex + 1}
                 </span>
               </div>
-              <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                {attemptedCount}/{test.totalQuestions} answered
+              <span className="text-[9px] sm:text-[11px] font-medium text-slate-400">
+                {totalMarks} total marks
+              </span>
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
+              {/* Question stem — scrollable container */}
+              <div className="flex-shrink-0 px-2.5 sm:px-4 py-2 sm:py-3">
+                <ExamQuestionBody question={currentQuestion} compact />
+              </div>
+
+              {/* Divider */}
+              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-slate-100" />
+
+              {/* Options — scrollable with padding */}
+              <div className="flex-shrink-0 flex flex-col gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-3 pb-3 sm:pb-4">
+                {(["A", "B", "C", "D"] as const).map((key) => (
+                  <ExamOptionRow
+                    key={key}
+                    optionKey={key}
+                    question={currentQuestion}
+                    selected={answers[currentQuestion._id] === key}
+                    onSelect={() => handleAnswerSelect(currentQuestion._id, key)}
+                    compact
+                  />
+                ))}
               </div>
             </div>
           </div>
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className={`h-2 rounded-full overflow-hidden ${theme === "dark" ? "bg-slate-700" : "bg-slate-200"}`}>
-              <div
-                className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Question Card */}
-      <Card>
-        <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
-          <div className="space-y-4 sm:space-y-6">
-            <div className="min-w-0 overflow-hidden">
-              <div className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 leading-relaxed break-words ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                {/* Match the following: show question/statement at TOP above the lists */}
-                {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && currentQuestion.question?.trim() && (
-                  <div className="mb-3">
-                    <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml stemOnly />
-                  </div>
-                )}
-                {/* Assertion–Reason block (do not repeat assertion in question text below) */}
-                {currentQuestion.assertionReason?.assertion != null &&
-                  (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
-                  <div className="mb-4 space-y-5 sm:space-y-6">
-                    {hasDistinctHindiQuestion(currentQuestion) ? (
-                      <>
-                        <UpscFormattedQuestionStem text={getQuestionHindi(currentQuestion)} theme={theme} />
-                        <div
-                          className={`border-t border-dashed ${theme === "dark" ? "border-slate-600" : "border-slate-300"}`}
-                          aria-hidden
-                        />
-                      </>
-                    ) : null}
-                    <UpscFormattedQuestionStem
-                      text={`Assertion (A): ${currentQuestion.assertionReason.assertion}\nReason (R): ${currentQuestion.assertionReason.reason}`}
-                      theme={theme}
-                    />
-                  </div>
-                )}
-                {/* Match columns: side-by-side (question text already shown above) */}
-                {currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0 && (
-                  <div className="overflow-x-auto mb-4">
-                    <div className="grid grid-cols-2 gap-3 sm:gap-6 min-w-[280px]">
-                      <div>
-                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-I</div>
-                        <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
-                          {currentQuestion.matchColumns.columnA.map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <div className={`text-xs font-bold uppercase tracking-wide mb-2 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-II</div>
-                        <ul className="list-decimal list-inside space-y-1 text-sm sm:text-base">
-                          {(currentQuestion.matchColumns.columnB || []).map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {/* Table */}
-                {currentQuestion.tableData?.headers?.length != null && currentQuestion.tableData.headers.length > 0 && (
-                  <div className="overflow-x-auto mb-4">
-                    <table className={`w-full border-collapse border text-sm sm:text-base ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>
-                      <thead>
-                        <tr className={theme === "dark" ? "bg-slate-700" : "bg-slate-100"}>
-                          {currentQuestion.tableData!.headers.map((h, i) => (
-                            <th key={i} className="border border-slate-400 px-2 py-1.5 text-left font-semibold">{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(currentQuestion.tableData!.rows || []).map((row, ri) => (
-                          <tr key={ri}>
-                            {row.map((cell, ci) => (
-                              <td key={ci} className={`border px-2 py-1.5 ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>{cell}</td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                {/* Question text: skip for assertion-reason (no repeat) and for match (already shown at top) */}
-                {!(
-                  currentQuestion.assertionReason?.assertion != null &&
-                  (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason)
-                ) &&
-                  !(currentQuestion.matchColumns?.columnA?.length != null && currentQuestion.matchColumns.columnA.length > 0) && (
-                  <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml />
-                )}
-              </div>
-            </div>
-
-            {currentQuestion.matchColumns?.columnA?.length != null &&
-              currentQuestion.matchColumns.columnA.length > 0 && (
-              <UpscPaperQuestionBlock
-                question={currentQuestion}
-                theme={theme}
-                allowHtml
-                showQuestion={false}
-              />
-            )}
-
-            {currentQuestion.assertionReason?.assertion != null &&
-            (currentQuestion.assertionReason.assertion || currentQuestion.assertionReason.reason) && (
-              <UpscPaperQuestionBlock question={currentQuestion} theme={theme} allowHtml showQuestion={false} />
-            )}
-
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-              <p className={`text-xs font-medium uppercase tracking-wide mb-3 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                Select your answer
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                {(["A", "B", "C", "D"] as const).map((option) => {
-                  const isSelected = answers[currentQuestion._id] === option;
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => handleAnswerSelect(currentQuestion._id, option)}
-                      className={`flex items-center justify-center gap-2 p-3 sm:p-4 min-h-[52px] rounded-xl border-2 transition-all active:scale-[0.99] touch-manipulation font-semibold text-base sm:text-lg ${
-                        isSelected
-                          ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                          : theme === "dark"
-                          ? "border-slate-700 bg-slate-800 hover:border-slate-600 text-slate-200"
-                          : "border-slate-300 bg-white hover:border-slate-400 text-slate-800"
-                      }`}
-                    >
-                      {isSelected ? <CheckCircle className="w-5 h-5" /> : null}
-                      <span>({option.toLowerCase()})</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Navigation - mobile friendly: wrap question numbers, touch-friendly buttons */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-2 sm:gap-4">
-          <Button
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            variant="outline"
-            className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 touch-manipulation"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Previous</span>
-          </Button>
-
-          {currentIndex < test.questions.length - 1 ? (
-            <Button
-              onClick={handleNext}
-              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-blue-600 to-indigo-600 touch-manipulation"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="flex items-center gap-1.5 min-h-[44px] px-3 sm:px-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 touch-manipulation"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span className="hidden sm:inline">Submitting...</span>
-                </>
-              ) : (
-                "Submit Test"
-              )}
-            </Button>
-          )}
-        </div>
-
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
-          {test.questions.map((_, index) => {
-            const isAnswered = answers[test.questions[index]._id];
-            return (
+          {/* Bottom nav */}
+          <div className="flex-shrink-0 pt-1.5 sm:pt-2">
+            <div className="grid grid-cols-3 gap-1 sm:gap-2">
               <button
-                key={index}
                 type="button"
-                onClick={() => setCurrentIndex(index)}
-                className={`min-w-[36px] w-9 h-9 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-medium transition-colors touch-manipulation ${
-                  index === currentIndex
-                    ? "bg-blue-600 text-white ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-slate-900"
-                    : isAnswered
-                    ? theme === "dark"
-                      ? "bg-green-900/30 text-green-400 border border-green-700"
-                      : "bg-green-100 text-green-700 border border-green-300"
-                    : theme === "dark"
-                    ? "bg-slate-800 text-slate-400 border border-slate-700"
-                    : "bg-slate-100 text-slate-600 border border-slate-300"
+                onClick={handlePrevious}
+                disabled={currentIndex === 0}
+                className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg border border-slate-300 bg-white text-[10px] sm:text-xs font-medium text-slate-600 disabled:opacity-40 min-h-[40px]"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden min-[400px]:inline">Previous</span>
+                <span className="min-[400px]:hidden">Prev</span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleMarkReview}
+                className={`inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-2 rounded-lg border text-[10px] sm:text-xs font-medium min-h-[40px] ${
+                  isMarked
+                    ? "border-amber-400 bg-amber-50 text-amber-700"
+                    : "border-slate-300 bg-white text-slate-600"
                 }`}
               >
-                {index + 1}
+                <Flag className={`w-3 h-3 shrink-0 ${isMarked ? "fill-amber-500 text-amber-500" : ""}`} />
+                <span className="truncate">Mark</span>
               </button>
-            );
-          })}
+              {currentIndex < test.questions.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={handleSaveAndNext}
+                  className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs font-semibold min-h-[40px]"
+                >
+                  <span className="truncate">Save &amp; Next</span>
+                  <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowSubmitDialog(true)}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center gap-1 px-2 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-semibold min-h-[40px]"
+                >
+                  Submit
+                </button>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Question palette — desktop sidebar */}
+        <aside className="hidden xl:flex flex-shrink-0 w-[260px] 2xl:w-[280px] bg-white border-l border-slate-200 flex-col overflow-hidden">
+          <PalettePanel
+            paletteStats={paletteStats}
+            paletteCols={paletteColsDesktop}
+            paletteBtnH={paletteBtnH}
+            test={test}
+            getPaletteStatus={getPaletteStatus}
+            paletteBtnClass={paletteBtnClass}
+            goToQuestion={goToQuestion}
+            onSubmit={() => setShowSubmitDialog(true)}
+            isSubmitting={isSubmitting}
+          />
+        </aside>
+
+        {/* Mobile / tablet palette drawer */}
+        {paletteOpen && (
+          <>
+            <button
+              type="button"
+              className="xl:hidden fixed inset-0 bg-black/40 z-40"
+              onClick={() => setPaletteOpen(false)}
+              aria-label="Close palette"
+            />
+            <aside className="xl:hidden fixed inset-y-0 right-0 z-50 w-[min(280px,88vw)] bg-white shadow-2xl flex flex-col">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100">
+                <span className="font-bold text-sm text-slate-800">Question Palette</span>
+                <button
+                  type="button"
+                  onClick={() => setPaletteOpen(false)}
+                  className="text-xs font-medium text-slate-500 px-2 py-1 rounded hover:bg-slate-100"
+                >
+                  Close
+                </button>
+              </div>
+              <PalettePanel
+                paletteStats={paletteStats}
+                paletteCols={paletteColsMobile}
+                paletteBtnH={paletteBtnH}
+                test={test}
+                getPaletteStatus={getPaletteStatus}
+                paletteBtnClass={paletteBtnClass}
+                goToQuestion={goToQuestion}
+                onSubmit={() => setShowSubmitDialog(true)}
+                isSubmitting={isSubmitting}
+                compact
+              />
+            </aside>
+          </>
+        )}
       </div>
 
-      {/* Error Message */}
       {error && (
-        <Card className={`border ${theme === "dark" ? "border-red-800 bg-red-950/50" : "border-red-200 bg-red-50"}`}>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className={`w-5 h-5 ${theme === "dark" ? "text-red-400" : "text-red-600"}`} />
-              <p className={theme === "dark" ? "text-red-300" : "text-red-800"}>{error}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex-shrink-0 mx-4 mb-2 px-4 py-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
       )}
 
-      {/* Submit Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={showSubmitDialog}
         title="Submit Test"
         message={
           attemptedCount === 0
-            ? "You haven't answered any questions. Are you sure you want to submit the test?"
-            : `You have attempted ${attemptedCount} out of ${test.totalQuestions} questions. Once submitted, you cannot change your answers. Are you sure you want to submit the test?`
+            ? "You haven't answered any questions. Are you sure you want to submit?"
+            : `You have attempted ${attemptedCount} of ${test.totalQuestions} questions. Once submitted, you cannot change your answers.`
         }
         confirmText="Submit Test"
         cancelText="Cancel"
-        confirmButtonClass="bg-green-600 hover:bg-green-700 text-white"
+        confirmButtonClass="bg-red-600 hover:bg-red-700 text-white"
         onConfirm={handleConfirmSubmit}
-        onCancel={handleCancelSubmit}
+        onCancel={() => setShowSubmitDialog(false)}
         loading={isSubmitting}
       />
     </div>
@@ -522,5 +588,3 @@ const TestPage: React.FC = () => {
 };
 
 export default TestPage;
-
-

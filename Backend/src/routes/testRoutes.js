@@ -9,6 +9,11 @@ import {
   getPrelimsPerformance,
   deleteTest,
 } from "../controllers/testController.js";
+import {
+  listStudentAssignedPractice,
+  listAssignedPracticeHistory,
+  startAssignedPracticeAttempt,
+} from "../controllers/assignedPracticeController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { testGenerationDedup } from "../middleware/testGenerationDedup.js";
 
@@ -46,6 +51,11 @@ router.get("/analytics", getTestAnalytics);
 
 // Get pre-lims performance analysis
 router.get("/prelims-performance", getPrelimsPerformance);
+
+// Assigned topic practice (admin-assigned, student-only)
+router.get("/assigned-practice", listStudentAssignedPractice);
+router.get("/assigned-practice/history", listAssignedPracticeHistory);
+router.post("/assigned-practice/:id/start", startAssignedPracticeAttempt);
 
 // Get all tests (history)
 router.get("/", getTests);

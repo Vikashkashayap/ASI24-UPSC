@@ -347,6 +347,30 @@ export const prelimsMockAPI = {
   startAttempt: (mockId: string) => api.post(`/api/prelims-mock/${mockId}/start`),
 };
 
+// Assigned topic practice – admin generates 50Q by subject+topic and assigns to students
+export interface AssignedPracticeGeneratePayload {
+  subject: string;
+  topic: string;
+  difficulty?: "easy" | "moderate" | "hard";
+  title?: string;
+  patternsToInclude?: string[];
+}
+
+export const assignedPracticeAPI = {
+  // Admin
+  generate: (data: AssignedPracticeGeneratePayload) =>
+    api.post("/api/admin/assigned-practice", data),
+  assign: (id: string, studentIds: string[]) =>
+    api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),
+  listAdmin: () => api.get("/api/admin/assigned-practice"),
+  delete: (id: string) => api.delete(`/api/admin/assigned-practice/${id}`),
+  // Student
+  listMine: () => api.get("/api/tests/assigned-practice"),
+  getHistory: (params?: { page?: number; limit?: number }) =>
+    api.get("/api/tests/assigned-practice/history", { params }),
+  startAttempt: (id: string) => api.post(`/api/tests/assigned-practice/${id}/start`),
+};
+
 // DART – Daily Activity & Reflection Tracker API
 export const dartAPI = {
   submit: (body: Record<string, unknown>) => api.post("/api/dart", body),

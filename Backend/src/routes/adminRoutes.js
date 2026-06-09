@@ -37,6 +37,12 @@ import {
   getMockResults,
 } from "../controllers/prelimsMockController.js";
 import {
+  createAssignedPractice,
+  assignStudentsToPractice,
+  listAdminAssignedPractice,
+  deleteAssignedPractice,
+} from "../controllers/assignedPracticeController.js";
+import {
   getAllPlans,
   createPlan,
   updatePlan,
@@ -96,6 +102,12 @@ router.get("/prelims-mock/:id/export", exportPrelimsMockAsJson);
 router.post("/prelims-mock/:id/go-live", goLivePrelimsMock);
 router.patch("/prelims-mock/:id", updatePrelimsMockSchedule);
 router.delete("/prelims-mock/:id", deletePrelimsMock);
+
+// Assigned topic practice (admin generates 50Q and assigns to students)
+router.post("/assigned-practice", createAssignedPractice);
+router.get("/assigned-practice", listAdminAssignedPractice);
+router.post("/assigned-practice/:id/assign", assignStudentsToPractice);
+router.delete("/assigned-practice/:id", deleteAssignedPractice);
 
 // Pricing plans: CRUD (admin only)
 router.get("/pricing", getAllPlans);

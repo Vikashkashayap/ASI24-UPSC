@@ -30,6 +30,11 @@ const testSchema = new mongoose.Schema(
       ref: "PrelimsMock",
       required: false,
     },
+    assignedPracticeTestId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AssignedPracticeTest",
+      required: false,
+    },
     difficulty: {
       type: String,
       required: false,

@@ -7,6 +7,7 @@ interface Props {
   text: string;
   theme?: Theme;
   className?: string;
+  compact?: boolean;
 }
 
 function partLabel(role: "A" | "R", theme: Theme): string {
@@ -19,19 +20,22 @@ function partLabel(role: "A" | "R", theme: Theme): string {
       : "Reason (R)";
 }
 
-function renderParts(parts: UpscStemPart[], theme: Theme, className: string) {
+function renderParts(parts: UpscStemPart[], theme: Theme, className: string, compact = false) {
+  const size = compact ? "text-[12px] sm:text-[13px] leading-relaxed" : "text-base sm:text-lg leading-relaxed";
   const introClass =
-    theme === "dark" ? "text-slate-100 font-semibold" : "text-slate-900 font-semibold";
-  const stmtClass = theme === "dark" ? "text-slate-200" : "text-slate-800";
+    theme === "dark" ? `text-slate-100 font-semibold ${size}` : `text-slate-900 font-semibold ${size}`;
+  const stmtClass = theme === "dark" ? `text-slate-200 ${size}` : `text-slate-800 ${size}`;
   const promptClass =
-    theme === "dark" ? "text-slate-300 font-medium italic" : "text-slate-700 font-medium italic";
+    theme === "dark"
+      ? `text-slate-600 font-semibold ${size}`
+      : `text-slate-700 font-semibold ${size}`;
 
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={`${compact ? "space-y-1.5" : "space-y-3"} ${className}`}>
       {parts.map((part, index) => {
         if (part.type === "intro") {
           return (
-            <p key={`intro-${index}`} className={`${introClass} text-base sm:text-lg leading-relaxed`}>
+            <p key={`intro-${index}`} className={introClass}>
               {part.text}
             </p>
           );
@@ -40,13 +44,13 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string) {
           return (
             <div key={`stmt-${part.number}-${index}`} className="flex gap-2 sm:gap-3 pl-0 sm:pl-1">
               <span className={`shrink-0 font-semibold tabular-nums ${stmtClass}`}>{part.number}.</span>
-              <p className={`${stmtClass} text-base sm:text-lg leading-relaxed flex-1 min-w-0`}>{part.text}</p>
+              <p className={`${stmtClass} flex-1 min-w-0 break-words`}>{part.text}</p>
             </div>
           );
         }
         if (part.type === "prompt") {
           return (
-            <p key={`prompt-${index}`} className={`${promptClass} text-base sm:text-lg leading-relaxed pt-1`}>
+            <p key={`prompt-${index}`} className={`${promptClass} ${compact ? "pt-0.5" : "pt-1"}`}>
               {part.text}
             </p>
           );
@@ -66,12 +70,12 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string) {
               >
                 {partLabel(part.role, theme)}
               </div>
-              <p className={`${stmtClass} text-base sm:text-lg leading-relaxed`}>{part.text}</p>
+              <p className={stmtClass}>{part.text}</p>
             </div>
           );
         }
         return (
-          <p key={`plain-${index}`} className={`${stmtClass} text-base sm:text-lg leading-relaxed`}>
+          <p key={`plain-${index}`} className={stmtClass}>
             {part.text}
           </p>
         );
@@ -80,12 +84,18 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string) {
   );
 }
 
-export const UpscFormattedQuestionStem: React.FC<Props> = ({ text, theme = "light", className = "" }) => {
+export const UpscFormattedQuestionStem: React.FC<Props> = ({
+  text,
+  theme = "light",
+  className = "",
+  compact = false,
+}) => {
   const parts = parseUpscQuestionStem(text);
+  const size = compact ? "text-[12px] sm:text-[13px] leading-relaxed" : "text-base sm:text-lg leading-relaxed";
   if (!isStructuredUpscStem(parts)) {
     return (
       <p
-        className={`${className} text-base sm:text-lg leading-relaxed break-words ${
+        className={`${className} ${size} break-words ${
           theme === "dark" ? "text-slate-100" : "text-slate-900"
         }`}
       >
@@ -93,5 +103,5 @@ export const UpscFormattedQuestionStem: React.FC<Props> = ({ text, theme = "ligh
       </p>
     );
   }
-  return renderParts(parts, theme, className);
+  return renderParts(parts, theme, className, compact);
 };

@@ -3,9 +3,19 @@ import crypto from "crypto";
 import { getFrontendOrigin } from "../config/urlConfig.js";
 import {
   getTestGenerationModel,
+  getPracticeGenerationModel,
+  getPracticeTranslationModel,
   getMaxTokensForTestGeneration,
+  getMaxTokensForPracticeGeneration,
+  getMaxTokensForPracticeHindiBatch,
   getMixBatchSize,
   getMixGenerateBuffer,
+  getPracticeBatchSize,
+  getPracticeGenerateBuffer,
+  getPracticeMaxRefillBatches,
+  getPracticeHindiBatchSize,
+  isPracticeEnglishOnly,
+  isPracticeBatchHindiEnabled,
 } from "../config/openRouterConfig.js";
 import { ensureEnglishBilingualFields } from "./questionTranslationService.js";
 
@@ -38,6 +48,18 @@ function getPrelimsJsonRules() {
   return usesFullBilingualExplanations() ? BILINGUAL_JSON_RULES_FULL : PRELIMS_COMPACT_JSON_RULES;
 }
 
+function getPracticeJsonRules() {
+  if (isPracticeEnglishOnly()) {
+    return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D), explanation (max 15 words, correct option only).`;
+  }
+  return getPrelimsJsonRules();
+}
+
+function practiceBatchJsonNote() {
+  if (isPracticeEnglishOnly()) return "English only.";
+  return bilingualBatchJsonNote();
+}
+
 /**
  * Normalize bilingual fields from the generation prompt (no separate Hindi translation API).
  */
@@ -63,6 +85,19 @@ function stripHtmlForFingerprint(html) {
   return String(html || "").replace(/<[^>]+>/g, " ");
 }
 
+function getQuestionText(q) {
+  if (!q || typeof q !== "object") return "";
+  return String(q.question_en ?? q.question ?? q.questionText ?? "").trim();
+}
+
+function getQuestionOptions(q) {
+  if (!q || typeof q !== "object") return {};
+  return q.options_en ?? q.options ?? {};
+}
+
+const UPSC_STEM_PREFIX_RE =
+  /^(consider the following statements?[:\.]?\s*|with reference to .*?[,\.]?\s*|which of the following (statements?|is\/are correct|is\/are incorrect|is\/are not correct)[:\.]?\s*|how many of the above.*?[:\.]?\s*|match the following.*?[:\.]?\s*)/i;
+
 /**
  * Normalize text so two visually identical stems (HTML vs plain, extra spaces) dedupe together.
  */
@@ -81,7 +116,7 @@ function normalizeTextForFingerprint(raw) {
  */
 export function canonicalDedupeKey(q) {
   if (!q || typeof q !== "object") return "";
-  const stem = normalizeTextForFingerprint(q.question ?? q.questionText ?? "");
+  const stem = normalizeTextForFingerprint(getQuestionText(q));
   const ar = q.assertionReason;
   let arKey = "";
   if (ar && typeof ar === "object" && (ar.assertion || ar.reason)) {
@@ -101,7 +136,7 @@ export function canonicalDedupeKey(q) {
       .join("|");
     tableKey = `${h}##${r}`;
   }
-  const opts = q.options || {};
+  const opts = getQuestionOptions(q);
   const optKey = ["A", "B", "C", "D"].map((k) => normalizeTextForFingerprint(opts[k] ?? "")).join("|");
   return [stem, arKey, matchKey, tableKey, optKey].filter(Boolean).join("##");
 }
@@ -132,10 +167,78 @@ export function dedupeQuestions(questions) {
  */
 function canonicalStemKey(q) {
   if (!q || typeof q !== "object") return "";
-  const stem = normalizeTextForFingerprint(q.question ?? q.questionText ?? "");
+  const stem = normalizeTextForFingerprint(getQuestionText(q));
   const ar = q.assertionReason;
-  const arKey = ar && typeof ar === "object" ? `${normalizeTextForFingerprint(ar.assertion)}|${normalizeTextForFingerprint(ar.reason)}` : "";
+  const arKey =
+    ar && typeof ar === "object"
+      ? `${normalizeTextForFingerprint(ar.assertion)}|${normalizeTextForFingerprint(ar.reason)}`
+      : "";
   return [stem, arKey].filter(Boolean).join("##");
+}
+
+/** Loose stem key — catches paraphrased repeats after stripping UPSC boilerplate. */
+function looseStemKey(q) {
+  let stem = normalizeTextForFingerprint(getQuestionText(q));
+  stem = stem.replace(UPSC_STEM_PREFIX_RE, "");
+  stem = stem.replace(/\b[1234]\.\s/g, " ");
+  return stem.trim().slice(0, 80);
+}
+
+/**
+ * Build fingerprint sets from stored/generated questions (for cross-paper dedupe).
+ */
+export function buildQuestionFingerprints(questions) {
+  const fullKeys = new Set();
+  const stemKeys = new Set();
+  const looseKeys = new Set();
+  const snippets = [];
+
+  for (const q of questions || []) {
+    const plain = {
+      question: getQuestionText(q),
+      question_en: getQuestionText(q),
+      options: getQuestionOptions(q),
+      options_en: getQuestionOptions(q),
+      matchColumns: q.matchColumns,
+      assertionReason: q.assertionReason,
+      tableData: q.tableData,
+    };
+    const fk = canonicalDedupeKey(plain);
+    const sk = canonicalStemKey(plain);
+    const lk = looseStemKey(plain);
+    if (fk) fullKeys.add(fk);
+    if (sk) stemKeys.add(sk);
+    if (lk) looseKeys.add(lk);
+    const stem = getQuestionText(q);
+    if (stem) snippets.push(stem.slice(0, 100));
+  }
+
+  return { fullKeys, stemKeys, looseKeys, snippets: [...new Set(snippets)] };
+}
+
+export function isQuestionRepeatOfPrior(q, priorFingerprints) {
+  if (!priorFingerprints || !q) return false;
+  const plain = {
+    question: getQuestionText(q),
+    question_en: getQuestionText(q),
+    options: getQuestionOptions(q),
+    options_en: getQuestionOptions(q),
+    matchColumns: q.matchColumns,
+    assertionReason: q.assertionReason,
+    tableData: q.tableData,
+  };
+  const fk = canonicalDedupeKey(plain);
+  const sk = canonicalStemKey(plain);
+  const lk = looseStemKey(plain);
+  if (fk && priorFingerprints.fullKeys?.has(fk)) return true;
+  if (sk && priorFingerprints.stemKeys?.has(sk)) return true;
+  if (lk && priorFingerprints.looseKeys?.has(lk)) return true;
+  return false;
+}
+
+export function filterOutPriorRepeats(questions, priorFingerprints) {
+  if (!priorFingerprints || !Array.isArray(questions)) return questions;
+  return questions.filter((q) => !isQuestionRepeatOfPrior(q, priorFingerprints));
 }
 
 /**
@@ -528,10 +631,11 @@ Return ONLY JSON with "test_name" and "questions" array.`;
 }
 
 /** CSAT papers use passage-based sets; stem-only dedupe would drop valid RC siblings. */
-function dedupeMockPaperQuestions(questions, { csat = false } = {}) {
-  const base = dedupeQuestions(questions);
-  if (csat) return base;
-  return dedupeQuestionsByStem(base);
+function dedupeMockPaperQuestions(questions, { csat = false, priorFingerprints = null } = {}) {
+  let base = dedupeQuestions(questions);
+  if (!csat) base = dedupeQuestionsByStem(base);
+  if (priorFingerprints) base = filterOutPriorRepeats(base, priorFingerprints);
+  return base;
 }
 
 function bilingualBatchJsonNote() {
@@ -550,23 +654,36 @@ async function runFullMockPaperGenerationLoop({
   csatPaper = false,
   logPrefix,
   generateBatch,
+  generateBuffer,
+  perBatch: perBatchOverride,
+  maxRefillBatches: maxRefillBatchesOverride,
+  estimateMaxTokens,
+  priorFingerprints = null,
+  rollingExcludeLimit = 5,
 }) {
-  const perBatch = getMixBatchSize();
-  const generateCount = displayCount + getMixGenerateBuffer();
+  const perBatch = perBatchOverride ?? getMixBatchSize();
+  const generateCount = displayCount + (generateBuffer ?? getMixGenerateBuffer());
   const batches = Math.ceil(generateCount / perBatch);
+  const tokenEst = estimateMaxTokens ?? getMaxTokensForTestGeneration;
   const all = [];
   let testName = null;
 
-  for (let b = 1; b <= batches; b += 1) {
-    const rollingExclude = [
+  const applyDedupe = (qs) =>
+    dedupeMockPaperQuestions(qs, { csat: csatPaper, priorFingerprints });
+
+  const collectExcludeSnippets = (qs) =>
+    [
       ...new Set(
-        dedupeMockPaperQuestions(all, { csat: csatPaper })
-          .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
+        applyDedupe(qs)
+          .map((q) => getQuestionText(q).slice(0, 100))
           .filter(Boolean)
       ),
-    ].slice(0, 5);
+    ].slice(0, rollingExcludeLimit);
+
+  for (let b = 1; b <= batches; b += 1) {
+    const rollingExclude = collectExcludeSnippets(all);
     console.log(
-      `📝 ${logPrefix}: batch ${b}/${batches} (${perBatch} Q, max_tokens≈${getMaxTokensForTestGeneration(perBatch)})...`
+      `📝 ${logPrefix}: batch ${b}/${batches} (${perBatch} Q, max_tokens≈${tokenEst(perBatch)})...`
     );
     const { questions: batchQuestions, testName: batchTestName } = await generateBatch(
       apiKey,
@@ -579,18 +696,15 @@ async function runFullMockPaperGenerationLoop({
     if (batchQuestions?.length) all.push(...batchQuestions);
   }
 
-  let deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
-  const maxRefills = getMixMaxRefillBatches();
+  let deduped = applyDedupe(all);
+  const maxRefills = maxRefillBatchesOverride ?? getMixMaxRefillBatches();
   let refill = 0;
   let stallRounds = 0;
 
   while (deduped.length < displayCount && refill < maxRefills) {
     const beforeCount = deduped.length;
     const need = Math.max(1, Math.min(perBatch, displayCount - deduped.length));
-    const snippetPool = deduped
-      .map((q) => String(q.question_en || q.question || q.questionText || "").trim().slice(0, 60))
-      .filter(Boolean)
-      .slice(0, 5);
+    const snippetPool = collectExcludeSnippets(deduped);
     console.log(
       `📝 ${logPrefix}: refill ${refill + 1}/${maxRefills} (unique ${deduped.length}/${displayCount}, requesting ${need})...`
     );
@@ -603,7 +717,7 @@ async function runFullMockPaperGenerationLoop({
     );
     if (batchTestName) testName = batchTestName;
     if (batchQuestions?.length) all.push(...batchQuestions);
-    deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
+    deduped = applyDedupe(all);
     refill += 1;
     if (deduped.length === beforeCount) stallRounds += 1;
     else stallRounds = 0;
@@ -620,14 +734,11 @@ async function runFullMockPaperGenerationLoop({
     console.log(`📝 ${logPrefix}: short by ${gap}, running up to ${gap + 2} micro top-up batches...`);
     for (let t = 0; t < gap + 2 && finalQuestions.length < displayCount; t += 1) {
       const need = displayCount - finalQuestions.length;
-      const snippets = finalQuestions
-        .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
-        .filter(Boolean)
-        .slice(0, 8);
+      const snippets = collectExcludeSnippets(finalQuestions);
       const { questions: extra } = await generateBatch(apiKey, model, need, `Top-up ${t + 1}`, snippets);
       if (extra?.length) {
         all.push(...extra);
-        deduped = dedupeMockPaperQuestions(all, { csat: csatPaper });
+        deduped = applyDedupe(all);
         finalQuestions = deduped.slice(0, displayCount);
       }
     }
@@ -1958,21 +2069,543 @@ async function fetchQuestionBatch({
 
   let { questions: batch, finishReason: lastFinish } = await runOnce(`${userPrompt}${avoidBlock}`, need);
 
-  if (batch.length < need && lastFinish === "length") {
+  if (batch.length < need) {
     const missing = need - batch.length;
     const stems = batch
       .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
       .filter(Boolean);
     const topUpPrompt = `${userPrompt}${avoidBlock}\n\nGenerate EXACTLY ${missing} ADDITIONAL questions (not ${need} total). Return ONLY a JSON array of ${missing} new objects.${stems.length ? `\nAvoid repeating:\n${stems.map((s) => `- ${s}`).join("\n")}` : ""}`;
-    const { questions: more } = await runOnce(topUpPrompt, missing);
+    const { questions: more, finishReason: topFinish } = await runOnce(topUpPrompt, missing);
     batch = dedupeMockPaperQuestions([...batch, ...more], { csat: csatPaper }).slice(0, need);
-  } else if (batch.length < need) {
-    console.warn(
-      `⚠️ Batch parsed ${batch.length}/${need} questions (finish_reason=${lastFinish ?? "unknown"}); skipping top-up`
-    );
+    if (batch.length < need && lastFinish !== "length" && topFinish !== "length") {
+      console.warn(
+        `⚠️ Batch parsed ${batch.length}/${need} questions after top-up (finish_reason=${topFinish ?? lastFinish ?? "unknown"})`
+      );
+    }
   }
 
   return { questions: batch, apiCalls };
+}
+
+const TOPIC_PRACTICE_DEFAULT_PATTERNS = Object.keys(PATTERN_LABELS);
+
+const PATTERN_TO_QUESTION_TYPE = {
+  statement_based: "statement",
+  statement_not_correct: "statement",
+  multi_statement_elimination: "statement",
+  odd_one_out: "odd_one_out",
+  pair_matching: "match",
+  assertion_reason: "assertion",
+  direct_conceptual: "direct",
+  chronology: "chronology",
+  sequence_arrangement: "chronology",
+  map_location: "map",
+};
+
+function getPatternFormatRule(patternId) {
+  const rules = {
+    statement_based:
+      '2–3 numbered statements; options MUST be statement combos: "1 only", "2 only", "1 and 2 only", "1, 2 and 3". Ask which are correct.',
+    statement_not_correct:
+      '2–3 numbered statements; ask which is NOT correct; options MUST use statement-number combos.',
+    pair_matching:
+      "List I & List II match-the-following; use matchColumns when helpful; standard UPSC pair options.",
+    assertion_reason:
+      "Assertion (A) + Reason (R); options: (a) Both correct, A explains R (b) Both correct, A does not explain R (c) A correct, R wrong (d) A wrong, R correct.",
+    direct_conceptual:
+      "Single-stem conceptual MCQ; elimination-based; avoid rote fact recall.",
+    chronology:
+      "Historical/events chronology; options show different orderings; pick correct sequence.",
+    sequence_arrangement:
+      "Logical/process sequence; options show different orderings; pick correct sequence.",
+    map_location:
+      "Location/map concept question (no image); geography tied to the topic.",
+    odd_one_out: "Four related items; one does not belong; identify the odd one.",
+    multi_statement_elimination:
+      '"How many of the above are correct?" with 2–4 statements; options like "Only one", "Only two", "All three", "None".',
+  };
+  return rules[patternId] || PATTERN_LABELS[patternId] || patternId;
+}
+
+function resolveTopicPracticePatterns(patternsToInclude = []) {
+  const valid = Array.isArray(patternsToInclude)
+    ? patternsToInclude.filter((id) => PATTERN_LABELS[id])
+    : [];
+  return valid.length > 0 ? valid : TOPIC_PRACTICE_DEFAULT_PATTERNS;
+}
+
+/** Equal split: 50 Q + 10 patterns → 5 each; remainder +1 to first patterns. */
+function buildEqualPatternQuota(patternIds, totalCount) {
+  const ids = Array.isArray(patternIds) ? patternIds.filter(Boolean) : [];
+  if (ids.length === 0) return [];
+  const base = Math.floor(totalCount / ids.length);
+  let remainder = totalCount % ids.length;
+  return ids.map((patternId) => {
+    const count = base + (remainder > 0 ? 1 : 0);
+    if (remainder > 0) remainder -= 1;
+    return { patternId, count };
+  });
+}
+
+function tagQuestionWithPattern(q, patternId) {
+  return {
+    ...q,
+    patternType: patternId,
+    questionType: PATTERN_TO_QUESTION_TYPE[patternId] || "direct",
+  };
+}
+
+function countPatternQuestions(questions, patternId) {
+  return (questions || []).filter((q) => q.patternType === patternId).length;
+}
+
+function interleavePatternQuestions(buckets, patternOrder) {
+  const final = [];
+  const maxLen = Math.max(0, ...patternOrder.map((p) => (buckets[p] || []).length));
+  for (let i = 0; i < maxLen; i += 1) {
+    for (const p of patternOrder) {
+      if (buckets[p]?.[i]) final.push(buckets[p][i]);
+    }
+  }
+  return final;
+}
+
+function buildCompactTopicPracticeSystemPrompt(
+  subject,
+  topic,
+  difficulty,
+  excludeSnippets = [],
+  patternsToInclude = [],
+  singlePatternId = null
+) {
+  const avoidLine =
+    Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+      ? `\nDo NOT repeat or closely paraphrase these prior stems/concepts (from earlier tests on this topic):\n${excludeSnippets.slice(0, 20).map((s) => `- ${String(s).slice(0, 100)}`).join("\n")}\n`
+      : "";
+  const diffNorm = String(difficulty || "moderate").toLowerCase();
+  const diffLine = diffNorm === "easy" ? "Easy" : diffNorm === "hard" ? "Hard" : "Moderate";
+  const explLine = usesFullBilingualExplanations()
+    ? "explanation_en + explanation_hi per option (brief)."
+    : '"explanation": one short English sentence for the correct option only.';
+  const jsonRules = getPracticeJsonRules();
+  const bilingualNote = isPracticeEnglishOnly() ? "English only." : "Bilingual EN+HI question and options.";
+
+  if (singlePatternId && PATTERN_LABELS[singlePatternId]) {
+    const label = PATTERN_LABELS[singlePatternId];
+    const rule = getPatternFormatRule(singlePatternId);
+    return `UPSC GS Paper-I topic-practice MCQ generator (real Prelims standard).${avoidLine}
+Subject: ${subject}. Topic: "${topic}". Difficulty: ${diffLine}.
+STRICT PATTERN (100% of this batch): "${label}" ONLY — every question must use this exact UPSC format.
+Format rule: ${rule}
+${jsonRules}
+questionType: "${PATTERN_TO_QUESTION_TYPE[singlePatternId] || "direct"}". Use matchColumns or assertionReason only if this pattern requires it.
+${explLine}
+${bilingualNote}
+Return ONLY a JSON array. No markdown. ZERO repeats — unique sub-concept per question.`;
+  }
+
+  const activePatterns = resolveTopicPracticePatterns(patternsToInclude);
+  const perPattern = activePatterns.length > 0 ? Math.floor(50 / activePatterns.length) : 5;
+  const patterns = activePatterns.map((id) => PATTERN_LABELS[id] || id).join("; ");
+  const patternRules = `UPSC format (real Prelims style):
+- Statement-based: 2–3 numbered statements; options like "1 only", "2 only", "1 and 2 only", "1, 2 and 3".
+- Statement NOT correct: same structure, ask which is incorrect.
+- Pair matching / Match the following: List I & List II (use matchColumns when needed).
+- Assertion–Reason: standard A/R with 4 UPSC options.
+- Direct conceptual: elimination-based, not rote recall.
+- Chronology / Sequence: events or steps; options show correct order.
+- Map/location: concept-based geography (no image).
+- Odd one out: four related items, one misfit.
+- Multi-statement elimination: "How many of the above are correct?" with 2–4 statements.`;
+
+  return `UPSC GS Paper-I topic-practice MCQ generator (real Prelims standard).${avoidLine}
+Subject: ${subject}. Topic: "${topic}". Difficulty: ${diffLine}.
+EQUAL WEIGHTAGE: ${activePatterns.length} patterns × ~${perPattern} questions each (50 total). Use ONLY: ${patterns}.
+${patternRules}
+${jsonRules}
+Per question: questionType (statement|match|assertion|chronology|pair|map|direct|odd_one_out). Use matchColumns or assertionReason only when the pattern needs it. At least one trap option per question.
+${explLine}
+${bilingualNote}
+Return ONLY a JSON array. No markdown. ZERO repeats — each question must test a unique concept/angle not used in this paper or any prior paper on this topic.`;
+}
+
+/**
+ * One cheap Hindi pass for English-only practice questions (1–2 API calls for 50Q).
+ */
+async function batchTranslatePracticeQuestionsToHindi(apiKey, model, questions) {
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
+
+  const chunkSize = getPracticeHindiBatchSize();
+  const merged = questions.map((q) => ({ ...q }));
+
+  for (let start = 0; start < merged.length; start += chunkSize) {
+    const slice = merged.slice(start, start + chunkSize);
+    const payload = slice.map((q, idx) => ({
+      id: idx,
+      question: String(q.question_en || q.question || "").trim(),
+      options: q.options_en || q.options,
+    }));
+
+    const systemPrompt =
+      "UPSC Hindi translator. Return JSON array only. For each input item add question_hi and options_hi (Devanagari). Same count and order. No extra text.";
+    const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
+
+    const maxTokens = getMaxTokensForPracticeHindiBatch(slice.length);
+    console.log(
+      `📝 Topic practice Hindi batch ${Math.floor(start / chunkSize) + 1}: ${slice.length} Q, max_tokens≈${maxTokens}...`
+    );
+
+    try {
+      const { aiContent } = await callOpenRouterTestGeneration({
+        apiKey,
+        model,
+        systemPrompt,
+        userPrompt,
+        maxTokens,
+        apiTitle: "UPSC Mentor - Topic Practice Hindi",
+      });
+
+      let parsed = null;
+      try {
+        parsed = JSON.parse(aiContent.trim().replace(/^```\s*(?:json)?\s*/i, "").replace(/\s*```\s*$/, ""));
+      } catch (_) {
+        parsed = extractJsonFromContent(aiContent);
+      }
+      const rows = Array.isArray(parsed) ? parsed : parsed?.questions || [];
+      if (!Array.isArray(rows) || rows.length === 0) {
+        console.warn("Topic practice Hindi batch: empty parse, keeping English fallbacks");
+        continue;
+      }
+
+      for (let i = 0; i < slice.length; i += 1) {
+        const srcIdx = start + i;
+        const row = rows.find((r) => r?.id === i) ?? rows[i];
+        if (!row || !merged[srcIdx]) continue;
+        const questionHi = String(row.question_hi || "").trim();
+        const optionsHi = row.options_hi || row.options;
+        if (questionHi) merged[srcIdx].question_hi = questionHi;
+        if (optionsHi && typeof optionsHi === "object") {
+          merged[srcIdx].options_hi = {
+            A: String(optionsHi.A ?? optionsHi.a ?? "").trim(),
+            B: String(optionsHi.B ?? optionsHi.b ?? "").trim(),
+            C: String(optionsHi.C ?? optionsHi.c ?? "").trim(),
+            D: String(optionsHi.D ?? optionsHi.d ?? "").trim(),
+          };
+        }
+      }
+    } catch (err) {
+      console.warn("Topic practice Hindi batch failed:", err.message);
+    }
+  }
+
+  return merged.map(ensureEnglishBilingualFields);
+}
+
+async function generateTopicPracticeBatch(
+  apiKey,
+  model,
+  batchSize,
+  batchLabel,
+  subject,
+  topic,
+  difficulty,
+  excludeSnippets = [],
+  patternsToInclude = [],
+  singlePatternId = null
+) {
+  const systemPrompt = buildCompactTopicPracticeSystemPrompt(
+    subject,
+    topic,
+    difficulty,
+    excludeSnippets,
+    patternsToInclude,
+    singlePatternId
+  );
+  const patternHint = singlePatternId
+    ? PATTERN_LABELS[singlePatternId]
+    : resolveTopicPracticePatterns(patternsToInclude)
+        .map((id) => PATTERN_LABELS[id] || id)
+        .join(", ");
+  const userPrompt = singlePatternId
+    ? `Generate EXACTLY ${batchSize} MCQs (${batchLabel}). Topic: "${topic}". ALL ${batchSize} must be "${patternHint}" type ONLY — same UPSC format, different sub-concepts. ${practiceBatchJsonNote()} JSON array only.`
+    : `Generate EXACTLY ${batchSize} UPSC-style MCQs (${batchLabel}). Topic: "${topic}". Equal mix of: ${patternHint}. Each question must use a distinct concept/angle — no repeats. ${practiceBatchJsonNote()} JSON array only.`;
+
+  const maxTokens = getMaxTokensForPracticeGeneration(batchSize);
+  const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    maxTokens,
+    apiTitle: "UPSC Mentor - Topic Practice",
+  });
+
+  if (finishReason === "length") {
+    console.warn(`⚠️ Topic practice batch truncated (max_tokens=${maxTokens}, need=${batchSize})`);
+  }
+
+  const validated = dedupeMockPaperQuestions(parseAndValidateQuestions(aiContent, batchSize), { csat: false });
+  if (validated.length > 0) {
+    return { questions: validated, finishReason };
+  }
+
+  console.error("Topic practice batch: no valid questions. Raw (first 600 chars):", aiContent.slice(0, 600));
+  return { questions: [], finishReason };
+}
+
+/**
+ * Generate topic practice with equal quota per pattern (e.g. 10 patterns × 5 Q = 50).
+ */
+async function runTopicPracticePatternQuotaLoop({
+  apiKey,
+  model,
+  subject,
+  topic,
+  difficulty,
+  patterns,
+  displayCount,
+  priorFingerprints,
+  priorSnippets = [],
+  logPrefix,
+  maxRefillBatches,
+}) {
+  const quotaPlan = buildEqualPatternQuota(patterns, displayCount);
+  let all = [];
+
+  console.log(
+    `📝 ${logPrefix}: equal pattern quota — ${quotaPlan.map((p) => `${PATTERN_LABELS[p.patternId] || p.patternId}=${p.count}`).join(", ")}`
+  );
+
+  const maxAttemptsPerPattern = Math.max(
+    6,
+    Math.ceil(Math.max(...quotaPlan.map((p) => p.count), 1) / getPracticeBatchSize()) + 5
+  );
+
+  const requestPatternBatch = async (patternId, batchSize, batchLabel) => {
+    const excludeSnippets = [
+      ...new Set([
+        ...(priorSnippets || []),
+        ...all.map((q) => getQuestionText(q).slice(0, 100)).filter(Boolean),
+      ]),
+    ].slice(0, 20);
+    return generateTopicPracticeBatch(
+      apiKey,
+      model,
+      batchSize,
+      batchLabel,
+      subject,
+      topic,
+      difficulty,
+      excludeSnippets,
+      [patternId],
+      patternId
+    );
+  };
+
+  for (const { patternId, count } of quotaPlan) {
+    let stallRounds = 0;
+    let attempts = 0;
+
+    while (countPatternQuestions(all, patternId) < count && attempts < maxAttemptsPerPattern) {
+      const before = countPatternQuestions(all, patternId);
+      const need = count - before;
+      const batchSize = Math.min(need, getPracticeBatchSize());
+      console.log(
+        `📝 ${logPrefix}: ${PATTERN_LABELS[patternId]} ${before}/${count}, requesting ${batchSize}...`
+      );
+      const { questions } = await requestPatternBatch(
+        patternId,
+        batchSize,
+        `${PATTERN_LABELS[patternId]} (${before + 1}–${count})`
+      );
+      if (questions?.length) {
+        const tagged = questions.map((q) => tagQuestionWithPattern(q, patternId));
+        all = dedupeMockPaperQuestions([...all, ...tagged], { priorFingerprints, csat: false });
+      }
+      attempts += 1;
+      if (countPatternQuestions(all, patternId) === before) stallRounds += 1;
+      else stallRounds = 0;
+      if (stallRounds >= 3) {
+        console.warn(`📝 ${logPrefix}: stall on pattern ${patternId}`);
+        break;
+      }
+    }
+
+    const got = countPatternQuestions(all, patternId);
+    if (got < count) {
+      console.warn(`📝 ${logPrefix}: pattern ${patternId} short — ${got}/${count}`);
+    }
+  }
+
+  let refill = 0;
+  while (refill < maxRefillBatches) {
+    const short = quotaPlan.filter((p) => countPatternQuestions(all, p.patternId) < p.count);
+    if (short.length === 0) break;
+    let progress = false;
+    for (const { patternId, count } of short) {
+      const before = countPatternQuestions(all, patternId);
+      if (before >= count) continue;
+      const need = count - before;
+      const batchSize = Math.min(need, getPracticeBatchSize());
+      console.log(
+        `📝 ${logPrefix}: refill ${refill + 1} — ${PATTERN_LABELS[patternId]} need ${need}...`
+      );
+      const { questions } = await requestPatternBatch(
+        patternId,
+        batchSize,
+        `${PATTERN_LABELS[patternId]} refill ${refill + 1}`
+      );
+      if (questions?.length) {
+        const tagged = questions.map((q) => tagQuestionWithPattern(q, patternId));
+        const merged = dedupeMockPaperQuestions([...all, ...tagged], { priorFingerprints, csat: false });
+        if (merged.length > all.length || countPatternQuestions(merged, patternId) > before) {
+          progress = true;
+        }
+        all = merged;
+      }
+    }
+    refill += 1;
+    if (!progress) break;
+  }
+
+  const buckets = {};
+  for (const { patternId, count } of quotaPlan) {
+    buckets[patternId] = all.filter((q) => q.patternType === patternId).slice(0, count);
+  }
+  const finalQuestions = interleavePatternQuestions(buckets, patterns).slice(0, displayCount);
+
+  return { finalQuestions, deduped: all, quotaPlan };
+}
+
+/**
+ * Token-efficient 50Q generator for admin topic practice.
+ * Uses compact prompts, 10Q batches, small over-generate buffer, and prior-stem exclusion.
+ */
+export const generateAssignedPracticeQuestions = async ({
+  subject,
+  topic,
+  difficulty = "Moderate",
+  questionCount = 50,
+  excludeSnippets = [],
+  patternsToInclude = [],
+  priorFingerprints = null,
+}) => {
+  try {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    const model = getPracticeGenerationModel();
+
+    if (!apiKey) {
+      throw new Error("Missing OPENROUTER_API_KEY in environment variables");
+    }
+
+    const subjectStr = String(subject || "").trim();
+    const topicStr = String(topic || "").trim();
+    if (!subjectStr || !topicStr) {
+      throw new Error("Subject and topic are required");
+    }
+
+    const displayCount = Math.max(10, Math.min(50, parseInt(questionCount, 10) || 50));
+    const diffNorm = ["easy", "moderate", "hard"].includes(String(difficulty || "").toLowerCase())
+      ? String(difficulty).toLowerCase()
+      : "moderate";
+    const prior =
+      priorFingerprints ||
+      (Array.isArray(excludeSnippets) && excludeSnippets.length > 0
+        ? { fullKeys: new Set(), stemKeys: new Set(), looseKeys: new Set(), snippets: excludeSnippets }
+        : null);
+    const priorSnippets = prior?.snippets?.length ? prior.snippets : excludeSnippets;
+    const priorCount = prior?.fullKeys?.size || 0;
+    const patterns = resolveTopicPracticePatterns(patternsToInclude);
+    if (patterns.length === 0) {
+      throw new Error("Select at least one question pattern");
+    }
+
+    const perPatternCount = Math.floor(displayCount / patterns.length);
+    const maxRefillBatches =
+      getPracticeMaxRefillBatches() + (priorCount > 0 ? Math.min(10, Math.floor(priorCount / 25) + 2) : 0);
+
+    const costMode = isPracticeEnglishOnly()
+      ? isPracticeBatchHindiEnabled()
+        ? "english+batch-hindi"
+        : "english-only"
+      : "bilingual";
+
+    console.log(
+      `📝 Topic practice: ${patterns.length} patterns × ~${perPatternCount}Q each (${displayCount} total), model=${model}, priorQ=${priorCount}`
+    );
+
+    const { finalQuestions, quotaPlan } = await runTopicPracticePatternQuotaLoop({
+      apiKey,
+      model,
+      subject: subjectStr,
+      topic: topicStr,
+      difficulty: diffNorm,
+      patterns,
+      displayCount,
+      priorFingerprints: prior,
+      priorSnippets,
+      logPrefix: `Topic practice (${subjectStr} — ${topicStr})`,
+      maxRefillBatches,
+    });
+
+    if (quotaPlan?.length) {
+      console.log(
+        `📝 Topic practice quota result: ${quotaPlan.map((p) => `${p.patternId}=${p.count}`).join(", ")}`
+      );
+    }
+
+    if (finalQuestions.length === 0) {
+      throw new Error("No valid UPSC questions generated. Please try again.");
+    }
+
+    if (finalQuestions.length < displayCount) {
+      throw new Error(
+        `Only ${finalQuestions.length} of ${displayCount} questions were generated. Please try again.`
+      );
+    }
+
+    let translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
+
+    if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled()) {
+      translatedQuestions = await batchTranslatePracticeQuestionsToHindi(
+        apiKey,
+        getPracticeTranslationModel(),
+        translatedQuestions
+      );
+    }
+
+    console.log(
+      `✅ Topic practice: ${translatedQuestions.length} questions (${subjectStr} — ${topicStr}, model: ${model}, mode: ${costMode})`
+    );
+
+    return {
+      success: true,
+      questions: translatedQuestions,
+      count: translatedQuestions.length,
+    };
+  } catch (error) {
+    console.error("Error generating assigned practice questions:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to generate questions",
+      questions: [],
+    };
+  }
+};
+
+/**
+ * Max API batch rounds for topic-based generation (dedupe often drops questions).
+ */
+function getTestGenMaxBatchRounds(count, batchSize) {
+  const minRounds = Math.ceil(count / batchSize);
+  const envRefill = parseInt(process.env.TEST_GEN_MAX_REFILL_BATCHES, 10);
+  if (count >= 50) {
+    return minRounds + Math.max(10, Math.min(25, envRefill || 15));
+  }
+  if (count >= 20) {
+    return minRounds + Math.max(4, Math.min(12, envRefill || 6));
+  }
+  return minRounds + 2;
 }
 
 /**
@@ -2019,14 +2652,16 @@ export const generateTestQuestions = async ({
     );
     let validatedQuestions = [];
     let apiCalls = 0;
-    const maxBatchRounds = Math.ceil(count / batchSize) + 2;
+    const maxBatchRounds = getTestGenMaxBatchRounds(count, batchSize);
+    let stallRounds = 0;
 
     for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
+      const beforeLen = validatedQuestions.length;
       const need = Math.min(batchSize, count - validatedQuestions.length);
       const avoidSnippets = validatedQuestions
         .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
         .filter(Boolean)
-        .slice(0, 5);
+        .slice(0, 8);
 
       const batchUserPrompt = buildPrelimsBatchUserPrompt({
         examType,
@@ -2036,8 +2671,9 @@ export const generateTestQuestions = async ({
         difficulty,
       });
 
+      const isRefill = round >= Math.ceil(count / batchSize);
       console.log(
-        `📝 Prelims batch ${round + 1}: requesting ${need} question(s) (${validatedQuestions.length}/${count} so far)...`
+        `📝 Prelims batch ${round + 1}/${maxBatchRounds}${isRefill ? " (refill)" : ""}: requesting ${need} question(s) (${validatedQuestions.length}/${count} so far)...`
       );
 
       const { questions: batchQuestions, apiCalls: batchCalls } = await fetchQuestionBatch({
@@ -2053,12 +2689,55 @@ export const generateTestQuestions = async ({
 
       if (batchQuestions.length === 0) {
         console.warn(`⚠️ Batch ${round + 1} returned 0 parseable questions`);
+        stallRounds += 1;
+        if (stallRounds >= 5) {
+          console.warn("⚠️ Too many empty batches; stopping early");
+          break;
+        }
         continue;
       }
 
       validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...batchQuestions], {
         csat: examType === "CSAT",
       }).slice(0, count);
+
+      if (validatedQuestions.length === beforeLen) {
+        stallRounds += 1;
+      } else {
+        stallRounds = 0;
+      }
+    }
+
+    // Last-resort top-up: request exactly the missing count in one small batch
+    if (validatedQuestions.length > 0 && validatedQuestions.length < count) {
+      const missing = count - validatedQuestions.length;
+      console.log(`📝 Prelims final top-up: requesting ${missing} more question(s)...`);
+      const avoidSnippets = validatedQuestions
+        .map((q) => String(q.question_en || q.question || "").trim().slice(0, 60))
+        .filter(Boolean)
+        .slice(0, 8);
+      const topUpPrompt = buildPrelimsBatchUserPrompt({
+        examType,
+        need: missing,
+        topic,
+        subjectsText,
+        difficulty,
+      });
+      const { questions: topUp, apiCalls: topUpCalls } = await fetchQuestionBatch({
+        apiKey,
+        model,
+        systemPrompt,
+        userPrompt: topUpPrompt,
+        need: missing,
+        avoidSnippets,
+        csatPaper: examType === "CSAT",
+      });
+      apiCalls += topUpCalls;
+      if (topUp.length > 0) {
+        validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...topUp], {
+          csat: examType === "CSAT",
+        }).slice(0, count);
+      }
     }
 
     if (validatedQuestions.length === 0) {
@@ -2094,6 +2773,7 @@ export const generateTestQuestions = async ({
 
 export default {
   generateTestQuestions,
+  generateAssignedPracticeQuestions,
   generateFullMockTestQuestions,
   generateFullMockMixTestQuestions,
   generateFullMockPyoTestQuestions,
@@ -2101,4 +2781,7 @@ export default {
   dedupeQuestions,
   dedupeQuestionsByStem,
   canonicalDedupeKey,
+  buildQuestionFingerprints,
+  filterOutPriorRepeats,
+  isQuestionRepeatOfPrior,
 };

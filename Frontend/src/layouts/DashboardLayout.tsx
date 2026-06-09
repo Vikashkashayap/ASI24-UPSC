@@ -108,6 +108,8 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/practice-test': { title: 'Practice Test', icon: <Target className="w-5 h-5" /> },
+    '/practice-test/history': { title: 'Practice Test History', icon: <History className="w-5 h-5" /> },
     '/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
@@ -130,6 +132,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
     '/admin/mentors': { title: 'Mentors', icon: <Users className="w-5 h-5" /> },
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
+    '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
     '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
@@ -185,6 +188,7 @@ export const DashboardLayout = () => {
   const [dartModalOpen, setDartModalOpen] = useState(false);
   const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
+  const isLiveTestPage = /^\/test\/[^/]+$/.test(location.pathname);
   const pageInfo = getPageTitle(location.pathname, user?.role);
   const isStudent = user?.role !== "admin" && user?.role !== "mentor";
   const hasActiveSubscription =
@@ -203,6 +207,14 @@ export const DashboardLayout = () => {
     theme === "dark"
       ? "border-slate-800/80 bg-[#0B1220] text-slate-50"
       : "border-gray-200 bg-white text-slate-900";
+
+  if (isLiveTestPage) {
+    return (
+      <div className="h-[100dvh] overflow-hidden bg-[#f0f4f8]">
+        <Outlet />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -288,6 +300,10 @@ export const DashboardLayout = () => {
                 <NavLink to="/admin/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Schedule tests">
                   <Target className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
+                </NavLink>
+                <NavLink to="/admin/topic-practice" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Topic Practice - Assign tests to students">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Topic Practice</span>}
                 </NavLink>
                 <NavLink to="/admin/pricing" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Pricing Plans">
                   <IndianRupee className="w-4 h-4 flex-shrink-0" />
@@ -444,6 +460,15 @@ export const DashboardLayout = () => {
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   badge="trial"
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/practice-test"
+                  title="Practice Test - Admin assigned tests"
+                  icon={Target}
+                  label="Practice Test"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
                   onNavigate={() => setMobileMenuOpen(false)}
                 />
                 <SidebarNavItem

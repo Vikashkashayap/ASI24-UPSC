@@ -47,6 +47,8 @@ const CopyEvaluationDetailPage = lazyPage(() => import("./pages/CopyEvaluationDe
 const EvaluationHistoryPage = lazyPage(() => import("./pages/EvaluationHistoryPage"));
 const MeetingPage = lazyPage(() => import("./pages/MeetingPage"), "MeetingPage");
 const TestGeneratorPage = lazyPage(() => import("./pages/TestGeneratorPage"));
+const PracticeTestPage = lazyPage(() => import("./pages/PracticeTestPage"), "PracticeTestPage");
+const PracticeTestHistoryPage = lazyPage(() => import("./pages/PracticeTestHistoryPage"), "PracticeTestHistoryPage");
 const TestHistoryPage = lazyPage(() => import("./pages/TestHistoryPage"));
 const TestPage = lazyPage(() => import("./pages/TestPage"));
 const TestResultPage = lazyPage(() => import("./pages/TestResultPage"));
@@ -76,6 +78,10 @@ const AdminProStudentsPage = lazyPage(
 const PrelimsMockAdminPage = lazyPage(
   () => import("./pages/admin/PrelimsMockAdminPage"),
   "PrelimsMockAdminPage"
+);
+const AssignedPracticeAdminPage = lazyPage(
+  () => import("./pages/admin/AssignedPracticeAdminPage"),
+  "AssignedPracticeAdminPage"
 );
 const MockResultsPage = lazyPage(() => import("./pages/admin/MockResultsPage"), "MockResultsPage");
 const StudentPerformancePage = lazyPage(
@@ -136,6 +142,8 @@ function App() {
               <Route path="evaluation-history" element={<EvaluationHistoryPage />} />
               <Route path="meeting" element={<MeetingPage />} />
               <Route path="prelims-test" element={<TestGeneratorPage />} />
+              <Route path="practice-test" element={<PracticeTestPage />} />
+              <Route path="practice-test/history" element={<PracticeTestHistoryPage />} />
               <Route path="prelims-mock" element={<PrelimsMockPage />} />
               <Route path="test-history" element={<TestHistoryPage />} />
               <Route path="test/:id" element={<TestPage />} />
@@ -169,6 +177,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="pro-students" element={<AdminProStudentsPage />} />
               <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
+              <Route path="topic-practice" element={<AssignedPracticeAdminPage />} />
               <Route path="mock-results/:mockId" element={<MockResultsPage />} />
               <Route path="student-performance/:studentId" element={<StudentPerformancePage />} />
               <Route path="pricing" element={<AdminPricingPage />} />
