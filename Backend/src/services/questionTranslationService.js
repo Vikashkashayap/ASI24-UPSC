@@ -1,5 +1,6 @@
 import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 import { translateToHindi, translateManyToHindi } from "./translateToHindi.js";
+import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
 
@@ -21,37 +22,45 @@ function normalizeOptionsObject(raw) {
 
 /**
  * Ensure English bilingual fields exist (backward compatible with legacy `question` / `options`).
+ * Uses toObject() for Mongoose subdocuments — spread alone drops question_hi / options_hi.
  */
 export function ensureEnglishBilingualFields(question) {
   if (!question || typeof question !== "object") return question;
 
-  const question_en = String(question.question_en ?? question.question ?? "").trim();
-  const options_en = normalizeOptionsObject(question.options_en ?? question.options);
+  const plain =
+    typeof question.toObject === "function" ? question.toObject() : { ...question };
 
-  let explanation_en = question.explanation_en;
+  const question_en = String(plain.question_en ?? plain.question ?? "").trim();
+  const question_hi = String(plain.question_hi ?? "").trim();
+  const options_en = normalizeOptionsObject(plain.options_en ?? plain.options);
+  const options_hi = normalizeOptionsObject(plain.options_hi);
+
+  let explanation_en = plain.explanation_en;
   if (!explanation_en) {
-    if (typeof question.explanation === "object" && question.explanation !== null) {
+    if (typeof plain.explanation === "object" && plain.explanation !== null) {
       explanation_en = {
-        A: String(question.explanation.A ?? "").trim(),
-        B: String(question.explanation.B ?? "").trim(),
-        C: String(question.explanation.C ?? "").trim(),
-        D: String(question.explanation.D ?? "").trim(),
+        A: String(plain.explanation.A ?? "").trim(),
+        B: String(plain.explanation.B ?? "").trim(),
+        C: String(plain.explanation.C ?? "").trim(),
+        D: String(plain.explanation.D ?? "").trim(),
       };
-    } else if (typeof question.explanation === "string") {
-      const str = question.explanation.trim();
+    } else if (typeof plain.explanation === "string") {
+      const str = plain.explanation.trim();
       explanation_en = { A: str, B: str, C: str, D: str };
     }
   }
 
   return {
-    ...question,
+    ...plain,
     question: question_en,
     question_en,
+    question_hi,
     options: options_en,
     options_en,
-    explanation: explanation_en ?? question.explanation,
+    options_hi,
+    explanation: explanation_en ?? plain.explanation,
     ...(explanation_en ? { explanation_en } : {}),
-    ...(question.explanation_hi ? { explanation_hi: question.explanation_hi } : {}),
+    ...(plain.explanation_hi ? { explanation_hi: plain.explanation_hi } : {}),
   };
 }
 
@@ -60,6 +69,7 @@ export function ensureEnglishBilingualFields(question) {
  * Never throws — returns English fallbacks on failure.
  */
 export async function enrichQuestionWithHindi(rawQuestion) {
+  assertOpenRouterAllowed("enrichQuestionWithHindi");
   const question = ensureEnglishBilingualFields(rawQuestion);
 
   if (!isSeparateHindiTranslationEnabled()) {
@@ -144,20 +154,21 @@ export async function enrichQuestionsWithHindi(questions, concurrency = 4) {
 
 /**
  * Pick bilingual fields for MongoDB subdocument storage.
+ * Hindi must already be on the question (generation time) — no runtime translation.
  */
 export function pickBilingualQuestionFields(q) {
   const base = ensureEnglishBilingualFields(q);
   return {
     question: base.question_en,
     question_en: base.question_en,
-    question_hi: base.question_hi || "",
+    question_hi: String(base.question_hi || "").trim(),
     options: base.options_en,
     options_en: base.options_en,
     options_hi: normalizeOptionsObject(base.options_hi),
     correctAnswer: base.correctAnswer,
     explanation: base.explanation ?? base.explanation_en ?? "No explanation provided.",
     explanation_en: base.explanation_en,
-    explanation_hi: base.explanation_hi,
+    explanation_hi: base.explanation_hi ?? undefined,
     userAnswer: base.userAnswer ?? null,
     timeSpent: base.timeSpent ?? 0,
     questionType: base.questionType,

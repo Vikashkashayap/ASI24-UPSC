@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { api } from "../../services/api";
-import { Search, Calendar, ArrowRight, UserMinus, TrendingUp, IndianRupee, Users } from "lucide-react";
+import { Search, Calendar, ArrowRight, UserMinus, TrendingUp, IndianRupee, Users, Trash2, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { adminAPI } from "../../services/api";
 
 interface ProStudent {
   _id: string;
@@ -46,6 +47,9 @@ export const AdminProStudentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState("");
+  const [studentToDelete, setStudentToDelete] = useState<ProStudent | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     fetchStudents();
@@ -95,6 +99,23 @@ export const AdminProStudentsPage = () => {
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(amount || 0);
+
+  const handleDeleteStudent = async () => {
+    if (!studentToDelete) return;
+    try {
+      setIsDeleting(true);
+      setDeleteError("");
+      const res = await adminAPI.deleteStudent(studentToDelete._id);
+      if (res.data.success) {
+        setStudentToDelete(null);
+        fetchStudents();
+      }
+    } catch (err: any) {
+      setDeleteError(err?.response?.data?.message || "Failed to delete pro student");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div
@@ -374,20 +395,38 @@ export const AdminProStudentsPage = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between md:justify-end gap-3 md:min-w-[220px]">
+                    <div className="flex items-center justify-between md:justify-end gap-2 md:min-w-[280px] shrink-0">
                       <div className="flex items-center gap-2 text-[11px] font-semibold opacity-50">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>{formatDate(student.createdAt)}</span>
                       </div>
-                      <Link to={`/admin/students/${student._id}`}>
+                      <div className="flex items-center gap-2">
                         <Button
-                          variant="ghost"
-                          className="rounded-xl h-8 px-3 hover:bg-emerald-500/10 hover:text-emerald-400 flex items-center gap-1.5 text-xs font-semibold"
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setStudentToDelete(student);
+                            setDeleteError("");
+                          }}
+                          className={`rounded-xl h-8 px-3 text-xs font-semibold flex items-center gap-1.5 ${
+                            theme === "dark"
+                              ? "border-red-800 text-red-400 hover:bg-red-950/30"
+                              : "border-red-200 text-red-600 hover:bg-red-50"
+                          }`}
                         >
-                          Profile
-                          <ArrowRight className="h-3 w-3" />
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
                         </Button>
-                      </Link>
+                        <Link to={`/admin/students/${student._id}`}>
+                          <Button
+                            variant="ghost"
+                            className="rounded-xl h-8 px-3 hover:bg-emerald-500/10 hover:text-emerald-400 flex items-center gap-1.5 text-xs font-semibold"
+                          >
+                            Profile
+                            <ArrowRight className="h-3 w-3" />
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -454,6 +493,64 @@ export const AdminProStudentsPage = () => {
           does not replace accounting data.
         </p>
       </div>
+
+      {studentToDelete && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-[#020012]/90 backdrop-blur-xl p-4"
+          onClick={() => !isDeleting && setStudentToDelete(null)}
+        >
+          <Card
+            className={`w-full max-w-md rounded-[2rem] border-2 shadow-xl ${
+              theme === "dark" ? "bg-slate-900 border-red-500/20" : "bg-white border-red-100"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader className="flex flex-col items-center pt-8 pb-2 text-center">
+              <div className="p-5 rounded-2xl bg-red-500/10 mb-4">
+                <Trash2 className="h-10 w-10 text-red-500" />
+              </div>
+              <CardTitle className="text-2xl font-black">Delete Pro Student?</CardTitle>
+              <p className="mt-2 px-6 text-sm opacity-60">
+                Permanently delete <span className="font-bold">{studentToDelete.name}</span> ({studentToDelete.email})?
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 pt-2 space-y-4">
+              <div
+                className={`p-4 rounded-2xl border flex items-start gap-3 ${
+                  theme === "dark"
+                    ? "bg-red-500/5 border-red-500/10 text-red-400"
+                    : "bg-red-50 border-red-100 text-red-600"
+                }`}
+              >
+                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                <p className="text-xs leading-relaxed font-medium">
+                  This removes their account, subscription, test history, and all associated data. This cannot be undone.
+                </p>
+              </div>
+              {deleteError && (
+                <p className="text-sm text-red-500 text-center">{deleteError}</p>
+              )}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl"
+                  onClick={() => setStudentToDelete(null)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 rounded-xl bg-red-600 hover:bg-red-700"
+                  onClick={handleDeleteStudent}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

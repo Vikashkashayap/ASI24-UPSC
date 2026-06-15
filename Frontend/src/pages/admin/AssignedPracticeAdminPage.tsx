@@ -740,8 +740,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                         type="button"
                         variant="outline"
                         onClick={() => setDeleteId(item._id)}
-                        disabled={!!deletingId || item.attemptCount > 0}
-                        title={item.attemptCount > 0 ? "Cannot delete after students have started" : "Delete"}
+                        disabled={!!deletingId}
+                        title="Delete practice test"
                         className={isDark ? "border-red-800 text-red-400 hover:bg-red-950/30" : "border-red-200 text-red-600 hover:bg-red-50"}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -762,7 +762,14 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <p className={`font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Delete this practice test?</p>
-            <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>This cannot be undone.</p>
+            <p className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              {(() => {
+                const item = list.find((i) => i._id === deleteId);
+                return item && item.attemptCount > 0
+                  ? `This will also remove ${item.attemptCount} student attempt(s). This cannot be undone.`
+                  : "This cannot be undone.";
+              })()}
+            </p>
             <div className="flex gap-2 mt-4">
               <Button variant="outline" onClick={() => setDeleteId(null)} disabled={!!deletingId}>Cancel</Button>
               <Button variant="default" className="bg-red-600 hover:bg-red-700" onClick={() => handleDelete(deleteId)} disabled={!!deletingId}>

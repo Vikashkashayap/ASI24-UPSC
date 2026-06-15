@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
 import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
+import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 
 const DEFAULT_MODEL =
   process.env.OPENROUTER_TRANSLATION_MODEL ||
@@ -16,6 +17,8 @@ const DEFAULT_MODEL =
 export async function translateToHindi(text) {
   const source = String(text ?? "").trim();
   if (!source) return "";
+
+  assertOpenRouterAllowed("translateToHindi");
 
   if (!isSeparateHindiTranslationEnabled()) {
     return source;

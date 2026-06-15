@@ -15,56 +15,41 @@ import {
   startAssignedPracticeAttempt,
 } from "../controllers/assignedPracticeController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { examAttemptGuard } from "../middleware/examAiGuard.js";
 import { testGenerationDedup } from "../middleware/testGenerationDedup.js";
 
 const router = express.Router();
 
-// Apply authentication to all test routes
 router.use(authMiddleware);
 
-// Debug middleware for test routes
 router.use((req, res, next) => {
   console.log(`🧪 Test route hit: ${req.method} ${req.path}`);
   next();
 });
 
-// Test endpoint to verify routes are working
 router.get("/test-connection", (req, res) => {
   res.json({
     success: true,
     message: "Test routes are mounted correctly",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
-// Generate new test (dedup prevents parallel duplicate OpenRouter runs)
+// Generation routes — AI allowed (not wrapped in examAttemptGuard)
 router.post("/generate", testGenerationDedup, generateTest);
-
-// Generate full-length UPSC Prelims GS Paper 1 mock (100 questions); subject from admin/body
 router.post("/generate-full-mock", generateFullMockTest);
 
-// Submit test answers
-router.post("/submit/:id", submitTest);
+// Exam attempt routes — zero AI tokens (DB bilingual fields only)
+router.post("/submit/:id", examAttemptGuard, submitTest);
+router.get("/assigned-practice", examAttemptGuard, listStudentAssignedPractice);
+router.get("/assigned-practice/history", examAttemptGuard, listAssignedPracticeHistory);
+router.post("/assigned-practice/:id/start", examAttemptGuard, startAssignedPracticeAttempt);
+router.get("/:id", examAttemptGuard, getTest);
 
-// Get test analytics
+// Read-only / history — no translation, guard optional but safe
 router.get("/analytics", getTestAnalytics);
-
-// Get pre-lims performance analysis
 router.get("/prelims-performance", getPrelimsPerformance);
-
-// Assigned topic practice (admin-assigned, student-only)
-router.get("/assigned-practice", listStudentAssignedPractice);
-router.get("/assigned-practice/history", listAssignedPracticeHistory);
-router.post("/assigned-practice/:id/start", startAssignedPracticeAttempt);
-
-// Get all tests (history)
 router.get("/", getTests);
-
-// Get test by ID (must come after specific routes)
-router.get("/:id", getTest);
-
-// Delete a test
 router.delete("/:id", deleteTest);
 
 export default router;
-

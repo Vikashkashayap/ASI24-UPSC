@@ -3,59 +3,28 @@ import { User } from "../models/User.js";
 import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
+import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
+import { ensureAttemptHasHindiFromParent } from "../services/syncHindiFromParent.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
 
+/** DB-only bilingual map — zero AI cost during exam attempts. */
 function mapQuestionForClient(q, { includeAnswers = false, includeMeta = false } = {}) {
-  const base = {
-    _id: q._id,
-    question: q.question,
-    question_en: q.question_en || q.question,
-    question_hi: q.question_hi || "",
-    options: q.options,
-    options_en: q.options_en || q.options,
-    options_hi: q.options_hi || { A: "", B: "", C: "", D: "" },
-    userAnswer: q.userAnswer ?? null,
-    questionType: q.questionType,
-    tableData: q.tableData ?? null,
-    matchColumns: q.matchColumns ?? null,
-    assertionReason: q.assertionReason ?? null,
-  };
-
-  if (!includeAnswers) return base;
-
-  return {
-    ...base,
-    correctAnswer: q.correctAnswer,
-    explanation: q.explanation,
-    explanation_en: q.explanation_en || q.explanation,
-    explanation_hi: q.explanation_hi,
-    isCorrect: q.userAnswer === q.correctAnswer,
-    timeSpent: q.timeSpent ?? 0,
-    ...(includeMeta
-      ? {
-          eliminationLogic: q.eliminationLogic,
-          conceptualSource: q.conceptualSource,
-        }
-      : {}),
-  };
+  const mapped = mapBilingualQuestionForClient(q, { includeAnswers });
+  if (!includeAnswers) return mapped;
+  if (includeMeta) {
+    return {
+      ...mapped,
+      eliminationLogic: q.eliminationLogic,
+      conceptualSource: q.conceptualSource,
+    };
+  }
+  return mapped;
 }
 
 function mapQuestionForStart(q) {
-  return {
-    _id: q._id,
-    question: q.question,
-    question_en: q.question_en || q.question,
-    question_hi: q.question_hi || "",
-    options: q.options,
-    options_en: q.options_en || q.options,
-    options_hi: q.options_hi || { A: "", B: "", C: "", D: "" },
-    questionType: q.questionType,
-    tableData: q.tableData ?? null,
-    matchColumns: q.matchColumns ?? null,
-    assertionReason: q.assertionReason ?? null,
-  };
+  return mapBilingualQuestionForClient(q, { includeAnswers: false });
 }
 
 /**
@@ -527,6 +496,8 @@ export const getTest = async (req, res) => {
         message: "Test not found",
       });
     }
+
+    await ensureAttemptHasHindiFromParent(test);
 
     // If test is submitted, return with answers and explanations
     if (test.isSubmitted) {

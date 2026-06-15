@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { ConfirmationDialog } from "../components/ui/dialog";
-import { ExamQuestionBody, ExamOptionRow, examPaletteCols } from "../components/exam/ExamQuestionBody";
+import { ExamQuestionBody, ExamOptionRow, examPaletteCols, getQuestionOptionKeys } from "../components/exam/ExamQuestionBody";
+import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
+import { useExamLanguage } from "../hooks/useExamLanguage";
 import { testAPI } from "../services/api";
 
 interface Question {
@@ -144,6 +146,7 @@ function PalettePanel({
 const TestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [test, setTest] = useState<TestData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -356,6 +359,7 @@ const TestPage: React.FC = () => {
   if (!test) return null;
 
   const currentQuestion = test.questions[currentIndex];
+  const optionKeys = getQuestionOptionKeys(currentQuestion);
   const isMarked = markedIds.has(currentQuestion._id);
   const paletteColsDesktop = examPaletteCols(test.totalQuestions, false);
   const paletteColsMobile = examPaletteCols(test.totalQuestions, true);
@@ -380,6 +384,7 @@ const TestPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
             <span className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tabular-nums">
               {attemptedCount}/{test.totalQuestions}
             </span>
@@ -439,7 +444,7 @@ const TestPage: React.FC = () => {
             <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
               {/* Question stem — scrollable container */}
               <div className="flex-shrink-0 px-2.5 sm:px-4 py-2 sm:py-3">
-                <ExamQuestionBody question={currentQuestion} compact />
+                <ExamQuestionBody question={currentQuestion} compact lang={examLang} />
               </div>
 
               {/* Divider */}
@@ -447,7 +452,7 @@ const TestPage: React.FC = () => {
 
               {/* Options — scrollable with padding */}
               <div className="flex-shrink-0 flex flex-col gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-3 pb-3 sm:pb-4">
-                {(["A", "B", "C", "D"] as const).map((key) => (
+                {optionKeys.map((key) => (
                   <ExamOptionRow
                     key={key}
                     optionKey={key}
@@ -455,6 +460,7 @@ const TestPage: React.FC = () => {
                     selected={answers[currentQuestion._id] === key}
                     onSelect={() => handleAnswerSelect(currentQuestion._id, key)}
                     compact
+                    lang={examLang}
                   />
                 ))}
               </div>

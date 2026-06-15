@@ -2,20 +2,31 @@ import React, { useState } from "react";
 import { UpscFormattedQuestionStem } from "../UpscFormattedQuestionStem";
 import {
   BilingualQuestionFields,
-  getOptionEnglish,
-  getOptionHindi,
+  ExamLang,
+  getOptionByLang,
   getQuestionEnglish,
   getQuestionHindi,
+  getOptionEnglish,
+  getOptionHindi,
   hasDistinctHindiQuestion,
 } from "../../utils/bilingualQuestion";
+import {
+  buildAssertionReasonStem,
+  isAssertionReasonText,
+  ParsedMatchFollowing,
+  parseMatchFollowingFromText,
+  resolveMatchColumns,
+} from "../../utils/upscQuestionFormat";
 
 interface ExamQuestionBodyProps {
   question: BilingualQuestionFields & {
+    questionType?: string;
     matchColumns?: { columnA: string[]; columnB: string[] } | null;
     assertionReason?: { assertion: string; reason: string } | null;
     tableData?: { headers: string[]; rows: string[][] } | null;
   };
   compact?: boolean;
+  lang?: ExamLang;
 }
 
 function LangPanel({
@@ -43,20 +54,283 @@ function LangPanel({
   );
 }
 
-/** Responsive: tabs on mobile, side-by-side on md+ */
+function MatchFollowingTable({
+  data,
+  compact,
+  lang,
+}: {
+  data: ParsedMatchFollowing;
+  compact?: boolean;
+  lang: "en" | "hi";
+}) {
+  const listILabel = lang === "hi" ? "सूची-I" : "List-I";
+  const listIILabel = lang === "hi" ? "सूची-II" : "List-II";
+  const textSize = compact ? "text-[11px] sm:text-xs" : "text-sm";
+
+  return (
+    <div className="space-y-2">
+      {data.intro ? (
+        <p className={`${textSize} font-semibold text-slate-900 leading-relaxed`}>{data.intro}</p>
+      ) : null}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+        <div className="rounded-lg border border-slate-200 bg-slate-50/80 overflow-hidden">
+          <div className="px-2.5 py-1.5 bg-blue-600 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wide">
+            {listILabel}
+          </div>
+          <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
+            {data.columnA.map((item, i) => (
+              <li key={i} className="flex gap-2 break-words leading-relaxed">
+                <span className="shrink-0 font-bold text-blue-700 w-5">
+                  {String.fromCharCode(65 + i)}.
+                </span>
+                <span className="text-slate-800">{item}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-slate-50/80 overflow-hidden">
+          <div className="px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wide">
+            {listIILabel}
+          </div>
+          <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
+            {(data.columnB.length ? data.columnB : data.columnA.map((_, i) => "")).map(
+              (item, i) =>
+                item ? (
+                  <li key={i} className="flex gap-2 break-words leading-relaxed">
+                    <span className="shrink-0 font-bold text-indigo-700 w-5">{i + 1}.</span>
+                    <span className="text-slate-800">{item}</span>
+                  </li>
+                ) : null
+            )}
+          </ol>
+        </div>
+      </div>
+      {data.prompt ? (
+        <p className={`${textSize} font-semibold text-slate-700 pt-0.5`}>{data.prompt}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function MatchBlock({
+  label,
+  data,
+  tableLang,
+  compact,
+  accent,
+}: {
+  label: string;
+  data: ParsedMatchFollowing;
+  tableLang: "en" | "hi";
+  compact?: boolean;
+  accent: "blue" | "slate";
+}) {
+  return (
+    <div className="min-w-0">
+      <div
+        className={`text-[10px] sm:text-[11px] font-bold uppercase mb-1.5 ${
+          accent === "blue" ? "text-blue-600" : "text-slate-400"
+        }`}
+      >
+        {label}
+      </div>
+      <MatchFollowingTable data={data} compact={compact} lang={tableLang} />
+    </div>
+  );
+}
+
+function BilingualMatchView({
+  question,
+  compact,
+  lang,
+}: {
+  question: ExamQuestionBodyProps["question"];
+  compact?: boolean;
+  lang?: ExamLang;
+}) {
+  const enData = resolveMatchColumns(question, "en");
+  const hiData = resolveMatchColumns(question, "hi");
+
+  if (!enData && !hiData) return null;
+
+  if (!lang) {
+    const data = enData || hiData!;
+    return (
+      <MatchFollowingTable
+        data={data}
+        compact={compact}
+        lang={enData ? "en" : "hi"}
+      />
+    );
+  }
+
+  const hiFirst = lang === "hi";
+  const blocks: React.ReactNode[] = [];
+
+  const pushHi = () => {
+    if (hiData) {
+      blocks.push(
+        <MatchBlock
+          key="hi"
+          label="हिंदी"
+          data={hiData}
+          tableLang="hi"
+          compact={compact}
+          accent="blue"
+        />
+      );
+    }
+  };
+  const pushEn = () => {
+    if (enData) {
+      blocks.push(
+        <MatchBlock
+          key="en"
+          label="English"
+          data={enData}
+          tableLang="en"
+          compact={compact}
+          accent="slate"
+        />
+      );
+    } else {
+      const enText = getQuestionEnglish(question);
+      if (enText) {
+        blocks.push(
+          <LangPanel key="en-fallback" label="English" text={enText} compact={compact} accent="slate" />
+        );
+      }
+    }
+  };
+
+  if (hiFirst) {
+    pushHi();
+    pushEn();
+  } else {
+    pushEn();
+    pushHi();
+  }
+
+  return <div className="space-y-3">{blocks}</div>;
+}
+
+function getAssertionStemText(
+  question: ExamQuestionBodyProps["question"],
+  lang: "en" | "hi"
+): string | null {
+  const text =
+    lang === "hi"
+      ? getQuestionHindi(question, { strict: true })
+      : getQuestionEnglish(question);
+
+  if (text && isAssertionReasonText(text)) return text;
+
+  if (lang === "en" && question.assertionReason?.assertion) {
+    return buildAssertionReasonStem({
+      assertion: question.assertionReason.assertion,
+      reason: question.assertionReason.reason || "",
+    });
+  }
+  return null;
+}
+
+function BilingualAssertionView({
+  question,
+  compact,
+  lang,
+}: {
+  question: ExamQuestionBodyProps["question"];
+  compact?: boolean;
+  lang?: ExamLang;
+}) {
+  const enStem = getAssertionStemText(question, "en");
+  const hiStem = getAssertionStemText(question, "hi");
+
+  if (!enStem && !hiStem) return null;
+
+  if (!lang) {
+    return (
+      <UpscFormattedQuestionStem
+        text={enStem || hiStem!}
+        theme="light"
+        compact={compact}
+      />
+    );
+  }
+
+  const hiFirst = lang === "hi";
+  const blocks: React.ReactNode[] = [];
+
+  const pushHi = () => {
+    if (hiStem) {
+      blocks.push(
+        <LangPanel key="hi" label="हिंदी" text={hiStem} compact={compact} accent="blue" />
+      );
+    }
+  };
+  const pushEn = () => {
+    if (enStem) {
+      blocks.push(
+        <LangPanel key="en" label="English" text={enStem} compact={compact} accent="slate" />
+      );
+    }
+  };
+
+  if (hiFirst) {
+    pushHi();
+    pushEn();
+  } else {
+    pushEn();
+    pushHi();
+  }
+
+  return <div className="space-y-3">{blocks}</div>;
+}
+
+/** Responsive stem — statement / chronology / plain text */
 export function ExamBilingualStem({
   question,
   compact = true,
+  lang,
 }: {
   question: BilingualQuestionFields;
   compact?: boolean;
+  lang?: ExamLang;
 }) {
   const [tab, setTab] = useState<"hi" | "en">("hi");
   const en = getQuestionEnglish(question);
-  const hi = getQuestionHindi(question);
-  const showBoth = hasDistinctHindiQuestion(question);
+  const hi = getQuestionHindi(question, { strict: true });
+  const showBoth = !lang && hasDistinctHindiQuestion(question);
 
   if (!en && !hi) return null;
+
+  if (lang && (hi || en)) {
+    const hiFirst = lang === "hi";
+    const primary = hiFirst ? hi || en : en || hi;
+    const secondary = hiFirst ? en : hi;
+    const primaryLabel = hiFirst ? "हिंदी" : "English";
+    const secondaryLabel = hiFirst ? "English" : "हिंदी";
+    const showSecondary = Boolean(secondary && secondary !== primary);
+
+    return (
+      <div className="space-y-2">
+        <LangPanel
+          label={primaryLabel}
+          text={primary}
+          compact={compact}
+          accent={hiFirst ? "blue" : "slate"}
+        />
+        {showSecondary ? (
+          <LangPanel
+            label={secondaryLabel}
+            text={secondary}
+            compact={compact}
+            accent={hiFirst ? "slate" : "blue"}
+          />
+        ) : null}
+      </div>
+    );
+  }
 
   if (!showBoth) {
     return <UpscFormattedQuestionStem text={en || hi} theme="light" compact={compact} />;
@@ -64,28 +338,31 @@ export function ExamBilingualStem({
 
   return (
     <>
-      {/* Mobile / small tablet: language tabs */}
       <div className="md:hidden">
         <div className="flex gap-2 mb-3">
-          {(["hi", "en"] as const).map((lang) => (
+          {(["hi", "en"] as const).map((code) => (
             <button
-              key={lang}
+              key={code}
               type="button"
-              onClick={() => setTab(lang)}
+              onClick={() => setTab(code)}
               className={`flex-1 py-2 rounded-lg text-[11px] font-semibold transition-colors touch-manipulation ${
-                tab === lang
+                tab === code
                   ? "bg-blue-600 text-white shadow-sm"
                   : "bg-slate-100 text-slate-600 border border-slate-200"
               }`}
             >
-              {lang === "hi" ? "हिंदी" : "English"}
+              {code === "hi" ? "हिंदी" : "English"}
             </button>
           ))}
         </div>
-        <LangPanel label={tab === "hi" ? "हिंदी" : "English"} text={tab === "hi" ? hi : en} compact={compact} accent={tab === "hi" ? "blue" : "slate"} />
+        <LangPanel
+          label={tab === "hi" ? "हिंदी" : "English"}
+          text={tab === "hi" ? hi : en}
+          compact={compact}
+          accent={tab === "hi" ? "blue" : "slate"}
+        />
       </div>
 
-      {/* Desktop: side-by-side */}
       <div className="hidden md:grid md:grid-cols-2 md:gap-4 min-h-0">
         <div className="min-w-0 md:border-r md:border-slate-100 md:pr-3">
           <LangPanel label="हिंदी" text={hi} compact={compact} accent="blue" />
@@ -98,42 +375,38 @@ export function ExamBilingualStem({
   );
 }
 
-export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({ question, compact = true }) => {
-  const hasMatch = (question.matchColumns?.columnA?.length ?? 0) > 0;
-  const hasAssertion =
-    question.assertionReason?.assertion != null &&
-    Boolean(question.assertionReason.assertion || question.assertionReason.reason);
+function detectMatch(question: ExamQuestionBodyProps["question"]): boolean {
+  if ((question.matchColumns?.columnA?.length ?? 0) > 0) return true;
+  const en = getQuestionEnglish(question);
+  const hi = getQuestionHindi(question, { strict: true });
+  return Boolean(parseMatchFollowingFromText(en) || (hi && parseMatchFollowingFromText(hi)));
+}
+
+function detectAssertion(question: ExamQuestionBodyProps["question"]): boolean {
+  if (question.assertionReason?.assertion) return true;
+  const en = getQuestionEnglish(question);
+  const hi = getQuestionHindi(question, { strict: true });
+  return isAssertionReasonText(en) || isAssertionReasonText(hi);
+}
+
+export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({
+  question,
+  compact = true,
+  lang,
+}) => {
+  const isMatch = detectMatch(question);
+  const isAssertion = detectAssertion(question);
 
   return (
     <div className="space-y-2 sm:space-y-3 min-h-0">
-      {hasMatch && question.question?.trim() && <ExamBilingualStem question={question} compact={compact} />}
-      {hasAssertion && (
-        <UpscFormattedQuestionStem
-          text={`Assertion (A): ${question.assertionReason!.assertion}\nReason (R): ${question.assertionReason!.reason}`}
-          theme="light"
-          compact={compact}
-        />
+      {isMatch ? (
+        <BilingualMatchView question={question} compact={compact} lang={lang} />
+      ) : isAssertion ? (
+        <BilingualAssertionView question={question} compact={compact} lang={lang} />
+      ) : (
+        <ExamBilingualStem question={question} compact={compact} lang={lang} />
       )}
-      {hasMatch && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] sm:text-xs leading-relaxed">
-          <div>
-            <div className="text-[10px] font-bold uppercase text-blue-700 mb-1">List-I</div>
-            <ol className="list-decimal list-inside space-y-1">
-              {question.matchColumns!.columnA.map((item, i) => (
-                <li key={i} className="break-words">{item}</li>
-              ))}
-            </ol>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold uppercase text-blue-700 mb-1">List-II</div>
-            <ol className="list-decimal list-inside space-y-1">
-              {(question.matchColumns!.columnB || []).map((item, i) => (
-                <li key={i} className="break-words">{item}</li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      )}
+
       {question.tableData?.headers?.length ? (
         <div className="overflow-x-auto -mx-1 sm:mx-0">
           <table className="w-full min-w-[280px] border-collapse border border-slate-300 text-[11px] sm:text-xs">
@@ -160,11 +433,9 @@ export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({ question, co
           </table>
         </div>
       ) : null}
-      {!hasAssertion && !hasMatch && <ExamBilingualStem question={question} compact={compact} />}
     </div>
   );
 };
-
 
 interface ExamOptionRowProps {
   optionKey: "A" | "B" | "C" | "D";
@@ -172,6 +443,7 @@ interface ExamOptionRowProps {
   selected: boolean;
   onSelect: () => void;
   compact?: boolean;
+  lang?: ExamLang;
 }
 
 export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
@@ -180,10 +452,16 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
   selected,
   onSelect,
   compact = true,
+  lang,
 }) => {
   const en = getOptionEnglish(question, optionKey);
-  const hi = getOptionHindi(question, optionKey);
-  const showBoth = Boolean(hi && en && hi !== en);
+  const hi = getOptionHindi(question, optionKey, { strict: true });
+  const showBoth = !lang && Boolean(hi && en && hi !== en);
+  const dualLang = Boolean(lang && hi && en && hi !== en);
+  const displayText = lang ? getOptionByLang(question, optionKey, lang) : en || hi;
+  const missingHi = lang === "hi" && !hi;
+  const primaryOpt = lang === "hi" ? hi || en : en || hi;
+  const secondaryOpt = lang === "hi" ? en : hi;
 
   return (
     <button
@@ -206,7 +484,16 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
           ({optionKey.toLowerCase()})
         </span>
         <div className="min-w-0 flex-1 text-slate-800 py-0.5">
-          {showBoth ? (
+          {missingHi ? (
+            <p className="break-words leading-relaxed">{en}</p>
+          ) : dualLang ? (
+            <div className="space-y-0.5">
+              <p className="break-words leading-relaxed font-medium text-slate-900">{primaryOpt}</p>
+              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">
+                {secondaryOpt}
+              </p>
+            </div>
+          ) : showBoth ? (
             <>
               <p className="break-words font-medium text-slate-900 leading-relaxed sm:hidden">{hi}</p>
               <p className="break-words leading-relaxed hidden sm:block">
@@ -216,7 +503,7 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
               </p>
             </>
           ) : (
-            <p className="break-words leading-relaxed">{en || hi}</p>
+            <p className="break-words leading-relaxed">{displayText}</p>
           )}
         </div>
       </div>
@@ -224,7 +511,6 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
   );
 };
 
-/** Grid columns for palette — fewer cols on narrow sidebars */
 export function examPaletteCols(total: number, narrow = false): number {
   if (narrow) {
     if (total <= 20) return 5;
@@ -236,3 +522,6 @@ export function examPaletteCols(total: number, narrow = false): number {
   if (total <= 100) return 12;
   return 12;
 }
+
+// Re-export for TestPage
+export { getQuestionOptionKeys } from "../../utils/upscQuestionFormat";

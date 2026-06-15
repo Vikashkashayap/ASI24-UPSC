@@ -5,7 +5,9 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
 import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
+import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
 import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
+import { useExamLanguage } from "../hooks/useExamLanguage";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -68,6 +70,7 @@ const TestResultPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { theme } = useTheme();
+  const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [result, setResult] = useState<TestResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -192,6 +195,7 @@ const TestResultPage: React.FC = () => {
             <span className="xs:hidden">New Test</span>
           </Button>
         )}
+        <ExamLanguageToggle lang={examLang} onChange={setExamLang} />
       </div>
 
       {/* Score Summary Card - Mobile-first */}
@@ -316,7 +320,7 @@ const TestResultPage: React.FC = () => {
                               {/* Match the following: show question/statement at TOP above the lists */}
                               {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && question.question?.trim() && (
                                 <div className="mb-2">
-                                  <UpscPaperQuestionBlock question={question} theme={theme} allowHtml stemOnly />
+                                  <UpscPaperQuestionBlock question={question} theme={theme} allowHtml stemOnly lang={examLang} />
                                 </div>
                               )}
                               {/* Assertion–Reason block (no repeat of assertion in question text below) */}
@@ -385,7 +389,7 @@ const TestResultPage: React.FC = () => {
                                 (question.assertionReason.assertion || question.assertionReason.reason)
                               ) &&
                                 !(question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0) && (
-                                <UpscPaperQuestionBlock question={question} theme={theme} allowHtml />
+                                <UpscPaperQuestionBlock question={question} theme={theme} allowHtml lang={examLang} />
                               )}
                             </div>
                           </div>
@@ -421,6 +425,7 @@ const TestResultPage: React.FC = () => {
                           theme={theme}
                           allowHtml
                           showQuestion={false}
+                          lang={examLang}
                         />
                       )}
 

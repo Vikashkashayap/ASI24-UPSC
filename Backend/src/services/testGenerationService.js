@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { getFrontendOrigin } from "../config/urlConfig.js";
+import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 import {
   getTestGenerationModel,
   getPracticeGenerationModel,
@@ -278,7 +279,7 @@ function buildPrelimsGSSystemPrompt(subjects, topic, difficulty, currentAffairsP
 
   return `UPSC Prelims GS Paper-I MCQ generator. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}.${extra}
 
-Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–3 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, which correct/incorrect. Concise stems.
+Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–5 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, chronology (3 options only), which correct/incorrect. Concise stems.
 
 ${getPrelimsJsonRules()}
 ${explLine}
@@ -1989,6 +1990,7 @@ async function callOpenRouterTestGeneration({
   maxTokens,
   apiTitle = "UPSC Mentor - Prelims Test Generator",
 }) {
+  assertOpenRouterAllowed("callOpenRouterTestGeneration");
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -2105,24 +2107,24 @@ const PATTERN_TO_QUESTION_TYPE = {
 function getPatternFormatRule(patternId) {
   const rules = {
     statement_based:
-      '2–3 numbered statements; options MUST be statement combos: "1 only", "2 only", "1 and 2 only", "1, 2 and 3". Ask which are correct.',
+      '2–5 numbered statements (minimum 2, maximum 5); options MUST be statement combos: "1 only", "2 only", "1 and 2 only", "1, 2 and 3", etc. Ask which are correct.',
     statement_not_correct:
-      '2–3 numbered statements; ask which is NOT correct; options MUST use statement-number combos.',
+      '2–5 numbered statements (minimum 2, maximum 5); ask which is NOT correct; options MUST use statement-number combos.',
     pair_matching:
-      "List I & List II match-the-following; use matchColumns when helpful; standard UPSC pair options.",
+      "List-I (A,B,C,D) & List-II (1,2,3,4) match-the-following; fill matchColumns OR format clearly in question text; standard UPSC code options (A-1,B-2...).",
     assertion_reason:
-      "Assertion (A) + Reason (R); options: (a) Both correct, A explains R (b) Both correct, A does not explain R (c) A correct, R wrong (d) A wrong, R correct.",
+      "Assertion (A) + Reason (R) in question text or assertionReason object; standard 4 UPSC A-R options.",
     direct_conceptual:
       "Single-stem conceptual MCQ; elimination-based; avoid rote fact recall.",
     chronology:
-      "Historical/events chronology; options show different orderings; pick correct sequence.",
+      "Chronology / correct order question; list 3–4 events in stem; provide EXACTLY 3 options (A, B, C only) with different orderings.",
     sequence_arrangement:
-      "Logical/process sequence; options show different orderings; pick correct sequence.",
+      "Sequence arrangement; list items in stem; provide EXACTLY 3 options (A, B, C only) with different orderings.",
     map_location:
       "Location/map concept question (no image); geography tied to the topic.",
     odd_one_out: "Four related items; one does not belong; identify the odd one.",
     multi_statement_elimination:
-      '"How many of the above are correct?" with 2–4 statements; options like "Only one", "Only two", "All three", "None".',
+      '"How many of the above are correct?" with 2–5 statements (min 2, max 5); options like "Only one", "Only two", "All three", "None".',
   };
   return rules[patternId] || PATTERN_LABELS[patternId] || patternId;
 }
@@ -2208,15 +2210,15 @@ Return ONLY a JSON array. No markdown. ZERO repeats — unique sub-concept per q
   const perPattern = activePatterns.length > 0 ? Math.floor(50 / activePatterns.length) : 5;
   const patterns = activePatterns.map((id) => PATTERN_LABELS[id] || id).join("; ");
   const patternRules = `UPSC format (real Prelims style):
-- Statement-based: 2–3 numbered statements; options like "1 only", "2 only", "1 and 2 only", "1, 2 and 3".
-- Statement NOT correct: same structure, ask which is incorrect.
-- Pair matching / Match the following: List I & List II (use matchColumns when needed).
-- Assertion–Reason: standard A/R with 4 UPSC options.
+- Statement-based: 2–5 numbered statements (min 2, max 5); options like "1 only", "2 only", "1 and 2 only", "1, 2 and 3".
+- Statement NOT correct: same structure (2–5 statements), ask which is incorrect.
+- Pair matching / Match the following: List-I (A,B,C,D) & List-II (1,2,3,4) in clear columns; use matchColumns when possible.
+- Assertion–Reason: Assertion (A) + Reason (R) with standard 4 UPSC options.
 - Direct conceptual: elimination-based, not rote recall.
-- Chronology / Sequence: events or steps; options show correct order.
+- Chronology / Sequence: list events; EXACTLY 3 options (A, B, C only) showing different orderings.
 - Map/location: concept-based geography (no image).
 - Odd one out: four related items, one misfit.
-- Multi-statement elimination: "How many of the above are correct?" with 2–4 statements.`;
+- Multi-statement elimination: "How many of the above are correct?" with 2–5 statements.`;
 
   return `UPSC GS Paper-I topic-practice MCQ generator (real Prelims standard).${avoidLine}
 Subject: ${subject}. Topic: "${topic}". Difficulty: ${diffLine}.
@@ -2409,7 +2411,7 @@ async function runTopicPracticePatternQuotaLoop({
     while (countPatternQuestions(all, patternId) < count && attempts < maxAttemptsPerPattern) {
       const before = countPatternQuestions(all, patternId);
       const need = count - before;
-      const batchSize = Math.min(need, getPracticeBatchSize());
+      const batchSize = Math.min(need + 2, getPracticeBatchSize());
       console.log(
         `📝 ${logPrefix}: ${PATTERN_LABELS[patternId]} ${before}/${count}, requesting ${batchSize}...`
       );
@@ -2425,7 +2427,7 @@ async function runTopicPracticePatternQuotaLoop({
       attempts += 1;
       if (countPatternQuestions(all, patternId) === before) stallRounds += 1;
       else stallRounds = 0;
-      if (stallRounds >= 3) {
+      if (stallRounds >= 5) {
         console.warn(`📝 ${logPrefix}: stall on pattern ${patternId}`);
         break;
       }
@@ -2446,7 +2448,7 @@ async function runTopicPracticePatternQuotaLoop({
       const before = countPatternQuestions(all, patternId);
       if (before >= count) continue;
       const need = count - before;
-      const batchSize = Math.min(need, getPracticeBatchSize());
+      const batchSize = Math.min(need + 2, getPracticeBatchSize());
       console.log(
         `📝 ${logPrefix}: refill ${refill + 1} — ${PATTERN_LABELS[patternId]} need ${need}...`
       );
@@ -2472,7 +2474,59 @@ async function runTopicPracticePatternQuotaLoop({
   for (const { patternId, count } of quotaPlan) {
     buckets[patternId] = all.filter((q) => q.patternType === patternId).slice(0, count);
   }
-  const finalQuestions = interleavePatternQuestions(buckets, patterns).slice(0, displayCount);
+  let finalQuestions = interleavePatternQuestions(buckets, patterns).slice(0, displayCount);
+
+  // Top-up when dedupe/parsing leaves gaps (e.g. 45/50 after equal pattern quota)
+  if (finalQuestions.length < displayCount) {
+    const gap = displayCount - finalQuestions.length;
+    console.log(`📝 ${logPrefix}: short by ${gap} after pattern quota — mixed-pattern top-up...`);
+    let topUpStall = 0;
+    for (let t = 0; t < gap + 4 && finalQuestions.length < displayCount; t += 1) {
+      const beforeLen = finalQuestions.length;
+      const need = displayCount - finalQuestions.length;
+      const batchSize = Math.min(Math.max(need + 2, 3), getPracticeBatchSize());
+      const excludeSnippets = [
+        ...new Set([
+          ...(priorSnippets || []),
+          ...all.map((q) => getQuestionText(q).slice(0, 100)).filter(Boolean),
+        ]),
+      ].slice(0, 20);
+      const { questions } = await generateTopicPracticeBatch(
+        apiKey,
+        model,
+        batchSize,
+        `Top-up ${t + 1}`,
+        subject,
+        topic,
+        difficulty,
+        excludeSnippets,
+        patterns,
+        null
+      );
+      if (questions?.length) {
+        const tagged = questions.map((q, idx) =>
+          tagQuestionWithPattern(q, patterns[idx % patterns.length])
+        );
+        all = dedupeMockPaperQuestions([...all, ...tagged], { priorFingerprints, csat: false });
+        const seen = new Set(finalQuestions.map((q) => getQuestionText(q)).filter(Boolean));
+        for (const q of all) {
+          if (finalQuestions.length >= displayCount) break;
+          const text = getQuestionText(q);
+          if (!text || seen.has(text)) continue;
+          seen.add(text);
+          finalQuestions.push(q);
+        }
+      }
+      if (finalQuestions.length === beforeLen) {
+        topUpStall += 1;
+        if (topUpStall >= 4) break;
+      } else {
+        topUpStall = 0;
+      }
+    }
+  }
+
+  finalQuestions = finalQuestions.slice(0, displayCount);
 
   return { finalQuestions, deduped: all, quotaPlan };
 }
@@ -2534,7 +2588,7 @@ export const generateAssignedPracticeQuestions = async ({
       `📝 Topic practice: ${patterns.length} patterns × ~${perPatternCount}Q each (${displayCount} total), model=${model}, priorQ=${priorCount}`
     );
 
-    const { finalQuestions, quotaPlan } = await runTopicPracticePatternQuotaLoop({
+    const { finalQuestions, quotaPlan, deduped } = await runTopicPracticePatternQuotaLoop({
       apiKey,
       model,
       subject: subjectStr,
@@ -2550,7 +2604,12 @@ export const generateAssignedPracticeQuestions = async ({
 
     if (quotaPlan?.length) {
       console.log(
-        `📝 Topic practice quota result: ${quotaPlan.map((p) => `${p.patternId}=${p.count}`).join(", ")}`
+        `📝 Topic practice quota result: ${quotaPlan
+          .map((p) => {
+            const actual = (deduped || finalQuestions).filter((q) => q.patternType === p.patternId).length;
+            return `${p.patternId}=${actual}/${p.count}`;
+          })
+          .join(", ")} → ${finalQuestions.length}/${displayCount} total`
       );
     }
 
@@ -2558,9 +2617,15 @@ export const generateAssignedPracticeQuestions = async ({
       throw new Error("No valid UPSC questions generated. Please try again.");
     }
 
-    if (finalQuestions.length < displayCount) {
+    const minAcceptable = Math.max(displayCount - 5, Math.floor(displayCount * 0.9));
+    if (finalQuestions.length < minAcceptable) {
       throw new Error(
         `Only ${finalQuestions.length} of ${displayCount} questions were generated. Please try again.`
+      );
+    }
+    if (finalQuestions.length < displayCount) {
+      console.warn(
+        `⚠️ Topic practice: using ${finalQuestions.length}/${displayCount} questions after top-up`
       );
     }
 

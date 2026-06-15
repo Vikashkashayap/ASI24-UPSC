@@ -349,14 +349,17 @@ export const deleteAssignedPractice = async (req, res) => {
 
     const attemptCount = await Test.countDocuments({ assignedPracticeTestId: id });
     if (attemptCount > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot delete: students have already started or completed this test",
-      });
+      await Test.deleteMany({ assignedPracticeTestId: id });
     }
 
     await AssignedPracticeTest.findByIdAndDelete(id);
-    return res.json({ success: true, message: "Assigned practice test deleted" });
+    return res.json({
+      success: true,
+      message:
+        attemptCount > 0
+          ? `Practice test and ${attemptCount} student attempt(s) deleted`
+          : "Assigned practice test deleted",
+    });
   } catch (error) {
     console.error("deleteAssignedPractice:", error);
     res.status(500).json({ success: false, message: error.message || "Internal server error" });
@@ -538,6 +541,7 @@ export const startAssignedPracticeAttempt = async (req, res) => {
       });
     }
 
+    // Copy stored bilingual fields only — no runtime translation (zero AI cost).
     const test = new Test({
       userId,
       subject: record.subject,

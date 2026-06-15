@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
+import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 
 /**
  * OpenRouter API Service
@@ -28,6 +29,7 @@ export const callOpenRouterAPI = async ({
   maxTokens = 2000,
 }) => {
   try {
+    assertOpenRouterAllowed("callOpenRouterAPI");
     // Validate API key - use directly like other working agents
     if (!apiKey || apiKey === "") {
       throw new Error("OpenRouter API key is required and cannot be empty. Please check your .env file.");
@@ -224,6 +226,7 @@ export const callOpenRouterVisionAPI = async ({
   maxTokens = 4096,
 }) => {
   try {
+    assertOpenRouterAllowed("callOpenRouterVisionAPI");
     if (!apiKey || apiKey === "") {
       throw new Error(
         "OpenRouter API key is required. Please set OPENROUTER_API_KEY in .env"

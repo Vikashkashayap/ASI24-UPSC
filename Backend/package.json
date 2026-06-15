@@ -7,7 +7,10 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "start:pm2": "pm2 start ecosystem.config.cjs --env production",
-    "build": "echo 'No build needed for plain JS backend!'"
+    "build": "echo 'No build needed for plain JS backend!'",
+    "migrate:bilingual": "node scripts/migrate-bilingual-questions.js",
+    "migrate:bilingual:translate-once": "node scripts/migrate-bilingual-translate-once.js",
+    "sync:hindi-attempts": "node scripts/sync-hindi-to-attempts.js"
   },
   "dependencies": {
     "@langchain/core": "^0.2.0",

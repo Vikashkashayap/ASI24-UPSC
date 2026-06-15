@@ -195,21 +195,42 @@ interface UpscPaperQuestionBlockProps {
   showQuestion?: boolean;
   /** Only Hindi/English stems (no options) — for match-the-following headers */
   stemOnly?: boolean;
+  /** Single language from DB — instant toggle */
+  lang?: Lang;
 }
 
-/** UPSC-style: full Hindi block (stem + options), then full English block */
+/** UPSC-style paper block — single lang when `lang` set, else Hindi then English */
 export const UpscPaperQuestionBlock: React.FC<UpscPaperQuestionBlockProps> = ({
   question,
   theme = "light",
   allowHtml = false,
   showQuestion = true,
   stemOnly = false,
+  lang,
 }) => {
   const bilingual = isBilingualQuestion(question);
   const hiQuestionClass =
     "text-base sm:text-lg font-semibold leading-relaxed break-words font-[inherit]";
   const enQuestionClass =
     "text-base sm:text-lg leading-relaxed break-words text-slate-700 dark:text-slate-300";
+
+  if (lang) {
+    const primaryClass = lang === "hi" ? hiQuestionClass : enQuestionClass;
+    return (
+      <div className="space-y-1">
+        {showQuestion ? (
+          <BilingualQuestionText
+            question={question}
+            theme={theme}
+            allowHtml={allowHtml}
+            lang={lang}
+            primaryClassName={primaryClass}
+          />
+        ) : null}
+        {!stemOnly ? <UpscPaperOptionsList question={question} lang={lang} theme={theme} /> : null}
+      </div>
+    );
+  }
 
   if (stemOnly) {
     if (!bilingual) {
