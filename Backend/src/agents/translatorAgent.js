@@ -1,12 +1,10 @@
 import { RunnableLambda } from "@langchain/core/runnables";
-import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import { getTranslationModel } from "../config/openRouterModels.js";
+import { openRouterChatCompletion } from "../services/openRouterClient.js";
 
-/**
- * Translator Agent for real-time speech-to-speech translation
- * Uses LangChain + OpenRouter for text translation
- * Optimized for UPSC/academic terminology preservation
- */
+const TRANSLATOR_SYSTEM =
+  "Translate UPSC/academic text. Preserve terms, names, numbers. Spoken-audio friendly. Output translation only.";
+
 export const translatorAgent = new RunnableLambda({
   func: async (input) => {
     const { text, sourceLanguage, targetLanguage, context = "academic" } = input || {};
@@ -19,7 +17,6 @@ export const translatorAgent = new RunnableLambda({
       throw new Error("Source and target languages are required");
     }
 
-    // If languages are the same, return original text
     if (sourceLanguage === targetLanguage) {
       return {
         translatedText: text,
@@ -30,57 +27,30 @@ export const translatorAgent = new RunnableLambda({
     }
 
     try {
-      const model = process.env.OPENROUTER_MODEL || "meta-llama/Meta-Llama-3.1-70B-Instruct";
+      const model = getTranslationModel();
       const apiKey = process.env.OPENROUTER_API_KEY;
-
       if (!apiKey) {
         throw new Error("Missing OPENROUTER_API_KEY in environment variables");
       }
 
-      // System prompt optimized for UPSC/academic translation
-      const systemPrompt = `You are a professional translator specializing in academic and UPSC (Union Public Service Commission) content.
-Your task is to translate text while preserving:
-- Technical terminology (especially UPSC-specific terms)
-- Academic precision
-- Formal tone appropriate for educational content
-- Proper names, dates, and numbers
-
-Translate from ${sourceLanguage} to ${targetLanguage}.
-Keep the translation concise and natural for spoken audio.
-Do not add explanations or notes, only provide the translated text.`;
-
-      const messages = [
-        { role: "system", content: systemPrompt },
-        {
-          role: "user",
-          content: `Translate the following text from ${sourceLanguage} to ${targetLanguage}:\n\n${text}`,
-        },
-      ];
-
-      // Call OpenRouter API
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": getFrontendOrigin(),
-          "X-Title": "Meeting Translator",
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          temperature: 0.3, // Lower temperature for more consistent translations
-          max_tokens: 500, // Keep translations concise for real-time audio
-        }),
+      const result = await openRouterChatCompletion({
+        apiKey,
+        model,
+        messages: [
+          { role: "system", content: TRANSLATOR_SYSTEM },
+          {
+            role: "user",
+            content: `${sourceLanguage} → ${targetLanguage} (${context}):\n\n${text}`,
+          },
+        ],
+        temperature: 0.2,
+        maxTokens: Math.min(500, Math.max(80, text.length * 2)),
+        xTitle: "Meeting Translator",
+        cacheTtlSec: 86400,
+        label: "meeting-translator",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      const translatedText = data.choices?.[0]?.message?.content?.trim() || text;
+      const translatedText = result.content?.trim() || text;
 
       return {
         translatedText,
@@ -91,7 +61,6 @@ Do not add explanations or notes, only provide the translated text.`;
       };
     } catch (error) {
       console.error("Translation error:", error);
-      // Fallback: return original text if translation fails
       return {
         translatedText: text,
         sourceLanguage,
@@ -102,4 +71,3 @@ Do not add explanations or notes, only provide the translated text.`;
     }
   },
 });
-

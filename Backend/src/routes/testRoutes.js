@@ -41,7 +41,7 @@ router.get("/test-connection", (req, res) => {
 router.post("/generate", testGenerationDedup, generateTest);
 
 // Generate full-length UPSC Prelims GS Paper 1 mock (100 questions); subject from admin/body
-router.post("/generate-full-mock", generateFullMockTest);
+router.post("/generate-full-mock", testGenerationDedup, generateFullMockTest);
 
 // Submit test answers
 router.post("/submit/:id", submitTest);

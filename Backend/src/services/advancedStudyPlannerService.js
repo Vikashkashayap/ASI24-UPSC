@@ -2,6 +2,9 @@ import { StudyPlan } from "../models/StudyPlan.js";
 import { MockResult } from "../models/MockResult.js";
 import { WeakTopic } from "../models/WeakTopic.js";
 import { callOpenRouterAPI, parseJSONFromResponse } from "./openRouterService.js";
+import { getChatModel } from "../config/openRouterModels.js";
+import { PLANNER_MAX_TOKENS, CHAT_MAX_TOKENS } from "../config/openRouterDefaults.js";
+import crypto from "crypto";
 import { generateTasks, getProgress, getDaysRemaining, toggleTaskComplete, recalculateStreak } from "./studyPlanService.js";
 import { getPerformanceSummary } from "./performanceService.js";
 import { applySyllabusToTasks } from "./syllabusTopicPool.js";
@@ -68,9 +71,9 @@ function getStartTimeForSession(preferredSession, wakeTime) {
   return map[preferredSession] || wakeTime || "07:00";
 }
 
-async function callAI(systemPrompt, userPrompt, maxTokens = 3000) {
+async function callAI(systemPrompt, userPrompt, maxTokens = PLANNER_MAX_TOKENS) {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini";
+  const model = getChatModel();
   if (!apiKey) return null;
   const res = await callOpenRouterAPI({
     apiKey,
@@ -573,13 +576,22 @@ export async function mentorChat(userId, message) {
     subjectStrength: analytics?.subjectStrength?.slice(0, 5),
   };
 
+  const cacheKey = crypto
+    .createHash("sha256")
+    .update(JSON.stringify({ message, context }))
+    .digest("hex")
+    .slice(0, 24);
+
   const aiReply = await callOpenRouterAPI({
     apiKey: process.env.OPENROUTER_API_KEY,
-    model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+    model: getChatModel(),
     systemPrompt: MENTOR_CHAT_SYSTEM,
     userPrompt: buildMentorChatUserPrompt(message, context),
     temperature: 0.6,
-    maxTokens: 500,
+    maxTokens: CHAT_MAX_TOKENS,
+    cacheTtlSec: 3600,
+    cacheKey: `mentor-chat:${cacheKey}`,
+    label: "mentor-chat",
   });
 
   const reply =
@@ -611,7 +623,7 @@ export async function regenerateMotivation(userId) {
   const meta = buildFallbackPlanMeta(plan, { weakSubjects: plan.weakSubjects });
   const line = await callOpenRouterAPI({
     apiKey: process.env.OPENROUTER_API_KEY,
-    model: process.env.OPENROUTER_MODEL || "openai/gpt-4o-mini",
+    model: getChatModel(),
     systemPrompt: "Generate one short motivational line (under 20 words) for a UPSC aspirant. Plain text only.",
     userPrompt: `Streak: ${plan.currentStreak}, Readiness: ${plan.readinessScore}%, Weak: ${(plan.weakSubjects || []).join(", ")}`,
     temperature: 0.8,

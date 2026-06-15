@@ -31,6 +31,7 @@ import { processScheduledPrelimsMocks } from "./controllers/prelimsMockControlle
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
+import { openRouterCostMiddleware } from "./middleware/openRouterCostMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
 
 const app = express();
@@ -61,6 +62,16 @@ app.use(
 );
 
 app.use(express.json());
+
+/* OpenRouter cost tracking on AI-heavy routes */
+app.use("/api/copy-evaluation", openRouterCostMiddleware);
+app.use("/api/tests", openRouterCostMiddleware);
+app.use("/api/study-planner", openRouterCostMiddleware);
+app.use("/api/prelims-mock", openRouterCostMiddleware);
+app.use("/api/admin", openRouterCostMiddleware);
+app.use("/api/current-affairs", openRouterCostMiddleware);
+app.use("/api/mentor", openRouterCostMiddleware);
+app.use("/api/agents/student-profiler", openRouterCostMiddleware);
 
 /* -------------------- DB -------------------- */
 

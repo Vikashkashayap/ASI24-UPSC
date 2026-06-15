@@ -12,8 +12,9 @@ import {
 } from "../services/copyEvaluationStorageService.js";
 import fs from "fs";
 
-const VISION_MODEL =
-  process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
+import { getVisionModel } from "../config/openRouterModels.js";
+
+const VISION_MODEL = getVisionModel();
 
 /**
  * Upload answer copy (PDF/image) and evaluate via vision AI

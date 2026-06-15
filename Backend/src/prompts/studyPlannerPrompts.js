@@ -83,10 +83,21 @@ Generate recommendedTasks for the next 14 days starting today (${profile.startDa
 }
 
 export function buildMentorChatUserPrompt(message, context) {
-  return `STUDENT CONTEXT:
-${JSON.stringify(context, null, 2)}
+  const compact = [
+    context.examType && `exam:${context.examType}`,
+    context.targetYear && `year:${context.targetYear}`,
+    context.readinessScore != null && `readiness:${context.readinessScore}%`,
+    context.streak != null && `streak:${context.streak}`,
+    context.weakSubjects?.length && `weak:${context.weakSubjects.join(",")}`,
+    context.mockAverage != null && `mockAvg:${context.mockAverage}%`,
+    context.performanceWeak?.length && `testWeak:${context.performanceWeak.join(",")}`,
+    context.todayProgress != null && `todayDone:${context.todayProgress.completed ?? 0}/${context.todayProgress.total ?? 0}`,
+  ]
+    .filter(Boolean)
+    .join(" | ");
 
-STUDENT QUESTION: ${message}`;
+  return `CONTEXT: ${compact || "none"}
+QUESTION: ${message}`;
 }
 
 export function buildMockAnalysisUserPrompt(mockData, planContext) {

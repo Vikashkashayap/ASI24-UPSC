@@ -10,14 +10,9 @@ interface Props {
   compact?: boolean;
 }
 
-function partLabel(role: "A" | "R", theme: Theme): string {
-  return role === "A"
-    ? theme === "dark"
-      ? "Assertion (A)"
-      : "Assertion (A)"
-    : theme === "dark"
-      ? "Reason (R)"
-      : "Reason (R)";
+function partLabel(role: "A" | "R", theme: Theme, hindi = false): string {
+  if (hindi) return role === "A" ? "अभिकथन (A)" : "कारण (R)";
+  return role === "A" ? "Assertion (A)" : "Reason (R)";
 }
 
 function renderParts(parts: UpscStemPart[], theme: Theme, className: string, compact = false) {
@@ -56,6 +51,7 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string, com
           );
         }
         if (part.type === "assertion") {
+          const hindi = /[\u0900-\u097F]/.test(part.text);
           return (
             <div
               key={`ar-${part.role}-${index}`}
@@ -68,7 +64,7 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string, com
                   theme === "dark" ? "text-blue-400" : "text-blue-700"
                 }`}
               >
-                {partLabel(part.role, theme)}
+                {partLabel(part.role, theme, hindi)}
               </div>
               <p className={stmtClass}>{part.text}</p>
             </div>

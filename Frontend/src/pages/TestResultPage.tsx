@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
 import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
-import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
+import { normalizeAssertionReasonPair } from "../utils/upscQuestionFormat";
 import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
@@ -41,8 +41,18 @@ interface QuestionResult {
   timeSpent?: number;
   questionType?: string;
   tableData?: { headers: string[]; rows: string[][] } | null;
-  matchColumns?: { columnA: string[]; columnB: string[] } | null;
-  assertionReason?: { assertion: string; reason: string } | null;
+  matchColumns?: {
+    columnA: string[];
+    columnB: string[];
+    columnA_hi?: string[];
+    columnB_hi?: string[];
+  } | null;
+  assertionReason?: {
+    assertion: string;
+    reason: string;
+    assertion_hi?: string;
+    reason_hi?: string;
+  } | null;
   eliminationLogic?: string;
   conceptualSource?: string;
 }
@@ -322,25 +332,54 @@ const TestResultPage: React.FC = () => {
                               {/* Assertion–Reason block (no repeat of assertion in question text below) */}
                               {question.assertionReason?.assertion != null &&
                                 (question.assertionReason.assertion || question.assertionReason.reason) && (
-                                <div className="mb-3 space-y-4">
-                                  {hasDistinctHindiQuestion(question) ? (
-                                    <>
-                                      <UpscFormattedQuestionStem text={getQuestionHindi(question)} theme={theme} />
-                                      <div
-                                        className={`border-t border-dashed ${theme === "dark" ? "border-slate-600" : "border-slate-300"}`}
-                                        aria-hidden
-                                      />
-                                    </>
-                                  ) : null}
-                                  <UpscFormattedQuestionStem
-                                    text={`Assertion (A): ${question.assertionReason.assertion}\nReason (R): ${question.assertionReason.reason}`}
-                                    theme={theme}
-                                  />
+                                <div className="mb-3 space-y-3">
+                                  {(() => {
+                                    const enPair = normalizeAssertionReasonPair(
+                                      question.assertionReason.assertion,
+                                      question.assertionReason.reason
+                                    );
+                                    const hiPair = normalizeAssertionReasonPair(
+                                      question.assertionReason.assertion_hi || question.assertionReason.assertion,
+                                      question.assertionReason.reason_hi || question.assertionReason.reason
+                                    );
+                                    const showHi =
+                                      /[\u0900-\u097F]/.test(`${hiPair.assertion} ${hiPair.reason}`) &&
+                                      (hiPair.assertion !== enPair.assertion || hiPair.reason !== enPair.reason);
+                                    return (
+                                      <>
+                                        {showHi && (
+                                          <UpscFormattedQuestionStem
+                                            text={`अभिकथन (A): ${hiPair.assertion}\nकारण (R): ${hiPair.reason}`}
+                                            theme={theme}
+                                          />
+                                        )}
+                                        <UpscFormattedQuestionStem
+                                          text={`Assertion (A): ${enPair.assertion}\nReason (R): ${enPair.reason}`}
+                                          theme={theme}
+                                        />
+                                      </>
+                                    );
+                                  })()}
                                 </div>
                               )}
-                              {/* Match columns (question text already shown above) */}
                               {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && (
-                                <div className="overflow-x-auto mb-3">
+                                <div className="overflow-x-auto mb-3 space-y-3">
+                                  {(question.matchColumns.columnA_hi?.length ?? 0) > 0 && (
+                                    <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
+                                      <div>
+                                        <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>सूची-I</div>
+                                        <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
+                                          {(question.matchColumns.columnA_hi || question.matchColumns.columnA).map((item, i) => <li key={i}>{item}</li>)}
+                                        </ul>
+                                      </div>
+                                      <div>
+                                        <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>सूची-II</div>
+                                        <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
+                                          {(question.matchColumns.columnB_hi || question.matchColumns.columnB || []).map((item, i) => <li key={i}>{item}</li>)}
+                                        </ul>
+                                      </div>
+                                    </div>
+                                  )}
                                   <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
                                     <div>
                                       <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-I</div>

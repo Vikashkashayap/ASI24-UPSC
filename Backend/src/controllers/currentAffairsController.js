@@ -1,6 +1,7 @@
 import CurrentAffair from "../models/CurrentAffair.js";
 import { runCurrentAffairsPipeline } from "../services/currentAffairsPipeline.js";
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import { getCheapModel } from "../config/openRouterModels.js";
+import { openRouterChatCompletion } from "../services/openRouterClient.js";
 
 /**
  * GET /api/current-affairs
@@ -162,9 +163,19 @@ export async function runCurrentAffairsJob(req, res) {
 export async function generateMcqs(req, res) {
   try {
     const { id } = req.params;
-    const doc = await CurrentAffair.findOne({ _id: id, isActive: true }).lean();
+    const doc = await CurrentAffair.findOne({ _id: id, isActive: true });
     if (!doc) {
       return res.status(404).json({ success: false, message: "Current affair not found" });
+    }
+
+    if (Array.isArray(doc.bonusMcqs) && doc.bonusMcqs.length > 0) {
+      const cached = doc.bonusMcqs.slice(0, 2).map((m) => ({
+        question: m.question,
+        options: m.options || {},
+        correctAnswer: m.correctAnswer,
+        explanation: m.explanation,
+      }));
+      return res.json({ success: true, data: { mcqs: cached, cached: true } });
     }
 
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -172,51 +183,35 @@ export async function generateMcqs(req, res) {
       return res.status(503).json({ success: false, message: "OPENROUTER_API_KEY not set" });
     }
 
-    const prompt = `You are a UPSC Prelims question setter. Based on the following current affair, generate exactly 2 multiple choice questions (Prelims style).
-
-Current affair title: ${doc.title}
+    const prompt = `UPSC Prelims: 2 MCQs from this CA. JSON array only.
+Title: ${doc.title}
 Summary: ${doc.summary}
 Key points: ${(doc.keyPoints || []).join("; ")}
+[{"question":"","options":{"A":"","B":"","C":"","D":""},"correctAnswer":"A|B|C|D","explanation":""}]`;
 
-For each question output STRICT JSON array of 2 objects:
-[
-  {
-    "question": "Question text?",
-    "options": { "A": "text", "B": "text", "C": "text", "D": "text" },
-    "correctAnswer": "A" | "B" | "C" | "D",
-    "explanation": "Brief explanation"
-  },
-  { ... }
-]
-Return ONLY the JSON array, no other text.`;
-
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": getFrontendOrigin(),
-        "X-Title": "MentorsDaily - Current Affairs MCQs",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o-mini",
-        temperature: 0.3,
-        messages: [{ role: "user", content: prompt }],
-      }),
+    const result = await openRouterChatCompletion({
+      apiKey,
+      model: getCheapModel(),
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.3,
+      maxTokens: 700,
+      xTitle: "MentorsDaily - Current Affairs MCQs",
+      cacheTtlSec: 604800,
+      cacheKey: `ca-mcqs:${doc._id}`,
+      label: "ca-mcqs",
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OpenRouter error: ${response.status} – ${errText.slice(0, 200)}`);
-    }
-
-    const data = await response.json();
-    const rawContent = data?.choices?.[0]?.message?.content?.trim() || "";
+    const rawContent = result.content?.trim() || "";
     const jsonMatch = rawContent.match(/\[[\s\S]*\]/);
     const mcqs = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
     const safeMcqs = Array.isArray(mcqs) ? mcqs.slice(0, 2) : [];
 
-    return res.json({ success: true, data: { mcqs: safeMcqs } });
+    if (safeMcqs.length > 0) {
+      doc.bonusMcqs = safeMcqs;
+      await doc.save();
+    }
+
+    return res.json({ success: true, data: { mcqs: safeMcqs, cached: false } });
   } catch (err) {
     console.error("generateMcqs error:", err);
     return res.status(500).json({

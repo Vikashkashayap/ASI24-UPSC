@@ -41,7 +41,7 @@ export default function CurrentAffairDetailPage() {
   }, [slug]);
 
   const handleGenerateMcqs = async () => {
-    if (!item?._id) return;
+    if (!item?._id || mcqsLoading || mcqs) return;
     setMcqsLoading(true);
     setMcqs(null);
     try {

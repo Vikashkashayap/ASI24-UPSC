@@ -18,6 +18,19 @@ const currentAffairSchema = new mongoose.Schema(
       default: "Moderate",
     },
     sourceUrl: { type: String, default: "" },
+    bonusMcqs: [
+      {
+        question: { type: String },
+        options: {
+          A: { type: String },
+          B: { type: String },
+          C: { type: String },
+          D: { type: String },
+        },
+        correctAnswer: { type: String },
+        explanation: { type: String },
+      },
+    ],
     date: { type: Date, default: Date.now },
     slug: { type: String, required: true, unique: true },
     isActive: { type: Boolean, default: true },

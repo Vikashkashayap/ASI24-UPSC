@@ -7,13 +7,15 @@ import {
   VISION_EVALUATION_SYSTEM_PROMPT,
   buildVisionUserPrompt,
 } from "../prompts/copyEvaluationPrompts.js";
+import { VISION_MAX_TOKENS } from "../config/openRouterDefaults.js";
+import { getVisionModel } from "../config/openRouterModels.js";
 import {
   callOpenRouterVisionAPI,
   parseJSONFromResponse,
 } from "./openRouterService.js";
 
-const MAX_RETRIES = 3;
-const VISION_MAX_TOKENS = 16384;
+const MAX_RETRIES = 2;
+const MAX_LINE_FEEDBACK = 15;
 
 const toArray = (val) => {
   if (Array.isArray(val)) return val.map(String).filter(Boolean);
@@ -51,7 +53,8 @@ const normalizeLineFeedback = (items) => {
     .filter(
       (row) =>
         row.studentLine && (row.examinerAnalysis || row.howToImprove)
-    );
+    )
+    .slice(0, MAX_LINE_FEEDBACK);
 };
 
 /** Split transcribed text into line/sentence units for coverage checks */
@@ -346,7 +349,7 @@ export const validateEvaluationResult = (result) => {
     return {
       valid: false,
       error:
-        "Line feedback too shallow — examinerAnalysis and howToImprove must be 3–5 detailed sentences each",
+        "Line feedback too shallow — examinerAnalysis and howToImprove must be 1–2 detailed sentences each",
     };
   }
 
@@ -386,7 +389,7 @@ const callVisionWithRetry = async ({
       systemPrompt: VISION_EVALUATION_SYSTEM_PROMPT,
       userPrompt:
         attempt > 0
-          ? `${userPrompt}\n\nIMPORTANT: Previous response failed validation (${lastValidationHint || "incomplete line-by-line feedback"}). Return ONLY valid JSON. You MUST include lineFeedback[] for introduction, every body section, and conclusion — each with studentLine (exact quote), examinerAnalysis (3–5 sentences of Research & Analysis per line), howToImprove (3–5 actionable sentences). Need at least 6+ lineFeedback entries total for a typical answer. No generic one-line feedback.`
+          ? `${userPrompt}\n\nIMPORTANT: Previous response failed validation (${lastValidationHint || "incomplete line-by-line feedback"}). Return ONLY valid JSON. Include lineFeedback[] for introduction, body, and conclusion — each with studentLine (exact quote), examinerAnalysis (1–2 sentences), howToImprove (1–2 actionable sentences). Need at least 4+ lineFeedback entries. No generic one-line feedback.`
           : userPrompt,
       images: imageContents,
       temperature: attempt === 0 ? 0.2 : 0.1,
@@ -453,8 +456,7 @@ export const evaluateCopyWithVision = async ({
     return { success: false, error: "No images to evaluate" };
   }
 
-  const visionModel =
-    model || process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
+  const visionModel = model || getVisionModel();
 
   return callVisionWithRetry({
     apiKey,

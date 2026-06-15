@@ -1,7 +1,7 @@
 import AssignedPracticeTest from "../models/AssignedPracticeTest.js";
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
-import { generateAssignedPracticeQuestions, buildQuestionFingerprints } from "../services/testGenerationService.js";
+import { generateAssignedPracticeQuestions, buildQuestionFingerprints, enrichAssignedPracticeWithHindi } from "../services/testGenerationService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 
 const GS_SUBJECTS = [
@@ -529,6 +529,21 @@ export const startAssignedPracticeAttempt = async (req, res) => {
       });
     }
 
+    let practiceQuestions = record.questions.map((q) =>
+      pickBilingualQuestionFields(typeof q.toObject === "function" ? q.toObject() : { ...q })
+    );
+    practiceQuestions = await enrichAssignedPracticeWithHindi(practiceQuestions);
+    const hindiChanged = practiceQuestions.some((q, i) => {
+      const orig = record.questions[i];
+      const origHi = String(orig?.question_hi || "").trim();
+      const newHi = String(q.question_hi || "").trim();
+      return newHi && newHi !== origHi;
+    });
+    if (hindiChanged) {
+      record.questions = practiceQuestions.map((q) => pickBilingualQuestionFields(q));
+      await record.save();
+    }
+
     const existing = await Test.findOne({ userId, assignedPracticeTestId: id });
     if (existing) {
       return res.json({
@@ -546,8 +561,8 @@ export const startAssignedPracticeAttempt = async (req, res) => {
       difficulty: difficultyToTestModel(record.difficulty),
       assignedPracticeTestId: record._id,
       durationMinutes: record.durationMinutes,
-      questions: record.questions.map((q) => {
-        const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
+      questions: practiceQuestions.map((q) => {
+        const plain = { ...q };
         return pickBilingualQuestionFields({
           ...plain,
           userAnswer: null,

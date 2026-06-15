@@ -45,18 +45,18 @@ This is the core deliverable. For introduction, EACH body section, and conclusio
 1. Split studentText into logical units: every sentence, bullet point, or sub-heading block (minimum 2 units per section; long sections need 4–10+ units).
 2. Fill lineFeedback[] — one object per unit, in the EXACT order the student wrote.
 3. studentLine: EXACT quote from handwriting for that unit (do not paraphrase or summarize).
-4. examinerAnalysis ("Research & Analysis"): 3–5 detailed sentences explaining:
+4. examinerAnalysis ("Research & Analysis"): 1–2 concise sentences explaining:
    - What the student is trying to say on this line
    - Whether it answers the question directive (discuss/analyse/examine/etc.)
    - Factual accuracy, depth, examples, constitutional refs, current affairs
    - How an UPSC examiner would read this line (strength/weakness)
-5. howToImprove: 3–5 detailed sentences with concrete actions:
+5. howToImprove: 1–2 actionable sentences with concrete actions:
    - What to rewrite, add, or remove on THIS line
    - Better keywords, Articles, committees, schemes, data, case studies
    - How to connect this line to the next part of the answer
-6. Also fill analysis[] (3–6 section-level summary bullets) and suggestions[] (3–6 actionable improvements).
-7. NEVER return only generic section bullets — lineFeedback must cover substantially all of studentText.
-8. If studentText has N sentences, lineFeedback must have at least N−1 entries (every major sentence covered).
+6. Also fill analysis[] (2–4 section-level summary bullets) and suggestions[] (2–4 actionable improvements).
+7. NEVER return only generic section bullets — lineFeedback must cover the most important lines (up to 15 total across the answer).
+8. Prioritize intro, key arguments, and conclusion lines for lineFeedback.
 
 OUTPUT RULES (CRITICAL):
 - Return ONLY valid JSON — no markdown, no code fences, no text outside JSON

@@ -15,14 +15,66 @@ const PROMPT_PATTERNS = [
   /ऊपर(?: दिए गए)?(?: कथनों| कथन)?(?: में से)?[^.]*\??/,
 ];
 
+const CHRONOLOGY_INTRO_PATTERNS = [
+  /arrange the following/i,
+  /chronological order/i,
+  /correct sequence/i,
+  /correct order/i,
+  /sequence of/i,
+  /कालानुक्रम/i,
+  /क्रम में व्यवस्थित/i,
+  /क्रम में सजाएं/i,
+];
+
+const MATCH_INTRO_PATTERNS = [
+  /match list-?i/i,
+  /match the following/i,
+  /सूची-?i/i,
+  /मिलान करें/i,
+];
+
+function isChronologyIntro(text: string): boolean {
+  return CHRONOLOGY_INTRO_PATTERNS.some((p) => p.test(text));
+}
+
+function isMatchIntro(text: string): boolean {
+  return MATCH_INTRO_PATTERNS.some((p) => p.test(text));
+}
+
 const INTRO_PATTERNS = [
   /consider the following/i,
   /read the following/i,
   /with reference to/i,
   /regarding the following/i,
-  /निम्नलिखित(?: कथनों?| में से)?/,
+  /arrange the following/i,
+  /match list-?i/i,
+  /match the following/i,
+  /निम्नलिखित(?: कथनों?| में से| घटनाओं)?/,
   /निम्न(?: कथनों?)?(?: पर| के| में)?/,
+  /कालानुक्रम/i,
+  /सूची-?i/i,
 ];
+
+function defaultStemPrompt(intro: string, fullText: string): string | null {
+  const isHi = /[\u0900-\u097F]/.test(fullText);
+  if (isChronologyIntro(intro) || isChronologyIntro(fullText)) {
+    return isHi
+      ? "उपर्युक्त घटनाओं का सही कालानुक्रमिक क्रम नीचे दिए गए विकल्पों में से चुनें।"
+      : "Select the correct chronological order from the options given below.";
+  }
+  if (isMatchIntro(intro) || isMatchIntro(fullText)) {
+    return isHi
+      ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनें।"
+      : "Select the correct answer using the codes given below.";
+  }
+  if (INTRO_PATTERNS.some((p) => p.test(intro || fullText))) {
+    return isHi
+      ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
+      : "Which of the statements given above is/are correct?";
+  }
+  return null;
+}
+
 
 function extractTrailingPrompt(text: string): { body: string; prompt: string | null } {
   for (const pattern of PROMPT_PATTERNS) {
@@ -37,7 +89,7 @@ function extractTrailingPrompt(text: string): { body: string; prompt: string | n
 
 function findStatementMarkers(text: string): { index: number; length: number; number: number }[] {
   const markers: { index: number; length: number; number: number }[] = [];
-  const regex = /\b(\d+)[.)]\s+/g;
+  const regex = /(?:^|\s)(?:\(?(\d+)\)?[.)]\s+)/g;
   let match: RegExpExecArray | null;
   while ((match = regex.exec(text)) !== null) {
     markers.push({
@@ -66,13 +118,9 @@ function parseStatementStem(text: string): UpscStemPart[] | null {
       const { body, prompt } = extractTrailingPrompt(stmt);
       stmt = body;
       if (prompt) parts.push({ type: "prompt", text: prompt });
-      else if (INTRO_PATTERNS.some((p) => p.test(intro || text))) {
-        parts.push({
-          type: "prompt",
-          text: /[\u0900-\u097F]/.test(text)
-            ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
-            : "Which of the statements given above is/are correct?",
-        });
+      else {
+        const auto = defaultStemPrompt(intro || text, text);
+        if (auto) parts.push({ type: "prompt", text: auto });
       }
     }
 
@@ -94,9 +142,10 @@ function parseAssertionReasonStem(text: string): UpscStemPart[] | null {
   const reasonAndRest = rSplit[1].trim();
   const { body: reason, prompt } = extractTrailingPrompt(reasonAndRest);
 
+  const clean = normalizeAssertionReasonPair(assertion, reason);
   const parts: UpscStemPart[] = [
-    { type: "assertion", role: "A", text: assertion },
-    { type: "assertion", role: "R", text: reason },
+    { type: "assertion", role: "A", text: clean.assertion },
+    { type: "assertion", role: "R", text: clean.reason },
   ];
   if (prompt) parts.push({ type: "prompt", text: prompt });
   return parts;
@@ -132,12 +181,9 @@ function parseNewlineStatements(text: string): UpscStemPart[] | null {
   }
 
   if (parts.some((p) => p.type === "statement") && !parts.some((p) => p.type === "prompt")) {
-    parts.push({
-      type: "prompt",
-      text: /[\u0900-\u097F]/.test(text)
-        ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
-        : "Which of the statements given above is/are correct?",
-    });
+    const introPart = parts.find((p) => p.type === "intro");
+    const auto = defaultStemPrompt(introPart?.type === "intro" ? introPart.text : "", text);
+    if (auto) parts.push({ type: "prompt", text: auto });
   }
 
   return parts.some((p) => p.type === "statement") ? parts : null;
@@ -161,4 +207,40 @@ export function parseUpscQuestionStem(text: string): UpscStemPart[] {
 
 export function isStructuredUpscStem(parts: UpscStemPart[]): boolean {
   return parts.some((p) => p.type === "statement" || p.type === "assertion");
+}
+
+/** Remove UPSC Assertion/Reason label prefix from stored field text. */
+export function stripAssertionReasonLabel(text: string, role: "A" | "R"): string {
+  let out = String(text ?? "").trim();
+  if (!out) return "";
+  const re =
+    role === "A"
+      ? /^(?:Assertion|अभिकथन)\s*\(A\)\s*:?\s*/i
+      : /^(?:Reason|कारण)\s*\(R\)\s*:?\s*/i;
+  while (re.test(out)) {
+    out = out.replace(re, "").trim();
+  }
+  return out;
+}
+
+/**
+ * Split combined "Assertion… Reason…" blobs and strip label prefixes.
+ * Fixes LLM output where both A and R were stored in assertion with reason empty.
+ */
+export function normalizeAssertionReasonPair(
+  assertion: string,
+  reason: string
+): { assertion: string; reason: string } {
+  let a = stripAssertionReasonLabel(assertion, "A");
+  let r = stripAssertionReasonLabel(reason, "R");
+
+  if (!r && a) {
+    const split = a.split(/(?:Reason|कारण)\s*\(R\)\s*:?\s*/i);
+    if (split.length >= 2) {
+      a = stripAssertionReasonLabel(split[0], "A");
+      r = split.slice(1).join(" ").trim();
+    }
+  }
+
+  return { assertion: a, reason: r };
 }

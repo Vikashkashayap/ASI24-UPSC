@@ -9,7 +9,7 @@
 
 import CurrentAffair, { slugify } from "../models/CurrentAffair.js";
 import { fetchTopHeadlines } from "./gnewsService.js";
-import { isUpscRelevant, generateCurrentAffairFromNews } from "./aiService.js";
+import { isUpscRelevant, generateCurrentAffairFromNews, passesUpscKeywordFilter } from "./aiService.js";
 
 const MIN_DAILY = 5;
 const MAX_DAILY = 7;
@@ -60,6 +60,11 @@ export async function runCurrentAffairsPipeline() {
     }
 
     try {
+      if (!passesUpscKeywordFilter(article)) {
+        result.skipped += 1;
+        continue;
+      }
+
       const relevant = await isUpscRelevant(article);
       if (!relevant) {
         result.skipped += 1;
