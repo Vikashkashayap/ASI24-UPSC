@@ -19,13 +19,27 @@ function mergeHindiFields(attemptQ, sourceQ) {
       D: plain.options_hi?.D || src.options_hi?.D || "",
     },
     explanation_hi: plain.explanation_hi || src.explanation_hi,
+    matchColumns_hi: plain.matchColumns_hi || src.matchColumns_hi,
   });
 }
 
-/** If attempt questions lack Hindi but parent has it, copy once and save. */
+function questionNeedsHindiFromParent(attemptQ, sourceQ) {
+  if (!sourceQ) return false;
+  const plain = typeof attemptQ.toObject === "function" ? attemptQ.toObject() : attemptQ;
+  const src = pickBilingualQuestionFields(sourceQ);
+  if (!String(plain.question_hi || "").trim() && String(src.question_hi || "").trim()) return true;
+  if (!plain.explanation_hi && src.explanation_hi) return true;
+  for (const key of ["A", "B", "C", "D"]) {
+    if (!String(plain.options_hi?.[key] || "").trim() && String(src.options_hi?.[key] || "").trim()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** If attempt questions lack Hindi but parent has it, copy once and save (including submitted tests for review). */
 export async function ensureAttemptHasHindiFromParent(testDoc) {
-  if (!testDoc?.questions?.length || testDoc.isSubmitted) return false;
-  if (!testDoc.questions.some((q) => !hasStoredHindiContent(q))) return false;
+  if (!testDoc?.questions?.length) return false;
 
   let parent = null;
   if (testDoc.assignedPracticeTestId) {
@@ -38,7 +52,7 @@ export async function ensureAttemptHasHindiFromParent(testDoc) {
   let changed = false;
   testDoc.questions = testDoc.questions.map((q, i) => {
     const source = parent.questions[i];
-    if (!source || hasStoredHindiContent(q) || !hasStoredHindiContent(source)) return q;
+    if (!source || !questionNeedsHindiFromParent(q, source) || !hasStoredHindiContent(source)) return q;
     changed = true;
     return mergeHindiFields(q, source);
   });

@@ -1,14 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, XCircle, Award, TrendingUp, BookOpen, ArrowLeft, AlertCircle, Clock } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Award,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { UpscPaperQuestionBlock } from "../components/BilingualQuestionDisplay";
-import { UpscFormattedQuestionStem } from "../components/UpscFormattedQuestionStem";
+import {
+  ExamQuestionBody,
+  ExamReviewOptionRow,
+  ExamReviewExplanation,
+  examPaletteCols,
+  getQuestionOptionKeys,
+} from "../components/exam/ExamQuestionBody";
 import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
-import { getQuestionHindi, hasDistinctHindiQuestion } from "../utils/bilingualQuestion";
+import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
-import { useTheme } from "../hooks/useTheme";
 import { testAPI } from "../services/api";
 
 interface QuestionResult {
@@ -16,24 +26,9 @@ interface QuestionResult {
   question: string;
   question_en?: string;
   question_hi?: string;
-  options: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  options_en?: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  options_hi?: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
+  options: { A: string; B: string; C: string; D: string };
+  options_en?: { A: string; B: string; C: string; D: string };
+  options_hi?: { A: string; B: string; C: string; D: string };
   correctAnswer: string;
   userAnswer: string | null;
   explanation: string | { A?: string; B?: string; C?: string; D?: string };
@@ -44,6 +39,7 @@ interface QuestionResult {
   questionType?: string;
   tableData?: { headers: string[]; rows: string[][] } | null;
   matchColumns?: { columnA: string[]; columnB: string[] } | null;
+  matchColumns_hi?: { columnA: string[]; columnB: string[] } | null;
   assertionReason?: { assertion: string; reason: string } | null;
   eliminationLogic?: string;
   conceptualSource?: string;
@@ -56,6 +52,8 @@ interface TestResult {
   topic: string;
   difficulty?: string;
   totalQuestions: number;
+  durationMinutes?: number;
+  totalMarks?: number;
   score: number;
   correctAnswers: number;
   wrongAnswers: number;
@@ -65,70 +63,170 @@ interface TestResult {
   submittedAt: string;
 }
 
+type ReviewPaletteStatus = "correct" | "wrong" | "unattempted" | "current";
+
+function formatTimeSpent(seconds: number): string {
+  if (seconds == null || seconds < 0) return "—";
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function ReviewPalettePanel({
+  result,
+  currentIndex,
+  paletteCols,
+  paletteBtnH,
+  getPaletteStatus,
+  paletteBtnClass,
+  goToQuestion,
+  compact = false,
+}: {
+  result: TestResult;
+  currentIndex: number;
+  paletteCols: number;
+  paletteBtnH: string;
+  getPaletteStatus: (i: number) => ReviewPaletteStatus;
+  paletteBtnClass: (s: ReviewPaletteStatus) => string;
+  goToQuestion: (i: number) => void;
+  compact?: boolean;
+}) {
+  const correct = result.correctAnswers;
+  const wrong = result.wrongAnswers;
+  const unattempted = result.totalQuestions - correct - wrong;
+
+  return (
+    <>
+      <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100">
+        {!compact && <h2 className="font-bold text-slate-800 text-xs">Question Review</h2>}
+        <div className="flex gap-2 mt-1 text-[10px] font-medium flex-wrap">
+          <span className="text-emerald-600">{correct} correct</span>
+          <span className="text-red-500">{wrong} wrong</span>
+          <span className="text-slate-400">{unattempted} skipped</span>
+        </div>
+      </div>
+      <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100 grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] sm:text-[10px] text-slate-500">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0" /> Correct
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded bg-red-500 shrink-0" /> Wrong
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded border border-slate-300 bg-white shrink-0" /> Skipped
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded border-2 border-blue-600 bg-blue-50 shrink-0" /> Current
+        </div>
+      </div>
+      <div className="flex-1 min-h-0 px-2 sm:px-3 py-2 overflow-y-auto">
+        <div
+          className="w-full grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${paletteCols}, minmax(0, 1fr))` }}
+        >
+          {result.questions.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => goToQuestion(index)}
+              className={`${paletteBtnH} rounded text-[10px] sm:text-[11px] font-semibold border transition-colors ${paletteBtnClass(getPaletteStatus(index))}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="flex-shrink-0 p-2 sm:p-3 border-t border-slate-100">
+        <div className="text-center text-[10px] sm:text-xs text-slate-500">
+          Score: <strong className="text-slate-800">{result.score.toFixed(2)}</strong>
+          <span className="text-slate-400"> / {result.totalMarks ?? result.totalQuestions * 2}</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
 const TestResultPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { theme } = useTheme();
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [result, setResult] = useState<TestResult | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      loadResult();
-    }
+    if (id) loadResult();
   }, [id]);
 
   const loadResult = async () => {
     try {
       setIsLoading(true);
       const response = await testAPI.getTest(id!);
-      
       if (response.data.success) {
         const testData = response.data.data;
-        
-        // If not submitted, redirect to test page
         if (!testData.isSubmitted) {
           navigate(`/test/${id}`);
           return;
         }
-
         setResult(testData);
       } else {
         setError("Failed to load results");
       }
-    } catch (err: any) {
-      console.error("Error loading results:", err);
-      setError(err.response?.data?.message || "Failed to load results");
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to load results");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getScoreColor = (score: number, total: number) => {
-    const percentage = (score / (total * 2)) * 100; // Max score is total * 2
-    if (percentage >= 70) return "text-green-600";
-    if (percentage >= 50) return "text-orange-600";
-    return "text-red-600";
+  const goToQuestion = (index: number) => {
+    if (!result || index < 0 || index >= result.questions.length) return;
+    setCurrentIndex(index);
+    setPaletteOpen(false);
   };
 
-  const formatTimeSpent = (seconds: number) => {
-    if (seconds == null || seconds < 0) return "—";
-    const m = Math.floor(seconds / 60);
-    const s = Math.round(seconds % 60);
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
+  const getPaletteStatus = (index: number): ReviewPaletteStatus => {
+    if (!result) return "unattempted";
+    if (index === currentIndex) return "current";
+    const q = result.questions[index];
+    if (!q.userAnswer) return "unattempted";
+    return q.isCorrect ? "correct" : "wrong";
   };
+
+  const paletteBtnClass = (status: ReviewPaletteStatus) => {
+    switch (status) {
+      case "current":
+        return "border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold";
+      case "correct":
+        return "bg-emerald-500 text-white border-emerald-500";
+      case "wrong":
+        return "bg-red-500 text-white border-red-500";
+      default:
+        return "bg-white text-slate-600 border-slate-200 hover:border-slate-300";
+    }
+  };
+
+  const fromAdmin = searchParams.get("fromAdmin") === "1";
+  const fromMentor = searchParams.get("fromMentor") === "1";
+  const studentId = searchParams.get("studentId");
+
+  const backPath = useMemo(() => {
+    if (fromMentor && studentId) return `/mentor-dashboard/students/${studentId}`;
+    if (fromAdmin && studentId) return `/admin/students/${studentId}`;
+    return "/test-history";
+  }, [fromAdmin, fromMentor, studentId]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center h-full min-h-[50vh] bg-slate-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>Loading results...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3" />
+          <p className="text-slate-600 text-sm">Loading results...</p>
         </div>
       </div>
     );
@@ -136,444 +234,189 @@ const TestResultPage: React.FC = () => {
 
   if (error && !result) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <p className={theme === "dark" ? "text-red-300" : "text-red-800"}>{error}</p>
-              <Button onClick={() => navigate("/prelims-test")} className="mt-4">
-                Go Back
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center h-full min-h-[50vh] bg-slate-100 p-4">
+        <div className="text-center max-w-sm">
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+          <p className="text-red-800 mb-4">{error}</p>
+          <Button onClick={() => navigate(backPath)}>Go Back</Button>
+        </div>
       </div>
     );
   }
 
   if (!result) return null;
 
-  const maxScore = result.totalQuestions * 2;
-  const scorePercentage = (result.score / maxScore) * 100;
-  const fromAdmin = searchParams.get("fromAdmin") === "1";
-  const fromMentor = searchParams.get("fromMentor") === "1";
-  const studentId = searchParams.get("studentId");
+  const currentQuestion = result.questions[currentIndex];
+  const optionKeys = getQuestionOptionKeys(currentQuestion);
+  const totalMarks = result.totalMarks ?? result.totalQuestions * 2;
+  const paletteColsDesktop = examPaletteCols(result.totalQuestions, false);
+  const paletteColsMobile = examPaletteCols(result.totalQuestions, true);
+  const paletteBtnH =
+    result.totalQuestions > 75 ? "h-[22px] sm:h-[24px]" : "h-[24px] sm:h-[26px]";
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-3 md:px-4 overflow-x-hidden">
-      {/* Header Actions - Mobile-first */}
-      <div className="flex items-center justify-between gap-2">
-        {fromMentor && studentId ? (
-          <Button
-            onClick={() => navigate(`/mentor-dashboard/students/${studentId}`)}
-            variant="outline"
-            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            <span className="hidden xs:inline">Back to Student</span>
-            <span className="xs:hidden">Back</span>
-          </Button>
-        ) : fromAdmin && studentId ? (
-          <Button
-            onClick={() => navigate(`/admin/students/${studentId}`)}
-            variant="outline"
-            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            <span className="hidden xs:inline">Back to Student</span>
-            <span className="xs:hidden">Back</span>
-          </Button>
-        ) : (
-          <Button
-            onClick={() => navigate("/prelims-test")}
-            variant="outline"
-            className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm min-h-[44px] touch-manipulation"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            <span className="hidden xs:inline">Generate New Test</span>
-            <span className="xs:hidden">New Test</span>
-          </Button>
-        )}
-        <ExamLanguageToggle lang={examLang} onChange={setExamLang} />
-      </div>
-
-      {/* Score Summary Card - Mobile-first */}
-      <Card className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white">
-        <CardContent className="pt-4 md:pt-6 px-3 md:px-6">
-          <div className="text-center">
-            <Award className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 opacity-90" />
-            <h2 className="text-lg md:text-2xl font-semibold mb-2">Test Results</h2>
-            <div className="text-3xl md:text-5xl font-bold mb-2">
-              {result.score.toFixed(2)}
-              <span className="text-xl md:text-3xl opacity-75">/{maxScore}</span>
-            </div>
-            <div className="text-sm md:text-lg mb-3 md:mb-4 space-y-1 md:space-y-0">
-              <div className="block md:inline">
-                {result.correctAnswers} Correct
-              </div>
-              <span className="hidden md:inline"> | </span>
-              <div className="block md:inline">
-                {result.wrongAnswers} Wrong
-              </div>
-              <span className="hidden md:inline"> | </span>
-              <div className="block md:inline">
-                {result.accuracy.toFixed(1)}% Accuracy
-              </div>
-            </div>
-            <div className="inline-block bg-white/20 backdrop-blur-sm px-3 md:px-6 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-semibold break-words">
-              {result.topic} {result.subject ? `· ${result.subject}` : ""} ({result.examType === "CSAT" ? "CSAT" : result.difficulty ?? "—"})
+    <div className="h-[100dvh] flex flex-col upsc-exam-page-bg text-slate-900 overflow-hidden">
+      <header className="flex-shrink-0 bg-white border-b border-slate-200 px-2 sm:px-4 py-2 shadow-sm safe-area-inset-top">
+        <div className="flex items-start sm:items-center justify-between gap-2 max-w-[1600px] mx-auto w-full">
+          <div className="min-w-0 flex-1 flex items-start gap-2">
+            <button
+              type="button"
+              onClick={() => navigate(backPath)}
+              className="shrink-0 p-1.5 rounded-md hover:bg-slate-100 text-slate-500 mt-0.5"
+              title="Back to history"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div className="min-w-0">
+              <h1 className="text-[11px] sm:text-sm font-bold text-slate-900 truncate leading-tight">
+                {result.topic}
+              </h1>
+              <p className="text-[9px] sm:text-[11px] text-slate-500 leading-tight mt-0.5 flex flex-wrap gap-x-1.5 gap-y-0">
+                <span>Q {currentIndex + 1}/{result.totalQuestions}</span>
+                <span className="text-slate-300 hidden sm:inline">·</span>
+                <span className="text-emerald-600 font-medium">{result.correctAnswers} correct</span>
+                <span className="text-slate-300 hidden sm:inline">·</span>
+                <span className="text-red-500 font-medium">{result.wrongAnswers} wrong</span>
+              </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats Grid - Mobile-first: 2 columns on mobile, 4 on desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-        <Card>
-          <CardContent className="pt-3 md:pt-6 px-3 md:px-6">
-            <div className="text-center">
-              <div className={`text-xl md:text-3xl font-bold mb-1 ${getScoreColor(result.score, result.totalQuestions)}`}>
-                {result.score.toFixed(2)}
-              </div>
-              <div className={`text-[10px] md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Total Score
-              </div>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
+            <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 text-blue-700 font-semibold text-[10px] sm:text-xs">
+              <Award className="w-3.5 h-3.5 shrink-0" />
+              {result.score.toFixed(2)}/{totalMarks}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-3 md:pt-6 px-3 md:px-6">
-            <div className="text-center">
-              <div className="text-xl md:text-3xl font-bold mb-1 text-green-600">{result.correctAnswers}</div>
-              <div className={`text-[10px] md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Correct
+            {currentQuestion.timeSpent != null && currentQuestion.timeSpent > 0 && (
+              <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-slate-600 text-[10px] font-medium">
+                <Clock className="w-3 h-3" />
+                {formatTimeSpent(currentQuestion.timeSpent)}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+            <button
+              type="button"
+              onClick={() => setPaletteOpen(true)}
+              className="xl:hidden inline-flex px-2 py-1 rounded-md bg-slate-100 text-[10px] font-semibold text-slate-700"
+            >
+              Review
+            </button>
+          </div>
+        </div>
+      </header>
 
-        <Card>
-          <CardContent className="pt-3 md:pt-6 px-3 md:px-6">
-            <div className="text-center">
-              <div className="text-xl md:text-3xl font-bold mb-1 text-red-600">{result.wrongAnswers}</div>
-              <div className={`text-[10px] md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Wrong
+      <div className="flex-1 min-h-0 flex overflow-hidden max-w-[1600px] mx-auto w-full">
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-1.5 sm:p-2 md:p-3">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <UpscExamPaperShell
+              questionNumber={currentIndex + 1}
+              examType={result.examType}
+              topic={result.topic}
+              totalMarks={totalMarks}
+              durationMinutes={result.durationMinutes}
+            >
+              <div className="px-2.5 sm:px-4 py-2 sm:py-3">
+                <ExamQuestionBody question={currentQuestion} compact lang={examLang} paperMode />
               </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardContent className="pt-3 md:pt-6 px-3 md:px-6">
-            <div className="text-center">
-              <div className="text-xl md:text-3xl font-bold mb-1 text-blue-600">{result.accuracy.toFixed(1)}%</div>
-              <div className={`text-[10px] md:text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                Accuracy
+              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-dashed border-black/20" />
+
+              <div className="flex-shrink-0 flex flex-col gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-3">
+                {optionKeys.map((key) => (
+                  <ExamReviewOptionRow
+                    key={key}
+                    optionKey={key}
+                    question={currentQuestion}
+                    correctAnswer={currentQuestion.correctAnswer}
+                    userAnswer={currentQuestion.userAnswer}
+                    compact
+                    lang={examLang}
+                    paperMode
+                  />
+                ))}
               </div>
+
+              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-dashed border-black/20" />
+
+              <div className="flex-shrink-0 py-2 sm:py-3">
+                <ExamReviewExplanation
+                  question={currentQuestion}
+                  userAnswer={currentQuestion.userAnswer}
+                  paperMode
+                />
+              </div>
+            </UpscExamPaperShell>
+          </div>
+
+          <div className="flex-shrink-0 pt-1.5 sm:pt-2">
+            <div className="grid grid-cols-2 gap-1 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => goToQuestion(currentIndex - 1)}
+                disabled={currentIndex === 0}
+                className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg border border-slate-300 bg-white text-[10px] sm:text-xs font-medium text-slate-600 disabled:opacity-40 min-h-[40px]"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
+                Previous
+              </button>
+              <button
+                type="button"
+                onClick={() => goToQuestion(currentIndex + 1)}
+                disabled={currentIndex >= result.questions.length - 1}
+                className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs font-semibold disabled:opacity-40 min-h-[40px]"
+              >
+                Next
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+              </button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
 
-      {/* Questions Review - Mobile-first */}
-      <Card>
-        <CardHeader className="px-3 md:px-6 pb-3 md:pb-6">
-          <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-            <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
-            Question Review
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-3 md:px-6">
-          <div className="space-y-3 md:space-y-4">
-            {result.questions.map((question, index) => {
-              const isExpanded = expandedQuestion === question._id;
+        <aside className="hidden xl:flex flex-shrink-0 w-[260px] 2xl:w-[280px] bg-white border-l border-slate-200 flex-col overflow-hidden">
+          <ReviewPalettePanel
+            result={result}
+            currentIndex={currentIndex}
+            paletteCols={paletteColsDesktop}
+            paletteBtnH={paletteBtnH}
+            getPaletteStatus={getPaletteStatus}
+            paletteBtnClass={paletteBtnClass}
+            goToQuestion={goToQuestion}
+          />
+        </aside>
 
-              return (
-                <div
-                  key={question._id}
-                  className={`border rounded-lg p-3 md:p-4 transition-all overflow-hidden ${
-                    question.isCorrect
-                      ? theme === "dark"
-                        ? "border-green-800 bg-green-950/20"
-                        : "border-green-200 bg-green-50"
-                      : theme === "dark"
-                      ? "border-red-800 bg-red-950/20"
-                      : "border-red-200 bg-red-50"
-                  }`}
+        {paletteOpen && (
+          <>
+            <button
+              type="button"
+              className="xl:hidden fixed inset-0 bg-black/40 z-40"
+              onClick={() => setPaletteOpen(false)}
+              aria-label="Close review palette"
+            />
+            <aside className="xl:hidden fixed inset-y-0 right-0 z-50 w-[min(280px,88vw)] bg-white shadow-2xl flex flex-col">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100">
+                <span className="font-bold text-sm text-slate-800">Question Review</span>
+                <button
+                  type="button"
+                  onClick={() => setPaletteOpen(false)}
+                  className="text-xs font-medium text-slate-500 px-2 py-1 rounded hover:bg-slate-100"
                 >
-                  <div className="flex items-start gap-2 md:gap-3">
-                    <div className="flex-shrink-0 mt-0.5 md:mt-1">
-                      {question.isCorrect ? (
-                        <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                      ) : (
-                        <XCircle className="w-5 h-5 md:w-6 md:h-6 text-red-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 overflow-hidden">
-                      <div className="flex items-start justify-between gap-2 md:gap-4 mb-2 md:mb-3">
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <div className={`text-sm md:text-base leading-relaxed ${theme === "dark" ? "text-slate-200" : "text-slate-900"} break-words`}>
-                            <span className="font-bold">Q{index + 1}.</span>{" "}
-                            <div className="mt-1 font-normal">
-                              {/* Match the following: show question/statement at TOP above the lists */}
-                              {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && question.question?.trim() && (
-                                <div className="mb-2">
-                                  <UpscPaperQuestionBlock question={question} theme={theme} allowHtml stemOnly lang={examLang} />
-                                </div>
-                              )}
-                              {/* Assertion–Reason block (no repeat of assertion in question text below) */}
-                              {question.assertionReason?.assertion != null &&
-                                (question.assertionReason.assertion || question.assertionReason.reason) && (
-                                <div className="mb-3 space-y-4">
-                                  {hasDistinctHindiQuestion(question) ? (
-                                    <>
-                                      <UpscFormattedQuestionStem text={getQuestionHindi(question)} theme={theme} />
-                                      <div
-                                        className={`border-t border-dashed ${theme === "dark" ? "border-slate-600" : "border-slate-300"}`}
-                                        aria-hidden
-                                      />
-                                    </>
-                                  ) : null}
-                                  <UpscFormattedQuestionStem
-                                    text={`Assertion (A): ${question.assertionReason.assertion}\nReason (R): ${question.assertionReason.reason}`}
-                                    theme={theme}
-                                  />
-                                </div>
-                              )}
-                              {/* Match columns (question text already shown above) */}
-                              {question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0 && (
-                                <div className="overflow-x-auto mb-3">
-                                  <div className="grid grid-cols-2 gap-2 sm:gap-4 min-w-[240px]">
-                                    <div>
-                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-I</div>
-                                      <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
-                                        {question.matchColumns.columnA.map((item, i) => <li key={i}>{item}</li>)}
-                                      </ul>
-                                    </div>
-                                    <div>
-                                      <div className={`text-xs font-bold uppercase tracking-wide mb-1 ${theme === "dark" ? "text-blue-400" : "text-blue-700"}`}>List-II</div>
-                                      <ul className="list-decimal list-inside space-y-0.5 text-xs sm:text-sm">
-                                        {(question.matchColumns.columnB || []).map((item, i) => <li key={i}>{item}</li>)}
-                                      </ul>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                              {question.tableData?.headers?.length != null && question.tableData.headers.length > 0 && (
-                                <div className="overflow-x-auto mb-3">
-                                  <table className={`w-full border-collapse border text-xs sm:text-sm ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>
-                                    <thead>
-                                      <tr className={theme === "dark" ? "bg-slate-700" : "bg-slate-100"}>
-                                        {question.tableData!.headers.map((h, i) => (
-                                          <th key={i} className="border border-slate-400 px-1.5 py-1 text-left font-semibold">{h}</th>
-                                        ))}
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {(question.tableData!.rows || []).map((row, ri) => (
-                                        <tr key={ri}>
-                                          {row.map((cell, ci) => (
-                                            <td key={ci} className={`border px-1.5 py-1 ${theme === "dark" ? "border-slate-600" : "border-slate-400"}`}>{cell}</td>
-                                          ))}
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )}
-                              {/* Question text: skip for assertion-reason (no repeat) and for match (already at top) */}
-                              {!(
-                                question.assertionReason?.assertion != null &&
-                                (question.assertionReason.assertion || question.assertionReason.reason)
-                              ) &&
-                                !(question.matchColumns?.columnA?.length != null && question.matchColumns.columnA.length > 0) && (
-                                <UpscPaperQuestionBlock question={question} theme={theme} allowHtml lang={examLang} />
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          {question.timeSpent != null && question.timeSpent > 0 && (
-                            <span
-                              className={`text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded flex items-center gap-1 ${
-                                theme === "dark" ? "bg-slate-700 text-slate-300" : "bg-slate-200 text-slate-700"
-                              }`}
-                              title="Time spent on this question"
-                            >
-                              <Clock className="w-3 h-3" />
-                              {formatTimeSpent(question.timeSpent)}
-                            </span>
-                          )}
-                          <span
-                            className={`text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded ${
-                              question.isCorrect
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
-                            }`}
-                          >
-                            {question.isCorrect ? "+2" : "-0.66"}
-                          </span>
-                        </div>
-                      </div>
-
-                      {question.matchColumns?.columnA?.length != null &&
-                        question.matchColumns.columnA.length > 0 && (
-                        <UpscPaperQuestionBlock
-                          question={question}
-                          theme={theme}
-                          allowHtml
-                          showQuestion={false}
-                          lang={examLang}
-                        />
-                      )}
-
-                      <div className="grid grid-cols-4 gap-1.5 md:gap-2 mb-2 md:mb-3">
-                        {(["A", "B", "C", "D"] as const).map((option) => {
-                          const isCorrect = option === question.correctAnswer;
-                          const isUserAnswer = option === question.userAnswer;
-                          return (
-                            <div
-                              key={option}
-                              className={`flex flex-col items-center justify-center p-2 rounded-lg border-2 text-xs md:text-sm font-semibold ${
-                                isCorrect
-                                  ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                                  : isUserAnswer && !isCorrect
-                                  ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
-                                  : theme === "dark"
-                                  ? "border-slate-700 bg-slate-800 text-slate-400"
-                                  : "border-slate-300 bg-white text-slate-600"
-                              }`}
-                            >
-                              <span>({option.toLowerCase()})</span>
-                              {isCorrect && <CheckCircle className="w-3.5 h-3.5 mt-0.5 text-green-600" />}
-                              {isUserAnswer && !isCorrect && <XCircle className="w-3.5 h-3.5 mt-0.5 text-red-600" />}
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* User Answer Summary - Mobile-first */}
-                      <div className={`text-xs md:text-sm mb-2 md:mb-3 p-2 rounded break-words ${
-                        theme === "dark" ? "bg-slate-800" : "bg-slate-100"
-                      }`}>
-                        <div className="flex flex-wrap gap-1 md:gap-2">
-                          <span className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>
-                            Your Answer:{" "}
-                          </span>
-                          <span className={`font-semibold ${
-                            question.isCorrect
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}>
-                            {question.userAnswer || "Not Attempted"}
-                          </span>
-                          <span className={`hidden md:inline ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`}>{'|'}</span>
-                          <span className={theme === "dark" ? "text-slate-400" : "text-slate-600"}>
-                            <span className="block md:inline">Correct: </span>
-                          </span>
-                          <span className="font-semibold text-green-600">{question.correctAnswer}</span>
-                        </div>
-                      </div>
-
-                      {/* Explanation - Mobile-first */}
-                      <button
-                        onClick={() => setExpandedQuestion(isExpanded ? null : question._id)}
-                        className={`w-full text-left text-xs md:text-sm font-medium min-h-[44px] px-2 py-2 rounded touch-manipulation ${
-                          theme === "dark" ? "text-blue-400 hover:bg-blue-900/20" : "text-blue-600 hover:bg-blue-50"
-                        } mb-2 transition-colors`}
-                      >
-                        {isExpanded ? "Hide" : "Show"} Explanation
-                      </button>
-
-                      {isExpanded && (
-                        <div className={`p-2 md:p-3 rounded-lg ${
-                          theme === "dark" ? "bg-slate-800 border border-slate-700" : "bg-blue-50 border border-blue-200"
-                        }`}>
-                          <div className="flex items-start gap-1.5 md:gap-2 mb-1.5 md:mb-2">
-                            <TrendingUp className={`w-3.5 h-3.5 md:w-4 md:h-4 mt-0.5 flex-shrink-0 ${
-                              theme === "dark" ? "text-blue-400" : "text-blue-600"
-                            }`} />
-                            <span className={`font-semibold text-xs md:text-sm ${
-                              theme === "dark" ? "text-blue-300" : "text-blue-800"
-                            }`}>
-                              Explanation
-                              {!question.explanation_hi && (
-                                <span className="font-normal opacity-70"> (English)</span>
-                              )}
-                              :
-                            </span>
-                          </div>
-                          {question.explanation &&
-                          typeof question.explanation === "object" &&
-                          (question.explanation.A != null || question.explanation.B != null || question.explanation.C != null || question.explanation.D != null) ? (
-                            <div className="space-y-2 text-xs md:text-sm">
-                              {(["A", "B", "C", "D"] as const).map((opt) => {
-                                const expl = question.explanation as { A?: string; B?: string; C?: string; D?: string };
-                                const text = expl[opt];
-                                if (text == null || text === "") return null;
-                                const isCorrect = opt === question.correctAnswer;
-                                return (
-                                  <div
-                                    key={opt}
-                                    className={`p-2.5 rounded-lg border ${
-                                      isCorrect
-                                        ? "border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-600"
-                                        : theme === "dark"
-                                        ? "border-slate-600 bg-slate-700/50"
-                                        : "border-slate-200 bg-white/80"
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-400" : theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                                        Option {opt}:
-                                      </span>
-                                      {isCorrect ? (
-                                        <span className="text-[10px] font-bold uppercase tracking-wide text-green-700 dark:text-green-400 bg-green-200/80 dark:bg-green-800/50 px-1.5 py-0.5 rounded">Correct</span>
-                                      ) : (
-                                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Incorrect</span>
-                                      )}
-                                    </div>
-                                    <span className={`break-words block ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                                      {text}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <p className={`text-xs md:text-sm break-words ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                              {typeof question.explanation === "string" ? question.explanation : ""}
-                            </p>
-                          )}
-                          {isExpanded && (question.eliminationLogic || question.conceptualSource) && (
-                            <div className="mt-3 pt-3 border-t border-slate-600/50 space-y-1.5 text-xs md:text-sm">
-                              {question.eliminationLogic && (
-                                <p><span className={`font-semibold ${theme === "dark" ? "text-amber-400" : "text-amber-700"}`}>Elimination logic:</span>{" "}
-                                  <span className={theme === "dark" ? "text-slate-300" : "text-slate-700"}>{question.eliminationLogic}</span>
-                                </p>
-                              )}
-                              {question.conceptualSource && (
-                                <p><span className={`font-semibold ${theme === "dark" ? "text-sky-400" : "text-sky-700"}`}>Source:</span>{" "}
-                                  <span className={theme === "dark" ? "text-slate-300" : "text-slate-700"}>{question.conceptualSource}</span>
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                  Close
+                </button>
+              </div>
+              <ReviewPalettePanel
+                result={result}
+                currentIndex={currentIndex}
+                paletteCols={paletteColsMobile}
+                paletteBtnH={paletteBtnH}
+                getPaletteStatus={getPaletteStatus}
+                paletteBtnClass={paletteBtnClass}
+                goToQuestion={goToQuestion}
+                compact
+              />
+            </aside>
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
 export default TestResultPage;
-

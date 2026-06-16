@@ -171,11 +171,104 @@ export interface ParsedMatchFollowing {
 }
 
 const MATCH_INTRO_RE =
-  /match\s+(?:the\s+)?following|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*मिलान|सूची[- ]?१.*सूची[- ]?२/i;
+  /match\s+(?:the\s+)?following|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*मिलान|सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२]|सूची[- ]?i.*(?:मिला|से)/i;
 const MATCH_PROMPT_RE =
-  /select the correct|code given below|नीचे दिए गए कोड|सही उत्तर|सही जोड़ी/i;
+  /select the correct|code given below|नीचे दिए गए|सही उत्तर|सही जोड़ी|कूट/i;
 const MATCH_SECTION_SKIP =
-  /^(?:list[- ]?i|list[- ]?ii|सूची[- ]?[12१२])(?:\s*\([^)]+\))?\s*$/i;
+  /^(?:list[- ]?i|list[- ]?ii|सूची[- ]?[iI12१२])(?:\s*\([^)]+\))?\s*$/i;
+
+function extractLetteredColumnItems(text: string): string[] {
+  const items: string[] = [];
+  const markers = [...text.matchAll(/\b([A-D])\.\s*/gi)];
+  if (markers.length < 2) return items;
+
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index! + markers[i][0].length;
+    const end = i + 1 < markers.length ? markers[i + 1].index! : text.length;
+    let item = text.slice(start, end).trim();
+    item = item.replace(/\s*(?:सूची|list)[- ]?[iI2२II].*$/i, "").trim();
+    if (item) items.push(item);
+  }
+  return items;
+}
+
+function extractNumberedColumnItems(text: string): string[] {
+  const items: string[] = [];
+  for (const line of text.split(/\n+/)) {
+    const m = line.trim().match(/^(\d+)[.)]\s*(.+)$/);
+    if (m) items.push(m[2].trim());
+  }
+  if (items.length >= 2) return items;
+
+  const markers = [...text.matchAll(/(?:^|\s)(\d+)\.\s+/g)];
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index! + markers[i][0].length;
+    const end = i + 1 < markers.length ? markers[i + 1].index! : text.length;
+    const item = text.slice(start, end).trim();
+    if (item) items.push(item);
+  }
+  return items;
+}
+
+function extractMatchIntro(fullText: string, beforeListII: string): string {
+  const beforeA = beforeListII.split(/\s*[A-D]\.\s*/i)[0]?.trim() || "";
+  const cleaned = beforeA
+    .replace(/\s*(?:सूची|list)[- ]?I\s*(?:\([^)]*\))?\s*:?\s*$/i, "")
+    .trim();
+
+  if (cleaned.length >= 10) {
+    return cleaned.endsWith(":") || cleaned.endsWith("：") ? cleaned : `${cleaned}:`;
+  }
+
+  const hi = fullText.match(/^(.+?(?:मिलाएं|मिलान करें|मिलान)[^.]*[.:]?)/i);
+  if (hi) return hi[1].trim();
+  const en = fullText.match(/^(Match[^:]*:?)/i);
+  if (en) return en[1].trim();
+
+  return /[\u0900-\u097F]/.test(fullText) ? "निम्नलिखित का मिलान कीजिए:" : "Match the following:";
+}
+
+function extractMatchPrompt(text: string): string {
+  for (const line of text.split(/\n+/)) {
+    const trimmed = line.trim();
+    if (!MATCH_PROMPT_RE.test(trimmed)) continue;
+    if (/\b[A-D]\.\s/.test(trimmed) || /(?:सूची|list)[- ]?I\s*\(/i.test(trimmed)) continue;
+    if (trimmed.length > 120) continue;
+    return trimmed;
+  }
+  return /[\u0900-\u097F]/.test(text)
+    ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
+    : "Select the correct answer using the code given below:";
+}
+
+/** Parse match columns from a single paragraph (common in Hindi translations). */
+function parseMatchParagraph(text: string): ParsedMatchFollowing | null {
+  // Split only on List-II header with subtitle e.g. "सूची-II (फोकस...)" — not intro "सूची-I का सूची-II से"
+  const listIISplit = text.split(/(?:सूची[- ]?II|list[- ]?ii)\s*\(/i);
+  const beforeListII = listIISplit[0] || text;
+  const afterListII =
+    listIISplit.length > 1
+      ? listIISplit
+          .slice(1)
+          .map((part, i) => (i === 0 ? `(${part}` : part))
+          .join("")
+      : "";
+
+  const columnA = extractLetteredColumnItems(beforeListII);
+  if (columnA.length < 2) return null;
+
+  let columnB = extractNumberedColumnItems(afterListII);
+  if (columnB.length < 2) {
+    columnB = extractNumberedColumnItems(text.slice(beforeListII.length));
+  }
+
+  return {
+    intro: extractMatchIntro(text, beforeListII),
+    columnA,
+    columnB,
+    prompt: extractMatchPrompt(text),
+  };
+}
 
 /** Parse "Match the following" / List-I & List-II from plain question text. */
 export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing | null {
@@ -191,7 +284,7 @@ export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing 
 
   for (const line of lines) {
     if (MATCH_PROMPT_RE.test(line)) {
-      if (!prompt) prompt = line;
+      if (!prompt && !/\b[A-D]\.\s/.test(line) && line.length < 120) prompt = line;
       continue;
     }
     if (MATCH_SECTION_SKIP.test(line)) continue;
@@ -238,22 +331,22 @@ export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing 
     }
   }
 
-  if (columnA.length < 2) return null;
+  if (columnA.length < 2) {
+    return parseMatchParagraph(trimmed);
+  }
 
   const intro =
     introParts.join(" ").trim() ||
     trimmed.split(/\n/)[0]?.trim() ||
     "Match the following:";
 
+  const cleanedIntro = intro.replace(/\s*list[- ]?i.*$/i, "").replace(/\s*सूची[- ]?I.*$/i, "").trim();
+
   return {
-    intro: intro.replace(/\s*list[- ]?i.*$/i, "").trim() || "Match the following:",
+    intro: cleanedIntro || extractMatchIntro(trimmed, trimmed),
     columnA,
     columnB,
-    prompt:
-      prompt ||
-      (/[\u0900-\u097F]/.test(trimmed)
-        ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
-        : "Select the correct answer using the code given below:"),
+    prompt: prompt || extractMatchPrompt(trimmed),
   };
 }
 
@@ -303,28 +396,51 @@ export function resolveMatchColumns(
     question_en?: string;
     question_hi?: string;
     matchColumns?: { columnA?: string[]; columnB?: string[] } | null;
+    matchColumns_hi?: { columnA?: string[]; columnB?: string[] } | null;
   },
   lang: "en" | "hi" = "en"
 ): ParsedMatchFollowing | null {
+  if (lang === "hi") {
+    if (question.matchColumns_hi?.columnA?.length) {
+      return {
+        intro: "निम्नलिखित का मिलान कीजिए:",
+        columnA: question.matchColumns_hi.columnA || [],
+        columnB: question.matchColumns_hi.columnB || [],
+        prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
+      };
+    }
+    const hiText = String(question.question_hi || "").trim();
+    if (!hiText) return null;
+    return parseMatchFollowingFromText(hiText) || parseMatchParagraph(hiText);
+  }
+
   if (question.matchColumns?.columnA?.length) {
     return {
-      intro:
-        lang === "hi"
-          ? "निम्नलिखित का मिलान कीजिए:"
-          : "Match the following:",
+      intro: "Match the following:",
       columnA: question.matchColumns.columnA || [],
       columnB: question.matchColumns.columnB || [],
-      prompt:
-        lang === "hi"
-          ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
-          : "Select the correct answer using the code given below:",
+      prompt: "Select the correct answer using the code given below:",
     };
   }
-  const text =
-    lang === "hi"
-      ? String(question.question_hi || "").trim()
-      : String(question.question_en || question.question || "").trim();
+  const text = String(question.question_en || question.question || "").trim();
   return parseMatchFollowingFromText(text);
+}
+
+/** Flatten match columns into translatable plain text (for Hindi batch translation). */
+export function formatMatchColumnsAsText(
+  questionEn: string,
+  columnA: string[],
+  columnB: string[]
+): string {
+  const lines = [questionEn.trim() || "Match the following:"];
+  columnA.forEach((item, i) => {
+    if (item?.trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item.trim()}`);
+  });
+  columnB.forEach((item, i) => {
+    if (item?.trim()) lines.push(`${i + 1}. ${item.trim()}`);
+  });
+  lines.push("Select the correct answer using the code given below:");
+  return lines.join("\n");
 }
 
 export function buildAssertionReasonStem(ar: {

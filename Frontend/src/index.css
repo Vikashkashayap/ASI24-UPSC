@@ -337,6 +337,187 @@ html {
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
 }
 
+/* UPSC Prelims exam booklet — paper texture, watermark, serif typography */
+.upsc-exam-serif {
+  font-family: "Times New Roman", Times, Georgia, "Noto Serif Devanagari", serif;
+}
+
+.upsc-exam-page-bg {
+  background-color: #ddd8ce;
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+}
+
+.upsc-exam-paper {
+  background-color: #faf6ed;
+  border: 2px solid #1a1a1a;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  font-family: "Times New Roman", Times, Georgia, "Noto Serif Devanagari", serif;
+}
+
+.upsc-exam-paper::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.upsc-exam-paper-body {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      rgba(0, 0, 0, 0.03) 27px,
+      rgba(0, 0, 0, 0.03) 28px
+    );
+  background-size: 100px 100px, 100% 28px;
+}
+
+.upsc-exam-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.upsc-exam-watermark-img {
+  width: min(220px, 45vw);
+  height: auto;
+  opacity: 0.07;
+  filter: grayscale(1);
+  user-select: none;
+}
+
+.upsc-exam-watermark-text {
+  position: absolute;
+  font-family: "Times New Roman", Times, serif;
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  color: rgba(0, 0, 0, 0.04);
+  transform: rotate(-28deg);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.upsc-exam-paper .upsc-paper-option {
+  border-radius: 2px;
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.upsc-exam-paper .upsc-paper-option:hover {
+  border-color: rgba(0, 0, 0, 0.45);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.upsc-exam-paper .upsc-paper-option-selected {
+  border-color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.upsc-exam-paper .upsc-paper-option-correct {
+  border-color: #15803d;
+  background: rgba(22, 163, 74, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(22, 163, 74, 0.25);
+}
+
+.upsc-exam-paper .upsc-paper-option-wrong {
+  border-color: #b91c1c;
+  background: rgba(220, 38, 38, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2);
+}
+
+.upsc-paper-explanation {
+  margin: 0 0.625rem 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px dashed rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 0;
+}
+
+@media (min-width: 640px) {
+  .upsc-paper-explanation {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+.upsc-paper-explanation-item {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.upsc-paper-explanation-correct {
+  border-color: rgba(22, 163, 74, 0.45);
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.upsc-paper-explanation-wrong {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.06);
+}
+
+.upsc-exam-paper .upsc-paper-lang-label {
+  color: rgba(0, 0, 0, 0.55) !important;
+  font-family: "Times New Roman", Times, serif;
+  letter-spacing: 0.08em;
+}
+
+/* Match-the-following lists — printed booklet style */
+.upsc-paper-match-col {
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+}
+
+.upsc-paper-match-header {
+  padding: 0.35rem 0.625rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.05);
+  font-family: "Times New Roman", Times, Georgia, "Noto Serif Devanagari", serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1a1a1a;
+}
+
+@media (min-width: 640px) {
+  .upsc-paper-match-header {
+    font-size: 11px;
+  }
+}
+
+/* Assertion–Reason blocks inside paper */
+.upsc-exam-paper .border-blue-700,
+.upsc-exam-paper .text-blue-700,
+.upsc-exam-paper .text-blue-600,
+.upsc-exam-paper .text-blue-400 {
+  color: #1a1a1a !important;
+}
+
+.upsc-exam-paper .border-slate-300.bg-slate-50,
+.upsc-exam-paper .rounded-lg.border.border-slate-300 {
+  border-color: rgba(0, 0, 0, 0.28) !important;
+  background: rgba(255, 255, 255, 0.35) !important;
+  border-radius: 0 !important;
+}
+
 /* Copy evaluation — premium report shell */
 .eval-report-glow {
   background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.14), transparent 70%);

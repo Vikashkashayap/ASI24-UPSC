@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConfirmationDialog } from '../components/ui/dialog';
 import { Pagination } from '../components/ui/pagination';
+import { ExamReviewExplanation } from '../components/exam/ExamQuestionBody';
 
 interface TestHistory {
   _id: string;
@@ -324,10 +325,9 @@ const TestHistoryPage: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => loadTestDetails(test._id)}
-                          disabled={loadingTestDetails}
+                          onClick={() => navigate(`/result/${test._id}`)}
                         >
-                          {loadingTestDetails ? 'Loading...' : 'View Details'}
+                          View Review
                         </Button>
                       ) : (
                         <Button
@@ -489,18 +489,14 @@ const TestHistoryPage: React.FC = () => {
                           ))}
                         </div>
 
-                        {/* Explanation */}
-                        {question.explanation && (
-                          <div className={`p-3 rounded-lg ${
-                            theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200"
-                          } border`}>
-                            <p className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                              Explanation:
-                            </p>
-                            <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                              {question.explanation}
-                            </p>
-                          </div>
+                        {/* Explanation — bilingual, per-option why (correct / wrong) */}
+                        {(question.explanation ||
+                          question.explanation_en ||
+                          question.explanation_hi) && (
+                          <ExamReviewExplanation
+                            question={question}
+                            userAnswer={question.userAnswer ?? null}
+                          />
                         )}
                       </div>
                     </CardContent>

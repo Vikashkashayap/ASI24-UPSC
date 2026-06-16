@@ -174,6 +174,7 @@ export function pickBilingualQuestionFields(q) {
     questionType: base.questionType,
     tableData: base.tableData,
     matchColumns: base.matchColumns,
+    matchColumns_hi: base.matchColumns_hi ?? undefined,
     assertionReason: base.assertionReason,
     eliminationLogic: base.eliminationLogic,
     conceptualSource: base.conceptualSource,

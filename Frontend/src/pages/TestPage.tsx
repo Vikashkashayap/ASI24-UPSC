@@ -14,6 +14,7 @@ import { Button } from "../components/ui/button";
 import { ConfirmationDialog } from "../components/ui/dialog";
 import { ExamQuestionBody, ExamOptionRow, examPaletteCols, getQuestionOptionKeys } from "../components/exam/ExamQuestionBody";
 import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
+import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
 import { testAPI } from "../services/api";
 
@@ -29,6 +30,7 @@ interface Question {
   questionType?: string;
   tableData?: { headers: string[]; rows: string[][] } | null;
   matchColumns?: { columnA: string[]; columnB: string[] } | null;
+  matchColumns_hi?: { columnA: string[]; columnB: string[] } | null;
   assertionReason?: { assertion: string; reason: string } | null;
 }
 
@@ -367,7 +369,7 @@ const TestPage: React.FC = () => {
     test.totalQuestions > 75 ? "h-[22px] sm:h-[24px]" : "h-[24px] sm:h-[26px]";
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[#eef2f7] text-slate-900 overflow-hidden">
+    <div className="h-[100dvh] flex flex-col upsc-exam-page-bg text-slate-900 overflow-hidden">
       {/* Top exam bar */}
       <header className="flex-shrink-0 bg-white border-b border-slate-200 px-2 sm:px-4 py-2 shadow-sm safe-area-inset-top">
         <div className="flex items-start sm:items-center justify-between gap-2 max-w-[1600px] mx-auto w-full">
@@ -426,31 +428,20 @@ const TestPage: React.FC = () => {
       <div className="flex-1 min-h-0 flex overflow-hidden max-w-[1600px] mx-auto w-full">
         {/* Question area */}
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-1.5 sm:p-2 md:p-3">
-          <div className="flex-1 min-h-0 flex flex-col bg-white rounded-lg sm:rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="flex-shrink-0 flex items-center justify-between px-2.5 sm:px-4 py-1.5 sm:py-2 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white text-[10px] sm:text-xs font-bold shadow-sm">
-                  {currentIndex + 1}
-                </span>
-                <span className="font-semibold text-slate-800 text-[11px] sm:text-sm">
-                  Question {currentIndex + 1}
-                </span>
-              </div>
-              <span className="text-[9px] sm:text-[11px] font-medium text-slate-400">
-                {totalMarks} total marks
-              </span>
-            </div>
-
-            <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
-              {/* Question stem — scrollable container */}
-              <div className="flex-shrink-0 px-2.5 sm:px-4 py-2 sm:py-3">
-                <ExamQuestionBody question={currentQuestion} compact lang={examLang} />
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+            <UpscExamPaperShell
+              questionNumber={currentIndex + 1}
+              examType={test.examType}
+              topic={test.topic}
+              totalMarks={totalMarks}
+              durationMinutes={test.durationMinutes}
+            >
+              <div className="px-2.5 sm:px-4 py-2 sm:py-3">
+                <ExamQuestionBody question={currentQuestion} compact lang={examLang} paperMode />
               </div>
 
-              {/* Divider */}
-              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-slate-100" />
+              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-dashed border-black/20" />
 
-              {/* Options — scrollable with padding */}
               <div className="flex-shrink-0 flex flex-col gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-3 pb-3 sm:pb-4">
                 {optionKeys.map((key) => (
                   <ExamOptionRow
@@ -461,10 +452,11 @@ const TestPage: React.FC = () => {
                     onSelect={() => handleAnswerSelect(currentQuestion._id, key)}
                     compact
                     lang={examLang}
+                    paperMode
                   />
                 ))}
               </div>
-            </div>
+            </UpscExamPaperShell>
           </div>
 
           {/* Bottom nav */}

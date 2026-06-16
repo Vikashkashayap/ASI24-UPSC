@@ -4,6 +4,7 @@
  */
 
 import { ensureEnglishBilingualFields } from "./questionTranslationService.js";
+import { parseMatchFollowingFromText } from "../utils/matchQuestionFormat.js";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
 
@@ -113,6 +114,14 @@ export function mapBilingualQuestionForClient(q, { includeAnswers = false } = {}
   const options_en = normalizeOptionsObject(base.options_en);
   const options_hi = normalizeOptionsObject(base.options_hi);
 
+  let matchColumns_hi = q.matchColumns_hi ?? null;
+  if (!matchColumns_hi?.columnA?.length && q.matchColumns?.columnA?.length && base.question_hi) {
+    const parsed = parseMatchFollowingFromText(base.question_hi);
+    if (parsed?.columnA?.length >= 2) {
+      matchColumns_hi = { columnA: parsed.columnA, columnB: parsed.columnB };
+    }
+  }
+
   const out = {
     _id: q._id,
     question: base.question_en,
@@ -133,6 +142,7 @@ export function mapBilingualQuestionForClient(q, { includeAnswers = false } = {}
     questionType: q.questionType,
     tableData: q.tableData ?? null,
     matchColumns: q.matchColumns ?? null,
+    matchColumns_hi,
     assertionReason: q.assertionReason ?? null,
     hasHindi: hasStoredHindiContent(base),
   };
