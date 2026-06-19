@@ -1,8 +1,8 @@
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, MoreVertical, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,32 +30,12 @@ const navLinkClass = ({ isActive, theme, collapsed, muted }: { isActive: boolean
   }`;
 
 const sidebarSectionLabelClass = (theme: "dark" | "light") =>
-  `px-3 mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`;
-
+  `px-3 mb-1 text-[10px] font-bold uppercase tracking-[0.1em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`;
 const sidebarNavIconClass = (isActive: boolean, theme: "dark" | "light") =>
   `w-[18px] h-[18px] flex-shrink-0 stroke-[2] ${isActive
     ? theme === "dark" ? "text-blue-300" : "text-blue-600"
     : theme === "dark" ? "text-slate-400 group-hover:text-slate-200" : "text-slate-500 group-hover:text-slate-700"
   }`;
-
-type SidebarBadgeVariant = "soon" | "trial";
-
-const SidebarBadge = ({ variant, theme }: { variant: SidebarBadgeVariant; theme: "dark" | "light" }) => {
-  const styles =
-    variant === "soon"
-      ? theme === "dark"
-        ? "bg-blue-500/15 text-blue-300 ring-blue-500/25"
-        : "bg-blue-50 text-blue-600 ring-blue-200/80"
-      : theme === "dark"
-        ? "bg-emerald-500/15 text-emerald-300 ring-emerald-500/25"
-        : "bg-emerald-50 text-emerald-700 ring-emerald-200/80";
-
-  return (
-    <span className={`ml-auto shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ring-1 ${styles}`}>
-      {variant === "soon" ? "Soon" : "Trial"}
-    </span>
-  );
-};
 
 const SidebarNavItem = ({
   to,
@@ -64,7 +44,6 @@ const SidebarNavItem = ({
   label,
   theme,
   collapsed,
-  badge,
   muted,
   onNavigate,
 }: {
@@ -74,7 +53,6 @@ const SidebarNavItem = ({
   label: string;
   theme: "dark" | "light";
   collapsed: boolean;
-  badge?: SidebarBadgeVariant;
   muted?: boolean;
   onNavigate?: () => void;
 }) => (
@@ -87,12 +65,7 @@ const SidebarNavItem = ({
     {({ isActive }) => (
       <>
         <Icon className={sidebarNavIconClass(isActive, theme)} />
-        {!collapsed && (
-          <>
-            <span className="truncate flex-1 min-w-0">{label}</span>
-            {badge && <SidebarBadge variant={badge} theme={theme} />}
-          </>
-        )}
+        {!collapsed && <span className="truncate flex-1 min-w-0">{label}</span>}
       </>
     )}
   </NavLink>
@@ -179,6 +152,161 @@ const formatExpiryDate = (dateStr: string | null | undefined) => {
   }
 };
 
+const SubscriptionCard = ({
+  planName,
+  endDate,
+  theme,
+  onClick,
+}: {
+  planName: string;
+  endDate?: string | null;
+  theme: "dark" | "light";
+  onClick?: () => void;
+}) => {
+  const expiry = formatExpiryDate(endDate);
+  const Wrapper = onClick ? "button" : "div";
+
+  return (
+    <Wrapper
+      type={onClick ? "button" : undefined}
+      onClick={onClick}
+      title={planName}
+      className={`w-full text-left flex items-start gap-2.5 px-3 py-2.5 rounded-xl font-medium transition-all ${
+        onClick ? "hover:brightness-110 active:scale-[0.98] cursor-pointer" : ""
+      } ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-blue-600/90 to-blue-700 text-white shadow-md shadow-blue-900/30 ring-1 ring-blue-500/30"
+          : "bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/30"
+      }`}
+    >
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 shrink-0 mt-0.5">
+        <Crown className="w-4 h-4 text-white" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-semibold leading-snug line-clamp-2">{planName}</p>
+        <p className="text-[11px] font-medium text-blue-100/90 mt-0.5">
+          Active{expiry ? ` · until ${expiry}` : ""}
+        </p>
+      </div>
+    </Wrapper>
+  );
+};
+
+const UserMenuDropdown = ({
+  open,
+  onClose,
+  user,
+  theme,
+  hasActiveSubscription,
+  onNavigate,
+  onLogout,
+}: {
+  open: boolean;
+  onClose: () => void;
+  user: { name?: string; email?: string; subscriptionPlan?: { name?: string } | null; subscriptionEndDate?: string | null } | null;
+  theme: "dark" | "light";
+  hasActiveSubscription: boolean;
+  onNavigate: (path: string) => void;
+  onLogout: () => void;
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) onClose();
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const expiry = formatExpiryDate(user?.subscriptionEndDate);
+  const menuItemClass = `w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors text-left ${
+    theme === "dark" ? "text-slate-200 hover:bg-white/[0.06]" : "text-slate-700 hover:bg-slate-100"
+  }`;
+
+  return (
+    <div
+      ref={menuRef}
+      className={`absolute right-0 top-[calc(100%+8px)] w-64 rounded-xl border shadow-xl z-50 overflow-hidden ${
+        theme === "dark" ? "bg-[#0f172a] border-slate-700/80 shadow-black/40" : "bg-white border-gray-200 shadow-slate-200/80"
+      }`}
+    >
+      <div className={`px-4 py-3 border-b ${theme === "dark" ? "border-slate-800" : "border-gray-100"}`}>
+        <p className={`text-sm font-semibold truncate ${theme === "dark" ? "text-white" : "text-slate-900"}`}>
+          {user?.name || "User"}
+        </p>
+        {user?.email && (
+          <p className={`text-xs truncate mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+            {user.email}
+          </p>
+        )}
+      </div>
+
+      {hasActiveSubscription && (
+        <div className={`px-4 py-3 border-b ${theme === "dark" ? "border-slate-800 bg-blue-500/5" : "border-gray-100 bg-blue-50/50"}`}>
+          <div className="flex items-center gap-2">
+            <Crown className={`w-4 h-4 shrink-0 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+            <div className="min-w-0">
+              <p className={`text-xs font-semibold truncate ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}>
+                {user?.subscriptionPlan?.name || "Pro Plan"}
+              </p>
+              {expiry && (
+                <p className={`text-[11px] mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                  Valid until {expiry}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="p-1.5">
+        <button type="button" className={menuItemClass} onClick={() => { onNavigate("/profile"); onClose(); }}>
+          <User className="w-4 h-4 shrink-0 opacity-70" />
+          Profile & Settings
+        </button>
+        {hasActiveSubscription ? (
+          <button type="button" className={menuItemClass} onClick={() => { onNavigate("/pricing"); onClose(); }}>
+            <Crown className="w-4 h-4 shrink-0 opacity-70" />
+            Upgrade Plan
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={`${menuItemClass} ${theme === "dark" ? "text-blue-300" : "text-blue-700"}`}
+            onClick={() => { onNavigate("/pricing"); onClose(); }}
+          >
+            <Lightbulb className="w-4 h-4 shrink-0" />
+            Subscribe to Pro
+          </button>
+        )}
+        <button type="button" className={menuItemClass} onClick={() => { onNavigate("/help-support"); onClose(); }}>
+          <HelpCircle className="w-4 h-4 shrink-0 opacity-70" />
+          Help & Support
+        </button>
+        <div className={`my-1 border-t ${theme === "dark" ? "border-slate-800" : "border-gray-100"}`} />
+        <button
+          type="button"
+          className={`${menuItemClass} ${theme === "dark" ? "text-red-400 hover:bg-red-500/10" : "text-red-600 hover:bg-red-50"}`}
+          onClick={() => { onLogout(); onClose(); }}
+        >
+          <LogOut className="w-4 h-4 shrink-0 opacity-70" />
+          Logout
+        </button>
+      </div>
+    </div>
+  );
+};
 export const DashboardLayout = () => {
   const { user, logout, refreshUser } = useAuth();
   const { theme } = useTheme();
@@ -186,7 +314,7 @@ export const DashboardLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dartModalOpen, setDartModalOpen] = useState(false);
-  const location = useLocation();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);  const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
   const isLiveTestPage = /^\/test\/[^/]+$/.test(location.pathname);
   const pageInfo = getPageTitle(location.pathname, user?.role);
@@ -202,6 +330,10 @@ export const DashboardLayout = () => {
     if (user?.role === "admin") return;
     if (user) refreshUser().catch(() => {});
   }, []);
+
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
 
   const sidebarSurface =
     theme === "dark"
@@ -238,8 +370,7 @@ export const DashboardLayout = () => {
       <div className="flex flex-1 min-h-0 overflow-hidden pt-[env(safe-area-inset-top,0px)]">
       {/* Sidebar — flush with header (no floating card gap) */}
       <aside
-        className={`${sidebarCollapsed ? "w-[76px]" : "w-[260px]"} fixed left-0 bottom-0 z-50 flex flex-col shrink-0 border-r transition-transform duration-300 top-[env(safe-area-inset-top,0px)] ${
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`${sidebarCollapsed ? "w-[76px]" : "w-[280px]"} fixed left-0 bottom-0 z-50 flex flex-col shrink-0 border-r transition-[width,transform] duration-300 top-[env(safe-area-inset-top,0px)] ${          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:static md:top-auto md:bottom-auto md:translate-x-0 ${sidebarSurface}`}
       >
         <div
@@ -375,29 +506,46 @@ export const DashboardLayout = () => {
               {!sidebarCollapsed && (
                 <div className="mb-3 px-0.5">
                   {hasActiveSubscription ? (
-                    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
-                        <Lightbulb className="w-3.5 h-3.5 text-white" />
-                      </span>
-                      <span className="text-xs truncate">
-                        {user?.subscriptionPlan?.name || "Pro"} · Active
-                      </span>
-                    </div>
+                    <SubscriptionCard
+                      planName={user?.subscriptionPlan?.name || "Pro Plan"}
+                      endDate={user?.subscriptionEndDate}
+                      theme={theme}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate("/profile");
+                      }}
+                    />
                   ) : (
                     <NavLink
                       to="/pricing"
-                      className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-white transition-all bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md shadow-blue-500/25 ring-1 ring-blue-400/30 active:scale-[0.98]"
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all bg-gradient-to-br from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-md shadow-blue-500/20 ring-1 ring-blue-400/30 active:scale-[0.98]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
-                        <Lightbulb className="w-3.5 h-3.5 text-white" />
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 shrink-0">
+                        <Lightbulb className="w-4 h-4 text-white" />
                       </span>
-                      <span>Subscribe to Pro</span>
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-semibold">Subscribe to Pro</p>
+                        <p className="text-[11px] font-medium text-blue-100/90 mt-0.5">Unlock all features</p>
+                      </div>
                     </NavLink>
                   )}
                 </div>
               )}
-              {/* Main Section */}
+              {sidebarCollapsed && hasActiveSubscription && (
+                <button
+                  type="button"
+                  title={user?.subscriptionPlan?.name || "Pro Plan"}
+                  onClick={() => navigate("/profile")}
+                  className={`mb-3 mx-auto flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                    theme === "dark"
+                      ? "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30"
+                      : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                  }`}
+                >
+                  <Crown className="w-4 h-4" />
+                </button>
+              )}              {/* Main Section */}
               <div className="space-y-0.5">
                 <SidebarNavItem
                   to="/home"
@@ -412,13 +560,12 @@ export const DashboardLayout = () => {
 
               {/* Performance & Analytics Section */}
               {!sidebarCollapsed && (
-                <div className="pt-5 pb-2">
+                <div className="pt-3 pb-1.5">
                   <div className={sidebarSectionLabelClass(theme)}>
                     Performance & Analytics
                   </div>
                 </div>
-              )}
-              <div className="space-y-0.5">
+              )}              <div className="space-y-0.5">
                 <SidebarNavItem
                   to="/performance"
                   title="Performance Dashboard"
@@ -445,13 +592,12 @@ export const DashboardLayout = () => {
 
               {/* Practice & Tests Section */}
               {!sidebarCollapsed && (
-                <div className="pt-5 pb-2">
+                <div className="pt-3 pb-1.5">
                   <div className={sidebarSectionLabelClass(theme)}>
                     Practice & Tests
                   </div>
                 </div>
-              )}
-              <div className="space-y-0.5">
+              )}              <div className="space-y-0.5">
                 <SidebarNavItem
                   to="/prelims-test"
                   title="Prelims Test"
@@ -459,7 +605,6 @@ export const DashboardLayout = () => {
                   label="Prelims Test"
                   theme={theme}
                   collapsed={sidebarCollapsed}
-                  badge="trial"
                   onNavigate={() => setMobileMenuOpen(false)}
                 />
                 <SidebarNavItem
@@ -497,13 +642,12 @@ export const DashboardLayout = () => {
 
               {/* Study Tools Section */}
               {!sidebarCollapsed && (
-                <div className="pt-5 pb-2">
+                <div className="pt-3 pb-1.5">
                   <div className={sidebarSectionLabelClass(theme)}>
                     Study Tools
                   </div>
                 </div>
-              )}
-              <div className="space-y-0.5">
+              )}              <div className="space-y-0.5">
                 <SidebarNavItem
                   to="/planner"
                   title="Study Planner"
@@ -520,30 +664,11 @@ export const DashboardLayout = () => {
                   label="AI Mentor"
                   theme={theme}
                   collapsed={sidebarCollapsed}
-                  badge="trial"
                   onNavigate={() => setMobileMenuOpen(false)}
                 />
               </div>
 
-              {!sidebarCollapsed && (
-                <div className="pt-5 pb-2">
-                  <div className={sidebarSectionLabelClass(theme)}>Account</div>
-                </div>
-              )}
-              <div className="space-y-0.5">
-                <SidebarNavItem
-                  to="/profile"
-                  title="Profile"
-                  icon={User}
-                  label="Profile"
-                  theme={theme}
-                  collapsed={sidebarCollapsed}
-                  onNavigate={() => setMobileMenuOpen(false)}
-                />
-              </div>
-
-              {/* Communication Section */}
-              {/* {!sidebarCollapsed && (
+              {/* Communication Section */}              {/* {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
                   <div className={sidebarSectionLabelClass(theme)}>
                     Communication
@@ -628,13 +753,13 @@ export const DashboardLayout = () => {
       {/* Main content — flex column; no left margin on desktop (sidebar is in-flow) */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         <header
-          className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-4 lg:px-6 border-b backdrop-blur-xl shrink-0 z-30 ${theme === "dark"
+          className={`h-14 md:h-[72px] flex items-center justify-between gap-3 px-3 md:px-5 lg:px-6 border-b backdrop-blur-xl shrink-0 z-30 ${theme === "dark"
               ? "border-slate-800/80 bg-[#0B1220]/95"
               : "border-gray-200 bg-white/95"
             }`}
         >
-          {/* Left: mobile menu | desktop: page pill only */}
-          <div className="flex items-center gap-1.5 md:gap-2 min-w-0 flex-1">
+          {/* Left: mobile menu + page context */}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <button
               onClick={() => setMobileMenuOpen(true)}
               className={`md:hidden shrink-0 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors touch-manipulation ${theme === "dark"
@@ -645,30 +770,50 @@ export const DashboardLayout = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            {/* Page title pill - icon + text, equal height with row */}
-            <div className={`hidden md:flex items-center gap-2 px-3 py-2 rounded-xl min-h-[40px] ${theme === "dark"
-                ? "bg-white/[0.04] ring-1 ring-slate-800/80 text-slate-50"
-                : "bg-gray-50 ring-1 ring-gray-200 text-slate-900"
+            <div className={`hidden md:flex items-center gap-2.5 min-w-0 ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              <span className={`flex items-center justify-center w-9 h-9 rounded-xl shrink-0 ${
+                theme === "dark" ? "bg-white/[0.06] text-blue-300" : "bg-blue-50 text-blue-600"
               }`}>
-              <span className="flex items-center justify-center w-5 h-5 shrink-0 [&>svg]:w-5 [&>svg]:h-5">
                 {pageInfo.icon}
               </span>
-              <h1 className="text-sm md:text-base font-semibold tracking-tight truncate">{pageInfo.title}</h1>
+              <div className="min-w-0">
+                <h1 className="text-base font-semibold tracking-tight truncate leading-tight">{pageInfo.title}</h1>
+                {isStudent && hasActiveSubscription && user?.subscriptionPlan?.name && (
+                  <p className={`text-[11px] truncate mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                    {user.subscriptionPlan.name}
+                  </p>
+                )}
+              </div>
             </div>
-            <div className={`text-sm md:text-base font-semibold tracking-tight md:hidden truncate ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-              MentorsDaily
+            <div className={`text-sm font-semibold tracking-tight md:hidden truncate ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+              {pageInfo.title}
             </div>
           </div>
 
-          {/* Right: DART (student only) + motivation + avatar */}
-          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 shrink-0 min-w-0 max-w-[55%] sm:max-w-none">
+          {/* Right: UPSC Notes + DART + user menu */}
+          <div className="flex items-center gap-2 shrink-0">
+            <a
+              href="https://notes.mentorsdaily.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 touch-manipulation shrink-0 ${
+                theme === "dark"
+                  ? "text-slate-200 hover:bg-white/[0.06] ring-1 ring-slate-700/80"
+                  : "text-slate-700 hover:bg-slate-100 ring-1 ring-gray-200"
+              }`}
+              title="Open UPSC Notes"
+            >
+              <BookOpen className="w-4 h-4 shrink-0" />
+              <span className="hidden sm:inline">UPSC Notes</span>
+              <ExternalLink className="w-3 h-3 shrink-0 opacity-60 hidden sm:block" />
+            </a>
             {isStudent && (
               <button
                 onClick={() => setDartModalOpen(true)}
-                className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 touch-manipulation shrink-0 ${
+                className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 touch-manipulation shrink-0 ${
                   theme === "dark"
                     ? "bg-blue-600/80 hover:bg-blue-600 text-white border border-blue-500/50"
-                    : "bg-[#2563eb] hover:bg-[#1d4ed8] text-white border border-blue-500/30"
+                    : "bg-[#2563eb] hover:bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
                 }`}
                 title="Log daily activity (DART)"
               >
@@ -676,57 +821,41 @@ export const DashboardLayout = () => {
                 <span className="hidden sm:inline">DART</span>
               </button>
             )}
-            <button
-              onClick={() => navigate("/profile")}
-              className={`md:hidden inline-flex items-center justify-center w-9 h-9 min-h-[44px] min-w-[44px] rounded-full transition-colors touch-manipulation active:scale-95 shrink-0 ${theme === "dark" ? "text-slate-300 hover:bg-slate-800" : "text-slate-600 hover:bg-slate-100"}`}
-              aria-label="More options"
-            >
-              <MoreVertical className="w-5 h-5" />
-            </button>
-            <div className={`hidden lg:flex items-center gap-2 min-w-0 max-w-[min(420px,50vw)] ${theme === "dark" ? "text-slate-300" : "text-gray-600"}`}>
-              {hasActiveSubscription ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#2563eb] text-white shadow-sm min-w-0 max-w-full">
-                    <Lightbulb className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{user?.subscriptionPlan?.name || "MentorsDaily Pro"} Active</span>
-                  </span>
-                  {user?.subscriptionEndDate && (
-                    <span className="hidden xl:inline text-[10px] text-slate-500 whitespace-nowrap shrink-0">
-                      Expires {formatExpiryDate(user.subscriptionEndDate)}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => navigate("/pricing")}
-                    className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors shrink-0 whitespace-nowrap ${
-                      theme === "dark"
-                        ? "border-blue-500/50 text-blue-300 hover:bg-blue-500/10"
-                        : "border-blue-300 text-blue-700 hover:bg-blue-50"
-                    }`}
-                  >
-                    Upgrade Plan
-                  </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className={`flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full transition-all duration-200 touch-manipulation active:scale-[0.98] ${
+                  theme === "dark"
+                    ? "hover:bg-white/[0.06] ring-1 ring-slate-700/80"
+                    : "hover:bg-slate-100 ring-1 ring-gray-200"
+                } ${userMenuOpen ? (theme === "dark" ? "bg-white/[0.06]" : "bg-slate-100") : ""}`}
+                aria-label="Account menu"
+                aria-expanded={userMenuOpen}
+              >
+                <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold shrink-0 ${
+                  theme === "dark"
+                    ? "bg-[#2563eb] text-white"
+                    : "bg-blue-100 text-blue-700"
+                }`}>
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
                 </div>
-              ) : isStudent ? (
-                <button
-                  type="button"
-                  onClick={() => navigate("/pricing")}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border border-blue-500/40 text-blue-600 bg-blue-500/5 hover:bg-blue-500/10 transition-colors"
-                >
-                  <Lightbulb className="w-3.5 h-3.5" />
-                  <span>Subscribe Now</span>
-                </button>
-              ) : null}
-            </div>
-            <div className={`hidden md:flex w-9 h-9 md:w-10 md:h-10 rounded-full items-center justify-center text-xs md:text-sm font-semibold shrink-0 ring-2 transition-all duration-200 hover:scale-105 ${theme === "dark"
-                ? "bg-[#2563eb] text-white ring-blue-500/30 shadow-lg shadow-blue-600/20"
-                : "bg-blue-100 text-blue-700 ring-blue-200/50 shadow-md shadow-blue-200/30"
-              }`}>
-              {user?.name?.charAt(0).toUpperCase() || "U"}
+                <ChevronDown className={`hidden sm:block w-4 h-4 shrink-0 transition-transform duration-200 ${
+                  userMenuOpen ? "rotate-180" : ""
+                } ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`} />
+              </button>
+              <UserMenuDropdown
+                open={userMenuOpen}
+                onClose={() => setUserMenuOpen(false)}
+                user={user}
+                theme={theme}
+                hasActiveSubscription={hasActiveSubscription}
+                onNavigate={navigate}
+                onLogout={logout}
+              />
             </div>
           </div>
         </header>
-
         {/* Scrollable Main Content - full-height wrapper for /mentor so only chat scrolls */}
         <main className={`flex-1 flex flex-col min-h-0 max-w-full overflow-hidden ${location.pathname === "/mentor" ? "px-0 py-0 pb-0" : ""}`}>
           {/* Inactive subscription warning banner for students */}
@@ -868,7 +997,7 @@ export const DashboardLayout = () => {
                 ? "font-semibold"
                 : "font-normal"
               }`}>
-              Test (Trial)
+              Test
             </span>
           </NavLink>
 
@@ -901,7 +1030,7 @@ export const DashboardLayout = () => {
                 ? "font-semibold"
                 : "font-normal"
               }`}>
-              Mentor (Trial)
+              Mentor
             </span>
           </NavLink>
 

@@ -8,6 +8,7 @@ import logoImg from "../../LOGO/mentorsdaily.png";
 const navItems: { label: string; to: string; external?: boolean }[] = [
   { label: "Features", to: "/features" },
   { label: "Plans", to: "/pricing" },
+  { label: "UPSC Notes", to: "https://notes.mentorsdaily.com/", external: true },
   { label: "Compare", to: "/compare" },
   { label: "Current Affairs", to: "/daily-current-affairs" },
   { label: "Testimonials", to: "/testimonials" },
