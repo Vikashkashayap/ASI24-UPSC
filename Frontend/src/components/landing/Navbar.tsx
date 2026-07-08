@@ -1,7 +1,7 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useTheme } from "../../hooks/useTheme";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import logoImg from "../../LOGO/mentorsdaily.png";
 
@@ -16,7 +16,7 @@ const navItems: { label: string; to: string; external?: boolean }[] = [
 ];
 
 export const LandingNavbar = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
@@ -93,22 +93,6 @@ export const LandingNavbar = () => {
 
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-3">
-
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className={`h-10 w-10 flex items-center justify-center rounded-lg border-2 transition ${
-                theme === "dark"
-                  ? "border-blue-400/50 text-slate-200 hover:bg-blue-900/30"
-                  : "border-[#2563eb]/50 text-slate-600 hover:bg-blue-50"
-              }`}
-              >
-                {theme === "dark" ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
 
               {/* Auth CTA: Sign up on login page, Sign in elsewhere */}
               <Link to={authCtaTo} className="hidden md:block">

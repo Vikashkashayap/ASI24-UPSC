@@ -255,7 +255,7 @@ const TestResultPage: React.FC = () => {
     result.totalQuestions > 75 ? "h-[22px] sm:h-[24px]" : "h-[24px] sm:h-[26px]";
 
   return (
-    <div className="h-[100dvh] flex flex-col upsc-exam-page-bg text-slate-900 overflow-hidden">
+    <div className="h-[100dvh] flex flex-col bg-slate-100 text-slate-900 overflow-hidden">
       <header className="flex-shrink-0 bg-white border-b border-slate-200 px-2 sm:px-4 py-2 shadow-sm safe-area-inset-top">
         <div className="flex items-start sm:items-center justify-between gap-2 max-w-[1600px] mx-auto w-full">
           <div className="min-w-0 flex-1 flex items-start gap-2">
@@ -305,21 +305,15 @@ const TestResultPage: React.FC = () => {
 
       <div className="flex-1 min-h-0 flex overflow-hidden max-w-[1600px] mx-auto w-full">
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-1.5 sm:p-2 md:p-3">
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-            <UpscExamPaperShell
-              questionNumber={currentIndex + 1}
-              examType={result.examType}
-              topic={result.topic}
-              totalMarks={totalMarks}
-              durationMinutes={result.durationMinutes}
-            >
-              <div className="px-2.5 sm:px-4 py-2 sm:py-3">
-                <ExamQuestionBody question={currentQuestion} compact lang={examLang} paperMode />
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <UpscExamPaperShell>
+              <div className="px-3 sm:px-5 py-3 sm:py-4">
+                <ExamQuestionBody question={currentQuestion} compact lang={examLang} />
               </div>
 
-              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-dashed border-black/20" />
+              <div className="flex-shrink-0 mx-3 sm:mx-5 border-t border-slate-100" />
 
-              <div className="flex-shrink-0 flex flex-col gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-3">
+              <div className="flex-shrink-0 flex flex-col gap-2 sm:gap-2.5 px-3 sm:px-5 py-3 sm:py-4">
                 {optionKeys.map((key) => (
                   <ExamReviewOptionRow
                     key={key}
@@ -329,18 +323,16 @@ const TestResultPage: React.FC = () => {
                     userAnswer={currentQuestion.userAnswer}
                     compact
                     lang={examLang}
-                    paperMode
                   />
                 ))}
               </div>
 
-              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-dashed border-black/20" />
+              <div className="flex-shrink-0 mx-2.5 sm:mx-4 border-t border-slate-200" />
 
               <div className="flex-shrink-0 py-2 sm:py-3">
                 <ExamReviewExplanation
                   question={currentQuestion}
                   userAnswer={currentQuestion.userAnswer}
-                  paperMode
                 />
               </div>
             </UpscExamPaperShell>

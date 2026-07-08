@@ -21,9 +21,13 @@ function partLabel(role: "A" | "R", theme: Theme): string {
 }
 
 function renderParts(parts: UpscStemPart[], theme: Theme, className: string, compact = false) {
-  const size = compact ? "text-[12px] sm:text-[13px] leading-relaxed" : "text-base sm:text-lg leading-relaxed";
+  const size = compact
+    ? "exam-question-text"
+    : "text-base sm:text-lg leading-relaxed";
   const introClass =
-    theme === "dark" ? `text-slate-100 font-semibold ${size}` : `text-slate-900 font-semibold ${size}`;
+    theme === "dark"
+      ? `text-slate-100 font-semibold ${compact ? "exam-question-text" : size}`
+      : `text-slate-900 font-semibold ${compact ? "exam-question-text" : size}`;
   const stmtClass = theme === "dark" ? `text-slate-200 ${size}` : `text-slate-800 ${size}`;
   const promptClass =
     theme === "dark"
@@ -91,7 +95,7 @@ export const UpscFormattedQuestionStem: React.FC<Props> = ({
   compact = false,
 }) => {
   const parts = parseUpscQuestionStem(text);
-  const size = compact ? "text-[12px] sm:text-[13px] leading-relaxed" : "text-base sm:text-lg leading-relaxed";
+  const size = compact ? "exam-question-text" : "text-base sm:text-lg leading-relaxed";
   if (!isStructuredUpscStem(parts)) {
     return (
       <p

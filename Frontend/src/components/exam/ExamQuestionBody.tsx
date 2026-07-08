@@ -40,26 +40,30 @@ function LangPanel({
   compact,
   accent = "slate",
   paperMode,
+  hideLabel,
 }: {
   label: string;
   text: string;
   compact?: boolean;
   accent?: "blue" | "slate";
   paperMode?: boolean;
+  hideLabel?: boolean;
 }) {
   return (
     <div className="min-w-0">
-      <div
-        className={`text-[10px] sm:text-[11px] font-bold uppercase mb-1 ${
-          paperMode
-            ? "upsc-paper-lang-label"
-            : accent === "blue"
-              ? "text-blue-600"
-              : "text-slate-400"
-        }`}
-      >
-        {label}
-      </div>
+      {!hideLabel ? (
+        <div
+          className={`text-[10px] sm:text-[11px] font-bold uppercase mb-1.5 tracking-wide ${
+            paperMode
+              ? "upsc-paper-lang-label"
+              : accent === "blue"
+                ? "text-blue-600"
+                : "text-slate-400"
+          }`}
+        >
+          {label}
+        </div>
+      ) : null}
       <UpscFormattedQuestionStem text={text} theme="light" compact={compact} />
     </div>
   );
@@ -78,10 +82,10 @@ function MatchFollowingTable({
 }) {
   const listILabel = lang === "hi" ? "सूची-I" : "List-I";
   const listIILabel = lang === "hi" ? "सूची-II" : "List-II";
-  const textSize = compact ? "text-[11px] sm:text-xs" : "text-sm";
+  const textSize = compact ? "exam-question-text" : "text-sm";
   const introClass = paperMode
-    ? `${textSize} font-semibold text-black leading-relaxed upsc-exam-serif`
-    : `${textSize} font-semibold text-slate-900 leading-relaxed`;
+    ? `${textSize} font-semibold text-black upsc-exam-serif`
+    : `${textSize} font-semibold text-slate-900`;
   const itemTextClass = paperMode ? "text-black" : "text-slate-800";
   const numClass = paperMode ? "shrink-0 font-bold text-black w-5" : "shrink-0 font-bold text-blue-700 w-5";
   const numClassII = paperMode ? "shrink-0 font-bold text-black w-5" : "shrink-0 font-bold text-indigo-700 w-5";
@@ -159,6 +163,7 @@ function MatchBlock({
   compact,
   accent,
   paperMode,
+  hideLabel,
 }: {
   label: string;
   data: ParsedMatchFollowing;
@@ -166,20 +171,23 @@ function MatchBlock({
   compact?: boolean;
   accent: "blue" | "slate";
   paperMode?: boolean;
+  hideLabel?: boolean;
 }) {
   return (
     <div className="min-w-0">
-      <div
-        className={`text-[10px] sm:text-[11px] font-bold uppercase mb-1.5 ${
-          paperMode
-            ? "upsc-paper-lang-label"
-            : accent === "blue"
-              ? "text-blue-600"
-              : "text-slate-400"
-        }`}
-      >
-        {label}
-      </div>
+      {!hideLabel ? (
+        <div
+          className={`text-[10px] sm:text-[11px] font-bold uppercase mb-1.5 tracking-wide ${
+            paperMode
+              ? "upsc-paper-lang-label"
+              : accent === "blue"
+                ? "text-blue-600"
+                : "text-slate-400"
+          }`}
+        >
+          {label}
+        </div>
+      ) : null}
       <MatchFollowingTable data={data} compact={compact} lang={tableLang} paperMode={paperMode} />
     </div>
   );
@@ -247,13 +255,14 @@ function BilingualMatchView({
           compact={compact}
           accent="blue"
           paperMode={paperMode}
+          hideLabel
         />
       );
     } else {
       const hiText = getQuestionHindi(question, { strict: true });
       if (hiText) {
         blocks.push(
-          <LangPanel key="hi-fallback" label="हिंदी" text={hiText} compact={compact} accent="blue" paperMode={paperMode} />
+          <LangPanel key="hi-fallback" label="हिंदी" text={hiText} compact={compact} accent="blue" paperMode={paperMode} hideLabel />
         );
       }
     }
@@ -269,13 +278,14 @@ function BilingualMatchView({
           compact={compact}
           accent="slate"
           paperMode={paperMode}
+          hideLabel
         />
       );
     } else {
       const enText = getQuestionEnglish(question);
       if (enText) {
         blocks.push(
-          <LangPanel key="en-fallback" label="English" text={enText} compact={compact} accent="slate" paperMode={paperMode} />
+          <LangPanel key="en-fallback" label="English" text={enText} compact={compact} accent="slate" paperMode={paperMode} hideLabel />
         );
       }
     }
@@ -344,14 +354,14 @@ function BilingualAssertionView({
   const pushHi = () => {
     if (hiStem) {
       blocks.push(
-        <LangPanel key="hi" label="हिंदी" text={hiStem} compact={compact} accent="blue" paperMode={paperMode} />
+        <LangPanel key="hi" label="हिंदी" text={hiStem} compact={compact} accent="blue" paperMode={paperMode} hideLabel />
       );
     }
   };
   const pushEn = () => {
     if (enStem) {
       blocks.push(
-        <LangPanel key="en" label="English" text={enStem} compact={compact} accent="slate" paperMode={paperMode} />
+        <LangPanel key="en" label="English" text={enStem} compact={compact} accent="slate" paperMode={paperMode} hideLabel />
       );
     }
   };
@@ -402,6 +412,7 @@ export function ExamBilingualStem({
           compact={compact}
           accent={hiFirst ? "blue" : "slate"}
           paperMode={paperMode}
+          hideLabel
         />
         {showSecondary ? (
           <LangPanel
@@ -410,6 +421,7 @@ export function ExamBilingualStem({
             compact={compact}
             accent={hiFirst ? "slate" : "blue"}
             paperMode={paperMode}
+            hideLabel
           />
         ) : null}
       </div>
@@ -575,49 +587,48 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full text-left transition-all touch-manipulation min-h-[44px] flex items-center ${
-        paperMode ? "upsc-paper-option upsc-exam-serif" : "rounded-lg"
+      className={`w-full text-left transition-all touch-manipulation min-h-[48px] flex items-center ${
+        paperMode ? "upsc-paper-option upsc-exam-serif" : "rounded-xl"
       } ${
-        compact ? "px-2.5 sm:px-3 py-2 sm:py-2.5 text-[11px] sm:text-xs leading-relaxed" : "px-3 py-2 text-sm"
+        compact ? "px-3 sm:px-4 py-2.5 sm:py-3" : "px-4 py-3 text-sm"
       } ${
         selected
           ? paperMode
             ? "upsc-paper-option-selected border"
-            : "border-blue-600 bg-blue-50 ring-1 ring-blue-200 shadow-sm"
+            : "border-blue-500 bg-blue-50/80 ring-2 ring-blue-100 shadow-sm"
           : paperMode
             ? "border"
-            : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50 active:bg-slate-100"
+            : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/80 active:bg-slate-100"
       }`}
     >
-      <div className="flex gap-2 sm:gap-2.5 items-start w-full">
+      <div className="flex gap-3 items-start w-full">
         <span
-          className={`shrink-0 font-bold text-[11px] sm:text-xs mt-0.5 ${
-            selected ? (paperMode ? "text-black" : "text-blue-700") : "text-slate-500"
-          }`}
+          className={`exam-option-radio ${selected ? "exam-option-radio-selected" : ""}`}
+          aria-hidden
         >
-          ({optionKey.toLowerCase()})
+          {selected ? <span className="exam-option-radio-dot" /> : null}
         </span>
-        <div className="min-w-0 flex-1 text-slate-800 py-0.5">
+        <div className="min-w-0 flex-1 exam-option-text py-0.5">
           {missingHi ? (
-            <p className="break-words leading-relaxed">{en}</p>
+            <p className="break-words">{en}</p>
           ) : dualLang ? (
-            <div className="space-y-0.5">
-              <p className="break-words leading-relaxed font-medium text-slate-900">{primaryOpt}</p>
-              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">
+            <div className="space-y-1">
+              <p className="break-words font-medium text-slate-900">{primaryOpt}</p>
+              <p className="break-words text-slate-500 text-[12px] sm:text-[13px] leading-relaxed">
                 {secondaryOpt}
               </p>
             </div>
           ) : showBoth ? (
             <>
-              <p className="break-words font-medium text-slate-900 leading-relaxed sm:hidden">{hi}</p>
-              <p className="break-words leading-relaxed hidden sm:block">
+              <p className="break-words font-medium text-slate-900 sm:hidden">{hi}</p>
+              <p className="break-words hidden sm:block">
                 <span className="font-medium text-slate-900">{hi}</span>
                 <span className="text-slate-300 mx-1.5">/</span>
                 <span className="text-slate-600">{en}</span>
               </p>
             </>
           ) : (
-            <p className="break-words leading-relaxed">{displayText}</p>
+            <p className="break-words">{displayText}</p>
           )}
         </div>
       </div>
@@ -681,25 +692,29 @@ export const ExamReviewOptionRow: React.FC<ExamReviewOptionRowProps> = ({
 
   return (
     <div
-      className={`w-full text-left min-h-[44px] flex items-center ${
-        paperMode ? `upsc-paper-option upsc-exam-serif ${stateClass}` : `rounded-lg border-2 ${stateClass}`
+      className={`w-full text-left min-h-[48px] flex items-center rounded-xl ${
+        paperMode ? `upsc-paper-option upsc-exam-serif ${stateClass}` : `border-2 ${stateClass}`
       } ${
-        compact ? "px-2.5 sm:px-3 py-2 sm:py-2.5 text-[11px] sm:text-xs leading-relaxed" : "px-3 py-2 text-sm"
+        compact ? "px-3 sm:px-4 py-2.5 sm:py-3" : "px-4 py-3 text-sm"
       } ${
         !paperMode && !isCorrect && !isUserWrong
           ? "border-slate-200 bg-white"
           : ""
       }`}
     >
-      <div className="flex gap-2 sm:gap-2.5 items-start w-full">
+      <div className="flex gap-3 items-start w-full">
         <span
-          className={`shrink-0 font-bold text-[11px] sm:text-xs mt-0.5 ${
-            isCorrect ? "text-green-700" : isUserWrong ? "text-red-700" : "text-slate-500"
+          className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[10px] font-bold ${
+            isCorrect
+              ? "bg-green-600 text-white"
+              : isUserWrong
+                ? "bg-red-500 text-white"
+                : "bg-slate-100 text-slate-500 border border-slate-200"
           }`}
         >
-          ({optionKey.toLowerCase()})
+          {optionKey}
         </span>
-        <div className="min-w-0 flex-1 text-slate-800 py-0.5">
+        <div className="min-w-0 flex-1 exam-option-text py-0.5">
           {missingHi ? (
             <p className="break-words leading-relaxed">{en}</p>
           ) : dualLang ? (
