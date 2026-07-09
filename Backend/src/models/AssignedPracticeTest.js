@@ -16,6 +16,27 @@ const assignedPracticeTestSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    chapter: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    notesTopicId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ContentTopic",
+      required: false,
+    },
+    notesTopicIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ContentTopic",
+      },
+    ],
+    notesSourceUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     title: {
       type: String,
       default: "",
@@ -86,6 +107,23 @@ const assignedPracticeTestSchema = new mongoose.Schema(
       type: String,
       enum: ["generating", "ready", "failed"],
       default: "generating",
+    },
+    generationProgress: {
+      totalBatches: { type: Number, default: 5 },
+      completedBatches: { type: Number, default: 0 },
+      currentBatch: { type: Number, default: 0 },
+      generatedQuestions: { type: Number, default: 0 },
+      failedBatches: { type: Number, default: 0 },
+      isComplete: { type: Boolean, default: false },
+    },
+    generationStats: {
+      inputTokens: { type: Number, default: 0 },
+      outputTokens: { type: Number, default: 0 },
+      totalTokens: { type: Number, default: 0 },
+      estimatedCostUsd: { type: Number, default: 0 },
+      generationTimeMs: { type: Number, default: 0 },
+      chunksRetrieved: { type: Number, default: 0 },
+      modelUsed: { type: String, default: "" },
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

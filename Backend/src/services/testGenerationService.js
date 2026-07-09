@@ -2132,7 +2132,7 @@ Return ONLY a JSON array. No markdown. Unique concept per question.`;
 /**
  * One cheap Hindi pass for English-only practice questions (1–2 API calls for 50Q).
  */
-async function batchTranslatePracticeQuestionsToHindi(apiKey, model, questions) {
+export async function batchTranslatePracticeQuestionsToHindi(apiKey, model, questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
 
   const chunkSize = getPracticeHindiBatchSize();

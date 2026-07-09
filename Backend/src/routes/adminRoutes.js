@@ -38,10 +38,22 @@ import {
 } from "../controllers/prelimsMockController.js";
 import {
   createAssignedPractice,
+  getAssignedPracticeById,
   assignStudentsToPractice,
   listAdminAssignedPractice,
   deleteAssignedPractice,
 } from "../controllers/assignedPracticeController.js";
+import {
+  listNotesSubjects,
+  listNotesChapters,
+  listNotesTopics,
+  previewNotesTopic,
+  syncNotesChapter,
+  syncNotesTopic,
+  getNotesCatalog,
+  syncNotesBySlug,
+  repairNotesChapter,
+} from "../controllers/notesController.js";
 import {
   getAllPlans,
   createPlan,
@@ -106,8 +118,20 @@ router.delete("/prelims-mock/:id", deletePrelimsMock);
 // Assigned topic practice (admin generates 50Q and assigns to students)
 router.post("/assigned-practice", createAssignedPractice);
 router.get("/assigned-practice", listAdminAssignedPractice);
+router.get("/assigned-practice/:id", getAssignedPracticeById);
 router.post("/assigned-practice/:id/assign", assignStudentsToPractice);
 router.delete("/assigned-practice/:id", deleteAssignedPractice);
+
+// Notes catalog (synced from notes.mentorsdaily.com)
+router.get("/notes/catalog", getNotesCatalog);
+router.get("/notes/subjects", listNotesSubjects);
+router.get("/notes/chapters", listNotesChapters);
+router.get("/notes/topics", listNotesTopics);
+router.get("/notes/topics/:topicId/preview", previewNotesTopic);
+router.post("/notes/sync-chapter", syncNotesChapter);
+router.post("/notes/sync-by-slug", syncNotesBySlug);
+router.post("/notes/repair-chapter/:chapterId", repairNotesChapter);
+router.post("/notes/sync-topic/:topicId", syncNotesTopic);
 
 // Pricing plans: CRUD (admin only)
 router.get("/pricing", getAllPlans);

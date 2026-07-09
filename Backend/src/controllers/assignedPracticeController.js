@@ -1,8 +1,11 @@
 import AssignedPracticeTest from "../models/AssignedPracticeTest.js";
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
-import { generateAssignedPracticeQuestions, buildQuestionFingerprints } from "../services/testGenerationService.js";
+import { buildQuestionFingerprints } from "../services/testGenerationService.js";
+import { notesService } from "../services/notes/notes.service.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
+import { patternLabelForQuestionType } from "../config/questionPatterns.js";
+import { runAssignedPracticeGeneration } from "../services/ai/batchGenerator.service.js";
 
 const GS_SUBJECTS = [
   "Polity",
@@ -75,6 +78,36 @@ async function validateStudentIds(studentIds) {
   return { ok: true, students, uniqueIds };
 }
 
+function normalizeNotesTopicIds(body = {}) {
+  if (Array.isArray(body.notesTopicIds) && body.notesTopicIds.length > 0) {
+    return [...new Set(body.notesTopicIds.map((id) => String(id).trim()).filter(Boolean))];
+  }
+  const single = body.notesTopicId ? String(body.notesTopicId).trim() : "";
+  return single ? [single] : [];
+}
+
+function buildMultiTopicLabel(topicMetas = []) {
+  const names = topicMetas.map((m) => m.topic.name);
+  if (names.length <= 3) return names.join(" · ");
+  return `${names.slice(0, 2).join(" · ")} · +${names.length - 2} more`;
+}
+
+function formatQuestionsForPreview(questions = []) {
+  return (questions || []).map((q, i) => ({
+    index: i + 1,
+    question: q.question || q.question_en || "",
+    options: q.options || q.options_en || {},
+    correctAnswer: q.correctAnswer,
+    questionType: q.questionType || "",
+    patternLabel: patternLabelForQuestionType(q.questionType),
+    explanation:
+      typeof q.explanation === "string"
+        ? q.explanation
+        : q.explanation_en || q.explanation?.[q.correctAnswer] || "",
+    sourceNote: q.conceptualSource || "",
+  }));
+}
+
 /**
  * POST /api/admin/assigned-practice
  * Body: { subject, topic, difficulty?, title? } — generate 50Q only (no students yet)
@@ -83,19 +116,48 @@ export const createAssignedPractice = async (req, res) => {
   let record = null;
   try {
     const adminId = req.user?._id ?? req.user?.id;
-    const { subject, topic, difficulty, title, patternsToInclude } = req.body;
+    const { subject, topic, difficulty, title, patternsToInclude, notesTopicId, notesTopicIds, chapter } = req.body;
 
     const subjectStr = typeof subject === "string" ? subject.trim() : "";
     const topicStr = typeof topic === "string" ? topic.trim() : "";
+    const chapterStr = typeof chapter === "string" ? chapter.trim() : "";
+    const topicIdList = normalizeNotesTopicIds({ notesTopicId, notesTopicIds });
 
-    if (!subjectStr || !GS_SUBJECTS.includes(subjectStr)) {
+    if (!subjectStr) {
       return res.status(400).json({
         success: false,
-        message: `Invalid subject. Allowed: ${GS_SUBJECTS.join(", ")}`,
+        message: "Subject is required",
       });
     }
 
-    if (!topicStr || topicStr.length < 2) {
+    if (!topicIdList.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Select at least one topic from Notes (chapter → topic). Questions are generated only from synced notes content.",
+      });
+    }
+
+    let topicMetas;
+    try {
+      topicMetas = await notesService.assertTopicsHaveContent(topicIdList);
+    } catch (err) {
+      return res.status(err.statusCode || 400).json({
+        success: false,
+        message: err.message || "Selected notes topics are invalid",
+      });
+    }
+
+    const resolvedTopic = topicStr || buildMultiTopicLabel(topicMetas);
+    const resolvedChapter = chapterStr || topicMetas[0]?.chapter?.title || "";
+    const resolvedSubject = topicMetas[0]?.topic.subject || subjectStr;
+    const primaryTopicId = topicIdList[0];
+
+    if (subjectStr !== resolvedSubject) {
+      console.warn(
+        `Subject mismatch: client sent "${subjectStr}", notes topic has "${resolvedSubject}" — using notes subject`
+      );
+    }
+    if (!resolvedTopic || resolvedTopic.length < 2) {
       return res.status(400).json({
         success: false,
         message: "Topic is required (minimum 2 characters)",
@@ -109,11 +171,15 @@ export const createAssignedPractice = async (req, res) => {
     const titleStr =
       typeof title === "string" && title.trim()
         ? title.trim()
-        : `${subjectStr} — ${topicStr}`;
+        : `${resolvedSubject} — ${resolvedChapter ? `${resolvedChapter}: ` : ""}${resolvedTopic}`;
 
     record = new AssignedPracticeTest({
-      subject: subjectStr,
-      topic: topicStr,
+      subject: resolvedSubject,
+      topic: resolvedTopic,
+      chapter: resolvedChapter,
+      notesTopicId: primaryTopicId,
+      notesTopicIds: topicIdList,
+      notesSourceUrl: topicMetas[0]?.topic.sourceUrl || "",
       title: titleStr,
       difficulty: diff,
       totalQuestions: ASSIGNED_QUESTION_COUNT,
@@ -126,54 +192,60 @@ export const createAssignedPractice = async (req, res) => {
     });
     await record.save();
 
-    console.log(
-      `📝 Generating topic practice (${ASSIGNED_QUESTION_COUNT}Q) for ${subjectStr} — ${topicStr}...`
-    );
-
-    const priorFingerprints = await getPriorTopicQuestionFingerprints(subjectStr, topicStr);
+    console.log(`📝 Starting notes-grounded RAG generation (${ASSIGNED_QUESTION_COUNT}Q) for ${resolvedSubject} — ${resolvedTopic}`);
+    await getPriorTopicQuestionFingerprints(resolvedSubject, resolvedTopic);
     const patterns = normalizePatternsToInclude(patternsToInclude);
 
-    const generationResult = await generateAssignedPracticeQuestions({
-      subject: subjectStr,
-      topic: topicStr,
-      difficulty: difficultyToGeneration(diff),
-      questionCount: ASSIGNED_QUESTION_COUNT,
-      priorFingerprints,
-      patternsToInclude: patterns,
-    });
-
-    if (!generationResult.success || !generationResult.questions?.length) {
-      record.status = "failed";
-      record.errorMessage = generationResult.error || "Failed to generate questions";
-      await record.save();
-      return res.status(500).json({
-        success: false,
-        message: record.errorMessage,
-      });
-    }
-
-    record.questions = generationResult.questions.map((q) =>
-      pickBilingualQuestionFields({ ...q })
-    );
-    record.totalQuestions = record.questions.length;
-    record.status = "ready";
-    record.errorMessage = "";
+    record.generationProgress = {
+      totalBatches: 5,
+      completedBatches: 0,
+      currentBatch: 0,
+      generatedQuestions: 0,
+      failedBatches: 0,
+      isComplete: false,
+    };
     await record.save();
 
-    return res.status(201).json({
+    setImmediate(async () => {
+      try {
+        await runAssignedPracticeGeneration({
+          assignedPracticeId: record._id,
+          topicIds: topicIdList,
+          topicName: resolvedTopic,
+          subject: resolvedSubject,
+          chapter: resolvedChapter,
+          difficulty: diff,
+          patternsToInclude: patterns,
+        });
+      } catch (bgErr) {
+        console.error("runAssignedPracticeGeneration:", bgErr);
+        await AssignedPracticeTest.findByIdAndUpdate(record._id, {
+          $set: { status: "failed", errorMessage: bgErr.message || "Generation failed in background." },
+        }).catch(() => {});
+      }
+    });
+
+    return res.status(202).json({
       success: true,
-      message: `Test generated with ${record.totalQuestions} questions. Now assign it to students.`,
+      message: "Generation started. Progress will update batch-by-batch.",
       data: {
         _id: record._id,
         subject: record.subject,
         topic: record.topic,
+        chapter: record.chapter,
+        notesTopicId: record.notesTopicId,
+        notesTopicIds: record.notesTopicIds || topicIdList,
+        notesSourceUrl: record.notesSourceUrl,
         title: record.title,
         difficulty: record.difficulty,
-        totalQuestions: record.totalQuestions,
+        totalQuestions: 0,
         status: record.status,
+        generationProgress: record.generationProgress,
         assignedStudents: [],
         isAssigned: false,
         createdAt: record.createdAt,
+        questions: [],
+        generatedFromNotes: true,
       },
     });
   } catch (error) {
@@ -187,6 +259,41 @@ export const createAssignedPractice = async (req, res) => {
       success: false,
       message: error.message || "Internal server error",
     });
+  }
+};
+
+/**
+ * GET /api/admin/assigned-practice/:id — preview generated questions
+ */
+export const getAssignedPracticeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const record = await AssignedPracticeTest.findById(id).lean();
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    res.json({
+      success: true,
+      data: {
+        _id: record._id,
+        subject: record.subject,
+        topic: record.topic,
+        chapter: record.chapter,
+        title: record.title,
+        difficulty: record.difficulty,
+        totalQuestions: record.totalQuestions,
+        status: record.status,
+        generationProgress: record.generationProgress || null,
+        generationStats: record.generationStats || null,
+        notesSourceUrl: record.notesSourceUrl,
+        questions: record.status === "ready" ? formatQuestionsForPreview(record.questions) : [],
+        generatedFromNotes: Boolean(record.notesTopicId),
+        errorMessage: record.errorMessage || "",
+      },
+    });
+  } catch (error) {
+    console.error("getAssignedPracticeById:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to load test" });
   }
 };
 
@@ -320,6 +427,8 @@ export const listAdminAssignedPractice = async (req, res) => {
         difficulty: r.difficulty,
         totalQuestions: r.totalQuestions,
         status: r.status,
+        generationProgress: r.generationProgress || null,
+        generationStats: r.generationStats || null,
         errorMessage: r.errorMessage || "",
         createdAt: r.createdAt,
         attemptCount: attemptCountByRecord[rid] || 0,

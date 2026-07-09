@@ -351,15 +351,80 @@ export const prelimsMockAPI = {
 export interface AssignedPracticeGeneratePayload {
   subject: string;
   topic: string;
+  chapter?: string;
+  notesTopicIds: string[];
+  notesTopicId?: string;
   difficulty?: "easy" | "moderate" | "hard";
   title?: string;
   patternsToInclude?: string[];
+}
+
+export interface NotesChapter {
+  _id: string | null;
+  title: string;
+  subject: string;
+  url: string;
+  slug?: string;
+  gsPaper?: string;
+  topicCount: number;
+  expectedTopicCount?: number;
+  chunkCount: number;
+  status: string;
+  synced?: boolean;
+  lastSyncedAt?: string;
+}
+
+export interface NotesTopic {
+  _id: string;
+  name: string;
+  slug: string;
+  subject: string;
+  chapterId: string;
+  heading: string;
+  summary: string;
+  chunkCount: number;
+  sourceUrl: string;
+}
+
+export const notesAPI = {
+  getSubjects: () => api.get<{ success: boolean; data: string[] }>("/api/admin/notes/subjects"),
+  getChapters: (subject: string) =>
+    api.get<{ success: boolean; data: NotesChapter[] }>("/api/admin/notes/chapters", {
+      params: { subject },
+    }),
+  getTopics: (chapterId: string) =>
+    api.get<{ success: boolean; data: NotesTopic[] }>("/api/admin/notes/topics", {
+      params: { chapterId },
+    }),
+  previewTopic: (topicId: string) =>
+    api.get(`/api/admin/notes/topics/${topicId}/preview`),
+  syncChapter: (data: { url: string; subject: string; title?: string }) =>
+    api.post("/api/admin/notes/sync-chapter", data),
+  syncBySlug: (data: { slug: string; subject: string; title?: string }) =>
+    api.post("/api/admin/notes/sync-by-slug", data),
+  repairChapter: (chapterId: string) =>
+    api.post(`/api/admin/notes/repair-chapter/${chapterId}`),
+  getCatalog: () => api.get("/api/admin/notes/catalog"),
+  syncTopic: (topicId: string, url?: string) =>
+    api.post(`/api/admin/notes/sync-topic/${topicId}`, url ? { url } : {}),
+};
+
+export interface PreviewQuestion {
+  index: number;
+  question: string;
+  options: { A: string; B: string; C: string; D: string };
+  correctAnswer: string;
+  explanation: string;
+  questionType?: string;
+  patternLabel?: string;
+  sourceNote?: string;
 }
 
 export const assignedPracticeAPI = {
   // Admin
   generate: (data: AssignedPracticeGeneratePayload) =>
     api.post("/api/admin/assigned-practice", data),
+  getById: (id: string) => api.get(`/api/admin/assigned-practice/${id}`),
   assign: (id: string, studentIds: string[]) =>
     api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),
   listAdmin: () => api.get("/api/admin/assigned-practice"),
