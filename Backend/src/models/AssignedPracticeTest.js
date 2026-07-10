@@ -115,6 +115,15 @@ const assignedPracticeTestSchema = new mongoose.Schema(
       generatedQuestions: { type: Number, default: 0 },
       failedBatches: { type: Number, default: 0 },
       isComplete: { type: Boolean, default: false },
+      currentStep: { type: String, default: "pending" },
+      readingNotes: { type: Boolean, default: false },
+      cleaningHtml: { type: Boolean, default: false },
+      batchSteps: {
+        type: Map,
+        of: Boolean,
+        default: {},
+      },
+      approved: { type: Boolean, default: false },
     },
     generationStats: {
       inputTokens: { type: Number, default: 0 },

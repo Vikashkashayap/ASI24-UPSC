@@ -1,88 +1,58 @@
 /**
- * PromptBuilder — compact context-only prompts (minimizes OpenRouter tokens).
+ * PromptBuilder — notes-only UPSC MCQs with COMPLETE stems (never intro-only).
  */
 
-import { buildBatchPatternHint, resolveNotesPatterns, PATTERN_LABELS } from "../../config/questionPatterns.js";
+import { buildBatchPatternHint, resolveNotesPatterns } from "../../config/questionPatterns.js";
 
-const SYSTEM_PROMPT = `You are a UPSC CSE Prelims Question Paper Setter.
-Generate questions exactly in UPSC style.
-Use ONLY the supplied MentorsDaily Notes context.
-Do NOT use your own knowledge.
-Do NOT fabricate facts.
-Do NOT use information outside the provided context.
-If context is insufficient for a requested pattern, switch to another valid UPSC pattern from the same context.
-Avoid repeated questions and repeated options.
-Use elimination-friendly UPSC language and analytical framing.
-Return valid JSON array only.`;
+const SYSTEM_PROMPT = `You are a UPSC CSE Question Setter.
+Generate questions ONLY using the supplied MentorsDaily Notes.
+Never use outside knowledge.
+Never guess.
+Return valid JSON only.
+Never output intro-only stems.`;
 
-const COMPACT_SCHEMA = `Schema: {"question":"","options":{"A":"","B":"","C":"","D":""},"answer":"A|B|C|D","explanation":"max 2 sentences","sourceParagraph":"verbatim 1-3 lines from context","difficulty":"easy|moderate|hard","questionType":"statement_based|multi_statement_elimination|pair_matching|chronology|sequence_arrangement|map_location|assertion_reason|statement_not_correct|direct_conceptual|odd_one_out","subject":"","chapter":"","topic":""}`;
+const USER_TAIL = `CRITICAL — COMPLETE STEM (never break):
+- statement_based: question MUST include numbered statements:
+  "Consider the following statements:\\n1. ...\\n2. ...\\n3. ...\\nWhich of the statements given above is/are correct?"
+  ALSO fill "statements":["...","..."]
+- chronology: question MUST include numbered events:
+  "Arrange the following in chronological order:\\n1. ...\\n2. ...\\n3. ...\\n4. ...\\nSelect the correct chronological order:"
+  ALSO fill "chronologyItems":["...","..."]
+- pair_matching: fill matchColumns.columnA + columnB (short items) AND put lists in question.
+- assertion_reason: full Assertion (A) + Reason (R) sentences in question + assertionReason object.
+- NEVER return only the intro line. Options like "1 and 2 only" or "1-2-3-4" are useless without the numbered list in question.
+- explanation: 2-3 short sentences why the correct option is right.
+- sourceParagraph: max 25 words quote.
+- JSON array only.
 
-/**
- * @param {{ difficulty?: string, questionCount?: number, patternsToInclude?: string[], batchIndex?: number }} opts
- */
-export function buildNotesQuestionSystemPrompt(opts = {}) {
-  const difficulty = capitalizeDifficulty(opts.difficulty || "moderate");
-  const count = opts.questionCount || 10;
-  const patterns = resolveNotesPatterns(opts.patternsToInclude);
-  const patternHint = buildBatchPatternHint(count, patterns, opts.batchIndex ?? 0);
-  const patternList = patterns.map((id) => PATTERN_LABELS[id] || id).join("; ");
-  const batchMix = serializeBatchMix(opts.generationPlan);
+Schema:{"question":"FULL stem with \\n and numbered items","options":{"A":"","B":"","C":"","D":""},"answer":"A|B|C|D","explanation":"2-3 sentences","sourceParagraph":"short quote","difficulty":"easy|moderate|hard","questionType":"statement_based|pair_matching|chronology|assertion_reason|direct_conceptual","statements":["s1","s2"]|null,"chronologyItems":["e1","e2"]|null,"matchColumns":null|{"columnA":[],"columnB":[]},"assertionReason":null|{"assertion":"","reason":""}}`;
 
-  return `${SYSTEM_PROMPT}
-Difficulty: ${difficulty}. Generate exactly ${count} unique MCQs for the given topic.
-Use ONLY these UPSC patterns (balanced this batch: ${patternHint}): ${patternList}.
-Target pattern+difficulty mix for this batch: ${batchMix}.
-Follow standard UPSC format per pattern (statements, pairs, assertion-reason, chronology order, etc.).
-${COMPACT_SCHEMA}`;
+export function buildNotesQuestionSystemPrompt() {
+  return SYSTEM_PROMPT;
 }
 
-/**
- * @param {{ context: string, topic: string, difficulty?: string, questionCount?: number, patternsToInclude?: string[], batchIndex?: number }} params
- */
 export function buildNotesQuestionUserPrompt(params) {
-  const difficulty = capitalizeDifficulty(params.difficulty || "moderate");
-  const count = params.questionCount || 10;
+  const count = Math.min(10, Math.max(1, parseInt(params.questionCount, 10) || 10));
+  const difficulty = String(params.difficulty || "moderate").toLowerCase();
   const patterns = resolveNotesPatterns(params.patternsToInclude);
   const patternHint = buildBatchPatternHint(count, patterns, params.batchIndex ?? 0);
-  const batchMix = serializeBatchMix(params.generationPlan);
-  const subject = String(params.subject || "").trim();
-  const chapter = String(params.chapter || "").trim();
   const topic = String(params.topic || "").trim();
+  const subject = String(params.subject || "").trim();
 
-  return `Context:
+  return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
+Difficulty: ${difficulty}. Patterns: ${patternHint}.
+Generate EXACTLY ${count} COMPLETE UPSC MCQs from Notes. Every stem must be answerable without outside text.
+
+NOTES:
 ${params.context}
 
-Subject: ${subject}
-Chapter: ${chapter}
-Topic: ${topic}
-Generate ${count} MCQs from the notes above only. Difficulty: ${difficulty}.
-Pattern mix this batch: ${patternHint}.
-Required batch quota: ${batchMix}.
-For each question include short explanation and sourceParagraph quoted from context.
-Avoid long explanations. JSON array only.`;
-}
-
-function capitalizeDifficulty(d) {
-  const v = String(d || "moderate").toLowerCase();
-  if (v === "easy") return "Easy";
-  if (v === "hard") return "Hard";
-  return "Moderate";
-}
-
-function serializeBatchMix(generationPlan) {
-  if (!generationPlan) return "balanced";
-  const p = Object.entries(generationPlan.patternCounts || {})
-    .map(([k, v]) => `${k}:${v}`)
-    .join(", ");
-  const d = Object.entries(generationPlan.difficultyCounts || {})
-    .map(([k, v]) => `${k}:${v}`)
-    .join(", ");
-  return `patterns[${p || "auto"}] difficulties[${d || "auto"}]`;
+${USER_TAIL}`;
 }
 
 export const promptBuilder = {
   buildNotesQuestionSystemPrompt,
   buildNotesQuestionUserPrompt,
+  SYSTEM_PROMPT,
 };
 
 export default promptBuilder;

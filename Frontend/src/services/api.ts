@@ -418,6 +418,21 @@ export interface PreviewQuestion {
   questionType?: string;
   patternLabel?: string;
   sourceNote?: string;
+  difficulty?: string;
+}
+
+export interface GenerationProgress {
+  totalBatches: number;
+  completedBatches: number;
+  currentBatch: number;
+  generatedQuestions: number;
+  failedBatches?: number;
+  isComplete?: boolean;
+  currentStep?: string;
+  readingNotes?: boolean;
+  cleaningHtml?: boolean;
+  batchSteps?: Record<string, boolean>;
+  approved?: boolean;
 }
 
 export const assignedPracticeAPI = {
@@ -429,6 +444,15 @@ export const assignedPracticeAPI = {
     api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),
   listAdmin: () => api.get("/api/admin/assigned-practice"),
   delete: (id: string) => api.delete(`/api/admin/assigned-practice/${id}`),
+  updateQuestion: (id: string, index: number, data: Partial<PreviewQuestion>) =>
+    api.patch(`/api/admin/assigned-practice/${id}/questions/${index}`, data),
+  deleteQuestion: (id: string, index: number) =>
+    api.delete(`/api/admin/assigned-practice/${id}/questions/${index}`),
+  regenerateQuestion: (id: string, index: number) =>
+    api.post(`/api/admin/assigned-practice/${id}/questions/${index}/regenerate`),
+  saveQuestions: (id: string, questions: PreviewQuestion[]) =>
+    api.patch(`/api/admin/assigned-practice/${id}/questions`, { questions }),
+  approve: (id: string) => api.post(`/api/admin/assigned-practice/${id}/approve`),
   // Student
   listMine: () => api.get("/api/tests/assigned-practice"),
   getHistory: (params?: { page?: number; limit?: number }) =>

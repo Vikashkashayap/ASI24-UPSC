@@ -99,7 +99,7 @@ export const UpscFormattedQuestionStem: React.FC<Props> = ({
   if (!isStructuredUpscStem(parts)) {
     return (
       <p
-        className={`${className} ${size} break-words ${
+        className={`${className} ${size} break-words whitespace-pre-line ${
           theme === "dark" ? "text-slate-100" : "text-slate-900"
         }`}
       >

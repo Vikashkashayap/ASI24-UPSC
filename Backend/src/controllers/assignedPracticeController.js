@@ -6,6 +6,7 @@ import { notesService } from "../services/notes/notes.service.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 import { patternLabelForQuestionType } from "../config/questionPatterns.js";
 import { runAssignedPracticeGeneration } from "../services/ai/batchGenerator.service.js";
+import { generateQuestionsFromContextBatch } from "../services/ai/questionGenerator.service.js";
 
 const GS_SUBJECTS = [
   "Polity",
@@ -192,7 +193,7 @@ export const createAssignedPractice = async (req, res) => {
     });
     await record.save();
 
-    console.log(`📝 Starting notes-grounded RAG generation (${ASSIGNED_QUESTION_COUNT}Q) for ${resolvedSubject} — ${resolvedTopic}`);
+    console.log(`📝 Starting notes-only generation (${ASSIGNED_QUESTION_COUNT}Q) for ${resolvedSubject} — ${resolvedTopic}`);
     await getPriorTopicQuestionFingerprints(resolvedSubject, resolvedTopic);
     const patterns = normalizePatternsToInclude(patternsToInclude);
 
@@ -203,6 +204,11 @@ export const createAssignedPractice = async (req, res) => {
       generatedQuestions: 0,
       failedBatches: 0,
       isComplete: false,
+      currentStep: "pending",
+      readingNotes: false,
+      cleaningHtml: false,
+      batchSteps: {},
+      approved: false,
     };
     await record.save();
 
@@ -286,7 +292,11 @@ export const getAssignedPracticeById = async (req, res) => {
         generationProgress: record.generationProgress || null,
         generationStats: record.generationStats || null,
         notesSourceUrl: record.notesSourceUrl,
-        questions: record.status === "ready" ? formatQuestionsForPreview(record.questions) : [],
+        questions: formatQuestionsForPreview(record.questions || []),
+        partialQuestions:
+          record.status === "generating"
+            ? formatQuestionsForPreview(record.questions || [])
+            : [],
         generatedFromNotes: Boolean(record.notesTopicId),
         errorMessage: record.errorMessage || "",
       },
@@ -442,6 +452,265 @@ export const listAdminAssignedPractice = async (req, res) => {
   } catch (error) {
     console.error("listAdminAssignedPractice:", error);
     res.status(500).json({ success: false, message: error.message || "Internal server error" });
+  }
+};
+
+/**
+ * PATCH /api/admin/assigned-practice/:id/questions/:index
+ * Update a single question (admin edit).
+ */
+export const updatePracticeQuestion = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+    const idx = parseInt(index, 10);
+    if (Number.isNaN(idx) || idx < 0) {
+      return res.status(400).json({ success: false, message: "Invalid question index" });
+    }
+
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    if (!record.questions?.[idx]) {
+      return res.status(404).json({ success: false, message: "Question not found" });
+    }
+
+    const { question, options, correctAnswer, explanation, difficulty, questionType } = req.body;
+    const q = record.questions[idx];
+    if (typeof question === "string" && question.trim()) {
+      q.question = question.trim();
+      q.question_en = question.trim();
+    }
+    if (options && typeof options === "object") {
+      ["A", "B", "C", "D"].forEach((k) => {
+        if (typeof options[k] === "string") {
+          q.options[k] = options[k].trim();
+          if (q.options_en) q.options_en[k] = options[k].trim();
+        }
+      });
+    }
+    if (["A", "B", "C", "D"].includes(String(correctAnswer || "").toUpperCase())) {
+      q.correctAnswer = String(correctAnswer).toUpperCase();
+      q.answer = q.correctAnswer;
+    }
+    if (typeof explanation === "string") {
+      q.explanation = explanation.trim();
+      q.explanation_en = explanation.trim();
+    }
+    if (["easy", "moderate", "hard"].includes(String(difficulty || "").toLowerCase())) {
+      q.difficulty = String(difficulty).toLowerCase();
+    }
+    if (typeof questionType === "string" && questionType.trim()) {
+      q.questionType = questionType.trim();
+    }
+
+    record.totalQuestions = record.questions.length;
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: "Question updated",
+      data: formatQuestionsForPreview(record.questions),
+    });
+  } catch (error) {
+    console.error("updatePracticeQuestion:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to update question" });
+  }
+};
+
+/**
+ * DELETE /api/admin/assigned-practice/:id/questions/:index
+ */
+export const deletePracticeQuestion = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+    const idx = parseInt(index, 10);
+    if (Number.isNaN(idx) || idx < 0) {
+      return res.status(400).json({ success: false, message: "Invalid question index" });
+    }
+
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    if (!record.questions?.[idx]) {
+      return res.status(404).json({ success: false, message: "Question not found" });
+    }
+
+    record.questions.splice(idx, 1);
+    record.totalQuestions = record.questions.length;
+    if (record.generationProgress) {
+      record.generationProgress.generatedQuestions = record.questions.length;
+    }
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: "Question deleted",
+      data: formatQuestionsForPreview(record.questions),
+    });
+  } catch (error) {
+    console.error("deletePracticeQuestion:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to delete question" });
+  }
+};
+
+/**
+ * POST /api/admin/assigned-practice/:id/questions/:index/regenerate
+ * Regenerate a single question from notes content.
+ */
+export const regeneratePracticeQuestion = async (req, res) => {
+  try {
+    const { id, index } = req.params;
+    const idx = parseInt(index, 10);
+    if (Number.isNaN(idx) || idx < 0) {
+      return res.status(400).json({ success: false, message: "Invalid question index" });
+    }
+
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    if (!record.questions?.[idx]) {
+      return res.status(404).json({ success: false, message: "Question not found" });
+    }
+
+    const topicId =
+      record.notesTopicIds?.[idx % (record.notesTopicIds?.length || 1)] ||
+      record.notesTopicId;
+    if (!topicId) {
+      return res.status(400).json({ success: false, message: "No notes topic linked to this test" });
+    }
+
+    const topicNotes = await notesService.fetchAndCleanTopicNotes(String(topicId));
+    const batchResult = await generateQuestionsFromContextBatch({
+      contextText: topicNotes.cleanText,
+      topic: topicNotes.topic.name || record.topic,
+      difficulty: record.difficulty,
+      batchSize: 1,
+      patternsToInclude: [],
+      batchIndex: idx,
+      subject: record.subject,
+      chapter: record.chapter,
+    });
+
+    if (!batchResult.success || !batchResult.questions?.length) {
+      return res.status(502).json({
+        success: false,
+        message: batchResult.error || "Failed to regenerate question from notes",
+      });
+    }
+
+    const newQ = pickBilingualQuestionFields({
+      ...batchResult.questions[0],
+      topic: topicNotes.topic.name || record.topic,
+      conceptualSource:
+        batchResult.questions[0].conceptualSource ||
+        batchResult.questions[0].sourceParagraph ||
+        topicNotes.topic.name,
+    });
+
+    record.questions[idx] = newQ;
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: "Question regenerated from notes",
+      data: formatQuestionsForPreview(record.questions),
+    });
+  } catch (error) {
+    console.error("regeneratePracticeQuestion:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to regenerate question" });
+  }
+};
+
+/**
+ * PATCH /api/admin/assigned-practice/:id/questions
+ * Save all questions (bulk admin edit).
+ */
+export const savePracticeQuestions = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { questions } = req.body;
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ success: false, message: "questions array is required" });
+    }
+
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+
+    record.questions = questions.map((q) =>
+      pickBilingualQuestionFields({
+        question: q.question || q.question_en || "",
+        question_en: q.question || q.question_en || "",
+        options: q.options || q.options_en || {},
+        options_en: q.options || q.options_en || {},
+        correctAnswer: q.correctAnswer,
+        answer: q.correctAnswer,
+        explanation: q.explanation || q.explanation_en || "",
+        explanation_en: q.explanation || q.explanation_en || "",
+        questionType: q.questionType || "",
+        difficulty: q.difficulty || record.difficulty,
+        conceptualSource: q.sourceNote || q.conceptualSource || "",
+      })
+    );
+    record.totalQuestions = record.questions.length;
+    if (record.generationProgress) {
+      record.generationProgress.generatedQuestions = record.questions.length;
+    }
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: "Questions saved",
+      data: formatQuestionsForPreview(record.questions),
+    });
+  } catch (error) {
+    console.error("savePracticeQuestions:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to save questions" });
+  }
+};
+
+/**
+ * POST /api/admin/assigned-practice/:id/approve
+ * Approve generated questions and mark test ready for assignment.
+ */
+export const approvePracticeTest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    if (!record.questions?.length) {
+      return res.status(400).json({ success: false, message: "No questions to approve" });
+    }
+
+    record.status = "ready";
+    record.errorMessage = "";
+    if (record.generationProgress) {
+      record.generationProgress.approved = true;
+      record.generationProgress.isComplete = true;
+      record.generationProgress.currentStep = "completed";
+    }
+    record.totalQuestions = record.questions.length;
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: `Approved ${record.questions.length} question(s) for assignment`,
+      data: {
+        _id: record._id,
+        status: record.status,
+        totalQuestions: record.totalQuestions,
+        questions: formatQuestionsForPreview(record.questions),
+      },
+    });
+  } catch (error) {
+    console.error("approvePracticeTest:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to approve test" });
   }
 };
 

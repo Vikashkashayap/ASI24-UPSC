@@ -42,6 +42,11 @@ import {
   assignStudentsToPractice,
   listAdminAssignedPractice,
   deleteAssignedPractice,
+  updatePracticeQuestion,
+  deletePracticeQuestion,
+  regeneratePracticeQuestion,
+  savePracticeQuestions,
+  approvePracticeTest,
 } from "../controllers/assignedPracticeController.js";
 import {
   listNotesSubjects,
@@ -119,6 +124,11 @@ router.delete("/prelims-mock/:id", deletePrelimsMock);
 router.post("/assigned-practice", createAssignedPractice);
 router.get("/assigned-practice", listAdminAssignedPractice);
 router.get("/assigned-practice/:id", getAssignedPracticeById);
+router.patch("/assigned-practice/:id/questions", savePracticeQuestions);
+router.patch("/assigned-practice/:id/questions/:index", updatePracticeQuestion);
+router.delete("/assigned-practice/:id/questions/:index", deletePracticeQuestion);
+router.post("/assigned-practice/:id/questions/:index/regenerate", regeneratePracticeQuestion);
+router.post("/assigned-practice/:id/approve", approvePracticeTest);
 router.post("/assigned-practice/:id/assign", assignStudentsToPractice);
 router.delete("/assigned-practice/:id", deleteAssignedPractice);
 

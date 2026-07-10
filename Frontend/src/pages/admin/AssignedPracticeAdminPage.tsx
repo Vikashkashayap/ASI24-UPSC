@@ -20,7 +20,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { useTheme } from "../../hooks/useTheme";
-import { assignedPracticeAPI, adminAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion } from "../../services/api";
+import { assignedPracticeAPI, adminAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion, type GenerationProgress } from "../../services/api";
 import { PRELIM_MOCK_PATTERNS } from "../../constants/testGenerator";
 
 const DEFAULT_PATTERNS = PRELIM_MOCK_PATTERNS.map((p) => p.id);
@@ -92,11 +92,12 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const [patternsToInclude, setPatternsToInclude] = useState<string[]>(DEFAULT_PATTERNS);
   const [generating, setGenerating] = useState(false);
   const [generationTestId, setGenerationTestId] = useState<string | null>(null);
-  const [generationStatus, setGenerationStatus] = useState<{
-    completedBatches: number;
-    totalBatches: number;
-    generatedQuestions: number;
-  } | null>(null);
+  const [generationStatus, setGenerationStatus] = useState<GenerationProgress | null>(null);
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null);
+  const [editDraft, setEditDraft] = useState<PreviewQuestion | null>(null);
+  const [savingQuestions, setSavingQuestions] = useState(false);
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
+  const [approving, setApproving] = useState(false);
 
   // Step 1.5 — preview AI-generated questions from notes
   const [flowStep, setFlowStep] = useState<"form" | "preview" | "assign">("form");
@@ -137,16 +138,45 @@ export const AssignedPracticeAdminPage: React.FC = () => {
         const res = await assignedPracticeAPI.getById(generationTestId);
         if (!res.data?.success || !res.data?.data) return;
         const data = res.data.data;
-        const gp = data.generationProgress || {};
+        const gp = (data.generationProgress || {}) as GenerationProgress;
         setGenerationStatus({
-          completedBatches: gp.completedBatches || 0,
           totalBatches: gp.totalBatches || 5,
+          completedBatches: gp.completedBatches || 0,
+          currentBatch: gp.currentBatch || 0,
           generatedQuestions: gp.generatedQuestions || 0,
+          failedBatches: gp.failedBatches,
+          isComplete: gp.isComplete,
+          currentStep: gp.currentStep,
+          readingNotes: gp.readingNotes,
+          cleaningHtml: gp.cleaningHtml,
+          batchSteps: gp.batchSteps,
+          approved: gp.approved,
         });
+
+        const liveQuestions = data.questions || data.partialQuestions || [];
+        if (liveQuestions.length > 0) {
+          setPreviewQuestions(liveQuestions);
+          setFlowStep("preview");
+          if (!activeTest) {
+            setActiveTest({
+              _id: data._id,
+              subject: data.subject,
+              topic: data.topic,
+              title: data.title || `${data.subject} — ${data.topic}`,
+              totalQuestions: liveQuestions.length,
+              difficulty: data.difficulty,
+            });
+          } else {
+            setActiveTest((prev) =>
+              prev ? { ...prev, totalQuestions: liveQuestions.length } : prev
+            );
+          }
+        }
+
         if (data.status === "ready") {
           setGenerationTestId(null);
           setGenerating(false);
-          setPreviewQuestions(data.questions || []);
+          setPreviewQuestions(data.questions || liveQuestions);
           setPreviewPage(1);
           setActiveTest({
             _id: data._id,
@@ -162,7 +192,11 @@ export const AssignedPracticeAdminPage: React.FC = () => {
         } else if (data.status === "failed") {
           setGenerationTestId(null);
           setGenerating(false);
-          setError(data.errorMessage || "Generation failed");
+          if (liveQuestions.length > 0) {
+            setError(data.errorMessage || "Generation incomplete — review partial questions below.");
+          } else {
+            setError(data.errorMessage || "Generation failed");
+          }
           loadList();
         }
       } catch {
@@ -555,6 +589,155 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const startEditQuestion = (q: PreviewQuestion) => {
+    setEditingQuestionIndex(q.index - 1);
+    setEditDraft({ ...q });
+  };
+
+  const cancelEditQuestion = () => {
+    setEditingQuestionIndex(null);
+    setEditDraft(null);
+  };
+
+  const handleSaveQuestion = async () => {
+    if (!activeTest || editingQuestionIndex === null || !editDraft) return;
+    setSavingQuestions(true);
+    setError(null);
+    try {
+      const res = await assignedPracticeAPI.updateQuestion(activeTest._id, editingQuestionIndex, {
+        question: editDraft.question,
+        options: editDraft.options,
+        correctAnswer: editDraft.correctAnswer,
+        explanation: editDraft.explanation,
+        difficulty: editDraft.difficulty,
+        questionType: editDraft.questionType,
+      });
+      if (res.data?.success) {
+        setPreviewQuestions(res.data.data || []);
+        setSuccess("Question saved.");
+        cancelEditQuestion();
+      } else {
+        setError(res.data?.message || "Failed to save question");
+      }
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to save question");
+    } finally {
+      setSavingQuestions(false);
+    }
+  };
+
+  const handleDeleteQuestion = async (q: PreviewQuestion) => {
+    if (!activeTest) return;
+    if (!window.confirm(`Delete question ${q.index}?`)) return;
+    setError(null);
+    try {
+      const res = await assignedPracticeAPI.deleteQuestion(activeTest._id, q.index - 1);
+      if (res.data?.success) {
+        setPreviewQuestions(res.data.data || []);
+        setActiveTest((prev) =>
+          prev ? { ...prev, totalQuestions: (res.data.data || []).length } : prev
+        );
+        setSuccess("Question deleted.");
+        if (editingQuestionIndex === q.index - 1) cancelEditQuestion();
+      }
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to delete question");
+    }
+  };
+
+  const handleRegenerateQuestion = async (q: PreviewQuestion) => {
+    if (!activeTest) return;
+    setRegeneratingIndex(q.index - 1);
+    setError(null);
+    try {
+      const res = await assignedPracticeAPI.regenerateQuestion(activeTest._id, q.index - 1);
+      if (res.data?.success) {
+        setPreviewQuestions(res.data.data || []);
+        setSuccess(`Question ${q.index} regenerated from notes.`);
+      } else {
+        setError(res.data?.message || "Regeneration failed");
+      }
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to regenerate question");
+    } finally {
+      setRegeneratingIndex(null);
+    }
+  };
+
+  const handleApproveTest = async () => {
+    if (!activeTest) return;
+    setApproving(true);
+    setError(null);
+    try {
+      const res = await assignedPracticeAPI.approve(activeTest._id);
+      if (res.data?.success) {
+        setPreviewQuestions(res.data.data?.questions || previewQuestions);
+        setSuccess(res.data.message || "Test approved. You can assign students.");
+        setGenerating(false);
+        setGenerationTestId(null);
+        loadList();
+      } else {
+        setError(res.data?.message || "Approve failed");
+      }
+    } catch (err: unknown) {
+      const ax = err as { response?: { data?: { message?: string } } };
+      setError(ax.response?.data?.message || "Failed to approve test");
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  const renderGenerationProgress = () => {
+    if (!generationStatus) return null;
+    const gs = generationStatus;
+    const batchDone = (n: number) =>
+      gs.completedBatches >= n || Boolean(gs.batchSteps?.[String(n - 1)]);
+    const steps = [
+      { key: "reading", label: "Reading Notes", done: Boolean(gs.readingNotes) },
+      { key: "cleaning", label: "Cleaning HTML", done: Boolean(gs.cleaningHtml) },
+      ...Array.from({ length: gs.totalBatches || 5 }, (_, i) => ({
+        key: `batch-${i + 1}`,
+        label: `Generating Batch ${i + 1} of ${gs.totalBatches || 5}`,
+        done: batchDone(i + 1),
+      })),
+      { key: "done", label: "Completed", done: Boolean(gs.isComplete) },
+    ];
+
+    return (
+      <div className={`rounded-lg border p-3 space-y-2 ${isDark ? "border-blue-800/40 bg-blue-950/20" : "border-blue-200 bg-blue-50"}`}>
+        <p className={`text-sm font-medium ${isDark ? "text-blue-200" : "text-blue-900"}`}>
+          Generating from MentorsDaily Notes
+        </p>
+        <ul className="space-y-1">
+          {steps.map((step) => (
+            <li key={step.key} className={`flex items-center gap-2 text-xs ${isDark ? "text-blue-200" : "text-blue-800"}`}>
+              {step.done ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+              ) : generating ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+              ) : (
+                <span className="w-3.5 h-3.5 rounded-full border border-current shrink-0" />
+              )}
+              {step.label}
+            </li>
+          ))}
+        </ul>
+        <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-slate-700" : "bg-slate-200"}`}>
+          <div
+            className="h-full bg-blue-600 transition-all"
+            style={{ width: `${Math.min(100, (gs.generatedQuestions / 50) * 100)}%` }}
+          />
+        </div>
+        <p className={`text-xs ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
+          Questions Generated: {gs.generatedQuestions}/50
+        </p>
+      </div>
+    );
+  };
+
   const previewSlice = useMemo(() => {
     const start = (previewPage - 1) * PREVIEW_PAGE_SIZE;
     return previewQuestions.slice(start, start + PREVIEW_PAGE_SIZE);
@@ -626,7 +809,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
           Topic Practice
         </h1>
         <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-          Select chapter & topic from Notes → AI generates 50 MCQs from your content → Preview → Assign students
+          Select chapter & topic from Notes → AI fetches live notes → generates 50 MCQs → Preview & edit → Assign students
         </p>
       </div>
 
@@ -685,7 +868,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               Step 1 — Generate Test
             </CardTitle>
             <CardDescription>
-              All UPSC subjects linked to notes.mentorsdaily.com. Sync a chapter once, then generate 50 MCQs from notes only (low-token OpenRouter).
+              Select chapter &amp; topic from notes.mentorsdaily.com. Questions are generated only from live-fetched notes content (no external AI knowledge).
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -1005,22 +1188,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   <strong>{patternsToInclude.length}</strong> pattern{patternsToInclude.length !== 1 ? "s" : ""} ({selectedPatternsLabel}).
                 </p>
               )}
-              {generating && generationStatus && (
-                <div className={`rounded-lg border p-3 space-y-2 ${isDark ? "border-blue-800/40 bg-blue-950/20" : "border-blue-200 bg-blue-50"}`}>
-                  <p className={`text-sm font-medium ${isDark ? "text-blue-200" : "text-blue-900"}`}>
-                    Batch {Math.max(1, generationStatus.completedBatches + 1)}/{generationStatus.totalBatches}
-                  </p>
-                  <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-slate-700" : "bg-slate-200"}`}>
-                    <div
-                      className="h-full bg-blue-600 transition-all"
-                      style={{ width: `${Math.min(100, (generationStatus.generatedQuestions / 50) * 100)}%` }}
-                    />
-                  </div>
-                  <p className={`text-xs ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
-                    Questions Generated: {generationStatus.generatedQuestions}/50
-                  </p>
-                </div>
-              )}
+              {generating && renderGenerationProgress()}
               <Button type="submit" disabled={generating || !subject || chapterNeedsSync || !chapterId || selectedTopicIds.length === 0 || patternsToInclude.length === 0} className="w-full sm:w-auto">
                 {generating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                 {generating ? "Generating from Notes…" : "Generate 50 Questions from Notes"}
@@ -1037,6 +1205,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             <CardTitle className="flex items-center gap-2 text-base">
               <BookOpen className="w-5 h-5 text-blue-500" />
               Preview — {activeTest.totalQuestions} Questions from Notes
+              {generating && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
             </CardTitle>
             <CardDescription>
               Generated from Notes for{" "}
@@ -1048,14 +1217,16 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   · Patterns: <strong>{patternsToInclude.length}</strong> selected
                 </>
               )}
-              . Review before assigning.
+              . Review, edit, or regenerate before assigning.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {generating && renderGenerationProgress()}
+
             <div className={`rounded-lg border px-3 py-2 text-xs flex flex-wrap gap-2 items-center ${isDark ? "border-blue-800/40 bg-blue-950/20 text-blue-200" : "border-blue-200 bg-blue-50 text-blue-800"}`}>
-              <span className="font-medium">📚 Notes-grounded</span>
+              <span className="font-medium">📚 Notes-only (live fetch)</span>
               <span>·</span>
-              <span>OpenRouter AI</span>
+              <span>Gemini Flash Lite</span>
               <span>·</span>
               <span>{activeTest.difficulty} difficulty</span>
               <span>·</span>
@@ -1071,47 +1242,141 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             </div>
 
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-              {previewSlice.map((q) => (
-                <div
-                  key={q.index}
-                  className={`rounded-lg border p-4 ${isDark ? "border-slate-600 bg-slate-900/40" : "border-slate-200 bg-white"}`}
-                >
-                  <p className={`text-xs font-medium mb-1 flex flex-wrap items-center gap-2 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    <span>Q{q.index}</span>
-                    {q.patternLabel && (
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isDark ? "bg-slate-700 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
-                        {q.patternLabel}
-                      </span>
-                    )}
-                  </p>
-                  <p className={`text-sm font-medium mb-3 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                    {q.question}
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-sm mb-3">
-                    {(["A", "B", "C", "D"] as const).map((key) => (
-                      <div
-                        key={key}
-                        className={`px-2 py-1 rounded ${
-                          q.correctAnswer === key
-                            ? isDark
-                              ? "bg-green-950/40 text-green-300 border border-green-800/50"
-                              : "bg-green-50 text-green-800 border border-green-200"
-                            : isDark
-                              ? "text-slate-300"
-                              : "text-slate-700"
-                        }`}
-                      >
-                        <span className="font-medium">{key}.</span> {q.options[key]}
+              {previewSlice.map((q) => {
+                const isEditing = editingQuestionIndex === q.index - 1 && editDraft;
+                return (
+                  <div
+                    key={q.index}
+                    className={`rounded-lg border p-4 ${isDark ? "border-slate-600 bg-slate-900/40" : "border-slate-200 bg-white"}`}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                      <p className={`text-xs font-medium flex flex-wrap items-center gap-2 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                        <span>Q{q.index}</span>
+                        {q.patternLabel && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isDark ? "bg-slate-700 text-slate-300" : "bg-slate-100 text-slate-600"}`}>
+                            {q.patternLabel}
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-7 min-h-0 text-xs px-2"
+                          onClick={() => (isEditing ? cancelEditQuestion() : startEditQuestion(q))}
+                          disabled={regeneratingIndex !== null}
+                        >
+                          <Pencil className="w-3 h-3 mr-1" />
+                          {isEditing ? "Cancel" : "Edit"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-7 min-h-0 text-xs px-2"
+                          onClick={() => handleRegenerateQuestion(q)}
+                          disabled={regeneratingIndex === q.index - 1 || generating}
+                        >
+                          {regeneratingIndex === q.index - 1 ? (
+                            <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                          ) : (
+                            <RefreshCw className="w-3 h-3 mr-1" />
+                          )}
+                          Regenerate
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="h-7 min-h-0 text-xs px-2 text-red-500 hover:text-red-600"
+                          onClick={() => handleDeleteQuestion(q)}
+                          disabled={generating}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Delete
+                        </Button>
                       </div>
-                    ))}
+                    </div>
+
+                    {isEditing && editDraft ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={editDraft.question}
+                          onChange={(e) => setEditDraft({ ...editDraft, question: e.target.value })}
+                          rows={3}
+                          className={`w-full text-sm rounded border px-2 py-1.5 ${inputCls}`}
+                        />
+                        {(["A", "B", "C", "D"] as const).map((key) => (
+                          <input
+                            key={key}
+                            value={editDraft.options[key]}
+                            onChange={(e) =>
+                              setEditDraft({
+                                ...editDraft,
+                                options: { ...editDraft.options, [key]: e.target.value },
+                              })
+                            }
+                            placeholder={`Option ${key}`}
+                            className={`w-full text-sm rounded border px-2 py-1.5 ${inputCls}`}
+                          />
+                        ))}
+                        <select
+                          value={editDraft.correctAnswer}
+                          onChange={(e) => setEditDraft({ ...editDraft, correctAnswer: e.target.value })}
+                          className={`text-sm rounded border px-2 py-1.5 ${inputCls}`}
+                        >
+                          {(["A", "B", "C", "D"] as const).map((k) => (
+                            <option key={k} value={k}>{k} — Correct</option>
+                          ))}
+                        </select>
+                        <textarea
+                          value={editDraft.explanation}
+                          onChange={(e) => setEditDraft({ ...editDraft, explanation: e.target.value })}
+                          rows={2}
+                          placeholder="Explanation"
+                          className={`w-full text-sm rounded border px-2 py-1.5 ${inputCls}`}
+                        />
+                        <Button type="button" className="h-8 min-h-0 text-xs px-3" onClick={handleSaveQuestion} disabled={savingQuestions}>
+                          {savingQuestions ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
+                          Save
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <p className={`text-sm font-medium mb-3 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                          {q.question}
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-sm mb-3">
+                          {(["A", "B", "C", "D"] as const).map((key) => (
+                            <div
+                              key={key}
+                              className={`px-2 py-1 rounded ${
+                                q.correctAnswer === key
+                                  ? isDark
+                                    ? "bg-green-950/40 text-green-300 border border-green-800/50"
+                                    : "bg-green-50 text-green-800 border border-green-200"
+                                  : isDark
+                                    ? "text-slate-300"
+                                    : "text-slate-700"
+                              }`}
+                            >
+                              <span className="font-medium">{key}.</span> {q.options[key]}
+                            </div>
+                          ))}
+                        </div>
+                        {q.explanation && (
+                          <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                            <span className="font-medium">Explanation:</span> {q.explanation}
+                          </p>
+                        )}
+                        {q.sourceNote && (
+                          <p className={`text-xs mt-1 italic ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                            Source: {q.sourceNote.slice(0, 120)}{q.sourceNote.length > 120 ? "…" : ""}
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
-                  {q.explanation && (
-                    <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                      <span className="font-medium">Explanation:</span> {q.explanation}
-                    </p>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {previewTotalPages > 1 && (
@@ -1139,11 +1404,19 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             )}
 
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button type="button" onClick={continueToAssign}>
-                <UserPlus className="w-4 h-4 mr-2" />
-                Continue to Assign Students
-              </Button>
-              <Button type="button" variant="outline" onClick={resetFlow}>
+              {!generating && (
+                <Button type="button" onClick={continueToAssign}>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Continue to Assign Students
+                </Button>
+              )}
+              {generating && previewQuestions.length > 0 && (
+                <Button type="button" variant="outline" onClick={handleApproveTest} disabled={approving}>
+                  {approving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                  Approve &amp; Finish Early
+                </Button>
+              )}
+              <Button type="button" variant="outline" onClick={resetFlow} disabled={generating && previewQuestions.length === 0}>
                 Generate New Test
               </Button>
             </div>
