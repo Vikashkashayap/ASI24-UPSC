@@ -56,6 +56,16 @@ export function splitIntoWordChunks(text, opts = {}) {
     if (sliceEnd >= words.length) break;
     start = Math.max(0, sliceEnd - overlapWords);
   }
+
+  // Merge tiny trailing chunk into previous (avoids ~100–200 token dead ends on top-up)
+  const minTailWords = Math.max(200, Math.floor(minWords * 0.45));
+  if (chunks.length >= 2) {
+    const lastWords = chunks[chunks.length - 1].split(/\s+/).filter(Boolean).length;
+    if (lastWords < minTailWords) {
+      const tail = chunks.pop();
+      chunks[chunks.length - 1] = `${chunks[chunks.length - 1]} ${tail}`.trim();
+    }
+  }
   return chunks;
 }
 
@@ -156,8 +166,28 @@ export function prepareContextForBatch(text, opts = {}) {
       ? splitIntoWordChunks(cleaned)
       : [cleaned];
 
-  const chunkIndex = batchIndex % chunks.length;
+  let chunkIndex = batchIndex % chunks.length;
   let context = chunks[chunkIndex] || chunks[0] || "";
+
+  // If selected chunk is too thin, prefer the richest chunk (or full reduced topic)
+  if (estimateTokens(context) < 350 && chunks.length > 1) {
+    let bestIdx = 0;
+    let bestTok = 0;
+    chunks.forEach((c, i) => {
+      const t = estimateTokens(c);
+      if (t > bestTok) {
+        bestTok = t;
+        bestIdx = i;
+      }
+    });
+    chunkIndex = bestIdx;
+    context = chunks[bestIdx];
+  }
+  if (estimateTokens(context) < 350 && words > WORD_SPLIT_THRESHOLD) {
+    context = reduceToImportantContent(cleaned, targetTokens);
+    chunkIndex = 0;
+  }
+
   let reduced = false;
   let summarized = false;
 
