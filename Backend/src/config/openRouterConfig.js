@@ -164,19 +164,20 @@ export function isPracticeBatchHindiEnabled() {
 
 export function getPracticeHindiBatchSize() {
 
-  return Math.max(10, Math.min(50, parseInt(process.env.PRACTICE_HINDI_BATCH_SIZE, 10) || 25));
+  // 25 long UPSC stems overflow output; 10 is reliable
+  return Math.max(5, Math.min(15, parseInt(process.env.PRACTICE_HINDI_BATCH_SIZE, 10) || 10));
 
 }
 
 
 
-/** Output token budget for topic-practice batches (compact explanations). */
+/** Output token budget — sized for complete UPSC stems (5Q fills → 10 per batch). */
 
 export function getMaxTokensForPracticeGeneration(questionCount) {
 
-  const count = Math.max(1, parseInt(questionCount, 10) || 20);
+  const count = Math.max(1, Math.min(10, parseInt(questionCount, 10) || 10));
 
-  const defaultPerQ = isPracticeEnglishOnly() ? 220 : 320;
+  const defaultPerQ = isPracticeEnglishOnly() ? 320 : 360;
 
   const perQuestion = parseInt(process.env.PRACTICE_GEN_TOKENS_PER_QUESTION, 10) || defaultPerQ;
 
@@ -184,11 +185,9 @@ export function getMaxTokensForPracticeGeneration(questionCount) {
 
     parseInt(process.env.PRACTICE_MAX_OUTPUT_TOKENS, 10) ||
 
-    parseInt(process.env.TEST_GEN_MAX_OUTPUT_TOKENS, 10) ||
+    4000;
 
-    4200;
-
-  const floor = Math.min(cap, Math.max(1400, count * perQuestion + 200));
+  const floor = Math.min(cap, Math.max(1400, count * perQuestion + 150));
 
   return Math.min(cap, floor);
 
@@ -196,17 +195,18 @@ export function getMaxTokensForPracticeGeneration(questionCount) {
 
 
 
-/** Output cap for batch Hindi translation pass. */
+/** Output cap for batch Hindi translation pass (separate from English gen cap). */
 
 export function getMaxTokensForPracticeHindiBatch(questionCount) {
 
-  const count = Math.max(1, parseInt(questionCount, 10) || 25);
+  const count = Math.max(1, parseInt(questionCount, 10) || 10);
 
-  const perQuestion = parseInt(process.env.PRACTICE_HINDI_TOKENS_PER_QUESTION, 10) || 260;
+  // Full bilingual stems need more than compact EN generation
+  const perQuestion = parseInt(process.env.PRACTICE_HINDI_TOKENS_PER_QUESTION, 10) || 420;
 
-  const cap = parseInt(process.env.PRACTICE_MAX_OUTPUT_TOKENS, 10) || 4200;
+  const cap = parseInt(process.env.PRACTICE_HINDI_MAX_OUTPUT_TOKENS, 10) || 10000;
 
-  return Math.min(cap, Math.max(1200, count * perQuestion + 150));
+  return Math.min(cap, Math.max(2000, count * perQuestion + 200));
 
 }
 

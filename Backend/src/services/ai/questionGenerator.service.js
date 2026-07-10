@@ -1,0 +1,849 @@
+import { callOpenRouterAPI } from "../openRouterService.js";
+import {
+  getPracticeGenerationModel,
+  getPracticeTranslationModel,
+  getPracticeBatchSize,
+  getPracticeGenerateBuffer,
+  getPracticeMaxRefillBatches,
+  getMaxTokensForPracticeGeneration,
+  isPracticeEnglishOnly,
+  isPracticeBatchHindiEnabled,
+} from "../../config/openRouterConfig.js";
+import { ensureEnglishBilingualFields } from "../questionTranslationService.js";
+import { notesService } from "../notes/notes.service.js";
+import { retrieverService } from "./retriever.service.js";
+import {
+  buildNotesQuestionSystemPrompt,
+  buildNotesQuestionUserPrompt,
+} from "./promptBuilder.js";
+import { resolveNotesPatterns } from "../../config/questionPatterns.js";
+import {
+  estimateRequestTokens,
+  logTokenEstimates,
+  estimateTokens,
+} from "./tokenEstimator.service.js";
+import { prepareContextForBatch, ABORT_CONTEXT_TOKENS } from "./contextReducer.service.js";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const BATCH_RETRIES = Math.max(1, Math.min(3, parseInt(process.env.PRACTICE_BATCH_RETRIES, 10) || 2));
+const TARGET_INPUT_TOKENS = parseInt(process.env.PRACTICE_TARGET_CONTEXT_TOKENS, 10) || 1200;
+
+/**
+ * Parse compact notes-grounded JSON array from LLM response.
+ */
+function parseNotesQuestions(aiContent, expectedCount, meta = {}) {
+  let content = String(aiContent || "").trim();
+  if (!content) return [];
+
+  if (content.startsWith("```")) {
+    content = content.replace(/^```\s*(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    const start = content.indexOf("[");
+    const end = content.lastIndexOf("]");
+    if (start >= 0 && end > start) {
+      try {
+        parsed = JSON.parse(content.slice(start, end + 1));
+      } catch {
+        parsed = salvageJsonObjects(content);
+      }
+    } else {
+      parsed = salvageJsonObjects(content);
+    }
+  }
+
+  const rows = Array.isArray(parsed) ? parsed : parsed?.questions || [];
+  if (!Array.isArray(rows)) return [];
+
+  return rows
+    .map((q) => normalizeNotesQuestion(q, meta))
+    .filter((q) => {
+      if (!q || !q.question || !q.correctAnswer) return false;
+      const isChrono =
+        String(q.questionType || "").includes("chronolog") ||
+        String(q.questionType || "").includes("sequence") ||
+        /arrange the following|chronological order/i.test(q.question);
+      const requiredKeys = isChrono ? ["A", "B", "C"] : ["A", "B", "C", "D"];
+      if (requiredKeys.some((k) => !q.options?.[k])) return false;
+      const normalizedOptions = requiredKeys
+        .map((k) => String(q.options[k] || "").toLowerCase().replace(/\s+/g, " ").trim());
+      if (new Set(normalizedOptions).size !== requiredKeys.length) return false;
+      if (!isCompleteUpscStem(q)) {
+        console.warn(
+          `⚠️ Dropped incomplete UPSC stem (${q.questionType}): "${String(q.question).slice(0, 80)}..."`
+        );
+        return false;
+      }
+      return true;
+    })
+    .slice(0, expectedCount);
+}
+
+/** Salvage individual question objects when the array JSON is truncated. */
+function salvageJsonObjects(content) {
+  const matches = content.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g) || [];
+  const out = [];
+  for (const m of matches) {
+    try {
+      const obj = JSON.parse(m);
+      if (obj && (obj.question || obj.question_en)) out.push(obj);
+    } catch {
+      /* skip malformed */
+    }
+  }
+  return out.length ? out : null;
+}
+
+function cleanStringList(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map((x) => String(x || "").trim()).filter((x) => x.length >= 3);
+}
+
+function normalizeMatchColumns(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const columnA = cleanStringList(raw.columnA || raw.listI || raw.list1);
+  const columnB = cleanStringList(raw.columnB || raw.listII || raw.list2);
+  if (columnA.length < 2 || columnB.length < 2) return null;
+  return { columnA, columnB };
+}
+
+function normalizeAssertionReason(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const assertion = String(raw.assertion || raw.A || "").trim();
+  const reason = String(raw.reason || raw.R || "").trim();
+  if (assertion.length < 15 || reason.length < 15) return null;
+  return { assertion, reason };
+}
+
+function countNumberedItems(text) {
+  return (String(text || "").match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+}
+
+function hasLetterAndNumberLists(text) {
+  const t = String(text || "");
+  const letters = (t.match(/(?:^|\n)\s*[A-D][.)]\s+\S+/gi) || []).length;
+  const numbers = countNumberedItems(t);
+  return letters >= 2 && numbers >= 2;
+}
+
+function formatMatchStem(intro, columnA, columnB) {
+  const lines = [String(intro || "Match the following:").replace(/\s+$/, "")];
+  if (!/:$/.test(lines[0])) lines[0] += ":";
+  columnA.forEach((item, i) => lines.push(`${String.fromCharCode(65 + i)}. ${item}`));
+  columnB.forEach((item, i) => lines.push(`${i + 1}. ${item}`));
+  lines.push("Select the correct answer using the code given below:");
+  return lines.join("\n");
+}
+
+function formatStatementStem(intro, statements) {
+  const head = String(intro || "Consider the following statements:").replace(/\s+$/, "");
+  const lines = [head.endsWith(":") ? head : `${head}:`];
+  statements.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
+  lines.push("Which of the statements given above is/are correct?");
+  return lines.join("\n");
+}
+
+function formatChronologyStem(intro, items) {
+  const head = String(intro || "Arrange the following in chronological order:").replace(/\s+$/, "");
+  const lines = [head.endsWith(":") ? head : `${head}:`];
+  items.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
+  lines.push("Select the correct chronological order:");
+  return lines.join("\n");
+}
+
+function formatAssertionStem(ar) {
+  return [
+    `Assertion (A): ${ar.assertion}`,
+    `Reason (R): ${ar.reason}`,
+    "In the context of the above, which of the following is correct?",
+  ].join("\n");
+}
+
+/**
+ * Build a full UPSC stem from structured fields when the LLM only sent an intro.
+ */
+function assembleCompleteStem(q) {
+  let questionEn = String(q.question ?? q.question_en ?? "")
+    .replace(/\\n/g, "\n")
+    .trim();
+  const questionType = String(q.questionType || q.type || "").toLowerCase();
+  const matchColumns = normalizeMatchColumns(q.matchColumns);
+  const assertionReason = normalizeAssertionReason(q.assertionReason);
+  const statements = cleanStringList(q.statements);
+  const chronologyItems = cleanStringList(q.chronologyItems || q.items || q.events);
+
+  const looksMatch =
+    questionType.includes("pair") ||
+    questionType.includes("match") ||
+    /match\s+(the\s+)?following|consider the following pairs/i.test(questionEn);
+  const looksAR =
+    questionType.includes("assertion") || /assertion\s*\(A\)/i.test(questionEn);
+  const looksChrono =
+    questionType.includes("chronolog") ||
+    questionType.includes("sequence") ||
+    /arrange the following|chronological order|कालानुक्रम/i.test(questionEn);
+  const looksStatement =
+    questionType.includes("statement") ||
+    /consider the following statements|which of the following statements/i.test(questionEn);
+
+  if (matchColumns && (looksMatch || !hasLetterAndNumberLists(questionEn))) {
+    const intro = questionEn.split("\n")[0] || "Match the following:";
+    if (!hasLetterAndNumberLists(questionEn)) {
+      questionEn = formatMatchStem(intro, matchColumns.columnA, matchColumns.columnB);
+    }
+  }
+
+  if (assertionReason && (looksAR || !/reason\s*\(R\)\s*:.+\S/i.test(questionEn))) {
+    const hasFullAR =
+      /assertion\s*\(A\)\s*:.+\S/i.test(questionEn) && /reason\s*\(R\)\s*:.+\S/i.test(questionEn);
+    if (!hasFullAR) questionEn = formatAssertionStem(assertionReason);
+  }
+
+  if (statements.length >= 2 && countNumberedItems(questionEn) < 2) {
+    const intro = questionEn.split("\n")[0] || "Consider the following statements:";
+    questionEn = formatStatementStem(intro, statements);
+  }
+
+  if (chronologyItems.length >= 2 && countNumberedItems(questionEn) < 2) {
+    const intro = questionEn.split("\n")[0] || "Arrange the following in chronological order:";
+    questionEn = formatChronologyStem(intro, chronologyItems);
+  }
+
+  // If still incomplete but looks like statement/chrono, keep as-is for reject filter
+  void looksStatement;
+  void looksChrono;
+
+  return { questionEn, matchColumns, assertionReason, questionType: questionType || "direct_conceptual" };
+}
+
+function optionsReferToNumberedItems(options = {}) {
+  const vals = ["A", "B", "C", "D"]
+    .map((k) => String(options[k] || ""))
+    .join(" ")
+    .toLowerCase();
+  return (
+    /\b1\s+and\s+2\b/.test(vals) ||
+    /\b1\s+only\b/.test(vals) ||
+    /\b1,\s*2\b/.test(vals) ||
+    /\b1-2-3/.test(vals) ||
+    /\b1,\s*2,\s*3\b/.test(vals) ||
+    /केवल\s*1/.test(vals) ||
+    /\b1\s+and\s+3\b/.test(vals)
+  );
+}
+
+/** Reject intro-only stems (missing statements/events/lists). */
+function isCompleteUpscStem(q) {
+  const text = String(q.question || "").replace(/\\n/g, "\n").trim();
+  if (text.length < 25) return false;
+
+  const type = String(q.questionType || "").toLowerCase();
+  const opts = q.options || q.options_en || {};
+  const needsNumbers = optionsReferToNumberedItems(opts);
+
+  const looksMatch =
+    type.includes("pair") ||
+    type.includes("match") ||
+    /match\s+(the\s+)?following|consider the following pairs|निम्नलिखित.*(?:मिलान|युग्म)/i.test(text);
+  const looksAR = type.includes("assertion") || /assertion\s*\(A\)|अभिकथन\s*\(A\)/i.test(text);
+  const looksChrono =
+    type.includes("chronolog") ||
+    type.includes("sequence") ||
+    /arrange the following|chronological order|कालानुक्रम/i.test(text);
+  const looksStatement =
+    type.includes("statement") ||
+    /consider the following statements|which of the following statements|निम्नलिखित(?: में से)?.*कथन/i.test(
+      text
+    );
+
+  if (
+    /^(match the following|arrange the following[\s\S]{0,80}|consider the following statements[\s\S]{0,80}|which of the following statements[\s\S]{0,80})\s*:?\s*$/i.test(
+      text
+    )
+  ) {
+    return false;
+  }
+
+  if (looksMatch) {
+    if (q.matchColumns?.columnA?.length >= 2 && q.matchColumns?.columnB?.length >= 2) return true;
+    return hasLetterAndNumberLists(text);
+  }
+
+  if (looksAR) {
+    if (q.assertionReason?.assertion?.length >= 15 && q.assertionReason?.reason?.length >= 15) {
+      return true;
+    }
+    return (
+      /assertion\s*\(A\)\s*:\s*.+\S/i.test(text) && /reason\s*\(R\)\s*:\s*.+\S/i.test(text)
+    );
+  }
+
+  // Chronology / statements / options like "1 and 2 only" REQUIRE numbered items in stem
+  if (looksChrono || looksStatement || needsNumbers) {
+    return countNumberedItems(text) >= 2;
+  }
+
+  return true;
+}
+
+function filterGroundedQuestions(questions) {
+  return questions || [];
+}
+
+function normalizeNotesQuestion(q, meta = {}) {
+  let optionsArr = [];
+  if (Array.isArray(q.options)) {
+    optionsArr = q.options.map((o) => String(o || "").trim());
+  } else if (q.options && typeof q.options === "object") {
+    optionsArr = ["A", "B", "C", "D"].map((k) => String(q.options[k] ?? q.options[k.toLowerCase()] ?? "").trim());
+  }
+
+  let correct = String(q.answer ?? q.correctAnswer ?? "").toUpperCase().trim().charAt(0);
+  if (["1", "2", "3", "4"].includes(correct)) {
+    correct = ["A", "B", "C", "D"][parseInt(correct, 10) - 1];
+  }
+  if (!["A", "B", "C", "D"].includes(correct)) correct = null;
+
+  const assembled = assembleCompleteStem(q);
+  const questionEn = assembled.questionEn;
+  const questionType = assembled.questionType || "direct_conceptual";
+  const isChrono =
+    questionType.includes("chronolog") ||
+    questionType.includes("sequence") ||
+    /arrange the following|chronological order/i.test(questionEn);
+
+  // Chronology UI shows 3 options; schema still stores D
+  if (isChrono && optionsArr[0] && optionsArr[1] && optionsArr[2] && !optionsArr[3]) {
+    optionsArr[3] = "None of the above";
+  }
+  if (isChrono && correct === "D") {
+    // prefer A–C for chronology; if model marked D, keep only if text exists
+  }
+
+  const explanationRaw = String(q.explanation ?? q.explanation_en ?? "").trim();
+  // Keep 2–3 clear sentences (best explanation, not a notes dump)
+  const explanation = explanationRaw
+    .split(/(?<=[.!?।])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(" ")
+    .trim()
+    .slice(0, 600);
+  // Short source quote only — never dump long notes into UI "Source"
+  let sourceChunk = String(q.sourceParagraph || q.sourceChunk || q.source_chunk || q.source || "").trim();
+  sourceChunk = sourceChunk.replace(/\s+/g, " ").slice(0, 180);
+  const subject = String(q.subject || meta.subject || "").trim();
+  const chapter = String(q.chapter || meta.chapter || "").trim();
+  const topic = String(q.topic || meta.topic || "").trim();
+  const answerAlias = correct;
+
+  const base = ensureEnglishBilingualFields({
+    question: questionEn,
+    question_en: questionEn,
+    options: {
+      A: optionsArr[0] || "",
+      B: optionsArr[1] || "",
+      C: optionsArr[2] || "",
+      D: optionsArr[3] || "",
+    },
+    options_en: {
+      A: optionsArr[0] || "",
+      B: optionsArr[1] || "",
+      C: optionsArr[2] || "",
+      D: optionsArr[3] || "",
+    },
+    correctAnswer: correct,
+    answer: answerAlias,
+    explanation,
+    explanation_en: explanation,
+    questionType,
+    difficulty: ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
+      ? String(q.difficulty).toLowerCase()
+      : "moderate",
+    conceptualSource: sourceChunk,
+    sourceParagraph: sourceChunk,
+    subject,
+    chapter,
+    topic,
+  });
+
+  if (assembled.matchColumns) base.matchColumns = assembled.matchColumns;
+  if (assembled.assertionReason) base.assertionReason = assembled.assertionReason;
+  return base;
+}
+
+function dedupeQuestions(questions) {
+  const seen = new Set();
+  const out = [];
+  for (const q of questions) {
+    const key = String(q.question || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .slice(0, 120);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(q);
+  }
+  return out;
+}
+
+/**
+ * One OpenRouter call for `requestCount` questions using prepared context + prompts.
+ */
+async function callNotesBatchOnce({
+  apiKey,
+  model,
+  requestCount,
+  safeContext,
+  topic,
+  difficulty,
+  batchLabel,
+  patternsToInclude,
+  batchIndex,
+  generationPlan,
+  subject,
+  chapter,
+  temperature = 0.2,
+}) {
+  const systemPrompt = buildNotesQuestionSystemPrompt();
+  const userPrompt = buildNotesQuestionUserPrompt({
+    context: safeContext,
+    topic,
+    subject,
+    chapter,
+    difficulty,
+    questionCount: requestCount,
+    patternsToInclude,
+    batchIndex,
+    generationPlan,
+  });
+
+  const estimates = estimateRequestTokens({
+    systemPrompt,
+    userPrompt,
+    questionCount: requestCount,
+  });
+  logTokenEstimates(batchLabel, estimates);
+
+  const maxTokens = getMaxTokensForPracticeGeneration(requestCount);
+  const startedAt = Date.now();
+  const result = await callOpenRouterAPI({
+    apiKey,
+    model,
+    systemPrompt,
+    userPrompt,
+    temperature,
+    maxTokens,
+  });
+
+  if (!result.success) {
+    return {
+      questions: [],
+      usage: {},
+      model,
+      durationMs: Date.now() - startedAt,
+      error: result.error,
+    };
+  }
+
+  const parsed = filterGroundedQuestions(
+    parseNotesQuestions(result.content, requestCount, { subject, chapter, topic })
+  );
+
+  return {
+    questions: parsed,
+    usage: result.usage || {},
+    model: result.model || model,
+    durationMs: Date.now() - startedAt,
+  };
+}
+
+async function generateNotesBatch({
+  apiKey,
+  model,
+  batchSize,
+  contextText,
+  topic,
+  difficulty,
+  batchLabel = "",
+  patternsToInclude = [],
+  batchIndex = 0,
+  generationPlan = null,
+  subject = "",
+  chapter = "",
+}) {
+  // Cap at 10 questions per request (Rule 5)
+  const safeBatchSize = Math.min(10, Math.max(1, parseInt(batchSize, 10) || 10));
+  const MAX_FILL_ROUNDS = Math.max(3, parseInt(process.env.PRACTICE_BATCH_FILL_ROUNDS, 10) || 5);
+
+  if (!contextText || contextText.length < 40) {
+    console.warn(`⚠️ Notes batch ${batchLabel}: empty context, skipping`);
+    return { questions: [], usage: {}, model, durationMs: 0 };
+  }
+
+  const prepared = prepareContextForBatch(contextText, {
+    batchIndex,
+    targetTokens: TARGET_INPUT_TOKENS,
+    abortTokens: ABORT_CONTEXT_TOKENS,
+  });
+  let safeContext = prepared.context;
+  if (!safeContext || safeContext.length < 40) {
+    console.warn(`⚠️ Notes batch ${batchLabel}: context empty after reduction, skipping`);
+    return { questions: [], usage: {}, model, durationMs: 0 };
+  }
+
+  if (prepared.reduced || prepared.summarized) {
+    console.log(
+      `📉 Context ${batchLabel || `Batch ${batchIndex + 1}`}: chunk ${prepared.chunkIndex + 1}/${prepared.totalChunks || 1}, tokens=${prepared.tokens}, reduced=${prepared.reduced}, summarized=${prepared.summarized}`
+    );
+  }
+
+  if (estimateTokens(safeContext) > ABORT_CONTEXT_TOKENS) {
+    const { summarizeContext } = await import("./contextReducer.service.js");
+    safeContext = summarizeContext(safeContext, TARGET_INPUT_TOKENS);
+    console.log(
+      `🛑 Context exceeded ${ABORT_CONTEXT_TOKENS} tokens — summarized to ${estimateTokens(safeContext)} before Gemini call`
+    );
+  }
+
+  // Shrink notes if prompt overhead pushes total input over abort
+  {
+    const systemPrompt = buildNotesQuestionSystemPrompt();
+    const probeUser = buildNotesQuestionUserPrompt({
+      context: safeContext,
+      topic,
+      subject,
+      chapter,
+      difficulty,
+      questionCount: safeBatchSize,
+      patternsToInclude,
+      batchIndex,
+      generationPlan,
+    });
+    const probe = estimateRequestTokens({
+      systemPrompt,
+      userPrompt: probeUser,
+      questionCount: safeBatchSize,
+    });
+    if (probe.inputTokens > ABORT_CONTEXT_TOKENS) {
+      const { reduceToImportantContent } = await import("./contextReducer.service.js");
+      const overhead = probe.systemTokens + 120;
+      safeContext = reduceToImportantContent(safeContext, Math.max(500, TARGET_INPUT_TOKENS - overhead));
+    }
+  }
+
+  const collected = [];
+  let usageSum = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+  let modelUsed = model;
+  let durationMs = 0;
+  let fill = 0;
+  // Prefer 1 call of 10; only fill remaining (max 2 extra calls) → fewer API hits
+  const MAX_FILL = Math.min(3, MAX_FILL_ROUNDS);
+
+  while (collected.length < safeBatchSize && fill < MAX_FILL) {
+    const need = safeBatchSize - collected.length;
+    // First attempt: request full batch. Later fills: only the gap (≤5).
+    const requestCount = fill === 0 ? need : Math.min(need, 5);
+    const label = `${batchLabel || `Batch ${batchIndex + 1}`} fill ${fill + 1} (need ${need}, req ${requestCount})`;
+
+    const once = await callNotesBatchOnce({
+      apiKey,
+      model,
+      requestCount,
+      safeContext,
+      topic,
+      difficulty,
+      batchLabel: label,
+      patternsToInclude,
+      batchIndex: batchIndex + fill,
+      generationPlan,
+      subject,
+      chapter,
+      temperature: fill === 0 ? 0.2 : 0.35,
+    });
+
+    durationMs += once.durationMs || 0;
+    modelUsed = once.model || modelUsed;
+    if (once.usage) {
+      usageSum.prompt_tokens += once.usage.prompt_tokens || 0;
+      usageSum.completion_tokens += once.usage.completion_tokens || 0;
+      usageSum.total_tokens +=
+        once.usage.total_tokens ||
+        (once.usage.prompt_tokens || 0) + (once.usage.completion_tokens || 0);
+    }
+
+    if (once.error) {
+      console.warn(`⚠️ Notes batch ${label}: API error — ${once.error}`);
+      fill += 1;
+      await sleep(400 * fill);
+      continue;
+    }
+
+    const before = collected.length;
+    collected.push(...(once.questions || []));
+    const uniq = dedupeQuestions(collected);
+    collected.length = 0;
+    collected.push(...uniq);
+
+    console.log(
+      `✅ Notes batch ${label}: +${collected.length - before} unique → ${collected.length}/${safeBatchSize}`
+    );
+
+    if (collected.length >= safeBatchSize) break;
+    fill += 1;
+    if (collected.length === before) await sleep(300);
+  }
+
+  const finalQs = collected.slice(0, safeBatchSize);
+  if (finalQs.length < safeBatchSize) {
+    console.warn(
+      `⚠️ Notes batch ${batchLabel}: only ${finalQs.length}/${safeBatchSize} after ${fill} fill rounds`
+    );
+  } else {
+    console.log(`✅ Notes batch ${batchLabel}: ${finalQs.length}/${safeBatchSize} questions ready`);
+  }
+
+  return {
+    questions: finalQs,
+    usage: usageSum,
+    model: modelUsed,
+    durationMs,
+  };
+}
+
+export async function generateQuestionsFromContextBatch({
+  contextText,
+  topic,
+  difficulty = "moderate",
+  batchSize = 10,
+  patternsToInclude = [],
+  batchIndex = 0,
+  generationPlan = null,
+  subject = "",
+  chapter = "",
+}) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const model = getPracticeGenerationModel();
+  if (!apiKey) {
+    return { success: false, error: "Missing OPENROUTER_API_KEY", questions: [] };
+  }
+  const result = await generateNotesBatch({
+    apiKey,
+    model,
+    batchSize,
+    contextText,
+    topic,
+    difficulty,
+    batchLabel: `Batch ${batchIndex + 1}`,
+    patternsToInclude,
+    batchIndex,
+    generationPlan,
+    subject,
+    chapter,
+  });
+  return {
+    success: result.questions.length > 0,
+    questions: result.questions,
+    usage: result.usage || {},
+    model: result.model || model,
+    durationMs: result.durationMs || 0,
+  };
+}
+
+/**
+ * Generate UPSC MCQs strictly from synced notes — RAG + token-optimized batches.
+ */
+export async function generateQuestionsFromNotes({
+  notesTopicId,
+  notesTopicIds,
+  subject,
+  chapter,
+  topic,
+  difficulty = "moderate",
+  questionCount = 50,
+  patternsToInclude = [],
+  generationPlan = null,
+}) {
+  try {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    const model = getPracticeGenerationModel();
+    if (!apiKey) throw new Error("Missing OPENROUTER_API_KEY");
+
+    const topicIds = Array.isArray(notesTopicIds) && notesTopicIds.length > 0
+      ? [...new Set(notesTopicIds.map((id) => String(id)).filter(Boolean))]
+      : notesTopicId
+        ? [String(notesTopicId)]
+        : [];
+
+    const topicMetas = await notesService.assertTopicsHaveContent(topicIds);
+    const topicStr =
+      topic ||
+      (topicMetas.length <= 3
+        ? topicMetas.map((n) => n.topic.name).join(" · ")
+        : `${topicMetas
+            .slice(0, 2)
+            .map((n) => n.topic.name)
+            .join(" · ")} · +${topicMetas.length - 2} more`);
+    const subjectStr = subject || topicMetas[0]?.topic.subject || "";
+    const activePatterns = resolveNotesPatterns(patternsToInclude);
+    const displayCount = Math.max(10, Math.min(50, parseInt(questionCount, 10) || 50));
+
+    const perBatch = getPracticeBatchSize();
+    const buffer = getPracticeGenerateBuffer();
+    const target = displayCount + buffer;
+    const plannedBatches = Math.ceil(target / perBatch);
+    const maxRefills = getPracticeMaxRefillBatches();
+
+    console.log(
+      `📚 Notes-grounded RAG: ${displayCount}Q for "${topicStr}" | topics=${topicMetas.length} | batch=${perBatch} | patterns=${activePatterns.length} | planned=${plannedBatches} batches`
+    );
+
+    let allQuestions = [];
+    let apiCalls = 0;
+    let batchIndex = 0;
+
+    const runBatch = async (size, label) => {
+      const topicMeta = topicMetas[batchIndex % topicMetas.length];
+      const activeTopicId = String(topicMeta.topic._id);
+      const activeTopicName = topicMeta.topic.name;
+      const contextText = await retrieverService.getContextForBatch({
+        topicId: activeTopicId,
+        batchIndex,
+        topicName: activeTopicName,
+        subject: subjectStr,
+      });
+      batchIndex += 1;
+      apiCalls += 1;
+      return generateNotesBatch({
+        apiKey,
+        model,
+        batchSize: size,
+        contextText,
+        topic: activeTopicName,
+        difficulty,
+        batchLabel: `${label} [${activeTopicName}]`,
+        patternsToInclude: activePatterns,
+        batchIndex: batchIndex - 1,
+        generationPlan,
+        subject: subjectStr,
+        chapter,
+      });
+    };
+
+    // Phase 1 — planned batches
+    for (let b = 1; b <= plannedBatches; b += 1) {
+      const need = Math.min(perBatch, target - allQuestions.length);
+      if (need <= 0) break;
+      console.log(`📝 Notes batch ${b}/${plannedBatches}: requesting ${need} question(s)...`);
+      const batch = await runBatch(need, `Part ${b}`);
+      if (batch.questions?.length) {
+        allQuestions = dedupeQuestions([...allQuestions, ...batch.questions]);
+      }
+    }
+
+    let deduped = dedupeQuestions(allQuestions);
+    let refill = 0;
+    let stallRounds = 0;
+
+    // Phase 2 — refill until target unique count
+    while (deduped.length < displayCount && refill < maxRefills) {
+      const before = deduped.length;
+      const need = Math.max(1, Math.min(perBatch, displayCount - deduped.length));
+      console.log(
+        `📝 Notes refill ${refill + 1}/${maxRefills}: unique ${deduped.length}/${displayCount}, requesting ${need}...`
+      );
+      const batch = await runBatch(need, `Refill ${refill + 1}`);
+      if (batch.questions?.length) {
+        allQuestions = dedupeQuestions([...allQuestions, ...batch.questions]);
+        deduped = allQuestions;
+      }
+      refill += 1;
+      stallRounds = deduped.length === before ? stallRounds + 1 : 0;
+      if (stallRounds >= 5) {
+        console.warn(`⚠️ Notes refill stalled after ${stallRounds} rounds with no new questions`);
+        break;
+      }
+    }
+
+    // Phase 3 — micro top-up for remaining gap
+    if (deduped.length < displayCount) {
+      const gap = displayCount - deduped.length;
+      const topUpRounds = Math.min(gap + 2, 6);
+      console.log(`📝 Notes top-up: short by ${gap}, up to ${topUpRounds} micro batches...`);
+      for (let t = 0; t < topUpRounds && deduped.length < displayCount; t += 1) {
+        const need = displayCount - deduped.length;
+        const batch = await runBatch(need, `Top-up ${t + 1}`);
+        if (batch.questions?.length) {
+          allQuestions = dedupeQuestions([...allQuestions, ...batch.questions]);
+          deduped = allQuestions;
+        }
+      }
+    }
+
+    if (deduped.length === 0) {
+      throw new Error("No valid questions generated from notes. Please try again.");
+    }
+
+    let finalQuestions = deduped.slice(0, displayCount);
+
+    const minAcceptable = Math.max(displayCount - 8, Math.floor(displayCount * 0.85));
+    if (finalQuestions.length < minAcceptable) {
+      throw new Error(
+        `Only ${finalQuestions.length} of ${displayCount} questions were generated from notes. Please try again.`
+      );
+    }
+
+    if (finalQuestions.length < displayCount) {
+      console.warn(`⚠️ Returning ${finalQuestions.length}/${displayCount} questions (below target but acceptable)`);
+    }
+
+    if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled()) {
+      finalQuestions = await translatePracticeBatch(apiKey, finalQuestions);
+    }
+
+    console.log(`✅ Notes-grounded: ${finalQuestions.length} questions for "${topicStr}" (${apiCalls} API calls)`);
+
+    return {
+      success: true,
+      questions: finalQuestions,
+      count: finalQuestions.length,
+      meta: {
+        notesTopicId: topicIds[0],
+        notesTopicIds: topicIds,
+        sourceUrl: topicMetas[0]?.topic.sourceUrl,
+        apiCalls,
+        ragBatches: batchIndex,
+        patternsToInclude: activePatterns,
+        topicCount: topicMetas.length,
+      },
+    };
+  } catch (error) {
+    console.error("generateQuestionsFromNotes:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to generate questions from notes",
+      questions: [],
+    };
+  }
+}
+
+async function translatePracticeBatch(apiKey, questions) {
+  try {
+    const { batchTranslatePracticeQuestionsToHindi } = await import("../testGenerationService.js");
+    if (typeof batchTranslatePracticeQuestionsToHindi === "function") {
+      return batchTranslatePracticeQuestionsToHindi(apiKey, getPracticeTranslationModel(), questions);
+    }
+  } catch {
+    /* fall through */
+  }
+  return questions.map(ensureEnglishBilingualFields);
+}
+
+export const questionGeneratorService = { generateQuestionsFromNotes, generateQuestionsFromContextBatch };
+export default questionGeneratorService;

@@ -476,15 +476,34 @@ export function ExamBilingualStem({
   );
 }
 
+function hasUsableMatchColumns(cols?: { columnA?: string[]; columnB?: string[] } | null): boolean {
+  const a = (cols?.columnA || []).filter((x) => String(x || "").trim().length >= 2);
+  const b = (cols?.columnB || []).filter((x) => String(x || "").trim().length >= 2);
+  return a.length >= 2 && b.length >= 2;
+}
+
 function detectMatch(question: ExamQuestionBodyProps["question"]): boolean {
-  if ((question.matchColumns?.columnA?.length ?? 0) > 0) return true;
+  if (hasUsableMatchColumns(question.matchColumns) || hasUsableMatchColumns(question.matchColumns_hi)) {
+    return true;
+  }
   const en = getQuestionEnglish(question);
   const hi = getQuestionHindi(question, { strict: true });
-  return Boolean(parseMatchFollowingFromText(en) || (hi && parseMatchFollowingFromText(hi)));
+  const enParsed = parseMatchFollowingFromText(en);
+  const hiParsed = hi ? parseMatchFollowingFromText(hi) : null;
+  return Boolean(
+    (enParsed && enParsed.columnA.length >= 2 && enParsed.columnB.length >= 2) ||
+      (hiParsed && hiParsed.columnA.length >= 2 && hiParsed.columnB.length >= 2)
+  );
+}
+
+function hasUsableAssertion(ar?: { assertion?: string; reason?: string } | null): boolean {
+  return Boolean(
+    String(ar?.assertion || "").trim().length >= 10 && String(ar?.reason || "").trim().length >= 10
+  );
 }
 
 function detectAssertion(question: ExamQuestionBodyProps["question"]): boolean {
-  if (question.assertionReason?.assertion) return true;
+  if (hasUsableAssertion(question.assertionReason)) return true;
   const en = getQuestionEnglish(question);
   const hi = getQuestionHindi(question, { strict: true });
   return isAssertionReasonText(en) || isAssertionReasonText(hi);

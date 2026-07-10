@@ -1,5 +1,5 @@
 const MATCH_INTRO_RE =
-  /match\s+(?:the\s+)?following|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*मिलान|सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२]|सूची[- ]?i.*(?:मिला|से)/i;
+  /match\s+(?:the\s+)?following|consider the following pairs|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*(?:मिलान|युग्म)|सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२]|सूची[- ]?i.*(?:मिला|से)/i;
 const MATCH_PROMPT_RE =
   /select the correct|code given below|नीचे दिए गए|सही उत्तर|सही जोड़ी|कूट/i;
 const MATCH_SECTION_SKIP =
@@ -70,15 +70,10 @@ function extractMatchPrompt(text) {
 }
 
 function parseMatchParagraph(text) {
-  const listIISplit = text.split(/(?:सूची[- ]?II|list[- ]?ii)\s*\(/i);
+  // Prefer explicit List-II / सूची-II header (with or without parenthesis)
+  const listIISplit = text.split(/(?:सूची[- ]?(?:II|2|२)|list[- ]?ii)\s*(?:\([^)]*\))?\s*:?/i);
   const beforeListII = listIISplit[0] || text;
-  const afterListII =
-    listIISplit.length > 1
-      ? listIISplit
-          .slice(1)
-          .map((part, i) => (i === 0 ? `(${part}` : part))
-          .join("")
-      : "";
+  const afterListII = listIISplit.length > 1 ? listIISplit.slice(1).join("") : "";
 
   const columnA = extractLetteredColumnItems(beforeListII);
   if (columnA.length < 2) return null;
@@ -88,9 +83,16 @@ function parseMatchParagraph(text) {
     columnB = extractNumberedColumnItems(text.slice(beforeListII.length));
   }
 
+  // Drop List-II bleed into columnA (e.g. "Objectivity 1. definition...")
+  const cleanedA = columnA.map((item) =>
+    String(item)
+      .replace(/\s+\d+[.)]\s+[\s\S]*$/, "")
+      .trim()
+  );
+
   return {
     intro: extractMatchIntro(text, beforeListII),
-    columnA,
+    columnA: cleanedA,
     columnB,
     prompt: extractMatchPrompt(text),
   };
@@ -131,7 +133,9 @@ export function parseMatchFollowingFromText(text) {
         columnA.push(embedded[1].trim());
         columnB.push(embedded[3].trim());
       } else {
-        columnA.push(rest);
+        // Strip accidental List-II bleed: "Objectivity 1. long definition..."
+        const bleed = rest.match(/^(.+?)\s+\d+[.)]\s+/);
+        columnA.push(bleed ? bleed[1].trim() : rest);
       }
       continue;
     }
@@ -178,9 +182,11 @@ export function parseMatchFollowingFromText(text) {
 
 export function formatMatchColumnsAsText(questionEn, columnA, columnB) {
   const lines = [String(questionEn || "").trim() || "Match the following:"];
+  lines.push("List-I");
   (columnA || []).forEach((item, i) => {
     if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${String(item).trim()}`);
   });
+  lines.push("List-II");
   (columnB || []).forEach((item, i) => {
     if (String(item || "").trim()) lines.push(`${i + 1}. ${String(item).trim()}`);
   });
@@ -191,7 +197,20 @@ export function formatMatchColumnsAsText(questionEn, columnA, columnB) {
 export function buildMatchQuestionTextForTranslation(q) {
   const en = String(q.question_en || q.question || "").trim();
   if (q.matchColumns?.columnA?.length) {
-    return formatMatchColumnsAsText(en, q.matchColumns.columnA, q.matchColumns.columnB || []);
+    return formatMatchColumnsAsText(
+      en.split("\n")[0] || "Match the following:",
+      q.matchColumns.columnA,
+      q.matchColumns.columnB || []
+    );
   }
   return en;
+}
+
+/** Structured payload fields for reliable Hindi match translation. */
+export function buildMatchColumnsPayload(q) {
+  if (!q?.matchColumns?.columnA?.length) return null;
+  return {
+    columnA: (q.matchColumns.columnA || []).map((x) => String(x || "").trim()).filter(Boolean),
+    columnB: (q.matchColumns.columnB || []).map((x) => String(x || "").trim()).filter(Boolean),
+  };
 }
