@@ -16,7 +16,7 @@ const QUESTIONS_PER_BATCH = 10;
 const TOTAL_BATCHES = 5;
 const TARGET_QUESTIONS = 50;
 const MIN_ACCEPTABLE_QUESTIONS = parseInt(process.env.PRACTICE_MIN_ACCEPTABLE_QUESTIONS, 10) || 50;
-const MAX_TOPUP_BATCHES = parseInt(process.env.PRACTICE_MAX_TOPUP_BATCHES, 10) || 12;
+const MAX_TOPUP_BATCHES = parseInt(process.env.PRACTICE_MAX_TOPUP_BATCHES, 10) || 20;
 const ESTIMATED_COST_PER_1K_TOKENS_USD = parseFloat(process.env.PRACTICE_COST_PER_1K_TOKENS_USD || "0.00035");
 
 function usageTotals(usage = {}) {
@@ -111,15 +111,19 @@ export async function runAssignedPracticeGeneration({
 
   /**
    * Pick ONE topic for this batch index — never concatenate topics (Rule 1).
-   * Rotate across selected topics only when admin selected more than one.
+   * Rotate across selected topics; prefer topics with enough notes text.
    */
   const pickSingleTopicContext = (batchIndex) => {
-    const activeTopicId = uniqueTopicIds[batchIndex % uniqueTopicIds.length];
+    const usable = uniqueTopicIds.filter((id) => {
+      const t = topicNotesMap.get(String(id));
+      return (t?.cleanText || "").length >= 80;
+    });
+    const pool = usable.length ? usable : uniqueTopicIds;
+    const activeTopicId = pool[batchIndex % pool.length];
     const topicNotes = topicNotesMap.get(String(activeTopicId));
     const fullText = topicNotes?.cleanText || "";
     const activeTopicName = topicNotes?.topic?.name || topicName;
 
-    // Pre-log chunk plan (actual reduction happens in QuestionGenerator)
     const preview = prepareContextForBatch(fullText, { batchIndex });
     console.log(
       `📚 Batch context: topic="${activeTopicName}" words=${countWords(fullText)} → chunk ${preview.chunkIndex + 1}/${preview.totalChunks || 1} (~${preview.tokens} tokens)`
@@ -128,7 +132,6 @@ export async function runAssignedPracticeGeneration({
     return {
       topicId: activeTopicId,
       topicName: activeTopicName,
-      // Pass full single-topic text; QuestionGenerator chunks+reduces for this batchIndex
       contextText: fullText,
       previewTokens: preview.tokens,
     };
@@ -240,20 +243,44 @@ export async function runAssignedPracticeGeneration({
     await mergeBatch(batchResult, batch + 1);
   }
 
-  // Top-up only if short of 50 — still 10Q max per request, one topic each
+  // Ensure UI shows all 5 batch steps done before top-up refill
+  await updateProgress(assignedPracticeId, {
+    "generationProgress.completedBatches": TOTAL_BATCHES,
+    "generationProgress.batchSteps.0": true,
+    "generationProgress.batchSteps.1": true,
+    "generationProgress.batchSteps.2": true,
+    "generationProgress.batchSteps.3": true,
+    "generationProgress.batchSteps.4": true,
+    "generationProgress.generatedQuestions": generatedQuestions.length,
+    "generationProgress.currentStep":
+      generatedQuestions.length >= TARGET_QUESTIONS ? "completed" : "topup",
+  });
+
+  // Top-up until exactly 50 — over-request to beat duplicates / incomplete-stem drops
   let topup = 0;
   let stallRounds = 0;
   while (generatedQuestions.length < TARGET_QUESTIONS && topup < MAX_TOPUP_BATCHES) {
-    const need = Math.min(QUESTIONS_PER_BATCH, TARGET_QUESTIONS - generatedQuestions.length);
+    const gap = TARGET_QUESTIONS - generatedQuestions.length;
+    // Ask for more than the gap so rejects/dupes still leave enough unique Qs
+    const need = Math.min(
+      QUESTIONS_PER_BATCH,
+      gap <= 2 ? Math.min(QUESTIONS_PER_BATCH, gap + 4) : Math.min(QUESTIONS_PER_BATCH, gap + 2)
+    );
     const before = generatedQuestions.length;
 
     console.log(
-      `📝 Notes top-up ${topup + 1}/${MAX_TOPUP_BATCHES}: ${before}/${TARGET_QUESTIONS}, requesting ${need}...`
+      `📝 Notes top-up ${topup + 1}/${MAX_TOPUP_BATCHES}: ${before}/${TARGET_QUESTIONS}, requesting ${need} (gap ${gap})...`
     );
 
+    await updateProgress(assignedPracticeId, {
+      "generationProgress.currentStep": `topup_${topup + 1}`,
+      "generationProgress.generatedQuestions": generatedQuestions.length,
+    });
+
+    // Jump topic/chunk index so top-ups don't reuse the same thin slice
     const batchResult = await runOneBatch({
       batchSize: need,
-      batchIndex: TOTAL_BATCHES + topup,
+      batchIndex: TOTAL_BATCHES + topup * 2 + stallRounds,
       label: `Top-up ${topup + 1}`,
     });
 
@@ -262,12 +289,35 @@ export async function runAssignedPracticeGeneration({
 
     if (generatedQuestions.length === before) {
       stallRounds += 1;
-      if (stallRounds >= 4) {
+      if (stallRounds >= 8) {
         console.warn(`⚠️ Notes top-up stalled after ${stallRounds} rounds with no new unique questions`);
         break;
       }
     } else {
       stallRounds = 0;
+    }
+  }
+
+  // Final hard refill if still short (different topic rotation seed)
+  if (generatedQuestions.length < TARGET_QUESTIONS) {
+    const hardRounds = Math.min(10, TARGET_QUESTIONS - generatedQuestions.length + 3);
+    console.log(
+      `🔁 Hard refill: ${generatedQuestions.length}/${TARGET_QUESTIONS}, up to ${hardRounds} more batches...`
+    );
+    for (let h = 0; h < hardRounds && generatedQuestions.length < TARGET_QUESTIONS; h += 1) {
+      const gap = TARGET_QUESTIONS - generatedQuestions.length;
+      const need = Math.min(QUESTIONS_PER_BATCH, Math.max(3, gap + 2));
+      const before = generatedQuestions.length;
+      const batchResult = await runOneBatch({
+        batchSize: need,
+        batchIndex: 17 + h * 3,
+        label: `Hard-refill ${h + 1}`,
+      });
+      await mergeBatch(batchResult, undefined);
+      if (generatedQuestions.length === before) {
+        // try next topic seed immediately
+        continue;
+      }
     }
   }
 
@@ -277,10 +327,11 @@ export async function runAssignedPracticeGeneration({
   if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled()) {
     finalQuestions = await translatePracticeQuestionsToHindi(finalQuestions);
   }
-  const isReady = finalQuestions.length >= MIN_ACCEPTABLE_QUESTIONS;
+  // Require full 50 — do not mark ready with a short set
+  const isReady = finalQuestions.length >= Math.min(MIN_ACCEPTABLE_QUESTIONS, TARGET_QUESTIONS);
   const errorMessage = isReady
     ? finalQuestions.length < TARGET_QUESTIONS
-      ? `Generated ${finalQuestions.length}/${TARGET_QUESTIONS} questions from notes (acceptable threshold reached).`
+      ? `Generated ${finalQuestions.length}/${TARGET_QUESTIONS} questions from notes (short of target).`
       : ""
     : `Only ${finalQuestions.length}/${TARGET_QUESTIONS} questions generated from notes. Please try again.`;
 

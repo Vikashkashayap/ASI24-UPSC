@@ -543,20 +543,36 @@ async function generateNotesBatch({
   let modelUsed = model;
   let durationMs = 0;
   let fill = 0;
-  // Prefer 1 call of 10; only fill remaining (max 2 extra calls) → fewer API hits
-  const MAX_FILL = Math.min(3, MAX_FILL_ROUNDS);
+  // Enough fill rounds to absorb incomplete-stem drops + duplicates
+  const MAX_FILL = Math.max(5, Math.min(8, MAX_FILL_ROUNDS));
 
   while (collected.length < safeBatchSize && fill < MAX_FILL) {
     const need = safeBatchSize - collected.length;
-    // First attempt: request full batch. Later fills: only the gap (≤5).
-    const requestCount = fill === 0 ? need : Math.min(need, 5);
+    // First attempt: full batch. Later fills: over-request so rejects/dupes don't leave a gap.
+    const requestCount =
+      fill === 0
+        ? need
+        : Math.min(10, Math.max(need, need <= 2 ? 5 : Math.min(need + 2, 8)));
     const label = `${batchLabel || `Batch ${batchIndex + 1}`} fill ${fill + 1} (need ${need}, req ${requestCount})`;
+
+    // Rotate context chunk on stalled fills so we don't keep hitting the same thin slice
+    let fillContext = safeContext;
+    if ((fill > 0 && collected.length === 0) || fill >= 2) {
+      const rotated = prepareContextForBatch(contextText, {
+        batchIndex: batchIndex + fill + 3,
+        targetTokens: TARGET_INPUT_TOKENS,
+        abortTokens: ABORT_CONTEXT_TOKENS,
+      });
+      if (rotated.context && rotated.context.length >= 80) {
+        fillContext = rotated.context;
+      }
+    }
 
     const once = await callNotesBatchOnce({
       apiKey,
       model,
       requestCount,
-      safeContext,
+      safeContext: fillContext,
       topic,
       difficulty,
       batchLabel: label,
@@ -565,7 +581,7 @@ async function generateNotesBatch({
       generationPlan,
       subject,
       chapter,
-      temperature: fill === 0 ? 0.2 : 0.35,
+      temperature: fill === 0 ? 0.2 : Math.min(0.55, 0.3 + fill * 0.05),
     });
 
     durationMs += once.durationMs || 0;
@@ -597,7 +613,7 @@ async function generateNotesBatch({
 
     if (collected.length >= safeBatchSize) break;
     fill += 1;
-    if (collected.length === before) await sleep(300);
+    if (collected.length === before) await sleep(350 * fill);
   }
 
   const finalQs = collected.slice(0, safeBatchSize);
