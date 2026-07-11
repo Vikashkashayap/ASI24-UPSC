@@ -359,6 +359,14 @@ export interface AssignedPracticeGeneratePayload {
   patternsToInclude?: string[];
 }
 
+export interface AssignedPracticeFromUrlPayload {
+  url: string;
+  difficulty?: "easy" | "moderate" | "hard";
+  questionCount?: number;
+  title?: string;
+  patternsToInclude?: string[];
+}
+
 export interface NotesChapter {
   _id: string | null;
   title: string;
@@ -439,6 +447,8 @@ export const assignedPracticeAPI = {
   // Admin
   generate: (data: AssignedPracticeGeneratePayload) =>
     api.post("/api/admin/assigned-practice", data),
+  generateFromUrl: (data: AssignedPracticeFromUrlPayload) =>
+    api.post("/api/admin/assigned-practice/from-url", data),
   getById: (id: string) => api.get(`/api/admin/assigned-practice/${id}`),
   assign: (id: string, studentIds: string[]) =>
     api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),

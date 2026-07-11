@@ -93,6 +93,21 @@ function buildMultiTopicLabel(topicMetas = []) {
   return `${names.slice(0, 2).join(" · ")} · +${names.length - 2} more`;
 }
 
+function explanationToString(explanation, correctAnswer = "A") {
+  if (typeof explanation === "string") return explanation.trim();
+  if (!explanation || typeof explanation !== "object") return "";
+  const key = String(correctAnswer || "A").toUpperCase();
+  const fromKey = explanation[key] ?? explanation.A ?? explanation.B ?? explanation.C ?? explanation.D;
+  if (typeof fromKey === "string" && fromKey.trim()) return fromKey.trim();
+  // Same text on all keys — pick first non-empty
+  for (const k of ["A", "B", "C", "D"]) {
+    if (typeof explanation[k] === "string" && explanation[k].trim()) {
+      return explanation[k].trim();
+    }
+  }
+  return "";
+}
+
 function formatQuestionsForPreview(questions = []) {
   return (questions || []).map((q, i) => ({
     index: i + 1,
@@ -102,9 +117,9 @@ function formatQuestionsForPreview(questions = []) {
     questionType: q.questionType || "",
     patternLabel: patternLabelForQuestionType(q.questionType),
     explanation:
-      typeof q.explanation === "string"
-        ? q.explanation
-        : q.explanation_en || q.explanation?.[q.correctAnswer] || "",
+      explanationToString(q.explanation, q.correctAnswer) ||
+      explanationToString(q.explanation_en, q.correctAnswer) ||
+      "",
     sourceNote: q.conceptualSource || "",
   }));
 }
@@ -948,5 +963,158 @@ export const startAssignedPracticeAttempt = async (req, res) => {
   } catch (error) {
     console.error("startAssignedPracticeAttempt:", error);
     res.status(500).json({ success: false, message: error.message || "Internal server error" });
+  }
+};
+
+/**
+ * POST /api/admin/assigned-practice/from-url
+ * Current Affairs only: fetch website → generate original 10 UPSC MCQs.
+ * Article body is temporary AI context only — never stored.
+ */
+export const createAssignedPracticeFromUrl = async (req, res) => {
+  let record = null;
+  try {
+    const adminId = req.user?._id ?? req.user?.id;
+    const {
+      url,
+      difficulty = "moderate",
+      questionCount = 10,
+      title,
+      patternsToInclude,
+    } = req.body || {};
+
+    const urlStr = typeof url === "string" ? url.trim() : "";
+    if (!urlStr) {
+      return res.status(400).json({
+        success: false,
+        message: "Website URL is required",
+      });
+    }
+
+    const { extractArticleFromUrl } = await import(
+      "../services/currentAffairs/articleExtractor.service.js"
+    );
+    const { generateCaMcqsFromArticle } = await import(
+      "../services/currentAffairs/caUrlMcqGenerator.service.js"
+    );
+
+    const article = await extractArticleFromUrl(urlStr);
+    // Drop raw content reference after generation by not assigning to record
+    const { content, title: articleTitle, sourceName, sourceUrl } = article;
+
+    const diff = ["easy", "moderate", "hard"].includes(String(difficulty || "").toLowerCase())
+      ? String(difficulty).toLowerCase()
+      : "moderate";
+    const count = Math.min(15, Math.max(5, parseInt(questionCount, 10) || 10));
+    const topicLabel = articleTitle || "Current Affairs";
+    const titleStr =
+      typeof title === "string" && title.trim()
+        ? title.trim()
+        : `Current Affairs — ${topicLabel}`;
+
+    record = new AssignedPracticeTest({
+      subject: "Current Affairs",
+      topic: topicLabel.slice(0, 200),
+      chapter: sourceName ? `Web: ${sourceName}` : "Web Article",
+      notesTopicIds: [],
+      notesSourceUrl: sourceUrl,
+      title: titleStr.slice(0, 300),
+      difficulty: diff,
+      totalQuestions: count,
+      durationMinutes: Math.max(12, Math.round(count * 1.2)),
+      totalMarks: count * 2,
+      negativeMark: 0.66,
+      assignedStudentIds: [],
+      status: "generating",
+      createdBy: adminId,
+      generationProgress: {
+        totalBatches: 1,
+        completedBatches: 0,
+        currentBatch: 1,
+        generatedQuestions: 0,
+        failedBatches: 0,
+        isComplete: false,
+        currentStep: "fetching_url",
+        readingNotes: true,
+        cleaningHtml: true,
+        batchSteps: {},
+        approved: false,
+      },
+    });
+    await record.save();
+
+    const patterns = normalizePatternsToInclude(patternsToInclude);
+
+    const { questions, model, generated } = await generateCaMcqsFromArticle({
+      content,
+      title: topicLabel,
+      questionCount: count,
+      difficulty: diff,
+    });
+
+    // content is out of scope after this — never written to Mongo
+    record.questions = questions;
+    record.totalQuestions = questions.length;
+    record.status = "ready";
+    record.generationProgress = {
+      totalBatches: 1,
+      completedBatches: 1,
+      currentBatch: 1,
+      generatedQuestions: questions.length,
+      failedBatches: 0,
+      isComplete: true,
+      currentStep: "complete",
+      readingNotes: false,
+      cleaningHtml: false,
+      batchSteps: { 1: true },
+      approved: false,
+    };
+    record.generationStats = {
+      ...(record.generationStats?.toObject?.() || {}),
+      modelUsed: model || "",
+      chunksRetrieved: 0,
+    };
+    if (patterns.length) {
+      // patterns stored implicitly via question types
+    }
+    await record.save();
+
+    return res.status(201).json({
+      success: true,
+      message: `Generated ${generated} original Current Affairs MCQs from URL. Article text was not saved.`,
+      data: {
+        _id: record._id,
+        subject: record.subject,
+        topic: record.topic,
+        chapter: record.chapter,
+        notesSourceUrl: record.notesSourceUrl,
+        title: record.title,
+        difficulty: record.difficulty,
+        totalQuestions: record.questions.length,
+        status: record.status,
+        generationProgress: record.generationProgress,
+        assignedStudents: [],
+        isAssigned: false,
+        createdAt: record.createdAt,
+        questions: formatQuestionsForPreview(record.questions),
+        generatedFromUrl: true,
+        sourceName,
+      },
+    });
+  } catch (error) {
+    console.error("createAssignedPracticeFromUrl:", error);
+    if (record?._id) {
+      await AssignedPracticeTest.findByIdAndUpdate(record._id, {
+        $set: {
+          status: "failed",
+          errorMessage: error.message || "URL generation failed",
+        },
+      }).catch(() => {});
+    }
+    return res.status(error.message?.includes("URL") || error.message?.includes("extract") ? 400 : 500).json({
+      success: false,
+      message: error.message || "Failed to generate from URL",
+      data: record?._id ? { _id: record._id, status: "failed" } : undefined,
+    });
   }
 };

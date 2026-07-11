@@ -38,6 +38,7 @@ import {
 } from "../controllers/prelimsMockController.js";
 import {
   createAssignedPractice,
+  createAssignedPracticeFromUrl,
   getAssignedPracticeById,
   assignStudentsToPractice,
   listAdminAssignedPractice,
@@ -122,6 +123,7 @@ router.delete("/prelims-mock/:id", deletePrelimsMock);
 
 // Assigned topic practice (admin generates 50Q and assigns to students)
 router.post("/assigned-practice", createAssignedPractice);
+router.post("/assigned-practice/from-url", createAssignedPracticeFromUrl);
 router.get("/assigned-practice", listAdminAssignedPractice);
 router.get("/assigned-practice/:id", getAssignedPracticeById);
 router.patch("/assigned-practice/:id/questions", savePracticeQuestions);

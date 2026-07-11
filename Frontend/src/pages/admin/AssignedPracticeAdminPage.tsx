@@ -73,6 +73,23 @@ function studentInitial(name: string): string {
   return (name[0] || "?").toUpperCase();
 }
 
+/** Explanation may be a string or bilingual map {A,B,C,D} from the API. */
+function explanationText(
+  explanation: string | Record<string, string> | undefined | null,
+  correctAnswer?: string
+): string {
+  if (!explanation) return "";
+  if (typeof explanation === "string") return explanation;
+  if (typeof explanation === "object") {
+    const key = String(correctAnswer || "A").toUpperCase();
+    const fromKey = explanation[key] || explanation.A || explanation.B || explanation.C || explanation.D;
+    if (typeof fromKey === "string" && fromKey.trim()) return fromKey.trim();
+    const first = Object.values(explanation).find((v) => typeof v === "string" && v.trim());
+    return typeof first === "string" ? first : "";
+  }
+  return "";
+}
+
 export const AssignedPracticeAdminPage: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -90,6 +107,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const [syncingChapterUrl, setSyncingChapterUrl] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "moderate" | "hard">("moderate");
   const [patternsToInclude, setPatternsToInclude] = useState<string[]>(DEFAULT_PATTERNS);
+  const [caWebsiteUrl, setCaWebsiteUrl] = useState("");
+  const [caUrlMode, setCaUrlMode] = useState(true); // Current Affairs: prefer URL mode
   const [generating, setGenerating] = useState(false);
   const [generationTestId, setGenerationTestId] = useState<string | null>(null);
   const [generationStatus, setGenerationStatus] = useState<GenerationProgress | null>(null);
@@ -530,6 +549,87 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     const subjectStr = subject || "";
+    const isCurrentAffairs = subjectStr === "Current Affairs";
+
+    // Current Affairs + website URL → generate 10 real-time CA MCQs
+    if (isCurrentAffairs && caUrlMode) {
+      const urlStr = caWebsiteUrl.trim();
+      if (!urlStr) {
+        setError("Paste a Current Affairs website URL (e.g. PIB, Vision, Drishti)");
+        return;
+      }
+      if (!/^https?:\/\//i.test(urlStr)) {
+        setError("URL must start with http:// or https://");
+        return;
+      }
+      if (patternsToInclude.length === 0) {
+        setError("Select at least one question pattern");
+        return;
+      }
+      setError(null);
+      setSuccess(null);
+      setGenerating(true);
+      try {
+        const res = await assignedPracticeAPI.generateFromUrl({
+          url: urlStr,
+          difficulty,
+          questionCount: 10,
+          patternsToInclude,
+        });
+        if (res.data.success && res.data.data) {
+          const data = res.data.data as {
+            _id: string;
+            subject: string;
+            topic: string;
+            title?: string;
+            totalQuestions: number;
+            difficulty: string;
+            questions?: PreviewQuestion[];
+            generationProgress?: GenerationProgress;
+          };
+          setGenerationTestId(data._id);
+          setActiveTest({
+            _id: data._id,
+            subject: data.subject,
+            topic: data.topic,
+            title: data.title || `${data.subject} — ${data.topic}`,
+            totalQuestions: data.totalQuestions || 10,
+            difficulty: data.difficulty,
+          });
+          if (data.questions?.length) {
+            setPreviewQuestions(
+              data.questions.map((q, i) => ({
+                ...q,
+                index: q.index || i + 1,
+                explanation: explanationText(q.explanation, q.correctAnswer),
+              }))
+            );
+            setFlowStep("preview");
+            setGenerationStatus({
+              completedBatches: 1,
+              totalBatches: 1,
+              generatedQuestions: data.questions.length,
+              isComplete: true,
+              currentStep: "complete",
+            });
+          }
+          setSuccess(
+            `Generated ${data.totalQuestions || 10} original Current Affairs MCQs from URL. Article text was not saved.`
+          );
+          loadList();
+          setGenerating(false);
+        } else {
+          setError((res.data as { message?: string }).message || "Failed to generate from URL");
+          setGenerating(false);
+        }
+      } catch (err: unknown) {
+        const ax = err as { response?: { data?: { message?: string } } };
+        setError(ax.response?.data?.message || "Failed to generate from URL");
+        setGenerating(false);
+      }
+      return;
+    }
+
     const topicNames = selectedTopics.map((t) => t.name.trim()).filter(Boolean);
     const topicStr = buildSelectedTopicLabel(topicNames);
     const chapterStr = selectedChapter?.title?.trim() || "";
@@ -591,7 +691,10 @@ export const AssignedPracticeAdminPage: React.FC = () => {
 
   const startEditQuestion = (q: PreviewQuestion) => {
     setEditingQuestionIndex(q.index - 1);
-    setEditDraft({ ...q });
+    setEditDraft({
+      ...q,
+      explanation: explanationText(q.explanation, q.correctAnswer),
+    });
   };
 
   const cancelEditQuestion = () => {
@@ -868,7 +971,9 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               Step 1 — Generate Test
             </CardTitle>
             <CardDescription>
-              Select chapter &amp; topic from notes.mentorsdaily.com. Questions are generated only from live-fetched notes content (no external AI knowledge).
+              {subject === "Current Affairs" && caUrlMode
+                ? "Paste a Current Affairs website link. AI extracts the topic and generates 10 original UPSC Prelims MCQs (article text is temporary — never saved)."
+                : "Select chapter & topic from notes.mentorsdaily.com. Questions are generated only from live-fetched notes content (no external AI knowledge)."}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -902,6 +1007,52 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                 </p>
               </div>
 
+              {subject === "Current Affairs" && (
+                <div
+                  className={`rounded-xl border p-4 space-y-3 ${
+                    isDark ? "border-blue-800/50 bg-blue-950/20" : "border-blue-200 bg-blue-50/60"
+                  }`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className={`text-sm font-semibold ${isDark ? "text-blue-100" : "text-blue-900"}`}>
+                        Current Affairs — Website URL
+                      </p>
+                      <p className={`text-xs mt-0.5 ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
+                        Paste a news/PIB/coaching article link. AI reads it and generates 10 original UPSC Prelims MCQs (article is not saved).
+                      </p>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={caUrlMode}
+                        onChange={(e) => setCaUrlMode(e.target.checked)}
+                        disabled={generating}
+                        className="rounded border-slate-400 text-blue-600"
+                      />
+                      Use website URL
+                    </label>
+                  </div>
+                  {caUrlMode && (
+                    <>
+                      <input
+                        type="url"
+                        value={caWebsiteUrl}
+                        onChange={(e) => setCaWebsiteUrl(e.target.value)}
+                        disabled={generating}
+                        placeholder="https://pib.gov.in/... or https://drishtiias.com/..."
+                        className={`w-full px-4 py-2.5 rounded-lg border text-sm ${inputCls}`}
+                      />
+                      <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                        Prefer official sources (PIB, PRS, ministry sites). Coaching sites are for understanding only — questions are always original.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {!(subject === "Current Affairs" && caUrlMode) && (
+              <>
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
                   Chapters <span className="text-red-500">*</span>
@@ -1138,6 +1289,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   </>
                 )}
               </div>
+              </>
+              )}
 
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
@@ -1159,8 +1312,9 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   Patterns to include
                 </label>
                 <p className={`text-xs mb-2 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                  Equal weightage: 50 questions split evenly across selected patterns (all 10 selected = 5 each).
-                  Leave all selected for the full UPSC mix, or choose specific patterns.
+                  {subject === "Current Affairs" && caUrlMode
+                    ? "Equal weightage across selected patterns for 10 Current Affairs questions."
+                    : "Equal weightage: 50 questions split evenly across selected patterns (all 10 selected = 5 each). Leave all selected for the full UPSC mix, or choose specific patterns."}
                 </p>
                 <div className="flex flex-wrap gap-x-4 gap-y-2">
                   {PRELIM_MOCK_PATTERNS.map((p) => (
@@ -1180,7 +1334,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-              {selectedTopics.length > 0 && (
+              {!(subject === "Current Affairs" && caUrlMode) && selectedTopics.length > 0 && (
                 <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                   Will generate <strong>50 questions</strong> from{" "}
                   <strong>{selectedTopics.length}</strong> topic{selectedTopics.length !== 1 ? "s" : ""} (
@@ -1188,10 +1342,32 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   <strong>{patternsToInclude.length}</strong> pattern{patternsToInclude.length !== 1 ? "s" : ""} ({selectedPatternsLabel}).
                 </p>
               )}
+              {subject === "Current Affairs" && caUrlMode && (
+                <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                  Will generate <strong>10 original Current Affairs MCQs</strong> from the website URL (temporary AI context — article not stored).
+                </p>
+              )}
               {generating && renderGenerationProgress()}
-              <Button type="submit" disabled={generating || !subject || chapterNeedsSync || !chapterId || selectedTopicIds.length === 0 || patternsToInclude.length === 0} className="w-full sm:w-auto">
+              <Button
+                type="submit"
+                disabled={
+                  generating ||
+                  !subject ||
+                  patternsToInclude.length === 0 ||
+                  (subject === "Current Affairs" && caUrlMode
+                    ? !caWebsiteUrl.trim()
+                    : chapterNeedsSync || !chapterId || selectedTopicIds.length === 0)
+                }
+                className="w-full sm:w-auto"
+              >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                {generating ? "Generating from Notes…" : "Generate 50 Questions from Notes"}
+                {generating
+                  ? subject === "Current Affairs" && caUrlMode
+                    ? "Fetching URL & generating…"
+                    : "Generating from Notes…"
+                  : subject === "Current Affairs" && caUrlMode
+                    ? "Generate 10 Questions from Website"
+                    : "Generate 50 Questions from Notes"}
               </Button>
             </form>
           </CardContent>
@@ -1328,7 +1504,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                           ))}
                         </select>
                         <textarea
-                          value={editDraft.explanation}
+                          value={explanationText(editDraft.explanation, editDraft.correctAnswer)}
                           onChange={(e) => setEditDraft({ ...editDraft, explanation: e.target.value })}
                           rows={2}
                           placeholder="Explanation"
@@ -1362,9 +1538,10 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                             </div>
                           ))}
                         </div>
-                        {q.explanation && (
+                        {explanationText(q.explanation, q.correctAnswer) && (
                           <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                            <span className="font-medium">Explanation:</span> {q.explanation}
+                            <span className="font-medium">Explanation:</span>{" "}
+                            {explanationText(q.explanation, q.correctAnswer)}
                           </p>
                         )}
                         {q.sourceNote && (
