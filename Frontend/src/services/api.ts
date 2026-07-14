@@ -1,22 +1,12 @@
 import axios from "axios";
+import { resolveApiBaseURL } from "../utils/apiUrl";
 
 // VITE_API_URL can be:
 //   - "http://localhost:5000" (local) → base = localhost backend
 //   - "/api" (production same-origin) → base = "" so /api/auth/login goes to same host
-//   - "https://studentportal.mentorsdaily.com/api" (production explicit) → base = https://studentportal.mentorsdaily.com
-const defaultApiUrl =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.MODE === "development" ? "http://localhost:5000" : "/api");
-const raw = defaultApiUrl.replace(/\/$/, "");
-const stripped = raw.replace(/\/api$/i, "").trim();
-let baseURL: string;
-if (stripped === "" && raw === "/api") {
-  baseURL = ""; // VITE_API_URL=/api → same-origin, paths are /api/...
-} else if (stripped === "") {
-  baseURL = "http://localhost:5000";
-} else {
-  baseURL = stripped;
-}
+//   - "https://studentportal.mentorsdaily.com/api" (production / Android) → absolute host
+// Native apps never use same-origin "" (see resolveApiBaseURL).
+const baseURL = resolveApiBaseURL();
 export const apiBaseURL = baseURL;
 
 export const api = axios.create({

@@ -9,9 +9,19 @@
     "build:terser": "node --max-old-space-size=768 ./node_modules/vite/bin/vite.js build",
     "build:prod": "cross-env VITE_LOW_MEM=1 NODE_OPTIONS=--max-old-space-size=512 vite build",
     "preview": "vite preview",
-    "copy-syllabus": "node ../scripts/copy-upsc-syllabus.mjs"
+    "copy-syllabus": "node ../scripts/copy-upsc-syllabus.mjs",
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "build:android": "cross-env VITE_LOW_MEM=1 node --max-old-space-size=512 ./node_modules/vite/bin/vite.js build --mode android && npx cap sync android",
+    "assets:android": "npx capacitor-assets generate --android --iconBackgroundColor '#0f172a' --iconBackgroundColorDark '#0f172a' --splashBackgroundColor '#0f172a' --splashBackgroundColorDark '#0f172a'"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -31,6 +41,8 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.4.1",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.7.0",

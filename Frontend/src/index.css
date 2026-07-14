@@ -221,12 +221,27 @@ code {
   scroll-behavior: smooth;
 }
 
-/* Safe area insets for mobile devices with notches */
+/* Safe area insets for notches / Android gesture bars / Cap StatusBar overlay */
 @supports (padding: max(0px)) {
   body {
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
+}
+
+.safe-area-inset-top {
+  padding-top: max(0px, env(safe-area-inset-top, 0px));
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  min-height: 100dvh;
 }
 
 /* Prevent text size adjustment on iOS */

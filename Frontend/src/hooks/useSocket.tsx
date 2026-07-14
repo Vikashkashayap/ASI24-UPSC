@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { resolveSocketURL } from "../utils/apiUrl";
 import { useAuth } from "./useAuth";
 
-const rawSocketUrl =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.MODE === "development" ? "http://localhost:5000" : "/api");
-const SOCKET_URL = rawSocketUrl.startsWith("/api")
-  ? window.location.origin
-  : rawSocketUrl.replace(/\/api$/i, "");
+const SOCKET_URL = resolveSocketURL();
 
 export const useSocket = () => {
   const { token } = useAuth();

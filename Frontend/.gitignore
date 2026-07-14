@@ -31,3 +31,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Capacitor / Android (build artifacts; android/.gitignore covers most)
+android/.idea/
+android/local.properties
+android/**/build/
+android/.gradle/
+
