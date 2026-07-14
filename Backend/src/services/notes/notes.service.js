@@ -61,28 +61,46 @@ class NotesService {
 
     const catalogChapters = getCatalogChapters(subjectStr);
     const synced = await SourceUrl.find({ subject: subjectStr })
-      .select("_id title subject url topicCount chunkCount status lastSyncedAt")
+      .select(
+        "_id title subject url sourceType topicCount chunkCount status lastSyncedAt filePath originalFileName fileSize mimeType embeddingStatus embeddingModel embeddingsIndexedAt"
+      )
       .lean();
 
     const byUrl = new Map(synced.map((c) => [c.url.replace(/\/$/, ""), c]));
+    const usedIds = new Set();
 
-    return catalogChapters.map((cat) => {
+    const mapDbChapter = (db, extras = {}) => ({
+      _id: db._id,
+      title: extras.title || db.title,
+      subject: subjectStr,
+      url: db.url,
+      slug: extras.slug ?? null,
+      gsPaper: extras.gsPaper ?? null,
+      sourceType: db.sourceType || "url",
+      topicCount: db.topicCount || 0,
+      expectedTopicCount: extras.expectedTopicCount,
+      chunkCount: db.chunkCount || 0,
+      status: db.status,
+      synced: db.status === "synced",
+      lastSyncedAt: db.lastSyncedAt,
+      hasPdf: Boolean(db.filePath),
+      originalFileName: db.originalFileName || "",
+      fileSize: db.fileSize || 0,
+      embeddingStatus: db.embeddingStatus || "pending",
+      embeddingModel: db.embeddingModel || "",
+      embeddingsIndexedAt: db.embeddingsIndexedAt || null,
+    });
+
+    const catalogRows = catalogChapters.map((cat) => {
       const db = byUrl.get(cat.url.replace(/\/$/, ""));
       if (db) {
-        return {
-          _id: db._id,
+        usedIds.add(String(db._id));
+        return mapDbChapter(db, {
           title: cat.title || db.title,
-          subject: subjectStr,
-          url: db.url,
           slug: cat.slug,
           gsPaper: cat.gsPaper,
-          topicCount: db.topicCount || 0,
           expectedTopicCount: cat.expectedTopicCount,
-          chunkCount: db.chunkCount || 0,
-          status: db.status,
-          synced: db.status === "synced",
-          lastSyncedAt: db.lastSyncedAt,
-        };
+        });
       }
       return {
         _id: null,
@@ -91,14 +109,28 @@ class NotesService {
         url: cat.url,
         slug: cat.slug,
         gsPaper: cat.gsPaper,
+        sourceType: "url",
         topicCount: 0,
         expectedTopicCount: cat.expectedTopicCount,
         chunkCount: 0,
         status: "not_synced",
         synced: false,
         lastSyncedAt: null,
+        hasPdf: false,
+        originalFileName: "",
+        fileSize: 0,
+        embeddingStatus: "pending",
+        embeddingModel: "",
+        embeddingsIndexedAt: null,
       };
     });
+
+    // PDF-only (or other DB) chapters not present in the static notes catalog
+    const extraRows = synced
+      .filter((db) => !usedIds.has(String(db._id)))
+      .map((db) => mapDbChapter(db, {}));
+
+    return [...catalogRows, ...extraRows];
   }
 
   /**
@@ -110,7 +142,7 @@ class NotesService {
 
     const topics = await ContentTopic.find({ sourceUrlId: chapterId })
       .sort({ name: 1 })
-      .select("_id name slug subject sourceUrlId heading summary chunkCount sourceUrl")
+      .select("_id name slug subject sourceUrlId heading summary chunkCount sourceUrl sourceFormat pageStart pageEnd")
       .lean();
 
     return topics.map((t) => ({
@@ -123,6 +155,9 @@ class NotesService {
       summary: t.summary || "",
       chunkCount: t.chunkCount || 0,
       sourceUrl: t.sourceUrl || "",
+      sourceFormat: t.sourceFormat || "web",
+      pageStart: t.pageStart ?? null,
+      pageEnd: t.pageEnd ?? null,
     }));
   }
 
@@ -257,17 +292,20 @@ class NotesService {
       err.statusCode = 404;
       throw err;
     }
-    if (note.topic.sourceUrl) {
+
+    const hasChunks =
+      (note.chunks?.length || 0) > 0 && String(note.fullText || "").trim().length >= 80;
+    const canLiveFetch = /^https?:\/\//i.test(String(note.topic.sourceUrl || ""));
+
+    if (hasChunks || canLiveFetch) {
       return note;
     }
-    if (!note.fullText || note.fullText.length < 100) {
-      const err = new Error(
-        "No notes content found for this topic. Sync the chapter from notes.mentorsdaily.com first."
-      );
-      err.statusCode = 400;
-      throw err;
-    }
-    return note;
+
+    const err = new Error(
+      "No content found for this topic. Sync from notes.mentorsdaily.com or upload/process a PDF for this chapter first."
+    );
+    err.statusCode = 400;
+    throw err;
   }
 
   /** Validate multiple topics have usable notes content. */
@@ -303,6 +341,11 @@ class NotesService {
       order: c.order ?? i,
       tokenCount: c.tokenCount ?? estimateTokenCount(c.text),
       sourceUrl,
+      page: c.page ?? null,
+      contentLanguage: c.contentLanguage || c.language || "",
+      subTopic: c.subTopic || "",
+      chunkNumber: c.chunkNumber ?? (c.order ?? i) + 1,
+      source: c.source || "notes",
     }));
 
     await ContentChunk.insertMany(docs);

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-/** Notes topic under a chapter (source URL). */
+/** Notes topic under a chapter (source URL or PDF). */
 const contentTopicSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -22,10 +22,19 @@ const contentTopicSchema = new mongoose.Schema(
     chunkCount: { type: Number, default: 0 },
     questionCount: { type: Number, default: 0 },
     sourceUrl: { type: String, default: "" },
+    /** web | pdf — provenance for RAG metadata (Step 2+). */
+    sourceFormat: {
+      type: String,
+      enum: ["web", "pdf"],
+      default: "web",
+    },
+    pageStart: { type: Number, default: null },
+    pageEnd: { type: Number, default: null },
   },
   { timestamps: true, collection: "contenttopics" }
 );
 
 contentTopicSchema.index({ sourceUrlId: 1, slug: 1 }, { unique: true });
+contentTopicSchema.index({ subject: 1, sourceFormat: 1 });
 
 export default mongoose.models.ContentTopic || mongoose.model("ContentTopic", contentTopicSchema);

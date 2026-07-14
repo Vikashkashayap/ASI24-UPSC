@@ -1,5 +1,11 @@
 import { notesService } from "../services/notes/notes.service.js";
 import { syncChapterFromUrl, syncTopicFromUrl, repairChapterTopicNames } from "../services/notes/notesSync.service.js";
+import { uploadPdfChapter } from "../services/notes/notesPdfUpload.service.js";
+import { syncChapterFromPdf } from "../services/notes/notesPdfSync.service.js";
+import { indexChapterInVectorDb, indexTopicInVectorDb } from "../services/notes/notesVectorIndex.service.js";
+import { embeddingService } from "../services/ai/embedding.service.js";
+import { qdrantService } from "../services/ai/qdrant.service.js";
+import { retrieverService } from "../services/ai/retriever.service.js";
 import { getFullCatalog } from "../config/notesCatalog.js";
 import SourceUrl from "../models/SourceUrl.js";
 
@@ -185,5 +191,290 @@ export const syncNotesTopic = async (req, res) => {
   } catch (error) {
     console.error("syncNotesTopic:", error);
     res.status(500).json({ success: false, message: error.message || "Failed to sync topic" });
+  }
+};
+
+/**
+ * POST /api/admin/notes/upload-pdf
+ * multipart: file | files[] (PDF) + fields: subject, title?, chapterId?, forceNew?, skipProcess?
+ * Supports multiple PDFs for subject knowledge base (PDF + website searchable together).
+ */
+export const uploadNotesPdf = async (req, res) => {
+  try {
+    const fileList = [];
+    if (req.file?.buffer?.length) fileList.push(req.file);
+    if (Array.isArray(req.files)) {
+      for (const f of req.files) {
+        if (f?.buffer?.length) fileList.push(f);
+      }
+    } else if (req.files && typeof req.files === "object") {
+      for (const key of ["file", "files"]) {
+        const rows = req.files[key];
+        if (Array.isArray(rows)) {
+          for (const f of rows) {
+            if (f?.buffer?.length) fileList.push(f);
+          }
+        } else if (rows?.buffer?.length) {
+          fileList.push(rows);
+        }
+      }
+    }
+
+    if (!fileList.length) {
+      return res.status(400).json({
+        success: false,
+        message: "PDF file(s) required (field name: file or files)",
+      });
+    }
+
+    const subject = String(req.body?.subject || "").trim();
+    const title = String(req.body?.title || "").trim();
+    const chapterId = String(req.body?.chapterId || "").trim() || undefined;
+    const skipProcess = String(req.body?.skipProcess || "").toLowerCase() === "true";
+    const forceNew =
+      String(req.body?.forceNew || "").toLowerCase() === "true" ||
+      fileList.length > 1 ||
+      String(req.body?.addToKnowledge || "").toLowerCase() === "true";
+    const adminId = req.user?._id ?? req.user?.id;
+
+    if (!subject) {
+      return res.status(400).json({ success: false, message: "subject is required" });
+    }
+    if (!forceNew && !chapterId && !title) {
+      return res.status(400).json({
+        success: false,
+        message: "title is required when uploading a new PDF chapter (or pass chapterId / forceNew)",
+      });
+    }
+
+    const results = [];
+    for (const file of fileList) {
+      const uploadResult = await uploadPdfChapter({
+        buffer: file.buffer,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        subject,
+        title: title || undefined,
+        chapterId: forceNew ? undefined : chapterId,
+        forceNew,
+        createdBy: adminId,
+      });
+
+      if (skipProcess) {
+        results.push({ chapter: uploadResult.chapter, processed: false });
+        continue;
+      }
+
+      const processed = await syncChapterFromPdf(uploadResult.chapter._id, {
+        buffer: file.buffer,
+      });
+      results.push({
+        chapter: {
+          ...uploadResult.chapter,
+          status: processed.status,
+          topicCount: processed.topicCount,
+          chunkCount: processed.chunkCount,
+          lastSyncedAt: new Date().toISOString(),
+        },
+        processed: true,
+        pageCount: processed.pageCount,
+        topics: processed.topics,
+        embedding: processed.embedding || null,
+      });
+    }
+
+    const totalTopics = results.reduce((s, r) => s + (r.chapter?.topicCount || 0), 0);
+    const totalChunks = results.reduce((s, r) => s + (r.chapter?.chunkCount || 0), 0);
+
+    res.status(201).json({
+      success: true,
+      message:
+        results.length > 1
+          ? `Uploaded ${results.length} PDFs to knowledge base (${totalTopics} topics, ${totalChunks} chunks). Topic search uses PDF + website notes.`
+          : `PDF uploaded and processed: ${totalTopics} topics, ${totalChunks} semantic chunks.`,
+      data: {
+        count: results.length,
+        chapters: results.map((r) => r.chapter),
+        chapter: results[0]?.chapter,
+        results,
+        processed: !skipProcess,
+      },
+    });
+  } catch (error) {
+    console.error("uploadNotesPdf:", error);
+    const msg = error.message || "Failed to upload PDF";
+    const status =
+      /required|Only PDF|exceeds max|not found|does not belong|scanned|too short|No topics|Invalid PDF/i.test(
+        msg
+      )
+        ? 400
+        : 500;
+    res.status(status).json({ success: false, message: msg });
+  }
+};
+
+/**
+ * POST /api/admin/notes/process-pdf/:chapterId
+ * Re-run extract → topics → semantic chunks for an already-uploaded PDF.
+ */
+export const processNotesPdf = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    if (!chapterId) {
+      return res.status(400).json({ success: false, message: "chapterId is required" });
+    }
+
+    const processed = await syncChapterFromPdf(chapterId);
+    res.json({
+      success: true,
+      message: `Processed PDF: ${processed.topicCount} topics, ${processed.chunkCount} semantic chunks.`,
+      data: processed,
+    });
+  } catch (error) {
+    console.error("processNotesPdf:", error);
+    const msg = error.message || "Failed to process PDF";
+    const status =
+      /not found|no uploaded PDF|scanned|too short|No topics|Invalid PDF/i.test(msg) ? 400 : 500;
+    res.status(status).json({ success: false, message: msg });
+  }
+};
+
+/**
+ * POST /api/admin/notes/reindex/:chapterId
+ * Sync / re-index embeddings into Qdrant (hash-gated unless force=true).
+ * Body/query: { force?: boolean }
+ */
+export const reindexNotesChapter = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    const force =
+      String(req.body?.force ?? req.query?.force ?? "").toLowerCase() === "true" ||
+      req.body?.force === true;
+
+    if (!chapterId) {
+      return res.status(400).json({ success: false, message: "chapterId is required" });
+    }
+
+    const result = await indexChapterInVectorDb(chapterId, { force });
+    res.json({
+      success: true,
+      message: result.skipped
+        ? result.reason || "Reindex skipped"
+        : `Indexed ${result.indexed} chunks across ${result.topics} topics (${result.model}).`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("reindexNotesChapter:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to reindex chapter" });
+  }
+};
+
+/**
+ * POST /api/admin/notes/reindex-topic/:topicId
+ */
+export const reindexNotesTopic = async (req, res) => {
+  try {
+    const { topicId } = req.params;
+    const force =
+      String(req.body?.force ?? req.query?.force ?? "true").toLowerCase() !== "false";
+
+    if (!topicId) {
+      return res.status(400).json({ success: false, message: "topicId is required" });
+    }
+
+    const result = await indexTopicInVectorDb(topicId, { force });
+    res.json({
+      success: true,
+      message: result.skipped
+        ? result.reason || "Topic reindex skipped"
+        : `Indexed ${result.indexed} chunks for topic.`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("reindexNotesTopic:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to reindex topic" });
+  }
+};
+
+/**
+ * GET /api/admin/notes/vector-health — embedding + Qdrant status
+ */
+export const notesVectorHealth = async (_req, res) => {
+  try {
+    const qdrant = await qdrantService.health();
+    res.json({
+      success: true,
+      data: {
+        embedding: {
+          configured: embeddingService.isConfigured(),
+          provider: embeddingService.getProvider(),
+          model: embeddingService.getModelName(),
+          dimension: embeddingService.getDimension(),
+        },
+        qdrant,
+      },
+    });
+  } catch (error) {
+    console.error("notesVectorHealth:", error);
+    res.status(500).json({ success: false, message: error.message || "Health check failed" });
+  }
+};
+
+/**
+ * GET /api/admin/notes/search-chunks?subject=&q=&chapterId=
+ * Preview chunk matches for a typed topic keyword across PDF + website knowledge.
+ * Prefer subject-wide search (all PDFs + synced notes under that subject).
+ */
+export const searchNotesChunks = async (req, res) => {
+  try {
+    const subject = String(req.query.subject || "").trim();
+    const chapterId = String(req.query.chapterId || "").trim();
+    const q = String(req.query.q || "").trim();
+    if (q.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "q (min 2 chars) is required",
+      });
+    }
+    if (!subject && !chapterId) {
+      return res.status(400).json({
+        success: false,
+        message: "subject or chapterId is required",
+      });
+    }
+
+    const result = subject
+      ? await retrieverService.getContextForSubjectQuery({
+          subject,
+          query: q,
+          batchIndex: 0,
+        })
+      : await retrieverService.getContextForChapterQuery({
+          chapterId,
+          query: q,
+          batchIndex: 0,
+        });
+
+    res.json({
+      success: true,
+      data: {
+        query: q,
+        subject: subject || null,
+        chapterId: chapterId || null,
+        scope: subject ? "subject" : "chapter",
+        matchedChunks: result.chunks?.length || 0,
+        source: result.source,
+        tokens: result.tokens || 0,
+        preview: (result.chunks || []).slice(0, 3).map((c) => ({
+          heading: c.heading || "",
+          page: c.page ?? null,
+          source: c.source || "",
+          excerpt: String(c.text || "").slice(0, 180),
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("searchNotesChunks:", error);
+    res.status(500).json({ success: false, message: error.message || "Search failed" });
   }
 };

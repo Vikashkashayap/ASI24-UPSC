@@ -7,6 +7,12 @@ import { pickBilingualQuestionFields } from "../services/questionTranslationServ
 import { patternLabelForQuestionType } from "../config/questionPatterns.js";
 import { runAssignedPracticeGeneration } from "../services/ai/batchGenerator.service.js";
 import { generateQuestionsFromContextBatch } from "../services/ai/questionGenerator.service.js";
+import { getPracticeBatchSize, getPracticeTranslationModel } from "../config/openRouterConfig.js";
+import { runInMigrationBatchContext } from "../middleware/examAiGuard.js";
+import { batchTranslatePracticeQuestionsToHindi } from "../services/testGenerationService.js";
+import SourceUrl from "../models/SourceUrl.js";
+import ContentChunk from "../models/ContentChunk.js";
+import { retrieverService } from "../services/ai/retriever.service.js";
 
 const GS_SUBJECTS = [
   "Polity",
@@ -19,7 +25,14 @@ const GS_SUBJECTS = [
   "Current Affairs",
 ];
 
-const ASSIGNED_QUESTION_COUNT = 50;
+const ASSIGNED_QUESTION_COUNT_DEFAULT = 50;
+const ALLOWED_QUESTION_COUNTS = new Set([50, 100]);
+
+function normalizeAssignedQuestionCount(value) {
+  const n = parseInt(value, 10);
+  if (ALLOWED_QUESTION_COUNTS.has(n)) return n;
+  return ASSIGNED_QUESTION_COUNT_DEFAULT;
+}
 
 const VALID_PATTERN_IDS = [
   "statement_based",
@@ -97,7 +110,11 @@ function formatQuestionsForPreview(questions = []) {
   return (questions || []).map((q, i) => ({
     index: i + 1,
     question: q.question || q.question_en || "",
+    question_en: q.question_en || q.question || "",
+    question_hi: q.question_hi || "",
     options: q.options || q.options_en || {},
+    options_en: q.options_en || q.options || {},
+    options_hi: q.options_hi || {},
     correctAnswer: q.correctAnswer,
     questionType: q.questionType || "",
     patternLabel: patternLabelForQuestionType(q.questionType),
@@ -105,24 +122,47 @@ function formatQuestionsForPreview(questions = []) {
       typeof q.explanation === "string"
         ? q.explanation
         : q.explanation_en || q.explanation?.[q.correctAnswer] || "",
+    explanation_en: q.explanation_en || q.explanation,
+    explanation_hi: q.explanation_hi || "",
+    matchColumns: q.matchColumns || null,
+    matchColumns_hi: q.matchColumns_hi || null,
+    assertionReason: q.assertionReason || null,
     sourceNote: q.conceptualSource || "",
+    backupReason: q.backupReason || "",
   }));
 }
 
 /**
  * POST /api/admin/assigned-practice
- * Body: { subject, topic, difficulty?, title? } — generate 50Q only (no students yet)
+ * Body: { subject, topic, difficulty?, title?, questionCount?: 50|100 } — generate only (no students yet)
  */
 export const createAssignedPractice = async (req, res) => {
   let record = null;
   try {
     const adminId = req.user?._id ?? req.user?.id;
-    const { subject, topic, difficulty, title, patternsToInclude, notesTopicId, notesTopicIds, chapter } = req.body;
+    const {
+      subject,
+      topic,
+      difficulty,
+      title,
+      patternsToInclude,
+      notesTopicId,
+      notesTopicIds,
+      chapter,
+      chapterId,
+      searchQuery,
+      questionCount,
+    } = req.body;
 
     const subjectStr = typeof subject === "string" ? subject.trim() : "";
     const topicStr = typeof topic === "string" ? topic.trim() : "";
     const chapterStr = typeof chapter === "string" ? chapter.trim() : "";
+    const chapterIdStr = typeof chapterId === "string" ? chapterId.trim() : "";
+    const keyword = typeof searchQuery === "string" ? searchQuery.trim() : "";
     const topicIdList = normalizeNotesTopicIds({ notesTopicId, notesTopicIds });
+    const keywordMode = Boolean(keyword && subjectStr);
+    const targetQuestions = normalizeAssignedQuestionCount(questionCount);
+    const totalBatches = Math.ceil(targetQuestions / getPracticeBatchSize());
 
     if (!subjectStr) {
       return res.status(400).json({
@@ -131,33 +171,86 @@ export const createAssignedPractice = async (req, res) => {
       });
     }
 
-    if (!topicIdList.length) {
+    if (!keywordMode && !topicIdList.length) {
       return res.status(400).json({
         success: false,
-        message: "Select at least one topic from Notes (chapter → topic). Questions are generated only from synced notes content.",
+        message:
+          "Select topic checkboxes, or type a topic keyword — RAG searches PDF + website knowledge for that subject.",
       });
     }
 
-    let topicMetas;
-    try {
-      topicMetas = await notesService.assertTopicsHaveContent(topicIdList);
-    } catch (err) {
-      return res.status(err.statusCode || 400).json({
+    if (keywordMode && keyword.length < 2) {
+      return res.status(400).json({
         success: false,
-        message: err.message || "Selected notes topics are invalid",
+        message: "Topic keyword must be at least 2 characters",
       });
     }
 
-    const resolvedTopic = topicStr || buildMultiTopicLabel(topicMetas);
-    const resolvedChapter = chapterStr || topicMetas[0]?.chapter?.title || "";
-    const resolvedSubject = topicMetas[0]?.topic.subject || subjectStr;
-    const primaryTopicId = topicIdList[0];
+    let topicMetas = [];
+    let resolvedTopic = topicStr;
+    let resolvedChapter = chapterStr;
+    let resolvedSubject = subjectStr;
+    let primaryTopicId = topicIdList[0] || undefined;
+    let notesSourceUrl = "";
 
-    if (subjectStr !== resolvedSubject) {
-      console.warn(
-        `Subject mismatch: client sent "${subjectStr}", notes topic has "${resolvedSubject}" — using notes subject`
-      );
+    if (keywordMode) {
+      const chunkCount = await ContentChunk.countDocuments({
+        sourceUrlId: {
+          $in: (await SourceUrl.find({ subject: subjectStr }).select("_id").lean()).map((c) => c._id),
+        },
+      });
+      if (!chunkCount) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "No knowledge chunks for this subject yet. Upload PDF(s) and/or sync website notes first.",
+        });
+      }
+
+      const probe = await retrieverService.getContextForSubjectQuery({
+        subject: subjectStr,
+        query: keyword,
+        batchIndex: 0,
+      });
+      if (!probe.contextText || probe.contextText.length < 80) {
+        return res.status(400).json({
+          success: false,
+          message: `No matching content for "${keyword}" in PDF/notes knowledge. Try another keyword.`,
+        });
+      }
+
+      resolvedTopic = topicStr || keyword;
+      if (chapterIdStr) {
+        const chapterDoc = await SourceUrl.findById(chapterIdStr).lean();
+        resolvedChapter = chapterStr || chapterDoc?.title || "";
+        notesSourceUrl = chapterDoc?.url || "";
+      } else {
+        resolvedChapter = chapterStr || "Subject knowledge";
+      }
+      primaryTopicId = undefined;
+    } else {
+      try {
+        topicMetas = await notesService.assertTopicsHaveContent(topicIdList);
+      } catch (err) {
+        return res.status(err.statusCode || 400).json({
+          success: false,
+          message: err.message || "Selected notes topics are invalid",
+        });
+      }
+
+      resolvedTopic = topicStr || buildMultiTopicLabel(topicMetas);
+      resolvedChapter = chapterStr || topicMetas[0]?.chapter?.title || "";
+      resolvedSubject = topicMetas[0]?.topic.subject || subjectStr;
+      primaryTopicId = topicIdList[0];
+      notesSourceUrl = topicMetas[0]?.topic.sourceUrl || "";
+
+      if (subjectStr !== resolvedSubject) {
+        console.warn(
+          `Subject mismatch: client sent "${subjectStr}", notes topic has "${resolvedSubject}" — using notes subject`
+        );
+      }
     }
+
     if (!resolvedTopic || resolvedTopic.length < 2) {
       return res.status(400).json({
         success: false,
@@ -179,13 +272,15 @@ export const createAssignedPractice = async (req, res) => {
       topic: resolvedTopic,
       chapter: resolvedChapter,
       notesTopicId: primaryTopicId,
-      notesTopicIds: topicIdList,
-      notesSourceUrl: topicMetas[0]?.topic.sourceUrl || "",
+      notesTopicIds: keywordMode ? [] : topicIdList,
+      notesChapterId: keywordMode ? chapterIdStr : chapterIdStr || topicMetas[0]?.chapter?._id || undefined,
+      searchQuery: keywordMode ? keyword : "",
+      notesSourceUrl,
       title: titleStr,
       difficulty: diff,
-      totalQuestions: ASSIGNED_QUESTION_COUNT,
-      durationMinutes: 60,
-      totalMarks: 100,
+      totalQuestions: targetQuestions,
+      durationMinutes: targetQuestions >= 100 ? 120 : 60,
+      totalMarks: targetQuestions >= 100 ? 200 : 100,
       negativeMark: 0.66,
       assignedStudentIds: [],
       status: "generating",
@@ -193,12 +288,14 @@ export const createAssignedPractice = async (req, res) => {
     });
     await record.save();
 
-    console.log(`📝 Starting notes-only generation (${ASSIGNED_QUESTION_COUNT}Q) for ${resolvedSubject} — ${resolvedTopic}`);
+    console.log(
+      `📝 Starting ${keywordMode ? "keyword-RAG" : "topic-RAG"} generation (${targetQuestions}Q) for ${resolvedSubject} — ${resolvedTopic}`
+    );
     await getPriorTopicQuestionFingerprints(resolvedSubject, resolvedTopic);
     const patterns = normalizePatternsToInclude(patternsToInclude);
 
     record.generationProgress = {
-      totalBatches: 5,
+      totalBatches,
       completedBatches: 0,
       currentBatch: 0,
       generatedQuestions: 0,
@@ -216,12 +313,15 @@ export const createAssignedPractice = async (req, res) => {
       try {
         await runAssignedPracticeGeneration({
           assignedPracticeId: record._id,
-          topicIds: topicIdList,
+          topicIds: keywordMode ? [] : topicIdList,
           topicName: resolvedTopic,
           subject: resolvedSubject,
           chapter: resolvedChapter,
           difficulty: diff,
           patternsToInclude: patterns,
+          chapterId: chapterIdStr || null,
+          searchQuery: keywordMode ? keyword : "",
+          questionCount: targetQuestions,
         });
       } catch (bgErr) {
         console.error("runAssignedPracticeGeneration:", bgErr);
@@ -233,7 +333,9 @@ export const createAssignedPractice = async (req, res) => {
 
     return res.status(202).json({
       success: true,
-      message: "Generation started. Progress will update batch-by-batch.",
+      message: keywordMode
+        ? `Generation started for keyword "${keyword}" (${targetQuestions}Q via RAG).`
+        : `Generation started for ${targetQuestions} questions. Progress will update batch-by-batch.`,
       data: {
         _id: record._id,
         subject: record.subject,
@@ -241,10 +343,11 @@ export const createAssignedPractice = async (req, res) => {
         chapter: record.chapter,
         notesTopicId: record.notesTopicId,
         notesTopicIds: record.notesTopicIds || topicIdList,
+        searchQuery: record.searchQuery,
         notesSourceUrl: record.notesSourceUrl,
         title: record.title,
         difficulty: record.difficulty,
-        totalQuestions: 0,
+        totalQuestions: targetQuestions,
         status: record.status,
         generationProgress: record.generationProgress,
         assignedStudents: [],
@@ -293,6 +396,8 @@ export const getAssignedPracticeById = async (req, res) => {
         generationStats: record.generationStats || null,
         notesSourceUrl: record.notesSourceUrl,
         questions: formatQuestionsForPreview(record.questions || []),
+        backupQuestions: formatQuestionsForPreview(record.backupQuestions || []),
+        backupCount: Array.isArray(record.backupQuestions) ? record.backupQuestions.length : 0,
         partialQuestions:
           record.status === "generating"
             ? formatQuestionsForPreview(record.questions || [])
@@ -385,12 +490,71 @@ export const assignStudentsToPractice = async (req, res) => {
 };
 
 /**
+ * Compact list title — avoid dumping full multi-topic strings in the admin table.
+ */
+function buildListDisplayTitle(record) {
+  const subject = String(record.subject || "").trim();
+  const chapter = String(record.chapter || "").trim();
+  const searchQuery = String(record.searchQuery || "").trim();
+  const topic = String(record.topic || "").trim();
+
+  let focus = searchQuery || topic;
+  const splitter = /\s*[·•|]\s*/;
+  if (!searchQuery && splitter.test(topic)) {
+    const parts = topic.split(splitter).map((p) => p.trim()).filter(Boolean);
+    const moreMatch = parts[parts.length - 1]?.match(/^\+(\d+)\s+more$/i);
+    const clean = moreMatch ? parts.slice(0, -1) : parts;
+    const extra = moreMatch ? Number(moreMatch[1]) : Math.max(0, clean.length - 2);
+    if (clean.length > 2 || moreMatch) {
+      focus = `${clean.slice(0, 2).join(" · ")}${extra > 0 ? ` · +${extra} more` : ""}`;
+    } else {
+      focus = clean.join(" · ");
+    }
+  } else if (focus.length > 72) {
+    focus = `${focus.slice(0, 69).trim()}…`;
+  }
+
+  // Prefer chapter as main title; subject is shown as a badge in UI
+  if (chapter) return chapter;
+  if (focus) return focus;
+  return String(record.title || subject || "Practice test");
+}
+
+/**
  * GET /api/admin/assigned-practice
+ * Query: page, limit, filter=all|assigned|unassigned
  */
 export const listAdminAssignedPractice = async (req, res) => {
   try {
-    const records = await AssignedPracticeTest.find()
+    const page = Math.max(1, parseInt(String(req.query.page || "1"), 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit || "10"), 10) || 10));
+    const filter = String(req.query.filter || "all").toLowerCase();
+
+    const query = {};
+    if (filter === "assigned") {
+      query.assignedStudentIds = { $exists: true, $not: { $size: 0 } };
+    } else if (filter === "unassigned") {
+      query.$or = [
+        { assignedStudentIds: { $exists: false } },
+        { assignedStudentIds: { $size: 0 } },
+        { assignedStudentIds: null },
+      ];
+      query.status = "ready";
+    }
+
+    const total = await AssignedPracticeTest.countDocuments(query);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const safePage = Math.min(page, totalPages);
+    const skip = (safePage - 1) * limit;
+
+    // Never ship full question payloads on the list endpoint
+    const records = await AssignedPracticeTest.find(query)
+      .select(
+        "subject topic chapter title difficulty totalQuestions status errorMessage createdAt assignedStudentIds searchQuery notesTopicIds generationProgress"
+      )
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     const allStudentIds = [
@@ -404,11 +568,13 @@ export const listAdminAssignedPractice = async (req, res) => {
     );
 
     const recordIds = records.map((r) => r._id);
-    const attempts = await Test.find({
-      assignedPracticeTestId: { $in: recordIds },
-    })
-      .select("assignedPracticeTestId userId isSubmitted")
-      .lean();
+    const attempts = recordIds.length
+      ? await Test.find({
+          assignedPracticeTestId: { $in: recordIds },
+        })
+          .select("assignedPracticeTestId userId isSubmitted")
+          .lean()
+      : [];
 
     const attemptCountByRecord = {};
     const startedByRecord = {};
@@ -433,22 +599,37 @@ export const listAdminAssignedPractice = async (req, res) => {
         _id: r._id,
         subject: r.subject,
         topic: r.topic,
+        chapter: r.chapter || "",
+        searchQuery: r.searchQuery || "",
         title: r.title,
+        displayTitle: buildListDisplayTitle(r),
         difficulty: r.difficulty,
         totalQuestions: r.totalQuestions,
         status: r.status,
         generationProgress: r.generationProgress || null,
-        generationStats: r.generationStats || null,
         errorMessage: r.errorMessage || "",
         createdAt: r.createdAt,
         attemptCount: attemptCountByRecord[rid] || 0,
         startedStudentIds: startedByRecord[rid] || [],
         assignedStudents,
+        assignedCount: assignedStudents.length,
+        topicCount: Array.isArray(r.notesTopicIds) ? r.notesTopicIds.length : 0,
         isAssigned: assignedStudents.length > 0,
       };
     });
 
-    return res.json({ success: true, data });
+    return res.json({
+      success: true,
+      data,
+      pagination: {
+        page: safePage,
+        limit,
+        total,
+        totalPages,
+        hasPrev: safePage > 1,
+        hasNext: safePage < totalPages,
+      },
+    });
   } catch (error) {
     console.error("listAdminAssignedPractice:", error);
     res.status(500).json({ success: false, message: error.message || "Internal server error" });
@@ -582,32 +763,54 @@ export const regeneratePracticeQuestion = async (req, res) => {
       return res.status(400).json({ success: false, message: "No notes topic linked to this test" });
     }
 
-    const topicNotes = await notesService.fetchAndCleanTopicNotes(String(topicId));
+    const note = await notesService.getNoteByTopic(String(topicId));
+    if (!note) {
+      return res.status(404).json({ success: false, message: "Notes topic not found" });
+    }
+
+    const { retrieverService } = await import("../services/ai/retriever.service.js");
+    const rag = await retrieverService.getContextForBatch({
+      topicId: String(topicId),
+      batchIndex: idx,
+      topicName: note.topic.name || record.topic,
+      subject: record.subject,
+      allowLiveFallback: true,
+    });
+
+    if (!rag.contextText || rag.contextText.length < 80) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "No retrieved chunks for this topic. Process the PDF or sync notes, then try again.",
+      });
+    }
+
     const batchResult = await generateQuestionsFromContextBatch({
-      contextText: topicNotes.cleanText,
-      topic: topicNotes.topic.name || record.topic,
+      contextText: rag.contextText,
+      topic: note.topic.name || record.topic,
       difficulty: record.difficulty,
       batchSize: 1,
       patternsToInclude: [],
       batchIndex: idx,
       subject: record.subject,
       chapter: record.chapter,
+      ragOptimized: true,
     });
 
     if (!batchResult.success || !batchResult.questions?.length) {
       return res.status(502).json({
         success: false,
-        message: batchResult.error || "Failed to regenerate question from notes",
+        message: batchResult.error || "Failed to regenerate question from retrieved chunks",
       });
     }
 
     const newQ = pickBilingualQuestionFields({
       ...batchResult.questions[0],
-      topic: topicNotes.topic.name || record.topic,
+      topic: note.topic.name || record.topic,
       conceptualSource:
         batchResult.questions[0].conceptualSource ||
         batchResult.questions[0].sourceParagraph ||
-        topicNotes.topic.name,
+        note.topic.name,
     });
 
     record.questions[idx] = newQ;
@@ -615,7 +818,7 @@ export const regeneratePracticeQuestion = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "Question regenerated from notes",
+      message: `Question regenerated via RAG (${rag.source})`,
       data: formatQuestionsForPreview(record.questions),
     });
   } catch (error) {
@@ -645,12 +848,19 @@ export const savePracticeQuestions = async (req, res) => {
       pickBilingualQuestionFields({
         question: q.question || q.question_en || "",
         question_en: q.question || q.question_en || "",
+        question_hi: q.question_hi || "",
         options: q.options || q.options_en || {},
         options_en: q.options || q.options_en || {},
+        options_hi: q.options_hi || {},
         correctAnswer: q.correctAnswer,
         answer: q.correctAnswer,
         explanation: q.explanation || q.explanation_en || "",
         explanation_en: q.explanation || q.explanation_en || "",
+        explanation_hi: q.explanation_hi,
+        matchColumns: q.matchColumns,
+        matchColumns_hi: q.matchColumns_hi,
+        assertionReason: q.assertionReason,
+        tableData: q.tableData,
         questionType: q.questionType || "",
         difficulty: q.difficulty || record.difficulty,
         conceptualSource: q.sourceNote || q.conceptualSource || "",
@@ -674,6 +884,93 @@ export const savePracticeQuestions = async (req, res) => {
 };
 
 /**
+ * POST /api/admin/assigned-practice/:id/fill-hindi
+ * Backfill missing question_hi / options_hi for an assigned practice test,
+ * then sync Hindi into any in-progress student attempts.
+ */
+export const fillMissingPracticeHindi = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({ success: false, message: "OPENROUTER_API_KEY not configured" });
+    }
+
+    const record = await AssignedPracticeTest.findById(id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Practice test not found" });
+    }
+    if (!record.questions?.length) {
+      return res.status(400).json({ success: false, message: "No questions to translate" });
+    }
+
+    const before = record.questions.filter((q) =>
+      /[\u0900-\u097F]/.test(String(q.question_hi || ""))
+    ).length;
+
+    const translated = await runInMigrationBatchContext(() =>
+      batchTranslatePracticeQuestionsToHindi(
+        apiKey,
+        getPracticeTranslationModel(),
+        record.questions.map((q) => (typeof q.toObject === "function" ? q.toObject() : { ...q }))
+      )
+    );
+
+    record.questions = translated.map((q) => pickBilingualQuestionFields(q));
+    record.markModified("questions");
+    await record.save();
+
+    const after = record.questions.filter((q) =>
+      /[\u0900-\u097F]/.test(String(q.question_hi || ""))
+    ).length;
+
+    // Sync into in-progress student attempts (no LLM)
+    const attempts = await Test.find({
+      assignedPracticeTestId: record._id,
+      isSubmitted: { $ne: true },
+    });
+    let attemptsUpdated = 0;
+    for (const test of attempts) {
+      let changed = false;
+      test.questions = test.questions.map((q, i) => {
+        const src = record.questions[i];
+        if (!src) return q;
+        const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
+        const next = pickBilingualQuestionFields({
+          ...plain,
+          question_hi: src.question_hi || plain.question_hi,
+          options_hi: src.options_hi || plain.options_hi,
+          explanation_hi: src.explanation_hi || plain.explanation_hi,
+          matchColumns_hi: src.matchColumns_hi || plain.matchColumns_hi,
+        });
+        if (String(next.question_hi || "") !== String(plain.question_hi || "")) changed = true;
+        return next;
+      });
+      if (changed) {
+        test.markModified("questions");
+        await test.save();
+        attemptsUpdated += 1;
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: `Hindi filled: ${before} → ${after}/${record.questions.length}; synced ${attemptsUpdated} attempt(s)`,
+      data: {
+        before,
+        after,
+        total: record.questions.length,
+        attemptsUpdated,
+        questions: formatQuestionsForPreview(record.questions),
+      },
+    });
+  } catch (error) {
+    console.error("fillMissingPracticeHindi:", error);
+    res.status(500).json({ success: false, message: error.message || "Failed to fill Hindi" });
+  }
+};
+
+/**
  * POST /api/admin/assigned-practice/:id/approve
  * Approve generated questions and mark test ready for assignment.
  */
@@ -686,6 +983,27 @@ export const approvePracticeTest = async (req, res) => {
     }
     if (!record.questions?.length) {
       return res.status(400).json({ success: false, message: "No questions to approve" });
+    }
+
+    const target = Number(record.totalQuestions) || 50;
+    const have = record.questions.length;
+    // Don't lock a short set while generation is still running / under target
+    const stillGenerating =
+      record.status === "generating" ||
+      (record.generationProgress &&
+        !record.generationProgress.isComplete &&
+        record.generationProgress.currentStep !== "completed");
+    if (stillGenerating && have < target) {
+      return res.status(400).json({
+        success: false,
+        message: `Generation still running (${have}/${target}). Wait until ${target} questions are ready, or let refill finish.`,
+      });
+    }
+    if (have < target && record.status !== "ready") {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${have}/${target} questions ready. Wait for RAG refill to finish or regenerate.`,
+      });
     }
 
     record.status = "ready";

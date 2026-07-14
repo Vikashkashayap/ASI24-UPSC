@@ -23,10 +23,11 @@ import {
   estimateTokens,
 } from "./tokenEstimator.service.js";
 import { prepareContextForBatch, ABORT_CONTEXT_TOKENS } from "./contextReducer.service.js";
+import { MAX_PROMPT_TOKENS, MAX_CONTEXT_TOKENS } from "./retriever.service.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const BATCH_RETRIES = Math.max(1, Math.min(3, parseInt(process.env.PRACTICE_BATCH_RETRIES, 10) || 2));
-const TARGET_INPUT_TOKENS = parseInt(process.env.PRACTICE_TARGET_CONTEXT_TOKENS, 10) || 1200;
+const TARGET_INPUT_TOKENS = parseInt(process.env.PRACTICE_TARGET_CONTEXT_TOKENS, 10) || 420;
 
 /**
  * Parse compact notes-grounded JSON array from LLM response.
@@ -103,11 +104,25 @@ function cleanStringList(arr) {
   return arr.map((x) => String(x || "").trim()).filter((x) => x.length >= 3);
 }
 
+/** Match List-I/II items — keep short labels (e.g. UK, Goa); still drop blanks */
+function cleanMatchList(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map((x) => String(x || "").trim()).filter((x) => x.length >= 1);
+}
+
 function normalizeMatchColumns(raw) {
   if (!raw || typeof raw !== "object") return null;
-  const columnA = cleanStringList(raw.columnA || raw.listI || raw.list1);
-  const columnB = cleanStringList(raw.columnB || raw.listII || raw.list2);
+  const columnA = cleanMatchList(raw.columnA || raw.listI || raw.list1);
+  const columnB = cleanMatchList(raw.columnB || raw.listII || raw.list2);
   if (columnA.length < 2 || columnB.length < 2) return null;
+  // Pad shorter side so both lists render complete in UPSC layout
+  const n = Math.max(columnA.length, columnB.length);
+  while (columnA.length < n) columnA.push("");
+  while (columnB.length < n) columnB.push("");
+  // Require at least 2 real pairs on each side
+  const aOk = columnA.filter((x) => x.length >= 1).length;
+  const bOk = columnB.filter((x) => x.length >= 1).length;
+  if (aOk < 2 || bOk < 2) return null;
   return { columnA, columnB };
 }
 
@@ -133,8 +148,14 @@ function hasLetterAndNumberLists(text) {
 function formatMatchStem(intro, columnA, columnB) {
   const lines = [String(intro || "Match the following:").replace(/\s+$/, "")];
   if (!/:$/.test(lines[0])) lines[0] += ":";
-  columnA.forEach((item, i) => lines.push(`${String.fromCharCode(65 + i)}. ${item}`));
-  columnB.forEach((item, i) => lines.push(`${i + 1}. ${item}`));
+  lines.push("List-I");
+  columnA.forEach((item, i) => {
+    if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+  });
+  lines.push("List-II");
+  columnB.forEach((item, i) => {
+    if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+  });
   lines.push("Select the correct answer using the code given below:");
   return lines.join("\n");
 }
@@ -269,7 +290,11 @@ function isCompleteUpscStem(q) {
   }
 
   if (looksMatch) {
-    if (q.matchColumns?.columnA?.length >= 2 && q.matchColumns?.columnB?.length >= 2) return true;
+    const a = q.matchColumns?.columnA || [];
+    const b = q.matchColumns?.columnB || [];
+    const aOk = a.filter((x) => String(x || "").trim()).length;
+    const bOk = b.filter((x) => String(x || "").trim()).length;
+    if (aOk >= 2 && bOk >= 2) return true;
     return hasLetterAndNumberLists(text);
   }
 
@@ -325,15 +350,14 @@ function normalizeNotesQuestion(q, meta = {}) {
   }
 
   const explanationRaw = String(q.explanation ?? q.explanation_en ?? "").trim();
-  // Keep 2–3 clear sentences (best explanation, not a notes dump)
-  const explanation = explanationRaw
-    .split(/(?<=[.!?।])\s+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 3)
-    .join(" ")
-    .trim()
-    .slice(0, 600);
+  // Keep ~50–70 word explanations (enough to teach, not a dump)
+  const explanation = (() => {
+    const cleaned = explanationRaw.replace(/\s+/g, " ").trim();
+    if (!cleaned) return "";
+    const words = cleaned.split(/\s+/).filter(Boolean);
+    if (words.length <= 75) return cleaned.slice(0, 900);
+    return `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`.slice(0, 900);
+  })();
   // Short source quote only — never dump long notes into UI "Source"
   let sourceChunk = String(q.sourceParagraph || q.sourceChunk || q.source_chunk || q.source || "").trim();
   sourceChunk = sourceChunk.replace(/\s+/g, " ").slice(0, 180);
@@ -410,8 +434,9 @@ async function callNotesBatchOnce({
   subject,
   chapter,
   temperature = 0.2,
+  openKnowledge = false,
 }) {
-  const systemPrompt = buildNotesQuestionSystemPrompt();
+  const systemPrompt = buildNotesQuestionSystemPrompt({ openKnowledge });
   const userPrompt = buildNotesQuestionUserPrompt({
     context: safeContext,
     topic,
@@ -422,6 +447,7 @@ async function callNotesBatchOnce({
     patternsToInclude,
     batchIndex,
     generationPlan,
+    openKnowledge,
   });
 
   const estimates = estimateRequestTokens({
@@ -477,44 +503,75 @@ async function generateNotesBatch({
   generationPlan = null,
   subject = "",
   chapter = "",
+  ragOptimized = false,
+  openKnowledge = false,
 }) {
   // Cap at 10 questions per request (Rule 5)
   const safeBatchSize = Math.min(10, Math.max(1, parseInt(batchSize, 10) || 10));
-  const MAX_FILL_ROUNDS = Math.max(3, parseInt(process.env.PRACTICE_BATCH_FILL_ROUNDS, 10) || 5);
+  // Honor PRACTICE_BATCH_FILL_ROUNDS exactly (clamp 1–8). Do NOT force a floor of 3/5.
+  const parsedFillRounds = parseInt(process.env.PRACTICE_BATCH_FILL_ROUNDS, 10);
+  const MAX_FILL_ROUNDS = Math.max(
+    1,
+    Math.min(8, Number.isFinite(parsedFillRounds) && parsedFillRounds > 0 ? parsedFillRounds : 5)
+  );
+  const promptCeiling = MAX_PROMPT_TOKENS || 900;
+  // RAG: keep context at NOTES_BATCH_CONTEXT_TOKENS — never double the budget
+  const contextTarget = ragOptimized
+    ? Math.min(MAX_CONTEXT_TOKENS || 420, TARGET_INPUT_TOKENS || 420)
+    : TARGET_INPUT_TOKENS;
+  const abortTokens = ragOptimized ? promptCeiling : ABORT_CONTEXT_TOKENS;
 
-  if (!contextText || contextText.length < 40) {
+  if (openKnowledge) {
+    // No KB context — tiny prompt, open syllabus knowledge only
+    console.log(`🧠 Open-knowledge batch ${batchLabel || `Batch ${batchIndex + 1}`}: topic="${topic}" (KB empty)`);
+  } else if (!contextText || contextText.length < 40) {
     console.warn(`⚠️ Notes batch ${batchLabel}: empty context, skipping`);
     return { questions: [], usage: {}, model, durationMs: 0 };
   }
 
-  const prepared = prepareContextForBatch(contextText, {
-    batchIndex,
-    targetTokens: TARGET_INPUT_TOKENS,
-    abortTokens: ABORT_CONTEXT_TOKENS,
-  });
-  let safeContext = prepared.context;
-  if (!safeContext || safeContext.length < 40) {
+  let safeContext = openKnowledge ? "" : String(contextText || "");
+  let prepared = {
+    context: safeContext,
+    chunkIndex: 0,
+    totalChunks: 1,
+    tokens: estimateTokens(safeContext),
+    reduced: false,
+    summarized: false,
+  };
+
+  // RAG path: context is already top-k chunks — only soft-trim to budget.
+  // Live/full-text path: keep legacy word-chunk reduction.
+  if (!openKnowledge && (!ragOptimized || estimateTokens(safeContext) > contextTarget)) {
+    prepared = prepareContextForBatch(contextText, {
+      batchIndex,
+      targetTokens: contextTarget,
+      abortTokens,
+    });
+    safeContext = prepared.context;
+  }
+
+  if (!openKnowledge && (!safeContext || safeContext.length < 40)) {
     console.warn(`⚠️ Notes batch ${batchLabel}: context empty after reduction, skipping`);
     return { questions: [], usage: {}, model, durationMs: 0 };
   }
 
-  if (prepared.reduced || prepared.summarized) {
+  if (!openKnowledge && (prepared.reduced || prepared.summarized)) {
     console.log(
-      `📉 Context ${batchLabel || `Batch ${batchIndex + 1}`}: chunk ${prepared.chunkIndex + 1}/${prepared.totalChunks || 1}, tokens=${prepared.tokens}, reduced=${prepared.reduced}, summarized=${prepared.summarized}`
+      `📉 Context ${batchLabel || `Batch ${batchIndex + 1}`}: chunk ${prepared.chunkIndex + 1}/${prepared.totalChunks || 1}, tokens=${prepared.tokens}, reduced=${prepared.reduced}, summarized=${prepared.summarized}, rag=${ragOptimized}`
     );
   }
 
-  if (estimateTokens(safeContext) > ABORT_CONTEXT_TOKENS) {
+  if (!openKnowledge && estimateTokens(safeContext) > abortTokens) {
     const { summarizeContext } = await import("./contextReducer.service.js");
-    safeContext = summarizeContext(safeContext, TARGET_INPUT_TOKENS);
+    safeContext = summarizeContext(safeContext, contextTarget);
     console.log(
-      `🛑 Context exceeded ${ABORT_CONTEXT_TOKENS} tokens — summarized to ${estimateTokens(safeContext)} before Gemini call`
+      `🛑 Context exceeded ${abortTokens} tokens — summarized to ${estimateTokens(safeContext)} before Gemini call`
     );
   }
 
-  // Shrink notes if prompt overhead pushes total input over abort
-  {
-    const systemPrompt = buildNotesQuestionSystemPrompt();
+  // Shrink notes if prompt overhead pushes total input over prompt ceiling
+  if (!openKnowledge) {
+    const systemPrompt = buildNotesQuestionSystemPrompt({ openKnowledge: false });
     const probeUser = buildNotesQuestionUserPrompt({
       context: safeContext,
       topic,
@@ -525,16 +582,21 @@ async function generateNotesBatch({
       patternsToInclude,
       batchIndex,
       generationPlan,
+      openKnowledge: false,
     });
     const probe = estimateRequestTokens({
       systemPrompt,
       userPrompt: probeUser,
       questionCount: safeBatchSize,
     });
-    if (probe.inputTokens > ABORT_CONTEXT_TOKENS) {
+    if (probe.inputTokens > promptCeiling) {
       const { reduceToImportantContent } = await import("./contextReducer.service.js");
-      const overhead = probe.systemTokens + 120;
-      safeContext = reduceToImportantContent(safeContext, Math.max(500, TARGET_INPUT_TOKENS - overhead));
+      const overhead = probe.systemTokens + (probe.userTokens - estimateTokens(safeContext)) + 80;
+      const room = Math.max(280, promptCeiling - overhead);
+      safeContext = reduceToImportantContent(safeContext, room);
+      console.log(
+        `📉 Prompt clamp to ≤${promptCeiling}: context → ${estimateTokens(safeContext)} tokens (overhead≈${overhead})`
+      );
     }
   }
 
@@ -543,36 +605,39 @@ async function generateNotesBatch({
   let modelUsed = model;
   let durationMs = 0;
   let fill = 0;
-  // Enough fill rounds to absorb incomplete-stem drops + duplicates
-  const MAX_FILL = Math.max(5, Math.min(8, MAX_FILL_ROUNDS));
+  const MAX_FILL = MAX_FILL_ROUNDS;
+  let lastFillContext = "";
+  let identicalZeroStreak = 0;
 
   while (collected.length < safeBatchSize && fill < MAX_FILL) {
     const need = safeBatchSize - collected.length;
-    // First attempt: full batch. Later fills: over-request so rejects/dupes don't leave a gap.
+    // Modest cushion only — never jump to 5 when need is 1–2 (burns output tokens).
     const requestCount =
-      fill === 0
-        ? need
-        : Math.min(10, Math.max(need, need <= 2 ? 5 : Math.min(need + 2, 8)));
+      fill === 0 ? need : Math.min(10, need + (need <= 2 ? 1 : Math.min(2, need)));
     const label = `${batchLabel || `Batch ${batchIndex + 1}`} fill ${fill + 1} (need ${need}, req ${requestCount})`;
 
-    // Rotate context chunk on stalled fills so we don't keep hitting the same thin slice
+    // Rotate context on stalled fills (RAG + legacy) so we don't re-pay the same prompt.
     let fillContext = safeContext;
-    if ((fill > 0 && collected.length === 0) || fill >= 2) {
+    const shouldRotate = !openKnowledge && ((fill > 0 && collected.length === 0) || fill >= 2);
+    if (shouldRotate) {
       const rotated = prepareContextForBatch(contextText, {
         batchIndex: batchIndex + fill + 3,
-        targetTokens: TARGET_INPUT_TOKENS,
-        abortTokens: ABORT_CONTEXT_TOKENS,
+        targetTokens: contextTarget,
+        abortTokens,
       });
       if (rotated.context && rotated.context.length >= 80) {
         fillContext = rotated.context;
       }
     }
 
+    const identicalContext = fill > 0 && fillContext === lastFillContext;
+    lastFillContext = fillContext;
+
     const once = await callNotesBatchOnce({
       apiKey,
       model,
       requestCount,
-      safeContext: fillContext,
+      safeContext: openKnowledge ? "" : fillContext,
       topic,
       difficulty,
       batchLabel: label,
@@ -582,6 +647,7 @@ async function generateNotesBatch({
       subject,
       chapter,
       temperature: fill === 0 ? 0.2 : Math.min(0.55, 0.3 + fill * 0.05),
+      openKnowledge,
     });
 
     durationMs += once.durationMs || 0;
@@ -613,7 +679,19 @@ async function generateNotesBatch({
 
     if (collected.length >= safeBatchSize) break;
     fill += 1;
-    if (collected.length === before) await sleep(350 * fill);
+    if (collected.length === before) {
+      identicalZeroStreak = identicalContext ? identicalZeroStreak + 1 : 1;
+      // Same packed RAG slice twice with zero yield → stop (token storm guard)
+      if (identicalZeroStreak >= 2) {
+        console.warn(
+          `⚠️ Notes batch ${label}: stopping fills — identical context twice with no new uniques`
+        );
+        break;
+      }
+      await sleep(350 * fill);
+    } else {
+      identicalZeroStreak = 0;
+    }
   }
 
   const finalQs = collected.slice(0, safeBatchSize);
@@ -643,6 +721,8 @@ export async function generateQuestionsFromContextBatch({
   generationPlan = null,
   subject = "",
   chapter = "",
+  ragOptimized = false,
+  openKnowledge = false,
 }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   const model = getPracticeGenerationModel();
@@ -656,12 +736,14 @@ export async function generateQuestionsFromContextBatch({
     contextText,
     topic,
     difficulty,
-    batchLabel: `Batch ${batchIndex + 1}`,
+    batchLabel: openKnowledge ? `OpenKB ${batchIndex + 1}` : `Batch ${batchIndex + 1}`,
     patternsToInclude,
     batchIndex,
     generationPlan,
     subject,
     chapter,
+    ragOptimized,
+    openKnowledge,
   });
   return {
     success: result.questions.length > 0,
@@ -669,6 +751,7 @@ export async function generateQuestionsFromContextBatch({
     usage: result.usage || {},
     model: result.model || model,
     durationMs: result.durationMs || 0,
+    openKnowledge: Boolean(openKnowledge),
   };
 }
 
@@ -740,7 +823,7 @@ export async function generateQuestionsFromNotes({
         apiKey,
         model,
         batchSize: size,
-        contextText,
+        contextText: contextText.contextText || contextText,
         topic: activeTopicName,
         difficulty,
         batchLabel: `${label} [${activeTopicName}]`,
@@ -749,6 +832,7 @@ export async function generateQuestionsFromNotes({
         generationPlan,
         subject: subjectStr,
         chapter,
+        ragOptimized: true,
       });
     };
 

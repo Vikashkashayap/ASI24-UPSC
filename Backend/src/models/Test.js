@@ -91,6 +91,7 @@ const testSchema = new mongoose.Schema(
         questionType: { type: String, required: false },
         tableData: { type: mongoose.Schema.Types.Mixed, required: false },
         matchColumns: { type: mongoose.Schema.Types.Mixed, required: false },
+        matchColumns_hi: { type: mongoose.Schema.Types.Mixed, required: false },
         assertionReason: { type: mongoose.Schema.Types.Mixed, required: false },
         eliminationLogic: { type: String, required: false },
         conceptualSource: { type: String, required: false },

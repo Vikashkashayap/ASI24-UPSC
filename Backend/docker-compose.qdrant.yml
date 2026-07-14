@@ -1,0 +1,24 @@
+# Qdrant vector DB for Topic Practice RAG (Step 3)
+# Usage (from Backend folder):
+#   docker compose -f docker-compose.qdrant.yml up -d
+# Dashboard: http://localhost:6333/dashboard
+# Then set in .env:
+#   QDRANT_URL=http://localhost:6333
+#   QDRANT_COLLECTION=notes_chunks
+#   QDRANT_VECTOR_SIZE=1024
+#   EMBEDDING_PROVIDER=bge-m3
+#   HF_TOKEN=hf_xxx   # or EMBEDDING_BASE_URL for local TEI/Infinity
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: asi24-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    restart: unless-stopped
+
+volumes:
+  qdrant_storage:

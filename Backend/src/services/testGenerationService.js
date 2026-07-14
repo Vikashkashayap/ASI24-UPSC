@@ -2129,210 +2129,258 @@ Per question: questionType (statement|match|assertion|chronology|pair|map|direct
 Return ONLY a JSON array. No markdown. Unique concept per question.`;
 }
 
+function practiceQuestionHasHindiStem(q) {
+  return /[\u0900-\u097F]/.test(String(q?.question_hi || ""));
+}
+
+function buildPracticeHindiTranslatePayload(q, idx) {
+  const matchColumns = buildMatchColumnsPayload(q);
+  const enQ = String(q.question_en || q.question || "").replace(/\\n/g, "\n").trim();
+  const numbered = (enQ.match(/(?:^|\n)\s*\d+[.)]\s+.+/g) || []).map((l) =>
+    l.replace(/^\s*\d+[.)]\s+/, "").trim()
+  );
+  return {
+    id: idx,
+    question: matchColumns ? enQ.split("\n")[0].trim() || "Match the following:" : enQ,
+    options: q.options_en || q.options,
+    explanation: String(q.explanation_en || q.explanation || "").trim().slice(0, 500),
+    ...(matchColumns ? { matchColumns } : {}),
+    ...(numbered.length >= 2 ? { numberedItems: numbered } : {}),
+  };
+}
+
+function applyPracticeHindiRow(mergedQ, row, srcLabel) {
+  if (!row || !mergedQ) return false;
+  let appliedStem = false;
+
+  const questionHi = String(row.question_hi || row.question || "").trim();
+  const optionsHi = row.options_hi || row.options;
+  const explanationHi = String(row.explanation_hi || "").trim();
+
+  // Structured match columns first (prevents List-I/II merge bug)
+  const mcHi = row.matchColumns_hi || row.matchColumns;
+  if (mcHi && typeof mcHi === "object") {
+    const columnA = (mcHi.columnA || []).map((x) => String(x || "").trim()).filter(Boolean);
+    const columnB = (mcHi.columnB || []).map((x) => String(x || "").trim()).filter(Boolean);
+    if (columnA.length >= 2 && columnB.length >= 2) {
+      mergedQ.matchColumns_hi = { columnA, columnB };
+      const intro = questionHi.split("\n")[0] || "निम्नलिखित का मिलान कीजिए:";
+      const lines = [intro.replace(/:$/, "") + ":"];
+      lines.push("सूची-I");
+      columnA.forEach((item, idx) => lines.push(`${String.fromCharCode(65 + idx)}. ${item}`));
+      lines.push("सूची-II");
+      columnB.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
+      lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+      mergedQ.question_hi = lines.join("\n");
+      appliedStem = true;
+    }
+  } else {
+    // Rebuild statement/chronology Hindi stem from numberedItems_hi when present
+    const numberedHi = Array.isArray(row.numberedItems_hi)
+      ? row.numberedItems_hi.map((x) => String(x || "").trim()).filter(Boolean)
+      : [];
+    const enFull = String(mergedQ.question_en || mergedQ.question || "").replace(/\\n/g, "\n");
+    const enHasNumbers = ((enFull.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length) >= 2;
+
+    if (numberedHi.length >= 2) {
+      const intro =
+        (questionHi && !/^\d+[.)]/.test(questionHi.split("\n")[0])
+          ? questionHi.split("\n")[0]
+          : enFull.split("\n")[0]) || "निम्नलिखित पर विचार करें:";
+      const lines = [intro.replace(/:$/, "") + ":"];
+      numberedHi.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
+      if (/chronolog|arrange|कालानुक्रम/i.test(enFull)) {
+        lines.push("सही कालानुक्रमिक क्रम चुनिए:");
+      } else if (/statement|कथन/i.test(enFull)) {
+        lines.push("उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?");
+      }
+      mergedQ.question_hi = lines.join("\n");
+      appliedStem = true;
+    } else if (questionHi && /[\u0900-\u097F]/.test(questionHi)) {
+      const hiNums = (questionHi.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+      // Do not save intro-only Hindi when English stem has numbered items
+      if (enHasNumbers && hiNums < 2) {
+        console.warn(
+          `⚠️ Skipping incomplete Hindi stem for ${srcLabel} (EN has lists, HI intro-only)`
+        );
+      } else {
+        mergedQ.question_hi = questionHi.replace(/\\n/g, "\n");
+        appliedStem = true;
+        if (mergedQ.matchColumns?.columnA?.length) {
+          const parsedHi = parseMatchFollowingFromText(mergedQ.question_hi);
+          if (parsedHi?.columnA?.length >= 2 && parsedHi?.columnB?.length >= 2) {
+            mergedQ.matchColumns_hi = {
+              columnA: parsedHi.columnA.map((t) =>
+                String(t).replace(/\s+\d+[.)]\s+[\s\S]*$/, "").trim()
+              ),
+              columnB: parsedHi.columnB,
+            };
+          }
+        }
+      }
+    }
+  }
+
+  if (optionsHi && typeof optionsHi === "object") {
+    const hiOpts = {
+      A: String(optionsHi.A ?? optionsHi.a ?? "").trim(),
+      B: String(optionsHi.B ?? optionsHi.b ?? "").trim(),
+      C: String(optionsHi.C ?? optionsHi.c ?? "").trim(),
+      D: String(optionsHi.D ?? optionsHi.d ?? "").trim(),
+    };
+    if (Object.values(hiOpts).some((v) => /[\u0900-\u097F]/.test(v))) {
+      mergedQ.options_hi = hiOpts;
+    }
+  }
+
+  if (explanationHi && /[\u0900-\u097F]/.test(explanationHi)) {
+    const cleaned = explanationHi.replace(/\s+/g, " ").trim();
+    const words = cleaned.split(/\s+/).filter(Boolean);
+    mergedQ.explanation_hi =
+      words.length <= 80 ? cleaned.slice(0, 900) : `${words.slice(0, 70).join(" ")}`.slice(0, 900);
+  }
+
+  return appliedStem;
+}
+
+/**
+ * Translate a subset of practice questions (by absolute index) into Hindi.
+ * Returns how many stems were newly applied in this call.
+ */
+async function translatePracticeHindiIndexBatch(apiKey, model, merged, indices, label) {
+  if (!indices.length) return 0;
+
+  const slice = indices.map((i) => merged[i]);
+  const payload = slice.map((q, idx) => buildPracticeHindiTranslatePayload(q, idx));
+
+    const systemPrompt = `UPSC Hindi translator. Return JSON array only.
+For each item return: id, question_hi, options_hi {A,B,C,D}, explanation_hi (50–70 Devanagari words; full teaching explanation, not one line).
+If matchColumns present: also matchColumns_hi:{columnA:[],columnB:[]} (same lengths; never merge lists).
+If numberedItems present: translate EACH item and return numberedItems_hi:[...] same length — question_hi MUST include intro + "1. ..\\n2. .." lines from numberedItems_hi (never intro-only).
+Same count/order. No markdown.`;
+  const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
+  const maxTokens = getMaxTokensForPracticeHindiBatch(slice.length);
+
+  console.log(`📝 ${label}: ${slice.length} Q, max_tokens≈${maxTokens}...`);
+
+  let rows = [];
+  const attempts = slice.length <= 2 ? 3 : 2;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const { aiContent, finishReason } = await callOpenRouterTestGeneration({
+        apiKey,
+        model,
+        systemPrompt,
+        userPrompt,
+        maxTokens,
+        apiTitle: "UPSC Mentor - Topic Practice Hindi",
+      });
+
+      if (!aiContent || !String(aiContent).trim()) {
+        console.warn(`${label} attempt ${attempt}: empty content (finish=${finishReason})`);
+        continue;
+      }
+
+      if (finishReason === "length") {
+        console.warn(`⚠️ ${label} truncated (max_tokens=${maxTokens}) — salvaging partial JSON`);
+      }
+      if (finishReason === "error") {
+        console.warn(`⚠️ ${label} finish=error — will retry if parse incomplete`);
+      }
+
+      let parsed = null;
+      try {
+        parsed = JSON.parse(
+          aiContent.trim().replace(/^```\s*(?:json)?\s*/i, "").replace(/\s*```\s*$/, "")
+        );
+      } catch (_) {
+        parsed = extractJsonFromContent(aiContent);
+      }
+      if (!parsed) {
+        const matches = String(aiContent).match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g) || [];
+        const salvaged = [];
+        for (const m of matches) {
+          try {
+            const obj = JSON.parse(m);
+            if (obj && (obj.question_hi || obj.options_hi || obj.id != null)) salvaged.push(obj);
+          } catch {
+            /* skip */
+          }
+        }
+        if (salvaged.length) parsed = salvaged;
+      }
+
+      rows = Array.isArray(parsed) ? parsed : parsed?.questions || [];
+      if (rows.length > 0) break;
+      console.warn(`${label} attempt ${attempt}: empty parse`);
+    } catch (err) {
+      console.warn(`${label} attempt ${attempt} failed:`, err.message);
+    }
+  }
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    console.warn(`${label}: keeping English fallbacks`);
+    return 0;
+  }
+
+  let applied = 0;
+  for (let i = 0; i < indices.length; i += 1) {
+    const srcIdx = indices[i];
+    const row = rows.find((r) => r?.id === i) ?? rows[i];
+    if (applyPracticeHindiRow(merged[srcIdx], row, `Q${srcIdx + 1}`)) applied += 1;
+  }
+  console.log(`✅ ${label}: ${applied}/${slice.length} questions translated`);
+  return applied;
+}
+
 /**
  * One cheap Hindi pass for English-only practice questions.
  * Structured matchColumns_hi + explanation_hi to avoid broken List-I/II layout.
+ * Retries missing stems with smaller batches (3 → 1) until coverage is complete.
  */
 export async function batchTranslatePracticeQuestionsToHindi(apiKey, model, questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
 
-  const chunkSize = getPracticeHindiBatchSize();
   const merged = questions.map((q) => ({ ...q }));
-  let translatedCount = 0;
+  const allIndices = merged.map((_, i) => i);
 
-  for (let start = 0; start < merged.length; start += chunkSize) {
-    const slice = merged.slice(start, start + chunkSize);
-    const payload = slice.map((q, idx) => {
-      const matchColumns = buildMatchColumnsPayload(q);
-      const enQ = String(q.question_en || q.question || "").replace(/\\n/g, "\n").trim();
-      const numbered = (enQ.match(/(?:^|\n)\s*\d+[.)]\s+.+/g) || []).map((l) =>
-        l.replace(/^\s*\d+[.)]\s+/, "").trim()
-      );
-      return {
-        id: idx,
-        question: matchColumns
-          ? enQ.split("\n")[0].trim() || "Match the following:"
-          : enQ,
-        options: q.options_en || q.options,
-        explanation: String(q.explanation_en || q.explanation || "").trim().slice(0, 500),
-        ...(matchColumns ? { matchColumns } : {}),
-        ...(numbered.length >= 2 ? { numberedItems: numbered } : {}),
-      };
-    });
-
-    const systemPrompt = `UPSC Hindi translator. Return JSON array only.
-For each item return: id, question_hi, options_hi {A,B,C,D}, explanation_hi (2-3 Devanagari sentences).
-If matchColumns present: also matchColumns_hi:{columnA:[],columnB:[]} (same lengths; never merge lists).
-If numberedItems present: translate EACH item and return numberedItems_hi:[...] same length — question_hi MUST include intro + "1. ..\\n2. .." lines from numberedItems_hi (never intro-only).
-Same count/order. No markdown.`;
-    const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
-
-    const maxTokens = getMaxTokensForPracticeHindiBatch(slice.length);
-    const batchNo = Math.floor(start / chunkSize) + 1;
-    console.log(
-      `📝 Topic practice Hindi batch ${batchNo}: ${slice.length} Q, max_tokens≈${maxTokens}...`
-    );
-
-    let rows = [];
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
-      try {
-        const { aiContent, finishReason } = await callOpenRouterTestGeneration({
-          apiKey,
-          model,
-          systemPrompt,
-          userPrompt,
-          maxTokens,
-          apiTitle: "UPSC Mentor - Topic Practice Hindi",
-        });
-
-        if (!aiContent || !String(aiContent).trim()) {
-          console.warn(`Topic practice Hindi batch ${batchNo} attempt ${attempt}: empty content (finish=${finishReason})`);
-          continue;
-        }
-
-        if (finishReason === "length") {
-          console.warn(
-            `⚠️ Topic practice Hindi batch ${batchNo} truncated (max_tokens=${maxTokens}) — salvaging partial JSON`
-          );
-        }
-
-        let parsed = null;
-        try {
-          parsed = JSON.parse(
-            aiContent.trim().replace(/^```\s*(?:json)?\s*/i, "").replace(/\s*```\s*$/, "")
-          );
-        } catch (_) {
-          parsed = extractJsonFromContent(aiContent);
-        }
-        if (!parsed) {
-          const matches = String(aiContent).match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g) || [];
-          const salvaged = [];
-          for (const m of matches) {
-            try {
-              const obj = JSON.parse(m);
-              if (obj && (obj.question_hi || obj.options_hi || obj.id != null)) salvaged.push(obj);
-            } catch {
-              /* skip */
-            }
-          }
-          if (salvaged.length) parsed = salvaged;
-        }
-
-        rows = Array.isArray(parsed) ? parsed : parsed?.questions || [];
-        if (rows.length > 0) break;
-        console.warn(`Topic practice Hindi batch ${batchNo} attempt ${attempt}: empty parse`);
-      } catch (err) {
-        console.warn(`Topic practice Hindi batch ${batchNo} attempt ${attempt} failed:`, err.message);
-      }
-    }
-
-    if (!Array.isArray(rows) || rows.length === 0) {
-      console.warn(`Topic practice Hindi batch ${batchNo}: keeping English fallbacks`);
-      continue;
-    }
-
+  const runPass = async (indices, chunkSize, passLabel) => {
     let applied = 0;
-    for (let i = 0; i < slice.length; i += 1) {
-      const srcIdx = start + i;
-      const row = rows.find((r) => r?.id === i) ?? rows[i];
-      if (!row || !merged[srcIdx]) continue;
-
-      const questionHi = String(row.question_hi || row.question || "").trim();
-      const optionsHi = row.options_hi || row.options;
-      const explanationHi = String(row.explanation_hi || "").trim();
-
-      // Structured match columns first (prevents List-I/II merge bug)
-      const mcHi = row.matchColumns_hi || row.matchColumns;
-      if (mcHi && typeof mcHi === "object") {
-        const columnA = (mcHi.columnA || []).map((x) => String(x || "").trim()).filter(Boolean);
-        const columnB = (mcHi.columnB || []).map((x) => String(x || "").trim()).filter(Boolean);
-        if (columnA.length >= 2 && columnB.length >= 2) {
-          merged[srcIdx].matchColumns_hi = { columnA, columnB };
-          const intro = questionHi.split("\n")[0] || "निम्नलिखित का मिलान कीजिए:";
-          const lines = [intro.replace(/:$/, "") + ":"];
-          lines.push("सूची-I");
-          columnA.forEach((item, idx) => lines.push(`${String.fromCharCode(65 + idx)}. ${item}`));
-          lines.push("सूची-II");
-          columnB.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
-          lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
-          merged[srcIdx].question_hi = lines.join("\n");
-          applied += 1;
-        }
-      } else {
-        // Rebuild statement/chronology Hindi stem from numberedItems_hi when present
-        const numberedHi = Array.isArray(row.numberedItems_hi)
-          ? row.numberedItems_hi.map((x) => String(x || "").trim()).filter(Boolean)
-          : [];
-        const enFull = String(merged[srcIdx].question_en || merged[srcIdx].question || "").replace(/\\n/g, "\n");
-        const enHasNumbers = ((enFull.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length) >= 2;
-
-        if (numberedHi.length >= 2) {
-          const intro =
-            (questionHi && !/^\d+[.)]/.test(questionHi.split("\n")[0])
-              ? questionHi.split("\n")[0]
-              : enFull.split("\n")[0]) || "निम्नलिखित पर विचार करें:";
-          const lines = [intro.replace(/:$/, "") + ":"];
-          numberedHi.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
-          if (/chronolog|arrange|कालानुक्रम/i.test(enFull)) {
-            lines.push("सही कालानुक्रमिक क्रम चुनिए:");
-          } else if (/statement|कथन/i.test(enFull)) {
-            lines.push("उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?");
-          }
-          merged[srcIdx].question_hi = lines.join("\n");
-          applied += 1;
-        } else if (questionHi && /[\u0900-\u097F]/.test(questionHi)) {
-          const hiNums = (questionHi.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
-          // Do not save intro-only Hindi when English stem has numbered items
-          if (enHasNumbers && hiNums < 2) {
-            console.warn(
-              `⚠️ Skipping incomplete Hindi stem for Q${srcIdx + 1} (EN has lists, HI intro-only)`
-            );
-          } else {
-            merged[srcIdx].question_hi = questionHi.replace(/\\n/g, "\n");
-            applied += 1;
-            if (merged[srcIdx].matchColumns?.columnA?.length) {
-              const parsedHi = parseMatchFollowingFromText(merged[srcIdx].question_hi);
-              if (parsedHi?.columnA?.length >= 2 && parsedHi?.columnB?.length >= 2) {
-                merged[srcIdx].matchColumns_hi = {
-                  columnA: parsedHi.columnA.map((t) =>
-                    String(t).replace(/\s+\d+[.)]\s+[\s\S]*$/, "").trim()
-                  ),
-                  columnB: parsedHi.columnB,
-                };
-              }
-            }
-          }
-        }
-      }
-
-      if (optionsHi && typeof optionsHi === "object") {
-        const hiOpts = {
-          A: String(optionsHi.A ?? optionsHi.a ?? "").trim(),
-          B: String(optionsHi.B ?? optionsHi.b ?? "").trim(),
-          C: String(optionsHi.C ?? optionsHi.c ?? "").trim(),
-          D: String(optionsHi.D ?? optionsHi.d ?? "").trim(),
-        };
-        if (Object.values(hiOpts).some((v) => /[\u0900-\u097F]/.test(v))) {
-          merged[srcIdx].options_hi = hiOpts;
-        }
-      }
-
-      if (explanationHi && /[\u0900-\u097F]/.test(explanationHi)) {
-        const shortHi = explanationHi
-          .split(/(?<=[.!?।])\s+/)
-          .filter(Boolean)
-          .slice(0, 3)
-          .join(" ")
-          .trim()
-          .slice(0, 600);
-        merged[srcIdx].explanation_hi = shortHi;
-      }
+    for (let start = 0; start < indices.length; start += chunkSize) {
+      const batchIndices = indices.slice(start, start + chunkSize);
+      const batchNo = Math.floor(start / chunkSize) + 1;
+      applied += await translatePracticeHindiIndexBatch(
+        apiKey,
+        model,
+        merged,
+        batchIndices,
+        `${passLabel} batch ${batchNo}`
+      );
     }
-    translatedCount += applied;
-    console.log(`✅ Topic practice Hindi batch ${batchNo}: ${applied}/${slice.length} questions translated`);
+    return applied;
+  };
+
+  await runPass(allIndices, getPracticeHindiBatchSize(), "Topic practice Hindi");
+
+  // Retry passes: OpenRouter often returns finish=error on large Hindi batches
+  const retrySizes = [3, 1, 1];
+  for (let r = 0; r < retrySizes.length; r += 1) {
+    const missing = allIndices.filter((i) => !practiceQuestionHasHindiStem(merged[i]));
+    if (!missing.length) break;
+    const size = retrySizes[r];
+    console.log(
+      `🔁 Hindi retry ${r + 1}: ${missing.length}/${merged.length} missing → batch size ${size}`
+    );
+    await runPass(missing, size, `Hindi retry-${size}`);
   }
 
-  console.log(`🌐 Hindi translation done: ${translatedCount}/${merged.length} questions have question_hi`);
+  const withHi = allIndices.filter((i) => practiceQuestionHasHindiStem(merged[i])).length;
+  console.log(`🌐 Hindi translation done: ${withHi}/${merged.length} questions have question_hi`);
+  if (withHi < merged.length) {
+    console.warn(
+      `⚠️ Hindi still missing for ${merged.length - withHi} question(s) after retries`
+    );
+  }
   return merged.map(ensureEnglishBilingualFields);
 }
 

@@ -21,7 +21,11 @@ export const ExamLanguageToggle: React.FC<ExamLanguageToggleProps> = ({
       role="group"
       aria-label="Exam language"
     >
-      {(["hi", "en"] as const).map((code) => (
+      {([
+        { code: "hi" as const, label: "हिंदी" },
+        { code: "both" as const, label: "Both" },
+        { code: "en" as const, label: "English" },
+      ]).map(({ code, label }) => (
         <button
           key={code}
           type="button"
@@ -32,7 +36,7 @@ export const ExamLanguageToggle: React.FC<ExamLanguageToggleProps> = ({
               : "text-slate-600 hover:bg-white"
           }`}
         >
-          {code === "hi" ? "हिंदी" : "English"}
+          {label}
         </button>
       ))}
     </div>

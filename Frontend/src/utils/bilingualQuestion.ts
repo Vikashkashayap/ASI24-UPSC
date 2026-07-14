@@ -1,6 +1,6 @@
 export type OptionKey = "A" | "B" | "C" | "D";
 
-export type ExamLang = "hi" | "en";
+export type ExamLang = "hi" | "en" | "both";
 
 export type BilingualOptions = Record<OptionKey, string>;
 
@@ -94,7 +94,8 @@ export function isBilingualQuestion(q: BilingualQuestionFields): boolean {
 }
 
 export function getQuestionByLang(q: BilingualQuestionFields, lang: ExamLang): string {
-  return lang === "hi" ? getQuestionHindi(q, { strict: true }) : getQuestionEnglish(q);
+  if (lang === "hi") return getQuestionHindi(q, { strict: true });
+  return getQuestionEnglish(q);
 }
 
 export function getOptionByLang(
@@ -102,9 +103,8 @@ export function getOptionByLang(
   key: OptionKey,
   lang: ExamLang
 ): string {
-  return lang === "hi"
-    ? getOptionHindi(q, key, { strict: true })
-    : getOptionEnglish(q, key);
+  if (lang === "hi") return getOptionHindi(q, key, { strict: true });
+  return getOptionEnglish(q, key);
 }
 
 type ExplanationShape = string | { A?: string; B?: string; C?: string; D?: string } | undefined;

@@ -54,6 +54,97 @@ export class MongoRetriever {
       scores: top.map((r) => r.score),
     };
   }
+
+  /**
+   * Search chunks across an entire chapter (PDF / notes SourceUrl).
+   * @param {string} sourceUrlId
+   * @param {string} query
+   * @param {number} topK
+   */
+  async retrieveByChapter(sourceUrlId, query, topK = 12) {
+    const chunks = await ContentChunk.find({ sourceUrlId })
+      .sort({ order: 1 })
+      .select("_id heading text order tokenCount sourceUrl topicId page subTopic source")
+      .lean();
+
+    if (!chunks.length) return { chunks: [], scores: [] };
+
+    const queryTerms = tokenize(query);
+    const scored = chunks.map((chunk) => ({
+      chunk,
+      score:
+        keywordScore(chunk.text, queryTerms) +
+        keywordScore(chunk.heading || "", queryTerms) * 0.6 +
+        keywordScore(chunk.subTopic || "", queryTerms) * 0.8,
+    }));
+
+    scored.sort((a, b) => b.score - a.score);
+
+    const matched = scored.filter((r) => r.score > 0);
+    const pool = matched.length ? matched : [];
+
+    if (
+      process.env.NOTES_USE_EMBEDDINGS === "true" &&
+      embeddingService.isConfigured() &&
+      query.trim() &&
+      pool.length
+    ) {
+      const queryVec = await embeddingService.embed(query);
+      if (queryVec) {
+        const candidates = pool.slice(0, Math.min(pool.length, topK * 3));
+        for (const row of candidates) {
+          const vec = await embeddingService.embed(row.chunk.text.slice(0, 2000));
+          if (vec) {
+            row.score += embeddingService.cosineSimilarity(queryVec, vec) * 10;
+          }
+        }
+        candidates.sort((a, b) => b.score - a.score);
+        const top = candidates.slice(0, topK);
+        return {
+          chunks: top.map((r) => r.chunk),
+          scores: top.map((r) => r.score),
+        };
+      }
+    }
+
+    const top = pool.slice(0, topK);
+    return {
+      chunks: top.map((r) => r.chunk),
+      scores: top.map((r) => r.score),
+    };
+  }
+
+  /**
+   * Search chunks across multiple chapters (PDF + website) by sourceUrlId list.
+   */
+  async retrieveBySourceIds(sourceUrlIds, query, topK = 12) {
+    const ids = (sourceUrlIds || []).filter(Boolean);
+    if (!ids.length) return { chunks: [], scores: [] };
+
+    const chunks = await ContentChunk.find({ sourceUrlId: { $in: ids } })
+      .sort({ order: 1 })
+      .select("_id heading text order tokenCount sourceUrl topicId page subTopic source sourceUrlId")
+      .lean();
+
+    if (!chunks.length) return { chunks: [], scores: [] };
+
+    const queryTerms = tokenize(query);
+    const scored = chunks.map((chunk) => ({
+      chunk,
+      score:
+        keywordScore(chunk.text, queryTerms) +
+        keywordScore(chunk.heading || "", queryTerms) * 0.6 +
+        keywordScore(chunk.subTopic || "", queryTerms) * 0.8,
+    }));
+
+    scored.sort((a, b) => b.score - a.score);
+    const matched = scored.filter((r) => r.score > 0);
+    const top = matched.slice(0, topK);
+    return {
+      chunks: top.map((r) => r.chunk),
+      scores: top.map((r) => r.score),
+    };
+  }
 }
 
 function tokenize(text) {

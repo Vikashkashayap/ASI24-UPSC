@@ -46,6 +46,7 @@ import {
   deletePracticeQuestion,
   regeneratePracticeQuestion,
   savePracticeQuestions,
+  fillMissingPracticeHindi,
   approvePracticeTest,
 } from "../controllers/assignedPracticeController.js";
 import {
@@ -58,6 +59,12 @@ import {
   getNotesCatalog,
   syncNotesBySlug,
   repairNotesChapter,
+  uploadNotesPdf,
+  processNotesPdf,
+  reindexNotesChapter,
+  reindexNotesTopic,
+  notesVectorHealth,
+  searchNotesChunks,
 } from "../controllers/notesController.js";
 import {
   getAllPlans,
@@ -90,6 +97,12 @@ const upload = multer({
 const pdfUpload = upload.fields([
   { name: "questionPdf", maxCount: 1 },
   { name: "answerKeyPdf", maxCount: 1 },
+]);
+
+/** Topic Practice / notes KB — single or multi PDF upload. */
+const notesPdfUpload = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "files", maxCount: 10 },
 ]);
 
 // Debugging: Log all hits to admin routes
@@ -125,6 +138,7 @@ router.post("/assigned-practice", createAssignedPractice);
 router.get("/assigned-practice", listAdminAssignedPractice);
 router.get("/assigned-practice/:id", getAssignedPracticeById);
 router.patch("/assigned-practice/:id/questions", savePracticeQuestions);
+router.post("/assigned-practice/:id/fill-hindi", fillMissingPracticeHindi);
 router.patch("/assigned-practice/:id/questions/:index", updatePracticeQuestion);
 router.delete("/assigned-practice/:id/questions/:index", deletePracticeQuestion);
 router.post("/assigned-practice/:id/questions/:index/regenerate", regeneratePracticeQuestion);
@@ -142,6 +156,27 @@ router.post("/notes/sync-chapter", syncNotesChapter);
 router.post("/notes/sync-by-slug", syncNotesBySlug);
 router.post("/notes/repair-chapter/:chapterId", repairNotesChapter);
 router.post("/notes/sync-topic/:topicId", syncNotesTopic);
+router.post("/notes/upload-pdf", (req, res, next) => {
+  notesPdfUpload(req, res, (err) => {
+    if (!err) return next();
+    if (err instanceof multer.MulterError) {
+      const message =
+        err.code === "LIMIT_FILE_SIZE"
+          ? "PDF too large (max 50MB)"
+          : err.message || "Upload error";
+      return res.status(400).json({ success: false, message });
+    }
+    return res.status(400).json({
+      success: false,
+      message: err.message || "Only PDF files are allowed",
+    });
+  });
+}, uploadNotesPdf);
+router.post("/notes/process-pdf/:chapterId", processNotesPdf);
+router.post("/notes/reindex/:chapterId", reindexNotesChapter);
+router.post("/notes/reindex-topic/:topicId", reindexNotesTopic);
+router.get("/notes/vector-health", notesVectorHealth);
+router.get("/notes/search-chunks", searchNotesChunks);
 
 // Pricing plans: CRUD (admin only)
 router.get("/pricing", getAllPlans);

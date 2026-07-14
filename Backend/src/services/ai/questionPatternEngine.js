@@ -108,7 +108,7 @@ class QuestionPatternEngine {
    * @param {{questionCount?: number, patternsToInclude?: string[]}} opts
    */
   createPlan(opts = {}) {
-    const total = Math.max(1, Math.min(50, parseInt(opts.questionCount, 10) || 50));
+    const total = Math.max(1, Math.min(120, parseInt(opts.questionCount, 10) || 50));
     const activePatterns = resolveNotesPatterns(opts.patternsToInclude);
     return {
       total,

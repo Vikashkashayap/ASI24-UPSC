@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { CheckCircle, XCircle } from "lucide-react";
 import { UpscFormattedQuestionStem } from "../UpscFormattedQuestionStem";
 import {
   BilingualQuestionFields,
   ExamLang,
   OptionKey,
-  getOptionByLang,
   getQuestionEnglish,
   getQuestionHindi,
   getOptionEnglish,
@@ -117,7 +116,7 @@ function MatchFollowingTable({
             {data.columnA.map((item, i) => (
               <li key={i} className="flex gap-2 break-words leading-relaxed">
                 <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
-                <span className={itemTextClass}>{item}</span>
+                <span className={itemTextClass}>{String(item || "").trim() || "—"}</span>
               </li>
             ))}
           </ol>
@@ -139,15 +138,15 @@ function MatchFollowingTable({
             {listIILabel}
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
-            {(data.columnB.length ? data.columnB : data.columnA.map((_, i) => "")).map(
-              (item, i) =>
-                item ? (
-                  <li key={i} className="flex gap-2 break-words leading-relaxed">
-                    <span className={numClassII}>{i + 1}.</span>
-                    <span className={itemTextClass}>{item}</span>
-                  </li>
-                ) : null
-            )}
+            {Array.from({ length: Math.max(data.columnB.length, data.columnA.length, 1) }, (_, i) => {
+              const item = String(data.columnB[i] || "").trim();
+              return (
+                <li key={i} className="flex gap-2 break-words leading-relaxed">
+                  <span className={numClassII}>{i + 1}.</span>
+                  <span className={itemTextClass}>{item || "—"}</span>
+                </li>
+              );
+            })}
           </ol>
         </div>
       </div>
@@ -209,7 +208,10 @@ function BilingualMatchView({
 
   if (!enData && !hiData) return null;
 
-  if (!lang) {
+  const showBoth = !lang || lang === "both";
+  const showLabels = showBoth;
+
+  if (showBoth) {
     const blocks: React.ReactNode[] = [];
     if (hiData) {
       blocks.push(
@@ -221,8 +223,16 @@ function BilingualMatchView({
           compact={compact}
           accent="blue"
           paperMode={paperMode}
+          hideLabel={!showLabels}
         />
       );
+    } else {
+      const hiText = getQuestionHindi(question, { strict: true });
+      if (hiText) {
+        blocks.push(
+          <LangPanel key="hi-fallback" label="हिंदी" text={hiText} compact={compact} accent="blue" paperMode={paperMode} />
+        );
+      }
     }
     if (enData) {
       blocks.push(
@@ -234,11 +244,19 @@ function BilingualMatchView({
           compact={compact}
           accent="slate"
           paperMode={paperMode}
+          hideLabel={!showLabels}
         />
       );
+    } else {
+      const enText = getQuestionEnglish(question);
+      if (enText) {
+        blocks.push(
+          <LangPanel key="en-fallback" label="English" text={enText} compact={compact} accent="slate" paperMode={paperMode} />
+        );
+      }
     }
     if (blocks.length === 0) return null;
-    return <div className="space-y-3">{blocks}</div>;
+    return <div className="space-y-4">{blocks}</div>;
   }
 
   const hiFirst = lang === "hi";
@@ -293,10 +311,8 @@ function BilingualMatchView({
 
   if (hiFirst) {
     pushHi();
-    pushEn();
   } else {
     pushEn();
-    pushHi();
   }
 
   return <div className="space-y-3">{blocks}</div>;
@@ -338,7 +354,32 @@ function BilingualAssertionView({
 
   if (!enStem && !hiStem) return null;
 
-  if (!lang) {
+  if (!lang || lang === "both") {
+    if (!lang && !hiStem) {
+      return (
+        <UpscFormattedQuestionStem
+          text={enStem || hiStem!}
+          theme="light"
+          compact={compact}
+        />
+      );
+    }
+    const blocks: React.ReactNode[] = [];
+    if (hiStem) {
+      blocks.push(
+        <LangPanel key="hi" label="हिंदी" text={hiStem} compact={compact} accent="blue" paperMode={paperMode} />
+      );
+    }
+    if (enStem) {
+      blocks.push(
+        <LangPanel key="en" label="English" text={enStem} compact={compact} accent="slate" paperMode={paperMode} />
+      );
+    }
+    return <div className="space-y-3">{blocks}</div>;
+  }
+
+  const only = lang === "hi" ? hiStem : enStem;
+  if (!only) {
     return (
       <UpscFormattedQuestionStem
         text={enStem || hiStem!}
@@ -347,34 +388,17 @@ function BilingualAssertionView({
       />
     );
   }
-
-  const hiFirst = lang === "hi";
-  const blocks: React.ReactNode[] = [];
-
-  const pushHi = () => {
-    if (hiStem) {
-      blocks.push(
-        <LangPanel key="hi" label="हिंदी" text={hiStem} compact={compact} accent="blue" paperMode={paperMode} hideLabel />
-      );
-    }
-  };
-  const pushEn = () => {
-    if (enStem) {
-      blocks.push(
-        <LangPanel key="en" label="English" text={enStem} compact={compact} accent="slate" paperMode={paperMode} hideLabel />
-      );
-    }
-  };
-
-  if (hiFirst) {
-    pushHi();
-    pushEn();
-  } else {
-    pushEn();
-    pushHi();
-  }
-
-  return <div className="space-y-3">{blocks}</div>;
+  return (
+    <LangPanel
+      key={lang}
+      label={lang === "hi" ? "हिंदी" : "English"}
+      text={only}
+      compact={compact}
+      accent={lang === "hi" ? "blue" : "slate"}
+      paperMode={paperMode}
+      hideLabel
+    />
+  );
 }
 
 /** Responsive stem — statement / chronology / plain text */
@@ -389,96 +413,45 @@ export function ExamBilingualStem({
   lang?: ExamLang;
   paperMode?: boolean;
 }) {
-  const [tab, setTab] = useState<"hi" | "en">("hi");
   const en = getQuestionEnglish(question);
   const hi = getQuestionHindi(question, { strict: true });
-  const showBoth = !lang && hasDistinctHindiQuestion(question);
 
   if (!en && !hi) return null;
 
-  if (lang && (hi || en)) {
-    const hiFirst = lang === "hi";
-    const primary = hiFirst ? hi || en : en || hi;
-    const secondary = hiFirst ? en : hi;
-    const primaryLabel = hiFirst ? "हिंदी" : "English";
-    const secondaryLabel = hiFirst ? "English" : "हिंदी";
-    const showSecondary = Boolean(secondary && secondary !== primary);
-
+  // Both languages — UPSC bilingual paper style
+  if (lang === "both" || (!lang && hasDistinctHindiQuestion(question))) {
     return (
-      <div className="space-y-2">
-        <LangPanel
-          label={primaryLabel}
-          text={primary}
-          compact={compact}
-          accent={hiFirst ? "blue" : "slate"}
-          paperMode={paperMode}
-          hideLabel
-        />
-        {showSecondary ? (
-          <LangPanel
-            label={secondaryLabel}
-            text={secondary}
-            compact={compact}
-            accent={hiFirst ? "slate" : "blue"}
-            paperMode={paperMode}
-            hideLabel
-          />
+      <div className="space-y-3">
+        {hi ? (
+          <LangPanel label="हिंदी" text={hi} compact={compact} accent="blue" paperMode={paperMode} />
+        ) : null}
+        {en ? (
+          <LangPanel label="English" text={en} compact={compact} accent="slate" paperMode={paperMode} />
         ) : null}
       </div>
     );
   }
 
-  if (!showBoth) {
-    return <UpscFormattedQuestionStem text={en || hi} theme="light" compact={compact} />;
+  if (lang === "hi" || lang === "en") {
+    const text = lang === "hi" ? hi || en : en || hi;
+    return (
+      <LangPanel
+        label={lang === "hi" ? "हिंदी" : "English"}
+        text={text}
+        compact={compact}
+        accent={lang === "hi" ? "blue" : "slate"}
+        paperMode={paperMode}
+        hideLabel
+      />
+    );
   }
 
-  return (
-    <>
-      <div className="md:hidden">
-        <div className="flex gap-2 mb-3">
-          {(["hi", "en"] as const).map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => setTab(code)}
-              className={`flex-1 py-2 text-[11px] font-semibold transition-colors touch-manipulation ${
-                tab === code
-                  ? paperMode
-                    ? "bg-black/10 text-black border border-black/30 shadow-none"
-                    : "bg-blue-600 text-white shadow-sm"
-                  : paperMode
-                    ? "bg-white/50 text-black/70 border border-black/15"
-                    : "bg-slate-100 text-slate-600 border border-slate-200"
-              } ${paperMode ? "rounded-sm upsc-exam-serif" : "rounded-lg"}`}
-            >
-              {code === "hi" ? "हिंदी" : "English"}
-            </button>
-          ))}
-        </div>
-        <LangPanel
-          label={tab === "hi" ? "हिंदी" : "English"}
-          text={tab === "hi" ? hi : en}
-          compact={compact}
-          accent={tab === "hi" ? "blue" : "slate"}
-          paperMode={paperMode}
-        />
-      </div>
-
-      <div className="hidden md:grid md:grid-cols-2 md:gap-4 min-h-0">
-        <div className={`min-w-0 md:pr-3 ${paperMode ? "md:border-r md:border-black/15" : "md:border-r md:border-slate-100"}`}>
-          <LangPanel label="हिंदी" text={hi} compact={compact} accent="blue" paperMode={paperMode} />
-        </div>
-        <div className="min-w-0 md:pl-0.5">
-          <LangPanel label="English" text={en} compact={compact} accent="slate" paperMode={paperMode} />
-        </div>
-      </div>
-    </>
-  );
+  return <UpscFormattedQuestionStem text={en || hi} theme="light" compact={compact} />;
 }
 
 function hasUsableMatchColumns(cols?: { columnA?: string[]; columnB?: string[] } | null): boolean {
-  const a = (cols?.columnA || []).filter((x) => String(x || "").trim().length >= 2);
-  const b = (cols?.columnB || []).filter((x) => String(x || "").trim().length >= 2);
+  const a = (cols?.columnA || []).filter((x) => String(x || "").trim().length >= 1);
+  const b = (cols?.columnB || []).filter((x) => String(x || "").trim().length >= 1);
   return a.length >= 2 && b.length >= 2;
 }
 
@@ -595,12 +568,14 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
 }) => {
   const en = getOptionEnglish(question, optionKey);
   const hi = getOptionHindi(question, optionKey, { strict: true });
-  const showBoth = !lang && Boolean(hi && en && hi !== en);
-  const dualLang = Boolean(lang && hi && en && hi !== en);
-  const displayText = lang ? getOptionByLang(question, optionKey, lang) : en || hi;
+  const showBoth = (lang === "both" || !lang) && Boolean(hi && en && hi !== en);
+  const singleLang = lang === "hi" || lang === "en";
+  const displayText = singleLang
+    ? lang === "hi"
+      ? hi || en
+      : en || hi
+    : en || hi;
   const missingHi = lang === "hi" && !hi;
-  const primaryOpt = lang === "hi" ? hi || en : en || hi;
-  const secondaryOpt = lang === "hi" ? en : hi;
 
   return (
     <button
@@ -630,22 +605,11 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
         <div className="min-w-0 flex-1 exam-option-text py-0.5">
           {missingHi ? (
             <p className="break-words">{en}</p>
-          ) : dualLang ? (
-            <div className="space-y-1">
-              <p className="break-words font-medium text-slate-900">{primaryOpt}</p>
-              <p className="break-words text-slate-500 text-[12px] sm:text-[13px] leading-relaxed">
-                {secondaryOpt}
-              </p>
-            </div>
           ) : showBoth ? (
-            <>
-              <p className="break-words font-medium text-slate-900 sm:hidden">{hi}</p>
-              <p className="break-words hidden sm:block">
-                <span className="font-medium text-slate-900">{hi}</span>
-                <span className="text-slate-300 mx-1.5">/</span>
-                <span className="text-slate-600">{en}</span>
-              </p>
-            </>
+            <div className="space-y-1">
+              <p className="break-words font-medium text-slate-900">{hi}</p>
+              <p className="break-words text-slate-500 text-[12px] sm:text-[13px] leading-relaxed">{en}</p>
+            </div>
           ) : (
             <p className="break-words">{displayText}</p>
           )}
@@ -688,12 +652,14 @@ export const ExamReviewOptionRow: React.FC<ExamReviewOptionRowProps> = ({
 }) => {
   const en = getOptionEnglish(question, optionKey);
   const hi = getOptionHindi(question, optionKey, { strict: true });
-  const showBoth = !lang && Boolean(hi && en && hi !== en);
-  const dualLang = Boolean(lang && hi && en && hi !== en);
-  const displayText = lang ? getOptionByLang(question, optionKey, lang) : en || hi;
+  const showBoth = (lang === "both" || !lang) && Boolean(hi && en && hi !== en);
+  const singleLang = lang === "hi" || lang === "en";
+  const displayText = singleLang
+    ? lang === "hi"
+      ? hi || en
+      : en || hi
+    : en || hi;
   const missingHi = lang === "hi" && !hi;
-  const primaryOpt = lang === "hi" ? hi || en : en || hi;
-  const secondaryOpt = lang === "hi" ? en : hi;
 
   const isCorrect = optionKey === correctAnswer;
   const isUserWrong = optionKey === userAnswer && userAnswer !== correctAnswer;
@@ -736,22 +702,11 @@ export const ExamReviewOptionRow: React.FC<ExamReviewOptionRowProps> = ({
         <div className="min-w-0 flex-1 exam-option-text py-0.5">
           {missingHi ? (
             <p className="break-words leading-relaxed">{en}</p>
-          ) : dualLang ? (
-            <div className="space-y-0.5">
-              <p className="break-words leading-relaxed font-medium text-slate-900">{primaryOpt}</p>
-              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">
-                {secondaryOpt}
-              </p>
-            </div>
           ) : showBoth ? (
-            <>
-              <p className="break-words font-medium text-slate-900 leading-relaxed sm:hidden">{hi}</p>
-              <p className="break-words leading-relaxed hidden sm:block">
-                <span className="font-medium text-slate-900">{hi}</span>
-                <span className="text-slate-300 mx-1.5">/</span>
-                <span className="text-slate-600">{en}</span>
-              </p>
-            </>
+            <div className="space-y-0.5">
+              <p className="break-words leading-relaxed font-medium text-slate-900">{hi}</p>
+              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">{en}</p>
+            </div>
           ) : (
             <p className="break-words leading-relaxed">{displayText}</p>
           )}

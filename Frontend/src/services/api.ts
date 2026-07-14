@@ -347,16 +347,21 @@ export const prelimsMockAPI = {
   startAttempt: (mockId: string) => api.post(`/api/prelims-mock/${mockId}/start`),
 };
 
-// Assigned topic practice – admin generates 50Q by subject+topic and assigns to students
+// Assigned topic practice – admin generates 50/100Q by subject+topic and assigns to students
 export interface AssignedPracticeGeneratePayload {
   subject: string;
   topic: string;
   chapter?: string;
-  notesTopicIds: string[];
+  chapterId?: string;
+  /** Free-text topic keyword — searches chapter PDF/notes chunks via RAG */
+  searchQuery?: string;
+  notesTopicIds?: string[];
   notesTopicId?: string;
   difficulty?: "easy" | "moderate" | "hard";
   title?: string;
   patternsToInclude?: string[];
+  /** 50 (default) or 100 */
+  questionCount?: 50 | 100;
 }
 
 export interface NotesChapter {
@@ -366,12 +371,19 @@ export interface NotesChapter {
   url: string;
   slug?: string;
   gsPaper?: string;
+  sourceType?: "url" | "pdf";
   topicCount: number;
   expectedTopicCount?: number;
   chunkCount: number;
   status: string;
   synced?: boolean;
   lastSyncedAt?: string;
+  hasPdf?: boolean;
+  originalFileName?: string;
+  fileSize?: number;
+  embeddingStatus?: "pending" | "indexing" | "indexed" | "failed" | "skipped";
+  embeddingModel?: string;
+  embeddingsIndexedAt?: string | null;
 }
 
 export interface NotesTopic {
@@ -384,6 +396,9 @@ export interface NotesTopic {
   summary: string;
   chunkCount: number;
   sourceUrl: string;
+  sourceFormat?: "web" | "pdf";
+  pageStart?: number | null;
+  pageEnd?: number | null;
 }
 
 export const notesAPI = {
@@ -407,18 +422,97 @@ export const notesAPI = {
   getCatalog: () => api.get("/api/admin/notes/catalog"),
   syncTopic: (topicId: string, url?: string) =>
     api.post(`/api/admin/notes/sync-topic/${topicId}`, url ? { url } : {}),
+  /** Upload one or many PDFs into subject knowledge (RAG searchable with website notes). */
+  uploadPdf: async (params: {
+    file?: File;
+    files?: File[];
+    subject: string;
+    title?: string;
+    chapterId?: string;
+    skipProcess?: boolean;
+    /** Always add as new knowledge PDF (do not replace chapter). Default true when files[].length > 1 */
+    forceNew?: boolean;
+    addToKnowledge?: boolean;
+  }) => {
+    const formData = new FormData();
+    const list = params.files?.length ? params.files : params.file ? [params.file] : [];
+    if (!list.length) throw new Error("No PDF file provided");
+
+    if (list.length === 1 && !params.forceNew && !params.addToKnowledge) {
+      formData.append("file", list[0]);
+    } else {
+      list.forEach((f) => formData.append("files", f));
+    }
+    formData.append("subject", params.subject);
+    if (params.title) formData.append("title", params.title);
+    if (params.chapterId) formData.append("chapterId", params.chapterId);
+    if (params.skipProcess) formData.append("skipProcess", "true");
+    if (params.forceNew || params.addToKnowledge || list.length > 1) {
+      formData.append("forceNew", "true");
+      formData.append("addToKnowledge", "true");
+    }
+    return api.post<{
+      success: boolean;
+      message: string;
+      data: {
+        count?: number;
+        chapter: NotesChapter;
+        chapters?: NotesChapter[];
+        processed?: boolean;
+        pageCount?: number;
+        topics?: Array<{ _id: string; name: string; chunkCount: number }>;
+      };
+    }>("/api/admin/notes/upload-pdf", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 600000,
+    });
+  },
+  /** Re-run Step 2 for an already-uploaded PDF chapter. */
+  processPdf: (chapterId: string) =>
+    api.post(`/api/admin/notes/process-pdf/${chapterId}`, null, { timeout: 300000 }),
+  /** Step 3: sync / re-index embeddings → Qdrant (hash-gated unless force). */
+  reindexChapter: (chapterId: string, force = false) =>
+    api.post(`/api/admin/notes/reindex/${chapterId}`, { force }, { timeout: 300000 }),
+  reindexTopic: (topicId: string, force = true) =>
+    api.post(`/api/admin/notes/reindex-topic/${topicId}`, { force }, { timeout: 300000 }),
+  vectorHealth: () => api.get("/api/admin/notes/vector-health"),
+  /** Preview chunk matches for a typed topic keyword (subject-wide PDF + website). */
+  searchChunks: (params: { subject?: string; chapterId?: string; q: string }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        query: string;
+        matchedChunks: number;
+        source: string;
+        tokens: number;
+        scope?: string;
+        preview: Array<{ heading: string; page: number | null; excerpt: string; source?: string }>;
+      };
+    }>("/api/admin/notes/search-chunks", {
+      params: {
+        q: params.q,
+        ...(params.subject ? { subject: params.subject } : {}),
+        ...(params.chapterId ? { chapterId: params.chapterId } : {}),
+      },
+    }),
 };
 
 export interface PreviewQuestion {
   index: number;
   question: string;
+  question_en?: string;
+  question_hi?: string;
   options: { A: string; B: string; C: string; D: string };
+  options_hi?: { A?: string; B?: string; C?: string; D?: string };
   correctAnswer: string;
   explanation: string;
   questionType?: string;
   patternLabel?: string;
   sourceNote?: string;
   difficulty?: string;
+  matchColumns?: { columnA: string[]; columnB: string[] } | null;
+  matchColumns_hi?: { columnA: string[]; columnB: string[] } | null;
+  backupReason?: string;
 }
 
 export interface GenerationProgress {
@@ -442,7 +536,8 @@ export const assignedPracticeAPI = {
   getById: (id: string) => api.get(`/api/admin/assigned-practice/${id}`),
   assign: (id: string, studentIds: string[]) =>
     api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),
-  listAdmin: () => api.get("/api/admin/assigned-practice"),
+  listAdmin: (params?: { page?: number; limit?: number; filter?: "all" | "assigned" | "unassigned" }) =>
+    api.get("/api/admin/assigned-practice", { params }),
   delete: (id: string) => api.delete(`/api/admin/assigned-practice/${id}`),
   updateQuestion: (id: string, index: number, data: Partial<PreviewQuestion>) =>
     api.patch(`/api/admin/assigned-practice/${id}/questions/${index}`, data),
@@ -453,6 +548,7 @@ export const assignedPracticeAPI = {
   saveQuestions: (id: string, questions: PreviewQuestion[]) =>
     api.patch(`/api/admin/assigned-practice/${id}/questions`, { questions }),
   approve: (id: string) => api.post(`/api/admin/assigned-practice/${id}/approve`),
+  fillHindi: (id: string) => api.post(`/api/admin/assigned-practice/${id}/fill-hindi`),
   // Student
   listMine: () => api.get("/api/tests/assigned-practice"),
   getHistory: (params?: { page?: number; limit?: number }) =>

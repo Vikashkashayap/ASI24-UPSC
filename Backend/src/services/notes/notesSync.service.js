@@ -7,40 +7,15 @@ import { splitIntoChunks } from "./chunking.service.js";
 import ContentChunk from "../../models/ContentChunk.js";
 import crypto from "crypto";
 import { getCatalogChapters } from "../../config/notesCatalog.js";
-import { embeddingService } from "../ai/embedding.service.js";
-import { qdrantService } from "../ai/qdrant.service.js";
+import { indexTopicInVectorDb, indexChapterInVectorDb } from "./notesVectorIndex.service.js";
 import {
   extractTopicsFromChapterPage,
   extractTitleFromTopicPageHtml,
   resolveTopicName,
-  decodeHtmlEntities,
 } from "./notesHtmlParser.js";
 
-const NOTES_BASE = "https://notes.mentorsdaily.com";
-
-async function indexTopicInVectorDb(topicId) {
-  if (!embeddingService.isConfigured() || !qdrantService.isConfigured()) return;
-  const chunks = await ContentChunk.find({ topicId }).sort({ order: 1 }).lean();
-  if (!chunks.length) return;
-  const vectors = await embeddingService.embedBatch(chunks.map((c) => c.text));
-  const upsertRows = chunks.map((chunk, idx) => ({
-    id: chunk._id.toString(),
-    vector: vectors[idx],
-    payload: {
-      topicId: String(chunk.topicId),
-      sourceUrlId: String(chunk.sourceUrlId),
-      order: chunk.order,
-      heading: chunk.heading || "",
-      text: chunk.text || "",
-      sourceUrl: chunk.sourceUrl || "",
-      tokenCount: chunk.tokenCount || 0,
-    },
-  }));
-  const inserted = await qdrantService.upsertChunks({ chunks: upsertRows });
-  if (inserted > 0) {
-    console.log(`🧠 Qdrant indexed ${inserted} chunks for topic ${topicId}`);
-  }
-}
+// re-export for callers that imported from this module
+export { indexTopicInVectorDb, indexChapterInVectorDb };
 
 /**
  * Fetch a notes page and extract main article text.
@@ -169,8 +144,6 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
         chunks,
         topicUrl
       );
-      await qdrantService.deleteNoteChunks(topic._id.toString());
-      await indexTopicInVectorDb(topic._id);
       totalChunks += saved;
     }
 
@@ -182,6 +155,15 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
     chapter.contentHash = hashContent(chapterHtml);
     await chapter.save();
 
+    // Step 3: hash-gated BGE-M3 → Qdrant (skips if embedding deps missing)
+    let embedding = null;
+    try {
+      embedding = await indexChapterInVectorDb(chapter._id, { force: true });
+    } catch (embedErr) {
+      console.warn("[notesSync] embedding index skipped/failed:", embedErr.message);
+      embedding = { skipped: true, reason: embedErr.message };
+    }
+
     return {
       chapterId: chapter._id,
       title: chapter.title,
@@ -190,6 +172,7 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
       topicCount: chapter.topicCount,
       chunkCount: chapter.chunkCount,
       status: chapter.status,
+      embedding,
     };
   } catch (err) {
     chapter.status = "failed";
@@ -220,8 +203,7 @@ export async function syncTopicFromUrl({ topicId, topicUrl }) {
 
   const chunks = splitIntoChunks(pageText, { heading: topic.name });
   const saved = await notesService.saveTopicChunks(topic._id, topic.sourceUrlId, chunks, url);
-  await qdrantService.deleteNoteChunks(topic._id.toString());
-  await indexTopicInVectorDb(topic._id);
+  const embedding = await indexTopicInVectorDb(topic._id, { force: true });
 
   topic.summary = pageText.slice(0, 400);
   topic.chunkCount = saved;
@@ -238,7 +220,7 @@ export async function syncTopicFromUrl({ topicId, topicUrl }) {
     await chapter.save();
   }
 
-  return { topicId: topic._id, name: topic.name, chunkCount: saved };
+  return { topicId: topic._id, name: topic.name, chunkCount: saved, embedding };
 }
 
 /**

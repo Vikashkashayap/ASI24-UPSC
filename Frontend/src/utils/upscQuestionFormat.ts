@@ -403,11 +403,24 @@ export function resolveMatchColumns(
   },
   lang: "en" | "hi" = "en"
 ): ParsedMatchFollowing | null {
+  const normalizeCols = (columnA: string[], columnB: string[]) => {
+    const a = columnA.map((x) => String(x || "").trim());
+    const b = columnB.map((x) => String(x || "").trim());
+    const n = Math.max(a.length, b.length);
+    while (a.length < n) a.push("");
+    while (b.length < n) b.push("");
+    return { columnA: a, columnB: b };
+  };
+
   if (lang === "hi") {
     if (question.matchColumns_hi?.columnA?.length) {
-      const columnA = (question.matchColumns_hi.columnA || []).filter((x) => String(x || "").trim());
-      const columnB = (question.matchColumns_hi.columnB || []).filter((x) => String(x || "").trim());
-      if (columnA.length >= 2 && columnB.length >= 2) {
+      const { columnA, columnB } = normalizeCols(
+        question.matchColumns_hi.columnA || [],
+        question.matchColumns_hi.columnB || []
+      );
+      const aOk = columnA.filter(Boolean).length;
+      const bOk = columnB.filter(Boolean).length;
+      if (aOk >= 2 && bOk >= 2) {
         return {
           intro: "निम्नलिखित का मिलान कीजिए:",
           columnA,
@@ -417,14 +430,36 @@ export function resolveMatchColumns(
       }
     }
     const hiText = String(question.question_hi || "").trim();
-    if (!hiText) return null;
-    return parseMatchFollowingFromText(hiText) || parseMatchParagraph(hiText);
+    if (hiText) {
+      const parsed = parseMatchFollowingFromText(hiText) || parseMatchParagraph(hiText);
+      if (parsed && parsed.columnA.filter(Boolean).length >= 2 && parsed.columnB.filter(Boolean).length >= 2) {
+        return parsed;
+      }
+    }
+    // Fall back to English structured lists with Hindi labels — better than blank List-II
+    if (question.matchColumns?.columnA?.length) {
+      const { columnA, columnB } = normalizeCols(
+        question.matchColumns.columnA || [],
+        question.matchColumns.columnB || []
+      );
+      if (columnA.filter(Boolean).length >= 2 && columnB.filter(Boolean).length >= 2) {
+        return {
+          intro: "निम्नलिखित का मिलान कीजिए:",
+          columnA,
+          columnB,
+          prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
+        };
+      }
+    }
+    return null;
   }
 
   if (question.matchColumns?.columnA?.length) {
-    const columnA = (question.matchColumns.columnA || []).filter((x) => String(x || "").trim());
-    const columnB = (question.matchColumns.columnB || []).filter((x) => String(x || "").trim());
-    if (columnA.length >= 2 && columnB.length >= 2) {
+    const { columnA, columnB } = normalizeCols(
+      question.matchColumns.columnA || [],
+      question.matchColumns.columnB || []
+    );
+    if (columnA.filter(Boolean).length >= 2 && columnB.filter(Boolean).length >= 2) {
       return {
         intro: "Match the following:",
         columnA,

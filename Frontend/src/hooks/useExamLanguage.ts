@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 
-export type ExamLang = "hi" | "en";
+export type ExamLang = "hi" | "en" | "both";
 
 const STORAGE_KEY = "asi24_exam_lang";
 
 export function readExamLang(): ExamLang {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
-    if (v === "en" || v === "hi") return v;
+    if (v === "en" || v === "hi" || v === "both") return v;
   } catch {
     /* ignore */
   }
-  return "hi";
+  return "both";
 }
 
 export function useExamLanguage() {
@@ -27,12 +27,12 @@ export function useExamLanguage() {
   }, []);
 
   const toggleLang = useCallback(() => {
-    setLang(lang === "hi" ? "en" : "hi");
+    setLang(lang === "hi" ? "en" : lang === "en" ? "both" : "hi");
   }, [lang, setLang]);
 
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && (e.newValue === "hi" || e.newValue === "en")) {
+      if (e.key === STORAGE_KEY && (e.newValue === "hi" || e.newValue === "en" || e.newValue === "both")) {
         setLangState(e.newValue);
       }
     };

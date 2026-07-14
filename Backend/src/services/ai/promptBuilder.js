@@ -1,58 +1,84 @@
 /**
- * PromptBuilder — notes-only UPSC MCQs with COMPLETE stems (never intro-only).
+ * PromptBuilder — RAG-grounded UPSC MCQs from retrieved syllabus chunks only.
+ * Static rules live in SYSTEM. USER prompt is dynamic only.
  */
 
-import { buildBatchPatternHint, resolveNotesPatterns } from "../../config/questionPatterns.js";
+import { resolveNotesPatterns } from "../../config/questionPatterns.js";
 
-const SYSTEM_PROMPT = `You are a UPSC CSE Question Setter.
-Generate questions ONLY using the supplied MentorsDaily Notes.
-Never use outside knowledge.
-Never guess.
-Return valid JSON only.
-Never output intro-only stems.`;
+/**
+ * Compact but explicit — flash-lite needs clear JSON/stem rules (Phase 2 slim + reliability).
+ */
+const SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
+Use ONLY the user CONTEXT (knowledge base excerpts). Never invent facts outside CONTEXT.
+If CONTEXT lacks a detail, skip that angle — do not use outside knowledge.
+Return ONLY a JSON array (no markdown, no prose).
+Each item MUST have: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words, why correct answer is right; grounded in CONTEXT), sourceParagraph (≤20 words from CONTEXT), difficulty, questionType.
+COMPLETE stems only — never intro-only.
+statement_based: put numbered statements 1. 2. 3. inside question, then ask which are correct. Also set statements[].
+chronology: number events inside question. Also set chronologyItems[].
+pair_matching: List-I (A.) and List-II (1.) inside question. Also set matchColumns{columnA,columnB}.
+assertion_reason: full Assertion (A) and Reason (R) inside question. Also set assertionReason{assertion,reason}.
+direct_conceptual: full clear MCQ stem in question.
+questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual`;
 
-const USER_TAIL = `CRITICAL — COMPLETE STEM (never break):
-- statement_based: question MUST include numbered statements:
-  "Consider the following statements:\\n1. ...\\n2. ...\\n3. ...\\nWhich of the statements given above is/are correct?"
-  ALSO fill "statements":["...","..."]
-- chronology: question MUST include numbered events:
-  "Arrange the following in chronological order:\\n1. ...\\n2. ...\\n3. ...\\n4. ...\\nSelect the correct chronological order:"
-  ALSO fill "chronologyItems":["...","..."]
-- pair_matching: fill matchColumns.columnA + columnB (short items) AND put lists in question.
-- assertion_reason: full Assertion (A) + Reason (R) sentences in question + assertionReason object.
-- NEVER return only the intro line. Options like "1 and 2 only" or "1-2-3-4" are useless without the numbered list in question.
-- explanation: 2-3 short sentences why the correct option is right.
-- sourceParagraph: max 25 words quote.
-- JSON array only.
+/** Used only when knowledge base returned zero chunks for the topic. */
+const OPEN_KNOWLEDGE_SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
+No knowledge-base CONTEXT was found. Use standard UPSC syllabus knowledge for the topic only.
+Return ONLY a JSON array (no markdown).
+Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words), sourceParagraph ("syllabus"), difficulty, questionType.
+COMPLETE stems. questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual`;
 
-Schema:{"question":"FULL stem with \\n and numbered items","options":{"A":"","B":"","C":"","D":""},"answer":"A|B|C|D","explanation":"2-3 sentences","sourceParagraph":"short quote","difficulty":"easy|moderate|hard","questionType":"statement_based|pair_matching|chronology|assertion_reason|direct_conceptual","statements":["s1","s2"]|null,"chronologyItems":["e1","e2"]|null,"matchColumns":null|{"columnA":[],"columnB":[]},"assertionReason":null|{"assertion":"","reason":""}}`;
+function compactPatternMix(count, patternsToInclude, batchIndex = 0) {
+  const active = resolveNotesPatterns(patternsToInclude);
+  const counts = new Map();
+  for (let i = 0; i < count; i += 1) {
+    const id = active[(batchIndex * count + i) % active.length];
+    counts.set(id, (counts.get(id) || 0) + 1);
+  }
+  return [...counts.entries()].map(([id, n]) => `${n}x${id}`).join(",");
+}
 
-export function buildNotesQuestionSystemPrompt() {
-  return SYSTEM_PROMPT;
+function compressContext(text) {
+  return String(text || "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+export function buildNotesQuestionSystemPrompt({ openKnowledge = false } = {}) {
+  return openKnowledge ? OPEN_KNOWLEDGE_SYSTEM_PROMPT : SYSTEM_PROMPT;
 }
 
 export function buildNotesQuestionUserPrompt(params) {
   const count = Math.min(10, Math.max(1, parseInt(params.questionCount, 10) || 10));
   const difficulty = String(params.difficulty || "moderate").toLowerCase();
-  const patterns = resolveNotesPatterns(params.patternsToInclude);
-  const patternHint = buildBatchPatternHint(count, patterns, params.batchIndex ?? 0);
+  const mix = compactPatternMix(count, params.patternsToInclude, params.batchIndex ?? 0);
   const topic = String(params.topic || "").trim();
   const subject = String(params.subject || "").trim();
+  const openKnowledge = Boolean(params.openKnowledge);
+  const context = compressContext(params.context);
+
+  if (openKnowledge) {
+    return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
+Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
+Knowledge base had no matching chunks. Generate EXACTLY ${count} complete UPSC MCQs from standard syllabus knowledge for this topic. Each explanation MUST be 50–70 words. JSON array only.`;
+  }
 
   return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
-Difficulty: ${difficulty}. Patterns: ${patternHint}.
-Generate EXACTLY ${count} COMPLETE UPSC MCQs from Notes. Every stem must be answerable without outside text.
+Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
+Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (knowledge base). Each explanation MUST be 50–70 words. JSON array only.
 
-NOTES:
-${params.context}
-
-${USER_TAIL}`;
+CONTEXT:
+${context}`;
 }
 
 export const promptBuilder = {
   buildNotesQuestionSystemPrompt,
   buildNotesQuestionUserPrompt,
   SYSTEM_PROMPT,
+  OPEN_KNOWLEDGE_SYSTEM_PROMPT,
+  compressContext,
 };
 
 export default promptBuilder;
