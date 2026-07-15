@@ -3,6 +3,8 @@
  * Prefers pdfjs-dist for per-page text; falls back to pdf-parse.
  */
 
+import path from "path";
+import { pathToFileURL } from "url";
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
@@ -10,6 +12,16 @@ const pdfParse = require("pdf-parse");
 
 const SCANNED_PDF_MESSAGE =
   "No text could be extracted from this PDF. It may be scanned (image-only). Use a text-selectable PDF or OCR first.";
+
+/** pdfjs standard fonts dir — avoids `standardFontDataUrl` console spam on Node. */
+function getPdfJsStandardFontDataUrl() {
+  try {
+    const pkg = path.dirname(require.resolve("pdfjs-dist/package.json"));
+    return `${pathToFileURL(path.join(pkg, "standard_fonts")).href}/`;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Normalize extracted page / document text.
@@ -31,7 +43,14 @@ export function cleanExtractedText(text) {
 async function extractWithPdfJs(buffer) {
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const data = new Uint8Array(buffer);
-  const loadingTask = pdfjsLib.getDocument({ data });
+  const standardFontDataUrl = getPdfJsStandardFontDataUrl();
+  const loadingTask = pdfjsLib.getDocument({
+    data,
+    ...(standardFontDataUrl ? { standardFontDataUrl } : {}),
+    // Text extract only — skip font face loading / noisy TrueType warnings
+    disableFontFace: true,
+    verbosity: 0,
+  });
   const pdf = await loadingTask.promise;
   const numPages = pdf.numPages;
   const pages = [];

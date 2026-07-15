@@ -52,6 +52,12 @@ const assignedPracticeTestSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    /** Optional book / notes / PDF source label for the practice set */
+    reference: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     difficulty: {
       type: String,
       enum: ["easy", "moderate", "hard"],

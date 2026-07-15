@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   Loader2,
   Trash2,
@@ -21,6 +22,7 @@ import {
   FileText,
   Database,
   ArrowLeft,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
@@ -79,12 +81,6 @@ interface GeneratedTestSummary {
   };
 }
 
-function buildSelectedTopicLabel(names: string[]): string {
-  if (names.length === 0) return "";
-  if (names.length <= 3) return names.join(" · ");
-  return `${names.slice(0, 2).join(" · ")} · +${names.length - 2} more`;
-}
-
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" });
 }
@@ -96,8 +92,7 @@ function studentInitial(name: string): string {
 }
 
 function listItemTitle(item: AssignedPracticeItem): string {
-  if (item.displayTitle) return item.displayTitle;
-  const raw = item.title || `${item.subject} — ${item.topic}`;
+  const raw = item.title || item.displayTitle || `${item.subject} — ${item.topic}`;
   if (raw.length <= 100) return raw;
   return `${raw.slice(0, 97).trim()}…`;
 }
@@ -135,8 +130,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const [chaptersLoading, setChaptersLoading] = useState(false);
   const [chapterId, setChapterId] = useState("");
   const [topics, setTopics] = useState<NotesTopic[]>([]);
-  const [topicsLoading, setTopicsLoading] = useState(false);
-  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
+  const [testName, setTestName] = useState("");
   const [topicKeyword, setTopicKeyword] = useState("");
   const [keywordMatch, setKeywordMatch] = useState<{
     matchedChunks: number;
@@ -307,7 +301,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       setChapters([]);
       setChapterId("");
       setTopics([]);
-      setSelectedTopicIds([]);
       return;
     }
     let cancelled = false;
@@ -336,23 +329,17 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   useEffect(() => {
     if (!chapterId || chapterId.startsWith("http")) {
       setTopics([]);
-      setSelectedTopicIds([]);
       return;
     }
     let cancelled = false;
     (async () => {
-      setTopicsLoading(true);
       try {
         const res = await notesAPI.getTopics(chapterId);
         if (!cancelled && res.data?.success) {
-          const list = res.data.data || [];
-          setTopics(list);
-          setSelectedTopicIds(list[0]?._id ? [list[0]._id] : []);
+          setTopics(res.data.data || []);
         }
       } catch {
         if (!cancelled) setTopics([]);
-      } finally {
-        if (!cancelled) setTopicsLoading(false);
       }
     })();
     return () => {
@@ -382,11 +369,26 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       (topics.length > 0 && topics.some((t) => (t.chunkCount || 0) > 0))
   );
 
-  const chapterNeedsSync = selectedChapter && !selectedChapter.synced && isWebChapter && !chapterReady;
-  const chapterNeedsContent = Boolean(selectedChapter && !chapterReady);
-  const knowledgeReady =
-    chapterReady || chapters.some((c) => Boolean(c.synced && (c.chunkCount || 0) > 0));
+  const knowledgeReady = chapters.some((c) => Boolean(c.synced && (c.chunkCount || 0) > 0));
   const pdfKnowledgeCount = chapters.filter((c) => c.sourceType === "pdf" || c.hasPdf).length;
+  const subjectChunkTotal = useMemo(
+    () => chapters.reduce((sum, c) => sum + (c.chunkCount || 0), 0),
+    [chapters]
+  );
+  const webChapters = useMemo(
+    () =>
+      chapters.filter(
+        (c) =>
+          /^https?:\/\//i.test(String(c.url || "")) &&
+          c.sourceType !== "pdf" &&
+          !String(c.url || "").startsWith("pdf://")
+      ),
+    [chapters]
+  );
+  const webChaptersPendingSync = useMemo(
+    () => webChapters.filter((c) => !c.synced),
+    [webChapters]
+  );
 
   const selectedPatternsLabel = useMemo(() => {
     if (patternsToInclude.length === DEFAULT_PATTERNS.length) return "All 10 UPSC patterns";
@@ -396,32 +398,13 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       .join(", ");
   }, [patternsToInclude]);
 
-  const selectedTopics = useMemo(
-    () => topics.filter((t) => selectedTopicIds.includes(t._id)),
-    [topics, selectedTopicIds]
-  );
-
   const keywordTrimmed = topicKeyword.trim();
   const keywordMode = keywordTrimmed.length >= 2;
+  const testNameTrimmed = testName.trim();
 
-  const filteredTopics = useMemo(() => {
-    if (!keywordTrimmed) return topics;
-    const q = keywordTrimmed.toLowerCase();
-    return topics.filter(
-      (t) =>
-        t.name.toLowerCase().includes(q) ||
-        String(t.heading || "").toLowerCase().includes(q)
-    );
-  }, [topics, keywordTrimmed]);
-
-  const selectedTopicChunkTotal = useMemo(
-    () => selectedTopics.reduce((sum, t) => sum + (t.chunkCount || 0), 0),
-    [selectedTopics]
-  );
-
-  // Debounced chapter keyword search preview
+  // Debounced subject-wide keyword search preview (RAG / vector DB)
   useEffect(() => {
-    if (!selectedChapter?._id || keywordTrimmed.length < 2) {
+    if (!subject || keywordTrimmed.length < 2) {
       setKeywordMatch(null);
       return;
     }
@@ -451,20 +434,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       clearTimeout(timer);
     };
   }, [topicKeyword, subject]);
-
-  const toggleTopicSelection = (topicId: string) => {
-    setSelectedTopicIds((prev) =>
-      prev.includes(topicId) ? prev.filter((id) => id !== topicId) : [...prev, topicId]
-    );
-  };
-
-  const selectAllTopics = () => {
-    setSelectedTopicIds(topics.map((t) => t._id));
-  };
-
-  const clearTopicSelection = () => {
-    setSelectedTopicIds([]);
-  };
 
   const loadStudents = async () => {
     setStudentsLoading(true);
@@ -628,7 +597,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     setLockedStudentIds(new Set());
     setSelectedStudentIds(new Set());
     setStudentSearch("");
-    setSelectedTopicIds(topics[0]?._id ? [topics[0]._id] : []);
+    setTestName("");
+    setTopicKeyword("");
   };
 
   const handleRepairNames = async () => {
@@ -642,7 +612,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
         const topicsRes = await notesAPI.getTopics(selectedChapter._id);
         if (topicsRes.data?.success) {
           setTopics(topicsRes.data.data || []);
-          setSelectedTopicIds(topicsRes.data.data?.[0]?._id ? [topicsRes.data.data[0]._id] : []);
         }
       }
     } catch (err: unknown) {
@@ -686,7 +655,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             const topicsRes = await notesAPI.getTopics(synced._id);
             if (topicsRes.data?.success) {
               setTopics(topicsRes.data.data || []);
-              setSelectedTopicIds(topicsRes.data.data?.[0]?._id ? [topicsRes.data.data[0]._id] : []);
             }
           }
         }
@@ -701,6 +669,53 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     }
   };
 
+  const handleSyncAllWebsiteChapters = async () => {
+    if (!subject) {
+      setError("Select a subject first");
+      return;
+    }
+    const targets = webChaptersPendingSync.length > 0 ? webChaptersPendingSync : webChapters;
+    if (targets.length === 0) {
+      setError("No website chapters found for this subject to sync.");
+      return;
+    }
+    setError(null);
+    let ok = 0;
+    for (const ch of targets) {
+      const slug = ch.slug || ch.url.replace(/\/$/, "").split("/").pop() || "";
+      if (!slug) continue;
+      setSyncingChapterUrl(ch.url);
+      try {
+        const res = await notesAPI.syncBySlug({ slug, subject, title: ch.title });
+        if (res.data?.success) {
+          ok += 1;
+          const syncedId = res.data.data?.chapterId;
+          if (syncedId) {
+            try {
+              await notesAPI.repairChapter(syncedId);
+            } catch {
+              /* non-fatal */
+            }
+          }
+        }
+      } catch {
+        /* continue remaining */
+      }
+    }
+    setSyncingChapterUrl(null);
+    try {
+      const chaptersRes = await notesAPI.getChapters(subject);
+      if (chaptersRes.data?.success) setChapters(chaptersRes.data.data || []);
+    } catch {
+      /* non-fatal */
+    }
+    if (ok > 0) {
+      setSuccess(`Synced ${ok} website chapter${ok !== 1 ? "s" : ""} from notes.mentorsdaily.com.`);
+    } else {
+      setError("Website sync failed. Try Sync from website on a single chapter.");
+    }
+  };
+
   const refreshChapterTopics = async (subjectStr: string, nextChapterId: string) => {
     const chaptersRes = await notesAPI.getChapters(subjectStr);
     if (chaptersRes.data?.success) {
@@ -709,9 +724,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     setChapterId(nextChapterId);
     const topicsRes = await notesAPI.getTopics(nextChapterId);
     if (topicsRes.data?.success) {
-      const nextTopics = topicsRes.data.data || [];
-      setTopics(nextTopics);
-      setSelectedTopicIds(nextTopics[0]?._id ? [nextTopics[0]._id] : []);
+      setTopics(topicsRes.data.data || []);
     }
   };
 
@@ -769,9 +782,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
           setChapterId(nextId);
           const topicsRes = await notesAPI.getTopics(nextId);
           if (topicsRes.data?.success) {
-            const nextTopics = topicsRes.data.data || [];
-            setTopics(nextTopics);
-            setSelectedTopicIds(nextTopics[0]?._id ? [nextTopics[0]._id] : []);
+            setTopics(topicsRes.data.data || []);
           }
         }
       }
@@ -811,32 +822,24 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     const subjectStr = subject || "";
-    const topicNames = selectedTopics.map((t) => t.name.trim()).filter(Boolean);
-    const topicStrFromList = buildSelectedTopicLabel(topicNames);
-    const chapterStr = selectedChapter?.title?.trim() || "";
-    const useKeyword = keywordTrimmed.length >= 2;
 
-    if (!subjectStr) {
-      setError("Select a subject");
+    if (!testNameTrimmed) {
+      setError("Enter a name for this test");
       return;
     }
-    if (!useKeyword && !selectedChapter?._id) {
-      setError("Select a synced chapter (sync from notes or upload a PDF first)");
+    if (!subjectStr) {
+      setError("Select a subject");
       return;
     }
     if (!knowledgeReady) {
       setError("No knowledge yet. Upload PDF(s) and/or sync website notes for this subject.");
       return;
     }
-    if (!useKeyword && (selectedTopicIds.length === 0 || topicNames.length === 0)) {
-      setError("Type a topic keyword above, or select at least one topic from the list");
+    if (!keywordMode) {
+      setError("Enter a topic keyword (at least 2 characters) to search knowledge and generate questions");
       return;
     }
-    if (!useKeyword && selectedTopicChunkTotal === 0) {
-      setError("Selected topics have no chunks. Re-upload PDF or sync the chapter.");
-      return;
-    }
-    if (useKeyword && keywordMatch && keywordMatch.matchedChunks === 0) {
+    if (keywordMatch && keywordMatch.matchedChunks === 0) {
       setError(`No matching content for "${keywordTrimmed}" in PDF/notes knowledge. Try another keyword.`);
       return;
     }
@@ -848,31 +851,15 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     setSuccess(null);
     setGenerating(true);
     try {
-      const payloadBase = {
+      const res = await assignedPracticeAPI.generate({
+        subject: subjectStr,
+        topic: keywordTrimmed,
+        title: testNameTrimmed,
+        searchQuery: keywordTrimmed,
         difficulty,
         patternsToInclude,
         questionCount,
-      };
-      const res = await assignedPracticeAPI.generate(
-        useKeyword
-          ? {
-              subject: subjectStr,
-              topic: keywordTrimmed,
-              chapter: chapterStr,
-              chapterId: selectedChapter._id,
-              searchQuery: keywordTrimmed,
-              ...payloadBase,
-            }
-          : {
-              subject: subjectStr,
-              topic: topicStrFromList,
-              chapter: chapterStr,
-              chapterId: selectedChapter._id,
-              notesTopicIds: selectedTopicIds,
-              notesTopicId: selectedTopicIds[0],
-              ...payloadBase,
-            }
-      );
+      });
       if (res.data.success && res.data.data) {
         const data = res.data.data;
         setGenerationTestId(data._id);
@@ -886,16 +873,12 @@ export const AssignedPracticeAdminPage: React.FC = () => {
           _id: data._id,
           subject: data.subject,
           topic: data.topic,
-          title: data.title || `${data.subject} — ${data.topic}`,
+          title: data.title || testNameTrimmed,
           totalQuestions: data.totalQuestions || questionCount,
           difficulty: data.difficulty || difficulty,
         });
-        const planned =
-          data.generationProgress?.totalBatches || Math.ceil(questionCount / 10);
         setSuccess(
-          useKeyword
-            ? `Searching PDF/notes for "${keywordTrimmed}" and generating ${questionCount} questions via RAG…`
-            : `Generation started. Creating ${questionCount} questions (~${planned} RAG batches).`
+          `Searching ${subjectStr} knowledge for "${keywordTrimmed}" and generating ${questionCount} questions via RAG…`
         );
         loadList();
       } else {
@@ -1193,8 +1176,20 @@ export const AssignedPracticeAdminPage: React.FC = () => {
         <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
           {flowStep === "assign"
             ? "Select students to assign this practice test. They will see it under Practice Test."
-            : "Select chapter & topic from Notes → AI generates 50 or 100 MCQs (RAG) → Preview & edit → Assign students"}
+            : "Uses central Knowledge Base (notes + PDFs) → AI generates 50 or 100 MCQs (RAG) → Preview & edit → Assign students"}
         </p>
+        {flowStep === "form" && (
+          <Link
+            to="/admin/knowledge-base"
+            className={`mt-3 inline-flex items-center gap-1.5 text-xs font-medium ${
+              isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
+            }`}
+          >
+            <Database className="w-3.5 h-3.5" />
+            Manage Knowledge Base
+            <ExternalLink className="w-3 h-3" />
+          </Link>
+        )}
       </div>
 
       {/* Step indicator */}
@@ -1252,13 +1247,29 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               Step 1 — Generate Test
             </CardTitle>
             <CardDescription>
-              Select subject → upload one or more PDFs and/or sync website notes. Type a topic keyword —
-              we search <strong>PDF + website</strong> knowledge via RAG (only matching chunks go to the AI —
-              never the whole document).
+              Knowledge comes from the central Knowledge Base (website notes + PDFs per subject). Give the test a
+              name, type a topic keyword — we RAG-search then generate from matched chunks.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleGenerate} className="space-y-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                  Test name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={testName}
+                  onChange={(e) => setTestName(e.target.value)}
+                  disabled={generating}
+                  placeholder='e.g. "Preamble — Polity Drill", "Basic Structure Set A"'
+                  className={`w-full px-4 py-2.5 rounded-lg border text-sm ${inputCls}`}
+                />
+                <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                  This name is shown in the practice list and when assigning to students.
+                </p>
+              </div>
+
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
                   Subject (from Notes)
@@ -1289,155 +1300,109 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  Chapters <span className="text-red-500">*</span>
-                  {chapters.length > 0 && (
-                    <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                      {chapters.length} chapter{chapters.length !== 1 ? "s" : ""} · click to select
-                    </span>
-                  )}
-                </label>
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                  <label className={`block text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    Subject knowledge
+                  </label>
+                  <Link
+                    to="/admin/knowledge-base"
+                    className={`inline-flex items-center gap-1 text-xs font-medium ${
+                      isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
+                    }`}
+                  >
+                    <Database className="w-3 h-3" />
+                    Manage in Knowledge Base
+                  </Link>
+                </div>
                 {chaptersLoading ? (
                   <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Loading chapters…
+                    <Loader2 className="w-4 h-4 animate-spin" /> Loading knowledge…
                   </div>
-                ) : chapters.length === 0 ? (
+                ) : !subject ? (
                   <p className={`text-sm ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    No chapters for this subject.
+                    Select a subject to use its PDF + notes knowledge.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {chapters.map((c) => {
-                      const key = c._id || c.url;
-                      const val = c._id || c.url;
-                      const isSelected = chapterId === val;
-                      const isSyncing = syncingChapterUrl === c.url;
-                      const isPdf =
-                        c.sourceType === "pdf" ||
-                        c.hasPdf ||
-                        String(c.url || "").startsWith("pdf://");
-                      const isWeb = /^https?:\/\//i.test(String(c.url || ""));
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          disabled={generating || uploadingPdf}
-                          onClick={() => setChapterId(val)}
-                          className={`text-left rounded-lg border p-3 transition-colors ${
-                            isSelected
-                              ? isDark
-                                ? "border-blue-500 bg-blue-950/40 ring-1 ring-blue-500"
-                                : "border-blue-500 bg-blue-50 ring-1 ring-blue-500"
-                              : isDark
-                                ? "border-slate-600 bg-slate-900/40 hover:border-slate-500"
-                                : "border-slate-200 bg-white hover:border-slate-300"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <p className={`font-medium text-sm leading-snug ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                              {c.title}
-                            </p>
-                            <span className="flex items-center gap-1 shrink-0">
-                              {isPdf && (
-                                <span
-                                  className={`text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${
-                                    isDark ? "bg-slate-700 text-slate-200" : "bg-slate-200 text-slate-700"
-                                  }`}
-                                >
-                                  PDF
-                                </span>
-                              )}
-                              {isSelected && <Check className="w-4 h-4 text-blue-500" />}
-                            </span>
-                          </div>
-                          <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                            {c.synced ? (
-                              <span className="text-green-600 dark:text-green-400">
-                                ✓ {c.topicCount} topics · {c.chunkCount || 0} chunks
-                                {c.embeddingStatus === "indexed" ? " · embedded" : ""}
-                              </span>
-                            ) : (
-                              <span className="text-amber-600 dark:text-amber-400">
-                                {isPdf
-                                  ? "↻ PDF pending — upload/process to enable"
-                                  : `↻ ~${c.expectedTopicCount || "?"} topics · sync or upload PDF`}
-                              </span>
-                            )}
-                          </p>
-                          {c.hasPdf && c.originalFileName && (
-                            <p className={`text-[11px] mt-1 truncate ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                              <FileText className="w-3 h-3 inline mr-1" />
-                              {c.originalFileName}
-                            </p>
-                          )}
-                          {!c.synced && isSelected && isWeb && (
-                            <span
-                              role="button"
-                              tabIndex={0}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (!isSyncing) handleSyncChapter(c);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (!isSyncing) handleSyncChapter(c);
-                                }
-                              }}
-                              className={`inline-flex items-center gap-1 mt-2 text-xs font-medium ${
-                                isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
-                              }`}
-                            >
-                              {isSyncing ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <RefreshCw className="w-3 h-3" />
-                              )}
-                              Sync from notes website
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-                {chapterNeedsSync && selectedChapter && (
-                  <div className={`mt-2 flex flex-wrap items-center gap-2 rounded-lg border p-3 ${isDark ? "border-amber-800/50 bg-amber-950/20" : "border-amber-200 bg-amber-50"}`}>
-                    <p className={`text-xs flex-1 min-w-0 ${isDark ? "text-amber-200" : "text-amber-800"}`}>
-                      This chapter is not synced yet. Sync from{" "}
-                      <a href={selectedChapter.url} target="_blank" rel="noopener noreferrer" className="underline">
-                        notes.mentorsdaily.com
-                      </a>{" "}
-                      or upload a PDF for this chapter below.
+                  <div
+                    className={`rounded-lg border px-3 py-3 text-sm ${
+                      isDark ? "border-slate-600 bg-slate-900/40" : "border-slate-200 bg-slate-50"
+                    }`}
+                  >
+                    <p className={`font-medium ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                      {subject}
+                      <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                        {chapters.length} source{chapters.length !== 1 ? "s" : ""} · {subjectChunkTotal} chunks
+                        {pdfKnowledgeCount > 0 ? ` · ${pdfKnowledgeCount} PDF` : ""}
+                      </span>
                     </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSyncChapter(selectedChapter)}
-                      disabled={!!syncingChapterUrl || uploadingPdf}
-                    >
-                      {syncingChapterUrl === selectedChapter.url ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                      ) : (
-                        <RefreshCw className="w-4 h-4 mr-1" />
-                      )}
-                      Sync Chapter
-                    </Button>
+                    {chapters.length > 0 ? (
+                      <ul className={`mt-2 space-y-2 text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                        {chapters.map((c) => {
+                          const isWeb = /^https?:\/\//i.test(String(c.url || ""));
+                          const isPdf =
+                            c.sourceType === "pdf" ||
+                            c.hasPdf ||
+                            String(c.url || "").startsWith("pdf://");
+                          const isSyncing = syncingChapterUrl === c.url;
+                          return (
+                            <li
+                              key={c._id || c.url}
+                              className="flex flex-wrap items-center justify-between gap-2"
+                            >
+                              <span className="min-w-0 flex-1">
+                                <span className={`font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                                  {c.title}
+                                </span>
+                                {isPdf && (
+                                  <span className={`ml-1.5 text-[10px] font-semibold uppercase ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                                    PDF
+                                  </span>
+                                )}
+                                {isWeb && !isPdf && (
+                                  <span className={`ml-1.5 text-[10px] font-semibold uppercase ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                                    WEB
+                                  </span>
+                                )}
+                                <span className="ml-2">
+                                  {c.synced
+                                    ? `${c.topicCount || 0} topics · ${c.chunkCount || 0} chunks`
+                                    : "not synced yet"}
+                                </span>
+                              </span>
+                              {isWeb && !isPdf && (
+                                <button
+                                  type="button"
+                                  disabled={generating || uploadingPdf || !!syncingChapterUrl}
+                                  onClick={() => void handleSyncChapter(c)}
+                                  className={`inline-flex items-center gap-1 shrink-0 text-xs font-medium ${
+                                    isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
+                                  } disabled:opacity-50`}
+                                >
+                                  {isSyncing ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    <RefreshCw className="w-3 h-3" />
+                                  )}
+                                  {c.synced ? "Re-sync website" : "Sync from website"}
+                                </button>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className={`mt-1 text-xs ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                        No knowledge yet for this subject. Sync from notes website or add PDF(s) below.
+                      </p>
+                    )}
+                    <p className={`mt-2 text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                      Keyword search runs across <strong>all</strong> of {subject} (PDF + website) — RAG uses
+                      matching chunks only.
+                    </p>
                   </div>
                 )}
                 {subject && (
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <input
-                      ref={pdfInputRef}
-                      type="file"
-                      accept="application/pdf,.pdf"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void handleUploadPdf(file, { replaceChapter: true });
-                      }}
-                    />
                     <input
                       ref={pdfAddInputRef}
                       type="file"
@@ -1454,6 +1419,20 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                       variant="outline"
                       className="h-8 text-xs"
                       disabled={!subject || generating || uploadingPdf || !!syncingChapterUrl}
+                      onClick={() => void handleSyncAllWebsiteChapters()}
+                    >
+                      {syncingChapterUrl && webChaptersPendingSync.length > 0 ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
+                      ) : (
+                        <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                      )}
+                      Sync website notes
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 text-xs"
+                      disabled={!subject || generating || uploadingPdf || !!syncingChapterUrl}
                       onClick={() => pdfAddInputRef.current?.click()}
                     >
                       {uploadingPdf ? (
@@ -1463,75 +1442,16 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                       )}
                       {uploadingPdf ? "Uploading PDF(s)…" : "Add PDF(s) to knowledge"}
                     </Button>
-                    {selectedChapter?._id && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="h-8 text-xs"
-                        disabled={!subject || generating || uploadingPdf || !!syncingChapterUrl}
-                        onClick={() => pdfInputRef.current?.click()}
-                      >
-                        <FileText className="w-3.5 h-3.5 mr-1" />
-                        Replace selected chapter PDF
-                      </Button>
-                    )}
-                    {selectedChapter?.synced && selectedChapter._id && isWebChapter && (
-                      <>
-                        <a
-                          href={selectedChapter.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1 text-xs ${isDark ? "text-blue-400" : "text-blue-600"} hover:underline`}
-                        >
-                          <Link2 className="w-3 h-3" />
-                          Open on notes.mentorsdaily.com
-                        </a>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          className="h-7 text-xs"
-                          onClick={handleRepairNames}
-                          disabled={!!syncingChapterUrl || uploadingPdf}
-                        >
-                          {syncingChapterUrl === selectedChapter.url ? (
-                            <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                          ) : (
-                            <RefreshCw className="w-3 h-3 mr-1" />
-                          )}
-                          Fix Topic Names
-                        </Button>
-                      </>
-                    )}
-                    {selectedChapter?._id && chapterReady && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="h-7 text-xs"
-                        onClick={handleReindexChapter}
-                        disabled={reindexingChapter || uploadingPdf || generating}
-                      >
-                        {reindexingChapter ? (
-                          <Loader2 className="w-3 h-3 animate-spin mr-1" />
-                        ) : (
-                          <Database className="w-3 h-3 mr-1" />
-                        )}
-                        Sync Embeddings
-                      </Button>
-                    )}
                   </div>
-                )}
-                {subject && (
-                  <p className={`mt-1.5 text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    Knowledge for <strong>{subject}</strong>: {pdfKnowledgeCount} PDF source
-                    {pdfKnowledgeCount !== 1 ? "s" : ""} + website notes. Multi-PDF upload supported.
-                    Topic keyword searches all of them; only top matched chunks go to the LLM (KB-first, low tokens).
-                  </p>
                 )}
               </div>
 
               <div>
                 <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  Topic keyword (search PDF + website knowledge)
+                  Topic keyword <span className="text-red-500">*</span>
+                  <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                    search PDF + website knowledge (RAG)
+                  </span>
                 </label>
                 <div className="relative">
                   <Search
@@ -1547,8 +1467,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   />
                 </div>
                 <p className={`mt-1.5 text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                  Type a topic — we search matching chunks across all PDFs + synced notes for this subject,
-                  then generate questions from those chunks only (knowledge base first — LLM open knowledge only if nothing matches). Or leave empty and use the topic list.
+                  Type the topic — we retrieve matching chunks from the vector DB for this subject, then
+                  generate questions only from that retrieved content (knowledge base first).
                 </p>
                 {keywordMode && (
                   <div
@@ -1564,13 +1484,13 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   >
                     {keywordSearching ? (
                       <span className="inline-flex items-center gap-1.5">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching chapter content…
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching knowledge base…
                       </span>
                     ) : keywordMatch ? (
                       <>
                         <p className="font-medium">
                           {keywordMatch.matchedChunks > 0
-                            ? `Matched ${keywordMatch.matchedChunks} chunk(s) in subject knowledge via ${keywordMatch.source} (~RAG top-k only)`
+                            ? `Matched ${keywordMatch.matchedChunks} chunk(s) via ${keywordMatch.source} (RAG top-k only)`
                             : `No chunks matched "${keywordTrimmed}" in PDF/notes knowledge`}
                         </p>
                         {keywordMatch.preview?.length > 0 && (
@@ -1589,116 +1509,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                       <span>Enter at least 2 characters to search…</span>
                     )}
                   </div>
-                )}
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <label className={`block text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                    Topics{" "}
-                    {!keywordMode && <span className="text-red-500">*</span>}
-                    <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                      {keywordMode ? "optional when keyword is set · filtered by keyword" : "select one or more"}
-                    </span>
-                  </label>
-                  {topics.length > 0 && chapterReady && (
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={selectAllTopics}
-                        disabled={generating || selectedTopicIds.length === topics.length}
-                        className={`text-xs font-medium ${isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"} disabled:opacity-50`}
-                      >
-                        Select all
-                      </button>
-                      <button
-                        type="button"
-                        onClick={clearTopicSelection}
-                        disabled={generating || selectedTopicIds.length === 0}
-                        className={`text-xs font-medium ${isDark ? "text-slate-400 hover:text-slate-300" : "text-slate-600 hover:text-slate-700"} disabled:opacity-50`}
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {chapterNeedsContent ? (
-                  <p className={`text-sm ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    Sync from the notes website or upload a PDF above to load topics.
-                  </p>
-                ) : topicsLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Loading topics…
-                  </div>
-                ) : topics.length === 0 ? (
-                  <p className={`text-sm ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    No topics in this chapter yet. Upload a PDF or sync from the notes website.
-                  </p>
-                ) : filteredTopics.length === 0 ? (
-                  <p className={`text-sm ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    No topic titles match &quot;{keywordTrimmed}&quot; — you can still generate using keyword search above.
-                  </p>
-                ) : (
-                  <>
-                    <div
-                      className={`max-h-56 overflow-y-auto rounded-lg border divide-y ${isDark ? "border-slate-600 divide-slate-700 bg-slate-900/30" : "border-slate-200 divide-slate-100 bg-white"}`}
-                    >
-                      {filteredTopics.map((t) => {
-                        const checked = selectedTopicIds.includes(t._id);
-                        return (
-                          <label
-                            key={t._id}
-                            className={`flex items-start gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
-                              checked
-                                ? isDark
-                                  ? "bg-blue-950/30"
-                                  : "bg-blue-50"
-                                : isDark
-                                  ? "hover:bg-slate-800/50"
-                                  : "hover:bg-slate-50"
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleTopicSelection(t._id)}
-                              disabled={generating || uploadingPdf}
-                              className="mt-1 rounded border-slate-400 text-blue-600 focus:ring-blue-500"
-                            />
-                            <span className="min-w-0 flex-1">
-                              <span className={`block text-sm font-medium ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                                {t.name}
-                                {t.sourceFormat === "pdf" && (
-                                  <span className={`ml-2 text-[10px] font-semibold uppercase ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                                    PDF
-                                  </span>
-                                )}
-                              </span>
-                              <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                                {t.chunkCount} chunks
-                                {t.pageStart != null
-                                  ? ` · p.${t.pageStart}${t.pageEnd != null && t.pageEnd !== t.pageStart ? `–${t.pageEnd}` : ""}`
-                                  : ""}
-                              </span>
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                    {selectedTopics.length > 0 && (
-                      <div className={`mt-2 rounded-lg border px-3 py-2 text-sm ${isDark ? "border-blue-800/40 bg-blue-950/20" : "border-blue-200 bg-blue-50"}`}>
-                        <p className={`font-medium ${isDark ? "text-blue-200" : "text-blue-900"}`}>
-                          {selectedTopics.length} topic{selectedTopics.length !== 1 ? "s" : ""} selected
-                        </p>
-                        <p className={`text-xs mt-0.5 ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
-                          {selectedChapter?.title} · {selectedTopicChunkTotal} chunks total · RAG retrieves top chunks per batch
-                        </p>
-                        <p className={`text-xs mt-1 ${isDark ? "text-blue-300/70" : "text-blue-600"}`}>
-                          {buildSelectedTopicLabel(selectedTopics.map((t) => t.name))}
-                        </p>
-                      </div>
-                    )}
-                  </>
                 )}
               </div>
 
@@ -1777,20 +1587,11 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   ))}
                 </div>
               </div>
-              {(selectedTopics.length > 0 || keywordMode) && (
+              {keywordMode && (
                 <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                   Will generate a <strong>{questionCount === 100 ? 120 : 70}-question pool</strong>, keep the best{" "}
-                  <strong>{questionCount}</strong> (extras drop duplicates / incomplete; explanations 50–70 words) from{" "}
-                  {keywordMode ? (
-                    <>
-                      keyword <strong>&quot;{keywordTrimmed}&quot;</strong>
-                    </>
-                  ) : (
-                    <>
-                      <strong>{selectedTopics.length}</strong> topic{selectedTopics.length !== 1 ? "s" : ""} (
-                      {buildSelectedTopicLabel(selectedTopics.map((t) => t.name))})
-                    </>
-                  )}{" "}
+                  <strong>{questionCount}</strong> from keyword <strong>&quot;{keywordTrimmed}&quot;</strong>
+                  {testNameTrimmed ? <> · named <strong>&quot;{testNameTrimmed}&quot;</strong></> : null}{" "}
                   using <strong>{patternsToInclude.length}</strong> pattern
                   {patternsToInclude.length !== 1 ? "s" : ""} ({selectedPatternsLabel}).
                 </p>
@@ -1801,22 +1602,20 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                 disabled={
                   generating ||
                   uploadingPdf ||
+                  !testNameTrimmed ||
                   !subject ||
                   !knowledgeReady ||
-                  (!keywordMode && !selectedChapter?._id) ||
+                  !keywordMode ||
                   patternsToInclude.length === 0 ||
-                  (keywordMode
-                    ? keywordSearching || (keywordMatch != null && keywordMatch.matchedChunks === 0)
-                    : selectedTopicIds.length === 0 || selectedTopicChunkTotal === 0)
+                  keywordSearching ||
+                  (keywordMatch != null && keywordMatch.matchedChunks === 0)
                 }
                 className="w-full sm:w-auto"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                 {generating
                   ? "Generating via RAG…"
-                  : keywordMode
-                    ? `Generate ${questionCount}Q for "${keywordTrimmed.slice(0, 28)}${keywordTrimmed.length > 28 ? "…" : ""}"`
-                    : `Generate ${questionCount} Questions (RAG)`}
+                  : `Generate ${questionCount}Q for "${keywordTrimmed.slice(0, 28)}${keywordTrimmed.length > 28 ? "…" : ""}"`}
               </Button>
             </form>
           </CardContent>
@@ -1833,9 +1632,9 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               {generating && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
             </CardTitle>
             <CardDescription>
-              Generated from Notes for{" "}
-              <strong>{selectedChapter?.title || activeTest.subject}</strong> →{" "}
-              <strong>{activeTest.topic}</strong>
+              <strong>{activeTest.title}</strong>
+              {" · "}
+              <strong>{activeTest.subject}</strong> → <strong>{activeTest.topic}</strong>
               {patternsToInclude.length > 0 && (
                 <>
                   {" "}
@@ -1869,14 +1668,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               <span>{activeTest.difficulty} difficulty</span>
               <span>·</span>
               <span>{selectedPatternsLabel}</span>
-              {selectedTopics.length === 1 && selectedTopics[0]?.sourceUrl && (
-                <>
-                  <span>·</span>
-                  <a href={selectedTopics[0].sourceUrl} target="_blank" rel="noopener noreferrer" className="underline">
-                    View source notes
-                  </a>
-                </>
-              )}
             </div>
 
             <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
@@ -2386,7 +2177,6 @@ export const AssignedPracticeAdminPage: React.FC = () => {
               <div className={`rounded-xl border overflow-hidden divide-y ${isDark ? "border-slate-700 divide-slate-700/80" : "border-slate-200 divide-slate-100"}`}>
                 {list.map((item) => {
                   const topicFocus = listTopicFocus(item);
-                  const chapterLabel = (item.chapter || "").trim();
                   const studentsPreview = item.assignedStudents.slice(0, 2);
                   const extraStudents = Math.max(0, (item.assignedCount ?? item.assignedStudents.length) - studentsPreview.length);
                   return (
@@ -2434,15 +2224,9 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                           </span>
                         </div>
 
-                        {chapterLabel ? (
-                          <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`} title={chapterLabel}>
-                            {chapterLabel}
-                          </p>
-                        ) : (
-                          <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`} title={listItemTitle(item)}>
-                            {listItemTitle(item)}
-                          </p>
-                        )}
+                        <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`} title={listItemTitle(item)}>
+                          {listItemTitle(item)}
+                        </p>
 
                         {topicFocus && (
                           <p className={`text-xs truncate ${isDark ? "text-slate-400" : "text-slate-500"}`} title={item.topic}>

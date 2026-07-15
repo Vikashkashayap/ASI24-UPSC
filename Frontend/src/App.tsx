@@ -83,6 +83,10 @@ const AssignedPracticeAdminPage = lazyPage(
   () => import("./pages/admin/AssignedPracticeAdminPage"),
   "AssignedPracticeAdminPage"
 );
+const KnowledgeBaseAdminPage = lazyPage(
+  () => import("./pages/admin/KnowledgeBaseAdminPage"),
+  "KnowledgeBaseAdminPage"
+);
 const MockResultsPage = lazyPage(() => import("./pages/admin/MockResultsPage"), "MockResultsPage");
 const StudentPerformancePage = lazyPage(
   () => import("./pages/admin/StudentPerformancePage"),
@@ -177,6 +181,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboardPage />} />
               <Route path="pro-students" element={<AdminProStudentsPage />} />
               <Route path="prelims-mock" element={<PrelimsMockAdminPage />} />
+              <Route path="knowledge-base" element={<KnowledgeBaseAdminPage />} />
               <Route path="topic-practice" element={<AssignedPracticeAdminPage />} />
               <Route path="mock-results/:mockId" element={<MockResultsPage />} />
               <Route path="student-performance/:studentId" element={<StudentPerformancePage />} />

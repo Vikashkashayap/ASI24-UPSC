@@ -145,6 +145,7 @@ export const createAssignedPractice = async (req, res) => {
       topic,
       difficulty,
       title,
+      reference,
       patternsToInclude,
       notesTopicId,
       notesTopicIds,
@@ -175,7 +176,7 @@ export const createAssignedPractice = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "Select topic checkboxes, or type a topic keyword — RAG searches PDF + website knowledge for that subject.",
+          "Topic keyword is required — RAG searches PDF + website knowledge for that subject.",
       });
     }
 
@@ -183,6 +184,14 @@ export const createAssignedPractice = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Topic keyword must be at least 2 characters",
+      });
+    }
+
+    const titleTrimmed = typeof title === "string" ? title.trim() : "";
+    if (!titleTrimmed) {
+      return res.status(400).json({
+        success: false,
+        message: "Test name is required",
       });
     }
 
@@ -262,21 +271,20 @@ export const createAssignedPractice = async (req, res) => {
       ? String(difficulty).toLowerCase()
       : "moderate";
 
-    const titleStr =
-      typeof title === "string" && title.trim()
-        ? title.trim()
-        : `${resolvedSubject} — ${resolvedChapter ? `${resolvedChapter}: ` : ""}${resolvedTopic}`;
+    const titleStr = titleTrimmed;
+    const referenceStr = typeof reference === "string" ? reference.trim() : "";
 
     record = new AssignedPracticeTest({
       subject: resolvedSubject,
       topic: resolvedTopic,
-      chapter: resolvedChapter,
+      chapter: keywordMode ? (resolvedChapter || "Subject knowledge") : resolvedChapter,
       notesTopicId: primaryTopicId,
       notesTopicIds: keywordMode ? [] : topicIdList,
-      notesChapterId: keywordMode ? chapterIdStr : chapterIdStr || topicMetas[0]?.chapter?._id || undefined,
+      notesChapterId: keywordMode ? undefined : chapterIdStr || topicMetas[0]?.chapter?._id || undefined,
       searchQuery: keywordMode ? keyword : "",
       notesSourceUrl,
       title: titleStr,
+      reference: referenceStr,
       difficulty: diff,
       totalQuestions: targetQuestions,
       durationMinutes: targetQuestions >= 100 ? 120 : 60,
@@ -346,6 +354,7 @@ export const createAssignedPractice = async (req, res) => {
         searchQuery: record.searchQuery,
         notesSourceUrl: record.notesSourceUrl,
         title: record.title,
+        reference: record.reference || "",
         difficulty: record.difficulty,
         totalQuestions: targetQuestions,
         status: record.status,
@@ -490,9 +499,14 @@ export const assignStudentsToPractice = async (req, res) => {
 };
 
 /**
- * Compact list title — avoid dumping full multi-topic strings in the admin table.
+ * Compact list title — prefer admin-given name; fall back to chapter / keyword.
  */
 function buildListDisplayTitle(record) {
+  const customTitle = String(record.title || "").trim();
+  if (customTitle) {
+    return customTitle.length > 80 ? `${customTitle.slice(0, 77).trim()}…` : customTitle;
+  }
+
   const subject = String(record.subject || "").trim();
   const chapter = String(record.chapter || "").trim();
   const searchQuery = String(record.searchQuery || "").trim();
@@ -514,10 +528,9 @@ function buildListDisplayTitle(record) {
     focus = `${focus.slice(0, 69).trim()}…`;
   }
 
-  // Prefer chapter as main title; subject is shown as a badge in UI
   if (chapter) return chapter;
   if (focus) return focus;
-  return String(record.title || subject || "Practice test");
+  return subject || "Practice test";
 }
 
 /**
@@ -550,7 +563,7 @@ export const listAdminAssignedPractice = async (req, res) => {
     // Never ship full question payloads on the list endpoint
     const records = await AssignedPracticeTest.find(query)
       .select(
-        "subject topic chapter title difficulty totalQuestions status errorMessage createdAt assignedStudentIds searchQuery notesTopicIds generationProgress"
+        "subject topic chapter title reference difficulty totalQuestions status errorMessage createdAt assignedStudentIds searchQuery notesTopicIds generationProgress"
       )
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -603,6 +616,7 @@ export const listAdminAssignedPractice = async (req, res) => {
         searchQuery: r.searchQuery || "",
         title: r.title,
         displayTitle: buildListDisplayTitle(r),
+        reference: r.reference || "",
         difficulty: r.difficulty,
         totalQuestions: r.totalQuestions,
         status: r.status,

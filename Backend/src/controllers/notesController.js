@@ -478,3 +478,22 @@ export const searchNotesChunks = async (req, res) => {
     res.status(500).json({ success: false, message: error.message || "Search failed" });
   }
 };
+
+/**
+ * DELETE /api/admin/notes/chapters/:chapterId — remove an uploaded PDF knowledge source
+ */
+export const deleteNotesChapter = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    const result = await notesService.deletePdfChapter(chapterId);
+    res.json({
+      success: true,
+      message: `Removed PDF "${result.title}" from knowledge base.`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("deleteNotesChapter:", error);
+    const status = error.statusCode || 500;
+    res.status(status).json({ success: false, message: error.message || "Failed to remove PDF" });
+  }
+};

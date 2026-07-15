@@ -353,12 +353,14 @@ export interface AssignedPracticeGeneratePayload {
   topic: string;
   chapter?: string;
   chapterId?: string;
-  /** Free-text topic keyword — searches chapter PDF/notes chunks via RAG */
+  /** Free-text topic keyword — searches subject PDF/notes chunks via RAG */
   searchQuery?: string;
   notesTopicIds?: string[];
   notesTopicId?: string;
   difficulty?: "easy" | "moderate" | "hard";
   title?: string;
+  /** Optional source / book reference shown with the practice set */
+  reference?: string;
   patternsToInclude?: string[];
   /** 50 (default) or 100 */
   questionCount?: 50 | 100;
@@ -495,6 +497,11 @@ export const notesAPI = {
         ...(params.chapterId ? { chapterId: params.chapterId } : {}),
       },
     }),
+  /** Remove an uploaded PDF source from subject knowledge (topics, chunks, vectors, file). */
+  deleteChapter: (chapterId: string) =>
+    api.delete<{ success: boolean; message: string; data: { chapterId: string; title: string } }>(
+      `/api/admin/notes/chapters/${chapterId}`
+    ),
 };
 
 export interface PreviewQuestion {

@@ -1,10 +1,17 @@
 import fetch from "node-fetch";
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
 import SourceUrl from "../../models/SourceUrl.js";
 import ContentTopic from "../../models/ContentTopic.js";
 import ContentChunk from "../../models/ContentChunk.js";
+import { qdrantService } from "../ai/qdrant.service.js";
 import { htmlToMarkdown, cleanHtml, htmlToEducationalText } from "./htmlCleaner.js";
 import { splitIntoChunks, estimateTokenCount } from "./chunking.service.js";
 import { getAllCatalogSubjects, getCatalogChapters } from "../../config/notesCatalog.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BACKEND_ROOT = path.join(__dirname, "../../..");
 
 const FETCH_HEADERS = { "User-Agent": "MentorsDaily-NotesSync/1.0" };
 // Soft cap only — ContextReducer enforces ~1200 token budget at generation time
@@ -355,6 +362,78 @@ class NotesService {
 
     console.log(`📝 NotesService: saved ${docs.length} chunks for topic ${topicId}`);
     return docs.length;
+  }
+
+  /**
+   * Remove a PDF knowledge source — deletes topics, chunks, Qdrant vectors, file, and DB record.
+   * @param {string} chapterId — SourceUrl _id
+   */
+  async deletePdfChapter(chapterId) {
+    const id = String(chapterId || "").trim();
+    if (!id) {
+      const err = new Error("chapterId is required");
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const chapter = await SourceUrl.findById(id);
+    if (!chapter) {
+      const err = new Error("Knowledge source not found");
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const isPdf =
+      chapter.sourceType === "pdf" || String(chapter.url || "").startsWith("pdf://");
+    if (!isPdf) {
+      const err = new Error("Only uploaded PDF sources can be removed from here");
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const topics = await ContentTopic.find({ sourceUrlId: chapter._id }).select("_id").lean();
+    const topicIds = topics.map((t) => t._id);
+
+    if (qdrantService.isConfigured()) {
+      try {
+        await qdrantService.deleteChapterChunks(String(chapter._id));
+      } catch (err) {
+        console.warn("[notesService] qdrant delete chapter failed:", err.message);
+      }
+    }
+
+    if (topicIds.length) {
+      await ContentChunk.deleteMany({ topicId: { $in: topicIds } });
+      await ContentTopic.deleteMany({ _id: { $in: topicIds } });
+    }
+
+    if (chapter.filePath) {
+      const fullPath = path.isAbsolute(chapter.filePath)
+        ? chapter.filePath
+        : path.join(BACKEND_ROOT, chapter.filePath);
+      try {
+        await fs.unlink(fullPath);
+      } catch (err) {
+        if (err?.code !== "ENOENT") {
+          console.warn("[notesService] PDF file delete failed:", err.message);
+        }
+      }
+    }
+
+    const title = chapter.title;
+    const chunkCount = chapter.chunkCount || 0;
+    await SourceUrl.findByIdAndDelete(chapter._id);
+
+    console.log(
+      `[notesService] removed PDF chapter ${id}: ${topicIds.length} topics, ${chunkCount} chunks`
+    );
+
+    return {
+      chapterId: id,
+      title,
+      topicsRemoved: topicIds.length,
+      chunksRemoved: chunkCount,
+    };
   }
 }
 

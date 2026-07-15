@@ -65,6 +65,7 @@ import {
   reindexNotesTopic,
   notesVectorHealth,
   searchNotesChunks,
+  deleteNotesChapter,
 } from "../controllers/notesController.js";
 import {
   getAllPlans,
@@ -150,6 +151,7 @@ router.delete("/assigned-practice/:id", deleteAssignedPractice);
 router.get("/notes/catalog", getNotesCatalog);
 router.get("/notes/subjects", listNotesSubjects);
 router.get("/notes/chapters", listNotesChapters);
+router.delete("/notes/chapters/:chapterId", deleteNotesChapter);
 router.get("/notes/topics", listNotesTopics);
 router.get("/notes/topics/:topicId/preview", previewNotesTopic);
 router.post("/notes/sync-chapter", syncNotesChapter);
