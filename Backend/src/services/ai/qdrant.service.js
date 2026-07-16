@@ -7,6 +7,16 @@ const DEFAULT_COLLECTION = process.env.QDRANT_COLLECTION || "notes_chunks";
 /** Deterministic UUID namespace for Mongo ObjectId → Qdrant point id. */
 const POINT_NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
+function normalizeQdrantDistance(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (!v) return "Cosine";
+  if (v.startsWith("cos")) return "Cosine";
+  if (v.startsWith("dot")) return "Dot";
+  if (v.startsWith("euc")) return "Euclid";
+  // Qdrant SDK accepts "Cosine" | "Dot" | "Euclid"
+  return "Cosine";
+}
+
 function defaultVectorSize() {
   return (
     parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) ||
@@ -64,7 +74,10 @@ class QdrantService {
     if (!client) return false;
 
     const wanted = this.getVectorSize();
+    const distance = normalizeQdrantDistance(process.env.QDRANT_DISTANCE || "Cosine");
     const existing = await this.getCollectionInfo();
+
+    let shouldCreate = !existing;
 
     if (existing) {
       const vectorsCfg = existing?.config?.params?.vectors;
@@ -85,17 +98,20 @@ class QdrantService {
           `[qdrant] Recreating collection ${this.collection}: size ${size} → ${wanted}`
         );
         await client.deleteCollection(this.collection);
+        shouldCreate = true;
       } else {
-        return true;
+        shouldCreate = false;
       }
     }
 
-    await client.createCollection(this.collection, {
-      vectors: {
-        size: wanted,
-        distance: "Cosine",
-      },
-    });
+    if (shouldCreate) {
+      await client.createCollection(this.collection, {
+        vectors: {
+          size: wanted,
+          distance,
+        },
+      });
+    }
 
     // Payload indexes for filtered RAG
     try {
@@ -142,7 +158,7 @@ class QdrantService {
 
     if (!points.length) return 0;
 
-    // Qdrant prefers batches; keep moderate size for HF rate limits upstream
+    // Qdrant prefers batches; keep moderate size for embedding API rate limits upstream
     const batchSize = parseInt(process.env.QDRANT_UPSERT_BATCH || "64", 10) || 64;
     for (let i = 0; i < points.length; i += batchSize) {
       const slice = points.slice(i, i + batchSize);
@@ -198,8 +214,14 @@ class QdrantService {
    */
   async health() {
     const client = this.getClient();
-    if (!client) return { ok: false, reason: "QDRANT_URL not set" };
+    if (!client) return { ok: false, error: "QDRANT_URL not set", reason: "QDRANT_URL not set" };
     try {
+      const ensureOnHealth =
+        String(process.env.QDRANT_HEALTH_ENSURE_COLLECTION ?? "true").toLowerCase() === "true";
+      if (ensureOnHealth) await this.ensureCollection();
+
+      // Verify connectivity even if collection missing
+      await client.getCollections();
       const info = await this.getCollectionInfo();
       return {
         ok: true,
@@ -209,8 +231,68 @@ class QdrantService {
         vectorSize: this.getVectorSize(),
       };
     } catch (err) {
-      return { ok: false, reason: err.message || String(err) };
+      return { ok: false, error: err.message || String(err), reason: err.message || String(err) };
     }
+  }
+
+  /** Alias — auto-create collection if missing. */
+  async initializeCollection() {
+    return this.ensureCollection();
+  }
+
+  /**
+   * Insert / upsert vectors (single batch API for RAG module).
+   * @param {Array<{ id: string, vector: number[], payload?: object, pointId?: string }>} points
+   */
+  async insertVectors(points = []) {
+    return this.upsertChunks({
+      chunks: points.map((p) => ({
+        id: p.id,
+        pointId: p.pointId,
+        vector: p.vector,
+        payload: p.payload || {},
+      })),
+    });
+  }
+
+  /** @param {Array<{ id: string, vector: number[], payload?: object }>} points */
+  async batchInsert(points = []) {
+    return this.insertVectors(points);
+  }
+
+  /**
+   * Update one vector by mongo chunk id (overwrite upsert).
+   */
+  async updateVector({ id, vector, payload = {} }) {
+    if (!id || !Array.isArray(vector)) return 0;
+    return this.insertVectors([{ id, vector, payload }]);
+  }
+
+  /**
+   * Delete one point by mongo chunk id.
+   */
+  async deleteVector(chunkId) {
+    const client = this.getClient();
+    if (!client || !chunkId) return 0;
+    await client.delete(this.collection, {
+      wait: true,
+      points: [this.toPointId(chunkId)],
+    });
+    return 1;
+  }
+
+  /**
+   * Filtered semantic search — used by /api/rag/search.
+   * @param {{ vector: number[], topK?: number, filters?: object }} params
+   */
+  async searchVectors({ vector, topK = 10, filters = {} } = {}) {
+    return this.searchChunks({
+      vector,
+      topK,
+      topicId: filters.topicId,
+      sourceUrlId: filters.sourceUrlId || filters.documentId,
+      subject: filters.subject,
+    });
   }
 }
 

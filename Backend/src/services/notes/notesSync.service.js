@@ -155,7 +155,7 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
     chapter.contentHash = hashContent(chapterHtml);
     await chapter.save();
 
-    // Step 3: hash-gated BGE-M3 → Qdrant (skips if embedding deps missing)
+    // Step 3: hash-gated Jina embeddings → Qdrant (skips if embedding deps missing)
     let embedding = null;
     try {
       embedding = await indexChapterInVectorDb(chapter._id, { force: true });

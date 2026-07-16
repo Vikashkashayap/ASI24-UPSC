@@ -3,11 +3,15 @@ import Test from "../models/Test.js";
 import { User } from "../models/User.js";
 import { buildQuestionFingerprints } from "../services/testGenerationService.js";
 import { notesService } from "../services/notes/notes.service.js";
-import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
+import { pickBilingualQuestionFields, ensureFullQuestionStem } from "../services/questionTranslationService.js";
 import { patternLabelForQuestionType } from "../config/questionPatterns.js";
 import { runAssignedPracticeGeneration } from "../services/ai/batchGenerator.service.js";
 import { generateQuestionsFromContextBatch } from "../services/ai/questionGenerator.service.js";
-import { getPracticeBatchSize, getPracticeTranslationModel } from "../config/openRouterConfig.js";
+import {
+  getPracticeBatchSize,
+  getPracticeTranslationModel,
+  isPracticeBatchHindiEnabled,
+} from "../config/openRouterConfig.js";
 import { runInMigrationBatchContext } from "../middleware/examAiGuard.js";
 import { batchTranslatePracticeQuestionsToHindi } from "../services/testGenerationService.js";
 import SourceUrl from "../models/SourceUrl.js";
@@ -32,6 +36,48 @@ function normalizeAssignedQuestionCount(value) {
   const n = parseInt(value, 10);
   if (ALLOWED_QUESTION_COUNTS.has(n)) return n;
   return ASSIGNED_QUESTION_COUNT_DEFAULT;
+}
+
+/** Deduplicate + keep only complete stems, capped at target (default 50). */
+function selectFinalPracticeQuestions(questions = [], target = ASSIGNED_QUESTION_COUNT_DEFAULT) {
+  const cap = normalizeAssignedQuestionCount(target);
+  const seen = new Set();
+  const out = [];
+  const rejected = [];
+
+  for (const raw of questions || []) {
+    const plain = typeof raw.toObject === "function" ? raw.toObject() : { ...raw };
+    const fixed = ensureFullQuestionStem(plain);
+    const text = String(fixed.question_en || fixed.question || "")
+      .replace(/\\n/g, "\n")
+      .trim();
+    const opts = fixed.options_en || fixed.options || {};
+    const filled = ["A", "B", "C", "D"].filter((k) => String(opts[k] || "").trim().length >= 1).length;
+    const answer = String(fixed.correctAnswer || fixed.answer || "")
+      .toUpperCase()
+      .trim()
+      .charAt(0);
+
+    if (text.length < 40 || filled < 4 || !["A", "B", "C", "D"].includes(answer)) {
+      rejected.push({ ...fixed, backupReason: "incomplete" });
+      continue;
+    }
+
+    const key = text
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0900-\u097f]+/g, " ")
+      .trim()
+      .slice(0, 140);
+    if (!key || seen.has(key)) {
+      rejected.push({ ...fixed, backupReason: "duplicate" });
+      continue;
+    }
+    seen.add(key);
+    out.push(pickBilingualQuestionFields({ ...fixed, correctAnswer: answer, answer }));
+    if (out.length >= cap) break;
+  }
+
+  return { questions: out, rejected, target: cap };
 }
 
 const VALID_PATTERN_IDS = [
@@ -999,14 +1045,17 @@ export const approvePracticeTest = async (req, res) => {
       return res.status(400).json({ success: false, message: "No questions to approve" });
     }
 
-    const target = Number(record.totalQuestions) || 50;
-    const have = record.questions.length;
-    // Don't lock a short set while generation is still running / under target
+    const target = normalizeAssignedQuestionCount(record.totalQuestions || ASSIGNED_QUESTION_COUNT_DEFAULT);
     const stillGenerating =
       record.status === "generating" ||
       (record.generationProgress &&
         !record.generationProgress.isComplete &&
         record.generationProgress.currentStep !== "completed");
+
+    // Cap + dedupe + drop incomplete before approve (never publish 61 for a 50-Q test)
+    const { questions: capped, rejected } = selectFinalPracticeQuestions(record.questions, target);
+    const have = capped.length;
+
     if (stillGenerating && have < target) {
       return res.status(400).json({
         success: false,
@@ -1016,23 +1065,64 @@ export const approvePracticeTest = async (req, res) => {
     if (have < target && record.status !== "ready") {
       return res.status(400).json({
         success: false,
-        message: `Only ${have}/${target} questions ready. Wait for RAG refill to finish or regenerate.`,
+        message: `Only ${have}/${target} complete questions ready. Wait for RAG refill to finish or regenerate.`,
+      });
+    }
+    if (have === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No complete questions to approve (empty/incomplete stems removed).",
       });
     }
 
+    let finalQuestions = capped;
+
+    // Ensure Hindi after approve when batch Hindi is enabled
+    if (isPracticeBatchHindiEnabled()) {
+      const needHi = finalQuestions.some(
+        (q) => !/[\u0900-\u097F]/.test(String(q.question_hi || ""))
+      );
+      if (needHi) {
+        const apiKey = process.env.OPENROUTER_API_KEY;
+        if (apiKey) {
+          console.log(`🌐 Approve: translating ${finalQuestions.length} questions to Hindi…`);
+          finalQuestions = await runInMigrationBatchContext(() =>
+            batchTranslatePracticeQuestionsToHindi(
+              apiKey,
+              getPracticeTranslationModel(),
+              finalQuestions
+            )
+          );
+          finalQuestions = finalQuestions.map((q) => pickBilingualQuestionFields(q));
+        }
+      }
+    }
+
+    const extras = [
+      ...(Array.isArray(record.backupQuestions) ? record.backupQuestions : []),
+      ...rejected.map((q) => pickBilingualQuestionFields(q)),
+    ];
+
+    record.questions = finalQuestions;
+    record.backupQuestions = extras;
+    record.totalQuestions = finalQuestions.length;
     record.status = "ready";
-    record.errorMessage = "";
+    record.errorMessage = rejected.length
+      ? `Removed ${rejected.length} duplicate/incomplete question(s). Showing ${finalQuestions.length}.`
+      : "";
     if (record.generationProgress) {
       record.generationProgress.approved = true;
       record.generationProgress.isComplete = true;
       record.generationProgress.currentStep = "completed";
+      record.generationProgress.generatedQuestions = finalQuestions.length;
     }
-    record.totalQuestions = record.questions.length;
+    record.markModified("questions");
+    record.markModified("backupQuestions");
     await record.save();
 
     return res.json({
       success: true,
-      message: `Approved ${record.questions.length} question(s) for assignment`,
+      message: `Approved ${finalQuestions.length} question(s) for assignment`,
       data: {
         _id: record._id,
         status: record.status,
@@ -1252,6 +1342,18 @@ export const startAssignedPracticeAttempt = async (req, res) => {
     }
 
     // Copy stored bilingual fields only — no runtime translation (zero AI cost).
+    // Cap to target (50) and repair stems so students never see blank match/statement questions.
+    const target = normalizeAssignedQuestionCount(
+      record.totalQuestions || ASSIGNED_QUESTION_COUNT_DEFAULT
+    );
+    const { questions: finalQuestions } = selectFinalPracticeQuestions(record.questions, target);
+    if (!finalQuestions.length) {
+      return res.status(400).json({
+        success: false,
+        message: "This test has no complete questions. Contact admin.",
+      });
+    }
+
     const test = new Test({
       userId,
       subject: record.subject,
@@ -1260,15 +1362,14 @@ export const startAssignedPracticeAttempt = async (req, res) => {
       difficulty: difficultyToTestModel(record.difficulty),
       assignedPracticeTestId: record._id,
       durationMinutes: record.durationMinutes,
-      questions: record.questions.map((q) => {
-        const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
-        return pickBilingualQuestionFields({
-          ...plain,
+      questions: finalQuestions.map((q) =>
+        pickBilingualQuestionFields({
+          ...q,
           userAnswer: null,
           timeSpent: 0,
-        });
-      }),
-      totalQuestions: record.questions.length,
+        })
+      ),
+      totalQuestions: finalQuestions.length,
     });
     await test.save();
 

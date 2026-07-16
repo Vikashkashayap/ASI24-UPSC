@@ -4,6 +4,114 @@ import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
 
+function countLetterListItems(text) {
+  return (String(text || "").match(/(?:^|\n)\s*[A-D][.)]\s+\S+/gi) || []).length;
+}
+
+function countNumberedListItems(text) {
+  return (String(text || "").match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+}
+
+function cleanList(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.map((x) => String(x || "").trim()).filter(Boolean);
+}
+
+/**
+ * Rebuild a full UPSC stem from structured fields when the LLM left only an intro
+ * (or empty text) while matchColumns / statements / chronology / A-R exist.
+ * Prevents blank exam UI when options like "A-4, B-1…" still render.
+ */
+export function ensureFullQuestionStem(rawQuestion) {
+  if (!rawQuestion || typeof rawQuestion !== "object") return rawQuestion;
+
+  const plain =
+    typeof rawQuestion.toObject === "function" ? rawQuestion.toObject() : { ...rawQuestion };
+
+  let question_en = String(
+    plain.question_en ?? plain.question ?? plain.questionText ?? plain.stem ?? ""
+  )
+    .replace(/\\n/g, "\n")
+    .trim();
+
+  const matchColumns = plain.matchColumns;
+  const columnA = cleanList(matchColumns?.columnA);
+  const columnB = cleanList(matchColumns?.columnB);
+  if (
+    columnA.length >= 2 &&
+    columnB.length >= 2 &&
+    (countLetterListItems(question_en) < 2 || countNumberedListItems(question_en) < 2)
+  ) {
+    const intro = (question_en.split("\n")[0] || "Match the following:").trim();
+    const lines = [intro.endsWith(":") ? intro : `${intro}:`, "List-I"];
+    columnA.forEach((item, i) => lines.push(`${String.fromCharCode(65 + i)}. ${item}`));
+    lines.push("List-II");
+    columnB.forEach((item, i) => lines.push(`${i + 1}. ${item}`));
+    lines.push("Select the correct answer using the code given below:");
+    question_en = lines.join("\n");
+  }
+
+  const statements = cleanList(plain.statements);
+  if (statements.length >= 2 && countNumberedListItems(question_en) < 2) {
+    const intro = (question_en.split("\n")[0] || "Consider the following statements:").trim();
+    const lines = [intro.endsWith(":") ? intro : `${intro}:`];
+    statements.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
+    lines.push("Which of the statements given above is/are correct?");
+    question_en = lines.join("\n");
+  }
+
+  const chronologyItems = cleanList(plain.chronologyItems || plain.items || plain.events);
+  if (chronologyItems.length >= 2 && countNumberedListItems(question_en) < 2) {
+    const intro = (
+      question_en.split("\n")[0] || "Arrange the following in chronological order:"
+    ).trim();
+    const lines = [intro.endsWith(":") ? intro : `${intro}:`];
+    chronologyItems.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
+    lines.push("Select the correct chronological order:");
+    question_en = lines.join("\n");
+  }
+
+  const ar = plain.assertionReason;
+  if (
+    ar?.assertion &&
+    ar?.reason &&
+    !(/assertion\s*\(A\)/i.test(question_en) && /reason\s*\(R\)/i.test(question_en))
+  ) {
+    question_en = [
+      `Assertion (A): ${String(ar.assertion).trim()}`,
+      `Reason (R): ${String(ar.reason).trim()}`,
+      "In the context of the above, which of the following is correct?",
+    ].join("\n");
+  }
+
+  let question_hi = String(plain.question_hi || "")
+    .replace(/\\n/g, "\n")
+    .trim();
+  const mcHi = plain.matchColumns_hi;
+  const columnAHi = cleanList(mcHi?.columnA);
+  const columnBHi = cleanList(mcHi?.columnB);
+  if (
+    columnAHi.length >= 2 &&
+    columnBHi.length >= 2 &&
+    (countLetterListItems(question_hi) < 2 || countNumberedListItems(question_hi) < 2)
+  ) {
+    const intro = (question_hi.split("\n")[0] || "निम्नलिखित का मिलान कीजिए:").trim();
+    const lines = [intro.endsWith(":") ? intro : `${intro}:`, "सूची-I"];
+    columnAHi.forEach((item, i) => lines.push(`${String.fromCharCode(65 + i)}. ${item}`));
+    lines.push("सूची-II");
+    columnBHi.forEach((item, i) => lines.push(`${i + 1}. ${item}`));
+    lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+    question_hi = lines.join("\n");
+  }
+
+  return {
+    ...plain,
+    question: question_en,
+    question_en,
+    question_hi,
+  };
+}
+
 /** True when Hindi stem and all four Hindi options are present. */
 export function questionHasBilingualContent(rawQuestion) {
   const q = ensureEnglishBilingualFields(rawQuestion);
@@ -27,8 +135,9 @@ function normalizeOptionsObject(raw) {
 export function ensureEnglishBilingualFields(question) {
   if (!question || typeof question !== "object") return question;
 
-  const plain =
-    typeof question.toObject === "function" ? question.toObject() : { ...question };
+  const plain = ensureFullQuestionStem(
+    typeof question.toObject === "function" ? question.toObject() : { ...question }
+  );
 
   const question_en = String(plain.question_en ?? plain.question ?? "").trim();
   const question_hi = String(plain.question_hi ?? "").trim();

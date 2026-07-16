@@ -10,7 +10,13 @@
     "build": "echo 'No build needed for plain JS backend!'",
     "migrate:bilingual": "node scripts/migrate-bilingual-questions.js",
     "migrate:bilingual:translate-once": "node scripts/migrate-bilingual-translate-once.js",
-    "sync:hindi-attempts": "node scripts/sync-hindi-to-attempts.js"
+    "sync:hindi-attempts": "node scripts/sync-hindi-to-attempts.js",
+    "test:qdrant": "node scripts/test-qdrant.js",
+    "test:embeddings": "node scripts/test-embeddings.js",
+    "test:search": "node scripts/test-semantic-search.js",
+    "test:qg:unit": "node --test tests/qg/*.test.js",
+    "test:qg:pipeline": "node scripts/test-qg-pipeline.js",
+    "rebuild:embeddings": "node scripts/rebuild-embeddings.js"
   },
   "dependencies": {
     "@langchain/core": "^0.2.0",

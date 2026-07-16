@@ -397,21 +397,35 @@ export const reindexNotesTopic = async (req, res) => {
 };
 
 /**
- * GET /api/admin/notes/vector-health — embedding + Qdrant status
+ * GET /api/admin/notes/vector-health — embedding + Qdrant + QG pipeline dashboard
  */
 export const notesVectorHealth = async (_req, res) => {
   try {
-    const qdrant = await qdrantService.health();
+    const [{ getSystemHealth }, qdrant] = await Promise.all([
+      import("../services/health.service.js"),
+      qdrantService.health(),
+    ]);
+    const system = await getSystemHealth();
     res.json({
       success: true,
       data: {
         embedding: {
           configured: embeddingService.isConfigured(),
-          provider: embeddingService.getProvider(),
+          provider: embeddingService.getProviderLabel(),
+          providerId: embeddingService.getProvider(),
           model: embeddingService.getModelName(),
           dimension: embeddingService.getDimension(),
+          status: system.embedding,
         },
-        qdrant,
+        qdrant: {
+          ...qdrant,
+          status: system.qdrant,
+        },
+        mongodb: system.mongodb,
+        llm: system.llm,
+        reranker: system.reranker,
+        models: system.models,
+        pipeline: system.pipeline,
       },
     });
   } catch (error) {

@@ -2,13 +2,12 @@ import AssignedPracticeTest from "../../models/AssignedPracticeTest.js";
 import { generateQuestionsFromContextBatch } from "./questionGenerator.service.js";
 import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../../config/questionPatterns.js";
 import { questionPatternEngine } from "./questionPatternEngine.js";
-import { pickBilingualQuestionFields } from "../questionTranslationService.js";
+import { pickBilingualQuestionFields, ensureFullQuestionStem } from "../questionTranslationService.js";
 import { notesService } from "../notes/notes.service.js";
 import { retrieverService } from "./retriever.service.js";
 import {
   getPracticeTranslationModel,
   getPracticeBatchSize,
-  isPracticeEnglishOnly,
   isPracticeBatchHindiEnabled,
 } from "../../config/openRouterConfig.js";
 
@@ -61,12 +60,15 @@ function partitionUniqueAndDupes(questions = []) {
 }
 
 function isCompletePracticeQuestion(q) {
-  const text = String(q.question_en || q.question || "").trim();
+  const fixed = ensureFullQuestionStem(q);
+  const text = String(fixed.question_en || fixed.question || "").trim();
   if (text.length < 40) return false;
-  const opts = q.options_en || q.options || {};
+  const opts = fixed.options_en || fixed.options || {};
   const filled = ["A", "B", "C", "D"].filter((k) => String(opts[k] || "").trim().length >= 1).length;
   if (filled < 4) return false;
-  if (!["A", "B", "C", "D"].includes(String(q.correctAnswer || "").toUpperCase())) return false;
+  if (!["A", "B", "C", "D"].includes(String(q.correctAnswer || q.answer || "").toUpperCase())) {
+    return false;
+  }
 
   const type = String(q.questionType || "").toLowerCase();
   const looksMatch =
@@ -74,12 +76,13 @@ function isCompletePracticeQuestion(q) {
     type.includes("match") ||
     /match\s+(the\s+)?following|list-i|सूची/i.test(text);
   if (looksMatch) {
-    const a = (q.matchColumns?.columnA || []).filter((x) => String(x || "").trim());
-    const b = (q.matchColumns?.columnB || []).filter((x) => String(x || "").trim());
-    if (a.length >= 2 && b.length >= 2) return true;
+    const a = (fixed.matchColumns?.columnA || []).filter((x) => String(x || "").trim());
+    const b = (fixed.matchColumns?.columnB || []).filter((x) => String(x || "").trim());
     const letters = (text.match(/(?:^|\n)\s*[A-D][.)]\s+\S+/gi) || []).length;
     const numbers = (text.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
-    return letters >= 2 && numbers >= 2;
+    // Require lists in the visible stem (not only structured columns)
+    if (letters >= 2 && numbers >= 2) return true;
+    return a.length >= 2 && b.length >= 2 && text.length >= 60;
   }
   return true;
 }
@@ -114,10 +117,10 @@ export async function runAssignedPracticeGeneration({
 }) {
   const startedAt = Date.now();
   const TARGET_QUESTIONS = normalizeTargetQuestionCount(questionCount);
-  /** Generate extras so duplicates can be replaced — default 70 for a 50-Q test */
+  /** Small spare pool for incomplete/dupe replacement — keep low so Finalizing is fast */
   const BUFFER_EXTRA = Math.max(
     0,
-    Math.min(40, parseInt(process.env.PRACTICE_POOL_BUFFER || "20", 10) || 20)
+    Math.min(40, parseInt(process.env.PRACTICE_POOL_BUFFER || "8", 10) || 8)
   );
   const GENERATE_POOL = TARGET_QUESTIONS + BUFFER_EXTRA;
   const TOTAL_BATCHES = Math.ceil(GENERATE_POOL / QUESTIONS_PER_BATCH);
@@ -392,14 +395,22 @@ export async function runAssignedPracticeGeneration({
 
     // Keep totalQuestions = TARGET (not live pool size) so UI target stays 50/100
     const patch = {
-      "generationProgress.generatedQuestions": generatedQuestions.length,
+      "generationProgress.generatedQuestions": Math.min(
+        TARGET_QUESTIONS,
+        generatedQuestions.filter(isCompletePracticeQuestion).length
+      ),
+      totalQuestions: TARGET_QUESTIONS,
     };
     if (typeof completedBatches === "number") {
       patch["generationProgress.completedBatches"] = completedBatches;
       patch[`generationProgress.batchSteps.${completedBatches - 1}`] = true;
     }
-    // Stream partial questions for live preview (do not change totalQuestions target)
-    patch.questions = generatedQuestions.slice(0, Math.max(TARGET_QUESTIONS, generatedQuestions.length));
+    // Live preview: only COMPLETE stems, capped at target (extras stay in-memory until finalize)
+    const completePreview = generatedQuestions
+      .filter(isCompletePracticeQuestion)
+      .slice(0, TARGET_QUESTIONS)
+      .map((q) => pickBilingualQuestionFields(q));
+    patch.questions = completePreview;
     await AssignedPracticeTest.findByIdAndUpdate(assignedPracticeId, { $set: patch });
   };
 
@@ -442,6 +453,14 @@ export async function runAssignedPracticeGeneration({
       );
       break;
     }
+
+    const completeAfterBatch = generatedQuestions.filter((q) => isCompletePracticeQuestion(q)).length;
+    if (completeAfterBatch >= TARGET_QUESTIONS) {
+      console.log(
+        `✅ Target complete after batch ${batch + 1} (${completeAfterBatch}/${TARGET_QUESTIONS}) — skipping remaining planned batches`
+      );
+      break;
+    }
   }
 
   await updateProgress(assignedPracticeId, {
@@ -466,21 +485,35 @@ export async function runAssignedPracticeGeneration({
 
   let topup = 0;
   let stallRounds = 0;
+  const countCompleteNow = () =>
+    generatedQuestions.filter((q) => isCompletePracticeQuestion(q)).length;
+
   while (generatedQuestions.length < GENERATE_POOL && topup < MAX_TOPUP_BATCHES) {
+    // Once we already have enough COMPLETE stems for the test, skip buffer fill
+    // (UI shows Finalizing; extra top-ups were making it feel stuck for minutes)
+    const completeNow = countCompleteNow();
+    if (completeNow >= TARGET_QUESTIONS) {
+      console.log(
+        `⏭️ Have ${completeNow} complete (≥${TARGET_QUESTIONS}) — skipping buffer top-up (pool ${generatedQuestions.length}/${GENERATE_POOL})`
+      );
+      break;
+    }
+
     const gap = GENERATE_POOL - generatedQuestions.length;
     const need = Math.min(
       QUESTIONS_PER_BATCH,
+      Math.max(3, TARGET_QUESTIONS - completeNow + 1),
       gap <= 2 ? Math.min(QUESTIONS_PER_BATCH, gap + 2) : Math.min(QUESTIONS_PER_BATCH, gap)
     );
     const before = generatedQuestions.length;
 
     console.log(
-      `📝 RAG top-up ${topup + 1}/${MAX_TOPUP_BATCHES}: ${before}/${GENERATE_POOL} (show ${TARGET_QUESTIONS}+buffer ${BUFFER_EXTRA}), requesting ${need}...`
+      `📝 RAG top-up ${topup + 1}/${MAX_TOPUP_BATCHES}: complete=${completeNow}/${TARGET_QUESTIONS}, pool=${before}/${GENERATE_POOL}, requesting ${need}...`
     );
 
     await updateProgress(assignedPracticeId, {
       "generationProgress.currentStep": `topup_${topup + 1}`,
-      "generationProgress.generatedQuestions": Math.min(TARGET_QUESTIONS, generatedQuestions.length),
+      "generationProgress.generatedQuestions": Math.min(TARGET_QUESTIONS, completeNow),
     });
 
     const batchResult = await runOneBatch({
@@ -493,6 +526,7 @@ export async function runAssignedPracticeGeneration({
     topup += 1;
 
     if (generatedQuestions.length >= GENERATE_POOL) break;
+    if (countCompleteNow() >= TARGET_QUESTIONS) break;
 
     if (generatedQuestions.length === before) {
       stallRounds += 1;
@@ -582,11 +616,13 @@ export async function runAssignedPracticeGeneration({
   const incompletePool = pools.incomplete;
   const duplicatePool = pools.duplicates;
 
-  let poolForFinal = completePool;
-  let finalQuestions = poolForFinal.slice(0, TARGET_QUESTIONS);
+  let poolForFinal = completePool.map((q) => ensureFullQuestionStem(q));
+  let finalQuestions = poolForFinal
+    .map((q) => pickBilingualQuestionFields(q))
+    .slice(0, TARGET_QUESTIONS);
 
   // Hindi only for the final set (not the buffer) — huge token savings
-  if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled() && finalQuestions.length > 0) {
+  if (isPracticeBatchHindiEnabled() && finalQuestions.length > 0) {
     await updateProgress(assignedPracticeId, {
       "generationProgress.currentStep": "translating_hindi",
       "generationProgress.generatedQuestions": finalQuestions.length,

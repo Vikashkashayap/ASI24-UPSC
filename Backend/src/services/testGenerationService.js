@@ -19,7 +19,370 @@ import {
   isPracticeEnglishOnly,
   isPracticeBatchHindiEnabled,
 } from "../config/openRouterConfig.js";
-import { ensureEnglishBilingualFields } from "./questionTranslationService.js";
+import {
+  ensureEnglishBilingualFields,
+  pickBilingualQuestionFields,
+} from "./questionTranslationService.js";
+import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
+import { retrieverService } from "./ai/retriever.service.js";
+import { generateQuestionsFromContextBatch } from "./ai/questionGenerator.service.js";
+import { questionPatternEngine } from "./ai/questionPatternEngine.js";
+import {
+  extractClaimedCorrectLetter,
+  lockPlainExplanationToAnswer,
+} from "./qg/utils/consistency.js";
+
+/** GS Prelims uses Knowledge Base RAG by default (same stack as Topic Practice). Set PRELIMS_USE_RAG=false for legacy open LLM. */
+export function isPrelimsRagEnabled(examType) {
+  return examType === "GS" && process.env.PRELIMS_USE_RAG !== "false";
+}
+
+function normalizePrelimsDifficulty(difficulty) {
+  const d = String(difficulty || "moderate").toLowerCase();
+  if (d === "easy") return "easy";
+  if (d === "hard") return "hard";
+  return "moderate";
+}
+
+/**
+ * Generate Prelims GS MCQs from Admin Knowledge Base (Qdrant/notes chunks) — same RAG path as Topic Practice.
+ */
+async function generateTestQuestionsFromKnowledgeBase({
+  subjects,
+  topic,
+  questionCount,
+  difficulty = "Moderate",
+}) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing OPENROUTER_API_KEY in environment variables");
+  }
+
+  const count = parseInt(questionCount, 10) || 20;
+  const subjectsList = Array.isArray(subjects) ? subjects : [subjects];
+  const primarySubject = String(subjectsList[0] || "").trim();
+  const topicQuery = String(topic || "").trim();
+  const difficultyKey = normalizePrelimsDifficulty(difficulty);
+  const allowOpenKnowledge = process.env.PRELIMS_ALLOW_OPEN_KNOWLEDGE === "true";
+
+  if (!primarySubject || !topicQuery) {
+    throw new Error("Subject and topic are required for knowledge-base generation");
+  }
+
+  const probe = await retrieverService.getContextForSubjectQuery({
+    subject: primarySubject,
+    query: topicQuery,
+    batchIndex: 0,
+  });
+
+  if ((!probe.contextText || probe.contextText.length < 80) && !allowOpenKnowledge) {
+    throw new Error(
+      `No matching content found in Knowledge Base for "${topicQuery}" under ${primarySubject}. Sync website notes or upload PDFs in Admin → Knowledge Base, then try again.`
+    );
+  }
+
+  const selectedPatterns = resolveNotesPatterns(ALL_PATTERN_IDS);
+  const planState = questionPatternEngine.createPlan({
+    questionCount: count + Math.min(5, count),
+    patternsToInclude: selectedPatterns,
+  });
+
+  const batchSize = Math.min(
+    count,
+    Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8),
+    parseInt(process.env.QG_MAX_QUESTIONS_PER_CALL, 10) || 10
+  );
+  const maxBatchRounds = getTestGenMaxBatchRounds(count, batchSize);
+  const usedChunkIds = new Set();
+  let validatedQuestions = [];
+  let stallRounds = 0;
+  let openKnowledgeUsed = false;
+
+  console.log(
+    `📚 Prelims RAG: ${count}Q | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey}`
+  );
+
+  for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
+    const beforeLen = validatedQuestions.length;
+    const need = Math.min(batchSize, count - validatedQuestions.length);
+
+    const rag = await retrieverService.getContextForSubjectQuery({
+      subject: primarySubject,
+      query: topicQuery,
+      batchIndex: round,
+      excludeChunkIds: [...usedChunkIds],
+    });
+    for (const id of rag.chunkIds || []) usedChunkIds.add(id);
+
+    const kbEmpty = !rag.contextText || rag.contextText.length < 80;
+    let openKnowledge = false;
+    let contextText = rag.contextText || "";
+
+    if (kbEmpty) {
+      if (!allowOpenKnowledge) {
+        console.warn(
+          `⚠️ Prelims RAG batch ${round + 1}: no KB chunks — skipping (PRELIMS_ALLOW_OPEN_KNOWLEDGE not enabled)`
+        );
+        stallRounds += 1;
+        if (stallRounds >= 5) break;
+        continue;
+      }
+      openKnowledge = true;
+      openKnowledgeUsed = true;
+      contextText = "";
+      console.warn(`⚠️ Prelims RAG batch ${round + 1}: KB empty — open syllabus fallback`);
+    } else {
+      console.log(
+        `📚 Prelims RAG batch ${round + 1}: source=${rag.source} chunks=${rag.chunks?.length || 0} ~${rag.tokens || 0} tokens`
+      );
+    }
+
+    const batchResult = await generateQuestionsFromContextBatch({
+      contextText,
+      topic: topicQuery,
+      difficulty: difficultyKey,
+      batchSize: need,
+      patternsToInclude: selectedPatterns,
+      batchIndex: round,
+      generationPlan: questionPatternEngine.nextBatchPlan({
+        plan: planState,
+        batchSize: need,
+      }),
+      subject: primarySubject,
+      chapter: "",
+      ragOptimized: !openKnowledge,
+      openKnowledge,
+    });
+
+    if (!batchResult?.success || !batchResult.questions?.length) {
+      console.warn(`⚠️ Prelims RAG batch ${round + 1} returned 0 questions`);
+      stallRounds += 1;
+      if (stallRounds >= 5) break;
+      continue;
+    }
+
+    const mapped = batchResult.questions.slice(0, need).map((q) =>
+      pickBilingualQuestionFields({
+        ...q,
+        topic: q.topic || topicQuery,
+        subject: q.subject || primarySubject,
+        conceptualSource:
+          q.conceptualSource || q.sourceParagraph || (openKnowledge ? "open_knowledge" : rag.source),
+      })
+    );
+
+    validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...mapped], {
+      csat: false,
+    }).slice(0, count);
+
+    if (validatedQuestions.length === beforeLen) {
+      stallRounds += 1;
+    } else {
+      stallRounds = 0;
+    }
+  }
+
+  if (validatedQuestions.length === 0) {
+    throw new Error(
+      allowOpenKnowledge
+        ? "No valid UPSC questions generated from Knowledge Base. Please try again."
+        : `Could not generate questions from Knowledge Base for "${topicQuery}". Sync more notes/PDFs or refine the topic.`
+    );
+  }
+
+  if (validatedQuestions.length < count) {
+    throw new Error(
+      `Only ${validatedQuestions.length} of ${count} questions could be grounded in Knowledge Base for "${topicQuery}". Sync more content or try a broader topic.`
+    );
+  }
+
+  console.log(
+    `✅ Prelims RAG generated ${validatedQuestions.length} questions` +
+      (openKnowledgeUsed ? " (some open-knowledge fallback)" : " (KB-grounded)")
+  );
+
+  let readyQuestions = finalizeGeneratedQuestions(validatedQuestions);
+
+  // Practice-style: English explanation 50–70 words, then Hindi (stem + options + explanation)
+  readyQuestions = await ensurePrelimsExplanationsPracticeStyle(apiKey, readyQuestions);
+
+  if (isPracticeBatchHindiEnabled()) {
+    console.log(`🌐 Prelims RAG: translating ${readyQuestions.length} questions to Hindi (practice-style)…`);
+    readyQuestions = await batchTranslatePracticeQuestionsToHindi(
+      apiKey,
+      getPracticeTranslationModel(),
+      readyQuestions
+    );
+    readyQuestions = readyQuestions.map((q) => pickBilingualQuestionFields(q));
+  }
+
+  const withHi = readyQuestions.filter((q) =>
+    /[\u0900-\u097F]/.test(String(q.question_hi || ""))
+  ).length;
+  console.log(
+    `✅ Prelims RAG ready: ${readyQuestions.length}Q (${withHi} with Hindi, explanations 50–70 words)`
+  );
+
+  return {
+    success: true,
+    questions: readyQuestions,
+    count: readyQuestions.length,
+    source: openKnowledgeUsed ? "knowledge_base+open" : "knowledge_base",
+  };
+}
+
+/** Plain English explanation text from string or per-option object. */
+function getPlainExplanationText(q) {
+  const raw = q?.explanation_en ?? q?.explanation;
+  if (!raw) return "";
+  if (typeof raw === "string") return raw.replace(/\s+/g, " ").trim();
+  if (typeof raw === "object") {
+    const ca = String(q.correctAnswer || q.answer || "A").toUpperCase();
+    const pick = raw[ca] || raw.A || raw.B || raw.C || raw.D || "";
+    return String(pick).replace(/\s+/g, " ").trim();
+  }
+  return "";
+}
+
+function countExplanationWords(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+}
+
+/** Cap at 70 words (hard UI range). */
+function clampExplanationToSeventy(text) {
+  const cleaned = String(text || "").replace(/\s+/g, " ").trim();
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  if (words.length <= 70) return cleaned;
+  return `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`;
+}
+
+function applyLockedPrelimsExplanation(q, explanationText) {
+  const locked = lockPlainExplanationToAnswer(explanationText, q);
+  const text = clampExplanationToSeventy(locked.explanation || explanationText || "");
+  return {
+    ...q,
+    explanation: text,
+    explanation_en: text,
+  };
+}
+
+function needsPrelimsExplanationRewrite(q) {
+  const answer = String(q.correctAnswer || q.answer || "").toUpperCase();
+  const text = getPlainExplanationText(q);
+  const words = countExplanationWords(text);
+  if (!text || words < 50 || words > 70) return true;
+  if (!answer) return true;
+  const claimed = extractClaimedCorrectLetter(text);
+  if (claimed && claimed !== answer) return true;
+  if (!new RegExp(`^\\s*Option\\s+${answer}\\b`, "i").test(text)) return true;
+  return false;
+}
+
+/**
+ * Practice-style explanations: force 50–70 words, correct-option lock, UPSC PYQ facts.
+ */
+async function ensurePrelimsExplanationsPracticeStyle(apiKey, questions) {
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
+
+  let out = questions.map((q) => applyLockedPrelimsExplanation(q, getPlainExplanationText(q)));
+
+  const rewriteIdx = [];
+  out.forEach((q, i) => {
+    if (needsPrelimsExplanationRewrite(q)) rewriteIdx.push(i);
+  });
+
+  if (!rewriteIdx.length) {
+    console.log(`📝 Prelims explanations: all ${out.length} already 50–70 words + correct-option lock`);
+    return out.map((q) => pickBilingualQuestionFields(q));
+  }
+
+  console.log(
+    `📝 Prelims explanations: polishing ${rewriteIdx.length}/${out.length} to 50–70 words with UPSC facts…`
+  );
+
+  const payload = rewriteIdx.map((i) => {
+    const q = out[i];
+    const opts = q.options_en || q.options || {};
+    const answer = String(q.correctAnswer || q.answer || "A").toUpperCase();
+    return {
+      id: i,
+      answer,
+      correctOptionText: String(opts[answer] || "").slice(0, 160),
+      question: String(q.question_en || q.question || "").slice(0, 400),
+      options: {
+        A: String(opts.A || "").slice(0, 120),
+        B: String(opts.B || "").slice(0, 120),
+        C: String(opts.C || "").slice(0, 120),
+        D: String(opts.D || "").slice(0, 120),
+      },
+      explanation: getPlainExplanationText(q),
+      sourceHint: String(q.conceptualSource || q.sourceParagraph || "").slice(0, 180),
+    };
+  });
+
+  const systemPrompt = `You write UPSC CSE Prelims (PYQ-standard) MCQ explanations.
+Return ONLY a JSON array. Each item: { "id": number, "explanation": string }.
+
+HARD RULES for every explanation:
+1. Exactly 50–70 English words (count carefully).
+2. MUST start with: Option {answer} ("{correctOptionText}") is correct.
+3. Defend ONLY that answer letter — never claim another letter is correct.
+4. Include 1–2 concrete UPSC-style facts (names, years, articles, schemes, places, committees, or causes/effects) grounded in the question domain / sourceHint.
+5. Briefly say why 1–2 wrong options fail (aspirant-level distractors).
+6. No markdown, no Hindi, no bullet points. Same id order/count as input.`;
+
+  const chunkSize = 5;
+  for (let start = 0; start < payload.length; start += chunkSize) {
+    const chunk = payload.slice(start, start + chunkSize);
+    try {
+      const { aiContent } = await callOpenRouterTestGeneration({
+        apiKey,
+        model: getPracticeTranslationModel(),
+        systemPrompt,
+        userPrompt: `Rewrite these explanations to EXACTLY 50–70 words. Match correct option letter+text. Add UPSC PYQ-style facts:\n${JSON.stringify(chunk)}`,
+        maxTokens: Math.min(4000, 350 * chunk.length + 400),
+        apiTitle: "UPSC Mentor - Prelims Explanation Polish",
+      });
+
+      let parsed = null;
+      try {
+        parsed = JSON.parse(
+          String(aiContent || "")
+            .trim()
+            .replace(/^```\s*(?:json)?\s*/i, "")
+            .replace(/\s*```\s*$/, "")
+        );
+      } catch (_) {
+        parsed = extractJsonFromContent(aiContent);
+      }
+      const rows = Array.isArray(parsed) ? parsed : parsed?.explanations || [];
+      for (const row of rows) {
+        const id = Number(row?.id);
+        const polished = String(row?.explanation || "").trim();
+        if (!Number.isInteger(id) || !out[id] || countExplanationWords(polished) < 40) continue;
+        out[id] = applyLockedPrelimsExplanation(out[id], polished);
+      }
+    } catch (err) {
+      console.warn("Prelims explanation polish batch failed:", err?.message || err);
+    }
+  }
+
+  // Final lock + clamp for every item
+  out = out.map((q) => applyLockedPrelimsExplanation(q, getPlainExplanationText(q)));
+
+  const stillBad = out.filter((q) => needsPrelimsExplanationRewrite(q)).length;
+  if (stillBad) {
+    console.warn(`⚠️ Prelims explanations: ${stillBad} still outside 50–70 / option-lock after polish`);
+  } else {
+    console.log(`✅ Prelims explanations: all ${out.length} are 50–70 words with correct-option match`);
+  }
+
+  return out.map((q) => pickBilingualQuestionFields(q));
+}
 
 function usesFullBilingualExplanations() {
   return process.env.TEST_GEN_FULL_BILINGUAL_EXPLANATIONS === "true";
@@ -2581,7 +2944,9 @@ function getTestGenMaxBatchRounds(count, batchSize) {
 }
 
 /**
- * Generate UPSC Prelims MCQs using OpenRouter API.
+ * Generate UPSC Prelims MCQs.
+ * GS (default): Knowledge Base RAG → same grounded generator as Topic Practice.
+ * CSAT / PRELIMS_USE_RAG=false: legacy open LLM syllabus generation.
  * @param {Object} params
  * @param {string[]} params.subjects - Subject names (e.g. ["Polity", "History"])
  * @param {string} params.topic - Topic name
@@ -2602,6 +2967,15 @@ export const generateTestQuestions = async ({
   currentAffairsPeriod,
 }) => {
   try {
+    if (isPrelimsRagEnabled(examType)) {
+      return await generateTestQuestionsFromKnowledgeBase({
+        subjects,
+        topic,
+        questionCount,
+        difficulty,
+      });
+    }
+
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = getTestGenerationModel();
 
@@ -2745,6 +3119,8 @@ export const generateTestQuestions = async ({
 
 export default {
   generateTestQuestions,
+  generateTestQuestionsFromKnowledgeBase,
+  isPrelimsRagEnabled,
   generateAssignedPracticeQuestions,
   generateFullMockTestQuestions,
   generateFullMockMixTestQuestions,

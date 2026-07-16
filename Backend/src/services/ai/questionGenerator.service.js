@@ -24,6 +24,7 @@ import {
 } from "./tokenEstimator.service.js";
 import { prepareContextForBatch, ABORT_CONTEXT_TOKENS } from "./contextReducer.service.js";
 import { MAX_PROMPT_TOKENS, MAX_CONTEXT_TOKENS } from "./retriever.service.js";
+import { lockPlainExplanationToAnswer } from "../qg/utils/consistency.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const BATCH_RETRIES = Math.max(1, Math.min(3, parseInt(process.env.PRACTICE_BATCH_RETRIES, 10) || 2));
@@ -188,7 +189,7 @@ function formatAssertionStem(ar) {
  * Build a full UPSC stem from structured fields when the LLM only sent an intro.
  */
 function assembleCompleteStem(q) {
-  let questionEn = String(q.question ?? q.question_en ?? "")
+  let questionEn = String(q.question ?? q.question_en ?? q.questionText ?? q.stem ?? "")
     .replace(/\\n/g, "\n")
     .trim();
   const questionType = String(q.questionType || q.type || "").toLowerCase();
@@ -316,7 +317,21 @@ function isCompleteUpscStem(q) {
 }
 
 function filterGroundedQuestions(questions) {
-  return questions || [];
+  return (questions || []).filter((q) => {
+    if (!q?.correctAnswer || !q?.options?.[q.correctAnswer]) return false;
+    // Drop if explanation still clearly claims a different letter after lock
+    const exp = String(q.explanation || "");
+    const wrongClaim = exp.match(
+      /\boption\s*([A-D])\b(?:\s*\([^)]*\))?\s+is\s+(?:the\s+)?(?:correct|right)\b/i
+    );
+    if (wrongClaim?.[1] && String(wrongClaim[1]).toUpperCase() !== q.correctAnswer) {
+      console.warn(
+        `⚠️ Dropped question with residual answer↔explanation mismatch (answer=${q.correctAnswer}, claimed=${wrongClaim[1]})`
+      );
+      return false;
+    }
+    return true;
+  });
 }
 
 function normalizeNotesQuestion(q, meta = {}) {
@@ -350,14 +365,35 @@ function normalizeNotesQuestion(q, meta = {}) {
   }
 
   const explanationRaw = String(q.explanation ?? q.explanation_en ?? "").trim();
-  // Keep ~50–70 word explanations (enough to teach, not a dump)
-  const explanation = (() => {
+  const optionsObj = {
+    A: optionsArr[0] || "",
+    B: optionsArr[1] || "",
+    C: optionsArr[2] || "",
+    D: optionsArr[3] || "",
+  };
+
+  // HARD LOCK: explanation must never disagree with answer letter (student safety)
+  let explanation = "";
+  if (correct && explanationRaw) {
+    const locked = lockPlainExplanationToAnswer(explanationRaw, {
+      correctAnswer: correct,
+      options: optionsObj,
+    });
+    explanation = locked.explanation;
+    if (locked.claimedLetter && locked.claimedLetter !== correct) {
+      console.warn(
+        `⚠️ Fixed answer↔explanation mismatch: answer=${correct} but explanation claimed ${locked.claimedLetter}`
+      );
+    }
+  } else if (explanationRaw) {
     const cleaned = explanationRaw.replace(/\s+/g, " ").trim();
-    if (!cleaned) return "";
     const words = cleaned.split(/\s+/).filter(Boolean);
-    if (words.length <= 75) return cleaned.slice(0, 900);
-    return `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`.slice(0, 900);
-  })();
+    explanation =
+      words.length <= 75
+        ? cleaned.slice(0, 900)
+        : `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`.slice(0, 900);
+  }
+
   // Short source quote only — never dump long notes into UI "Source"
   let sourceChunk = String(q.sourceParagraph || q.sourceChunk || q.source_chunk || q.source || "").trim();
   sourceChunk = sourceChunk.replace(/\s+/g, " ").slice(0, 180);
@@ -369,18 +405,8 @@ function normalizeNotesQuestion(q, meta = {}) {
   const base = ensureEnglishBilingualFields({
     question: questionEn,
     question_en: questionEn,
-    options: {
-      A: optionsArr[0] || "",
-      B: optionsArr[1] || "",
-      C: optionsArr[2] || "",
-      D: optionsArr[3] || "",
-    },
-    options_en: {
-      A: optionsArr[0] || "",
-      B: optionsArr[1] || "",
-      C: optionsArr[2] || "",
-      D: optionsArr[3] || "",
-    },
+    options: optionsObj,
+    options_en: { ...optionsObj },
     correctAnswer: correct,
     answer: answerAlias,
     explanation,
@@ -725,10 +751,102 @@ export async function generateQuestionsFromContextBatch({
   openKnowledge = false,
 }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = getPracticeGenerationModel();
   if (!apiKey) {
     return { success: false, error: "Missing OPENROUTER_API_KEY", questions: [] };
   }
+
+  const useEnterpriseQg =
+    process.env.QG_ENTERPRISE_PIPELINE !== "false" && !openKnowledge;
+
+  // Best Pro path: Pro generate + Flash verify + Pro explain + Flash fact-check
+  if (useEnterpriseQg) {
+    try {
+      const { generateVerifiedFromContext, getModelForStage, QG_CONFIG } = await import(
+        "../qg/index.js"
+      );
+      const target = Math.min(10, Math.max(1, Number(batchSize) || 5));
+      console.log(
+        `[qg.enterprise] batch ${batchIndex + 1}: ${target}Q | profile=${QG_CONFIG.qualityProfile} | Q=${getModelForStage("question")} V=${getModelForStage("verification")} E=${getModelForStage("explanation")} F=${getModelForStage("factCheck")}`
+      );
+
+      const result = await generateVerifiedFromContext({
+        contextText,
+        topic,
+        subject,
+        chapter,
+        difficulty: difficulty === "moderate" ? "medium" : difficulty,
+        batchSize: target,
+        patternsToInclude,
+        retrievalSource: ragOptimized ? "rag" : "provided",
+      });
+
+      const questions = (result.questions || []).map((q) => {
+        const explanationText = String(q.explanation || q.explanation_en || "").trim();
+        // Prefer compact 50–70 word body for UI when structured detail exists
+        const detail =
+          q.explanationStructured?.detailedExplanation ||
+          explanationText.split("\n").find((l) => l && !/^Correct Answer:/i.test(l)) ||
+          explanationText;
+        const words = String(detail).replace(/\s+/g, " ").trim().split(/\s+/).filter(Boolean);
+        const compactExplain =
+          words.length > 75
+            ? `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`
+            : String(detail).replace(/\s+/g, " ").trim();
+
+        return ensureEnglishBilingualFields({
+          question: q.question,
+          question_en: q.question_en || q.question,
+          options: q.options,
+          options_en: q.options_en || q.options,
+          correctAnswer: q.correctAnswer,
+          answer: q.correctAnswer,
+          explanation: compactExplain,
+          explanation_en: compactExplain,
+          explanationStructured: q.explanationStructured,
+          questionType: q.questionType || "direct_conceptual",
+          difficulty:
+            q.difficulty === "medium"
+              ? "moderate"
+              : ["easy", "moderate", "hard"].includes(String(q.difficulty || "").toLowerCase())
+                ? String(q.difficulty).toLowerCase()
+                : "moderate",
+          conceptualSource: q.sourceParagraph || q.conceptualSource || "",
+          sourceParagraph: q.sourceParagraph || "",
+          subject: q.subject || subject,
+          chapter: q.chapter || chapter,
+          topic: q.topic || topic,
+          statements: q.statements,
+          chronologyItems: q.chronologyItems,
+          matchColumns: q.matchColumns,
+          assertionReason: q.assertionReason,
+          overallAiConfidence: q.overallAiConfidence,
+          qualityScores: q.qualityScores,
+          modelUsed: q.modelUsed,
+        });
+      });
+
+      return {
+        success: questions.length > 0,
+        questions,
+        usage: {},
+        model: getModelForStage("question"),
+        models: result.models,
+        qualityProfile: result.qualityProfile || QG_CONFIG.qualityProfile,
+        durationMs: result.durationMs || 0,
+        openKnowledge: false,
+        enterpriseQg: true,
+        rejected: result.rejected || [],
+      };
+    } catch (err) {
+      console.error(
+        `[qg.enterprise] batch failed, falling back to legacy generator:`,
+        err?.message || err
+      );
+      // fall through to legacy
+    }
+  }
+
+  const model = getPracticeGenerationModel();
   const result = await generateNotesBatch({
     apiKey,
     model,
@@ -752,6 +870,7 @@ export async function generateQuestionsFromContextBatch({
     model: result.model || model,
     durationMs: result.durationMs || 0,
     openKnowledge: Boolean(openKnowledge),
+    enterpriseQg: false,
   };
 }
 
@@ -903,7 +1022,7 @@ export async function generateQuestionsFromNotes({
       console.warn(`⚠️ Returning ${finalQuestions.length}/${displayCount} questions (below target but acceptable)`);
     }
 
-    if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled()) {
+    if (isPracticeBatchHindiEnabled()) {
       finalQuestions = await translatePracticeBatch(apiKey, finalQuestions);
     }
 

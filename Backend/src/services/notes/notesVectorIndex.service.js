@@ -57,7 +57,10 @@ export async function indexTopicInVectorDb(topicId, opts = {}) {
   const vectors = [];
   for (let i = 0; i < chunks.length; i += EMBED_BATCH) {
     const slice = chunks.slice(i, i + EMBED_BATCH);
-    const batchVectors = await embeddingService.embedBatch(slice.map((c) => c.text));
+    const batchVectors = await embeddingService.generateBatchEmbeddings(
+      slice.map((c) => c.text),
+      { task: "passage" }
+    );
     vectors.push(...batchVectors);
   }
 
@@ -133,7 +136,7 @@ export async function indexChapterInVectorDb(chapterId, opts = {}) {
   if (!isReady()) {
     chapter.embeddingStatus = "skipped";
     chapter.embeddingError =
-      "Set QDRANT_URL and embedding credentials (HF_TOKEN or EMBEDDING_BASE_URL)";
+      "Set QDRANT_URL and JINA_API_KEY (or other EMBEDDING_PROVIDER credentials)";
     await chapter.save();
     return {
       chapterId: chapter._id,

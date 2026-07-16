@@ -26,12 +26,18 @@ import offersRoutes from "./routes/offersRoutes.js";
 import currentAffairsRoutes, {
   currentAffairsAdminRouter,
 } from "./routes/currentAffairsRoutes.js";
+import ragRoutes from "./rag/routes/ragRoutes.js";
+import { uploadPdf as ragUploadPdf } from "./rag/controllers/ragController.js";
+import { ragPdfUpload } from "./rag/middleware/uploadPdf.js";
+import { requireAdmin } from "./middleware/adminMiddleware.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
+import { qdrantService } from "./services/ai/qdrant.service.js";
+import { getSystemHealth } from "./services/health.service.js";
 
 const app = express();
 
@@ -66,6 +72,17 @@ app.use(express.json());
 
 connectDB();
 
+// Proactively create collection (non-fatal if it fails)
+if (qdrantService.isConfigured()) {
+  const autoCreate =
+    String(process.env.QDRANT_AUTO_CREATE_COLLECTION ?? "true").toLowerCase() === "true";
+  if (autoCreate) {
+    qdrantService.ensureCollection().catch((err) => {
+      console.error("[qdrant] ensureCollection on startup failed:", err?.message || err);
+    });
+  }
+}
+
 if (isGoogleOAuthConfigured()) {
   console.log("✅ Google OAuth credentials loaded (strategy registers on first login)");
 } else {
@@ -88,6 +105,46 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+/** Full system health — MongoDB, Qdrant, Jina embeddings, OpenRouter LLM */
+app.get("/health", async (_req, res) => {
+  try {
+    const health = await getSystemHealth();
+    const allOk = Object.entries(health)
+      .filter(([k]) => k !== "embeddingProvider")
+      .every(([, v]) => v === "connected");
+    return res.status(allOk ? 200 : 503).json(health);
+  } catch (err) {
+    console.error("[health]", err);
+    return res.status(500).json({
+      mongodb: "disconnected",
+      qdrant: "disconnected",
+      embedding: "disconnected",
+      embeddingProvider: "Jina AI",
+      llm: "disconnected",
+      error: err?.message || "Health check failed",
+    });
+  }
+});
+
+/* -------------------- HEALTH CHECKS -------------------- */
+
+app.get("/health/qdrant", async (_req, res) => {
+  try {
+    const qdrant = await qdrantService.health();
+    const status = qdrant?.ok ? 200 : 503;
+    return res.status(status).json({
+      success: Boolean(qdrant?.ok),
+      data: qdrant,
+    });
+  } catch (err) {
+    console.error("[health/qdrant]", err);
+    return res.status(500).json({
+      success: false,
+      message: err?.message || "Qdrant health check failed",
+    });
+  }
+});
+
 /* -------------------- ROUTES -------------------- */
 
 app.use("/api/auth", authRoutes);
@@ -104,6 +161,11 @@ app.use("/api/study-planner", authMiddleware, advancedStudyPlannerRoutes);
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin", adminRoutes);
+
+// Shared Knowledge Base RAG (search + generate + admin manage)
+app.use("/api/rag", ragRoutes);
+// Prompt alias: POST /api/admin/upload-pdf → same pipeline as Knowledge Base PDF ingest
+app.post("/api/admin/upload-pdf", requireAdmin, ragPdfUpload, ragUploadPdf);
 
 app.use("/api/offers", offersRoutes);
 app.use("/api/current-affairs", currentAffairsRoutes);

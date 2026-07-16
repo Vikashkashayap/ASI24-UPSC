@@ -1,64 +1,73 @@
 import fetch from "node-fetch";
 
-const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
-const DEFAULT_HF_URL = "https://api-inference.huggingface.co/models";
-const BGE_M3_MODEL = "BAAI/bge-m3";
-const BGE_M3_DIMENSION = 1024;
+const DEFAULT_JINA_URL = "https://api.jina.ai/v1/embeddings";
+const DEFAULT_OPENAI_URL = "https://api.openai.com/v1";
+const DEFAULT_VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";
+
+const PROVIDER_LABELS = {
+  jina: "Jina AI",
+  openai: "OpenAI",
+  voyage: "Voyage AI",
+};
+
+const JINA_TASKS = {
+  query: "retrieval.query",
+  passage: "retrieval.passage",
+  document: "retrieval.passage",
+  default: "retrieval.passage",
+};
 
 /**
- * EmbeddingService — pluggable text embeddings.
- * Default provider: BAAI/bge-m3 (multilingual, 1024-d) via:
- *   1) OpenAI-compatible EMBEDDING_BASE_URL (TEI / Infinity / Xinference), or
- *   2) HuggingFace Inference API (HF_TOKEN / HUGGINGFACE_API_KEY)
- * Legacy: EMBEDDING_PROVIDER=openai → text-embedding-3-small
+ * Pluggable embedding service — default: Jina AI (jina-embeddings-v4).
+ * Switch providers via EMBEDDING_PROVIDER=jina|openai|voyage without changing the RAG pipeline.
  */
 class EmbeddingService {
   constructor() {
-    this.provider = String(process.env.EMBEDDING_PROVIDER || "bge-m3")
-      .trim()
-      .toLowerCase();
+    this.provider = String(process.env.EMBEDDING_PROVIDER || "jina").trim().toLowerCase();
     this.disabled = false;
     this.warned = false;
+    this.timeoutMs = parseInt(process.env.EMBEDDING_TIMEOUT_MS, 10) || 30_000;
+    this.retries = parseInt(process.env.EMBEDDING_RETRIES, 10) || 3;
+    this.retryBaseMs = parseInt(process.env.EMBEDDING_RETRY_BASE_MS, 10) || 800;
+    this.batchSize = parseInt(process.env.EMBEDDING_BATCH_SIZE, 10) || 4;
+    this.maxInputChars = parseInt(process.env.EMBEDDING_MAX_CHARS, 10) || 8000;
 
-    if (this.provider === "openai") {
-      this.model = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
-      this.baseUrl = String(process.env.OPENAI_BASE_URL || DEFAULT_OPENAI_BASE_URL).replace(
-        /\/$/,
-        ""
-      );
-      this.embedUrl = `${this.baseUrl}/embeddings`;
-      this.apiKey = this.resolveOpenAiApiKey();
-      this.dimension =
-        parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.PINECONE_DIMENSION, 10) || 1536;
-      this.maxInputChars = 8000;
-    } else {
-      // bge-m3 (default)
-      this.provider = "bge-m3";
-      this.model = process.env.EMBEDDING_MODEL || BGE_M3_MODEL;
-      this.dimension =
-        parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) ||
-        BGE_M3_DIMENSION;
-      this.maxInputChars = parseInt(process.env.EMBEDDING_MAX_CHARS, 10) || 8000;
+    this._initProvider();
+  }
 
-      const customBase = String(process.env.EMBEDDING_BASE_URL || "").trim().replace(/\/$/, "");
-      if (customBase) {
-        this.transport = "openai-compatible";
-        this.baseUrl = customBase;
-        this.embedUrl = `${customBase}/embeddings`;
-        this.apiKey = String(
-          process.env.EMBEDDING_API_KEY ||
-            process.env.HF_TOKEN ||
-            process.env.HUGGINGFACE_API_KEY ||
-            ""
-        ).trim();
-      } else {
-        this.transport = "huggingface";
-        this.baseUrl = String(process.env.HF_INFERENCE_URL || DEFAULT_HF_URL).replace(/\/$/, "");
-        this.embedUrl = `${this.baseUrl}/${this.model}`;
-        this.apiKey = String(
-          process.env.HF_TOKEN || process.env.HUGGINGFACE_API_KEY || process.env.EMBEDDING_API_KEY || ""
-        ).trim();
-      }
+  _initProvider() {
+    switch (this.provider) {
+      case "openai":
+        this.model = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+        this.baseUrl = String(process.env.OPENAI_BASE_URL || DEFAULT_OPENAI_URL).replace(/\/$/, "");
+        this.embedUrl = `${this.baseUrl}/embeddings`;
+        this.apiKey = this._resolveOpenAiApiKey();
+        this.dimension =
+          parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) || 1536;
+        break;
+
+      case "voyage":
+        this.model = process.env.VOYAGE_MODEL || "voyage-3";
+        this.embedUrl = process.env.VOYAGE_API_URL || DEFAULT_VOYAGE_URL;
+        this.apiKey = String(process.env.VOYAGE_API_KEY || "").trim();
+        this.dimension =
+          parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) || 1024;
+        break;
+
+      case "jina":
+      default:
+        this.provider = "jina";
+        this.model = process.env.JINA_MODEL || "jina-embeddings-v4";
+        this.embedUrl = process.env.JINA_API_URL || DEFAULT_JINA_URL;
+        this.apiKey = String(process.env.JINA_API_KEY || "").trim();
+        this.dimension =
+          parseInt(
+            process.env.JINA_DIMENSIONS ||
+              process.env.QDRANT_VECTOR_SIZE ||
+              process.env.EMBEDDING_DIMENSION,
+            10
+          ) || 1024;
+        break;
     }
   }
 
@@ -70,19 +79,22 @@ class EmbeddingService {
     return this.dimension;
   }
 
+  /** Internal provider id: jina | openai | voyage */
   getProvider() {
     return this.provider;
   }
 
+  /** Human-readable label for health / admin UI */
+  getProviderLabel() {
+    return PROVIDER_LABELS[this.provider] || this.provider;
+  }
+
   isConfigured() {
     if (this.disabled) return false;
-    if (this.provider === "openai") return Boolean(this.apiKey);
-    // Local TEI/Infinity may not require a key
-    if (this.transport === "openai-compatible") return Boolean(this.embedUrl);
     return Boolean(this.apiKey);
   }
 
-  resolveOpenAiApiKey() {
+  _resolveOpenAiApiKey() {
     const explicit = String(process.env.OPENAI_API_KEY || "").trim();
     if (explicit) return explicit;
     const openRouter = String(process.env.OPENROUTER_API_KEY || "").trim();
@@ -90,54 +102,133 @@ class EmbeddingService {
     return "";
   }
 
-  disableWithWarning(message) {
+  _disableWithWarning(message) {
     this.disabled = true;
     if (!this.warned) {
-      console.warn(message);
+      console.warn(`[embedding] ${message}`);
       this.warned = true;
     }
   }
 
-  truncate(text) {
+  _truncate(text) {
     return String(text || "").trim().slice(0, this.maxInputChars);
   }
 
-  /**
-   * Normalize HF / OpenAI embedding payloads to a flat number[].
-   * @param {unknown} raw
-   * @returns {number[]|null}
-   */
-  normalizeVector(raw) {
+  _sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  _resolveJinaTask(task) {
+    const key = String(task || "default").toLowerCase();
+    return JINA_TASKS[key] || JINA_TASKS.default;
+  }
+
+  _normalizeVector(raw) {
     if (!raw) return null;
-    if (Array.isArray(raw) && typeof raw[0] === "number") {
-      return raw;
-    }
-    // Token embeddings: mean-pool
-    if (Array.isArray(raw) && Array.isArray(raw[0]) && typeof raw[0][0] === "number") {
-      const rows = raw;
-      const dim = rows[0].length;
-      const out = new Array(dim).fill(0);
-      for (const row of rows) {
-        for (let i = 0; i < dim; i += 1) out[i] += row[i];
-      }
-      for (let i = 0; i < dim; i += 1) out[i] /= rows.length;
-      return out;
-    }
-    // Nested batch: [ [tokenvecs] ] or [ dense ]
-    if (Array.isArray(raw) && Array.isArray(raw[0])) {
-      return this.normalizeVector(raw[0]);
-    }
-    if (Array.isArray(raw?.embedding)) return this.normalizeVector(raw.embedding);
+    if (Array.isArray(raw) && typeof raw[0] === "number") return raw;
+    if (Array.isArray(raw?.embedding)) return this._normalizeVector(raw.embedding);
+    if (Array.isArray(raw) && Array.isArray(raw[0])) return this._normalizeVector(raw[0]);
     return null;
   }
 
-  async embedOpenAiCompatible(texts) {
+  _isRetryableStatus(status) {
+    return status === 429 || status === 502 || status === 503 || status === 504;
+  }
+
+  async _fetchWithTimeout(url, options) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async _requestWithRetry(requestFn, { label = "embedding" } = {}) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= this.retries; attempt += 1) {
+      const started = Date.now();
+      try {
+        const result = await requestFn();
+        const durationMs = Date.now() - started;
+        console.log(`[embedding] ${label} ok in ${durationMs}ms (attempt ${attempt})`);
+        return result;
+      } catch (err) {
+        lastError = err;
+        const durationMs = Date.now() - started;
+        const retryable = err.retryable !== false;
+        console.warn(
+          `[embedding] ${label} failed in ${durationMs}ms (attempt ${attempt}/${this.retries}): ${err.message}`
+        );
+        if (!retryable || attempt >= this.retries) break;
+        const delayMs = err.retryAfterMs || this.retryBaseMs * 2 ** (attempt - 1);
+        console.log(`[embedding] retrying ${label} in ${delayMs}ms`);
+        await this._sleep(delayMs);
+      }
+    }
+
+    console.error(`[embedding] ${label} failed after ${this.retries} attempts: ${lastError?.message}`);
+    throw lastError;
+  }
+
+  async _callJina(texts, task = "default") {
+    if (!this.apiKey) {
+      throw Object.assign(new Error("JINA_API_KEY is not set"), { retryable: false });
+    }
+
+    const jinaTask = this._resolveJinaTask(task);
+    const body = {
+      model: this.model,
+      task: jinaTask,
+      dimensions: this.dimension,
+      input: texts.map((t) => ({ text: t })),
+    };
+
+    const response = await this._fetchWithTimeout(this.embedUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      if (response.status === 401 || response.status === 403) {
+        this._disableWithWarning(`auth failure (${response.status}) — check JINA_API_KEY`);
+        throw Object.assign(new Error(`Jina auth failed: ${response.status}`), { retryable: false });
+      }
+      const retryAfterHeader = response.headers.get("retry-after");
+      let retryAfterMs = retryAfterHeader ? parseInt(retryAfterHeader, 10) * 1000 : undefined;
+      if (!retryAfterMs && /tokens per minute/i.test(errText)) {
+        retryAfterMs = 15_000;
+      }
+      throw Object.assign(
+        new Error(`Jina API ${response.status}: ${errText.slice(0, 200)}`),
+        { retryable: this._isRetryableStatus(response.status), retryAfterMs }
+      );
+    }
+
+    const data = await response.json();
+    const rows = data?.data || [];
+    const byIndex = new Map(rows.map((row) => [row.index, row.embedding]));
+    return texts.map((_, i) => this._normalizeVector(byIndex.get(i) ?? rows[i]?.embedding));
+  }
+
+  async _callOpenAiCompatible(texts) {
+    if (!this.apiKey) {
+      throw Object.assign(new Error("Embedding API key is not set"), { retryable: false });
+    }
+
     const headers = {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${this.apiKey}`,
     };
-    if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
-    const response = await fetch(this.embedUrl, {
+    const response = await this._fetchWithTimeout(this.embedUrl, {
       method: "POST",
       headers,
       body: JSON.stringify({
@@ -149,88 +240,141 @@ class EmbeddingService {
     if (!response.ok) {
       const errText = await response.text();
       if (response.status === 401 || response.status === 403) {
-        this.disableWithWarning(
-          `EmbeddingService disabled due to auth failure (${response.status}) at ${this.embedUrl}.`
-        );
-        return texts.map(() => null);
+        this._disableWithWarning(`auth failure (${response.status}) at ${this.embedUrl}`);
+        throw Object.assign(new Error(`Embedding auth failed: ${response.status}`), { retryable: false });
       }
-      console.warn("EmbeddingService openai-compatible failed:", response.status, errText.slice(0, 200));
-      return texts.map(() => null);
+      const retryAfterHeader = response.headers.get("retry-after");
+      let retryAfterMs = retryAfterHeader ? parseInt(retryAfterHeader, 10) * 1000 : undefined;
+      if (!retryAfterMs && /tokens per minute/i.test(errText)) {
+        retryAfterMs = 15_000;
+      }
+      throw Object.assign(
+        new Error(`Embedding API ${response.status}: ${errText.slice(0, 200)}`),
+        { retryable: this._isRetryableStatus(response.status), retryAfterMs }
+      );
     }
 
     const data = await response.json();
     const byIndex = new Map((data?.data || []).map((row) => [row.index, row.embedding]));
-    return texts.map((_, i) => this.normalizeVector(byIndex.get(i) ?? data?.data?.[i]?.embedding));
+    return texts.map((_, i) => this._normalizeVector(byIndex.get(i) ?? data?.data?.[i]?.embedding));
   }
 
-  async embedHuggingFace(texts) {
-    const results = [];
-    for (const text of texts) {
-      const response = await fetch(this.embedUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          inputs: text,
-          options: { wait_for_model: true },
-        }),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        if (response.status === 401 || response.status === 403) {
-          this.disableWithWarning(
-            `EmbeddingService disabled due to HF auth failure (${response.status}). Set HF_TOKEN.`
-          );
-          results.push(null);
-          continue;
-        }
-        // Model loading
-        if (response.status === 503) {
-          console.warn("EmbeddingService HF model loading:", errText.slice(0, 160));
-          results.push(null);
-          continue;
-        }
-        console.warn("EmbeddingService HF failed:", response.status, errText.slice(0, 200));
-        results.push(null);
-        continue;
-      }
-
-      const data = await response.json();
-      results.push(this.normalizeVector(data));
+  async _embedProviderBatch(texts, opts = {}) {
+    switch (this.provider) {
+      case "openai":
+      case "voyage":
+        return this._callOpenAiCompatible(texts);
+      case "jina":
+      default:
+        return this._callJina(texts, opts.task);
     }
-    return results;
   }
 
   /**
+   * Generate a single embedding vector.
    * @param {string} text
+   * @param {{ task?: 'query'|'passage'|'document'|'default' }} [opts]
    * @returns {Promise<number[]|null>}
    */
-  async embed(text) {
-    const input = this.truncate(text);
+  async generateEmbedding(text, opts = {}) {
+    const input = this._truncate(text);
     if (!input || !this.isConfigured()) return null;
-    const [vector] = await this.embedBatch([input]);
+    const [vector] = await this.generateBatchEmbeddings([input], opts);
     return vector;
   }
 
   /**
+   * Generate embeddings for multiple texts (batched).
    * @param {string[]} texts
+   * @param {{ task?: 'query'|'passage'|'document'|'default' }} [opts]
    * @returns {Promise<(number[]|null)[]>}
    */
-  async embedBatch(texts) {
-    const list = (texts || []).map((t) => this.truncate(t));
-    if (!list.length || !this.isConfigured()) return list.map(() => null);
-
-    try {
-      if (this.provider === "openai" || this.transport === "openai-compatible") {
-        return await this.embedOpenAiCompatible(list);
-      }
-      return await this.embedHuggingFace(list);
-    } catch (err) {
-      console.warn("EmbeddingService.embedBatch error:", err.message);
+  async generateBatchEmbeddings(texts, opts = {}) {
+    const list = (texts || []).map((t) => this._truncate(t));
+    if (!list.length || !this.isConfigured()) {
       return list.map(() => null);
+    }
+
+    const results = [];
+    const taskLabel = opts.task || "default";
+
+    for (let i = 0; i < list.length; i += this.batchSize) {
+      const slice = list.slice(i, i + this.batchSize);
+      const nonEmpty = slice
+        .map((text, offset) => ({ text, offset }))
+        .filter((row) => row.text);
+
+      if (!nonEmpty.length) {
+        results.push(...slice.map(() => null));
+        continue;
+      }
+
+      try {
+        const vectors = await this._requestWithRetry(
+          () => this._embedProviderBatch(nonEmpty.map((row) => row.text), opts),
+          { label: `${this.provider} batch (${nonEmpty.length}, task=${taskLabel})` }
+        );
+
+        const batchResult = slice.map(() => null);
+        nonEmpty.forEach((row, idx) => {
+          batchResult[row.offset] = vectors[idx] ?? null;
+        });
+        results.push(...batchResult);
+      } catch (err) {
+        console.error(`[embedding] batch failed: ${err.message}`);
+        results.push(...slice.map(() => null));
+      }
+    }
+
+    return results;
+  }
+
+  /** @deprecated alias — use generateEmbedding */
+  async embed(text, opts = {}) {
+    return this.generateEmbedding(text, opts);
+  }
+
+  /** @deprecated alias — use generateBatchEmbeddings */
+  async embedBatch(texts, opts = {}) {
+    return this.generateBatchEmbeddings(texts, opts);
+  }
+
+  /**
+   * Lightweight connectivity probe for health checks.
+   * @returns {Promise<{ ok: boolean, provider: string, model: string, dimension: number, durationMs?: number, error?: string }>}
+   */
+  async healthCheck() {
+    if (!this.isConfigured()) {
+      return {
+        ok: false,
+        provider: this.getProviderLabel(),
+        model: this.model,
+        dimension: this.dimension,
+        error: `${this.getProviderLabel()} API key not configured`,
+      };
+    }
+
+    const started = Date.now();
+    try {
+      const vector = await this.generateEmbedding("health check ping", { task: "query" });
+      const ok = Array.isArray(vector) && vector.length === this.dimension;
+      return {
+        ok,
+        provider: this.getProviderLabel(),
+        model: this.model,
+        dimension: this.dimension,
+        durationMs: Date.now() - started,
+        error: ok ? undefined : `Unexpected vector dimension: ${vector?.length}`,
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        provider: this.getProviderLabel(),
+        model: this.model,
+        dimension: this.dimension,
+        durationMs: Date.now() - started,
+        error: err.message,
+      };
     }
   }
 
@@ -251,4 +395,3 @@ class EmbeddingService {
 
 export const embeddingService = new EmbeddingService();
 export default embeddingService;
-export { BGE_M3_MODEL, BGE_M3_DIMENSION };

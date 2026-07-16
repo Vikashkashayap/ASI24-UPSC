@@ -1,12 +1,12 @@
 /**
  * Semantic chunking for notes / PDF content (Step 2).
  * Splits on headings, paragraphs, bullets, and tables — not fixed character windows.
- * Target: 400–700 words · overlap: 80 words.
+ * Target: 500–800 words · overlap: 100 words (env overrides via PRACTICE_CHUNK_*).
  */
 
-const DEFAULT_MIN_WORDS = 400;
-const DEFAULT_MAX_WORDS = 700;
-const DEFAULT_OVERLAP_WORDS = 80;
+const DEFAULT_MIN_WORDS = parseInt(process.env.PRACTICE_CHUNK_MIN_WORDS, 10) || 500;
+const DEFAULT_MAX_WORDS = parseInt(process.env.PRACTICE_CHUNK_MAX_WORDS, 10) || 800;
+const DEFAULT_OVERLAP_WORDS = parseInt(process.env.PRACTICE_CHUNK_OVERLAP_WORDS, 10) || 100;
 
 export function countWords(text) {
   return String(text || "")

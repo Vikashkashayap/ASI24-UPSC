@@ -6,18 +6,27 @@ import { qdrantService } from "./qdrant.service.js";
 import { estimateTokens } from "./tokenEstimator.service.js";
 import { prepareContextForBatch } from "./contextReducer.service.js";
 import SourceUrl from "../../models/SourceUrl.js";
+import { retrieveAndBuildContext } from "../qg/index.js";
+import { QG_CONFIG } from "../qg/config/qg.config.js";
 
-/** Top chunks retrieved per generation batch (pack until context budget). */
-const RAG_TOP_K = parseInt(process.env.NOTES_RAG_TOP_K || process.env.NOTES_CHUNKS_PER_BATCH, 10) || 3;
-/** Max tokens of retrieved notes in the prompt context body (keep total input lean). */
-const MAX_CONTEXT_TOKENS = parseInt(process.env.NOTES_BATCH_CONTEXT_TOKENS, 10) || 320;
-/** Tighter budget for subject-wide keyword search (token savings). */
+/** Final context chunks after hybrid retrieve + rerank (enterprise pipeline). */
+const RAG_TOP_K =
+  parseInt(process.env.NOTES_RAG_TOP_K || process.env.QG_FINAL_TOP_K || process.env.NOTES_CHUNKS_PER_BATCH, 10) ||
+  QG_CONFIG.hybrid.finalTopK ||
+  5;
+/** Max tokens of retrieved notes in the prompt context body. */
+const MAX_CONTEXT_TOKENS =
+  parseInt(process.env.NOTES_BATCH_CONTEXT_TOKENS || process.env.QG_CONTEXT_MAX_TOKENS, 10) ||
+  QG_CONFIG.context.maxTokens ||
+  2800;
+/** Subject-wide keyword search budget. */
 const KEYWORD_CONTEXT_TOKENS =
-  parseInt(process.env.NOTES_KEYWORD_CONTEXT_TOKENS, 10) || Math.min(280, MAX_CONTEXT_TOKENS);
+  parseInt(process.env.NOTES_KEYWORD_CONTEXT_TOKENS, 10) || Math.min(MAX_CONTEXT_TOKENS, 2400);
 /** Hard ceiling for full prompt (system + user) — never exceed. */
-const MAX_PROMPT_TOKENS = parseInt(process.env.PRACTICE_MAX_PROMPT_TOKENS, 10) || 750;
+const MAX_PROMPT_TOKENS = parseInt(process.env.PRACTICE_MAX_PROMPT_TOKENS, 10) || 4500;
 const CACHE_TTL_MS = parseInt(process.env.NOTES_RETRIEVAL_CACHE_MS, 10) || 10 * 60 * 1000;
 const CHUNKS_PER_BATCH = RAG_TOP_K;
+const USE_HYBRID_PIPELINE = process.env.QG_HYBRID_RETRIEVAL !== "false";
 
 const RAG_QUERY_ANGLES = [
   (topic, subject) => `${subject} ${topic}`,
@@ -65,7 +74,7 @@ export function dedupeChunks(chunks = []) {
 }
 
 /**
- * RetrieverService — Qdrant (BGE-M3) → Mongo keyword → optional live HTML fallback.
+ * RetrieverService — Qdrant (Jina embeddings) → Mongo keyword → optional live HTML fallback.
  * LLM receives only top-k relevant chunks, never the whole PDF/page.
  */
 class RetrieverService {
@@ -120,6 +129,28 @@ class RetrieverService {
     const queryFn = RAG_QUERY_ANGLES[batchIndex % RAG_QUERY_ANGLES.length];
     const query = queryFn(topicName || note.topic.name, subject || note.topic.subject);
 
+    if (USE_HYBRID_PIPELINE) {
+      const built = await retrieveAndBuildContext({
+        query,
+        subject: subject || note.topic.subject || "",
+        topic: topicName || note.topic.name || "",
+        topicId,
+        excludeChunkIds,
+        maxTokens: MAX_CONTEXT_TOKENS,
+      });
+
+      if (built.contextText?.length >= 80) {
+        return {
+          contextText: built.contextText,
+          chunks: built.chunks,
+          source: built.source || "hybrid",
+          tokens: built.tokens,
+          chunkIds: built.chunkIds,
+          hybrid: true,
+        };
+      }
+    }
+
     let selected = await this.retrieveTopChunks({
       topicId,
       query,
@@ -137,7 +168,6 @@ class RetrieverService {
       selected = dedupeChunks(
         [...note.chunks].sort((a, b) => (a.order || 0) - (b.order || 0)).slice(0, RAG_TOP_K)
       );
-      // Soft-exclude only: if all chunks already used, recycle (stay on KB, don't open LLM)
       const fresh = selected.filter((c) => {
         const id = String(c._id || c.mongoChunkId || "");
         return !id || !excludeChunkIds.includes(id);
@@ -146,7 +176,6 @@ class RetrieverService {
       source = "stored_chunks";
     }
 
-    // If excludes removed everything, recycle from vector/mongo hits without exclude
     if (!selected.length) {
       const recycled = await this.retrieveTopChunks({
         topicId,
@@ -160,7 +189,6 @@ class RetrieverService {
       }
     }
 
-    // Live HTML fallback only for website topics (never send whole PDF)
     if (!selected.length && allowLiveFallback) {
       const url = String(note.topic.sourceUrl || "");
       if (/^https?:\/\//i.test(url)) {
@@ -221,7 +249,7 @@ class RetrieverService {
     let source = "mongo";
 
     if (qdrantService.isConfigured() && embeddingService.isConfigured()) {
-      const queryVector = await embeddingService.embed(angledQuery);
+      const queryVector = await embeddingService.generateEmbedding(angledQuery, { task: "query" });
       if (queryVector) {
         const vectorHits = await qdrantService.searchChunks({
           vector: queryVector,
@@ -304,13 +332,36 @@ class RetrieverService {
 
     const queryFn = RAG_QUERY_ANGLES[batchIndex % RAG_QUERY_ANGLES.length];
     const angledQuery = queryFn(q, subjectStr);
-    const topK = RAG_TOP_K + (excludeChunkIds?.length || 0);
 
+    if (USE_HYBRID_PIPELINE) {
+      const built = await retrieveAndBuildContext({
+        query: angledQuery,
+        subject: subjectStr,
+        topic: q,
+        excludeChunkIds,
+        maxTokens,
+      });
+      if (built.contextText?.length >= 80) {
+        return {
+          contextText: built.contextText,
+          chunks: built.chunks,
+          source: built.source || "hybrid",
+          tokens: built.tokens,
+          chunkIds: built.chunkIds,
+          query: angledQuery,
+          scope: "subject",
+          subject: subjectStr,
+          hybrid: true,
+        };
+      }
+    }
+
+    const topK = RAG_TOP_K + (excludeChunkIds?.length || 0);
     let selected = [];
     let source = "mongo";
 
     if (qdrantService.isConfigured() && embeddingService.isConfigured()) {
-      const queryVector = await embeddingService.embed(angledQuery);
+      const queryVector = await embeddingService.generateEmbedding(angledQuery, { task: "query" });
       if (queryVector) {
         const vectorHits = await qdrantService.searchChunks({
           vector: queryVector,
@@ -351,7 +402,6 @@ class RetrieverService {
       return !id || !excludeChunkIds.includes(id);
     });
 
-    // Recycle when all matching chunks already used — prefer KB over open LLM
     if (!selected.length && excludeChunkIds?.length) {
       const chapters = await SourceUrl.find({ subject: subjectStr }).select("_id").lean();
       const ids = chapters.map((c) => c._id);
@@ -391,7 +441,7 @@ class RetrieverService {
     let source = "mongo";
 
     if (qdrantService.isConfigured() && embeddingService.isConfigured()) {
-      const queryVector = await embeddingService.embed(query);
+      const queryVector = await embeddingService.generateEmbedding(query, { task: "query" });
       if (queryVector) {
         const vectorHits = await qdrantService.searchChunks({
           vector: queryVector,

@@ -1,32 +1,91 @@
 /**
  * PromptBuilder — RAG-grounded UPSC MCQs from retrieved syllabus chunks only.
  * Static rules live in SYSTEM. USER prompt is dynamic only.
+ *
+ * Critical student-facing rule: answer letter ↔ option text ↔ explanation
+ * must never disagree (no confusion in practice tests).
  */
 
 import { resolveNotesPatterns } from "../../config/questionPatterns.js";
 
 /**
- * Compact but explicit — flash-lite needs clear JSON/stem rules (Phase 2 slim + reliability).
+ * Gold-standard single-call system prompt.
+ * Forces: decide correct OPTION TEXT → assign letter → explain that same letter.
  */
-const SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
-Use ONLY the user CONTEXT (knowledge base excerpts). Never invent facts outside CONTEXT.
-If CONTEXT lacks a detail, skip that angle — do not use outside knowledge.
-Return ONLY a JSON array (no markdown, no prose).
-Each item MUST have: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words, why correct answer is right; grounded in CONTEXT), sourceParagraph (≤20 words from CONTEXT), difficulty, questionType.
-COMPLETE stems only — never intro-only.
-statement_based: put numbered statements 1. 2. 3. inside question, then ask which are correct. Also set statements[].
-chronology: number events inside question. Also set chronologyItems[].
-pair_matching: List-I (A.) and List-II (1.) inside question. Also set matchColumns{columnA,columnB}.
-assertion_reason: full Assertion (A) and Reason (R) inside question. Also set assertionReason{assertion,reason}.
-direct_conceptual: full clear MCQ stem in question.
-questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual`;
+const SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims question setter (Vision IAS / Insights / official UPSC PYQ standard).
+
+SOURCE RULES:
+1. Use ONLY the user CONTEXT (knowledge-base excerpts). Never invent facts, dates, articles, figures, names, or schemes outside CONTEXT.
+2. If CONTEXT cannot support a high-quality question, skip that angle — do not pad with outside knowledge.
+3. Return ONLY a JSON array (no markdown, no prose outside JSON).
+
+═══════════════════════════════════════════════════════════
+CRITICAL CONSISTENCY LOCK (students must never see a mismatch)
+═══════════════════════════════════════════════════════════
+For EVERY question you MUST follow this exact order:
+
+STEP 1 — Write 4 options (A,B,C,D). Exactly ONE option text is factually correct per CONTEXT.
+STEP 2 — Set "answer" to the LETTER of that correct option text (A or B or C or D).
+STEP 3 — Write "explanation" that DEFENDS ONLY that same letter.
+         - First sentence MUST be: Option {answer} ("{exact option text}") is correct.
+         - Then justify from CONTEXT (why that option text is right).
+         - Briefly say why the other three options are wrong.
+         - NEVER say another letter is correct.
+         - NEVER defend a different option than "answer".
+
+SELF-CHECK before emitting each item (mandatory):
+□ Read options A–D again.
+□ Confirm "answer" letter points to the option TEXT that CONTEXT supports.
+□ Confirm explanation opens with that same letter and quotes that same option text.
+□ Confirm explanation does NOT claim Option X is correct when answer is Y.
+If ANY check fails → fix the JSON before output. Do not ship mismatched items.
+
+FORBIDDEN (instant fail):
+- answer = "B" but explanation says "Option A is correct"
+- answer letter points to wrong option text
+- explanation praises one option while "answer" marks another
+- two options that are identical or trivially the same meaning
+- incomplete stems (intro-only without statements / lists / events)
+
+OUTPUT each item MUST have:
+- question (COMPLETE stem)
+- options {A,B,C,D}
+- answer (exactly "A"|"B"|"C"|"D" — letter of the correct option text)
+- explanation (50–70 words; must open with Option {answer} and defend only that letter; include 1–2 concrete UPSC PYQ-style facts from CONTEXT)
+- sourceParagraph (≤20 words verbatim from CONTEXT supporting the answer)
+- difficulty ("easy"|"moderate"|"hard")
+- questionType
+
+STEM COMPLETENESS (mandatory — students must see the full question):
+- Put the COMPLETE stem in "question" (never leave question empty or intro-only).
+- statement_based: numbered statements 1. 2. 3. inside question, then ask which are correct. Also set statements[].
+- chronology: number events inside question. Also set chronologyItems[]. Prefer 3 order codes (A–C).
+- pair_matching: List-I (A.) and List-II (1.) items MUST appear inside question text AND in matchColumns{columnA,columnB}. Options are match codes like "A-1, B-2…".
+- assertion_reason: full Assertion (A) and Reason (R) inside question. Also set assertionReason{assertion,reason}.
+- direct_conceptual: full clear MCQ stem in question.
+- elimination: options like "1 and 2 only" that reward careful reading.
+- NEVER output options without a complete stem.
+
+questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual|elimination
+
+OPTION QUALITY:
+- Wrong options = serious aspirant-level distractors from the SAME domain, grounded in CONTEXT (or a plausible misreading).
+- Avoid "all of the above" / "none of the above" unless CONTEXT clearly supports it.
+- Options must be mutually exclusive (exactly one correct).`;
 
 /** Used only when knowledge base returned zero chunks for the topic. */
 const OPEN_KNOWLEDGE_SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
 No knowledge-base CONTEXT was found. Use standard UPSC syllabus knowledge for the topic only.
 Return ONLY a JSON array (no markdown).
+
+CRITICAL CONSISTENCY LOCK:
+1. Decide which option TEXT is correct.
+2. Set "answer" to that option's letter (A|B|C|D).
+3. Explanation MUST open with: Option {answer} ("{option text}") is correct. — then defend ONLY that letter (50–70 words).
+4. Never let explanation defend a different letter than "answer".
+
 Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words), sourceParagraph ("syllabus"), difficulty, questionType.
-COMPLETE stems. questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual`;
+COMPLETE stems. questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual|elimination`;
 
 function compactPatternMix(count, patternsToInclude, batchIndex = 0) {
   const active = resolveNotesPatterns(patternsToInclude);
@@ -62,12 +121,24 @@ export function buildNotesQuestionUserPrompt(params) {
   if (openKnowledge) {
     return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
 Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
-Knowledge base had no matching chunks. Generate EXACTLY ${count} complete UPSC MCQs from standard syllabus knowledge for this topic. Each explanation MUST be 50–70 words. JSON array only.`;
+Knowledge base had no matching chunks. Generate EXACTLY ${count} complete UPSC MCQs from standard syllabus knowledge for this topic.
+For each item: answer letter MUST match correct option text; explanation MUST defend that same letter only (open with Option {answer}).
+JSON array only.`;
   }
 
   return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
 Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
-Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (knowledge base). Each explanation MUST be 50–70 words. JSON array only.
+Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (knowledge base).
+
+HARD RULES (student safety):
+1. answer = letter of the option TEXT that CONTEXT supports.
+2. explanation = 50–70 words; MUST start with: Option {answer} ("{that option text}") is correct.
+3. explanation must NEVER say a different letter is correct.
+4. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME.
+5. Questions must be directly about the Topic. Ignore broad/unrelated CONTEXT lines even if they are in the same subject.
+6. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
+
+JSON array only.
 
 CONTEXT:
 ${context}`;

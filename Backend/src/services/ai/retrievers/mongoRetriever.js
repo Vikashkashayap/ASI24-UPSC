@@ -30,11 +30,13 @@ export class MongoRetriever {
 
     // If embeddings available and explicitly enabled, re-rank top candidates
     if (process.env.NOTES_USE_EMBEDDINGS === "true" && embeddingService.isConfigured() && query.trim()) {
-      const queryVec = await embeddingService.embed(query);
+      const queryVec = await embeddingService.generateEmbedding(query, { task: "query" });
       if (queryVec) {
         const candidates = scored.slice(0, Math.min(scored.length, topK * 2));
         for (const row of candidates) {
-          const vec = await embeddingService.embed(row.chunk.text.slice(0, 2000));
+          const vec = await embeddingService.generateEmbedding(row.chunk.text.slice(0, 2000), {
+            task: "passage",
+          });
           if (vec) {
             row.score += embeddingService.cosineSimilarity(queryVec, vec) * 10;
           }
@@ -89,11 +91,13 @@ export class MongoRetriever {
       query.trim() &&
       pool.length
     ) {
-      const queryVec = await embeddingService.embed(query);
+      const queryVec = await embeddingService.generateEmbedding(query, { task: "query" });
       if (queryVec) {
         const candidates = pool.slice(0, Math.min(pool.length, topK * 3));
         for (const row of candidates) {
-          const vec = await embeddingService.embed(row.chunk.text.slice(0, 2000));
+          const vec = await embeddingService.generateEmbedding(row.chunk.text.slice(0, 2000), {
+            task: "passage",
+          });
           if (vec) {
             row.score += embeddingService.cosineSimilarity(queryVec, vec) * 10;
           }

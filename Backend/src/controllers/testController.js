@@ -1,6 +1,6 @@
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
-import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
+import { generateTestQuestions, generateFullMockTestQuestions, isPrelimsRagEnabled } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
@@ -175,23 +175,40 @@ export const generateTest = async (req, res) => {
     }
 
     const subjectDisplay = subjects.join(", ");
+    const topicNormalized = String(topic).trim().replace(/\s+/g, " ");
+    const difficultyKey = examType === "GS" ? difficulty || "Moderate" : undefined;
 
     // ---------------------------------------------------------
-    // CACHING LOGIC START (GS only; same subject set + topic + difficulty + count)
+    // CACHING: same subject + topic + difficulty + count → reuse DB questions
+    // Works for both RAG and legacy LLM paths. Excludes mocks / assigned practice.
     // ---------------------------------------------------------
-    if (examType === "GS" && difficulty) {
+    if (examType === "GS" && difficultyKey) {
+      const topicRegex = new RegExp(
+        `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+        "i"
+      );
+
+      // Match tests where mock/practice ids are missing or null (not assigned papers)
       const existingTest = await Test.findOne({
         subject: subjectDisplay,
-        topic,
-        difficulty,
+        topic: topicRegex,
+        difficulty: difficultyKey,
+        examType: "GS",
         totalQuestions: count,
         questions: { $exists: true, $not: { $size: 0 } },
+        $and: [
+          { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+          { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+        ],
       }).sort({ createdAt: -1 });
 
-      if (existingTest) {
-        console.log(`♻️  CACHE HIT: Found existing test for ${subjectDisplay} - ${topic} (${difficulty})`);
+      if (existingTest?.questions?.length >= count) {
+        console.log(
+          `♻️  CACHE HIT: Reusing questions for ${subjectDisplay} - ${topicNormalized} (${difficultyKey}, ${count}Q) — skipping AI`
+        );
 
         const shuffledQuestions = [...existingTest.questions]
+          .slice(0, count)
           .map((value) => ({ value, sort: Math.random() }))
           .sort((a, b) => a.sort - b.sort)
           .map(({ value }) => value);
@@ -200,13 +217,13 @@ export const generateTest = async (req, res) => {
           userId: req.user?.id,
           subject: subjectDisplay,
           examType: "GS",
-          topic,
-          difficulty,
+          topic: topicNormalized,
+          difficulty: difficultyKey,
           questions: shuffledQuestions.map((q) => {
             const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
             return pickBilingualQuestionFields({ ...plain, userAnswer: null });
           }),
-          totalQuestions: existingTest.totalQuestions,
+          totalQuestions: count,
         });
 
         await newTest.save();
@@ -220,6 +237,7 @@ export const generateTest = async (req, res) => {
           totalQuestions: newTest.totalQuestions,
           questions: newTest.questions.map((q) => mapQuestionForStart(q)),
           createdAt: newTest.createdAt,
+          fromCache: true,
         };
 
         return res.status(201).json({
@@ -228,18 +246,26 @@ export const generateTest = async (req, res) => {
           data: testForUser,
         });
       }
+
+      console.log(
+        `📭 CACHE MISS: No prior test for ${subjectDisplay} - ${topicNormalized} (${difficultyKey}, ${count}Q) — generating new`
+      );
     }
     // ---------------------------------------------------------
     // CACHING LOGIC END
     // ---------------------------------------------------------
 
-    console.log(`📝 Generating ${count} questions for ${subjectDisplay} - ${topic} (${examType})...`);
+    console.log(
+      `📝 Generating ${count} questions for ${subjectDisplay} - ${topicNormalized} (${examType})${
+        isPrelimsRagEnabled(examType) ? " [Knowledge Base RAG]" : ""
+      }...`
+    );
     const generationResult = await generateTestQuestions({
       subjects,
-      topic,
+      topic: topicNormalized,
       examType,
       questionCount: count,
-      difficulty: examType === "GS" ? difficulty || "Moderate" : undefined,
+      difficulty: difficultyKey,
       csatCategories: examType === "CSAT" ? csatCategories : undefined,
       currentAffairsPeriod: currentAffairsPeriod || undefined,
     });
@@ -254,6 +280,13 @@ export const generateTest = async (req, res) => {
       console.error("=".repeat(60));
 
       const lowerError = errorMessage.toLowerCase();
+      if (lowerError.includes("knowledge base") || lowerError.includes("no matching content")) {
+        return res.status(400).json({
+          success: false,
+          message: errorMessage,
+          error: errorMessage,
+        });
+      }
       if (lowerError.includes("401") || lowerError.includes("unauthorized") || (lowerError.includes("invalid") && lowerError.includes("api key"))) {
         errorMessage = "Invalid OpenRouter API key. Please check your OPENROUTER_API_KEY in the .env file. Get your key from https://openrouter.ai/keys";
       } else if (lowerError.includes("not configured") || lowerError.includes("missing") || lowerError.includes("required")) {
@@ -280,8 +313,8 @@ export const generateTest = async (req, res) => {
       userId: req.user?.id,
       subject: subjectDisplay,
       examType,
-      topic,
-      ...(examType === "GS" && difficulty && { difficulty }),
+      topic: topicNormalized,
+      ...(examType === "GS" && difficultyKey && { difficulty: difficultyKey }),
       questions: generationResult.questions.map((q) => pickBilingualQuestionFields(q)),
       totalQuestions: generationResult.questions.length,
     });

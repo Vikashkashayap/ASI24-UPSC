@@ -6,8 +6,9 @@
 #   QDRANT_URL=http://localhost:6333
 #   QDRANT_COLLECTION=notes_chunks
 #   QDRANT_VECTOR_SIZE=1024
-#   EMBEDDING_PROVIDER=bge-m3
-#   HF_TOKEN=hf_xxx   # or EMBEDDING_BASE_URL for local TEI/Infinity
+#   EMBEDDING_PROVIDER=jina
+#   JINA_API_KEY=your-jina-api-key
+#   JINA_MODEL=jina-embeddings-v4
 
 services:
   qdrant:

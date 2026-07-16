@@ -311,8 +311,28 @@ function BilingualMatchView({
 
   if (hiFirst) {
     pushHi();
+    if (blocks.length === 0) pushEn();
   } else {
     pushEn();
+    if (blocks.length === 0) pushHi();
+  }
+
+  if (blocks.length === 0) {
+    const fallback = getQuestionEnglish(question) || getQuestionHindi(question, { strict: false });
+    if (fallback) {
+      return (
+        <LangPanel
+          key="fallback"
+          label={lang === "hi" ? "हिंदी" : "English"}
+          text={fallback}
+          compact={compact}
+          accent={lang === "hi" ? "blue" : "slate"}
+          paperMode={paperMode}
+          hideLabel
+        />
+      );
+    }
+    return null;
   }
 
   return <div className="space-y-3">{blocks}</div>;
@@ -413,8 +433,36 @@ export function ExamBilingualStem({
   lang?: ExamLang;
   paperMode?: boolean;
 }) {
-  const en = getQuestionEnglish(question);
-  const hi = getQuestionHindi(question, { strict: true });
+  let en = getQuestionEnglish(question);
+  let hi = getQuestionHindi(question, { strict: true });
+
+  // Rebuild stem from structured match columns when text was stored empty
+  if (!en && hasUsableMatchColumns((question as ExamQuestionBodyProps["question"]).matchColumns)) {
+    const cols = (question as ExamQuestionBodyProps["question"]).matchColumns!;
+    const lines = ["Match the following:", "List-I"];
+    (cols.columnA || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+    });
+    lines.push("List-II");
+    (cols.columnB || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+    });
+    lines.push("Select the correct answer using the code given below:");
+    en = lines.join("\n");
+  }
+  if (!hi && hasUsableMatchColumns((question as ExamQuestionBodyProps["question"]).matchColumns_hi)) {
+    const cols = (question as ExamQuestionBodyProps["question"]).matchColumns_hi!;
+    const lines = ["निम्नलिखित का मिलान कीजिए:", "सूची-I"];
+    (cols.columnA || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+    });
+    lines.push("सूची-II");
+    (cols.columnB || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+    });
+    lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+    hi = lines.join("\n");
+  }
 
   if (!en && !hi) return null;
 
@@ -482,26 +530,59 @@ function detectAssertion(question: ExamQuestionBodyProps["question"]): boolean {
   return isAssertionReasonText(en) || isAssertionReasonText(hi);
 }
 
+function repairStemFromColumns(question: ExamQuestionBodyProps["question"]) {
+  const q = { ...question };
+  if (!getQuestionEnglish(q) && hasUsableMatchColumns(q.matchColumns)) {
+    const cols = q.matchColumns!;
+    const lines = ["Match the following:", "List-I"];
+    (cols.columnA || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+    });
+    lines.push("List-II");
+    (cols.columnB || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+    });
+    lines.push("Select the correct answer using the code given below:");
+    q.question = lines.join("\n");
+    q.question_en = q.question;
+  }
+  if (!getQuestionHindi(q, { strict: true }) && hasUsableMatchColumns(q.matchColumns_hi)) {
+    const cols = q.matchColumns_hi!;
+    const lines = ["निम्नलिखित का मिलान कीजिए:", "सूची-I"];
+    (cols.columnA || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+    });
+    lines.push("सूची-II");
+    (cols.columnB || []).forEach((item, i) => {
+      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+    });
+    lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+    q.question_hi = lines.join("\n");
+  }
+  return q;
+}
+
 export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({
   question,
   compact = true,
   lang,
   paperMode,
 }) => {
-  const isMatch = detectMatch(question);
-  const isAssertion = detectAssertion(question);
+  const repaired = repairStemFromColumns(question);
+  const isMatch = detectMatch(repaired);
+  const isAssertion = detectAssertion(repaired);
 
   return (
     <div className={`space-y-2 sm:space-y-3 min-h-0 ${paperMode ? "upsc-exam-serif text-black" : ""}`}>
       {isMatch ? (
-        <BilingualMatchView question={question} compact={compact} lang={lang} paperMode={paperMode} />
+        <BilingualMatchView question={repaired} compact={compact} lang={lang} paperMode={paperMode} />
       ) : isAssertion ? (
-        <BilingualAssertionView question={question} compact={compact} lang={lang} paperMode={paperMode} />
+        <BilingualAssertionView question={repaired} compact={compact} lang={lang} paperMode={paperMode} />
       ) : (
-        <ExamBilingualStem question={question} compact={compact} lang={lang} paperMode={paperMode} />
+        <ExamBilingualStem question={repaired} compact={compact} lang={lang} paperMode={paperMode} />
       )}
 
-      {question.tableData?.headers?.length ? (
+      {repaired.tableData?.headers?.length ? (
         <div className="overflow-x-auto -mx-1 sm:mx-0">
           <table
             className={`w-full min-w-[280px] border-collapse text-[11px] sm:text-xs ${
@@ -512,7 +593,7 @@ export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({
           >
             <thead>
               <tr className={paperMode ? "bg-black/[0.06]" : "bg-slate-100"}>
-                {question.tableData.headers.map((h, i) => (
+                {repaired.tableData.headers.map((h, i) => (
                   <th
                     key={i}
                     className={`px-2 py-1.5 text-left font-semibold ${
@@ -525,7 +606,7 @@ export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({
               </tr>
             </thead>
             <tbody>
-              {(question.tableData.rows || []).map((row, ri) => (
+              {(repaired.tableData.rows || []).map((row, ri) => (
                 <tr key={ri}>
                   {row.map((cell, ci) => (
                     <td
