@@ -43,10 +43,13 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [subjects, setSubjects] = useState<SyllabusCatalogSubject[]>([]);
+  const [medium, setMedium] = useState<"en" | "hi">("en");
   const [subjectKey, setSubjectKey] = useState("");
   const [subjectDetail, setSubjectDetail] = useState<{
     key: string;
     name: string;
+    displayName?: string;
+    nameHi?: string;
     primarySource?: string;
     sourceNote?: string | null;
     duration?: string | null;
@@ -90,7 +93,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
 
   const loadCatalog = useCallback(async () => {
     try {
-      const res = await syllabusTargetsAPI.getCatalog();
+      const res = await syllabusTargetsAPI.getCatalog({ medium });
       if (res.data.success) setSubjects(res.data.data.subjects || []);
     } catch (e: unknown) {
       const msg =
@@ -99,7 +102,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
           : "Failed to load syllabus catalog";
       setError(String(msg));
     }
-  }, []);
+  }, [medium]);
 
   const loadStudents = useCallback(async () => {
     try {
@@ -150,7 +153,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
     (async () => {
       try {
         setModulesLoading(true);
-        const res = await syllabusTargetsAPI.getSubjectModules(subjectKey);
+        const res = await syllabusTargetsAPI.getSubjectModules(subjectKey, { medium });
         if (!cancelled && res.data.success) {
           setSubjectDetail(res.data.data.subject || null);
           setModules(res.data.data.modules || []);
@@ -165,7 +168,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [subjectKey]);
+  }, [subjectKey, medium]);
 
   const filteredModules = useMemo(() => {
     const q = moduleSearch.trim().toLowerCase();
@@ -236,6 +239,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
         studentIds: [...selectedStudentIds],
         dueDate: dueDate || null,
         note: note.trim() || undefined,
+        medium,
       });
       if (res.data.success) {
         setSuccess(res.data.message || "Modules assigned");
@@ -275,9 +279,13 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
       return;
     }
 
-    const subjectName = subjectDetail?.name || selectedSubject?.name || subjectKey;
+    const subjectName =
+      subjectDetail?.displayName || subjectDetail?.name || selectedSubject?.displayName || selectedSubject?.name || subjectKey;
     const chapterNames = selected.flatMap((m) => {
-      const fromChapters = (m.chapters || []).map((c) => String(c.name || "").trim()).filter(Boolean);
+      // Prefer English names for Topic Practice RAG (notes KB is mostly English)
+      const fromChapters = (m.chapters || [])
+        .map((c) => String(c.nameEn || c.name || "").trim())
+        .filter(Boolean);
       if (fromChapters.length) return fromChapters;
       return (m.topics || []).map((t) => String(t.topicName || "").trim()).filter(Boolean);
     });
@@ -304,6 +312,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
       moduleLabels,
       chapterNames,
       studentIds: [...selectedStudentIds],
+      medium,
     };
 
     navigate("/admin/topic-practice", { state: handoff });
@@ -323,6 +332,8 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   };
 
   const selectedSubject = subjects.find((s) => s.key === subjectKey);
+  const subjectLabel = (s: SyllabusCatalogSubject) => s.displayName || s.name;
+  const moduleWord = medium === "hi" ? "मॉड्यूल" : "modules";
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 px-3 md:px-6 pb-8">
@@ -363,6 +374,40 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          <div>
+            <label className={`block text-xs font-semibold uppercase tracking-wide mb-1.5 ${muted}`}>
+              Medium
+            </label>
+            <div className="flex rounded-lg border overflow-hidden text-sm font-medium w-full sm:w-auto sm:inline-flex">
+              {(
+                [
+                  { id: "en" as const, label: "English" },
+                  { id: "hi" as const, label: "हिंदी" },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setMedium(opt.id)}
+                  className={`flex-1 sm:flex-none px-4 py-2 transition-colors ${
+                    medium === opt.id
+                      ? "bg-sky-600 text-white"
+                      : isDark
+                        ? "bg-slate-950 text-slate-300 hover:bg-slate-800"
+                        : "bg-white text-slate-700 hover:bg-slate-50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className={`mt-1.5 text-xs ${muted}`}>
+              {medium === "hi"
+                ? "हिंदी माध्यम — subjects/modules Hindi labels ke saath assign honge."
+                : "English medium — subjects/modules keep English labels."}
+            </p>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className={`block text-xs font-semibold uppercase tracking-wide mb-1.5 ${muted}`}>
@@ -373,10 +418,10 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
                 value={subjectKey}
                 onChange={(e) => setSubjectKey(e.target.value)}
               >
-                <option value="">Select subject…</option>
+                <option value="">{medium === "hi" ? "विषय चुनें…" : "Select subject…"}</option>
                 {subjects.map((s) => (
                   <option key={s.key} value={s.key}>
-                    {s.name} — {s.moduleCount} modules
+                    {subjectLabel(s)} — {s.moduleCount} {moduleWord}
                     {s.duration ? ` · ${s.duration}` : ""}
                   </option>
                 ))}
@@ -422,7 +467,16 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
                 isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"
               }`}
             >
-              <h2 className={`text-lg font-semibold ${text}`}>{subjectDetail.name}</h2>
+              <h2 className={`text-lg font-semibold ${text}`}>
+                {subjectDetail.displayName || subjectDetail.name}
+                {medium === "hi" && (
+                  <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                    isDark ? "bg-amber-950 text-amber-300" : "bg-amber-50 text-amber-800"
+                  }`}>
+                    हिंदी
+                  </span>
+                )}
+              </h2>
               {subjectDetail.primarySource && (
                 <p className={`text-sm mt-1 ${muted}`}>{subjectDetail.primarySource}</p>
               )}
@@ -513,6 +567,8 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
                     const chapters = m.chapters || m.topics?.map((t) => ({
                       chapter: t.chapter || "",
                       name: t.topicName,
+                      nameEn: t.topicName,
+                      nameHi: t.topicNameHi,
                     })) || [];
                     const duration =
                       m.durationLabel ||
@@ -590,15 +646,27 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
                             <table className="w-full text-[13px]">
                               <thead>
                                 <tr className={muted}>
-                                  <th className="text-left font-semibold text-[11px] uppercase tracking-wide py-1.5 w-12">Ch</th>
-                                  <th className="text-left font-semibold text-[11px] uppercase tracking-wide py-1.5">Chapter / Unit</th>
+                                  <th className="text-left font-semibold text-[11px] uppercase tracking-wide py-1.5 w-12">
+                                    {medium === "hi" ? "अध्." : "Ch"}
+                                  </th>
+                                  <th className="text-left font-semibold text-[11px] uppercase tracking-wide py-1.5">
+                                    {medium === "hi" ? "अध्याय / इकाई" : "Chapter / Unit"}
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {chapters.map((ch, idx) => (
                                   <tr key={`${m.moduleId}-${ch.chapter || idx}`} className={isDark ? "border-t border-slate-800/80" : "border-t border-slate-100"}>
                                     <td className={`py-1.5 align-top font-medium ${text}`}>{ch.chapter || idx + 1}</td>
-                                    <td className={`py-1.5 align-top ${isDark ? "text-slate-300" : "text-slate-700"}`}>{ch.name}</td>
+                                    <td className={`py-1.5 align-top ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                                      {ch.name}
+                                      {medium === "hi" && ch.nameEn && ch.nameEn !== ch.name ? (
+                                        <span className={`block text-[11px] mt-0.5 ${muted}`}>{ch.nameEn}</span>
+                                      ) : null}
+                                      {medium === "en" && ch.nameHi && ch.nameHi !== ch.name ? (
+                                        <span className={`block text-[11px] mt-0.5 ${muted}`}>{ch.nameHi}</span>
+                                      ) : null}
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -757,6 +825,13 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
                     <div className={`text-sm font-semibold ${text}`}>
                       <span className={`mr-1.5 text-xs font-bold ${muted}`}>{item.moduleId}</span>
                       {item.subjectName} — {item.moduleName}
+                      {item.medium === "hi" && (
+                        <span className={`ml-2 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${
+                          isDark ? "bg-amber-950 text-amber-300" : "bg-amber-50 text-amber-800"
+                        }`}>
+                          हिंदी
+                        </span>
+                      )}
                     </div>
                     <div className={`text-xs mt-0.5 ${muted}`}>
                       {item.chapterRange || (item.topicCount ? `${item.topicCount} chapters` : "")}

@@ -567,6 +567,8 @@ export const assignedPracticeAPI = {
 export interface SyllabusCatalogSubject {
   key: string;
   name: string;
+  nameHi?: string;
+  displayName?: string;
   primarySource?: string;
   sourceNote?: string | null;
   duration?: string | null;
@@ -577,20 +579,30 @@ export interface SyllabusCatalogSubject {
 export interface SyllabusCatalogModule {
   moduleId: string;
   moduleName: string;
+  moduleNameHi?: string;
+  subjectKey?: string;
+  subjectName?: string;
+  subjectNameHi?: string;
   sequence?: number | null;
   chapterRange?: string | null;
   estimatedDays?: number | null;
   estimatedHours?: number | null;
   durationLabel?: string | null;
-  topicCount: number;
-  importance?: string | null;
   hasModuleTest?: boolean;
   testLabel?: string | null;
   focus?: string | null;
+  importance?: string | null;
   overview?: string | null;
+  topicCount?: number;
   chips?: string[];
-  chapters?: Array<{ chapter: string; name: string }>;
-  topics?: Array<{ topicId: string; topicName: string; chapter?: string; hours?: number }>;
+  chapters?: Array<{ chapter: string; name: string; nameEn?: string; nameHi?: string }>;
+  topics?: Array<{
+    topicId: string;
+    topicName: string;
+    topicNameHi?: string;
+    chapter?: string;
+    hours?: number;
+  }>;
 }
 
 export interface SyllabusModuleTargetItem {
@@ -599,6 +611,7 @@ export interface SyllabusModuleTargetItem {
   subjectName: string;
   moduleId: string;
   moduleName: string;
+  medium?: "en" | "hi";
   estimatedDays?: number | null;
   estimatedHours?: number | null;
   chapterRange?: string;
@@ -621,6 +634,7 @@ export interface StudentSyllabusTarget {
   subjectName: string;
   moduleId: string;
   moduleName: string;
+  medium?: "en" | "hi";
   estimatedDays?: number | null;
   estimatedHours?: number | null;
   chapterRange?: string;
@@ -635,25 +649,29 @@ export interface StudentSyllabusTarget {
 
 export const syllabusTargetsAPI = {
   // Admin
-  getCatalog: () =>
-    api.get<{ success: boolean; data: { subjects: SyllabusCatalogSubject[] } }>(
-      "/api/admin/syllabus-targets/catalog"
+  getCatalog: (params?: { medium?: "en" | "hi" }) =>
+    api.get<{ success: boolean; data: { subjects: SyllabusCatalogSubject[]; medium?: "en" | "hi" } }>(
+      "/api/admin/syllabus-targets/catalog",
+      { params }
     ),
-  getSubjectModules: (subjectKey: string) =>
+  getSubjectModules: (subjectKey: string, params?: { medium?: "en" | "hi" }) =>
     api.get<{
       success: boolean;
       data: {
         subject: {
           key: string;
           name: string;
+          nameHi?: string;
+          displayName?: string;
           primarySource?: string;
           sourceNote?: string | null;
           duration?: string | null;
           chips?: string[];
         };
         modules: SyllabusCatalogModule[];
+        medium?: "en" | "hi";
       };
-    }>(`/api/admin/syllabus-targets/catalog/${subjectKey}`),
+    }>(`/api/admin/syllabus-targets/catalog/${subjectKey}`, { params }),
   listAdmin: (params?: { page?: number; limit?: number; filter?: string; subjectKey?: string }) =>
     api.get<{
       success: boolean;
@@ -675,6 +693,7 @@ export const syllabusTargetsAPI = {
     studentIds: string[];
     dueDate?: string | null;
     note?: string;
+    medium?: "en" | "hi";
   }) => api.post("/api/admin/syllabus-targets", body),
   updateAssign: (
     id: string,

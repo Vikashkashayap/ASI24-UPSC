@@ -64,6 +64,13 @@ const syllabusModuleTargetSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /** Assignment language medium for student dashboard labels */
+    medium: {
+      type: String,
+      enum: ["en", "hi"],
+      default: "en",
+      index: true,
+    },
     assignedStudentIds: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -93,6 +100,6 @@ const syllabusModuleTargetSchema = new mongoose.Schema(
 );
 
 syllabusModuleTargetSchema.index({ assignedStudentIds: 1, status: 1 });
-syllabusModuleTargetSchema.index({ subjectKey: 1, moduleId: 1 });
+syllabusModuleTargetSchema.index({ subjectKey: 1, moduleId: 1, medium: 1 });
 
 export default mongoose.model("SyllabusModuleTarget", syllabusModuleTargetSchema);

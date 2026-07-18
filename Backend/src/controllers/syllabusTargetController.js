@@ -6,6 +6,10 @@ import {
   getModuleDetail,
   getFullCatalog,
 } from "../services/syllabusCatalog.js";
+import {
+  formatChapterPreview,
+  normalizeMedium,
+} from "../services/foundationSyllabusHindi.js";
 
 async function validateStudentIds(studentIds) {
   if (!Array.isArray(studentIds) || studentIds.length === 0) {
@@ -31,6 +35,7 @@ function serializeTarget(doc, studentMap = new Map()) {
     subjectName: doc.subjectName,
     moduleId: doc.moduleId,
     moduleName: doc.moduleName,
+    medium: doc.medium === "hi" ? "hi" : "en",
     estimatedDays: doc.estimatedDays,
     estimatedHours: doc.estimatedHours,
     chapterRange: doc.chapterRange || "",
@@ -53,11 +58,13 @@ function serializeTarget(doc, studentMap = new Map()) {
 
 /**
  * GET /api/admin/syllabus-targets/catalog
+ * Query: medium=en|hi
  */
-export const getSyllabusCatalog = async (_req, res) => {
+export const getSyllabusCatalog = async (req, res) => {
   try {
-    const subjects = listSyllabusSubjects();
-    return res.json({ success: true, data: { subjects } });
+    const medium = normalizeMedium(req.query?.medium);
+    const subjects = listSyllabusSubjects(medium);
+    return res.json({ success: true, data: { subjects, medium } });
   } catch (error) {
     console.error("getSyllabusCatalog:", error);
     return res.status(500).json({ success: false, message: error.message || "Failed to load catalog" });
@@ -67,10 +74,11 @@ export const getSyllabusCatalog = async (_req, res) => {
 /**
  * GET /api/admin/syllabus-targets/catalog/full
  */
-export const getSyllabusCatalogFull = async (_req, res) => {
+export const getSyllabusCatalogFull = async (req, res) => {
   try {
-    const subjects = getFullCatalog();
-    return res.json({ success: true, data: { subjects } });
+    const medium = normalizeMedium(req.query?.medium);
+    const subjects = getFullCatalog(medium);
+    return res.json({ success: true, data: { subjects, medium } });
   } catch (error) {
     console.error("getSyllabusCatalogFull:", error);
     return res.status(500).json({ success: false, message: error.message || "Failed to load catalog" });
@@ -79,14 +87,16 @@ export const getSyllabusCatalogFull = async (_req, res) => {
 
 /**
  * GET /api/admin/syllabus-targets/catalog/:subjectKey
+ * Query: medium=en|hi
  */
 export const getSyllabusSubjectModules = async (req, res) => {
   try {
-    const packed = getSubjectModules(req.params.subjectKey);
+    const medium = normalizeMedium(req.query?.medium);
+    const packed = getSubjectModules(req.params.subjectKey, medium);
     if (!packed) {
       return res.status(404).json({ success: false, message: "Subject not found" });
     }
-    return res.json({ success: true, data: packed });
+    return res.json({ success: true, data: { ...packed, medium } });
   } catch (error) {
     console.error("getSyllabusSubjectModules:", error);
     return res.status(500).json({ success: false, message: error.message || "Failed to load modules" });
@@ -95,11 +105,12 @@ export const getSyllabusSubjectModules = async (req, res) => {
 
 /**
  * POST /api/admin/syllabus-targets
- * Body: { subjectKey, moduleIds: string[], studentIds: string[], dueDate?, note? }
+ * Body: { subjectKey, moduleIds: string[], studentIds: string[], dueDate?, note?, medium?: 'en'|'hi' }
  */
 export const createSyllabusTargets = async (req, res) => {
   try {
-    const { subjectKey, moduleIds, studentIds, dueDate, note } = req.body || {};
+    const { subjectKey, moduleIds, studentIds, dueDate, note, medium: mediumRaw } = req.body || {};
+    const medium = normalizeMedium(mediumRaw);
 
     if (!subjectKey || !Array.isArray(moduleIds) || moduleIds.length === 0) {
       return res.status(400).json({
@@ -118,20 +129,33 @@ export const createSyllabusTargets = async (req, res) => {
     const skipped = [];
 
     for (const moduleId of uniqueModuleIds) {
-      const detail = getModuleDetail(subjectKey, moduleId);
+      const detail = getModuleDetail(subjectKey, moduleId, medium);
       if (!detail?.module) {
         skipped.push({ moduleId, reason: "Module not found" });
         continue;
       }
 
       const { subject, module: mod } = detail;
+      const subjectName = subject.displayName || subject.name;
+      const moduleName = mod.moduleName;
 
-      // Upsert-style: if same module already active, merge student ids
+      // Upsert-style: same module + medium already active → merge student ids
       let existing = await SyllabusModuleTarget.findOne({
         subjectKey: subject.key,
         moduleId: mod.moduleId,
+        medium,
         status: "active",
       });
+
+      // Legacy rows without medium: treat as English
+      if (!existing && medium === "en") {
+        existing = await SyllabusModuleTarget.findOne({
+          subjectKey: subject.key,
+          moduleId: mod.moduleId,
+          status: "active",
+          $or: [{ medium: { $exists: false } }, { medium: null }, { medium: "en" }],
+        });
+      }
 
       if (existing) {
         const merged = new Set([
@@ -139,6 +163,26 @@ export const createSyllabusTargets = async (req, res) => {
           ...validation.uniqueIds,
         ]);
         existing.assignedStudentIds = [...merged];
+        existing.medium = medium;
+        existing.subjectName = subjectName;
+        existing.moduleName = moduleName;
+        existing.durationLabel = mod.durationLabel || existing.durationLabel || "";
+        existing.topicsPreview = (mod.chapters || mod.topics || [])
+          .slice(0, 12)
+          .map((t) => {
+            const nameHi = t.nameHi || t.name;
+            const nameEn = t.nameEn || t.name;
+            if (t.name || t.topicName) {
+              return formatChapterPreview(
+                t.chapter,
+                medium === "hi" ? nameHi : nameEn,
+                medium,
+                medium === "hi" ? nameEn : ""
+              );
+            }
+            return t.topicName;
+          })
+          .filter(Boolean);
         if (dueDate) existing.dueDate = new Date(dueDate);
         if (typeof note === "string" && note.trim()) existing.note = note.trim().slice(0, 500);
         await existing.save();
@@ -146,17 +190,30 @@ export const createSyllabusTargets = async (req, res) => {
       } else {
         const doc = await SyllabusModuleTarget.create({
           subjectKey: subject.key,
-          subjectName: subject.name,
+          subjectName,
           moduleId: mod.moduleId,
-          moduleName: mod.moduleName,
+          moduleName,
+          medium,
           estimatedDays: mod.estimatedDays,
           estimatedHours: mod.estimatedHours,
           chapterRange: mod.chapterRange || "",
           durationLabel: mod.durationLabel || "",
           topicCount: mod.topicCount,
           topicsPreview: (mod.chapters || mod.topics || [])
-            .slice(0, 8)
-            .map((t) => (t.name ? `Ch ${t.chapter}: ${t.name}` : t.topicName))
+            .slice(0, 12)
+            .map((t) => {
+              const nameHi = t.nameHi || t.name;
+              const nameEn = t.nameEn || t.name;
+              if (t.name || t.topicName) {
+                return formatChapterPreview(
+                  t.chapter,
+                  medium === "hi" ? nameHi : nameEn,
+                  medium,
+                  medium === "hi" ? nameEn : ""
+                );
+              }
+              return t.topicName;
+            })
             .filter(Boolean),
           note: typeof note === "string" ? note.trim().slice(0, 500) : "",
           dueDate: dueDate ? new Date(dueDate) : null,
@@ -346,6 +403,7 @@ export const listMySyllabusTargets = async (req, res) => {
         subjectName: r.subjectName,
         moduleId: r.moduleId,
         moduleName: r.moduleName,
+        medium: r.medium === "hi" ? "hi" : "en",
         estimatedDays: r.estimatedDays,
         estimatedHours: r.estimatedHours,
         chapterRange: r.chapterRange || "",

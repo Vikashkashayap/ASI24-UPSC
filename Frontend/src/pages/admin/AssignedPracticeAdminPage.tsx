@@ -134,6 +134,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     moduleLabels: string[];
     chapterCount: number;
     studentCount: number;
+    medium?: "en" | "hi";
   } | null>(null);
 
   // Step 1 — generate (notes-linked)
@@ -240,12 +241,13 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       moduleLabels: handoff.moduleLabels || [],
       chapterCount: handoff.chapterNames?.length || 0,
       studentCount: handoff.studentIds?.length || 0,
+      medium: handoff.medium === "hi" ? "hi" : "en",
     });
     setFlowStep("form");
     setSuccess(
       `Topics from Syllabus Targets loaded${
         handoff.moduleLabels?.length ? ` (${handoff.moduleLabels.join(", ")})` : ""
-      }. Review keyword → Generate → Assign.`
+      }${handoff.medium === "hi" ? " · हिंदी medium" : ""}. Review keyword → Generate → Assign.`
     );
   }, [notesSubjects, notesSubjectsLoading]);
 
@@ -1302,6 +1304,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
           <div className="min-w-0 flex-1">
             <p className={`text-sm font-semibold ${isDark ? "text-sky-200" : "text-sky-900"}`}>
               From Syllabus Targets — {syllabusHandoffBanner.subjectName}
+              {syllabusHandoffBanner.medium === "hi" ? " · हिंदी" : ""}
             </p>
             <p className={`text-xs mt-1 ${isDark ? "text-sky-300/80" : "text-sky-800/80"}`}>
               {syllabusHandoffBanner.moduleLabels.length > 0

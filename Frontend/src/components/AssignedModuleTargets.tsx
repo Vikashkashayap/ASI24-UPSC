@@ -151,6 +151,7 @@ export function AssignedModuleTargets() {
                   <div className="sd-assigned-subject">
                     {t.subjectName}
                     {t.moduleId ? ` · ${t.moduleId}` : ""}
+                    {t.medium === "hi" ? " · हिंदी" : ""}
                   </div>
                   <strong>{t.moduleName}</strong>
                   <div className="sd-assigned-meta">

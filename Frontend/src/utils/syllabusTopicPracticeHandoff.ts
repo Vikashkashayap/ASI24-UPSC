@@ -9,6 +9,8 @@ export interface SyllabusToTopicPracticeHandoff {
   moduleLabels: string[];
   chapterNames: string[];
   studentIds: string[];
+  /** Assignment / generation medium preference */
+  medium?: "en" | "hi";
 }
 
 /** Map foundation syllabus subject keys → Notes / Knowledge Base subjects. */
