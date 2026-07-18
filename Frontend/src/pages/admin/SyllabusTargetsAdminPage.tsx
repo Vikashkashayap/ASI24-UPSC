@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
   Check,
@@ -6,6 +7,7 @@ import {
   ChevronRight,
   Loader2,
   Search,
+  Sparkles,
   Target,
   Trash2,
   UserPlus,
@@ -22,6 +24,7 @@ import {
   type SyllabusCatalogSubject,
   type SyllabusModuleTargetItem,
 } from "../../services/api";
+import type { SyllabusToTopicPracticeHandoff } from "../../utils/syllabusTopicPracticeHandoff";
 
 interface StudentRow {
   _id: string;
@@ -37,6 +40,7 @@ function formatDate(iso?: string | null) {
 export const SyllabusTargetsAdminPage: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const navigate = useNavigate();
 
   const [subjects, setSubjects] = useState<SyllabusCatalogSubject[]>([]);
   const [subjectKey, setSubjectKey] = useState("");
@@ -250,6 +254,59 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
     } finally {
       setAssigning(false);
     }
+  };
+
+  /** Send selected modules → Topic Practice so admin can generate & assign MCQs. */
+  const handleAddToTopicPractice = () => {
+    setError(null);
+    setSuccess(null);
+    if (!subjectKey) {
+      setError("Select a subject first");
+      return;
+    }
+    if (selectedModuleIds.size === 0) {
+      setError("Select at least one module to add to Topic Practice");
+      return;
+    }
+
+    const selected = modules.filter((m) => selectedModuleIds.has(m.moduleId));
+    if (selected.length === 0) {
+      setError("Selected modules not found — reload the subject and try again");
+      return;
+    }
+
+    const subjectName = subjectDetail?.name || selectedSubject?.name || subjectKey;
+    const chapterNames = selected.flatMap((m) => {
+      const fromChapters = (m.chapters || []).map((c) => String(c.name || "").trim()).filter(Boolean);
+      if (fromChapters.length) return fromChapters;
+      return (m.topics || []).map((t) => String(t.topicName || "").trim()).filter(Boolean);
+    });
+    const moduleLabels = selected.map((m) => `${m.moduleId} ${m.moduleName}`.trim());
+
+    // Prefer chapter/topic names for RAG; fall back to module titles if too long / empty
+    let topicKeyword = chapterNames.join(" · ");
+    if (!topicKeyword || topicKeyword.length > 220) {
+      topicKeyword = moduleLabels.join(" · ");
+    }
+
+    const testName =
+      selected.length === 1
+        ? `${subjectName} — ${selected[0].moduleId} ${selected[0].moduleName}`
+        : `${subjectName} — ${selected.map((m) => m.moduleId).join(", ")}`;
+
+    const handoff: SyllabusToTopicPracticeHandoff = {
+      fromSyllabusTargets: true,
+      subjectKey,
+      subjectName,
+      topicKeyword,
+      testName,
+      moduleIds: selected.map((m) => m.moduleId),
+      moduleLabels,
+      chapterNames,
+      studentIds: [...selectedStudentIds],
+    };
+
+    navigate("/admin/topic-practice", { state: handoff });
   };
 
   const handleDelete = async (id: string) => {
@@ -639,7 +696,18 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleAddToTopicPractice}
+              disabled={assigning || selectedModuleIds.size === 0}
+              className="gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Add to Topic Practice
+              {selectedModuleIds.size > 0 ? ` (${selectedModuleIds.size})` : ""}
+            </Button>
             <Button
               type="button"
               onClick={handleAssign}
@@ -650,6 +718,14 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
               Assign to students
             </Button>
           </div>
+          {selectedModuleIds.size > 0 && (
+            <p className={`text-xs text-right ${muted}`}>
+              Topic Practice opens with selected chapter topics prefilled — generate MCQs and send to students there.
+              {selectedStudentIds.size > 0
+                ? ` ${selectedStudentIds.size} student${selectedStudentIds.size === 1 ? "" : "s"} will be pre-selected.`
+                : ""}
+            </p>
+          )}
         </CardContent>
       </Card>
 

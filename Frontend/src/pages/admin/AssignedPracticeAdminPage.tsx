@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Loader2,
   Trash2,
@@ -29,6 +29,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../..
 import { useTheme } from "../../hooks/useTheme";
 import { assignedPracticeAPI, adminAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion, type GenerationProgress } from "../../services/api";
 import { PRELIM_MOCK_PATTERNS } from "../../constants/testGenerator";
+import {
+  isSyllabusToTopicPracticeHandoff,
+  resolveNotesSubjectFromSyllabus,
+  type SyllabusToTopicPracticeHandoff,
+} from "../../utils/syllabusTopicPracticeHandoff";
 
 const DEFAULT_PATTERNS = PRELIM_MOCK_PATTERNS.map((p) => p.id);
 
@@ -121,6 +126,15 @@ function listTopicFocus(item: AssignedPracticeItem): string {
 export const AssignedPracticeAdminPage: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const location = useLocation();
+  const navigate = useNavigate();
+  const syllabusHandoffRef = useRef<SyllabusToTopicPracticeHandoff | null>(null);
+  const [syllabusHandoffBanner, setSyllabusHandoffBanner] = useState<{
+    subjectName: string;
+    moduleLabels: string[];
+    chapterCount: number;
+    studentCount: number;
+  } | null>(null);
 
   // Step 1 — generate (notes-linked)
   const [notesSubjects, setNotesSubjects] = useState<string[]>([]);
@@ -187,6 +201,13 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isSyllabusToTopicPracticeHandoff(location.state)) {
+      syllabusHandoffRef.current = location.state;
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
+
+  useEffect(() => {
     loadStudents();
     loadNotesSubjects();
   }, []);
@@ -194,6 +215,39 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   useEffect(() => {
     loadList();
   }, [listPage, listFilter]);
+
+  /** Apply Syllabus Targets → Topic Practice handoff once notes subjects are ready. */
+  useEffect(() => {
+    const handoff = syllabusHandoffRef.current;
+    if (!handoff || notesSubjectsLoading) return;
+
+    syllabusHandoffRef.current = null;
+
+    if (handoff.topicKeyword?.trim()) setTopicKeyword(handoff.topicKeyword.trim());
+    if (handoff.testName?.trim()) setTestName(handoff.testName.trim());
+    if (handoff.studentIds?.length) {
+      setSelectedStudentIds(new Set(handoff.studentIds));
+    }
+
+    const matched =
+      resolveNotesSubjectFromSyllabus(notesSubjects, handoff.subjectKey, handoff.subjectName) ||
+      notesSubjects[0] ||
+      "";
+    if (matched) setSubject(matched);
+
+    setSyllabusHandoffBanner({
+      subjectName: handoff.subjectName,
+      moduleLabels: handoff.moduleLabels || [],
+      chapterCount: handoff.chapterNames?.length || 0,
+      studentCount: handoff.studentIds?.length || 0,
+    });
+    setFlowStep("form");
+    setSuccess(
+      `Topics from Syllabus Targets loaded${
+        handoff.moduleLabels?.length ? ` (${handoff.moduleLabels.join(", ")})` : ""
+      }. Review keyword → Generate → Assign.`
+    );
+  }, [notesSubjects, notesSubjectsLoading]);
 
   useEffect(() => {
     if (!generationTestId) return;
@@ -287,7 +341,8 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       if (res.data?.success) {
         const list = res.data.data || [];
         setNotesSubjects(list);
-        if (list.length && !subject) setSubject(list[0]);
+        // Don't override when a syllabus handoff is pending (applied in effect below)
+        if (list.length && !subject && !syllabusHandoffRef.current) setSubject(list[0]);
       }
     } catch {
       setError("Failed to load notes subjects. Sync chapters from notes.mentorsdaily.com first.");
@@ -1235,6 +1290,48 @@ export const AssignedPracticeAdminPage: React.FC = () => {
       {success && (
         <div className={`rounded-lg border p-4 text-sm ${isDark ? "bg-green-950/30 border-green-800 text-green-300" : "bg-green-50 border-green-200 text-green-800"}`}>
           {success}
+        </div>
+      )}
+
+      {flowStep === "form" && syllabusHandoffBanner && (
+        <div
+          className={`rounded-xl border px-4 py-3 flex flex-col sm:flex-row sm:items-start gap-3 ${
+            isDark ? "border-sky-800/60 bg-sky-950/30" : "border-sky-200 bg-sky-50"
+          }`}
+        >
+          <div className="min-w-0 flex-1">
+            <p className={`text-sm font-semibold ${isDark ? "text-sky-200" : "text-sky-900"}`}>
+              From Syllabus Targets — {syllabusHandoffBanner.subjectName}
+            </p>
+            <p className={`text-xs mt-1 ${isDark ? "text-sky-300/80" : "text-sky-800/80"}`}>
+              {syllabusHandoffBanner.moduleLabels.length > 0
+                ? syllabusHandoffBanner.moduleLabels.join(" · ")
+                : "Selected modules"}
+              {syllabusHandoffBanner.chapterCount > 0
+                ? ` · ${syllabusHandoffBanner.chapterCount} chapter topic${
+                    syllabusHandoffBanner.chapterCount === 1 ? "" : "s"
+                  } in keyword`
+                : ""}
+              {syllabusHandoffBanner.studentCount > 0
+                ? ` · ${syllabusHandoffBanner.studentCount} student${
+                    syllabusHandoffBanner.studentCount === 1 ? "" : "s"
+                  } pre-selected for assign`
+                : ""}
+            </p>
+            <p className={`text-xs mt-1.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              Topic keyword and test name are prefilled. Generate questions, then assign to students.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSyllabusHandoffBanner(null)}
+            className={`shrink-0 self-end sm:self-start p-1 rounded ${
+              isDark ? "text-sky-300 hover:bg-sky-900/50" : "text-sky-700 hover:bg-sky-100"
+            }`}
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 
