@@ -563,6 +563,139 @@ export const assignedPracticeAPI = {
   startAttempt: (id: string) => api.post(`/api/tests/assigned-practice/${id}/start`),
 };
 
+/** Admin-assigned syllabus modules → student home targets */
+export interface SyllabusCatalogSubject {
+  key: string;
+  name: string;
+  primarySource?: string;
+  sourceNote?: string | null;
+  duration?: string | null;
+  moduleCount: number;
+  chips?: string[];
+}
+
+export interface SyllabusCatalogModule {
+  moduleId: string;
+  moduleName: string;
+  sequence?: number | null;
+  chapterRange?: string | null;
+  estimatedDays?: number | null;
+  estimatedHours?: number | null;
+  durationLabel?: string | null;
+  topicCount: number;
+  importance?: string | null;
+  hasModuleTest?: boolean;
+  testLabel?: string | null;
+  focus?: string | null;
+  overview?: string | null;
+  chips?: string[];
+  chapters?: Array<{ chapter: string; name: string }>;
+  topics?: Array<{ topicId: string; topicName: string; chapter?: string; hours?: number }>;
+}
+
+export interface SyllabusModuleTargetItem {
+  _id: string;
+  subjectKey: string;
+  subjectName: string;
+  moduleId: string;
+  moduleName: string;
+  estimatedDays?: number | null;
+  estimatedHours?: number | null;
+  chapterRange?: string;
+  durationLabel?: string;
+  topicCount: number;
+  topicsPreview: string[];
+  note?: string;
+  dueDate?: string | null;
+  status: "active" | "archived";
+  assignedCount: number;
+  completedCount: number;
+  assignedStudents: { _id: string; name: string; email: string }[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface StudentSyllabusTarget {
+  _id: string;
+  subjectKey: string;
+  subjectName: string;
+  moduleId: string;
+  moduleName: string;
+  estimatedDays?: number | null;
+  estimatedHours?: number | null;
+  chapterRange?: string;
+  durationLabel?: string;
+  topicCount: number;
+  topicsPreview: string[];
+  note?: string;
+  dueDate?: string | null;
+  completed: boolean;
+  createdAt: string;
+}
+
+export const syllabusTargetsAPI = {
+  // Admin
+  getCatalog: () =>
+    api.get<{ success: boolean; data: { subjects: SyllabusCatalogSubject[] } }>(
+      "/api/admin/syllabus-targets/catalog"
+    ),
+  getSubjectModules: (subjectKey: string) =>
+    api.get<{
+      success: boolean;
+      data: {
+        subject: {
+          key: string;
+          name: string;
+          primarySource?: string;
+          sourceNote?: string | null;
+          duration?: string | null;
+          chips?: string[];
+        };
+        modules: SyllabusCatalogModule[];
+      };
+    }>(`/api/admin/syllabus-targets/catalog/${subjectKey}`),
+  listAdmin: (params?: { page?: number; limit?: number; filter?: string; subjectKey?: string }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        targets: SyllabusModuleTargetItem[];
+        pagination: {
+          page: number;
+          limit: number;
+          total: number;
+          totalPages: number;
+          hasPrev: boolean;
+          hasNext: boolean;
+        };
+      };
+    }>("/api/admin/syllabus-targets", { params }),
+  assign: (body: {
+    subjectKey: string;
+    moduleIds: string[];
+    studentIds: string[];
+    dueDate?: string | null;
+    note?: string;
+  }) => api.post("/api/admin/syllabus-targets", body),
+  updateAssign: (
+    id: string,
+    body: { studentIds: string[]; dueDate?: string | null; note?: string }
+  ) => api.patch(`/api/admin/syllabus-targets/${id}/assign`, body),
+  archive: (id: string) => api.patch(`/api/admin/syllabus-targets/${id}/archive`),
+  delete: (id: string) => api.delete(`/api/admin/syllabus-targets/${id}`),
+  // Student
+  listMine: (params?: { includeCompleted?: boolean }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        targets: StudentSyllabusTarget[];
+        activeCount: number;
+        completedCount: number;
+      };
+    }>("/api/syllabus-targets/mine", { params }),
+  toggleComplete: (id: string, completed = true) =>
+    api.post(`/api/syllabus-targets/${id}/complete`, { completed }),
+};
+
 // DART – Daily Activity & Reflection Tracker API
 export const dartAPI = {
   submit: (body: Record<string, unknown>) => api.post("/api/dart", body),

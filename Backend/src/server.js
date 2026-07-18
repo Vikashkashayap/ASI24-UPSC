@@ -26,6 +26,7 @@ import offersRoutes from "./routes/offersRoutes.js";
 import currentAffairsRoutes, {
   currentAffairsAdminRouter,
 } from "./routes/currentAffairsRoutes.js";
+import syllabusTargetRoutes from "./routes/syllabusTargetRoutes.js";
 import ragRoutes from "./rag/routes/ragRoutes.js";
 import { uploadPdf as ragUploadPdf } from "./rag/controllers/ragController.js";
 import { ragPdfUpload } from "./rag/middleware/uploadPdf.js";
@@ -157,6 +158,7 @@ app.use("/api/tests", testRoutes);
 app.use("/api/agents/student-profiler", studentProfilerRoutes);
 app.use("/api/study-plan", authMiddleware, studyPlanRoutes);
 app.use("/api/study-planner", authMiddleware, advancedStudyPlannerRoutes);
+app.use("/api/syllabus-targets", syllabusTargetRoutes);
 
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);

@@ -13,9 +13,8 @@ import { MentorChatDrawer } from "../components/MentorChatDrawer";
 import { PageLoader } from "../components/PageLoader";
 import { useAuth } from "../hooks/useAuth";
 
-/** ~1.8 MB syllabus JSON — separate chunk, not in home route initial bundle */
-const SyllabusTargetsPanel = lazy(() =>
-  import("../components/SyllabusTargetsPanel").then((m) => ({ default: m.SyllabusTargetsPanel }))
+const AssignedModuleTargets = lazy(() =>
+  import("../components/AssignedModuleTargets").then((m) => ({ default: m.AssignedModuleTargets }))
 );
 import "./homePage.css";
 
@@ -181,19 +180,9 @@ export const HomePage = () => {
             </article>
           </section>
 
-          <div className="sd-card sd-syllabus-card">
-            <Suspense fallback={<PageLoader />}>
-              <SyllabusTargetsPanel
-                todayLabel={todayLabel}
-                studentProfile={{
-                  targetYear: user?.targetYear,
-                  prepStartDate: user?.prepStartDate,
-                  dailyStudyHours: user?.dailyStudyHours,
-                  educationBackground: user?.educationBackground,
-                }}
-              />
-            </Suspense>
-          </div>
+          <Suspense fallback={<PageLoader />}>
+            <AssignedModuleTargets />
+          </Suspense>
         </div>
 
         <aside className="sd-sidebar">

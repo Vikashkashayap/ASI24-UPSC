@@ -1264,9 +1264,13 @@ function InternationalRelationsSection() {
   return <GenericSyllabusSection modules={internationalRelationsModules} showPrelimsImportance={false} />;
 }
 
-type Props = { todayLabel: string };
+type Props = { todayLabel: string; title?: string };
 
-export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { studentProfile?: StudentProfile }) {
+export function SyllabusTargetsPanel({
+  todayLabel,
+  title = "Today's Targets",
+  studentProfile,
+}: Props & { studentProfile?: StudentProfile }) {
   const [segment, setSegment] = useState<Segment>(recommendedSegmentByBackground(studentProfile?.educationBackground));
   const [prelimsSubject, setPrelimsSubject] = useState<PrelimsSubject>("overview");
   const [historyPart, setHistoryPart] = useState<HistoryPart>(() => defaultHistoryPartForProfile(studentProfile?.educationBackground));
@@ -1408,7 +1412,7 @@ export function SyllabusTargetsPanel({ todayLabel, studentProfile }: Props & { s
     <>
       <div className="sd-card-hd">
         <div>
-          <h3>Today&apos;s Targets</h3>
+          <h3>{title}</h3>
           <p className="sd-syll-deck">{subtitle}</p>
           <p className="sd-syll-deck">{planHint}</p>
         </div>

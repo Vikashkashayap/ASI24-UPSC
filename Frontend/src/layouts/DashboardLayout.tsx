@@ -75,6 +75,7 @@ const SidebarNavItem = ({
 const getPageTitle = (pathname: string, userRole?: string): { title: string; icon: React.ReactNode } => {
   const studentRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/home': { title: 'Home', icon: <Home className="w-5 h-5" /> },
+    '/syllabus': { title: 'Syllabus', icon: <BookOpen className="w-5 h-5" /> },
     '/performance': { title: 'Performance Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/planner': { title: 'Study Planner', icon: <CalendarClock className="w-5 h-5" /> },
     '/mentor': { title: 'AI Mentor', icon: <MessageCircle className="w-5 h-5" /> },
@@ -107,6 +108,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
     '/admin/knowledge-base': { title: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
     '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
+    '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
     '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
@@ -441,6 +443,10 @@ export const DashboardLayout = () => {
                   <ClipboardList className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Topic Practice</span>}
                 </NavLink>
+                <NavLink to="/admin/syllabus-targets" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Syllabus Targets - Assign modules to student home">
+                  <BookOpen className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Syllabus Targets</span>}
+                </NavLink>
                 <NavLink to="/admin/pricing" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Pricing Plans">
                   <IndianRupee className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Pricing Plans</span>}
@@ -557,6 +563,15 @@ export const DashboardLayout = () => {
                   title="Home"
                   icon={Home}
                   label="Home"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/syllabus"
+                  title="Syllabus"
+                  icon={BookOpen}
+                  label="Syllabus"
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   onNavigate={() => setMobileMenuOpen(false)}

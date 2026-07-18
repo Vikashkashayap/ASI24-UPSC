@@ -50,6 +50,16 @@ import {
   approvePracticeTest,
 } from "../controllers/assignedPracticeController.js";
 import {
+  getSyllabusCatalog,
+  getSyllabusCatalogFull,
+  getSyllabusSubjectModules,
+  createSyllabusTargets,
+  listAdminSyllabusTargets,
+  updateSyllabusTargetAssignment,
+  deleteSyllabusTarget,
+  archiveSyllabusTarget,
+} from "../controllers/syllabusTargetController.js";
+import {
   listNotesSubjects,
   listNotesChapters,
   listNotesTopics,
@@ -146,6 +156,16 @@ router.post("/assigned-practice/:id/questions/:index/regenerate", regeneratePrac
 router.post("/assigned-practice/:id/approve", approvePracticeTest);
 router.post("/assigned-practice/:id/assign", assignStudentsToPractice);
 router.delete("/assigned-practice/:id", deleteAssignedPractice);
+
+// Syllabus module targets (assign modules → student home)
+router.get("/syllabus-targets/catalog", getSyllabusCatalog);
+router.get("/syllabus-targets/catalog/full", getSyllabusCatalogFull);
+router.get("/syllabus-targets/catalog/:subjectKey", getSyllabusSubjectModules);
+router.get("/syllabus-targets", listAdminSyllabusTargets);
+router.post("/syllabus-targets", createSyllabusTargets);
+router.patch("/syllabus-targets/:id/assign", updateSyllabusTargetAssignment);
+router.patch("/syllabus-targets/:id/archive", archiveSyllabusTarget);
+router.delete("/syllabus-targets/:id", deleteSyllabusTarget);
 
 // Notes catalog (synced from notes.mentorsdaily.com)
 router.get("/notes/catalog", getNotesCatalog);
