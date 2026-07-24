@@ -1,5 +1,11 @@
 import React from "react";
-import { isStructuredUpscStem, parseUpscQuestionStem, type UpscStemPart } from "../utils/upscQuestionFormat";
+import {
+  isBlankUpscItemText,
+  isStructuredUpscStem,
+  parseUpscQuestionStem,
+  stemHasBlankNumberedItems,
+  type UpscStemPart,
+} from "../utils/upscQuestionFormat";
 
 type Theme = "dark" | "light";
 
@@ -10,14 +16,8 @@ interface Props {
   compact?: boolean;
 }
 
-function partLabel(role: "A" | "R", theme: Theme): string {
-  return role === "A"
-    ? theme === "dark"
-      ? "Assertion (A)"
-      : "Assertion (A)"
-    : theme === "dark"
-      ? "Reason (R)"
-      : "Reason (R)";
+function partLabel(role: "A" | "R", _theme: Theme): string {
+  return role === "A" ? "Assertion (A)" : "Reason (R)";
 }
 
 function renderParts(parts: UpscStemPart[], theme: Theme, className: string, compact = false) {
@@ -45,10 +45,12 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string, com
           );
         }
         if (part.type === "statement") {
+          const stmtText = String(part.text || "").trim();
+          if (isBlankUpscItemText(stmtText)) return null;
           return (
             <div key={`stmt-${part.number}-${index}`} className="flex gap-2 sm:gap-3 pl-0 sm:pl-1">
               <span className={`shrink-0 font-semibold tabular-nums ${stmtClass}`}>{part.number}.</span>
-              <p className={`${stmtClass} flex-1 min-w-0 break-words`}>{part.text}</p>
+              <p className={`${stmtClass} flex-1 min-w-0 break-words`}>{stmtText}</p>
             </div>
           );
         }
@@ -94,8 +96,37 @@ export const UpscFormattedQuestionStem: React.FC<Props> = ({
   className = "",
   compact = false,
 }) => {
-  const parts = parseUpscQuestionStem(text);
   const size = compact ? "exam-question-text" : "text-base sm:text-lg leading-relaxed";
+  const parts = parseUpscQuestionStem(text);
+  const hasUsableStatements = parts.some(
+    (p) => p.type === "statement" && !isBlankUpscItemText(p.text)
+  );
+
+  // Corrupted bank item: intro + blank "1. —" — do not fake a structured UPSC stem
+  if (stemHasBlankNumberedItems(text) && !hasUsableStatements) {
+    return (
+      <div className={`${className} space-y-2`}>
+        <p
+          className={`${size} break-words whitespace-pre-line ${
+            theme === "dark" ? "text-slate-100" : "text-slate-900"
+          }`}
+        >
+          {String(text || "")
+            .replace(/\[object Object\]/gi, "")
+            .replace(/(?:^|\n)\s*\d+[.)]\s*(?:[—–\-−]|\.\.\.|…)?\s*(?=\n|$)/g, "")
+            .trim()}
+        </p>
+        <p
+          className={`text-xs sm:text-sm font-medium ${
+            theme === "dark" ? "text-amber-300" : "text-amber-700"
+          }`}
+        >
+          This question is incomplete (missing statements). Please skip it or regenerate the test.
+        </p>
+      </div>
+    );
+  }
+
   if (!isStructuredUpscStem(parts)) {
     return (
       <p

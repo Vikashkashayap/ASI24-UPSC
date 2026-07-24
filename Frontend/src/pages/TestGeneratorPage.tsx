@@ -31,8 +31,8 @@ const TestGeneratorPage: React.FC = () => {
   const [subjects, setSubjects] = useState<string[]>(["Polity"]);
   const [topic, setTopic] = useState("");
   const [fromPlanner, setFromPlanner] = useState(false);
-  const [difficulty, setDifficulty] = useState("Moderate");
-  const [questionCount, setQuestionCount] = useState(20);
+  const [difficulty, setDifficulty] = useState("Hard");
+  const [questionCount, setQuestionCount] = useState(10);
 
   useEffect(() => {
     const sub = searchParams.get("subject");
@@ -113,7 +113,7 @@ const TestGeneratorPage: React.FC = () => {
     const allowedCounts = [5, 10, 20] as const;
     const safeQuestionCount = allowedCounts.includes(questionCount as (typeof allowedCounts)[number])
       ? questionCount
-      : 20;
+      : 10;
 
     try {
       const response = await testAPI.generateTest({

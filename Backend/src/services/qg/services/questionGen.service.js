@@ -29,6 +29,22 @@ function countNumberItems(text) {
   return (String(text || "").match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
 }
 
+function coerceItemText(x) {
+  if (x == null) return "";
+  if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+    const s = String(x).trim();
+    return s === "[object Object]" ? "" : s;
+  }
+  if (typeof x === "object") {
+    for (const k of ["text", "en", "hi", "item", "statement", "content", "value", "label", "event"]) {
+      if (typeof x[k] === "string" && x[k].trim() && x[k].trim() !== "[object Object]") {
+        return x[k].trim();
+      }
+    }
+  }
+  return "";
+}
+
 function assembleStem(q) {
   // Prefer explicit stem aliases — models sometimes put text only in questionText/stem
   let question = String(q.question || q.question_en || q.questionText || q.stem || "")
@@ -40,15 +56,15 @@ function assembleStem(q) {
     const intro = question.split("\n")[0] || "Consider the following statements:";
     const lines = [intro.endsWith(":") ? intro : `${intro}:`];
     q.statements.forEach((s, i) => {
-      const t = String(s || "").trim();
+      const t = coerceItemText(s);
       if (t) lines.push(`${i + 1}. ${t}`);
     });
     lines.push("Which of the statements given above is/are correct?");
     question = lines.join("\n");
   }
 
-  const columnA = (q.matchColumns?.columnA || []).map((x) => String(x || "").trim()).filter(Boolean);
-  const columnB = (q.matchColumns?.columnB || []).map((x) => String(x || "").trim()).filter(Boolean);
+  const columnA = (q.matchColumns?.columnA || []).map(coerceItemText).filter(Boolean);
+  const columnB = (q.matchColumns?.columnB || []).map(coerceItemText).filter(Boolean);
   // Always embed lists when missing — do NOT skip just because intro says "List-I"
   if (columnA.length >= 2 && columnB.length >= 2 && (countLetterItems(question) < 2 || countNumberItems(question) < 2)) {
     const intro = question.split("\n")[0] || "Match the following:";
@@ -61,7 +77,7 @@ function assembleStem(q) {
   }
 
   const chrono = Array.isArray(q.chronologyItems) ? q.chronologyItems : [];
-  const chronoClean = chrono.map((x) => String(x || "").trim()).filter(Boolean);
+  const chronoClean = chrono.map(coerceItemText).filter(Boolean);
   if (chronoClean.length >= 2 && countNumberItems(question) < 2) {
     const intro = question.split("\n")[0] || "Arrange the following in chronological order:";
     const lines = [intro.endsWith(":") ? intro : `${intro}:`];

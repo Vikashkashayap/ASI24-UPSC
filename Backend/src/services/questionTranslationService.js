@@ -1,20 +1,38 @@
 import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 import { translateToHindi, translateManyToHindi } from "./translateToHindi.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
+import {
+  coerceStemItemText,
+  countSubstantiveLetterItems,
+  countSubstantiveNumberedItems,
+  filterStudentReadyQuestions,
+  isCompleteUpscStem,
+  isPlaceholderItemText,
+  isStudentReadyMcq,
+  sanitizeStemText,
+} from "./ai/stemQuality.js";
 
 const OPTION_KEYS = ["A", "B", "C", "D"];
 
+/**
+ * LLMs sometimes return list items as objects ({ text, hi, item… }).
+ * Coerce to a plain string — never String(obj) → "[object Object]".
+ */
+export function coerceListItemText(value) {
+  return coerceStemItemText(value);
+}
+
 function countLetterListItems(text) {
-  return (String(text || "").match(/(?:^|\n)\s*[A-D][.)]\s+\S+/gi) || []).length;
+  return countSubstantiveLetterItems(text);
 }
 
 function countNumberedListItems(text) {
-  return (String(text || "").match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+  return countSubstantiveNumberedItems(text);
 }
 
 function cleanList(arr) {
   if (!Array.isArray(arr)) return [];
-  return arr.map((x) => String(x || "").trim()).filter(Boolean);
+  return arr.map((x) => coerceListItemText(x)).filter((x) => x.length >= 2 && !isPlaceholderItemText(x));
 }
 
 /**
@@ -106,9 +124,9 @@ export function ensureFullQuestionStem(rawQuestion) {
 
   return {
     ...plain,
-    question: question_en,
-    question_en,
-    question_hi,
+    question: sanitizeStemText(question_en),
+    question_en: sanitizeStemText(question_en),
+    question_hi: sanitizeStemText(question_hi),
   };
 }
 
@@ -123,7 +141,8 @@ function normalizeOptionsObject(raw) {
   const options = { A: "", B: "", C: "", D: "" };
   if (!raw || typeof raw !== "object") return options;
   for (const key of OPTION_KEYS) {
-    options[key] = String(raw[key] ?? "").trim();
+    const s = String(raw[key] ?? "").trim();
+    options[key] = isPlaceholderItemText(s) ? "" : s;
   }
   return options;
 }
@@ -292,3 +311,11 @@ export function pickBilingualQuestionFields(q) {
     questionId: base.questionId,
   };
 }
+
+export {
+  filterStudentReadyQuestions,
+  isCompleteUpscStem,
+  isStudentReadyMcq,
+  sanitizeStemText,
+};
+

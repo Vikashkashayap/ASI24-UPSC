@@ -84,6 +84,23 @@ const syllabusModuleTargetSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    /**
+     * Per-student chapter completion within a module.
+     * `chapters` holds topicsPreview line strings (e.g. "Ch 7: Demography…").
+     */
+    chapterCompletions: [
+      {
+        studentId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        chapters: {
+          type: [String],
+          default: [],
+        },
+      },
+    ],
     status: {
       type: String,
       enum: ["active", "archived"],

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   Clock,
   AlertCircle,
@@ -16,7 +16,7 @@ import { ExamQuestionBody, ExamOptionRow, examPaletteCols, getQuestionOptionKeys
 import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
 import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
-import { testAPI } from "../services/api";
+import { testAPI, syllabusTargetsAPI } from "../services/api";
 
 interface Question {
   _id: string;
@@ -148,6 +148,14 @@ function PalettePanel({
 const TestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const moduleHandoff = (location.state || {}) as {
+    fromModuleTarget?: boolean;
+    fromModuleFinal?: boolean;
+    targetId?: string;
+    chapter?: string;
+    nextChapter?: string | null;
+  };
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [test, setTest] = useState<TestData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -286,8 +294,37 @@ const TestPage: React.FC = () => {
         answers: answersObject,
         questionTimeSpent: finalTimeSpent,
       });
-      if (response.data.success) navigate(`/result/${id}`);
-      else setError(response.data.message || "Failed to submit test");
+      if (response.data.success) {
+        // Chapter practice: unlock next chapter
+        if (moduleHandoff.fromModuleTarget && moduleHandoff.targetId && moduleHandoff.chapter) {
+          try {
+            console.log("[ModuleTargets] submit unlock payload →", {
+              targetId: moduleHandoff.targetId,
+              chapter: moduleHandoff.chapter,
+              nextChapter: moduleHandoff.nextChapter || null,
+            });
+            await syllabusTargetsAPI.toggleChapterComplete(
+              moduleHandoff.targetId,
+              moduleHandoff.chapter,
+              true
+            );
+          } catch (unlockErr) {
+            console.warn("[ModuleTargets] chapter unlock after submit failed", unlockErr);
+          }
+        }
+        // Module Final: mark module complete → unlock next module
+        if (moduleHandoff.fromModuleFinal && moduleHandoff.targetId) {
+          try {
+            console.log("[ModuleTargets] module final submit → unlock next module", {
+              targetId: moduleHandoff.targetId,
+            });
+            await syllabusTargetsAPI.toggleComplete(moduleHandoff.targetId, true);
+          } catch (unlockErr) {
+            console.warn("[ModuleTargets] module unlock after final failed", unlockErr);
+          }
+        }
+        navigate(`/result/${id}`);
+      } else setError(response.data.message || "Failed to submit test");
     } catch (err: unknown) {
       const ax = err as { response?: { data?: { message?: string } } };
       setError(ax.response?.data?.message || "Failed to submit test");
@@ -383,6 +420,12 @@ const TestPage: React.FC = () => {
               <span className="text-emerald-600 font-medium">+2 marks</span>
               <span className="text-slate-300 hidden sm:inline">·</span>
               <span className="text-red-500 font-medium">-0.66 wrong</span>
+              {test.difficulty ? (
+                <>
+                  <span className="text-slate-300 hidden sm:inline">·</span>
+                  <span className="font-medium text-slate-600">{test.difficulty}</span>
+                </>
+              ) : null}
             </p>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">

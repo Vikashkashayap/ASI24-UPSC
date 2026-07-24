@@ -25,6 +25,13 @@ import {
 import { prepareContextForBatch, ABORT_CONTEXT_TOKENS } from "./contextReducer.service.js";
 import { MAX_PROMPT_TOKENS, MAX_CONTEXT_TOKENS } from "./retriever.service.js";
 import { lockPlainExplanationToAnswer } from "../qg/utils/consistency.js";
+import {
+  countSubstantiveLetterItems,
+  countSubstantiveNumberedItems,
+  isCompleteUpscStem,
+  isPlaceholderItemText,
+  sanitizeStemText,
+} from "./stemQuality.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const BATCH_RETRIES = Math.max(1, Math.min(3, parseInt(process.env.PRACTICE_BATCH_RETRIES, 10) || 2));
@@ -70,7 +77,9 @@ function parseNotesQuestions(aiContent, expectedCount, meta = {}) {
         String(q.questionType || "").includes("sequence") ||
         /arrange the following|chronological order/i.test(q.question);
       const requiredKeys = isChrono ? ["A", "B", "C"] : ["A", "B", "C", "D"];
-      if (requiredKeys.some((k) => !q.options?.[k])) return false;
+      if (requiredKeys.some((k) => !q.options?.[k] || isPlaceholderItemText(q.options[k]))) {
+        return false;
+      }
       const normalizedOptions = requiredKeys
         .map((k) => String(q.options[k] || "").toLowerCase().replace(/\s+/g, " ").trim());
       if (new Set(normalizedOptions).size !== requiredKeys.length) return false;
@@ -102,13 +111,43 @@ function salvageJsonObjects(content) {
 
 function cleanStringList(arr) {
   if (!Array.isArray(arr)) return [];
-  return arr.map((x) => String(x || "").trim()).filter((x) => x.length >= 3);
+  return arr
+    .map((x) => {
+      if (x == null) return "";
+      if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+        const s = String(x).trim();
+        return isPlaceholderItemText(s) ? "" : s;
+      }
+      if (typeof x === "object") {
+        for (const k of ["text", "en", "hi", "item", "statement", "content", "value", "label", "event"]) {
+          if (typeof x[k] === "string" && x[k].trim() && !isPlaceholderItemText(x[k])) {
+            return x[k].trim();
+          }
+        }
+      }
+      return "";
+    })
+    .filter((x) => x.length >= 8);
 }
 
 /** Match List-I/II items — keep short labels (e.g. UK, Goa); still drop blanks */
 function cleanMatchList(arr) {
   if (!Array.isArray(arr)) return [];
-  return arr.map((x) => String(x || "").trim()).filter((x) => x.length >= 1);
+  return arr
+    .map((x) => {
+      if (x == null) return "";
+      if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+        const s = String(x).trim();
+        return s === "[object Object]" ? "" : s;
+      }
+      if (typeof x === "object") {
+        for (const k of ["text", "en", "hi", "item", "content", "value", "label", "name"]) {
+          if (typeof x[k] === "string" && x[k].trim()) return x[k].trim();
+        }
+      }
+      return "";
+    })
+    .filter((x) => x.length >= 1);
 }
 
 function normalizeMatchColumns(raw) {
@@ -136,14 +175,11 @@ function normalizeAssertionReason(raw) {
 }
 
 function countNumberedItems(text) {
-  return (String(text || "").match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+  return countSubstantiveNumberedItems(text);
 }
 
 function hasLetterAndNumberLists(text) {
-  const t = String(text || "");
-  const letters = (t.match(/(?:^|\n)\s*[A-D][.)]\s+\S+/gi) || []).length;
-  const numbers = countNumberedItems(t);
-  return letters >= 2 && numbers >= 2;
+  return countSubstantiveLetterItems(text) >= 2 && countSubstantiveNumberedItems(text) >= 2;
 }
 
 function formatMatchStem(intro, columnA, columnB) {
@@ -239,81 +275,12 @@ function assembleCompleteStem(q) {
   void looksStatement;
   void looksChrono;
 
-  return { questionEn, matchColumns, assertionReason, questionType: questionType || "direct_conceptual" };
-}
-
-function optionsReferToNumberedItems(options = {}) {
-  const vals = ["A", "B", "C", "D"]
-    .map((k) => String(options[k] || ""))
-    .join(" ")
-    .toLowerCase();
-  return (
-    /\b1\s+and\s+2\b/.test(vals) ||
-    /\b1\s+only\b/.test(vals) ||
-    /\b1,\s*2\b/.test(vals) ||
-    /\b1-2-3/.test(vals) ||
-    /\b1,\s*2,\s*3\b/.test(vals) ||
-    /केवल\s*1/.test(vals) ||
-    /\b1\s+and\s+3\b/.test(vals)
-  );
-}
-
-/** Reject intro-only stems (missing statements/events/lists). */
-function isCompleteUpscStem(q) {
-  const text = String(q.question || "").replace(/\\n/g, "\n").trim();
-  if (text.length < 25) return false;
-
-  const type = String(q.questionType || "").toLowerCase();
-  const opts = q.options || q.options_en || {};
-  const needsNumbers = optionsReferToNumberedItems(opts);
-
-  const looksMatch =
-    type.includes("pair") ||
-    type.includes("match") ||
-    /match\s+(the\s+)?following|consider the following pairs|निम्नलिखित.*(?:मिलान|युग्म)/i.test(text);
-  const looksAR = type.includes("assertion") || /assertion\s*\(A\)|अभिकथन\s*\(A\)/i.test(text);
-  const looksChrono =
-    type.includes("chronolog") ||
-    type.includes("sequence") ||
-    /arrange the following|chronological order|कालानुक्रम/i.test(text);
-  const looksStatement =
-    type.includes("statement") ||
-    /consider the following statements|which of the following statements|निम्नलिखित(?: में से)?.*कथन/i.test(
-      text
-    );
-
-  if (
-    /^(match the following|arrange the following[\s\S]{0,80}|consider the following statements[\s\S]{0,80}|which of the following statements[\s\S]{0,80})\s*:?\s*$/i.test(
-      text
-    )
-  ) {
-    return false;
-  }
-
-  if (looksMatch) {
-    const a = q.matchColumns?.columnA || [];
-    const b = q.matchColumns?.columnB || [];
-    const aOk = a.filter((x) => String(x || "").trim()).length;
-    const bOk = b.filter((x) => String(x || "").trim()).length;
-    if (aOk >= 2 && bOk >= 2) return true;
-    return hasLetterAndNumberLists(text);
-  }
-
-  if (looksAR) {
-    if (q.assertionReason?.assertion?.length >= 15 && q.assertionReason?.reason?.length >= 15) {
-      return true;
-    }
-    return (
-      /assertion\s*\(A\)\s*:\s*.+\S/i.test(text) && /reason\s*\(R\)\s*:\s*.+\S/i.test(text)
-    );
-  }
-
-  // Chronology / statements / options like "1 and 2 only" REQUIRE numbered items in stem
-  if (looksChrono || looksStatement || needsNumbers) {
-    return countNumberedItems(text) >= 2;
-  }
-
-  return true;
+  return {
+    questionEn: sanitizeStemText(questionEn),
+    matchColumns,
+    assertionReason,
+    questionType: questionType || "direct_conceptual",
+  };
 }
 
 function filterGroundedQuestions(questions) {

@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   CalendarClock,
   CalendarDays,
-  Clock,
   FileText,
-  Flame,
   MessageCircle,
   Sparkles,
 } from "lucide-react";
@@ -70,9 +68,6 @@ export const HomePage = () => {
   const firstName = studentName.split(" ")[0];
   const daysSinceJoin = Math.max(1, Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24)));
   const dailyHours = parseDailyHours(user?.dailyStudyHours);
-  const dailyGoal = Math.max(4, Math.round(dailyHours));
-  const todayHoursDone = 3.5;
-  const hoursProgress = Math.min(100, Math.round((todayHoursDone / dailyGoal) * 100));
   const daysLeftForPrelims = Number(countdown.days) || 0;
   const preparationPhase = getPreparationPhase(daysLeftForPrelims);
   const phaseMeta = phaseLabels[preparationPhase];
@@ -144,40 +139,21 @@ export const HomePage = () => {
       <div className="sd-layout">
         <div className="sd-main">
           <section className="sd-hero">
-            <h1>
-              {greeting},{" "}
-              <span className="sd-name-highlight">{firstName}</span>
-            </h1>
-            <p>
-              Day {daysSinceJoin} of your journey · Target UPSC CSE {targetYear}
-            </p>
-          </section>
-
-          <section className="sd-stats-grid">
-            <article className="sd-stat-card sd-stat-streak">
-              <div className="sd-stat-icon"><Flame className="sd-stat-svg" /></div>
-              <div>
-                <span className="sd-stat-label">Study Streak</span>
-                <strong className="sd-stat-value">14 days</strong>
+            <div className="sd-hero-top">
+              <div className="sd-hero-copy">
+                <h1>
+                  {greeting},{" "}
+                  <span className="sd-name-highlight">{firstName}</span>
+                </h1>
+                <p>
+                  Day {daysSinceJoin} of your journey · Target UPSC CSE {targetYear}
+                </p>
               </div>
-            </article>
-
-            <article className="sd-stat-card sd-stat-hours">
-              <div className="sd-stat-icon"><Clock className="sd-stat-svg" /></div>
-              <div className="sd-stat-body">
-                <span className="sd-stat-label">Today&apos;s Hours</span>
-                <strong className="sd-stat-value">{todayHoursDone} / {dailyGoal} hrs</strong>
-                <div className="sd-stat-bar"><div style={{ width: `${hoursProgress}%` }} /></div>
+              <div className="sd-hero-date">
+                <CalendarDays className="sd-hero-date-icon" aria-hidden />
+                <span>Today · {todayLabel}</span>
               </div>
-            </article>
-
-            <article className="sd-stat-card sd-stat-date">
-              <div className="sd-stat-icon"><CalendarDays className="sd-stat-svg" /></div>
-              <div>
-                <span className="sd-stat-label">Today</span>
-                <strong className="sd-stat-value">{todayLabel}</strong>
-              </div>
-            </article>
+            </div>
           </section>
 
           <Suspense fallback={<PageLoader />}>

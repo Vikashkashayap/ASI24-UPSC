@@ -5,6 +5,54 @@ export type UpscStemPart =
   | { type: "assertion"; role: "A" | "R"; text: string }
   | { type: "plain"; text: string };
 
+const PLACEHOLDER_ITEM_RE =
+  /^(?:[—–\-−•·.…]{1,6}|n\/?a|na|tbd|todo|null|undefined|none|blank|empty|\[object object\]|\.\.\.|…)$/i;
+
+/** True when a numbered statement/option body is blank or a dash placeholder. */
+export function isBlankUpscItemText(value: unknown): boolean {
+  const s = String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!s) return true;
+  if (s === "[object Object]") return true;
+  if (PLACEHOLDER_ITEM_RE.test(s)) return true;
+  if (/^[\s—–\-−•·.…,;:|/\\]+$/.test(s)) return true;
+  return false;
+}
+
+/** Strip corrupted / blank numbered lines before render. */
+export function sanitizeUpscStemText(text: string): string {
+  return String(text || "")
+    .replace(/\\n/g, "\n")
+    .replace(/\[object Object\]/gi, "")
+    .split("\n")
+    .map((line) => {
+      const m = line.match(/^(\s*\d+[.)]\s+)(.*)$/);
+      if (!m) return line;
+      const body = m[2].trim();
+      if (isBlankUpscItemText(body)) return null;
+      return `${m[1]}${body}`;
+    })
+    .filter((l): l is string => l != null)
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+export function stemHasBlankNumberedItems(text: string): boolean {
+  const src = String(text || "").replace(/\\n/g, "\n");
+  const markers = [...src.matchAll(/(?:^|\n)\s*\d+[.)]\s+/g)];
+  if (markers.length < 2) return false;
+  let blank = 0;
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index! + markers[i][0].length;
+    const end = i + 1 < markers.length ? markers[i + 1].index! : src.length;
+    const body = src.slice(start, end).trim().split(/\n/)[0] || "";
+    if (isBlankUpscItemText(body) || body.length < 8) blank += 1;
+  }
+  return blank > 0;
+}
+
 const PROMPT_PATTERNS = [
   /which of the (?:statements|following statements)(?: given above)?(?: is\/are| are)?[^.]*\??/i,
   /how many of the (?:above )?statements?(?: given above)?(?: is\/are| are)?[^.]*\??/i,
@@ -76,7 +124,11 @@ function parseStatementStem(text: string): UpscStemPart[] | null {
       }
     }
 
-    if (stmt) parts.push({ type: "statement", number: markers[i].number, text: stmt });
+    if (stmt) {
+      if (!isBlankUpscItemText(stmt)) {
+        parts.push({ type: "statement", number: markers[i].number, text: stmt });
+      }
+    }
   }
 
   return parts.length > 0 ? parts : null;
@@ -126,7 +178,10 @@ function parseNewlineStatements(text: string): UpscStemPart[] | null {
   for (const line of lines.slice(firstStmtIdx)) {
     const stmtMatch = line.match(/^(\d+)[.)]\s+(.+)$/);
     if (stmtMatch) {
-      parts.push({ type: "statement", number: Number(stmtMatch[1]), text: stmtMatch[2].trim() });
+      const body = stmtMatch[2].trim();
+      if (!isBlankUpscItemText(body)) {
+        parts.push({ type: "statement", number: Number(stmtMatch[1]), text: body });
+      }
       continue;
     }
     if (PROMPT_PATTERNS.some((p) => p.test(line))) {
@@ -148,11 +203,22 @@ function parseNewlineStatements(text: string): UpscStemPart[] | null {
 
 /** Parse UPSC Prelims-style question stem into intro / numbered statements / prompt / A-R blocks. */
 export function parseUpscQuestionStem(text: string): UpscStemPart[] {
-  const trimmed = text.trim();
+  const trimmed = sanitizeUpscStemText(text);
   if (!trimmed) return [];
 
   if (trimmed.includes("<table")) {
     return [{ type: "plain", text: trimmed }];
+  }
+
+  // If original had blank numbered lines, prefer plain sanitized text over fake empty structure
+  if (stemHasBlankNumberedItems(text) && !stemHasBlankNumberedItems(trimmed)) {
+    const structured =
+      parseAssertionReasonStem(trimmed) ||
+      parseNewlineStatements(trimmed) ||
+      parseStatementStem(trimmed);
+    if (structured && structured.some((p) => p.type === "statement" || p.type === "assertion")) {
+      return structured;
+    }
   }
 
   return (
@@ -380,10 +446,19 @@ export function getQuestionOptionKeys(q: {
   options?: Record<string, string>;
   options_en?: Record<string, string>;
 }): OptionKey[] {
-  if (isChronologyQuestion(q)) return ["A", "B", "C"];
+  if (isChronologyQuestion(q)) {
+    return (["A", "B", "C"] as OptionKey[]).filter((k) => {
+      const opts = q.options_en || q.options || {};
+      const v = String(opts[k] ?? "").trim();
+      return v && !isBlankUpscItemText(v);
+    });
+  }
   const opts = q.options_en || q.options || {};
   const keys: OptionKey[] = ["A", "B", "C", "D"];
-  return keys.filter((k) => String(opts[k] ?? "").trim());
+  return keys.filter((k) => {
+    const v = String(opts[k] ?? "").trim();
+    return v && !isBlankUpscItemText(v);
+  });
 }
 
 export function isAssertionReasonText(text: string): boolean {
@@ -404,8 +479,22 @@ export function resolveMatchColumns(
   lang: "en" | "hi" = "en"
 ): ParsedMatchFollowing | null {
   const normalizeCols = (columnA: string[], columnB: string[]) => {
-    const a = columnA.map((x) => String(x || "").trim());
-    const b = columnB.map((x) => String(x || "").trim());
+    const coerce = (x: unknown) => {
+      if (x == null) return "";
+      if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+        const s = String(x).trim();
+        return s === "[object Object]" ? "" : s;
+      }
+      if (typeof x === "object") {
+        const o = x as Record<string, unknown>;
+        for (const k of ["text", "hi", "en", "item", "content", "value", "label", "name"]) {
+          if (typeof o[k] === "string" && String(o[k]).trim()) return String(o[k]).trim();
+        }
+      }
+      return "";
+    };
+    const a = columnA.map(coerce);
+    const b = columnB.map(coerce);
     const n = Math.max(a.length, b.length);
     while (a.length < n) a.push("");
     while (b.length < n) b.push("");

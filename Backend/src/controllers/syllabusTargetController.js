@@ -10,6 +10,14 @@ import {
   formatChapterPreview,
   normalizeMedium,
 } from "../services/foundationSyllabusHindi.js";
+import {
+  parseChapterPreviewLine,
+  resolveKbSubject,
+  createChapterPracticeTest,
+  createModuleFinalTestFromChapterBank,
+  prefetchNextChapter,
+  loadRelatedTopicsMap,
+} from "../services/chapterModulePractice.service.js";
 
 async function validateStudentIds(studentIds) {
   if (!Array.isArray(studentIds) || studentIds.length === 0) {
@@ -380,6 +388,26 @@ export const archiveSyllabusTarget = async (req, res) => {
   }
 };
 
+/** Foundation subject order (polity/P1 first), then natural module id (P1 < P2 < P10 < P16). */
+function compareTargetsBySyllabusOrder(a, b, subjectRank) {
+  const ra = subjectRank.has(a.subjectKey) ? subjectRank.get(a.subjectKey) : 999;
+  const rb = subjectRank.has(b.subjectKey) ? subjectRank.get(b.subjectKey) : 999;
+  if (ra !== rb) return ra - rb;
+  return String(a.moduleId || "").localeCompare(String(b.moduleId || ""), undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
+/**
+ * Student home order: syllabus sequence from P1.
+ * Completed modules stay in place (not removed / not dumped to the end).
+ */
+function sortStudentTargets(targets) {
+  const subjectRank = new Map(listSyllabusSubjects("en").map((s, i) => [s.key, i]));
+  return [...targets].sort((a, b) => compareTargetsBySyllabusOrder(a, b, subjectRank));
+}
+
 /**
  * GET /api/syllabus-targets/mine — student home
  */
@@ -391,39 +419,56 @@ export const listMySyllabusTargets = async (req, res) => {
     const records = await SyllabusModuleTarget.find({
       status: "active",
       assignedStudentIds: userId,
-    })
-      .sort({ dueDate: 1, updatedAt: -1 })
-      .lean();
+    }).lean();
 
-    const mapped = records.map((r) => {
-      const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
-      return {
-        _id: r._id,
-        subjectKey: r.subjectKey,
-        subjectName: r.subjectName,
-        moduleId: r.moduleId,
-        moduleName: r.moduleName,
-        medium: r.medium === "hi" ? "hi" : "en",
-        estimatedDays: r.estimatedDays,
-        estimatedHours: r.estimatedHours,
-        chapterRange: r.chapterRange || "",
-        durationLabel: r.durationLabel || "",
-        topicCount: r.topicCount,
-        topicsPreview: r.topicsPreview || [],
-        note: r.note || "",
-        dueDate: r.dueDate || null,
-        completed,
-        createdAt: r.createdAt,
-      };
-    });
+    const mapped = await Promise.all(
+      records.map(async (r) => {
+        const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
+        const chapterEntry = (r.chapterCompletions || []).find(
+          (c) => String(c.studentId) === String(userId)
+        );
+        const kbSubject = resolveKbSubject(r.subjectKey, r.subjectName);
+        const topicsPreview = r.topicsPreview || [];
+        let relatedTopicsByChapter = {};
+        try {
+          relatedTopicsByChapter = await loadRelatedTopicsMap(kbSubject, topicsPreview);
+        } catch {
+          relatedTopicsByChapter = {};
+        }
+        return {
+          _id: r._id,
+          subjectKey: r.subjectKey,
+          subjectName: r.subjectName,
+          moduleId: r.moduleId,
+          moduleName: r.moduleName,
+          medium: r.medium === "hi" ? "hi" : "en",
+          estimatedDays: r.estimatedDays,
+          estimatedHours: r.estimatedHours,
+          chapterRange: r.chapterRange || "",
+          durationLabel: r.durationLabel || "",
+          topicCount: r.topicCount,
+          topicsPreview,
+          completedChapters: chapterEntry?.chapters || [],
+          chaptersComplete:
+            topicsPreview.length > 0 &&
+            topicsPreview.every((line) => (chapterEntry?.chapters || []).includes(line)),
+          relatedTopicsByChapter,
+          note: r.note || "",
+          dueDate: r.dueDate || null,
+          completed,
+          createdAt: r.createdAt,
+        };
+      })
+    );
 
-    const active = mapped.filter((t) => !t.completed);
-    const completed = mapped.filter((t) => t.completed);
+    const sorted = sortStudentTargets(mapped);
+    const active = sorted.filter((t) => !t.completed);
+    const completed = sorted.filter((t) => t.completed);
 
     return res.json({
       success: true,
       data: {
-        targets: includeCompleted ? mapped : active,
+        targets: includeCompleted ? sorted : active,
         activeCount: active.length,
         completedCount: completed.length,
       },
@@ -453,23 +498,409 @@ export const toggleMySyllabusTargetComplete = async (req, res) => {
 
     const markComplete = req.body?.completed !== false;
     const already = (record.completedStudentIds || []).some((id) => String(id) === String(userId));
+    const topics = record.topicsPreview || [];
 
     if (markComplete && !already) {
       record.completedStudentIds = [...(record.completedStudentIds || []), userId];
+      // Mark every chapter complete when the whole module is checked
+      if (topics.length > 0) {
+        const idx = (record.chapterCompletions || []).findIndex(
+          (c) => String(c.studentId) === String(userId)
+        );
+        if (idx >= 0) {
+          record.chapterCompletions[idx].chapters = [...topics];
+        } else {
+          record.chapterCompletions = [
+            ...(record.chapterCompletions || []),
+            { studentId: userId, chapters: [...topics] },
+          ];
+        }
+        record.markModified("chapterCompletions");
+      }
     } else if (!markComplete && already) {
       record.completedStudentIds = (record.completedStudentIds || []).filter(
         (id) => String(id) !== String(userId)
       );
+      // Clear chapter ticks when the whole module is unchecked
+      const idx = (record.chapterCompletions || []).findIndex(
+        (c) => String(c.studentId) === String(userId)
+      );
+      if (idx >= 0) {
+        record.chapterCompletions[idx].chapters = [];
+        record.markModified("chapterCompletions");
+      }
     }
     await record.save();
+
+    const chapterEntry = (record.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
 
     return res.json({
       success: true,
       message: markComplete ? "Module marked complete" : "Module marked incomplete",
-      data: { _id: record._id, completed: markComplete },
+      data: {
+        _id: record._id,
+        completed: markComplete,
+        completedChapters: chapterEntry?.chapters || [],
+      },
     });
   } catch (error) {
     console.error("toggleMySyllabusTargetComplete:", error);
     return res.status(500).json({ success: false, message: error.message || "Failed to update" });
+  }
+};
+
+/**
+ * POST /api/syllabus-targets/:id/chapters/complete
+ * Body: { chapter: string, completed?: boolean }
+ * Toggle a single chapter within an assigned module (same check UX as module).
+ */
+export const toggleMySyllabusChapterComplete = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const chapter = typeof req.body?.chapter === "string" ? req.body.chapter.trim() : "";
+    if (!chapter) {
+      return res.status(400).json({ success: false, message: "Chapter is required" });
+    }
+
+    const record = await SyllabusModuleTarget.findById(req.params.id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Target not found" });
+    }
+
+    const isAssigned = (record.assignedStudentIds || []).some((id) => String(id) === String(userId));
+    if (!isAssigned) {
+      return res.status(403).json({ success: false, message: "This target is not assigned to you" });
+    }
+
+    const topics = record.topicsPreview || [];
+    if (topics.length > 0 && !topics.includes(chapter)) {
+      return res.status(400).json({ success: false, message: "Chapter is not part of this module" });
+    }
+
+    const markComplete = req.body?.completed !== false;
+    let entry = (record.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
+    if (!entry) {
+      record.chapterCompletions.push({ studentId: userId, chapters: [] });
+      entry = record.chapterCompletions[record.chapterCompletions.length - 1];
+    }
+
+    const set = new Set(entry.chapters || []);
+    if (markComplete) set.add(chapter);
+    else set.delete(chapter);
+    entry.chapters = [...set];
+    record.markModified("chapterCompletions");
+
+    // Module unlock requires Module Final (50Q) — do NOT auto-complete module when chapters finish.
+    // If a chapter is unmarked, clear module-complete so next module locks again.
+    const allChaptersDone = topics.length > 0 && topics.every((t) => set.has(t));
+    const alreadyModule = (record.completedStudentIds || []).some(
+      (id) => String(id) === String(userId)
+    );
+    if (!allChaptersDone && alreadyModule) {
+      record.completedStudentIds = (record.completedStudentIds || []).filter(
+        (id) => String(id) !== String(userId)
+      );
+    }
+
+    await record.save();
+
+    return res.json({
+      success: true,
+      message: markComplete ? "Chapter marked complete" : "Chapter marked incomplete",
+      data: {
+        _id: record._id,
+        chapter,
+        completedChapters: [...(entry.chapters || [])],
+        chaptersComplete: allChaptersDone,
+        completed: (record.completedStudentIds || []).some(
+          (id) => String(id) === String(userId)
+        ),
+      },
+    });
+  } catch (error) {
+    console.error("toggleMySyllabusChapterComplete:", error);
+    return res.status(500).json({ success: false, message: error.message || "Failed to update chapter" });
+  }
+};
+
+/**
+ * POST /api/syllabus-targets/:id/chapters/practice
+ * Body: { chapter: string }
+ * Generate 25 Hard RAG MCQs (5×5 batches), show 20 (does NOT unlock next chapter —
+ * unlock happens when the student submits the test via chapters/complete).
+ * Prefetches related UPSC topics for the *next* chapter into cache.
+ */
+export const startChapterPractice = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const chapter = typeof req.body?.chapter === "string" ? req.body.chapter.trim() : "";
+    if (!chapter) {
+      return res.status(400).json({ success: false, message: "Chapter is required" });
+    }
+
+    const record = await SyllabusModuleTarget.findById(req.params.id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Target not found" });
+    }
+
+    const isAssigned = (record.assignedStudentIds || []).some((id) => String(id) === String(userId));
+    if (!isAssigned) {
+      return res.status(403).json({ success: false, message: "This target is not assigned to you" });
+    }
+
+    const topics = record.topicsPreview || [];
+    if (topics.length > 0 && !topics.includes(chapter)) {
+      return res.status(400).json({ success: false, message: "Chapter is not part of this module" });
+    }
+
+    // Module lock: previous assigned module (syllabus order) must be fully complete
+    const allAssigned = await SyllabusModuleTarget.find({
+      status: "active",
+      assignedStudentIds: userId,
+    }).lean();
+    const subjectRank = new Map(listSyllabusSubjects("en").map((s, i) => [s.key, i]));
+    const orderedModules = allAssigned
+      .map((r) => ({
+        _id: r._id,
+        subjectKey: r.subjectKey,
+        moduleId: r.moduleId,
+        moduleName: r.moduleName,
+        completed: (r.completedStudentIds || []).some((id) => String(id) === String(userId)),
+      }))
+      .sort((a, b) => compareTargetsBySyllabusOrder(a, b, subjectRank));
+    const moduleIdx = orderedModules.findIndex((m) => String(m._id) === String(record._id));
+    if (moduleIdx > 0 && !orderedModules[moduleIdx - 1].completed) {
+      const prev = orderedModules[moduleIdx - 1];
+      return res.status(403).json({
+        success: false,
+        message: `Complete previous module first: ${prev.moduleId} ${prev.moduleName}`,
+      });
+    }
+
+    // Sequential lock: previous chapter must be completed (test submitted) first
+    const chapterIdx = topics.indexOf(chapter);
+    if (chapterIdx > 0) {
+      const entry = (record.chapterCompletions || []).find(
+        (c) => String(c.studentId) === String(userId)
+      );
+      const doneSet = new Set(entry?.chapters || []);
+      const prev = topics[chapterIdx - 1];
+      if (!doneSet.has(prev)) {
+        return res.status(403).json({
+          success: false,
+          message: `Complete and submit the previous chapter test first: ${prev}`,
+        });
+      }
+    }
+
+    const parsed = parseChapterPreviewLine(chapter);
+    const topicName = parsed.topicName;
+    if (!topicName) {
+      return res.status(400).json({ success: false, message: "Could not read chapter topic" });
+    }
+
+    const kbSubject = resolveKbSubject(record.subjectKey, record.subjectName);
+
+    const payload = {
+      targetId: String(record._id),
+      subjectKey: record.subjectKey,
+      subjectName: record.subjectName,
+      moduleId: record.moduleId,
+      moduleName: record.moduleName,
+      chapter,
+      chapterNum: parsed.chapterNum || null,
+      topicName,
+      kbSubject,
+      difficulty: "Hard",
+      generateCount: 25,
+      showCount: 20,
+      batchSize: 5,
+      batches: "5×5",
+      extraForDedupe: 5,
+      userId: String(userId),
+    };
+    console.log("\n========== [chapterPractice] REQUEST PAYLOAD ==========");
+    console.log(JSON.stringify(payload, null, 2));
+    console.log("=======================================================\n");
+
+    // Related topics already cached for *this* chapter (from a previous student's next-chapter prefetch)
+    let relatedTopics = [];
+    try {
+      const map = await loadRelatedTopicsMap(kbSubject, [chapter]);
+      relatedTopics = map[chapter] || [];
+    } catch {
+      relatedTopics = [];
+    }
+
+    const { test, fromCache } = await createChapterPracticeTest({
+      userId,
+      kbSubject,
+      topicName,
+      chapterLabel: chapter,
+    });
+
+    console.log("[chapterPractice] test created", {
+      testId: String(test._id),
+      fromCache,
+      topic: topicName,
+      questions: test.totalQuestions,
+    });
+
+    // Prefetch next chapter related topics + warm question cache (non-blocking)
+    const nextLabel = chapterIdx >= 0 && chapterIdx < topics.length - 1 ? topics[chapterIdx + 1] : null;
+    if (nextLabel) {
+      void prefetchNextChapter({
+        subjectKey: record.subjectKey,
+        kbSubject,
+        currentLabel: chapter,
+        nextLabel,
+      }).catch((err) => console.warn("[startChapterPractice] prefetch:", err.message));
+    }
+
+    const entry = (record.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: fromCache
+        ? "Chapter practice ready (cached questions)"
+        : "Chapter practice generated from Knowledge Base",
+      data: {
+        testId: test._id,
+        test,
+        fromCache,
+        chapter,
+        topicName,
+        kbSubject,
+        relatedTopics,
+        nextChapter: nextLabel,
+        completedChapters: entry?.chapters || [],
+        completed: (record.completedStudentIds || []).some((id) => String(id) === String(userId)),
+        payload,
+      },
+    });
+  } catch (error) {
+    console.error("startChapterPractice:", error);
+    const status = error.status || error.statusCode || 500;
+    return res.status(status).json({
+      success: false,
+      message: error.message || "Failed to start chapter practice",
+    });
+  }
+};
+
+/**
+ * POST /api/syllabus-targets/:id/module-final
+ * All chapter tests done → 50Q module final:
+ * reuse chapter-bank questions from DB, RAG-generate only the shortfall.
+ * Submit of this test marks the module complete and unlocks the next module.
+ */
+export const startModuleFinal = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const record = await SyllabusModuleTarget.findById(req.params.id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Target not found" });
+    }
+
+    const isAssigned = (record.assignedStudentIds || []).some((id) => String(id) === String(userId));
+    if (!isAssigned) {
+      return res.status(403).json({ success: false, message: "This target is not assigned to you" });
+    }
+
+    const topics = record.topicsPreview || [];
+    const entry = (record.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
+    const doneSet = new Set(entry?.chapters || []);
+    const chaptersComplete = topics.length > 0 && topics.every((t) => doneSet.has(t));
+    if (!chaptersComplete) {
+      return res.status(400).json({
+        success: false,
+        message: "Complete all chapter tests in this module before the Module Final",
+      });
+    }
+
+    // Previous module must be complete (same lock as chapter practice)
+    const allAssigned = await SyllabusModuleTarget.find({
+      status: "active",
+      assignedStudentIds: userId,
+    }).lean();
+    const subjectRank = new Map(listSyllabusSubjects("en").map((s, i) => [s.key, i]));
+    const orderedModules = allAssigned
+      .map((r) => ({
+        _id: r._id,
+        subjectKey: r.subjectKey,
+        moduleId: r.moduleId,
+        moduleName: r.moduleName,
+        completed: (r.completedStudentIds || []).some((id) => String(id) === String(userId)),
+      }))
+      .sort((a, b) => compareTargetsBySyllabusOrder(a, b, subjectRank));
+    const moduleIdx = orderedModules.findIndex((m) => String(m._id) === String(record._id));
+    if (moduleIdx > 0 && !orderedModules[moduleIdx - 1].completed) {
+      const prev = orderedModules[moduleIdx - 1];
+      return res.status(403).json({
+        success: false,
+        message: `Complete previous module first: ${prev.moduleId} ${prev.moduleName}`,
+      });
+    }
+
+    const kbSubject = resolveKbSubject(record.subjectKey, record.subjectName);
+    const payload = {
+      targetId: String(record._id),
+      subjectKey: record.subjectKey,
+      moduleId: record.moduleId,
+      moduleName: record.moduleName,
+      chapterCount: topics.length,
+      chapters: topics,
+      questionCount: 50,
+      source: "chapter_bank_plus_rag_topup",
+      userId: String(userId),
+    };
+    console.log("\n========== [moduleFinal] REQUEST PAYLOAD ==========");
+    console.log(JSON.stringify(payload, null, 2));
+    console.log("===================================================\n");
+
+    const { test } = await createModuleFinalTestFromChapterBank({
+      userId,
+      kbSubject,
+      moduleId: record.moduleId,
+      moduleName: record.moduleName,
+      chapterLabels: topics,
+      showCount: 50,
+    });
+
+    const bankPart = test.bankCount != null ? test.bankCount : null;
+    const genPart = test.generatedCount || 0;
+    const detail =
+      genPart > 0
+        ? `${test.totalQuestions}Q ready (${Math.min(bankPart ?? test.totalQuestions, 50)} from chapter bank + ${genPart} newly generated)`
+        : `${test.totalQuestions} questions shuffled from chapter bank`;
+
+    return res.status(201).json({
+      success: true,
+      message: `Module Final ready — ${detail}`,
+      data: {
+        testId: test._id,
+        test,
+        chaptersComplete: true,
+        completed: (record.completedStudentIds || []).some(
+          (id) => String(id) === String(userId)
+        ),
+        payload,
+      },
+    });
+  } catch (error) {
+    console.error("startModuleFinal:", error);
+    const status = error.status || error.statusCode || 500;
+    return res.status(status).json({
+      success: false,
+      message: error.message || "Failed to start module final",
+    });
   }
 };

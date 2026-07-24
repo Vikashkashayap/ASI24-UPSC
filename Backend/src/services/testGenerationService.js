@@ -22,6 +22,8 @@ import {
 import {
   ensureEnglishBilingualFields,
   pickBilingualQuestionFields,
+  coerceListItemText,
+  filterStudentReadyQuestions,
 } from "./questionTranslationService.js";
 import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
 import { retrieverService } from "./ai/retriever.service.js";
@@ -52,6 +54,8 @@ async function generateTestQuestionsFromKnowledgeBase({
   topic,
   questionCount,
   difficulty = "Moderate",
+  batchSize: batchSizeOverride,
+  minAcceptable,
 }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -59,6 +63,10 @@ async function generateTestQuestionsFromKnowledgeBase({
   }
 
   const count = parseInt(questionCount, 10) || 20;
+  const minKeep = Math.min(
+    count,
+    Math.max(1, parseInt(minAcceptable != null ? minAcceptable : count, 10) || count)
+  );
   const subjectsList = Array.isArray(subjects) ? subjects : [subjects];
   const primarySubject = String(subjectsList[0] || "").trim();
   const topicQuery = String(topic || "").trim();
@@ -87,11 +95,17 @@ async function generateTestQuestionsFromKnowledgeBase({
     patternsToInclude: selectedPatterns,
   });
 
-  const batchSize = Math.min(
-    count,
-    Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8),
-    parseInt(process.env.QG_MAX_QUESTIONS_PER_CALL, 10) || 10
-  );
+  const forcedBatch =
+    batchSizeOverride != null && Number.isFinite(Number(batchSizeOverride))
+      ? Math.min(Math.max(1, parseInt(batchSizeOverride, 10)), count)
+      : null;
+  const batchSize =
+    forcedBatch ||
+    Math.min(
+      count,
+      Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8),
+      parseInt(process.env.QG_MAX_QUESTIONS_PER_CALL, 10) || 10
+    );
   const maxBatchRounds = getTestGenMaxBatchRounds(count, batchSize);
   const usedChunkIds = new Set();
   let validatedQuestions = [];
@@ -99,7 +113,7 @@ async function generateTestQuestionsFromKnowledgeBase({
   let openKnowledgeUsed = false;
 
   console.log(
-    `📚 Prelims RAG: ${count}Q | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey}`
+    `📚 Prelims RAG: ${count}Q | batchSize=${batchSize} (~${Math.ceil(count / batchSize)} batches) | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey}`
   );
 
   for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
@@ -190,9 +204,15 @@ async function generateTestQuestionsFromKnowledgeBase({
     );
   }
 
-  if (validatedQuestions.length < count) {
+  if (validatedQuestions.length < minKeep) {
     throw new Error(
       `Only ${validatedQuestions.length} of ${count} questions could be grounded in Knowledge Base for "${topicQuery}". Sync more content or try a broader topic.`
+    );
+  }
+
+  if (validatedQuestions.length < count) {
+    console.warn(
+      `⚠️ Prelims RAG: got ${validatedQuestions.length}/${count} (acceptable ≥${minKeep}) — continuing`
     );
   }
 
@@ -329,11 +349,12 @@ Return ONLY a JSON array. Each item: { "id": number, "explanation": string }.
 
 HARD RULES for every explanation:
 1. Exactly 50–70 English words (count carefully).
-2. MUST start with: Option {answer} ("{correctOptionText}") is correct.
-3. Defend ONLY that answer letter — never claim another letter is correct.
-4. Include 1–2 concrete UPSC-style facts (names, years, articles, schemes, places, committees, or causes/effects) grounded in the question domain / sourceHint.
-5. Briefly say why 1–2 wrong options fail (aspirant-level distractors).
-6. No markdown, no Hindi, no bullet points. Same id order/count as input.`;
+2. The given "answer" letter and "correctOptionText" are LOCKED — do not change which option is correct.
+3. MUST start with: Option {answer} ("{correctOptionText}") is correct.
+4. Defend ONLY that answer letter — never claim another letter is correct; never rewrite so Option X looks right when answer is Y.
+5. Include 1–2 concrete UPSC-style facts (names, years, articles, schemes, places, committees, or causes/effects) grounded in the question domain / sourceHint.
+6. Briefly say why 1–2 wrong options fail (aspirant-level distractors).
+7. No markdown, no Hindi, no bullet points. Same id order/count as input.`;
 
   const chunkSize = 5;
   for (let start = 0; start < payload.length; start += chunkSize) {
@@ -393,18 +414,29 @@ function usesCompactFullMockPrompts() {
   return process.env.TEST_GEN_FULL_MOCK_VERBOSE !== "true";
 }
 
+/** Compact but strict: answer letter ↔ option text ↔ explanation must never disagree. */
+const ANSWER_OPTION_LOCK = `
+ANSWER↔OPTION LOCK (mandatory — never ship a mismatch):
+1. Decide the correct OPTION TEXT first, then place it under one letter (A|B|C|D).
+2. Set "answer" to THAT letter only. Do not pick a letter first then invent text.
+3. explanation must defend ONLY that letter (start: Option {answer} ("{exact options text}") is correct).
+4. Never say Option X is correct when answer is Y. Never swap option texts after setting answer.
+5. Self-check before emit: options[answer] is the true correct text.`;
+
 const PRELIMS_COMPACT_JSON_RULES = `
 JSON array only. Each object (no extra text):
 - question_en, question_hi (Devanagari, same meaning)
-- options_en, options_hi: { "A","B","C","D" }
-- answer: A|B|C|D
-- explanation: one short English sentence why the correct option is right (max 25 words). Do NOT include explanation_hi.`;
+- options_en, options_hi: { "A","B","C","D" } — letter mapping identical in EN/HI (A_hi translates A_en, never reorder)
+- answer: A|B|C|D — letter of the correct option text
+- explanation: one short English sentence why the correct option is right (max 25 words). Do NOT include explanation_hi.
+${ANSWER_OPTION_LOCK}`;
 
 const BILINGUAL_JSON_RULES_FULL = `
 BILINGUAL OUTPUT (English + Hindi in the SAME object):
-- question_en, question_hi, options_en, options_hi (same meaning in Hindi)
-- explanation_en, explanation_hi: { "A","B","C","D" } — one brief sentence per option
-- answer: A|B|C|D`;
+- question_en, question_hi, options_en, options_hi (same meaning in Hindi; same letter→text mapping)
+- explanation_en, explanation_hi: { "A","B","C","D" } — one brief sentence per option; correct letter's sentence must defend that letter
+- answer: A|B|C|D
+${ANSWER_OPTION_LOCK}`;
 
 /** Full bilingual schema for full-mock generators. */
 const BILINGUAL_JSON_RULES = BILINGUAL_JSON_RULES_FULL;
@@ -415,7 +447,8 @@ function getPrelimsJsonRules() {
 
 function getPracticeJsonRules() {
   if (isPracticeEnglishOnly()) {
-    return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D), explanation (max 15 words, correct option only).`;
+    return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D = letter of correct option text), explanation (max 15 words, defend that same letter only).
+${ANSWER_OPTION_LOCK}`;
   }
   return getPrelimsJsonRules();
 }
@@ -430,13 +463,14 @@ function practiceBatchJsonNote() {
  */
 function finalizeGeneratedQuestions(questions) {
   const normalized = questions.map(ensureEnglishBilingualFields);
-  const withHindi = normalized.filter(
+  const ready = filterStudentReadyQuestions(normalized);
+  const withHindi = ready.filter(
     (q) => String(q.question_hi || "").trim() && String(q.options_hi?.A || "").trim()
   ).length;
   console.log(
-    `✅ ${normalized.length} question(s) ready (${withHindi} with Hindi from single API call, no translation pass)`
+    `✅ ${ready.length}/${normalized.length} question(s) student-ready (${withHindi} with Hindi; blank/incomplete stems dropped)`
   );
-  return normalized;
+  return ready;
 }
 
 /** Generate unique question ID for deduplication (hash of normalized question text). */
@@ -638,12 +672,13 @@ function buildPrelimsGSSystemPrompt(subjects, topic, difficulty, currentAffairsP
   }
 
   const explLine = usesFullBilingualExplanations()
-    ? "Include explanation_en and explanation_hi for all four options (one short sentence each)."
-    : 'Include "explanation": one short English sentence for why the correct option is right.';
+    ? "Include explanation_en and explanation_hi for all four options (one short sentence each). Correct letter's sentence must defend that letter only."
+    : 'Include "explanation": one short English sentence defending ONLY the answer letter + its option text.';
 
   return `UPSC Prelims GS Paper-I MCQ generator. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}.${extra}
 
 Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–5 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, chronology (3 options only), which correct/incorrect. Concise stems.
+${ANSWER_OPTION_LOCK}
 
 ${getPrelimsJsonRules()}
 ${explLine}
@@ -657,12 +692,13 @@ function buildPrelimsCSATSystemPrompt(csatCategories, topic) {
       : "Quantitative Aptitude, Logical Reasoning, Reading Comprehension, Data Interpretation";
 
   const explLine = usesFullBilingualExplanations()
-    ? "Include explanation_en and explanation_hi per option."
-    : 'Include "explanation": one short English sentence for the correct option.';
+    ? "Include explanation_en and explanation_hi per option. Correct letter must defend that letter only."
+    : 'Include "explanation": one short English sentence defending ONLY the answer letter.';
 
   return `UPSC Prelims CSAT MCQ generator. Categories: ${categoriesText}. Topic: ${topic}.
 
 Rules: 4 options, single correct answer, clear exam-style wording.
+${ANSWER_OPTION_LOCK}
 
 ${getPrelimsJsonRules()}
 ${explLine}
@@ -2488,7 +2524,7 @@ Subject: ${subject}. Topic: "${topic}". Difficulty: ${diffLine}.
 Patterns (balanced, topic-focused): ${patterns}.
 ${getPracticeJsonRules()}
 Per question: questionType (statement|match|assertion|chronology|pair|map|direct|odd_one_out). Use matchColumns or assertionReason only when needed.
-"explanation": one short English sentence for the correct option only (max 15 words).${bilingualNote}
+"explanation": one short English sentence for the correct option only (max 15 words) — must match "answer" letter + that option's text.${bilingualNote}
 Return ONLY a JSON array. No markdown. Unique concept per question.`;
 }
 
@@ -2523,8 +2559,8 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
   // Structured match columns first (prevents List-I/II merge bug)
   const mcHi = row.matchColumns_hi || row.matchColumns;
   if (mcHi && typeof mcHi === "object") {
-    const columnA = (mcHi.columnA || []).map((x) => String(x || "").trim()).filter(Boolean);
-    const columnB = (mcHi.columnB || []).map((x) => String(x || "").trim()).filter(Boolean);
+    const columnA = (mcHi.columnA || []).map((x) => coerceListItemText(x)).filter(Boolean);
+    const columnB = (mcHi.columnB || []).map((x) => coerceListItemText(x)).filter(Boolean);
     if (columnA.length >= 2 && columnB.length >= 2) {
       mergedQ.matchColumns_hi = { columnA, columnB };
       const intro = questionHi.split("\n")[0] || "निम्नलिखित का मिलान कीजिए:";
@@ -2540,7 +2576,7 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
   } else {
     // Rebuild statement/chronology Hindi stem from numberedItems_hi when present
     const numberedHi = Array.isArray(row.numberedItems_hi)
-      ? row.numberedItems_hi.map((x) => String(x || "").trim()).filter(Boolean)
+      ? row.numberedItems_hi.map((x) => coerceListItemText(x)).filter(Boolean)
       : [];
     const enFull = String(mergedQ.question_en || mergedQ.question || "").replace(/\\n/g, "\n");
     const enHasNumbers = ((enFull.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length) >= 2;
@@ -2559,7 +2595,7 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
       }
       mergedQ.question_hi = lines.join("\n");
       appliedStem = true;
-    } else if (questionHi && /[\u0900-\u097F]/.test(questionHi)) {
+    } else if (questionHi && /[\u0900-\u097F]/.test(questionHi) && !/\[object Object\]/i.test(questionHi)) {
       const hiNums = (questionHi.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
       // Do not save intro-only Hindi when English stem has numbered items
       if (enHasNumbers && hiNums < 2) {
@@ -2574,13 +2610,17 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
           if (parsedHi?.columnA?.length >= 2 && parsedHi?.columnB?.length >= 2) {
             mergedQ.matchColumns_hi = {
               columnA: parsedHi.columnA.map((t) =>
-                String(t).replace(/\s+\d+[.)]\s+[\s\S]*$/, "").trim()
+                coerceListItemText(t).replace(/\s+\d+[.)]\s+[\s\S]*$/, "").trim()
               ),
-              columnB: parsedHi.columnB,
+              columnB: parsedHi.columnB.map((t) => coerceListItemText(t)),
             };
           }
         }
       }
+    } else if (/\[object Object\]/i.test(questionHi)) {
+      console.warn(
+        `⚠️ Skipping corrupted Hindi stem for ${srcLabel} ([object Object] in numbered items)`
+      );
     }
   }
 
@@ -2618,8 +2658,9 @@ async function translatePracticeHindiIndexBatch(apiKey, model, merged, indices, 
 
     const systemPrompt = `UPSC Hindi translator. Return JSON array only.
 For each item return: id, question_hi, options_hi {A,B,C,D}, explanation_hi (50–70 Devanagari words; full teaching explanation, not one line).
-If matchColumns present: also matchColumns_hi:{columnA:[],columnB:[]} (same lengths; never merge lists).
-If numberedItems present: translate EACH item and return numberedItems_hi:[...] same length — question_hi MUST include intro + "1. ..\\n2. .." lines from numberedItems_hi (never intro-only).
+LETTER LOCK: options_hi.A MUST translate options.A (same for B/C/D). Never swap, reorder, or move text between letters — correctAnswer letter stays valid.
+If matchColumns present: also matchColumns_hi:{columnA:[],columnB:[]} — each entry a PLAIN STRING (never an object).
+If numberedItems present: return numberedItems_hi as an array of PLAIN STRINGS only (e.g. ["कथन एक","कथन दो"]) — NEVER objects like {"text":"..."}. Same length as numberedItems. question_hi MUST include intro + "1. ..\\n2. .." lines from those strings (never intro-only, never "[object Object]").
 Same count/order. No markdown.`;
   const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
   const maxTokens = getMaxTokensForPracticeHindiBatch(slice.length);
@@ -2965,6 +3006,8 @@ export const generateTestQuestions = async ({
   difficulty = "Moderate",
   csatCategories,
   currentAffairsPeriod,
+  batchSize: batchSizeParam,
+  minAcceptable,
 }) => {
   try {
     if (isPrelimsRagEnabled(examType)) {
@@ -2973,6 +3016,8 @@ export const generateTestQuestions = async ({
         topic,
         questionCount,
         difficulty,
+        batchSize: batchSizeParam,
+        minAcceptable,
       });
     }
 
@@ -2992,10 +3037,13 @@ export const generateTestQuestions = async ({
         ? buildPrelimsCSATSystemPrompt(csatCategories || [], topic)
         : buildPrelimsGSSystemPrompt(subjectsList, topic, difficulty, currentAffairsPeriod);
 
-    const batchSize = Math.min(
-      count,
-      Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8)
-    );
+    const batchSize =
+      batchSizeParam != null && Number.isFinite(Number(batchSizeParam))
+        ? Math.min(Math.max(1, parseInt(batchSizeParam, 10)), count)
+        : Math.min(
+            count,
+            Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8)
+          );
     let validatedQuestions = [];
     let apiCalls = 0;
     const maxBatchRounds = getTestGenMaxBatchRounds(count, batchSize);

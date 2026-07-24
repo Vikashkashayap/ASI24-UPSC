@@ -40,26 +40,58 @@ export function getQuestionEnglish(q: BilingualQuestionFields): string {
   return (q.question_en || q.question || "").trim();
 }
 
+/** True when stem was corrupted by String(object) or blank placeholders during generation. */
+export function isCorruptedStemText(text: string): boolean {
+  const s = String(text || "");
+  if (/\[object Object\]/i.test(s)) return true;
+  const markers = [...s.replace(/\\n/g, "\n").matchAll(/(?:^|\n)\s*\d+[.)]\s+/g)];
+  if (markers.length < 2) return false;
+  let blank = 0;
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index! + markers[i][0].length;
+    const end = i + 1 < markers.length ? markers[i + 1].index! : s.length;
+    const body = (s.slice(start, end).trim().split(/\n/)[0] || "").trim();
+    if (
+      !body ||
+      body === "[object Object]" ||
+      /^(?:[—–\-−•·.…]{1,6}|n\/?a|tbd|\.\.\.|…)$/i.test(body)
+    ) {
+      blank += 1;
+    }
+  }
+  return blank >= 2;
+}
+
 /** Hindi stem — no English fallback when strict (exam Hindi toggle). */
 export function getQuestionHindi(
   q: BilingualQuestionFields,
   { strict = true }: { strict?: boolean } = {}
 ): string {
   const hi = (q.question_hi || "").trim();
+  // Broken Hindi (e.g. "1. [object Object]") — fall back to English so statements remain readable
+  if (hi && isCorruptedStemText(hi)) {
+    return getQuestionEnglish(q);
+  }
   if (hi) return hi;
   if (strict) return "";
   return getQuestionEnglish(q);
 }
 
 export function hasStoredHindiQuestion(q: BilingualQuestionFields): boolean {
-  if (q.hasHindi === true) return true;
+  if (q.hasHindi === true) {
+    const hiStem = (q.question_hi || "").trim();
+    if (hiStem && isCorruptedStemText(hiStem)) return false;
+    return true;
+  }
   const hiStem = (q.question_hi || "").trim();
-  if (!hiStem) return false;
+  if (!hiStem || isCorruptedStemText(hiStem)) return false;
   return OPTION_KEYS.every((key) => Boolean(flatOptionHi(q, key)));
 }
 
 export function hasDistinctHindiQuestion(q: BilingualQuestionFields): boolean {
-  const hi = (q.question_hi || "").trim();
+  const hiRaw = (q.question_hi || "").trim();
+  if (!hiRaw || isCorruptedStemText(hiRaw)) return false;
+  const hi = getQuestionHindi(q, { strict: true });
   const en = getQuestionEnglish(q);
   return Boolean(hi && en && hi !== en);
 }

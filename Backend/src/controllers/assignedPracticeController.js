@@ -581,15 +581,20 @@ function buildListDisplayTitle(record) {
 
 /**
  * GET /api/admin/assigned-practice
- * Query: page, limit, filter=all|assigned|unassigned
+ * Query: page, limit, filter=all|assigned|unassigned, subject (optional)
  */
 export const listAdminAssignedPractice = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(String(req.query.page || "1"), 10) || 1);
     const limit = Math.min(50, Math.max(1, parseInt(String(req.query.limit || "10"), 10) || 10));
     const filter = String(req.query.filter || "all").toLowerCase();
+    const subject = String(req.query.subject || "").trim();
 
     const query = {};
+    if (subject) {
+      const escaped = subject.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      query.subject = new RegExp(`^${escaped}$`, "i");
+    }
     if (filter === "assigned") {
       query.assignedStudentIds = { $exists: true, $not: { $size: 0 } };
     } else if (filter === "unassigned") {

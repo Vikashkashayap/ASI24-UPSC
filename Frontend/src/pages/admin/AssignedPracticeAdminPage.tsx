@@ -192,6 +192,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const [list, setList] = useState<AssignedPracticeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [listFilter, setListFilter] = useState<"all" | "unassigned" | "assigned">("all");
+  const [listSubject, setListSubject] = useState("");
   const [listPage, setListPage] = useState(1);
   const LIST_PAGE_SIZE = 5;
   const [listPagination, setListPagination] = useState<ListPagination | null>(null);
@@ -215,7 +216,7 @@ export const AssignedPracticeAdminPage: React.FC = () => {
 
   useEffect(() => {
     loadList();
-  }, [listPage, listFilter]);
+  }, [listPage, listFilter, listSubject]);
 
   /** Apply Syllabus Targets → Topic Practice handoff once notes subjects are ready. */
   useEffect(() => {
@@ -504,15 +505,21 @@ export const AssignedPracticeAdminPage: React.FC = () => {
     }
   };
 
-  const loadList = async (override?: { page?: number; filter?: "all" | "unassigned" | "assigned" }) => {
+  const loadList = async (override?: {
+    page?: number;
+    filter?: "all" | "unassigned" | "assigned";
+    subject?: string;
+  }) => {
     const page = override?.page ?? listPage;
     const filter = override?.filter ?? listFilter;
+    const subjectFilter = override?.subject ?? listSubject;
     try {
       setLoading(true);
       const res = await assignedPracticeAPI.listAdmin({
         page,
         limit: LIST_PAGE_SIZE,
         filter,
+        ...(subjectFilter ? { subject: subjectFilter } : {}),
       });
       if (res.data.success) {
         setList(res.data.data || []);
@@ -554,6 +561,11 @@ export const AssignedPracticeAdminPage: React.FC = () => {
 
   const setFilterAndResetPage = (f: "all" | "unassigned" | "assigned") => {
     setListFilter(f);
+    setListPage(1);
+  };
+
+  const setSubjectAndResetPage = (s: string) => {
+    setListSubject(s);
     setListPage(1);
   };
 
@@ -2245,21 +2257,40 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   : "Generated tests — assign unassigned ones or review assigned."}
               </CardDescription>
             </div>
-            <div className="flex rounded-lg border overflow-hidden text-xs font-medium shrink-0">
-              {(["all", "unassigned", "assigned"] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setFilterAndResetPage(f)}
-                  className={`px-3 py-1.5 capitalize transition-colors ${
-                    listFilter === f
-                      ? "bg-blue-600 text-white"
-                      : isDark ? "bg-slate-800 text-slate-400 hover:bg-slate-700" : "bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <select
+                value={listSubject}
+                onChange={(e) => setSubjectAndResetPage(e.target.value)}
+                className={`text-xs font-medium rounded-lg border px-2.5 py-1.5 min-w-[140px] ${
+                  isDark
+                    ? "bg-slate-800 border-slate-600 text-slate-200"
+                    : "bg-white border-slate-200 text-slate-700"
+                }`}
+                aria-label="Filter by subject"
+              >
+                <option value="">All subjects</option>
+                {notesSubjects.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+              <div className="flex rounded-lg border overflow-hidden text-xs font-medium">
+                {(["all", "unassigned", "assigned"] as const).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFilterAndResetPage(f)}
+                    className={`px-3 py-1.5 capitalize transition-colors ${
+                      listFilter === f
+                        ? "bg-blue-600 text-white"
+                        : isDark ? "bg-slate-800 text-slate-400 hover:bg-slate-700" : "bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -2270,7 +2301,11 @@ export const AssignedPracticeAdminPage: React.FC = () => {
             </div>
           ) : list.length === 0 ? (
             <p className={`text-sm py-6 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              {listFilter === "all" ? "No practice tests yet. Generate one above." : `No ${listFilter} tests.`}
+              {listSubject
+                ? `No ${listFilter === "all" ? "" : `${listFilter} `}tests for ${listSubject}.`
+                : listFilter === "all"
+                ? "No practice tests yet. Generate one above."
+                : `No ${listFilter} tests.`}
             </p>
           ) : (
             <>

@@ -17,15 +17,17 @@ ABSOLUTE RULES:
 ═══════════════════════════════════════════════════════════
 CRITICAL CONSISTENCY LOCK (students must never see a mismatch)
 ═══════════════════════════════════════════════════════════
-Follow this order for EVERY question:
-STEP 1 — Write options A–D. Exactly ONE option TEXT is correct per CONTEXT.
-STEP 2 — Set correctAnswer to the LETTER of that correct option text.
-STEP 3 — distractorRationale for the correct letter = "correct"; for others explain why tempting.
+Follow this order for EVERY question — NEVER reverse it:
+STEP 1 — Decide the SINGLE correct OPTION TEXT from CONTEXT.
+STEP 2 — Write options A–D; put that correct text under EXACTLY one letter.
+STEP 3 — Set correctAnswer to THAT letter only.
+STEP 4 — distractorRationale for the correct letter = "correct"; for others explain why tempting.
 
 SELF-CHECK before emit:
 □ correctAnswer ∈ {A,B,C,D}
-□ correctAnswer points to the option TEXT that CONTEXT supports
-□ Do NOT mark letter X if option Y's text is the real answer
+□ options[correctAnswer] is the option TEXT that CONTEXT supports
+□ Do NOT mark letter X if option Y's text is the real answer — fix correctAnswer instead
+□ Never shuffle option texts after setting correctAnswer
 □ Options are mutually exclusive (exactly one correct)
 
 FORBIDDEN: marking B when A's text is the true answer.
@@ -60,7 +62,7 @@ OUTPUT JSON:
   "distractorRationale":{"A":"why tempting or 'correct'","B":"...","C":"...","D":"..."}
 }]}
 
-STEM RULE: For pair_matching, "question" MUST include List-I and List-II item lines (A. … / 1. …), not only "Match the following". For statements/chronology, numbered items MUST be inside "question". Never leave "question" blank.`;
+STEM RULE: For pair_matching, "question" MUST include List-I and List-II item lines (A. … / 1. …), not only "Match the following". For statements/chronology, numbered items MUST be inside "question" as FULL plain-string sentences (never "1. —", never blank, never objects). statements[] / chronologyItems[] / matchColumns items MUST be plain strings only. Never leave "question" blank. Prefer HARD UPSC Prelims aspirant level.`;
 }
 
 export function buildQuestionUserPrompt({

@@ -543,8 +543,12 @@ export const assignedPracticeAPI = {
   getById: (id: string) => api.get(`/api/admin/assigned-practice/${id}`),
   assign: (id: string, studentIds: string[]) =>
     api.post(`/api/admin/assigned-practice/${id}/assign`, { studentIds }),
-  listAdmin: (params?: { page?: number; limit?: number; filter?: "all" | "assigned" | "unassigned" }) =>
-    api.get("/api/admin/assigned-practice", { params }),
+  listAdmin: (params?: {
+    page?: number;
+    limit?: number;
+    filter?: "all" | "assigned" | "unassigned";
+    subject?: string;
+  }) => api.get("/api/admin/assigned-practice", { params }),
   delete: (id: string) => api.delete(`/api/admin/assigned-practice/${id}`),
   updateQuestion: (id: string, index: number, data: Partial<PreviewQuestion>) =>
     api.patch(`/api/admin/assigned-practice/${id}/questions/${index}`, data),
@@ -641,6 +645,12 @@ export interface StudentSyllabusTarget {
   durationLabel?: string;
   topicCount: number;
   topicsPreview: string[];
+  /** Chapter preview lines the student has marked done */
+  completedChapters?: string[];
+  /** All chapter tests submitted (Module Final still required to unlock next) */
+  chaptersComplete?: boolean;
+  /** Cached related UPSC topics per chapter label (from KB search prefetch) */
+  relatedTopicsByChapter?: Record<string, string[]>;
   note?: string;
   dueDate?: string | null;
   completed: boolean;
@@ -712,7 +722,53 @@ export const syllabusTargetsAPI = {
       };
     }>("/api/syllabus-targets/mine", { params }),
   toggleComplete: (id: string, completed = true) =>
-    api.post(`/api/syllabus-targets/${id}/complete`, { completed }),
+    api.post<{
+      success: boolean;
+      data: { _id: string; completed: boolean; completedChapters?: string[] };
+    }>(`/api/syllabus-targets/${id}/complete`, { completed }),
+  toggleChapterComplete: (id: string, chapter: string, completed = true) =>
+    api.post<{
+      success: boolean;
+      data: {
+        _id: string;
+        chapter: string;
+        completedChapters: string[];
+        completed: boolean;
+      };
+    }>(`/api/syllabus-targets/${id}/chapters/complete`, { chapter, completed }),
+  /** Tick chapter → 20 Hard RAG questions from Knowledge Base + start test */
+  startChapterPractice: (id: string, chapter: string) =>
+    api.post<{
+      success: boolean;
+      message?: string;
+      data: {
+        testId: string;
+        test: { _id: string; subject: string; topic: string; difficulty?: string; totalQuestions: number };
+        fromCache?: boolean;
+        chapter: string;
+        topicName: string;
+        relatedTopics?: string[];
+        nextChapter?: string | null;
+        completedChapters: string[];
+        completed: boolean;
+      };
+    }>(
+      `/api/syllabus-targets/${id}/chapters/practice`,
+      { chapter },
+      { timeout: 300000 }
+    ),
+  /** All chapters done → 50Q final: chapter-bank reuse + RAG top-up for shortfall */
+  startModuleFinal: (id: string) =>
+    api.post<{
+      success: boolean;
+      message?: string;
+      data: {
+        testId: string;
+        test: { _id: string; subject: string; topic: string; totalQuestions: number };
+        chaptersComplete: boolean;
+        completed: boolean;
+      };
+    }>(`/api/syllabus-targets/${id}/module-final`, {}, { timeout: 300000 }),
 };
 
 // DART – Daily Activity & Reflection Tracker API

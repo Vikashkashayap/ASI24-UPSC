@@ -10,6 +10,7 @@ import GeneratedQuestion, { buildQuestionCacheKey } from "../models/GeneratedQue
 import { RAG_CONFIG } from "../config/rag.config.js";
 import { ragLogger } from "../utils/logger.js";
 import { withRetry } from "../utils/retry.js";
+import { lockPlainExplanationToAnswer } from "../../services/qg/utils/consistency.js";
 
 function normalizeDifficulty(d) {
   const v = String(d || "Medium").trim().toLowerCase();
@@ -22,11 +23,21 @@ function normalizeDifficulty(d) {
 function buildSystemPrompt() {
   return `You are an expert UPSC Civil Services Prelims question setter.
 Generate MCQs STRICTLY from the provided CONTEXT only.
-Rules:
+
+SOURCE RULES:
 - Never invent facts, dates, articles, or figures not present in CONTEXT.
 - If CONTEXT is insufficient for a question, omit that question.
 - If CONTEXT cannot support ANY question, respond exactly: {"insufficient":true,"message":"Insufficient context."}
 - Return ONLY valid JSON (no markdown).
+
+CRITICAL CONSISTENCY LOCK (students must never see a mismatch):
+1. Decide the SINGLE correct OPTION TEXT from CONTEXT first.
+2. Put that text under exactly one letter in options A–D.
+3. Set correctAnswer to THAT letter only (A|B|C|D).
+4. explanation MUST open with: Option {correctAnswer} ("{exact option text}") is correct. — then defend ONLY that letter.
+5. Never mark letter X if option Y's text is the real answer. Never shuffle texts after setting correctAnswer.
+6. Self-check: options[correctAnswer] === the factually correct text; explanation defends the same letter.
+
 JSON shape:
 {"questions":[{"question":"...","options":{"A":"...","B":"...","C":"...","D":"..."},"correctAnswer":"A","explanation":"..."}]}`;
 }
@@ -43,6 +54,7 @@ ${contextText}
 """
 
 Generate exactly ${count} UPSC Prelims MCQs grounded ONLY in CONTEXT.
+HARD RULE: correctAnswer letter MUST match the option text that CONTEXT supports; explanation must defend that same letter only.
 Each explanation must cite the relevant fact from CONTEXT in 2–4 sentences.`;
 }
 
@@ -77,16 +89,23 @@ function normalizeQuestion(q, meta) {
   if (!["A", "B", "C", "D"].includes(correct)) return null;
   if (!q?.question || !options.A || !options.B || !options.C || !options.D) return null;
 
+  const optionsObj = {
+    A: String(options.A).trim(),
+    B: String(options.B).trim(),
+    C: String(options.C).trim(),
+    D: String(options.D).trim(),
+  };
+
+  const locked = lockPlainExplanationToAnswer(String(q.explanation || "").trim(), {
+    correctAnswer: correct,
+    options: optionsObj,
+  });
+
   return {
     question: String(q.question).trim(),
-    options: {
-      A: String(options.A).trim(),
-      B: String(options.B).trim(),
-      C: String(options.C).trim(),
-      D: String(options.D).trim(),
-    },
+    options: optionsObj,
     correctAnswer: correct,
-    explanation: String(q.explanation || "").trim(),
+    explanation: locked.explanation || String(q.explanation || "").trim(),
     difficulty: meta.difficulty,
     subject: meta.subject,
     topic: meta.topic,

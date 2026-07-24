@@ -113,12 +113,34 @@ function MatchFollowingTable({
             {listILabel}
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
-            {data.columnA.map((item, i) => (
-              <li key={i} className="flex gap-2 break-words leading-relaxed">
-                <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
-                <span className={itemTextClass}>{String(item || "").trim() || "—"}</span>
-              </li>
-            ))}
+            {data.columnA.map((item, i) => {
+              const label =
+                typeof item === "string"
+                  ? item.trim()
+                  : typeof item === "object" && item
+                    ? String(
+                        (item as { text?: string; hi?: string; en?: string }).text ||
+                          (item as { text?: string; hi?: string; en?: string }).hi ||
+                          (item as { text?: string; hi?: string; en?: string }).en ||
+                          ""
+                      ).trim()
+                    : String(item || "").trim();
+              const safe = label && label !== "[object Object]" && !/^([—–\-−…]|\.\.\.)$/.test(label) ? label : "";
+              if (!safe) {
+                return (
+                  <li key={i} className="flex gap-2 break-words leading-relaxed opacity-60">
+                    <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
+                    <span className={`${itemTextClass} italic`}>Missing item</span>
+                  </li>
+                );
+              }
+              return (
+                <li key={i} className="flex gap-2 break-words leading-relaxed">
+                  <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
+                  <span className={itemTextClass}>{safe}</span>
+                </li>
+              );
+            })}
           </ol>
         </div>
         <div
@@ -139,11 +161,25 @@ function MatchFollowingTable({
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
             {Array.from({ length: Math.max(data.columnB.length, data.columnA.length, 1) }, (_, i) => {
-              const item = String(data.columnB[i] || "").trim();
+              const raw = data.columnB[i] as unknown;
+              const label =
+                typeof raw === "string"
+                  ? raw.trim()
+                  : typeof raw === "object" && raw
+                    ? String(
+                        (raw as { text?: string; hi?: string; en?: string }).text ||
+                          (raw as { text?: string; hi?: string; en?: string }).hi ||
+                          (raw as { text?: string; hi?: string; en?: string }).en ||
+                          ""
+                      ).trim()
+                    : String(raw || "").trim();
+              const item = label && label !== "[object Object]" && !/^([—–\-−…]|\.\.\.)$/.test(label) ? label : "";
               return (
                 <li key={i} className="flex gap-2 break-words leading-relaxed">
                   <span className={numClassII}>{i + 1}.</span>
-                  <span className={itemTextClass}>{item || "—"}</span>
+                  <span className={`${itemTextClass}${item ? "" : " italic opacity-60"}`}>
+                    {item || "Missing item"}
+                  </span>
                 </li>
               );
             })}
@@ -441,11 +477,13 @@ export function ExamBilingualStem({
     const cols = (question as ExamQuestionBodyProps["question"]).matchColumns!;
     const lines = ["Match the following:", "List-I"];
     (cols.columnA || []).forEach((item, i) => {
-      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+      const t = coerceDisplayItem(item);
+      if (t) lines.push(`${String.fromCharCode(65 + i)}. ${t}`);
     });
     lines.push("List-II");
     (cols.columnB || []).forEach((item, i) => {
-      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+      const t = coerceDisplayItem(item);
+      if (t) lines.push(`${i + 1}. ${t}`);
     });
     lines.push("Select the correct answer using the code given below:");
     en = lines.join("\n");
@@ -454,11 +492,13 @@ export function ExamBilingualStem({
     const cols = (question as ExamQuestionBodyProps["question"]).matchColumns_hi!;
     const lines = ["निम्नलिखित का मिलान कीजिए:", "सूची-I"];
     (cols.columnA || []).forEach((item, i) => {
-      if (String(item || "").trim()) lines.push(`${String.fromCharCode(65 + i)}. ${item}`);
+      const t = coerceDisplayItem(item);
+      if (t) lines.push(`${String.fromCharCode(65 + i)}. ${t}`);
     });
     lines.push("सूची-II");
     (cols.columnB || []).forEach((item, i) => {
-      if (String(item || "").trim()) lines.push(`${i + 1}. ${item}`);
+      const t = coerceDisplayItem(item);
+      if (t) lines.push(`${i + 1}. ${t}`);
     });
     lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
     hi = lines.join("\n");
@@ -498,9 +538,24 @@ export function ExamBilingualStem({
 }
 
 function hasUsableMatchColumns(cols?: { columnA?: string[]; columnB?: string[] } | null): boolean {
-  const a = (cols?.columnA || []).filter((x) => String(x || "").trim().length >= 1);
-  const b = (cols?.columnB || []).filter((x) => String(x || "").trim().length >= 1);
+  const a = (cols?.columnA || []).filter((x) => coerceDisplayItem(x).length >= 1);
+  const b = (cols?.columnB || []).filter((x) => coerceDisplayItem(x).length >= 1);
   return a.length >= 2 && b.length >= 2;
+}
+
+function coerceDisplayItem(x: unknown): string {
+  if (x == null) return "";
+  if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+    const s = String(x).trim();
+    return s === "[object Object]" ? "" : s;
+  }
+  if (typeof x === "object") {
+    const o = x as Record<string, unknown>;
+    for (const k of ["text", "hi", "en", "item", "content", "value", "label", "name"]) {
+      if (typeof o[k] === "string" && String(o[k]).trim()) return String(o[k]).trim();
+    }
+  }
+  return "";
 }
 
 function detectMatch(question: ExamQuestionBodyProps["question"]): boolean {
