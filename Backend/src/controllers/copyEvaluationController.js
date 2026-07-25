@@ -33,7 +33,7 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     }
 
     const {
-      subject = "General Studies",
+      subject = "Polity",
       paper = "",
       year = new Date().getFullYear(),
       maxMarks = 15,

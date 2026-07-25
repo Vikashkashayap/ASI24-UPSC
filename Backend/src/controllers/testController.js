@@ -5,6 +5,10 @@ import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
 import { ensureAttemptHasHindiFromParent } from "../services/syncHindiFromParent.js";
+import {
+  getPrelimsDailyLockStatus,
+  PRELIMS_DAILY_LIMIT_MESSAGE,
+} from "../services/prelimsTopicDailyLock.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
@@ -119,6 +123,28 @@ export const generateFullMockTest = async (req, res) => {
 };
 
 /**
+ * Daily lock status for Prelims / Practice test generator (1 per IST day).
+ * GET /api/tests/prelims-daily-status
+ */
+export const getPrelimsDailyStatus = async (req, res) => {
+  try {
+    const userId = req.user?._id ?? req.user?.id;
+    const status = await getPrelimsDailyLockStatus(userId, req.user?.role);
+    return res.json({
+      success: true,
+      data: status,
+      message: status.locked ? PRELIMS_DAILY_LIMIT_MESSAGE : undefined,
+    });
+  } catch (error) {
+    console.error("Error in getPrelimsDailyStatus:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to load daily lock status",
+    });
+  }
+};
+
+/**
  * Generate a new test with AI-generated questions
  * POST /api/tests/generate
  * Body: { subjects: string[], topic: string, examType: "GS" | "CSAT", questionCount: number, difficulty?, csatCategories?, currentAffairsPeriod? }
@@ -127,6 +153,20 @@ export const generateTest = async (req, res) => {
   try {
     const { subjects, topic, examType, questionCount, difficulty, csatCategories, currentAffairsPeriod } = req.body;
     const count = questionCount != null ? parseInt(questionCount, 10) : null;
+
+    // 1 practice test per calendar day (IST) — enforced before cache / AI
+    const dailyLock = await getPrelimsDailyLockStatus(
+      req.user?._id ?? req.user?.id,
+      req.user?.role
+    );
+    if (dailyLock.locked) {
+      return res.status(403).json({
+        success: false,
+        code: "PRELIMS_DAILY_LIMIT",
+        message: PRELIMS_DAILY_LIMIT_MESSAGE,
+        data: dailyLock,
+      });
+    }
 
     // Validation
     if (!Array.isArray(subjects) || subjects.length === 0 || !topic || !examType || count == null) {

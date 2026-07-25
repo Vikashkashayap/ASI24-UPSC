@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Loader2, BookOpen, Target, TrendingUp, History } from "lucide-react";
+import { Loader2, BookOpen, Target, TrendingUp, History, Lock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { SubjectToggle } from "../components/SubjectToggle";
 import { useTheme } from "../hooks/useTheme";
-import { testAPI } from "../services/api";
+import { testAPI, type PrelimsDailyStatus } from "../services/api";
 import {
   SUBJECTS,
   GS_SUBJECTS,
@@ -18,6 +18,21 @@ function matchSubjectFromUrl(raw: string): string {
   const decoded = decodeURIComponent(raw).trim();
   const hit = SUBJECTS.find((s) => s.toLowerCase() === decoded.toLowerCase());
   return hit || decoded;
+}
+
+function formatUnlockTime(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "midnight (IST) tomorrow";
+  }
 }
 
 const TestGeneratorPage: React.FC = () => {
@@ -33,6 +48,8 @@ const TestGeneratorPage: React.FC = () => {
   const [fromPlanner, setFromPlanner] = useState(false);
   const [difficulty, setDifficulty] = useState("Hard");
   const [questionCount, setQuestionCount] = useState(10);
+  const [dailyStatus, setDailyStatus] = useState<PrelimsDailyStatus | null>(null);
+  const [dailyStatusLoading, setDailyStatusLoading] = useState(true);
 
   useEffect(() => {
     const sub = searchParams.get("subject");
@@ -58,10 +75,34 @@ const TestGeneratorPage: React.FC = () => {
 
     if (pyq === "1") setDifficulty("Hard");
   }, [searchParams]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setDailyStatusLoading(true);
+        const res = await testAPI.getPrelimsDailyStatus();
+        if (!cancelled && res.data?.success) {
+          setDailyStatus(res.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to load prelims daily status:", err);
+      } finally {
+        if (!cancelled) setDailyStatusLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const [csatCategories, setCsatCategories] = useState<string[]>([]);
   // Current Affairs: optional month/year (future ready)
   const [currentAffairsMonth, setCurrentAffairsMonth] = useState<string>("");
   const [currentAffairsYear, setCurrentAffairsYear] = useState<string>("");
+
+  const isDailyLocked = Boolean(dailyStatus?.locked);
+  const formDisabled = isGenerating || isDailyLocked;
 
   const hasCsat = subjects.includes("CSAT");
   const hasGsSubject = subjects.some((s) => s !== "CSAT" && GS_SUBJECTS.includes(s as any));
@@ -77,16 +118,17 @@ const TestGeneratorPage: React.FC = () => {
   const showCurrentAffairsOptions = subjects.includes("Current Affairs");
 
   const canSubmit = useMemo(() => {
+    if (isDailyLocked) return false;
     if (!topic.trim()) return false;
     if (csatMixedError) return false;
     if (examType === "CSAT" && csatCategories.length === 0) return false;
     if (subjects.length === 0) return false;
     return true;
-  }, [topic, csatMixedError, examType, csatCategories.length, subjects.length]);
+  }, [isDailyLocked, topic, csatMixedError, examType, csatCategories.length, subjects.length]);
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (generateInFlightRef.current || isGenerating) return;
+    if (generateInFlightRef.current || isGenerating || isDailyLocked) return;
     setError(null);
 
     if (!topic.trim()) {
@@ -139,7 +181,12 @@ const TestGeneratorPage: React.FC = () => {
     } catch (err: any) {
       console.error("Error generating test:", err);
       const msg = err.response?.data?.message;
-      if (err.response?.status === 429) {
+      const code = err.response?.data?.code;
+      if (err.response?.status === 403 && (code === "PRELIMS_DAILY_LIMIT" || err.response?.data?.data?.locked)) {
+        const lockData = err.response?.data?.data as PrelimsDailyStatus | undefined;
+        if (lockData) setDailyStatus(lockData);
+        setError(msg || "You've already used today's Practice Test. Try again tomorrow.");
+      } else if (err.response?.status === 429) {
         setError(msg || "Test generation is already running. Please wait.");
       } else {
         setError(msg || "Failed to generate test. Please try again.");
@@ -189,7 +236,7 @@ const TestGeneratorPage: React.FC = () => {
         </div>
       </div>
 
-      {fromPlanner && topic && (
+      {fromPlanner && topic && !isDailyLocked && (
         <div
           className={`rounded-xl px-4 py-3 text-sm border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ${
             theme === "dark" ? "bg-blue-950/40 border-blue-500/30 text-blue-200" : "bg-blue-50 border-blue-200 text-blue-800"
@@ -203,23 +250,86 @@ const TestGeneratorPage: React.FC = () => {
         </div>
       )}
 
+      {isDailyLocked && dailyStatus && (
+        <div
+          className={`rounded-xl px-4 py-4 border-2 flex flex-col sm:flex-row sm:items-center gap-3 ${
+            theme === "dark"
+              ? "bg-amber-950/40 border-amber-500/40 text-amber-100"
+              : "bg-amber-50 border-amber-300 text-amber-950"
+          }`}
+        >
+          <div
+            className={`p-2.5 rounded-lg shrink-0 ${
+              theme === "dark" ? "bg-amber-500/20" : "bg-amber-200/60"
+            }`}
+          >
+            <Lock className={`w-5 h-5 ${theme === "dark" ? "text-amber-400" : "text-amber-700"}`} />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="font-semibold text-sm md:text-base">Today's Practice Test is locked</p>
+            <p className={`text-xs md:text-sm ${theme === "dark" ? "text-amber-200/80" : "text-amber-900/80"}`}>
+              You can generate only 1 test per day.
+              {dailyStatus.todayTest?.topic
+                ? ` Today's topic: ${dailyStatus.todayTest.subject} — ${dailyStatus.todayTest.topic}.`
+                : ""}{" "}
+              A new test will be available after {formatUnlockTime(dailyStatus.unlocksAt)}.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+            {dailyStatus.todayTest?._id && (
+              <Button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    dailyStatus.todayTest?.isSubmitted
+                      ? `/result/${dailyStatus.todayTest._id}`
+                      : `/test/${dailyStatus.todayTest?._id}`
+                  )
+                }
+                className={`min-h-[40px] ${
+                  theme === "dark"
+                    ? "bg-amber-600 hover:bg-amber-500 text-white"
+                    : "bg-amber-600 hover:bg-amber-700 text-white"
+                }`}
+              >
+                {dailyStatus.todayTest.isSubmitted ? "View Result" : "Continue Test"}
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate("/test-history")}
+              className="min-h-[40px]"
+            >
+              View History
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl rounded-2xl ${theme === "dark"
         ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg"
         : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
-        }`}>
+        } ${isDailyLocked ? "opacity-90" : ""}`}>
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
         <CardHeader className="relative z-10 pb-3 md:pb-4 px-4 md:px-6 pt-4 md:pt-6">
           <div className="flex items-center gap-2 md:gap-3">
             <div className={`p-2 rounded-lg shrink-0 ${theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
               }`}>
-              <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+              {isDailyLocked ? (
+                <Lock className={`w-5 h-5 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+              ) : (
+                <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
+              )}
             </div>
             <div className="min-w-0">
               <CardTitle className={`text-base md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                Test Configuration
+                {isDailyLocked ? "Test Locked for Today" : "Test Configuration"}
               </CardTitle>
               <CardDescription className="mt-0.5 md:mt-1 text-xs md:text-sm">
-                Select your preferences to generate a customized test
+                {isDailyLocked
+                  ? "You can generate again after midnight (IST) tomorrow"
+                  : "Select your preferences to generate a customized test"}
               </CardDescription>
             </div>
           </div>
@@ -235,7 +345,7 @@ const TestGeneratorPage: React.FC = () => {
                 options={SUBJECTS}
                 selected={subjects}
                 onChange={setSubjects}
-                disabled={isGenerating}
+                disabled={formDisabled}
               />
             </div>
 
@@ -247,7 +357,7 @@ const TestGeneratorPage: React.FC = () => {
                   options={CSAT_CATEGORIES}
                   selected={csatCategories}
                   onChange={setCsatCategories}
-                  disabled={isGenerating}
+                  disabled={formDisabled}
                 />
               </div>
             )}
@@ -274,9 +384,9 @@ const TestGeneratorPage: React.FC = () => {
                       ? "bg-slate-800 border-slate-700 text-slate-200"
                       : "border-slate-300 bg-white"
                 }`}
-                disabled={isGenerating}
+                disabled={formDisabled}
                 required
-                autoFocus={fromPlanner && !!topic}
+                autoFocus={fromPlanner && !!topic && !isDailyLocked}
               />
             </div>
 
@@ -296,6 +406,7 @@ const TestGeneratorPage: React.FC = () => {
                       value={currentAffairsMonth}
                       onChange={(e) => setCurrentAffairsMonth(e.target.value)}
                       placeholder="e.g. 1–12"
+                      disabled={formDisabled}
                       className={`w-24 px-3 py-2 rounded-lg border ${theme === "dark" ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-300"}`}
                     />
                   </div>
@@ -308,6 +419,7 @@ const TestGeneratorPage: React.FC = () => {
                       value={currentAffairsYear}
                       onChange={(e) => setCurrentAffairsYear(e.target.value)}
                       placeholder="e.g. 2024"
+                      disabled={formDisabled}
                       className={`w-24 px-3 py-2 rounded-lg border ${theme === "dark" ? "bg-slate-800 border-slate-700 text-slate-200" : "bg-white border-slate-300"}`}
                     />
                   </div>
@@ -316,7 +428,7 @@ const TestGeneratorPage: React.FC = () => {
             )}
 
             {/* Validation error: CSAT mixed with GS */}
-            {csatMixedError && (
+            {csatMixedError && !isDailyLocked && (
               <div className={`border rounded-lg p-4 flex items-start gap-3 ${theme === "dark"
                 ? "bg-red-950/50 border-red-800"
                 : "bg-red-50 border-red-200"
@@ -340,8 +452,8 @@ const TestGeneratorPage: React.FC = () => {
             {/* Generate Button */}
             <Button
               type="submit"
-              disabled={isGenerating || !canSubmit}
-              className={`w-full px-6 py-4 md:py-4 text-base font-semibold min-h-[48px] touch-manipulation ${isGenerating || !canSubmit
+              disabled={isGenerating || !canSubmit || dailyStatusLoading}
+              className={`w-full px-6 py-4 md:py-4 text-base font-semibold min-h-[48px] touch-manipulation ${isGenerating || !canSubmit || dailyStatusLoading
                 ? "bg-slate-400 border-slate-400 text-slate-200 cursor-not-allowed"
                 : "bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white hover:shadow-lg transform hover:scale-[1.01] active:scale-[0.99]"
                 }`}
@@ -350,6 +462,16 @@ const TestGeneratorPage: React.FC = () => {
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Generating Test... This may take 30-60 seconds
+                </>
+              ) : isDailyLocked ? (
+                <>
+                  <Lock className="mr-2 h-5 w-5" />
+                  Locked — Available Tomorrow
+                </>
+              ) : dailyStatusLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Checking daily limit...
                 </>
               ) : (
                 <>

@@ -34,7 +34,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [subject, setSubject] = useState('General Studies');
+  const [subject, setSubject] = useState('Polity');
   const [paper, setPaper] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
   const [dragOver, setDragOver] = useState(false);
@@ -207,8 +207,20 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                     isDark ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white border-slate-300'
                   }`}
                 >
-                  <option>General Studies</option>
+                  <option>Polity</option>
+                  <option>Governance</option>
+                  <option>History</option>
+                  <option>Geography</option>
+                  <option>Economy</option>
+                  <option>Environment</option>
+                  <option>International Relations</option>
+                  <option>Society</option>
+                  <option>Art & Culture</option>
+                  <option>Science & Tech</option>
+                  <option>Internal Security</option>
+                  <option>Ethics</option>
                   <option>Essay</option>
+                  <option>General Studies</option>
                   <option>Optional Subject</option>
                 </select>
               </div>
@@ -257,11 +269,11 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
               className="w-full bg-gradient-to-r from-indigo-500 to-emerald-400 text-white disabled:opacity-50"
             >
               {isUploading ? (
-                'Evaluating with Vision AI...'
+                'Evaluating...'
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Start Premium Evaluation
+                  Start Evaluation
                 </>
               )}
             </Button>

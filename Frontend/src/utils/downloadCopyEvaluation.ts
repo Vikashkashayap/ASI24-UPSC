@@ -26,7 +26,7 @@ const lineFeedbackHtml = (items: LineFeedback[] = []) => {
     .map(
       (row, i) => `
   <div class="line-card">
-    <p><strong>Line ${i + 1}</strong></p>
+    <p><strong>Line ${i + 1}</strong>${row.verdict ? ` · <em>${escapeHtml(row.verdict.replace(/_/g, ' '))}</em>` : ''}</p>
     <div class="box quote">${escapeHtml(row.studentLine)}</div>
     <p><strong>Research &amp; Analysis:</strong> ${escapeHtml(row.examinerAnalysis)}</p>
     <p><strong>How to improve:</strong> ${escapeHtml(row.howToImprove)}</p>
@@ -96,10 +96,14 @@ export function downloadCopyEvaluationReport({
   <h1>UPSC Mains — Premium Copy Evaluation</h1>
   <p class="meta">${escapeHtml([subject, paper, createdAt ? new Date(createdAt).toLocaleString() : ''].filter(Boolean).join(' · '))}</p>
   <p class="meta">File: ${escapeHtml(fileName || 'Answer copy')}</p>
-  <p class="score">Score: ${marks} / ${result.maxMarks} (${pct}%) · Words: ~${result.wordCount || '—'} · Limit: ${result.wordLimitStatus || 'GOOD'}</p>
+  <p class="score">Score: ${marks} / ${result.maxMarks} (${pct}%) · Words: ~${result.wordCount || '—'} · Limit: ${result.wordLimitStatus || 'GOOD'}${result.onTrackVerdict ? ` · ${escapeHtml(result.onTrackVerdict.replace(/_/g, ' '))}` : ''}${result.knowledgeContextUsed ? ' · KB + AI' : ''}</p>
 
   ${result.questionText ? `<h2>Question</h2><div class="box">${escapeHtml(result.questionText)}</div>` : ''}
   ${result.extractedAnswerText ? `<h2>Transcribed Answer</h2><div class="box">${escapeHtml(result.extractedAnswerText)}</div>` : ''}
+
+  ${result.onTrackExplanation ? `<h2>On-Track Assessment</h2><p>${escapeHtml(result.onTrackExplanation)}</p>` : ''}
+  ${result.criticalMistakes?.length ? `<h2>Critical Mistakes</h2>${listHtml(result.criticalMistakes)}` : ''}
+  ${result.factualAccuracyNotes ? `<h2>Factual Accuracy</h2><p>${escapeHtml(result.factualAccuracyNotes)}</p>` : ''}
 
   ${result.questionDemand ? `
   <h2>Question Demand</h2>

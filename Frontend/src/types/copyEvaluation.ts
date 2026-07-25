@@ -1,6 +1,21 @@
 /** Per-line / per-passage feedback tied to what the student actually wrote */
+export type LineVerdict =
+  | 'CORRECT'
+  | 'PARTIALLY_CORRECT'
+  | 'INCORRECT'
+  | 'IRRELEVANT'
+  | 'INCOMPLETE'
+  | '';
+
+export type OnTrackVerdict =
+  | 'ON_TRACK'
+  | 'PARTIALLY_ON_TRACK'
+  | 'OFF_TRACK'
+  | '';
+
 export interface LineFeedback {
   studentLine: string;
+  verdict?: LineVerdict;
   examinerAnalysis: string;
   howToImprove: string;
 }
@@ -29,6 +44,15 @@ export interface QuestionDemand {
   missingAreas?: string[];
 }
 
+export interface KnowledgeMeta {
+  used?: boolean;
+  chunkCount?: number;
+  source?: string;
+  kbSubject?: string | null;
+  query?: string;
+  extractedQuestion?: string;
+}
+
 export interface VisionEvaluationResult {
   questionDemand?: QuestionDemand;
   introduction?: SectionFeedback;
@@ -40,6 +64,12 @@ export interface VisionEvaluationResult {
   wordCount?: number;
   wordLimitStatus?: 'GOOD' | 'SHORT' | 'LONG' | 'EXCESSIVE';
   examinerRemark?: string;
+  onTrackVerdict?: OnTrackVerdict;
+  onTrackExplanation?: string;
+  criticalMistakes?: string[];
+  factualAccuracyNotes?: string;
+  knowledgeContextUsed?: boolean;
+  knowledgeMeta?: KnowledgeMeta;
   improvementPriority?: string[];
   modelAnswerSuggestions?: string[];
   constitutionalReferences?: string[];

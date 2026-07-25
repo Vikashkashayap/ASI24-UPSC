@@ -8,7 +8,7 @@ import {
 import { downloadCopyEvaluationReport } from '../utils/downloadCopyEvaluation';
 import { copyEvaluationAPI } from '../services/api';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CopyEvaluationLoading } from '../components/copy-evaluation/CopyEvaluationLoading';
@@ -159,55 +159,34 @@ const CopyEvaluationPage: React.FC = () => {
     !visionResult;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 xs:space-y-5 md:space-y-6 pb-8 px-2 xs:px-3 sm:px-4">
-      <div
-        className={`relative overflow-hidden rounded-2xl p-4 xs:p-6 md:p-8 mb-6 border-2 transition-all duration-300 ${
-          theme === 'dark'
-            ? 'bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10'
-            : 'bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30'
-        }`}
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col gap-2">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-2.5 rounded-xl ${theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'}`}
-              >
-                <FileText
-                  className={`w-6 h-6 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
-                />
-              </div>
-              <div>
-                <h1
-                  className={`text-xl xs:text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-                    theme === 'dark'
-                      ? 'from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent'
-                      : 'from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent'
-                  }`}
-                >
-                  Copy Evaluation
-                </h1>
-                <p
-                  className={`text-xs md:text-sm mt-0.5 ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
-                  }`}
-                >
-                  Premium examiner-style AI evaluation — vision reads your handwriting directly
-                </p>
-              </div>
-            </div>
-            {!hasResult && !isUploading && (
-              <Button
-                onClick={() => navigate('/evaluation-history')}
-                className="bg-gradient-to-r from-indigo-500 to-emerald-400 hover:from-indigo-400 hover:to-emerald-300 text-white"
-              >
-                <History className="w-4 h-4 mr-2" />
-                History
-              </Button>
-            )}
-          </div>
+    <div className="max-w-7xl mx-auto space-y-4 pb-8 px-2 xs:px-3 sm:px-4">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1
+            className={`text-xl xs:text-2xl font-bold tracking-tight ${
+              theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+            }`}
+          >
+            Copy Evaluation
+          </h1>
+          <p
+            className={`text-sm mt-0.5 ${
+              theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+            }`}
+          >
+            UPSC Mains answer copy check — examiner marks & line-wise feedback
+          </p>
         </div>
+        {!hasResult && !isUploading && (
+          <Button
+            onClick={() => navigate('/evaluation-history')}
+            variant="outline"
+            size="sm"
+          >
+            <History className="w-4 h-4 mr-2" />
+            History
+          </Button>
+        )}
       </div>
 
       <div className="min-h-[calc(100vh-14rem)]">
@@ -217,40 +196,35 @@ const CopyEvaluationPage: React.FC = () => {
           <Card
             className={`h-full min-h-[400px] ${
               theme === 'dark'
-                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-blue-900/50'
+                ? 'bg-slate-900/80 border-slate-700'
                 : 'bg-white border-slate-200'
-            } shadow-xl`}
+            }`}
           >
             <CardContent className="p-8 text-center flex items-center justify-center h-full min-h-[400px]">
               <div className="max-w-md">
-                <div
-                  className={`p-6 rounded-full mx-auto mb-6 w-fit ${
-                    theme === 'dark' ? 'bg-indigo-500/10' : 'bg-blue-100'
+                <FileText
+                  className={`w-12 h-12 mx-auto mb-4 ${
+                    theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
                   }`}
-                >
-                  <FileText
-                    className={`w-16 h-16 mx-auto ${
-                      theme === 'dark' ? 'text-indigo-400' : 'text-blue-600'
-                    }`}
-                  />
-                </div>
+                />
                 <h2
-                  className={`text-xl font-bold mb-2 ${
+                  className={`text-lg font-bold mb-2 ${
                     theme === 'dark' ? 'text-slate-200' : 'text-slate-800'
                   }`}
                 >
-                  No Answer Copy Evaluated Yet
+                  No copy evaluated yet
                 </h2>
                 <p
-                  className={`text-sm mb-8 ${
+                  className={`text-sm mb-6 ${
                     theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
                   }`}
                 >
-                  Upload handwritten UPSC mains answers for section-wise examiner feedback, scores, and model answer guidance
+                  Upload your handwritten UPSC Mains answer (PDF or image) for
+                  examiner-style checking.
                 </p>
                 <Button
                   onClick={() => setShowUploadModal(true)}
-                  className="bg-gradient-to-r from-indigo-500 to-emerald-400 hover:from-indigo-400 hover:to-emerald-300 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Answer Copy
@@ -259,80 +233,83 @@ const CopyEvaluationPage: React.FC = () => {
             </CardContent>
           </Card>
         ) : (
-          <Card
-            className={`shadow-xl ${
-              theme === 'dark'
-                ? 'bg-gradient-to-br from-slate-950/90 via-slate-900/90 to-slate-950/90 border-blue-900/50'
-                : 'bg-white border-slate-200'
-            }`}
-          >
-            <CardHeader className="border-b flex-shrink-0 py-3">
-              <div className="flex items-center justify-end flex-wrap gap-2">
-                  <Button onClick={() => navigate('/evaluation-history')} variant="outline" size="sm">
-                    <History className="w-4 h-4 mr-1.5" />
-                    History
-                  </Button>
-                  {visionResult && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        downloadCopyEvaluationReport({
-                          result: visionResult,
-                          fileName: fullEvaluation?.fileName || fullEvaluation?.pdfFileName,
-                          subject: fullEvaluation?.subject,
-                          paper: fullEvaluation?.paper,
-                          createdAt: fullEvaluation?.createdAt,
-                        })
-                      }
-                    >
-                      <Download className="w-4 h-4 mr-1.5" />
-                      Download
-                    </Button>
-                  )}
-                  <Button onClick={() => setShowUploadModal(true)} variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-1.5" />
-                    New Upload
-                  </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-3 xs:p-5 overflow-y-auto max-h-[calc(100vh-14rem)] custom-scrollbar bg-transparent">
-              {visionResult ? (
-                <CopyEvaluationResultView
-                  result={visionResult}
-                  evaluationId={fullEvaluation?._id || selectedEvaluationId || undefined}
-                  storedPages={fullEvaluation?.storedPages}
-                  subject={fullEvaluation?.subject}
-                  paper={fullEvaluation?.paper}
-                  fileName={
-                    fullEvaluation?.fileName || fullEvaluation?.pdfFileName
-                  }
-                  onDownload={() =>
+          <div className="space-y-3">
+            <div className="flex items-center justify-end flex-wrap gap-2">
+              <Button
+                onClick={() => navigate('/evaluation-history')}
+                variant="outline"
+                size="sm"
+              >
+                <History className="w-4 h-4 mr-1.5" />
+                History
+              </Button>
+              {visionResult && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
                     downloadCopyEvaluationReport({
                       result: visionResult,
-                      fileName: fullEvaluation?.fileName || fullEvaluation?.pdfFileName,
+                      fileName:
+                        fullEvaluation?.fileName || fullEvaluation?.pdfFileName,
                       subject: fullEvaluation?.subject,
                       paper: fullEvaluation?.paper,
                       createdAt: fullEvaluation?.createdAt,
                     })
                   }
-                />
-              ) : isLegacyResult && fullEvaluation?.evaluations ? (
-                <QuestionEvaluationView
-                  question={
-                    (fullEvaluation.evaluations as Record<string, unknown>[])[
-                      selectedQuestionIndex
-                    ]
-                  }
-                  paper={fullEvaluation.paper || 'GS'}
-                />
-              ) : (
-                <p className={theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}>
-                  No evaluation data available
-                </p>
+                >
+                  <Download className="w-4 h-4 mr-1.5" />
+                  Download
+                </Button>
               )}
-            </CardContent>
-          </Card>
+              <Button
+                onClick={() => setShowUploadModal(true)}
+                variant="outline"
+                size="sm"
+              >
+                <Upload className="w-4 h-4 mr-1.5" />
+                New Upload
+              </Button>
+            </div>
+
+            {visionResult ? (
+              <CopyEvaluationResultView
+                result={visionResult}
+                evaluationId={
+                  fullEvaluation?._id || selectedEvaluationId || undefined
+                }
+                storedPages={fullEvaluation?.storedPages}
+                subject={fullEvaluation?.subject}
+                paper={fullEvaluation?.paper}
+                fileName={
+                  fullEvaluation?.fileName || fullEvaluation?.pdfFileName
+                }
+              />
+            ) : isLegacyResult && fullEvaluation?.evaluations ? (
+              <Card
+                className={
+                  theme === 'dark'
+                    ? 'bg-slate-900/80 border-slate-700'
+                    : 'bg-white border-slate-200'
+                }
+              >
+                <CardContent className="p-4">
+                  <QuestionEvaluationView
+                    question={
+                      (fullEvaluation.evaluations as Record<string, unknown>[])[
+                        selectedQuestionIndex
+                      ]
+                    }
+                    paper={fullEvaluation.paper || 'GS'}
+                  />
+                </CardContent>
+              </Card>
+            ) : (
+              <p className={theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}>
+                No evaluation data available
+              </p>
+            )}
+          </div>
         )}
       </div>
 

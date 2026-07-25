@@ -115,8 +115,20 @@ const storedPageSchema = new mongoose.Schema({
   fileName: { type: String, required: true },
 }, { _id: false });
 
+const lineFeedbackSchema = new mongoose.Schema({
+  studentLine: { type: String, default: '' },
+  verdict: {
+    type: String,
+    enum: ['CORRECT', 'PARTIALLY_CORRECT', 'INCORRECT', 'IRRELEVANT', 'INCOMPLETE', ''],
+    default: '',
+  },
+  examinerAnalysis: { type: String, default: '' },
+  howToImprove: { type: String, default: '' },
+}, { _id: false });
+
 const sectionFeedbackSchema = new mongoose.Schema({
   studentText: { type: String, default: '' },
+  lineFeedback: [lineFeedbackSchema],
   analysis: [{ type: String }],
   strengths: [{ type: String }],
   weaknesses: [{ type: String }],
@@ -126,6 +138,8 @@ const sectionFeedbackSchema = new mongoose.Schema({
 const bodySectionSchema = new mongoose.Schema({
   sectionTitle: { type: String, default: '' },
   studentText: { type: String, default: '' },
+  lineFeedback: [lineFeedbackSchema],
+  analysis: [{ type: String }],
   strengths: [{ type: String }],
   weaknesses: [{ type: String }],
   suggestions: [{ type: String }],
@@ -134,6 +148,15 @@ const bodySectionSchema = new mongoose.Schema({
 const questionDemandSchema = new mongoose.Schema({
   expectedPoints: [{ type: String }],
   missingAreas: [{ type: String }],
+}, { _id: false });
+
+const knowledgeMetaSchema = new mongoose.Schema({
+  used: { type: Boolean, default: false },
+  chunkCount: { type: Number, default: 0 },
+  source: { type: String, default: '' },
+  kbSubject: { type: String, default: null },
+  query: { type: String, default: '' },
+  extractedQuestion: { type: String, default: '' },
 }, { _id: false });
 
 const visionEvaluationResultSchema = new mongoose.Schema({
@@ -151,6 +174,16 @@ const visionEvaluationResultSchema = new mongoose.Schema({
     default: 'GOOD',
   },
   examinerRemark: { type: String, default: '' },
+  onTrackVerdict: {
+    type: String,
+    enum: ['ON_TRACK', 'PARTIALLY_ON_TRACK', 'OFF_TRACK', ''],
+    default: '',
+  },
+  onTrackExplanation: { type: String, default: '' },
+  criticalMistakes: [{ type: String }],
+  factualAccuracyNotes: { type: String, default: '' },
+  knowledgeContextUsed: { type: Boolean, default: false },
+  knowledgeMeta: knowledgeMetaSchema,
   improvementPriority: [{ type: String }],
   modelAnswerSuggestions: [{ type: String }],
   constitutionalReferences: [{ type: String }],

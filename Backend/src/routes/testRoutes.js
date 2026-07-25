@@ -2,6 +2,7 @@ import express from "express";
 import {
   generateTest,
   generateFullMockTest,
+  getPrelimsDailyStatus,
   submitTest,
   getTest,
   getTests,
@@ -36,8 +37,14 @@ router.get("/test-connection", (req, res) => {
 });
 
 // Generation routes — AI allowed (not wrapped in examAttemptGuard)
+router.get("/prelims-daily-status", getPrelimsDailyStatus);
 router.post("/generate", testGenerationDedup, generateTest);
 router.post("/generate-full-mock", generateFullMockTest);
+
+// Named GET routes MUST be before /:id or Express treats them as test ids
+router.get("/analytics", getTestAnalytics);
+router.get("/prelims-performance", getPrelimsPerformance);
+router.get("/", getTests);
 
 // Exam attempt routes — zero AI tokens (DB bilingual fields only)
 router.post("/submit/:id", examAttemptGuard, submitTest);
@@ -45,11 +52,6 @@ router.get("/assigned-practice", examAttemptGuard, listStudentAssignedPractice);
 router.get("/assigned-practice/history", examAttemptGuard, listAssignedPracticeHistory);
 router.post("/assigned-practice/:id/start", examAttemptGuard, startAssignedPracticeAttempt);
 router.get("/:id", examAttemptGuard, getTest);
-
-// Read-only / history — no translation, guard optional but safe
-router.get("/analytics", getTestAnalytics);
-router.get("/prelims-performance", getPrelimsPerformance);
-router.get("/", getTests);
 router.delete("/:id", deleteTest);
 
 export default router;

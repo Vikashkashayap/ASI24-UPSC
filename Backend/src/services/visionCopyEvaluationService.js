@@ -1,24 +1,69 @@
 /**
  * Premium Vision Copy Evaluation Service
- * Handwritten answer analysis via OpenRouter Gemini vision (no OCR).
+ * Handwritten answer analysis via OpenRouter Gemini vision.
+ * Flow: extract question → MentorsDaily KB retrieval → examiner evaluation (KB + LLM).
  */
 
 import {
   VISION_EVALUATION_SYSTEM_PROMPT,
   buildVisionUserPrompt,
+  QUESTION_EXTRACT_SYSTEM_PROMPT,
+  buildQuestionExtractUserPrompt,
 } from "../prompts/copyEvaluationPrompts.js";
 import {
   callOpenRouterVisionAPI,
   parseJSONFromResponse,
 } from "./openRouterService.js";
+import { getCopyEvaluationKnowledgeContext } from "./copyEvaluationKnowledgeService.js";
 
 const MAX_RETRIES = 3;
 const VISION_MAX_TOKENS = 16384;
+const EXTRACT_MAX_TOKENS = 512;
+
+const LINE_VERDICTS = new Set([
+  "CORRECT",
+  "PARTIALLY_CORRECT",
+  "INCORRECT",
+  "IRRELEVANT",
+  "INCOMPLETE",
+]);
+
+const ON_TRACK_VERDICTS = new Set([
+  "ON_TRACK",
+  "PARTIALLY_ON_TRACK",
+  "OFF_TRACK",
+]);
 
 const toArray = (val) => {
   if (Array.isArray(val)) return val.map(String).filter(Boolean);
   if (typeof val === "string" && val.trim()) return [val.trim()];
   return [];
+};
+
+const normalizeVerdict = (v) => {
+  const raw = String(v || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, "_");
+  if (LINE_VERDICTS.has(raw)) return raw;
+  if (raw.includes("PARTIAL")) return "PARTIALLY_CORRECT";
+  if (raw.includes("INCORRECT") || raw.includes("WRONG")) return "INCORRECT";
+  if (raw.includes("IRRELEVANT")) return "IRRELEVANT";
+  if (raw.includes("INCOMPLETE") || raw.includes("MISSING")) return "INCOMPLETE";
+  if (raw.includes("CORRECT") || raw.includes("GOOD")) return "CORRECT";
+  return "";
+};
+
+const normalizeOnTrack = (v) => {
+  const raw = String(v || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, "_");
+  if (ON_TRACK_VERDICTS.has(raw)) return raw;
+  if (raw.includes("OFF")) return "OFF_TRACK";
+  if (raw.includes("PARTIAL")) return "PARTIALLY_ON_TRACK";
+  if (raw.includes("ON")) return "ON_TRACK";
+  return "PARTIALLY_ON_TRACK";
 };
 
 const normalizeLineFeedback = (items) => {
@@ -32,6 +77,9 @@ const normalizeLineFeedback = (items) => {
           row?.text ??
           ""
       ).trim(),
+      verdict: normalizeVerdict(
+        row?.verdict ?? row?.lineVerdict ?? row?.status ?? ""
+      ),
       examinerAnalysis: String(
         row?.examinerAnalysis ??
           row?.researchAnalysis ??
@@ -154,6 +202,11 @@ export const normalizeLegacyFormat = (raw) => {
     examinerRemark: String(
       raw.examinerFeedback || raw.examinerRemark || ""
     ).trim(),
+    onTrackVerdict: normalizeOnTrack(raw.onTrackVerdict),
+    onTrackExplanation: String(raw.onTrackExplanation || "").trim(),
+    criticalMistakes: toArray(raw.criticalMistakes),
+    factualAccuracyNotes: String(raw.factualAccuracyNotes || "").trim(),
+    knowledgeContextUsed: false,
     improvementPriority: toArray(raw.suggestions).slice(0, 5),
     modelAnswerSuggestions: raw.improvedConclusion
       ? [String(raw.improvedConclusion)]
@@ -180,7 +233,7 @@ export const normalizeLegacyFormat = (raw) => {
 /**
  * Normalize premium AI evaluation JSON + backward-compatible fields
  */
-export const normalizeEvaluationResult = (raw) => {
+export const normalizeEvaluationResult = (raw, extras = {}) => {
   if (!raw || typeof raw !== "object") return null;
 
   if (
@@ -188,7 +241,12 @@ export const normalizeEvaluationResult = (raw) => {
     !raw.questionDemand &&
     raw.marks === undefined
   ) {
-    return normalizeLegacyFormat(raw);
+    const legacy = normalizeLegacyFormat(raw);
+    if (legacy && extras.knowledgeMeta) {
+      legacy.knowledgeContextUsed = Boolean(extras.knowledgeMeta.used);
+      legacy.knowledgeMeta = extras.knowledgeMeta;
+    }
+    return legacy;
   }
 
   const marks = Number(raw.marks ?? raw.overallMarks);
@@ -235,6 +293,9 @@ export const normalizeEvaluationResult = (raw) => {
     ? raw.wordLimitStatus
     : "GOOD";
 
+  const criticalMistakes = toArray(raw.criticalMistakes);
+  const knowledgeMeta = extras.knowledgeMeta || null;
+
   return {
     questionDemand: {
       expectedPoints: toArray(raw.questionDemand?.expectedPoints),
@@ -247,6 +308,8 @@ export const normalizeEvaluationResult = (raw) => {
           {
             sectionTitle: "Answer Body",
             studentText: extractedAnswerText,
+            lineFeedback: [],
+            analysis: [],
             strengths: allStrengths.slice(0, 5),
             weaknesses: allWeaknesses.slice(0, 5),
             suggestions: allSuggestions.slice(0, 5),
@@ -261,6 +324,12 @@ export const normalizeEvaluationResult = (raw) => {
     examinerRemark: String(
       raw.examinerRemark || raw.examinerFeedback || ""
     ).trim(),
+    onTrackVerdict: normalizeOnTrack(raw.onTrackVerdict),
+    onTrackExplanation: String(raw.onTrackExplanation || "").trim(),
+    criticalMistakes,
+    factualAccuracyNotes: String(raw.factualAccuracyNotes || "").trim(),
+    knowledgeContextUsed: Boolean(knowledgeMeta?.used),
+    knowledgeMeta: knowledgeMeta || undefined,
     improvementPriority: toArray(raw.improvementPriority),
     modelAnswerSuggestions: toArray(raw.modelAnswerSuggestions),
     questionText,
@@ -272,7 +341,11 @@ export const normalizeEvaluationResult = (raw) => {
     overallMarks: clampedMarks,
     summary: String(raw.overallFeedback || raw.summary || "").trim(),
     strengths: allStrengths.length ? allStrengths : toArray(raw.strengths),
-    weaknesses: allWeaknesses.length ? allWeaknesses : toArray(raw.weaknesses),
+    weaknesses: allWeaknesses.length
+      ? allWeaknesses
+      : criticalMistakes.length
+        ? criticalMistakes
+        : toArray(raw.weaknesses),
     missingDimensions: toArray(raw.questionDemand?.missingAreas),
     presentationFeedback: String(
       raw.presentationNotes || raw.presentationFeedback || ""
@@ -350,8 +423,71 @@ export const validateEvaluationResult = (result) => {
     };
   }
 
+  if (hasAnswer && !result.onTrackVerdict) {
+    return {
+      valid: false,
+      error: "Missing onTrackVerdict (ON_TRACK / PARTIALLY_ON_TRACK / OFF_TRACK)",
+    };
+  }
+
+  if (hasAnswer && (!result.criticalMistakes || result.criticalMistakes.length < 1)) {
+    // Soft: only fail if also no weaknesses
+    if (!(result.weaknesses?.length > 0)) {
+      return {
+        valid: false,
+        error: "Missing criticalMistakes — list specific student errors",
+      };
+    }
+  }
+
   return { valid: true };
 };
+
+/**
+ * Light vision pass: extract question text for KB retrieval
+ */
+async function extractQuestionFromPages({ apiKey, model, pages, metadata }) {
+  try {
+    const extractPages = pages.slice(0, 2);
+    const imageContents = extractPages.map((page) => ({
+      type: "image_url",
+      image_url: {
+        url: page.dataUrl || `data:${page.mimeType};base64,${page.base64}`,
+      },
+    }));
+
+    const apiResponse = await callOpenRouterVisionAPI({
+      apiKey,
+      model,
+      systemPrompt: QUESTION_EXTRACT_SYSTEM_PROMPT,
+      userPrompt: buildQuestionExtractUserPrompt({
+        subject: metadata.subject,
+        paper: metadata.paper,
+        year: metadata.year,
+        pageCount: extractPages.length,
+      }),
+      images: imageContents,
+      temperature: 0.1,
+      maxTokens: EXTRACT_MAX_TOKENS,
+    });
+
+    if (!apiResponse.success) {
+      console.warn("⚠️ Question extract failed:", apiResponse.error);
+      return { questionText: "", directive: "", confidence: "low" };
+    }
+
+    const parsed = parseJSONFromResponse(apiResponse.content) || {};
+    return {
+      questionText: String(parsed.questionText || "").trim(),
+      directive: String(parsed.directive || "").trim(),
+      wordLimit: parsed.wordLimit ?? null,
+      confidence: parsed.confidence || "medium",
+    };
+  } catch (err) {
+    console.warn("⚠️ Question extract error:", err.message);
+    return { questionText: "", directive: "", confidence: "low" };
+  }
+}
 
 const callVisionWithRetry = async ({
   apiKey,
@@ -359,6 +495,9 @@ const callVisionWithRetry = async ({
   pages,
   metadata,
   maxMarks,
+  knowledgeContext = "",
+  extractedQuestionHint = "",
+  knowledgeMeta = null,
 }) => {
   const userPrompt = buildVisionUserPrompt({
     subject: metadata.subject,
@@ -366,6 +505,8 @@ const callVisionWithRetry = async ({
     year: metadata.year,
     pageCount: pages.length,
     maxMarks,
+    knowledgeContext,
+    extractedQuestionHint,
   });
 
   const imageContents = pages.map((page) => ({
@@ -386,7 +527,7 @@ const callVisionWithRetry = async ({
       systemPrompt: VISION_EVALUATION_SYSTEM_PROMPT,
       userPrompt:
         attempt > 0
-          ? `${userPrompt}\n\nIMPORTANT: Previous response failed validation (${lastValidationHint || "incomplete line-by-line feedback"}). Return ONLY valid JSON. You MUST include lineFeedback[] for introduction, every body section, and conclusion — each with studentLine (exact quote), examinerAnalysis (3–5 sentences of Research & Analysis per line), howToImprove (3–5 actionable sentences). Need at least 6+ lineFeedback entries total for a typical answer. No generic one-line feedback.`
+          ? `${userPrompt}\n\nIMPORTANT: Previous response failed validation (${lastValidationHint || "incomplete feedback"}). Return ONLY valid JSON. Must include: onTrackVerdict, criticalMistakes[], and lineFeedback[] for introduction, every body section, and conclusion — each with studentLine, verdict, examinerAnalysis (3–5 sentences), howToImprove (3–5 sentences). Need ≥6 lineFeedback entries for a typical answer.`
           : userPrompt,
       images: imageContents,
       temperature: attempt === 0 ? 0.2 : 0.1,
@@ -404,7 +545,7 @@ const callVisionWithRetry = async ({
 
     lastRaw = apiResponse.content;
     const parsed = parseJSONFromResponse(apiResponse.content);
-    const normalized = normalizeEvaluationResult(parsed);
+    const normalized = normalizeEvaluationResult(parsed, { knowledgeMeta });
     const validation = validateEvaluationResult(normalized);
 
     if (validation.valid) {
@@ -436,7 +577,7 @@ const callVisionWithRetry = async ({
 };
 
 /**
- * Evaluate answer copy images via OpenRouter vision
+ * Evaluate answer copy images via OpenRouter vision + MentorsDaily KB
  */
 export const evaluateCopyWithVision = async ({
   pages,
@@ -456,12 +597,50 @@ export const evaluateCopyWithVision = async ({
   const visionModel =
     model || process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
 
+  // Pass 1: extract question for targeted KB retrieval
+  console.log("📝 Extracting question from copy for KB grounding...");
+  const extracted = await extractQuestionFromPages({
+    apiKey,
+    model: visionModel,
+    pages,
+    metadata,
+  });
+
+  // Pass 1.5: MentorsDaily knowledge base
+  console.log("📚 Retrieving MentorsDaily knowledge for evaluation...");
+  const kb = await getCopyEvaluationKnowledgeContext({
+    questionText: extracted.questionText,
+    subject: metadata.subject,
+    paper: metadata.paper,
+  });
+
+  const knowledgeMeta = {
+    used: Boolean(kb.contextText?.trim()),
+    chunkCount: kb.chunkCount || 0,
+    source: kb.source || "empty",
+    kbSubject: kb.kbSubject || null,
+    query: kb.query || "",
+    extractedQuestion: extracted.questionText || "",
+  };
+
+  if (knowledgeMeta.used) {
+    console.log(
+      `✅ KB context ready (${knowledgeMeta.chunkCount} chunks, source=${knowledgeMeta.source}, subject=${knowledgeMeta.kbSubject || "any"})`
+    );
+  } else {
+    console.log("ℹ️ No KB chunks found — evaluating with LLM examiner knowledge only");
+  }
+
+  // Pass 2: full examiner evaluation
   return callVisionWithRetry({
     apiKey,
     model: visionModel,
     pages,
     metadata,
     maxMarks: maxMarks || 15,
+    knowledgeContext: kb.contextText || "",
+    extractedQuestionHint: extracted.questionText || "",
+    knowledgeMeta,
   });
 };
 

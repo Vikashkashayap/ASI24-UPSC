@@ -134,9 +134,30 @@ export interface GenerateTestParams {
 export interface GenerateFullMockParams {
   subject: string; // One subject or comma-separated, e.g. "Polity" or "Polity, History, Geography"
 }
+export interface PrelimsDailyStatus {
+  locked: boolean;
+  usedToday: boolean;
+  dateKey: string;
+  unlocksAt: string;
+  bypass?: boolean;
+  todayTest?: {
+    _id: string;
+    topic: string;
+    subject: string;
+    createdAt: string;
+    isSubmitted: boolean;
+  } | null;
+}
+
 export const testAPI = {
   generateTest: async (params: GenerateTestParams) => {
     return api.post("/api/tests/generate", params);
+  },
+
+  getPrelimsDailyStatus: async () => {
+    return api.get<{ success: boolean; data: PrelimsDailyStatus; message?: string }>(
+      "/api/tests/prelims-daily-status"
+    );
   },
 
   generateFullMockTest: async (params: GenerateFullMockParams) => {
