@@ -703,7 +703,14 @@ export const syllabusTargetsAPI = {
         medium?: "en" | "hi";
       };
     }>(`/api/admin/syllabus-targets/catalog/${subjectKey}`, { params }),
-  listAdmin: (params?: { page?: number; limit?: number; filter?: string; subjectKey?: string }) =>
+  listAdmin: (params?: {
+    page?: number;
+    limit?: number;
+    filter?: string;
+    subjectKey?: string;
+    studentId?: string;
+    student?: string;
+  }) =>
     api.get<{
       success: boolean;
       data: {

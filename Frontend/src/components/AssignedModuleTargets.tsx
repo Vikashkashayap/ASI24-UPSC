@@ -108,13 +108,14 @@ function axiosMessage(err: unknown): string {
   return "Could not start chapter practice";
 }
 
-/** Module N unlocked only after previous module (syllabus order) is fully complete. */
+/** Module N unlocked only after previous module in the same subject is fully complete. */
 function isModuleLocked(
   target: StudentSyllabusTarget,
   allTargets: StudentSyllabusTarget[]
 ): boolean {
   if (target.completed) return false;
-  const ordered = [...allTargets].sort(compareBySyllabus);
+  const sameSubject = allTargets.filter((t) => t.subjectKey === target.subjectKey);
+  const ordered = [...sameSubject].sort(compareBySyllabus);
   const idx = ordered.findIndex((t) => t._id === target._id);
   if (idx <= 0) return false;
   return !ordered[idx - 1].completed;
@@ -376,7 +377,8 @@ export function AssignedModuleTargets() {
           : 0;
     const prevModule = (() => {
       if (!moduleLocked) return null;
-      const ordered = [...targets].sort(compareBySyllabus);
+      const sameSubject = targets.filter((x) => x.subjectKey === t.subjectKey);
+      const ordered = [...sameSubject].sort(compareBySyllabus);
       const idx = ordered.findIndex((x) => x._id === t._id);
       return idx > 0 ? ordered[idx - 1] : null;
     })();

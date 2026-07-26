@@ -72,6 +72,9 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   const [list, setList] = useState<SyllabusModuleTargetItem[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listPage, setListPage] = useState(1);
+  const [listSubjectFilter, setListSubjectFilter] = useState("");
+  const [listStudentIdFilter, setListStudentIdFilter] = useState("");
+  const [listStudentSearch, setListStudentSearch] = useState("");
   const [listPagination, setListPagination] = useState<{
     page: number;
     total: number;
@@ -121,7 +124,13 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   const loadList = useCallback(async () => {
     try {
       setListLoading(true);
-      const res = await syllabusTargetsAPI.listAdmin({ page: listPage, limit: 10, filter: "active" });
+      const res = await syllabusTargetsAPI.listAdmin({
+        page: listPage,
+        limit: 10,
+        filter: "active",
+        ...(listSubjectFilter ? { subjectKey: listSubjectFilter } : {}),
+        ...(listStudentIdFilter ? { studentId: listStudentIdFilter } : {}),
+      });
       if (res.data.success) {
         setList(res.data.data.targets || []);
         setListPagination(res.data.data.pagination);
@@ -131,7 +140,7 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
     } finally {
       setListLoading(false);
     }
-  }, [listPage]);
+  }, [listPage, listSubjectFilter, listStudentIdFilter]);
 
   useEffect(() => {
     loadCatalog();
@@ -334,6 +343,21 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   const selectedSubject = subjects.find((s) => s.key === subjectKey);
   const subjectLabel = (s: SyllabusCatalogSubject) => s.displayName || s.name;
   const moduleWord = medium === "hi" ? "मॉड्यूल" : "modules";
+
+  const assignmentStudentOptions = useMemo(() => {
+    const q = listStudentSearch.trim().toLowerCase();
+    const sorted = [...students].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
+    if (!q) return sorted.slice(0, 200);
+    return sorted
+      .filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.email.toLowerCase().includes(q)
+      )
+      .slice(0, 200);
+  }, [students, listStudentSearch]);
+
+  const selectedListStudent = students.find((s) => s._id === listStudentIdFilter);
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 px-3 md:px-6 pb-8">
@@ -798,12 +822,107 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
       </Card>
 
       <Card className={`border ${surface}`}>
-        <CardHeader>
-          <CardTitle className={`text-lg ${text}`}>Active assignments</CardTitle>
-          <CardDescription>
-            Modules currently assigned as student home targets
-            {listPagination ? ` · ${listPagination.total} total` : ""}
-          </CardDescription>
+        <CardHeader className="space-y-3">
+          <div className="flex flex-col gap-3">
+            <div className="min-w-0">
+              <CardTitle className={`text-lg ${text}`}>Active assignments</CardTitle>
+              <CardDescription>
+                Modules currently assigned as student home targets
+                {listPagination ? ` · ${listPagination.total} total` : ""}
+                {listSubjectFilter
+                  ? ` · subject: ${
+                      subjects.find((s) => s.key === listSubjectFilter)?.displayName ||
+                      subjects.find((s) => s.key === listSubjectFilter)?.name ||
+                      listSubjectFilter
+                    }`
+                  : ""}
+                {selectedListStudent ? ` · student: ${selectedListStudent.name}` : ""}
+              </CardDescription>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="min-w-0">
+                <label className={`block text-[10px] font-semibold uppercase tracking-wide mb-1 ${muted}`}>
+                  Filter by subject
+                </label>
+                <select
+                  className={inputClass}
+                  value={listSubjectFilter}
+                  onChange={(e) => {
+                    setListSubjectFilter(e.target.value);
+                    setListPage(1);
+                  }}
+                  aria-label="Filter active assignments by subject"
+                >
+                  <option value="">All subjects</option>
+                  {subjects.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {subjectLabel(s)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="min-w-0">
+                <label className={`block text-[10px] font-semibold uppercase tracking-wide mb-1 ${muted}`}>
+                  Filter by student
+                </label>
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <Search className={`absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${muted}`} />
+                    <input
+                      type="text"
+                      value={listStudentSearch}
+                      onChange={(e) => setListStudentSearch(e.target.value)}
+                      placeholder="Search student name…"
+                      className={`${inputClass} pl-8`}
+                      aria-label="Search student name"
+                    />
+                  </div>
+                  <select
+                    className={inputClass}
+                    value={listStudentIdFilter}
+                    onChange={(e) => {
+                      setListStudentIdFilter(e.target.value);
+                      setListPage(1);
+                    }}
+                    aria-label="Filter active assignments by student"
+                  >
+                    <option value="">All students</option>
+                    {listStudentIdFilter &&
+                      selectedListStudent &&
+                      !assignmentStudentOptions.some((s) => s._id === listStudentIdFilter) && (
+                        <option value={selectedListStudent._id}>
+                          {selectedListStudent.name}
+                        </option>
+                      )}
+                    {assignmentStudentOptions.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            {(listSubjectFilter || listStudentIdFilter) && (
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => {
+                    setListSubjectFilter("");
+                    setListStudentIdFilter("");
+                    setListStudentSearch("");
+                    setListPage(1);
+                  }}
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Clear filters
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {listLoading ? (
@@ -811,7 +930,11 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
               <Loader2 className="w-4 h-4 animate-spin" /> Loading…
             </div>
           ) : list.length === 0 ? (
-            <p className={`text-sm text-center py-10 ${muted}`}>No active syllabus targets yet</p>
+            <p className={`text-sm text-center py-10 ${muted}`}>
+              {listSubjectFilter || listStudentIdFilter
+                ? "No active assignments match these filters"
+                : "No active syllabus targets yet"}
+            </p>
           ) : (
             <div className="space-y-2">
               {list.map((item) => (

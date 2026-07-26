@@ -268,11 +268,42 @@ export const listAdminSyllabusTargets = async (req, res) => {
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
     const filter = req.query.filter || "active";
     const subjectKey = req.query.subjectKey ? String(req.query.subjectKey) : "";
+    const studentId = req.query.studentId ? String(req.query.studentId).trim() : "";
+    const studentName = req.query.student ? String(req.query.student).trim() : "";
 
     const query = {};
     if (filter === "active") query.status = "active";
     else if (filter === "archived") query.status = "archived";
     if (subjectKey) query.subjectKey = subjectKey;
+
+    if (studentId) {
+      query.assignedStudentIds = studentId;
+    } else if (studentName) {
+      const escaped = studentName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const matchedStudents = await User.find({
+        name: { $regex: escaped, $options: "i" },
+      })
+        .select("_id")
+        .lean();
+      const matchedIds = matchedStudents.map((s) => s._id);
+      if (matchedIds.length === 0) {
+        return res.json({
+          success: true,
+          data: {
+            targets: [],
+            pagination: {
+              page,
+              limit,
+              total: 0,
+              totalPages: 1,
+              hasPrev: false,
+              hasNext: false,
+            },
+          },
+        });
+      }
+      query.assignedStudentIds = { $in: matchedIds };
+    }
 
     const total = await SyllabusModuleTarget.countDocuments(query);
     const records = await SyllabusModuleTarget.find(query)
@@ -657,10 +688,11 @@ export const startChapterPractice = async (req, res) => {
       return res.status(400).json({ success: false, message: "Chapter is not part of this module" });
     }
 
-    // Module lock: previous assigned module (syllabus order) must be fully complete
+    // Module lock: previous assigned module in the same subject must be fully complete
     const allAssigned = await SyllabusModuleTarget.find({
       status: "active",
       assignedStudentIds: userId,
+      subjectKey: record.subjectKey,
     }).lean();
     const subjectRank = new Map(listSyllabusSubjects("en").map((s, i) => [s.key, i]));
     const orderedModules = allAssigned
@@ -826,10 +858,11 @@ export const startModuleFinal = async (req, res) => {
       });
     }
 
-    // Previous module must be complete (same lock as chapter practice)
+    // Previous module in the same subject must be complete (same lock as chapter practice)
     const allAssigned = await SyllabusModuleTarget.find({
       status: "active",
       assignedStudentIds: userId,
+      subjectKey: record.subjectKey,
     }).lean();
     const subjectRank = new Map(listSyllabusSubjects("en").map((s, i) => [s.key, i]));
     const orderedModules = allAssigned
