@@ -110,7 +110,19 @@ async function generateTestQuestionsFromKnowledgeBase({
     );
   }
 
-  const selectedPatterns = resolveNotesPatterns(ALL_PATTERN_IDS);
+  let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
+  let openKnowledgeUsed = preferOpenKnowledge;
+
+  const openKnowledgePatterns = resolveNotesPatterns([
+    "statement_based",
+    "direct_conceptual",
+    "assertion_reason",
+    "elimination",
+  ]);
+  // Open-knowledge: simpler patterns → fewer incomplete pair/match stems from flash-lite
+  const selectedPatterns = preferOpenKnowledge
+    ? openKnowledgePatterns
+    : resolveNotesPatterns(ALL_PATTERN_IDS);
   const planState = questionPatternEngine.createPlan({
     questionCount: count + Math.min(5, count),
     patternsToInclude: selectedPatterns,
@@ -127,32 +139,36 @@ async function generateTestQuestionsFromKnowledgeBase({
       Math.max(5, parseInt(process.env.TEST_GEN_BATCH_SIZE, 10) || 8),
       parseInt(process.env.QG_MAX_QUESTIONS_PER_CALL, 10) || 10
     );
-  const maxBatchRounds = getTestGenMaxBatchRounds(count, batchSize);
+  const maxBatchRoundsBase = getTestGenMaxBatchRounds(count, batchSize);
+  const maxBatchRounds = preferOpenKnowledge
+    ? Math.min(maxBatchRoundsBase, Math.ceil(count / Math.min(batchSize, 8)) + 3)
+    : maxBatchRoundsBase;
   const usedChunkIds = new Set();
   let validatedQuestions = [];
   let stallRounds = 0;
-  let openKnowledgeUsed = false;
-  let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
 
   if (forceKbOnly) {
     console.warn("⚠️ PRELIMS_FORCE_KB_ONLY=true — LLM fallback disabled (KB-only)");
   }
 
   console.log(
-    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge}`
+    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge} | maxRounds=${maxBatchRounds}`
   );
 
   const runBatch = async ({ need, round, openKnowledge, contextText, ragSource }) => {
+    // Ask for extra Qs to absorb incomplete-stem + soft topic drops (caps at 10)
+    const askCount = Math.min(10, Math.max(need, Math.ceil(need * 1.35)));
+    const patternsForBatch = openKnowledge ? openKnowledgePatterns : selectedPatterns;
     const batchResult = await generateQuestionsFromContextBatch({
       contextText: openKnowledge ? "" : contextText,
       topic: topicQuery,
       difficulty: difficultyKey,
-      batchSize: need,
-      patternsToInclude: selectedPatterns,
+      batchSize: askCount,
+      patternsToInclude: patternsForBatch,
       batchIndex: round,
       generationPlan: questionPatternEngine.nextBatchPlan({
         plan: planState,
-        batchSize: need,
+        batchSize: askCount,
       }),
       subject: primarySubject,
       chapter: "",
@@ -164,7 +180,7 @@ async function generateTestQuestionsFromKnowledgeBase({
       return [];
     }
 
-    const mapped = batchResult.questions.slice(0, need).map((q) =>
+    const mapped = batchResult.questions.slice(0, askCount).map((q) =>
       pickBilingualQuestionFields({
         ...q,
         topic: q.topic || topicQuery,
@@ -176,12 +192,17 @@ async function generateTestQuestionsFromKnowledgeBase({
       })
     );
 
-    const onTopic = filterQuestionsByTopic(mapped, topicQuery);
+    // LLM open-syllabus already has TOPIC LOCK in the prompt — soft filter only
+    // (strict keyword filter was dropping valid Economy Qs that don't say "evolution")
+    const onTopic = filterQuestionsByTopic(mapped, topicQuery, {
+      soft: Boolean(openKnowledge),
+    });
     if (onTopic.dropped > 0) {
       console.warn(
-        `⚠️ Prelims batch ${round + 1}: dropped ${onTopic.dropped} off-topic question(s) for "${topicQuery}" (${openKnowledge ? "LLM" : "KB"})`
+        `⚠️ Prelims batch ${round + 1}: dropped ${onTopic.dropped} off-topic question(s) for "${topicQuery}" (${openKnowledge ? "LLM-soft" : "KB"})`
       );
     }
+    // Keep all on-topic (may be > need) so progress fills faster across rounds
     return onTopic.questions;
   };
 
@@ -264,6 +285,10 @@ async function generateTestQuestionsFromKnowledgeBase({
     validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...kept], {
       csat: false,
     }).slice(0, count);
+
+    console.log(
+      `📈 Prelims progress: ${validatedQuestions.length}/${count} on-topic (batch ${round + 1}/${maxBatchRounds})`
+    );
 
     if (validatedQuestions.length === beforeLen) {
       stallRounds += 1;

@@ -1,9 +1,11 @@
 /**
  * Topic ↔ content relevance helpers.
- * Prevents off-topic KB chunks / cached questions (e.g. Preamble for Cabinet) from leaking in.
+ * Prevents clear off-topic leaks (e.g. Preamble for Cabinet) without
+ * killing valid on-topic Qs (NITI, Five Year Plan, LPG reforms, etc.).
  */
 
-const STOP = new Set([
+/** Pure filler — never strip subject words like economy/indian from the student topic */
+const FILLER_STOP = new Set([
   "the",
   "and",
   "for",
@@ -19,8 +21,15 @@ const STOP = new Set([
   "over",
   "between",
   "among",
-  "india",
-  "indian",
+  "of",
+  "on",
+  "in",
+  "to",
+  "a",
+  "an",
+  "its",
+  "their",
+  "our",
   "upsc",
   "prelims",
   "gs",
@@ -28,32 +37,111 @@ const STOP = new Set([
   "paper",
   "topic",
   "subject",
-  "polity",
-  "history",
-  "geography",
-  "economy",
-  "environment",
-  "science",
-  "tech",
-  "culture",
-  "current",
-  "affairs",
-  "csat",
 ]);
 
-/** Common UPSC topic synonyms / typo fixes so retrieval scoring is resilient. */
+/** Per-token synonyms / stems / typos */
 const TOKEN_ALIASES = {
-  cabinent: ["cabinet"],
-  cabinet: ["cabinet", "cabinets"],
+  cabinent: ["cabinet", "cabinets"],
+  cabinet: ["cabinets", "cabinet committee", "ccs"],
   ministers: ["minister", "ministry", "ministries", "council"],
   minister: ["ministers", "ministry", "ministries"],
-  council: ["councils", "cabinet"],
-  committee: ["committees", "cabinet"],
-  committees: ["committee", "cabinet"],
+  council: ["councils"],
+  committee: ["committees"],
+  committees: ["committee"],
   preamble: ["preamble"],
   federalism: ["federal", "federation"],
-  judiciary: ["judicial", "supreme", "highcourt"],
+  judiciary: ["judicial", "supreme court", "high court"],
+  economic: ["economy", "economies", "economically"],
+  economy: ["economic", "economies", "economically"],
+  planning: ["plan", "plans", "planned", "planner", "planners"],
+  plan: ["plans", "planned", "planning"],
+  plans: ["plan", "planned", "planning"],
+  evolution: ["evolve", "evolved", "development", "growth", "transition", "reform", "reforms"],
+  indian: ["india"],
+  india: ["indian"],
 };
+
+/**
+ * Extra domain phrases keyed by normalized topic phrase.
+ * Matched as substrings in question text.
+ */
+const TOPIC_PHRASE_HINTS = {
+  "economic planning": [
+    "five year plan",
+    "five-year plan",
+    "planning commission",
+    "niti aayog",
+    "niti ayog",
+    "national development council",
+    "mixed economy",
+    "licence raj",
+    "license raj",
+    "planned economy",
+    "central planning",
+    "indicative planning",
+    "perspective plan",
+    "rolling plan",
+    "bombay plan",
+    "gadgil",
+    "growth target",
+  ],
+  "evolution of the indian economy": [
+    "indian economy",
+    "colonial economy",
+    "pre-independence",
+    "post-independence",
+    "five year plan",
+    "five-year plan",
+    "planning commission",
+    "niti aayog",
+    "mixed economy",
+    "licence raj",
+    "license raj",
+    "lpg",
+    "liberali",
+    "privatisation",
+    "privatization",
+    "globalisation",
+    "globalization",
+    "1991",
+    "economic reform",
+    "green revolution",
+    "hindu rate",
+    "bombay plan",
+    "drain of wealth",
+    "deindustrial",
+    "gdp",
+    "national income",
+    "public sector",
+    "industrial policy",
+  ],
+  "central council of ministers": [
+    "cabinet",
+    "prime minister",
+    "council of ministers",
+    "article 74",
+    "article 75",
+    "collective responsibility",
+  ],
+  "cabinet committee": [
+    "cabinet committee",
+    "ccs",
+    "ccp",
+    "cabinet secretariat",
+    "council of ministers",
+  ],
+};
+
+/** If question hits these AND misses topic tokens, treat as clear off-topic (soft mode). */
+const CLEAR_OFFTOPIC_MARKERS = [
+  "preamble of the constitution",
+  "preamble to the constitution",
+  "fundamental rights",
+  "directive principles",
+  "dpsp",
+  "supreme court of india was established",
+  "which schedule of the constitution",
+];
 
 function editDistance(a, b) {
   if (a === b) return 0;
@@ -73,6 +161,14 @@ function editDistance(a, b) {
   return prev[b.length];
 }
 
+function normalizeTopicKey(topic) {
+  return String(topic || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /**
  * @param {string} topic
  * @returns {string[]}
@@ -82,7 +178,7 @@ export function tokenizeTopic(topic) {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter((t) => t.length >= 3 && !STOP.has(t));
+    .filter((t) => t.length >= 3 && !FILLER_STOP.has(t));
 
   const out = new Set();
   for (const t of raw) {
@@ -92,15 +188,38 @@ export function tokenizeTopic(topic) {
   return [...out];
 }
 
+function phraseHintsForTopic(topic) {
+  const key = normalizeTopicKey(topic);
+  const hints = new Set();
+  if (TOPIC_PHRASE_HINTS[key]) {
+    for (const h of TOPIC_PHRASE_HINTS[key]) hints.add(h);
+  }
+  for (const [k, list] of Object.entries(TOPIC_PHRASE_HINTS)) {
+    if (key.includes(k) || k.includes(key)) {
+      for (const h of list) hints.add(h);
+    }
+    // overlap on a distinctive multi-word fragment
+    const keyWords = key.split(" ").filter((w) => w.length >= 5);
+    if (keyWords.length >= 2 && keyWords.every((w) => k.includes(w) || w.includes(k.split(" ")[0]))) {
+      // skip overly loose match
+    }
+    if (keyWords.some((w) => w.length >= 6 && k.includes(w)) && k.split(" ").length >= 2) {
+      for (const h of list) hints.add(h);
+    }
+  }
+  if (key.length >= 6) hints.add(key);
+  return [...hints];
+}
+
 function textHasToken(haystack, token) {
   if (!token) return false;
-  if (haystack.includes(token)) return true;
-  // Fuzzy: allow 1 edit for long tokens (typos like cabinent↔cabinet)
-  if (token.length >= 6) {
+  const t = String(token).toLowerCase();
+  if (haystack.includes(t)) return true;
+  if (t.length >= 6 && !t.includes(" ")) {
     const words = haystack.split(/[^a-z0-9]+/).filter((w) => w.length >= 5);
     for (const w of words) {
-      if (Math.abs(w.length - token.length) > 1) continue;
-      if (editDistance(w, token) <= 1) return true;
+      if (Math.abs(w.length - t.length) > 1) continue;
+      if (editDistance(w, t) <= 1) return true;
     }
   }
   return false;
@@ -131,18 +250,20 @@ export function topicOverlapScore(text, tokens) {
  */
 export function filterChunksByTopic(chunks, topic, opts = {}) {
   const tokens = tokenizeTopic(topic);
-  if (!tokens.length) return { chunks: chunks || [], tokens, dropped: 0 };
+  const phrases = phraseHintsForTopic(topic);
+  if (!tokens.length && !phrases.length) return { chunks: chunks || [], tokens, dropped: 0 };
 
-  // At least one distinctive topic token must appear (aliases expand the search set)
   const minHits = Math.max(1, opts.minHits ?? 1);
   const kept = [];
   let dropped = 0;
   for (const c of chunks || []) {
     const blob = [c.heading, c.subTopic, c.chapter, c.book, c.text].filter(Boolean).join(" ");
-    const score = topicOverlapScore(blob, tokens);
-    const hitCount = Math.round(score * tokens.length);
-    if (hitCount >= minHits) {
-      kept.push({ ...c, topicOverlap: score });
+    const hay = blob.toLowerCase();
+    const score = tokens.length ? topicOverlapScore(hay, tokens) : 0;
+    const hitCount = tokens.length ? Math.round(score * tokens.length) : 0;
+    const phraseHit = phrases.some((p) => hay.includes(p));
+    if (hitCount >= minHits || phraseHit) {
+      kept.push({ ...c, topicOverlap: Math.max(score, phraseHit ? 0.5 : 0) });
     } else {
       dropped += 1;
     }
@@ -150,17 +271,9 @@ export function filterChunksByTopic(chunks, topic, opts = {}) {
   return { chunks: kept, tokens, dropped };
 }
 
-/**
- * True if question content is about the topic (not just same subject).
- * @param {object} question
- * @param {string} topic
- */
-export function isQuestionOnTopic(question, topic) {
-  const tokens = tokenizeTopic(topic);
-  if (!tokens.length) return true;
-
+function questionBlob(question) {
   const opts = question?.options || {};
-  const blob = [
+  return [
     question?.question,
     question?.question_en,
     question?.topic,
@@ -176,24 +289,54 @@ export function isQuestionOnTopic(question, topic) {
     opts.d,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(" ")
+    .toLowerCase();
+}
 
-  const score = topicOverlapScore(blob, tokens);
-  const hitCount = Math.round(score * tokens.length);
-  // One real topic token in stem/options/explanation is enough
-  return hitCount >= 1;
+/**
+ * True if question content is about the topic (not just same subject).
+ * @param {object} question
+ * @param {string} topic
+ * @param {{ soft?: boolean }} [opts] soft=true → only drop clear cross-topic leaks
+ */
+export function isQuestionOnTopic(question, topic, opts = {}) {
+  const soft = Boolean(opts.soft);
+  const tokens = tokenizeTopic(topic);
+  const phrases = phraseHintsForTopic(topic);
+  if (!tokens.length && !phrases.length) return true;
+
+  const hay = questionBlob(question);
+  if (!hay.trim()) return false;
+
+  if (phrases.some((p) => hay.includes(p))) return true;
+
+  const score = tokens.length ? topicOverlapScore(hay, tokens) : 0;
+  const hitCount = tokens.length ? Math.round(score * tokens.length) : 0;
+  if (hitCount >= 1) return true;
+
+  if (soft) {
+    // LLM open-syllabus: trust prompt TOPIC LOCK unless clearly another chapter
+    const clearLeak = CLEAR_OFFTOPIC_MARKERS.some((m) => hay.includes(m));
+    return !clearLeak;
+  }
+
+  return false;
 }
 
 /**
  * Filter an array of questions down to on-topic ones.
+ * @param {object[]} questions
+ * @param {string} topic
+ * @param {{ soft?: boolean }} [opts]
  */
-export function filterQuestionsByTopic(questions, topic) {
+export function filterQuestionsByTopic(questions, topic, opts = {}) {
   const list = Array.isArray(questions) ? questions : [];
-  const kept = list.filter((q) => isQuestionOnTopic(q, topic));
+  const kept = list.filter((q) => isQuestionOnTopic(q, topic, opts));
   return {
     questions: kept,
     dropped: list.length - kept.length,
     tokens: tokenizeTopic(topic),
+    soft: Boolean(opts.soft),
   };
 }
 
