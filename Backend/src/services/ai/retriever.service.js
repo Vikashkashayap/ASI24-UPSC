@@ -8,6 +8,7 @@ import { prepareContextForBatch } from "./contextReducer.service.js";
 import SourceUrl from "../../models/SourceUrl.js";
 import { retrieveAndBuildContext } from "../qg/index.js";
 import { QG_CONFIG } from "../qg/config/qg.config.js";
+import { filterChunksByTopic } from "../qg/utils/topicRelevance.js";
 
 /** Final context chunks after hybrid retrieve + rerank (enterprise pipeline). */
 const RAG_TOP_K =
@@ -341,18 +342,34 @@ class RetrieverService {
         excludeChunkIds,
         maxTokens,
       });
-      if (built.contextText?.length >= 80) {
-        return {
-          contextText: built.contextText,
-          chunks: built.chunks,
-          source: built.source || "hybrid",
-          tokens: built.tokens,
-          chunkIds: built.chunkIds,
-          query: angledQuery,
-          scope: "subject",
-          subject: subjectStr,
-          hybrid: true,
-        };
+      const topicFiltered = filterChunksByTopic(built.chunks || [], q);
+      if (topicFiltered.dropped > 0) {
+        console.warn(
+          `[retriever] dropped ${topicFiltered.dropped} off-topic chunk(s) for "${q}" (hybrid)`
+        );
+      }
+      if (topicFiltered.chunks.length && built.contextText?.length >= 80) {
+        // Rebuild context from on-topic chunks only when filter removed something
+        const contextText =
+          topicFiltered.dropped > 0
+            ? formatChunksAsContext(topicFiltered.chunks, maxTokens)
+            : built.contextText;
+        const tokens = estimateTokens(contextText);
+        if (contextText.length >= 80) {
+          return {
+            contextText,
+            chunks: topicFiltered.chunks,
+            source: built.source || "hybrid",
+            tokens,
+            chunkIds: topicFiltered.chunks
+              .map((c) => String(c._id || c.mongoChunkId || ""))
+              .filter(Boolean),
+            query: angledQuery,
+            scope: "subject",
+            subject: subjectStr,
+            hybrid: true,
+          };
+        }
       }
     }
 
@@ -412,6 +429,14 @@ class RetrieverService {
     }
 
     selected = selected.slice(0, RAG_TOP_K);
+    const topicFiltered = filterChunksByTopic(selected, q);
+    if (topicFiltered.dropped > 0) {
+      console.warn(
+        `[retriever] dropped ${topicFiltered.dropped} off-topic chunk(s) for "${q}" (${source})`
+      );
+    }
+    selected = topicFiltered.chunks;
+
     const contextText = formatChunksAsContext(selected, maxTokens);
     const tokens = estimateTokens(contextText);
 

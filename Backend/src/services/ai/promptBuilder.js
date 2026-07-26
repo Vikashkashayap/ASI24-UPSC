@@ -84,10 +84,15 @@ OPTION QUALITY:
 - Options must be mutually exclusive (exactly one correct).
 - Every option A–D must be non-empty real text (never "—" or blank).`;
 
-/** Used only when knowledge base returned zero chunks for the topic. */
+/** Used only when knowledge base returned zero on-topic chunks for the topic. */
 const OPEN_KNOWLEDGE_SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
-No knowledge-base CONTEXT was found. Use standard UPSC syllabus knowledge for the topic only.
+No on-topic knowledge-base CONTEXT was found. Use standard UPSC syllabus knowledge for the requested Topic ONLY.
 Return ONLY a JSON array (no markdown).
+
+TOPIC LOCK (mandatory):
+- Every question MUST be directly about the Topic given by the user.
+- Do NOT drift to related-but-different syllabus areas (e.g. if Topic is Cabinet/Council of Ministers, do NOT ask about Preamble, Fundamental Rights, Citizenship, or amendment procedure).
+- If you cannot write a high-quality on-topic question, omit it — never pad with off-topic MCQs.
 
 CRITICAL CONSISTENCY LOCK:
 1. Decide which option TEXT is correct first.
@@ -133,8 +138,13 @@ export function buildNotesQuestionUserPrompt(params) {
   if (openKnowledge) {
     return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
 Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
-Knowledge base had no matching chunks. Generate EXACTLY ${count} complete UPSC MCQs from standard syllabus knowledge for this topic.
-For each item: answer letter MUST match correct option text; explanation MUST defend that same letter only (open with Option {answer}).
+Knowledge base had no on-topic chunks for this Topic. Generate EXACTLY ${count} complete UPSC Prelims MCQs from standard syllabus knowledge.
+
+HARD RULES:
+1. TOPIC LOCK: every question MUST be about "${topic}" only — no off-topic drift within the same subject.
+2. Decide correct OPTION TEXT first, then set answer = that letter.
+3. explanation MUST start with: Option {answer} ("{that option text}") is correct. (50–70 words)
+4. answer letter ↔ option text ↔ explanation must match.
 JSON array only.`;
   }
 
@@ -148,8 +158,9 @@ HARD RULES (student safety):
 3. explanation = 50–70 words; MUST start with: Option {answer} ("{that option text}") is correct.
 4. explanation must NEVER say a different letter is correct.
 5. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME. If wrong, fix answer.
-6. Questions must be directly about the Topic. Ignore broad/unrelated CONTEXT lines even if they are in the same subject.
-7. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
+6. TOPIC LOCK: Every question MUST be directly about "${topic}". If CONTEXT is about a different sub-topic (e.g. Preamble when Topic is Cabinet), IGNORE that CONTEXT and return [] — do NOT invent off-topic MCQs.
+7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
+8. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
 
 JSON array only.
 

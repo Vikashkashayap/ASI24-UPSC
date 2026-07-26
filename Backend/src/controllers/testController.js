@@ -9,6 +9,7 @@ import {
   getPrelimsDailyLockStatus,
   PRELIMS_DAILY_LIMIT_MESSAGE,
 } from "../services/prelimsTopicDailyLock.js";
+import { filterQuestionsByTopic } from "../services/qg/utils/topicRelevance.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
@@ -154,20 +155,6 @@ export const generateTest = async (req, res) => {
     const { subjects, topic, examType, questionCount, difficulty, csatCategories, currentAffairsPeriod } = req.body;
     const count = questionCount != null ? parseInt(questionCount, 10) : null;
 
-    // 1 practice test per calendar day (IST) — enforced before cache / AI
-    const dailyLock = await getPrelimsDailyLockStatus(
-      req.user?._id ?? req.user?.id,
-      req.user?.role
-    );
-    if (dailyLock.locked) {
-      return res.status(403).json({
-        success: false,
-        code: "PRELIMS_DAILY_LIMIT",
-        message: PRELIMS_DAILY_LIMIT_MESSAGE,
-        data: dailyLock,
-      });
-    }
-
     // Validation
     if (!Array.isArray(subjects) || subjects.length === 0 || !topic || !examType || count == null) {
       return res.status(400).json({
@@ -243,48 +230,55 @@ export const generateTest = async (req, res) => {
       }).sort({ createdAt: -1 });
 
       if (existingTest?.questions?.length >= count) {
-        console.log(
-          `♻️  CACHE HIT: Reusing questions for ${subjectDisplay} - ${topicNormalized} (${difficultyKey}, ${count}Q) — skipping AI`
-        );
+        const cacheTopicCheck = filterQuestionsByTopic(existingTest.questions, topicNormalized);
+        if (cacheTopicCheck.dropped > 0 || cacheTopicCheck.questions.length < count) {
+          console.warn(
+            `⚠️ CACHE SKIP: prior test for ${subjectDisplay} - ${topicNormalized} has ${cacheTopicCheck.dropped} off-topic Qs — regenerating`
+          );
+        } else {
+          console.log(
+            `♻️  CACHE HIT: Reusing questions for ${subjectDisplay} - ${topicNormalized} (${difficultyKey}, ${count}Q) — skipping AI`
+          );
 
-        const shuffledQuestions = [...existingTest.questions]
-          .slice(0, count)
-          .map((value) => ({ value, sort: Math.random() }))
-          .sort((a, b) => a.sort - b.sort)
-          .map(({ value }) => value);
+          const shuffledQuestions = [...existingTest.questions]
+            .slice(0, count)
+            .map((value) => ({ value, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ value }) => value);
 
-        const newTest = new Test({
-          userId: req.user?.id,
-          subject: subjectDisplay,
-          examType: "GS",
-          topic: topicNormalized,
-          difficulty: difficultyKey,
-          questions: shuffledQuestions.map((q) => {
-            const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
-            return pickBilingualQuestionFields({ ...plain, userAnswer: null });
-          }),
-          totalQuestions: count,
-        });
+          const newTest = new Test({
+            userId: req.user?.id,
+            subject: subjectDisplay,
+            examType: "GS",
+            topic: topicNormalized,
+            difficulty: difficultyKey,
+            questions: shuffledQuestions.map((q) => {
+              const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
+              return pickBilingualQuestionFields({ ...plain, userAnswer: null });
+            }),
+            totalQuestions: count,
+          });
 
-        await newTest.save();
+          await newTest.save();
 
-        const testForUser = {
-          _id: newTest._id,
-          subject: newTest.subject,
-          examType: newTest.examType,
-          topic: newTest.topic,
-          difficulty: newTest.difficulty,
-          totalQuestions: newTest.totalQuestions,
-          questions: newTest.questions.map((q) => mapQuestionForStart(q)),
-          createdAt: newTest.createdAt,
-          fromCache: true,
-        };
+          const testForUser = {
+            _id: newTest._id,
+            subject: newTest.subject,
+            examType: newTest.examType,
+            topic: newTest.topic,
+            difficulty: newTest.difficulty,
+            totalQuestions: newTest.totalQuestions,
+            questions: newTest.questions.map((q) => mapQuestionForStart(q)),
+            createdAt: newTest.createdAt,
+            fromCache: true,
+          };
 
-        return res.status(201).json({
-          success: true,
-          message: "Test generated successfully (cached)",
-          data: testForUser,
-        });
+          return res.status(201).json({
+            success: true,
+            message: "Test generated successfully (cached)",
+            data: testForUser,
+          });
+        }
       }
 
       console.log(

@@ -33,6 +33,7 @@ import {
   extractClaimedCorrectLetter,
   lockPlainExplanationToAnswer,
 } from "./qg/utils/consistency.js";
+import { filterQuestionsByTopic } from "./qg/utils/topicRelevance.js";
 
 /** GS Prelims uses Knowledge Base RAG by default (same stack as Topic Practice). Set PRELIMS_USE_RAG=false for legacy open LLM. */
 export function isPrelimsRagEnabled(examType) {
@@ -47,7 +48,7 @@ function normalizePrelimsDifficulty(difficulty) {
 }
 
 /**
- * Generate Prelims GS MCQs from Admin Knowledge Base (Qdrant/notes chunks) — same RAG path as Topic Practice.
+ * GS Prelims: prefer on-topic Knowledge Base RAG; if topic missing from KB, fall back to LLM.
  */
 async function generateTestQuestionsFromKnowledgeBase({
   subjects,
@@ -71,7 +72,11 @@ async function generateTestQuestionsFromKnowledgeBase({
   const primarySubject = String(subjectsList[0] || "").trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
-  const allowOpenKnowledge = process.env.PRELIMS_ALLOW_OPEN_KNOWLEDGE === "true";
+  // Student generator: always allow LLM when KB misses / is weak.
+  // Old PRELIMS_ALLOW_OPEN_KNOWLEDGE=false caused stuck empty loops — ignored here.
+  // Set PRELIMS_FORCE_KB_ONLY=true only if you truly want KB-only (no LLM).
+  const forceKbOnly = String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
+  const allowOpenKnowledge = !forceKbOnly;
 
   if (!primarySubject || !topicQuery) {
     throw new Error("Subject and topic are required for knowledge-base generation");
@@ -82,10 +87,26 @@ async function generateTestQuestionsFromKnowledgeBase({
     query: topicQuery,
     batchIndex: 0,
   });
+  const probeHasOnTopicKb = Boolean(probe.contextText && probe.contextText.length >= 80);
+  // Keyword-only retrieval (e.g. Jina embeddings down) is often weakly related — prefer LLM sooner
+  const probeSource = String(probe.source || "");
+  const probeWeakRetrieval =
+    probeHasOnTopicKb &&
+    !/qdrant|hybrid|vector/i.test(probeSource) &&
+    /keyword|metadata|mongo/i.test(probeSource);
 
-  if ((!probe.contextText || probe.contextText.length < 80) && !allowOpenKnowledge) {
-    throw new Error(
-      `No matching content found in Knowledge Base for "${topicQuery}" under ${primarySubject}. Sync website notes or upload PDFs in Admin → Knowledge Base, then try again.`
+  if (!probeHasOnTopicKb) {
+    if (!allowOpenKnowledge) {
+      throw new Error(
+        `No matching content found in Knowledge Base for "${topicQuery}" under ${primarySubject}. Sync website notes or upload PDFs in Admin → Knowledge Base, then try again.`
+      );
+    }
+    console.warn(
+      `📭 No on-topic KB for "${topicQuery}" (${primarySubject}) — using LLM open-syllabus fallback`
+    );
+  } else if (probeWeakRetrieval && allowOpenKnowledge) {
+    console.warn(
+      `📭 Weak KB retrieval for "${topicQuery}" (source=${probeSource}) — preferring LLM open-syllabus`
     );
   }
 
@@ -111,48 +132,19 @@ async function generateTestQuestionsFromKnowledgeBase({
   let validatedQuestions = [];
   let stallRounds = 0;
   let openKnowledgeUsed = false;
+  let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
+
+  if (forceKbOnly) {
+    console.warn("⚠️ PRELIMS_FORCE_KB_ONLY=true — LLM fallback disabled (KB-only)");
+  }
 
   console.log(
-    `📚 Prelims RAG: ${count}Q | batchSize=${batchSize} (~${Math.ceil(count / batchSize)} batches) | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey}`
+    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge}`
   );
 
-  for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
-    const beforeLen = validatedQuestions.length;
-    const need = Math.min(batchSize, count - validatedQuestions.length);
-
-    const rag = await retrieverService.getContextForSubjectQuery({
-      subject: primarySubject,
-      query: topicQuery,
-      batchIndex: round,
-      excludeChunkIds: [...usedChunkIds],
-    });
-    for (const id of rag.chunkIds || []) usedChunkIds.add(id);
-
-    const kbEmpty = !rag.contextText || rag.contextText.length < 80;
-    let openKnowledge = false;
-    let contextText = rag.contextText || "";
-
-    if (kbEmpty) {
-      if (!allowOpenKnowledge) {
-        console.warn(
-          `⚠️ Prelims RAG batch ${round + 1}: no KB chunks — skipping (PRELIMS_ALLOW_OPEN_KNOWLEDGE not enabled)`
-        );
-        stallRounds += 1;
-        if (stallRounds >= 5) break;
-        continue;
-      }
-      openKnowledge = true;
-      openKnowledgeUsed = true;
-      contextText = "";
-      console.warn(`⚠️ Prelims RAG batch ${round + 1}: KB empty — open syllabus fallback`);
-    } else {
-      console.log(
-        `📚 Prelims RAG batch ${round + 1}: source=${rag.source} chunks=${rag.chunks?.length || 0} ~${rag.tokens || 0} tokens`
-      );
-    }
-
+  const runBatch = async ({ need, round, openKnowledge, contextText, ragSource }) => {
     const batchResult = await generateQuestionsFromContextBatch({
-      contextText,
+      contextText: openKnowledge ? "" : contextText,
       topic: topicQuery,
       difficulty: difficultyKey,
       batchSize: need,
@@ -169,10 +161,7 @@ async function generateTestQuestionsFromKnowledgeBase({
     });
 
     if (!batchResult?.success || !batchResult.questions?.length) {
-      console.warn(`⚠️ Prelims RAG batch ${round + 1} returned 0 questions`);
-      stallRounds += 1;
-      if (stallRounds >= 5) break;
-      continue;
+      return [];
     }
 
     const mapped = batchResult.questions.slice(0, need).map((q) =>
@@ -181,11 +170,98 @@ async function generateTestQuestionsFromKnowledgeBase({
         topic: q.topic || topicQuery,
         subject: q.subject || primarySubject,
         conceptualSource:
-          q.conceptualSource || q.sourceParagraph || (openKnowledge ? "open_knowledge" : rag.source),
+          q.conceptualSource ||
+          q.sourceParagraph ||
+          (openKnowledge ? "open_knowledge" : ragSource || "kb"),
       })
     );
 
-    validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...mapped], {
+    const onTopic = filterQuestionsByTopic(mapped, topicQuery);
+    if (onTopic.dropped > 0) {
+      console.warn(
+        `⚠️ Prelims batch ${round + 1}: dropped ${onTopic.dropped} off-topic question(s) for "${topicQuery}" (${openKnowledge ? "LLM" : "KB"})`
+      );
+    }
+    return onTopic.questions;
+  };
+
+  for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
+    const beforeLen = validatedQuestions.length;
+    const need = Math.min(batchSize, count - validatedQuestions.length);
+
+    let openKnowledge = preferOpenKnowledge;
+    let contextText = "";
+    let ragSource = "";
+
+    if (!openKnowledge) {
+      const rag = await retrieverService.getContextForSubjectQuery({
+        subject: primarySubject,
+        query: topicQuery,
+        batchIndex: round,
+        excludeChunkIds: [...usedChunkIds],
+      });
+      for (const id of rag.chunkIds || []) usedChunkIds.add(id);
+
+      const kbEmpty = !rag.contextText || rag.contextText.length < 80;
+      if (kbEmpty) {
+        if (!allowOpenKnowledge) {
+          console.warn(
+            `⚠️ Prelims batch ${round + 1}: no on-topic KB chunks — skipping (open knowledge disabled)`
+          );
+          stallRounds += 1;
+          if (stallRounds >= 5) break;
+          continue;
+        }
+        openKnowledge = true;
+        preferOpenKnowledge = true;
+        openKnowledgeUsed = true;
+        console.warn(
+          `⚠️ Prelims batch ${round + 1}: no on-topic KB — switching to LLM open-syllabus`
+        );
+      } else {
+        contextText = rag.contextText || "";
+        ragSource = rag.source || "kb";
+        console.log(
+          `📚 Prelims batch ${round + 1}: KB source=${ragSource} chunks=${rag.chunks?.length || 0} ~${rag.tokens || 0} tokens`
+        );
+      }
+    } else {
+      openKnowledgeUsed = true;
+      console.log(`🤖 Prelims batch ${round + 1}: LLM open-syllabus for "${topicQuery}"`);
+    }
+
+    let kept = await runBatch({
+      need,
+      round,
+      openKnowledge,
+      contextText,
+      ragSource,
+    });
+
+    // KB returned nothing useful / all off-topic → LLM retry for this round
+    if (!kept.length && !openKnowledge && allowOpenKnowledge) {
+      console.warn(
+        `⚠️ Prelims batch ${round + 1}: KB produced 0 on-topic Qs — retrying via LLM`
+      );
+      preferOpenKnowledge = true;
+      openKnowledgeUsed = true;
+      kept = await runBatch({
+        need,
+        round,
+        openKnowledge: true,
+        contextText: "",
+        ragSource: "",
+      });
+    }
+
+    if (!kept.length) {
+      console.warn(`⚠️ Prelims batch ${round + 1} returned 0 on-topic questions`);
+      stallRounds += 1;
+      if (stallRounds >= 5) break;
+      continue;
+    }
+
+    validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...kept], {
       csat: false,
     }).slice(0, count);
 
@@ -198,27 +274,25 @@ async function generateTestQuestionsFromKnowledgeBase({
 
   if (validatedQuestions.length === 0) {
     throw new Error(
-      allowOpenKnowledge
-        ? "No valid UPSC questions generated from Knowledge Base. Please try again."
-        : `Could not generate questions from Knowledge Base for "${topicQuery}". Sync more notes/PDFs or refine the topic.`
+      `Could not generate on-topic questions for "${topicQuery}". Please try again or refine the topic.`
     );
   }
 
   if (validatedQuestions.length < minKeep) {
     throw new Error(
-      `Only ${validatedQuestions.length} of ${count} questions could be grounded in Knowledge Base for "${topicQuery}". Sync more content or try a broader topic.`
+      `Only ${validatedQuestions.length} of ${count} on-topic questions could be generated for "${topicQuery}". Please try again.`
     );
   }
 
   if (validatedQuestions.length < count) {
     console.warn(
-      `⚠️ Prelims RAG: got ${validatedQuestions.length}/${count} (acceptable ≥${minKeep}) — continuing`
+      `⚠️ Prelims gen: got ${validatedQuestions.length}/${count} (acceptable ≥${minKeep}) — continuing`
     );
   }
 
   console.log(
-    `✅ Prelims RAG generated ${validatedQuestions.length} questions` +
-      (openKnowledgeUsed ? " (some open-knowledge fallback)" : " (KB-grounded)")
+    `✅ Prelims generated ${validatedQuestions.length} on-topic questions` +
+      (openKnowledgeUsed ? " (LLM open-syllabus used)" : " (KB-grounded)")
   );
 
   let readyQuestions = finalizeGeneratedQuestions(validatedQuestions);
@@ -678,6 +752,7 @@ function buildPrelimsGSSystemPrompt(subjects, topic, difficulty, currentAffairsP
   return `UPSC Prelims GS Paper-I MCQ generator. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}.${extra}
 
 Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–5 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, chronology (3 options only), which correct/incorrect. Concise stems.
+TOPIC LOCK: Every question MUST be directly about "${topic}". Do not drift to other areas of the same subject.
 ${ANSWER_OPTION_LOCK}
 
 ${getPrelimsJsonRules()}
@@ -3091,9 +3166,19 @@ export const generateTestQuestions = async ({
         continue;
       }
 
-      validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...batchQuestions], {
-        csat: examType === "CSAT",
-      }).slice(0, count);
+      const onTopicBatch = filterQuestionsByTopic(batchQuestions, topic);
+      if (onTopicBatch.dropped > 0) {
+        console.warn(
+          `⚠️ Prelims batch ${round + 1}: dropped ${onTopicBatch.dropped} off-topic question(s) for "${topic}"`
+        );
+      }
+
+      validatedQuestions = dedupeMockPaperQuestions(
+        [...validatedQuestions, ...onTopicBatch.questions],
+        {
+          csat: examType === "CSAT",
+        }
+      ).slice(0, count);
 
       if (validatedQuestions.length === beforeLen) {
         stallRounds += 1;
@@ -3128,9 +3213,18 @@ export const generateTestQuestions = async ({
       });
       apiCalls += topUpCalls;
       if (topUp.length > 0) {
-        validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...topUp], {
-          csat: examType === "CSAT",
-        }).slice(0, count);
+        const onTopicTopUp = filterQuestionsByTopic(topUp, topic);
+        if (onTopicTopUp.dropped > 0) {
+          console.warn(
+            `⚠️ Prelims top-up: dropped ${onTopicTopUp.dropped} off-topic question(s) for "${topic}"`
+          );
+        }
+        validatedQuestions = dedupeMockPaperQuestions(
+          [...validatedQuestions, ...onTopicTopUp.questions],
+          {
+            csat: examType === "CSAT",
+          }
+        ).slice(0, count);
       }
     }
 
