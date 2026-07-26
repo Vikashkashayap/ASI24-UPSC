@@ -1,6 +1,7 @@
 /**
  * Student Module Targets → chapter practice:
- * - Generate 25 Hard Prelims MCQs (5×5 batches) from Admin Knowledge Base (RAG), show 20
+ * - Generate 30 Hard MCQs (10×3 batches): KB first, LLM if topic not in KB
+ * - Show 20 unique questions to the student
  * - Prefetch related UPSC topics for the *next* chapter into cache
  */
 
@@ -19,6 +20,7 @@ import { pickBilingualQuestionFields, filterStudentReadyQuestions } from "../ser
 import { searchKnowledgeBase } from "../rag/services/search.service.js";
 import { generateQuestionsFromRag } from "../rag/services/questionGen.service.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
+import { ALL_PATTERN_IDS } from "../config/questionPatterns.js";
 
 const SYLLABUS_KEY_TO_KB_SUBJECT = {
   polity: "Polity",
@@ -84,6 +86,103 @@ export function resolveTestSubject(kbSubject) {
 
 function normalizeTopicKey(topic) {
   return String(topic || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function normalizePatternId(questionType) {
+  const t = String(questionType || "").toLowerCase().replace(/[\s-]+/g, "_");
+  if (ALL_PATTERN_IDS.includes(t)) return t;
+  if (t.includes("not_correct") || t.includes("incorrect")) return "statement_not_correct";
+  if (t.includes("elimin")) return "multi_statement_elimination";
+  if (t.includes("pair") || t.includes("match")) return "pair_matching";
+  if (t.includes("assert")) return "assertion_reason";
+  if (t.includes("chron")) return "chronology";
+  if (t.includes("sequence") || t.includes("arrang")) return "sequence_arrangement";
+  if (t.includes("map") || t.includes("location")) return "map_location";
+  if (t.includes("odd")) return "odd_one_out";
+  if (t.includes("statement")) return "statement_based";
+  if (t.includes("direct") || t.includes("concept")) return "direct_conceptual";
+  return "direct_conceptual";
+}
+
+/**
+ * Pick `showCount` unique questions with equal-as-possible coverage of all UPSC patterns.
+ * No repeats (caller should already dedupe; we still guard by stem).
+ */
+function pickBalancedPatternSet(pool, showCount) {
+  const unique = dedupeQuestionsByStem(dedupeQuestions(pool || []));
+  if (unique.length <= showCount) return unique;
+
+  const buckets = new Map(ALL_PATTERN_IDS.map((id) => [id, []]));
+  const leftovers = [];
+  for (const q of unique) {
+    const id = normalizePatternId(q.questionType || q.type);
+    if (buckets.has(id)) buckets.get(id).push(q);
+    else leftovers.push(q);
+  }
+
+  // Shuffle inside each bucket for variety
+  for (const [, list] of buckets) {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+  }
+  for (let i = leftovers.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [leftovers[i], leftovers[j]] = [leftovers[j], leftovers[i]];
+  }
+
+  const picked = [];
+  const used = new Set();
+  let guard = 0;
+  while (picked.length < showCount && guard < showCount * ALL_PATTERN_IDS.length + 20) {
+    guard += 1;
+    let added = false;
+    for (const id of ALL_PATTERN_IDS) {
+      if (picked.length >= showCount) break;
+      const list = buckets.get(id) || [];
+      while (list.length) {
+        const q = list.shift();
+        const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
+        if (used.has(key)) continue;
+        used.add(key);
+        picked.push(q);
+        added = true;
+        break;
+      }
+    }
+    if (!added) break;
+  }
+
+  while (picked.length < showCount && leftovers.length) {
+    const q = leftovers.shift();
+    const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
+    if (used.has(key)) continue;
+    used.add(key);
+    picked.push(q);
+  }
+
+  // If still short, take any remaining from buckets
+  if (picked.length < showCount) {
+    for (const list of buckets.values()) {
+      while (list.length && picked.length < showCount) {
+        const q = list.shift();
+        const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
+        if (used.has(key)) continue;
+        used.add(key);
+        picked.push(q);
+      }
+    }
+  }
+
+  const coverage = {};
+  for (const q of picked) {
+    const id = normalizePatternId(q.questionType || q.type);
+    coverage[id] = (coverage[id] || 0) + 1;
+  }
+  console.log(`[chapterPractice] pattern coverage in shown ${picked.length}Q:`, coverage);
+
+  return picked.slice(0, showCount);
 }
 
 /**
@@ -175,7 +274,7 @@ export async function warmChapterQuestionCache({ kbSubject, topicName }) {
       subject: kbSubject,
       topic: topicName,
       difficulty: "Hard",
-      count: 25,
+      count: 30,
       force: false,
     });
   } catch (err) {
@@ -240,9 +339,9 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 }
 
 /**
- * Create (or reuse-from-cache) a chapter practice test from Knowledge Base RAG.
- * Generates 25Q in 5×5 batches so ~5 extras absorb near-duplicates after dedupe,
- * then shows 20 unique questions to the student.
+ * Create (or reuse-from-cache) a chapter practice test.
+ * Generate 30 Hard MCQs in 10×3 batches (KB first, LLM if topic missing),
+ * then show 20 unique questions to the student.
  */
 export async function createChapterPracticeTest({
   userId,
@@ -253,9 +352,10 @@ export async function createChapterPracticeTest({
   const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
   const testSubject = resolveTestSubject(kbSubject);
   const difficulty = "Hard";
-  const GENERATE_COUNT = 25; // 20 show + 5 buffer for duplicate filter
-  const SHOW_COUNT = 20;
-  const BATCH_SIZE = 5;
+  const GENERATE_COUNT = 30; // 10 × 3 batches
+  const SHOW_COUNT = 20; // student sees 20
+  const MIN_ACCEPTABLE = 20; // need a full paper; 30 pool absorbs drops/dupes
+  const BATCH_SIZE = 10;
 
   /** Drop exact + near-duplicate stems; keep unique pool for the paper. */
   const uniquePool = (list) => {
@@ -270,7 +370,7 @@ export async function createChapterPracticeTest({
     return unique;
   };
 
-  // Reuse prior GS Hard paper for same subject+topic (shuffle, take 20 unique)
+  // Reuse prior GS Hard paper for same subject+topic (shuffle, take SHOW_COUNT)
   const topicRegex = new RegExp(
     `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
     "i"
@@ -302,11 +402,7 @@ export async function createChapterPracticeTest({
     );
     if (cached.length >= SHOW_COUNT) {
       fromCache = true;
-      questions = [...cached]
-        .map((value) => ({ value, sort: Math.random() }))
-        .sort((a, b) => a.sort - b.sort)
-        .slice(0, SHOW_COUNT)
-        .map(({ value }) => value);
+      questions = pickBalancedPatternSet(cached, SHOW_COUNT);
       console.log(
         `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}")`
       );
@@ -319,7 +415,7 @@ export async function createChapterPracticeTest({
 
   if (!fromCache) {
     console.log(
-      `[chapterPractice] generate ${GENERATE_COUNT}Q (5 extra for duplicate filter) in ${BATCH_SIZE}×${Math.ceil(GENERATE_COUNT / BATCH_SIZE)} batches → show ${SHOW_COUNT} unique`
+      `[chapterPractice] generate ${GENERATE_COUNT}Q in ${BATCH_SIZE}×${Math.ceil(GENERATE_COUNT / BATCH_SIZE)} batches → show ${SHOW_COUNT} (KB+LLM fallback)`
     );
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
@@ -328,13 +424,13 @@ export async function createChapterPracticeTest({
       questionCount: GENERATE_COUNT,
       difficulty,
       batchSize: BATCH_SIZE,
-      minAcceptable: SHOW_COUNT,
+      minAcceptable: MIN_ACCEPTABLE,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
       const err = new Error(
         generationResult.error ||
-          `No Knowledge Base content found for "${topicNormalized}" under ${kbSubject}. Upload/sync notes in Admin → Knowledge Base.`
+          `Could not generate questions for "${topicNormalized}" under ${kbSubject}. Please try again.`
       );
       err.status = 400;
       throw err;
@@ -343,23 +439,20 @@ export async function createChapterPracticeTest({
     const rawPool = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
     const pool = filterStudentReadyQuestions(uniquePool(rawPool));
 
-    if (pool.length < SHOW_COUNT) {
+    // Prefer 20; if quality filters ate a few, still ship ≥18 so UI is not stuck
+    const hardFloor = Math.min(MIN_ACCEPTABLE, 18);
+    if (pool.length < hardFloor) {
       const err = new Error(
-        `After removing duplicates/blank stems only ${pool.length} unique questions remain for "${topicNormalized}" (need ${SHOW_COUNT}). Sync more Knowledge Base content or try again.`
+        `Only ${pool.length} usable questions for "${topicNormalized}" (need ${hardFloor}+). Please try again.`
       );
       err.status = 400;
       throw err;
     }
 
-    // Shuffle unique pool, take 20 for the student paper
-    questions = [...pool]
-      .map((value) => ({ value, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .slice(0, SHOW_COUNT)
-      .map(({ value }) => value);
+    questions = pickBalancedPatternSet(pool, SHOW_COUNT);
 
     console.log(
-      `[chapterPractice] raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} (no duplicates)`
+      `[chapterPractice] raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} (no repeats, balanced patterns)`
     );
   }
 
@@ -390,7 +483,7 @@ export async function createChapterPracticeTest({
       chapterLabel: chapterLabel || topicNormalized,
       kbSubject,
       generatedCount: GENERATE_COUNT,
-      shownCount: SHOW_COUNT,
+      shownCount: questions.length,
     },
     fromCache,
   };

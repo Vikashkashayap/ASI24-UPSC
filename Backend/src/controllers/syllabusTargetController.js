@@ -716,11 +716,11 @@ export const startChapterPractice = async (req, res) => {
       topicName,
       kbSubject,
       difficulty: "Hard",
-      generateCount: 25,
+      generateCount: 30,
       showCount: 20,
-      batchSize: 5,
-      batches: "5×5",
-      extraForDedupe: 5,
+      minAcceptable: 20,
+      batchSize: 10,
+      batches: "10×3",
       userId: String(userId),
     };
     console.log("\n========== [chapterPractice] REQUEST PAYLOAD ==========");

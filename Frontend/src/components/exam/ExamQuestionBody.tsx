@@ -262,7 +262,8 @@ function BilingualMatchView({
           hideLabel={!showLabels}
         />
       );
-    } else {
+    } else if (!enData) {
+      // Only plain-text Hindi fallback when this is NOT a match question
       const hiText = getQuestionHindi(question, { strict: true });
       if (hiText) {
         blocks.push(
@@ -270,6 +271,7 @@ function BilingualMatchView({
         );
       }
     }
+    // If EN is match but HI missing/broken: hiData already falls back to EN columns via resolveMatchColumns
     if (enData) {
       blocks.push(
         <MatchBlock
@@ -312,7 +314,7 @@ function BilingualMatchView({
           hideLabel
         />
       );
-    } else {
+    } else if (!enData) {
       const hiText = getQuestionHindi(question, { strict: true });
       if (hiText) {
         blocks.push(

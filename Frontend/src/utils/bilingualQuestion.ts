@@ -62,19 +62,76 @@ export function isCorruptedStemText(text: string): boolean {
   return blank >= 2;
 }
 
+function countNumberedItems(text: string): number {
+  const s = String(text || "").replace(/\\n/g, "\n");
+  const markers = [...s.matchAll(/(?:^|\n)\s*\d+[.)]\s+/g)];
+  let ok = 0;
+  for (let i = 0; i < markers.length; i++) {
+    const start = markers[i].index! + markers[i][0].length;
+    const end = i + 1 < markers.length ? markers[i + 1].index! : s.length;
+    const body = (s.slice(start, end).trim().split(/\n/)[0] || "").trim();
+    if (body && body !== "[object Object]" && !/^(?:[—–\-−•·.…]{1,6}|\.\.\.|…)$/i.test(body)) {
+      ok += 1;
+    }
+  }
+  return ok;
+}
+
+function countLetterItems(text: string): number {
+  const s = String(text || "").replace(/\\n/g, "\n");
+  return (s.match(/(?:^|\n)\s*[A-DΑ-Δअ-ई][.)]\s+\S+/gi) || []).length;
+}
+
+/**
+ * Hindi stem incomplete vs English (half lists / wrong pattern) — do not show as "full Hindi".
+ */
+export function isIncompleteHindiStem(hi: string, en: string): boolean {
+  const h = String(hi || "").trim();
+  const e = String(en || "").trim();
+  if (!h || !e) return false;
+  if (isCorruptedStemText(h)) return true;
+
+  const enIsMatch = /match\s+the\s+following|list\s*[-–—]?\s*i\b/i.test(e);
+  const hiIsMatch = /मिलान|सूची\s*[-–—]?\s*i/i.test(h);
+  const hiWrongStatementForMatch =
+    enIsMatch &&
+    !hiIsMatch &&
+    /उपर्युक्त कथनों|कौन-सा\/से सही|which of the (following )?statements/i.test(h);
+  if (hiWrongStatementForMatch) return true;
+
+  const enNums = countNumberedItems(e);
+  const hiNums = countNumberedItems(h);
+  if (enNums >= 2 && hiNums < Math.min(2, enNums)) return true;
+  if (enNums >= 3 && hiNums > 0 && hiNums < enNums - 1) return true;
+
+  const enLetters = countLetterItems(e);
+  const hiLetters = countLetterItems(h);
+  if (enIsMatch && enLetters >= 2 && hiIsMatch && hiLetters < 2) return true;
+
+  // Assertion-reason: both A and R must exist in Hindi when English has them
+  if (/assertion\s*\(A\)/i.test(e) && /reason\s*\(R\)/i.test(e)) {
+    if (!/assertion\s*\(A\)|अभिकथन\s*\(A\)/i.test(h) || !/reason\s*\(R\)|कारण\s*\(R\)/i.test(h)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 /** Hindi stem — no English fallback when strict (exam Hindi toggle). */
 export function getQuestionHindi(
   q: BilingualQuestionFields,
   { strict = true }: { strict?: boolean } = {}
 ): string {
   const hi = (q.question_hi || "").trim();
-  // Broken Hindi (e.g. "1. [object Object]") — fall back to English so statements remain readable
-  if (hi && isCorruptedStemText(hi)) {
-    return getQuestionEnglish(q);
+  const en = getQuestionEnglish(q);
+  // Broken / half Hindi — fall back to English so student never sees incomplete stem
+  if (hi && (isCorruptedStemText(hi) || isIncompleteHindiStem(hi, en))) {
+    return strict ? "" : en;
   }
   if (hi) return hi;
   if (strict) return "";
-  return getQuestionEnglish(q);
+  return en;
 }
 
 export function hasStoredHindiQuestion(q: BilingualQuestionFields): boolean {

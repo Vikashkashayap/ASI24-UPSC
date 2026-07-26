@@ -130,6 +130,19 @@ const TOPIC_PHRASE_HINTS = {
     "cabinet secretariat",
     "council of ministers",
   ],
+  "essence determinants and consequences of ethics": [
+    "ethics",
+    "ethical",
+    "morality",
+    "moral",
+    "values",
+    "determinant",
+    "consequence",
+    "human values",
+    "integrity",
+    "conscience",
+    "attitude",
+  ],
 };
 
 /** If question hits these AND misses topic tokens, treat as clear off-topic (soft mode). */

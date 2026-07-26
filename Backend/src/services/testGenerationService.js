@@ -113,16 +113,8 @@ async function generateTestQuestionsFromKnowledgeBase({
   let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
   let openKnowledgeUsed = preferOpenKnowledge;
 
-  const openKnowledgePatterns = resolveNotesPatterns([
-    "statement_based",
-    "direct_conceptual",
-    "assertion_reason",
-    "elimination",
-  ]);
-  // Open-knowledge: simpler patterns → fewer incomplete pair/match stems from flash-lite
-  const selectedPatterns = preferOpenKnowledge
-    ? openKnowledgePatterns
-    : resolveNotesPatterns(ALL_PATTERN_IDS);
+  // Always all UPSC Prelims patterns in equal ratio (KB + LLM) — none missing
+  const selectedPatterns = resolveNotesPatterns(ALL_PATTERN_IDS);
   const planState = questionPatternEngine.createPlan({
     questionCount: count + Math.min(5, count),
     patternsToInclude: selectedPatterns,
@@ -152,19 +144,18 @@ async function generateTestQuestionsFromKnowledgeBase({
   }
 
   console.log(
-    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge} | maxRounds=${maxBatchRounds}`
+    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge} | maxRounds=${maxBatchRounds} | patterns=${selectedPatterns.length}`
   );
 
   const runBatch = async ({ need, round, openKnowledge, contextText, ragSource }) => {
     // Ask for extra Qs to absorb incomplete-stem + soft topic drops (caps at 10)
     const askCount = Math.min(10, Math.max(need, Math.ceil(need * 1.35)));
-    const patternsForBatch = openKnowledge ? openKnowledgePatterns : selectedPatterns;
     const batchResult = await generateQuestionsFromContextBatch({
       contextText: openKnowledge ? "" : contextText,
       topic: topicQuery,
       difficulty: difficultyKey,
       batchSize: askCount,
-      patternsToInclude: patternsForBatch,
+      patternsToInclude: selectedPatterns,
       batchIndex: round,
       generationPlan: questionPatternEngine.nextBatchPlan({
         plan: planState,
@@ -289,6 +280,14 @@ async function generateTestQuestionsFromKnowledgeBase({
     console.log(
       `📈 Prelims progress: ${validatedQuestions.length}/${count} on-topic (batch ${round + 1}/${maxBatchRounds})`
     );
+
+    // Prefer filling toward count, but stop once caller has enough (chapter: 20 of 30)
+  if (validatedQuestions.length >= minKeep && minKeep < count) {
+    console.log(
+      `✅ Early stop at ${validatedQuestions.length}/${count} (minKeep=${minKeep}) — enough for paper`
+    );
+    break;
+  }
 
     if (validatedQuestions.length === beforeLen) {
       stallRounds += 1;
@@ -2635,12 +2634,20 @@ function practiceQuestionHasHindiStem(q) {
 function buildPracticeHindiTranslatePayload(q, idx) {
   const matchColumns = buildMatchColumnsPayload(q);
   const enQ = String(q.question_en || q.question || "").replace(/\\n/g, "\n").trim();
-  const numbered = (enQ.match(/(?:^|\n)\s*\d+[.)]\s+.+/g) || []).map((l) =>
-    l.replace(/^\s*\d+[.)]\s+/, "").trim()
-  );
+  // Match questions: List-II uses 1. 2. 3. — never send those as numberedItems or Hindi becomes fake "statements"
+  const isMatch =
+    Boolean(matchColumns) ||
+    /match\s+the\s+following|list\s*[-–—]?\s*i\b|सूची\s*[-–—]?\s*i/i.test(enQ);
+  const numbered = isMatch
+    ? []
+    : (enQ.match(/(?:^|\n)\s*\d+[.)]\s+.+/g) || []).map((l) =>
+        l.replace(/^\s*\d+[.)]\s+/, "").trim()
+      );
   return {
     id: idx,
-    question: matchColumns ? enQ.split("\n")[0].trim() || "Match the following:" : enQ,
+    question: matchColumns
+      ? enQ.split("\n")[0].trim() || "Match the following:"
+      : enQ,
     options: q.options_en || q.options,
     explanation: String(q.explanation_en || q.explanation || "").trim().slice(0, 500),
     ...(matchColumns ? { matchColumns } : {}),
@@ -2655,6 +2662,10 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
   const questionHi = String(row.question_hi || row.question || "").trim();
   const optionsHi = row.options_hi || row.options;
   const explanationHi = String(row.explanation_hi || "").trim();
+  const enFull = String(mergedQ.question_en || mergedQ.question || "").replace(/\\n/g, "\n");
+  const enIsMatch =
+    Boolean(mergedQ.matchColumns?.columnA?.length >= 2) ||
+    /match\s+the\s+following|list\s*[-–—]?\s*i\b/i.test(enFull);
 
   // Structured match columns first (prevents List-I/II merge bug)
   const mcHi = row.matchColumns_hi || row.matchColumns;
@@ -2673,12 +2684,47 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
       mergedQ.question_hi = lines.join("\n");
       appliedStem = true;
     }
-  } else {
+  }
+
+  // English is match → never rebuild Hindi as statement/chronology from numberedItems
+  if (!appliedStem && enIsMatch) {
+    const enCols = buildMatchColumnsPayload(mergedQ);
+    if (enCols?.columnA?.length >= 2 && enCols?.columnB?.length >= 2) {
+      // Prefer LLM Hindi columns when present but incomplete path above failed; else keep EN lists
+      // and still build a full Hindi stem shell so UI can show सूची-I/II (EN items until translated).
+      const columnA = (mergedQ.matchColumns_hi?.columnA?.length >= 2
+        ? mergedQ.matchColumns_hi.columnA
+        : enCols.columnA
+      ).map((x) => coerceListItemText(x)).filter(Boolean);
+      const columnB = (mergedQ.matchColumns_hi?.columnB?.length >= 2
+        ? mergedQ.matchColumns_hi.columnB
+        : enCols.columnB
+      ).map((x) => coerceListItemText(x)).filter(Boolean);
+      if (columnA.length >= 2 && columnB.length >= 2) {
+        if (!mergedQ.matchColumns_hi?.columnA?.length) {
+          // Leave matchColumns_hi empty so UI can prefer EN structured + Hindi labels,
+          // but do NOT save a fake "statements correct?" Hindi stem.
+          console.warn(
+            `⚠️ ${srcLabel}: match Q missing matchColumns_hi — skipping broken statement-style Hindi stem`
+          );
+        } else {
+          const lines = ["निम्नलिखित का मिलान कीजिए:"];
+          lines.push("सूची-I");
+          columnA.forEach((item, idx) => lines.push(`${String.fromCharCode(65 + idx)}. ${item}`));
+          lines.push("सूची-II");
+          columnB.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
+          lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+          mergedQ.question_hi = lines.join("\n");
+          appliedStem = true;
+        }
+      }
+    }
+    // Do not fall through to numberedItems statement rebuild for match questions
+  } else if (!appliedStem) {
     // Rebuild statement/chronology Hindi stem from numberedItems_hi when present
     const numberedHi = Array.isArray(row.numberedItems_hi)
       ? row.numberedItems_hi.map((x) => coerceListItemText(x)).filter(Boolean)
       : [];
-    const enFull = String(mergedQ.question_en || mergedQ.question || "").replace(/\\n/g, "\n");
     const enHasNumbers = ((enFull.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length) >= 2;
 
     if (numberedHi.length >= 2) {
@@ -2759,9 +2805,11 @@ async function translatePracticeHindiIndexBatch(apiKey, model, merged, indices, 
     const systemPrompt = `UPSC Hindi translator. Return JSON array only.
 For each item return: id, question_hi, options_hi {A,B,C,D}, explanation_hi (50–70 Devanagari words; full teaching explanation, not one line).
 LETTER LOCK: options_hi.A MUST translate options.A (same for B/C/D). Never swap, reorder, or move text between letters — correctAnswer letter stays valid.
-If matchColumns present: also matchColumns_hi:{columnA:[],columnB:[]} — each entry a PLAIN STRING (never an object).
-If numberedItems present: return numberedItems_hi as an array of PLAIN STRINGS only (e.g. ["कथन एक","कथन दो"]) — NEVER objects like {"text":"..."}. Same length as numberedItems. question_hi MUST include intro + "1. ..\\n2. .." lines from those strings (never intro-only, never "[object Object]").
-Same count/order. No markdown.`;
+If matchColumns present: this is a MATCH question (List-I / List-II). You MUST return matchColumns_hi:{columnA:[],columnB:[]} with the SAME lengths as English, each entry a PLAIN STRING. Also set question_hi to full stem with:
+"निम्नलिखित का मिलान कीजिए:" + "सूची-I" + "A. …" lines + "सूची-II" + "1. …" lines + "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
+NEVER turn a match question into statement-based Hindi (no "उपर्युक्त कथनों में से कौन-सा/से सही").
+If numberedItems present (and NO matchColumns): return numberedItems_hi as PLAIN STRINGS only, same length. question_hi MUST include intro + "1. ..\\n2. .." lines (never intro-only, never "[object Object]").
+Same count/order. No markdown. Complete Hindi only — never half/truncated lists.`;
   const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
   const maxTokens = getMaxTokensForPracticeHindiBatch(slice.length);
 

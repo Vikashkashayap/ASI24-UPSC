@@ -1,17 +1,4 @@
-import { resolveNotesPatterns } from "../../config/questionPatterns.js";
-
-const DEFAULT_TYPE_DISTRIBUTION = [
-  { id: "statement_based", count: 10 },
-  { id: "multi_statement_elimination", count: 6 },
-  { id: "pair_matching", count: 5 },
-  { id: "chronology", count: 5 },
-  { id: "sequence_arrangement", count: 5 },
-  { id: "map_location", count: 4 },
-  { id: "assertion_reason", count: 3 },
-  { id: "statement_not_correct", count: 4 },
-  { id: "direct_conceptual", count: 4 },
-  { id: "odd_one_out", count: 4 },
-];
+import { resolveNotesPatterns, ALL_PATTERN_IDS } from "../../config/questionPatterns.js";
 
 const DIFFICULTY_WEIGHTS = [
   { id: "easy", ratio: 0.2 },
@@ -19,47 +6,33 @@ const DIFFICULTY_WEIGHTS = [
   { id: "hard", ratio: 0.3 },
 ];
 
+/**
+ * Equal-ratio quota across every active UPSC pattern so none is missing.
+ * e.g. 30Q × 10 patterns → 3 each; 20Q → 2 each.
+ */
 function buildQuotaMap(total, activePatterns) {
-  const active = new Set(activePatterns);
+  const patterns =
+    Array.isArray(activePatterns) && activePatterns.length > 0
+      ? [...activePatterns]
+      : [...ALL_PATTERN_IDS];
+  const n = patterns.length;
   const quota = new Map();
 
-  const preferred = DEFAULT_TYPE_DISTRIBUTION.filter((row) => active.has(row.id));
-  const preferredTotal = preferred.reduce((sum, row) => sum + row.count, 0) || 1;
-
-  let used = 0;
-  for (const row of preferred) {
-    const c = Math.max(1, Math.round((row.count / preferredTotal) * total));
-    quota.set(row.id, c);
-    used += c;
-  }
-
-  // If topic/patterns exclude many defaults, backfill with available active patterns.
-  if (used < total && activePatterns.length) {
-    for (let i = 0; i < total - used; i += 1) {
-      const id = activePatterns[i % activePatterns.length];
-      quota.set(id, (quota.get(id) || 0) + 1);
+  if (total < n) {
+    // Fewer Qs than patterns: give 1 to the first `total` patterns (still as even as possible)
+    for (let i = 0; i < n; i += 1) {
+      quota.set(patterns[i], i < total ? 1 : 0);
     }
+    return quota;
   }
 
-  // Normalize to exact total.
-  while ([...quota.values()].reduce((a, b) => a + b, 0) > total) {
-    let maxKey = null;
-    let maxVal = -1;
-    for (const [k, v] of quota.entries()) {
-      if (v > maxVal) {
-        maxVal = v;
-        maxKey = k;
-      }
-    }
-    if (!maxKey || maxVal <= 1) break;
-    quota.set(maxKey, maxVal - 1);
+  const base = Math.floor(total / n);
+  let rem = total % n;
+  for (let i = 0; i < n; i += 1) {
+    const extra = rem > 0 ? 1 : 0;
+    if (rem > 0) rem -= 1;
+    quota.set(patterns[i], base + extra);
   }
-
-  while ([...quota.values()].reduce((a, b) => a + b, 0) < total && activePatterns.length) {
-    const id = activePatterns[[...quota.values()].reduce((a, b) => a + b, 0) % activePatterns.length];
-    quota.set(id, (quota.get(id) || 0) + 1);
-  }
-
   return quota;
 }
 
@@ -91,6 +64,7 @@ function consumeQuota(quota, size) {
   let taken = 0;
   const keys = [...quota.keys()];
   while (taken < size && keys.length) {
+    let progressed = false;
     for (const key of keys) {
       if (taken >= size) break;
       const left = quota.get(key) || 0;
@@ -98,7 +72,9 @@ function consumeQuota(quota, size) {
       quota.set(key, left - 1);
       out.set(key, (out.get(key) || 0) + 1);
       taken += 1;
+      progressed = true;
     }
+    if (!progressed) break;
   }
   return out;
 }
@@ -110,9 +86,14 @@ class QuestionPatternEngine {
   createPlan(opts = {}) {
     const total = Math.max(1, Math.min(120, parseInt(opts.questionCount, 10) || 50));
     const activePatterns = resolveNotesPatterns(opts.patternsToInclude);
+    const patterns = buildQuotaMap(total, activePatterns);
+    console.log(
+      `[patternPlan] equal-ratio ${total}Q across ${activePatterns.length} patterns:`,
+      Object.fromEntries(patterns)
+    );
     return {
       total,
-      patterns: buildQuotaMap(total, activePatterns),
+      patterns,
       difficulties: buildDifficultyQuota(total),
     };
   }

@@ -519,13 +519,19 @@ export function resolveMatchColumns(
       }
     }
     const hiText = String(question.question_hi || "").trim();
-    if (hiText) {
+    // Reject fake "statement" Hindi that was wrongly generated for a match question
+    const hiLooksLikeMatch =
+      /सूची\s*[-–—]?\s*i|मिलान|match\s+the\s+following|list\s*[-–—]?\s*i/i.test(hiText);
+    const hiLooksLikeWrongStatement =
+      /उपर्युक्त कथनों|कौन-सा\/से सही|which of the (following )?statements/i.test(hiText) &&
+      !hiLooksLikeMatch;
+    if (hiText && !hiLooksLikeWrongStatement) {
       const parsed = parseMatchFollowingFromText(hiText) || parseMatchParagraph(hiText);
       if (parsed && parsed.columnA.filter(Boolean).length >= 2 && parsed.columnB.filter(Boolean).length >= 2) {
         return parsed;
       }
     }
-    // Fall back to English structured lists with Hindi labels — better than blank List-II
+    // Fall back to English structured lists / parsed EN stem with Hindi labels
     if (question.matchColumns?.columnA?.length) {
       const { columnA, columnB } = normalizeCols(
         question.matchColumns.columnA || [],
@@ -539,6 +545,20 @@ export function resolveMatchColumns(
           prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
         };
       }
+    }
+    const enText = String(question.question_en || question.question || "").trim();
+    const enParsed = parseMatchFollowingFromText(enText) || parseMatchParagraph(enText);
+    if (
+      enParsed &&
+      enParsed.columnA.filter(Boolean).length >= 2 &&
+      enParsed.columnB.filter(Boolean).length >= 2
+    ) {
+      return {
+        intro: "निम्नलिखित का मिलान कीजिए:",
+        columnA: enParsed.columnA,
+        columnB: enParsed.columnB,
+        prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
+      };
     }
     return null;
   }

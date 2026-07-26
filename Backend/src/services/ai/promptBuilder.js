@@ -76,7 +76,8 @@ QUALITY BAR (UPSC aspirant / Hard Prelims):
 - Close distractors from the SAME topic; no trivial giveaways.
 - Statements must be precise enough for serious CSE Prelims practice.
 
-questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual|elimination
+questionType one of: statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
+Cover Mix evenly — no pattern missing, no duplicate stems.
 
 OPTION QUALITY:
 - Wrong options = serious aspirant-level distractors from the SAME domain, grounded in CONTEXT (or a plausible misreading).
@@ -102,9 +103,17 @@ CRITICAL CONSISTENCY LOCK:
 5. Before output: re-check options[answer] is truly correct; if not, fix "answer".
 
 Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words), sourceParagraph ("syllabus"), difficulty, questionType.
-COMPLETE stems. questionType one of: statement_based|pair_matching|chronology|assertion_reason|direct_conceptual|elimination`;
+COMPLETE stems. Set questionType to EXACTLY one of:
+statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
+Cover the Mix evenly — do not skip patterns. No duplicate stems.`;
 
-function compactPatternMix(count, patternsToInclude, batchIndex = 0) {
+function compactPatternMix(count, patternsToInclude, batchIndex = 0, generationPlan = null) {
+  if (generationPlan?.patternCounts && typeof generationPlan.patternCounts === "object") {
+    const entries = Object.entries(generationPlan.patternCounts).filter(([, n]) => Number(n) > 0);
+    if (entries.length) {
+      return entries.map(([id, n]) => `${n}x${id}`).join(",");
+    }
+  }
   const active = resolveNotesPatterns(patternsToInclude);
   const counts = new Map();
   for (let i = 0; i < count; i += 1) {
@@ -129,11 +138,22 @@ export function buildNotesQuestionSystemPrompt({ openKnowledge = false } = {}) {
 export function buildNotesQuestionUserPrompt(params) {
   const count = Math.min(10, Math.max(1, parseInt(params.questionCount, 10) || 10));
   const difficulty = String(params.difficulty || "moderate").toLowerCase();
-  const mix = compactPatternMix(count, params.patternsToInclude, params.batchIndex ?? 0);
+  const mix = compactPatternMix(
+    count,
+    params.patternsToInclude,
+    params.batchIndex ?? 0,
+    params.generationPlan
+  );
   const topic = String(params.topic || "").trim();
   const subject = String(params.subject || "").trim();
   const openKnowledge = Boolean(params.openKnowledge);
   const context = compressContext(params.context);
+
+  const patternRules = `PATTERN RULES (mandatory — equal mix, none missing from Mix):
+- Follow Mix exactly: ${mix}
+- Every item MUST set "questionType" to the pattern id you wrote (from the Mix list).
+- COMPLETE stems only (no empty statements / blank match lists).
+- No repeated or near-duplicate questions.`;
 
   if (openKnowledge) {
     return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
@@ -142,9 +162,10 @@ Knowledge base had no on-topic chunks for this Topic. Generate EXACTLY ${count} 
 
 HARD RULES:
 1. TOPIC LOCK: every question MUST be about "${topic}" only — no off-topic drift within the same subject.
-2. Decide correct OPTION TEXT first, then set answer = that letter.
-3. explanation MUST start with: Option {answer} ("{that option text}") is correct. (50–70 words)
-4. answer letter ↔ option text ↔ explanation must match.
+2. ${patternRules}
+3. Decide correct OPTION TEXT first, then set answer = that letter.
+4. explanation MUST start with: Option {answer} ("{that option text}") is correct. (50–70 words)
+5. answer letter ↔ option text ↔ explanation must match.
 JSON array only.`;
   }
 
@@ -160,7 +181,8 @@ HARD RULES (student safety):
 5. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME. If wrong, fix answer.
 6. TOPIC LOCK: Every question MUST be directly about "${topic}". If CONTEXT is about a different sub-topic (e.g. Preamble when Topic is Cabinet), IGNORE that CONTEXT and return [] — do NOT invent off-topic MCQs.
 7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
-8. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
+8. ${patternRules}
+9. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
 
 JSON array only.
 
