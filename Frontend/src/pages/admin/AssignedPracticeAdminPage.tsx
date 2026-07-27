@@ -27,7 +27,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { useTheme } from "../../hooks/useTheme";
-import { assignedPracticeAPI, adminAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion, type GenerationProgress } from "../../services/api";
+import { assignedPracticeAPI, adminAPI, mentorStaffAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion, type GenerationProgress } from "../../services/api";
 import { PRELIM_MOCK_PATTERNS } from "../../constants/testGenerator";
 import {
   isSyllabusToTopicPracticeHandoff,
@@ -123,7 +123,12 @@ function listTopicFocus(item: AssignedPracticeItem): string {
   return `${parts.slice(0, 2).join(" · ")} · +${parts.length - 2} more`;
 }
 
-export const AssignedPracticeAdminPage: React.FC = () => {
+type AssignedPracticeAdminPageProps = {
+  mode?: "admin" | "mentor";
+};
+
+export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAdminPageProps) {
+  const isMentor = mode === "mentor";
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const location = useLocation();
@@ -496,8 +501,21 @@ export const AssignedPracticeAdminPage: React.FC = () => {
   const loadStudents = async () => {
     setStudentsLoading(true);
     try {
-      const res = await adminAPI.getStudents({ page: 1, limit: 10000, mentorPicker: true });
-      if (res.data?.success) setStudents(res.data.data.students || []);
+      if (isMentor) {
+        const res = await mentorStaffAPI.getStudents();
+        if (res.data?.success) {
+          setStudents(
+            (res.data.data.students || []).map((s: { _id: string; name: string; email: string }) => ({
+              _id: s._id,
+              name: s.name,
+              email: s.email,
+            }))
+          );
+        }
+      } else {
+        const res = await adminAPI.getStudents({ page: 1, limit: 10000, mentorPicker: true });
+        if (res.data?.success) setStudents(res.data.data.students || []);
+      }
     } catch {
       /* non-fatal */
     } finally {
@@ -1244,10 +1262,14 @@ export const AssignedPracticeAdminPage: React.FC = () => {
         </h1>
         <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
           {flowStep === "assign"
-            ? "Select students to assign this practice test. They will see it under Practice Test."
-            : "Uses central Knowledge Base (notes + PDFs) → AI generates 50 or 100 MCQs (RAG) → Preview & edit → Assign students"}
+            ? isMentor
+              ? "Select students from your roster to assign this practice test."
+              : "Select students to assign this practice test. They will see it under Practice Test."
+            : isMentor
+              ? "Generate MCQs from Knowledge Base → Preview & edit → Assign to your students only."
+              : "Uses central Knowledge Base (notes + PDFs) → AI generates 50 or 100 MCQs (RAG) → Preview & edit → Assign students"}
         </p>
-        {flowStep === "form" && (
+        {flowStep === "form" && !isMentor && (
           <Link
             to="/admin/knowledge-base"
             className={`mt-3 inline-flex items-center gap-1.5 text-xs font-medium ${
@@ -1416,15 +1438,17 @@ export const AssignedPracticeAdminPage: React.FC = () => {
                   <label className={`block text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
                     Subject knowledge
                   </label>
-                  <Link
-                    to="/admin/knowledge-base"
-                    className={`inline-flex items-center gap-1 text-xs font-medium ${
-                      isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
-                    }`}
-                  >
-                    <Database className="w-3 h-3" />
-                    Manage in Knowledge Base
-                  </Link>
+                  {!isMentor && (
+                    <Link
+                      to="/admin/knowledge-base"
+                      className={`inline-flex items-center gap-1 text-xs font-medium ${
+                        isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
+                      }`}
+                    >
+                      <Database className="w-3 h-3" />
+                      Manage in Knowledge Base
+                    </Link>
+                  )}
                 </div>
                 {chaptersLoading ? (
                   <div className="flex items-center gap-2 text-sm text-slate-500">

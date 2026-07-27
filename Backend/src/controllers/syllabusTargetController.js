@@ -18,20 +18,13 @@ import {
   prefetchNextChapter,
   loadRelatedTopicsMap,
 } from "../services/chapterModulePractice.service.js";
+import {
+  validateStudentIdsForActor,
+  getMentorRosterIdSet,
+} from "../utils/mentorRosterAccess.js";
 
 async function validateStudentIds(studentIds) {
-  if (!Array.isArray(studentIds) || studentIds.length === 0) {
-    return { ok: false, message: "At least one student must be selected" };
-  }
-  const uniqueIds = [...new Set(studentIds.map((id) => String(id)))];
-  const students = await User.find({
-    _id: { $in: uniqueIds },
-    role: "student",
-  }).select("_id name email");
-  if (students.length !== uniqueIds.length) {
-    return { ok: false, message: "One or more selected users are invalid or not students" };
-  }
-  return { ok: true, students, uniqueIds };
+  return validateStudentIdsForActor({ role: "admin" }, studentIds);
 }
 
 function serializeTarget(doc, studentMap = new Map()) {
@@ -127,7 +120,7 @@ export const createSyllabusTargets = async (req, res) => {
       });
     }
 
-    const validation = await validateStudentIds(studentIds);
+    const validation = await validateStudentIdsForActor(req.user, studentIds);
     if (!validation.ok) {
       return res.status(400).json({ success: false, message: validation.message });
     }
@@ -276,15 +269,41 @@ export const listAdminSyllabusTargets = async (req, res) => {
     else if (filter === "archived") query.status = "archived";
     if (subjectKey) query.subjectKey = subjectKey;
 
+    let mentorRosterSet = null;
+    if (req.user?.role === "mentor") {
+      mentorRosterSet = await getMentorRosterIdSet(req.user._id);
+      if (mentorRosterSet.size === 0) {
+        return res.json({
+          success: true,
+          data: {
+            targets: [],
+            pagination: {
+              page,
+              limit,
+              total: 0,
+              totalPages: 1,
+              hasPrev: false,
+              hasNext: false,
+            },
+          },
+        });
+      }
+      query.assignedStudentIds = { $in: [...mentorRosterSet] };
+    }
+
     if (studentId) {
+      if (mentorRosterSet && !mentorRosterSet.has(studentId)) {
+        return res.status(403).json({ success: false, message: "Student is not on your roster" });
+      }
       query.assignedStudentIds = studentId;
     } else if (studentName) {
       const escaped = studentName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const matchedStudents = await User.find({
+      const nameQuery = {
+        role: "student",
         name: { $regex: escaped, $options: "i" },
-      })
-        .select("_id")
-        .lean();
+      };
+      if (mentorRosterSet) nameQuery.mentorId = req.user._id;
+      const matchedStudents = await User.find(nameQuery).select("_id").lean();
       const matchedIds = matchedStudents.map((s) => s._id);
       if (matchedIds.length === 0) {
         return res.json({
@@ -312,8 +331,20 @@ export const listAdminSyllabusTargets = async (req, res) => {
       .limit(limit)
       .lean();
 
+    const scopedRecords = mentorRosterSet
+      ? records.map((r) => ({
+          ...r,
+          assignedStudentIds: (r.assignedStudentIds || []).filter((id) =>
+            mentorRosterSet.has(String(id))
+          ),
+          completedStudentIds: (r.completedStudentIds || []).filter((id) =>
+            mentorRosterSet.has(String(id))
+          ),
+        }))
+      : records;
+
     const allStudentIds = [
-      ...new Set(records.flatMap((r) => (r.assignedStudentIds || []).map(String))),
+      ...new Set(scopedRecords.flatMap((r) => (r.assignedStudentIds || []).map(String))),
     ];
     const students = allStudentIds.length
       ? await User.find({ _id: { $in: allStudentIds } }).select("_id name email").lean()
@@ -323,7 +354,7 @@ export const listAdminSyllabusTargets = async (req, res) => {
     return res.json({
       success: true,
       data: {
-        targets: records.map((r) => serializeTarget(r, studentMap)),
+        targets: scopedRecords.map((r) => serializeTarget(r, studentMap)),
         pagination: {
           page,
           limit,
@@ -351,17 +382,30 @@ export const updateSyllabusTargetAssignment = async (req, res) => {
       return res.status(404).json({ success: false, message: "Target not found" });
     }
 
-    const validation = await validateStudentIds(req.body?.studentIds);
+    const validation = await validateStudentIdsForActor(req.user, req.body?.studentIds);
     if (!validation.ok) {
       return res.status(400).json({ success: false, message: validation.message });
     }
 
-    record.assignedStudentIds = validation.students.map((s) => s._id);
-    // Drop completions for students no longer assigned
-    const keep = new Set(validation.uniqueIds);
-    record.completedStudentIds = (record.completedStudentIds || []).filter((id) =>
-      keep.has(String(id))
-    );
+    if (req.user?.role === "mentor" && validation.rosterIds) {
+      const outsideRoster = (record.assignedStudentIds || []).filter(
+        (id) => !validation.rosterIds.has(String(id))
+      );
+      record.assignedStudentIds = [...outsideRoster, ...validation.students.map((s) => s._id)];
+      const keep = new Set([
+        ...outsideRoster.map(String),
+        ...validation.uniqueIds,
+      ]);
+      record.completedStudentIds = (record.completedStudentIds || []).filter((id) =>
+        keep.has(String(id))
+      );
+    } else {
+      record.assignedStudentIds = validation.students.map((s) => s._id);
+      const keep = new Set(validation.uniqueIds);
+      record.completedStudentIds = (record.completedStudentIds || []).filter((id) =>
+        keep.has(String(id))
+      );
+    }
     if (req.body?.dueDate !== undefined) {
       record.dueDate = req.body.dueDate ? new Date(req.body.dueDate) : null;
     }
@@ -390,10 +434,33 @@ export const updateSyllabusTargetAssignment = async (req, res) => {
  */
 export const deleteSyllabusTarget = async (req, res) => {
   try {
-    const record = await SyllabusModuleTarget.findByIdAndDelete(req.params.id);
+    const record = await SyllabusModuleTarget.findById(req.params.id);
     if (!record) {
       return res.status(404).json({ success: false, message: "Target not found" });
     }
+
+    // Mentors only remove their own students from the plan (full delete if none remain)
+    if (req.user?.role === "mentor") {
+      const rosterSet = await getMentorRosterIdSet(req.user._id);
+      const remaining = (record.assignedStudentIds || []).filter(
+        (id) => !rosterSet.has(String(id))
+      );
+      if (remaining.length === 0) {
+        await SyllabusModuleTarget.findByIdAndDelete(req.params.id);
+        return res.json({ success: true, message: "Syllabus target deleted" });
+      }
+      record.assignedStudentIds = remaining;
+      record.completedStudentIds = (record.completedStudentIds || []).filter(
+        (id) => !rosterSet.has(String(id))
+      );
+      await record.save();
+      return res.json({
+        success: true,
+        message: "Removed this plan from your students",
+      });
+    }
+
+    await SyllabusModuleTarget.findByIdAndDelete(req.params.id);
     return res.json({ success: true, message: "Syllabus target deleted" });
   } catch (error) {
     console.error("deleteSyllabusTarget:", error);

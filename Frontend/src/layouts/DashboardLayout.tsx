@@ -6,6 +6,7 @@ import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, Clip
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
+import { GenderAvatar } from "../components/GenderAvatar";
 
 const DartFormModal = lazyNamed(
   () => import("../components/dart/DartFormModal"),
@@ -118,10 +119,10 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/mentor': { title: 'AI Mentor', icon: <MessageCircle className="w-5 h-5" /> },
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
-    '/prelims-test': { title: 'Prelims Test', icon: <ClipboardList className="w-5 h-5" /> },
-    '/practice-test': { title: 'Practice Test', icon: <Target className="w-5 h-5" /> },
-    '/practice-test/history': { title: 'Practice Test History', icon: <History className="w-5 h-5" /> },
-    '/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
+    '/prelims-test': { title: 'Practice Test', icon: <ClipboardList className="w-5 h-5" /> },
+    '/practice-test': { title: 'Modular Test', icon: <Target className="w-5 h-5" /> },
+    '/practice-test/history': { title: 'Modular Test History', icon: <History className="w-5 h-5" /> },
+    '/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
     '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
@@ -134,6 +135,8 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
   const mentorRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/mentor-dashboard': { title: 'Mentor Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/mentor-dashboard/students': { title: 'Your Students', icon: <Users className="w-5 h-5" /> },
+    '/mentor-dashboard/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
+    '/mentor-dashboard/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
   };
@@ -142,7 +145,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
     '/admin/mentors': { title: 'Mentors', icon: <Users className="w-5 h-5" /> },
-    '/admin/prelims-mock': { title: 'Prelims Mock', icon: <Target className="w-5 h-5" /> },
+    '/admin/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
     '/admin/knowledge-base': { title: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
     '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
@@ -532,6 +535,14 @@ export const DashboardLayout = () => {
                   <Users className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Students</span>}
                 </NavLink>
+                <NavLink to="/mentor-dashboard/topic-practice" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Topic Practice - Assign tests to your students">
+                  <ClipboardList className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Topic Practice</span>}
+                </NavLink>
+                <NavLink to="/mentor-dashboard/syllabus-targets" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Syllabus Targets - Send planner to your students">
+                  <BookOpen className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Syllabus Targets</span>}
+                </NavLink>
               </div>
               {!sidebarCollapsed && (
                 <div className="pt-3 md:pt-4 pb-1 md:pb-2">
@@ -649,9 +660,9 @@ export const DashboardLayout = () => {
               <SidebarSection label="Practice & Tests" theme={theme} collapsed={sidebarCollapsed}>
                 <SidebarNavItem
                   to="/prelims-test"
-                  title="Prelims Test"
+                  title="Practice Test"
                   icon={ClipboardList}
-                  label="Prelims Test"
+                  label="Practice Test"
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   pathname={location.pathname}
@@ -665,9 +676,9 @@ export const DashboardLayout = () => {
                 />
                 <SidebarNavItem
                   to="/practice-test"
-                  title="Practice Test — admin assigned"
+                  title="Modular Test — admin assigned"
                   icon={Target}
-                  label="Practice Test"
+                  label="Modular Test"
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   pathname={location.pathname}
@@ -676,9 +687,9 @@ export const DashboardLayout = () => {
                 />
                 <SidebarNavItem
                   to="/prelims-mock"
-                  title="Prelims Mock — scheduled tests"
+                  title="Prelims Test Series — scheduled tests"
                   icon={Layers}
-                  label="Prelims Mock"
+                  label="Prelims Test Series"
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   pathname={location.pathname}
@@ -853,13 +864,7 @@ export const DashboardLayout = () => {
                 aria-label="Account menu"
                 aria-expanded={userMenuOpen}
               >
-                <div className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-semibold shrink-0 ${
-                  theme === "dark"
-                    ? "bg-[#2563eb] text-white"
-                    : "bg-blue-100 text-blue-700"
-                }`}>
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
-                </div>
+                <GenderAvatar gender={user?.gender} name={user?.name} size="sm" />
                 <ChevronDown className={`hidden sm:block w-4 h-4 shrink-0 transition-transform duration-200 ${
                   userMenuOpen ? "rotate-180" : ""
                 } ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`} />

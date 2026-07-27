@@ -24,5 +24,9 @@ export const MentorRoute: React.FC<{ children: React.ReactNode }> = ({ children 
     return <Navigate to="/home" replace />;
   }
 
+  if (user.mustChangePassword && location.pathname !== "/change-password") {
+    return <Navigate to="/change-password" replace />;
+  }
+
   return <>{children}</>;
 };

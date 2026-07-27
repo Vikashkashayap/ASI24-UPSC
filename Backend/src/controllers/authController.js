@@ -29,6 +29,7 @@ const serializeUser = (user, subscriptionPlan) => ({
   subscriptionPlan: subscriptionPlan || undefined,
   phone: user.phone || "",
   city: user.city || "",
+  gender: user.gender || "",
   attempt: user.attempt || "",
   targetYear: user.targetYear || "",
   prepStartDate: user.prepStartDate || "",
@@ -286,6 +287,7 @@ export const me = async (req, res) => {
       subscriptionPlan: subscriptionPlan || undefined,
       phone: userObj.phone || "",
       city: userObj.city || "",
+      gender: userObj.gender || "",
       attempt: userObj.attempt || "",
       targetYear: userObj.targetYear || "",
       prepStartDate: userObj.prepStartDate || "",
@@ -294,4 +296,74 @@ export const me = async (req, res) => {
       isEmailVerified: Boolean(userObj.isEmailVerified),
     },
   });
+};
+
+const ALLOWED_GENDERS = new Set(["", "Male", "Female", "Other"]);
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId || userId === "000000000000000000000000") {
+      return res.status(403).json({ message: "Profile update not available for this account" });
+    }
+
+    const {
+      name,
+      phone,
+      city,
+      gender,
+      attempt,
+      targetYear,
+      prepStartDate,
+      dailyStudyHours,
+      educationBackground,
+    } = req.body || {};
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (name !== undefined) {
+      const trimmed = String(name).trim();
+      if (!trimmed) {
+        return res.status(400).json({ message: "Full name is required" });
+      }
+      user.name = trimmed;
+    }
+    if (phone !== undefined) user.phone = String(phone).trim();
+    if (city !== undefined) user.city = String(city).trim();
+    if (gender !== undefined) {
+      const nextGender = String(gender).trim();
+      if (!ALLOWED_GENDERS.has(nextGender)) {
+        return res.status(400).json({ message: "Invalid gender value" });
+      }
+      user.gender = nextGender;
+    }
+    if (attempt !== undefined) user.attempt = String(attempt).trim();
+    if (targetYear !== undefined) user.targetYear = String(targetYear).trim();
+    if (prepStartDate !== undefined) user.prepStartDate = String(prepStartDate).trim();
+    if (dailyStudyHours !== undefined) user.dailyStudyHours = String(dailyStudyHours).trim();
+    if (educationBackground !== undefined) {
+      user.educationBackground = String(educationBackground).trim();
+    }
+
+    await user.save();
+
+    let subscriptionPlan = null;
+    if (user.subscriptionPlanId) {
+      const plan = await PricingPlan.findById(user.subscriptionPlanId)
+        .select("name duration")
+        .lean();
+      if (plan) subscriptionPlan = plan;
+    }
+
+    return res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: serializeUser(user, subscriptionPlan),
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message || "Failed to update profile" });
+  }
 };

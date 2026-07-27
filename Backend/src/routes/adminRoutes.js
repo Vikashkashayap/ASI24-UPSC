@@ -89,7 +89,7 @@ import {
   updateOffer,
   deleteOffer,
 } from "../controllers/offerController.js";
-import { requireAdmin } from "../middleware/adminMiddleware.js";
+import { requireAdminOrMentorTools } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
@@ -122,8 +122,8 @@ router.use((req, res, next) => {
   next();
 });
 
-// All admin routes require authentication + admin role
-router.use(requireAdmin);
+// Admin for most routes; mentors allowed only on Topic Practice / Syllabus / Notes tools
+router.use(requireAdminOrMentorTools);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);

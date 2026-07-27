@@ -202,6 +202,9 @@ export const AdminMentorsPage: React.FC = () => {
         <p className={`mt-1 text-sm ${sub}`}>
           Create mentor logins and assign any registered student from the full roster.
         </p>
+        <p className={`mt-1 text-xs ${sub}`}>
+          New mentors receive a temporary password. After admin password reset, mentor logs in with that password and is forced to set a permanent one.
+        </p>
       </div>
 
       {message && (
@@ -335,7 +338,7 @@ export const AdminMentorsPage: React.FC = () => {
                 Current assignments
               </CardTitle>
               <p className={`text-xs font-normal ${sub} pt-1`}>
-                Expand a row for details. Use the key to reset login password, trash to remove the mentor.
+                Expand a row for details. Use the key to issue a new temporary password; the mentor can then log in and set a permanent password.
               </p>
             </CardHeader>
             <CardContent className="pt-0">

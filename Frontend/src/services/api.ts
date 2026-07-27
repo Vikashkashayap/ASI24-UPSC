@@ -221,6 +221,19 @@ export const authAPI = {
   getMe: async () => {
     return api.get("/api/auth/me");
   },
+  updateProfile: async (payload: {
+    name?: string;
+    phone?: string;
+    city?: string;
+    gender?: string;
+    attempt?: string;
+    targetYear?: string;
+    prepStartDate?: string;
+    dailyStudyHours?: string;
+    educationBackground?: string;
+  }) => {
+    return api.patch("/api/auth/profile", payload);
+  },
 };
 
 // Admin API
@@ -294,6 +307,35 @@ export const mentorStaffAPI = {
   postFeedback: (body: { studentId: string; message: string }) =>
     api.post("/api/mentor/feedback", body),
   getAnalytics: () => api.get("/api/mentor/analytics"),
+  // Topic Practice — assign ready tests to roster only
+  listAssignedPractice: (params?: { page?: number; limit?: number; filter?: string; subject?: string }) =>
+    api.get("/api/mentor/assigned-practice", { params }),
+  assignPractice: (id: string, studentIds: string[]) =>
+    api.post(`/api/mentor/assigned-practice/${id}/assign`, { studentIds }),
+  // Syllabus Targets / planner — roster only
+  getSyllabusCatalog: (params?: { medium?: "en" | "hi" }) =>
+    api.get("/api/mentor/syllabus-targets/catalog", { params }),
+  getSyllabusSubjectModules: (subjectKey: string, params?: { medium?: "en" | "hi" }) =>
+    api.get(`/api/mentor/syllabus-targets/catalog/${subjectKey}`, { params }),
+  listSyllabusTargets: (params?: {
+    page?: number;
+    limit?: number;
+    filter?: string;
+    subjectKey?: string;
+    studentId?: string;
+  }) => api.get("/api/mentor/syllabus-targets", { params }),
+  assignSyllabusTargets: (body: {
+    subjectKey: string;
+    moduleIds: string[];
+    studentIds: string[];
+    dueDate?: string | null;
+    note?: string;
+    medium?: "en" | "hi";
+  }) => api.post("/api/mentor/syllabus-targets", body),
+  updateSyllabusTargetAssign: (
+    id: string,
+    body: { studentIds: string[]; dueDate?: string | null; note?: string }
+  ) => api.patch(`/api/mentor/syllabus-targets/${id}/assign`, body),
 };
 
 // Prelims Import API (PDF parsed → structured test, modern UI)

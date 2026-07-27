@@ -22,6 +22,15 @@ import {
   getMentorAnalytics,
 } from "../controllers/mentorRoleController.js";
 import {
+  mentorGetSyllabusCatalog,
+  mentorGetSyllabusSubjectModules,
+  mentorCreateSyllabusTargets,
+  mentorListSyllabusTargets,
+  mentorUpdateSyllabusTargetAssignment,
+  mentorListAssignedPractice,
+  mentorAssignStudentsToPractice,
+} from "../controllers/mentorAssignmentController.js";
+import {
   getStudentById,
   getStudentPrelims,
   getStudentMains,
@@ -46,6 +55,18 @@ router.post("/assign-students", ...requireAdmin, assignStudentsToMentor);
 /** Mentor: roster + analytics (static paths before /students/:studentId) */
 router.get("/analytics", ...requireMentor, getMentorAnalytics);
 router.get("/students", ...requireMentor, getMentorStudents);
+
+/** Mentor: Topic Practice assign (roster only) */
+router.get("/assigned-practice", ...requireMentor, mentorListAssignedPractice);
+router.post("/assigned-practice/:id/assign", ...requireMentor, mentorAssignStudentsToPractice);
+
+/** Mentor: Syllabus Targets / planner (roster only) */
+router.get("/syllabus-targets/catalog", ...requireMentor, mentorGetSyllabusCatalog);
+router.get("/syllabus-targets/catalog/:subjectKey", ...requireMentor, mentorGetSyllabusSubjectModules);
+router.get("/syllabus-targets", ...requireMentor, mentorListSyllabusTargets);
+router.post("/syllabus-targets", ...requireMentor, mentorCreateSyllabusTargets);
+router.patch("/syllabus-targets/:id/assign", ...requireMentor, mentorUpdateSyllabusTargetAssignment);
+
 
 /** Same data as admin student APIs, scoped to assigned students */
 router.get("/students/:studentId/profile", ...mentorScopedStudent, getStudentById);

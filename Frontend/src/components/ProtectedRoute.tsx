@@ -18,6 +18,10 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  if (user.mustChangePassword && location.pathname !== "/change-password") {
+    return <Navigate to="/change-password" replace />;
+  }
+
   // Human mentors use the mentor dashboard, not the student shell (except shared pages).
   if (user.role === "mentor") {
     const allowed =

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, required: false, sparse: true }, // unique per Google user
     phone: { type: String, default: "" },
     city: { type: String, default: "" },
+    gender: { type: String, default: "" },
     attempt: { type: String, default: "" },
     targetYear: { type: String, default: "" },
     prepStartDate: { type: String, default: "" },

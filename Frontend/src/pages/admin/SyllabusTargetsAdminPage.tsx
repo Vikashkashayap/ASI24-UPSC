@@ -19,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { useTheme } from "../../hooks/useTheme";
 import {
   adminAPI,
+  mentorStaffAPI,
   syllabusTargetsAPI,
   type SyllabusCatalogModule,
   type SyllabusCatalogSubject,
@@ -37,7 +38,12 @@ function formatDate(iso?: string | null) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export const SyllabusTargetsAdminPage: React.FC = () => {
+type SyllabusTargetsAdminPageProps = {
+  mode?: "admin" | "mentor";
+};
+
+export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdminPageProps) {
+  const isMentor = mode === "mentor";
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const navigate = useNavigate();
@@ -110,16 +116,29 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
   const loadStudents = useCallback(async () => {
     try {
       setStudentsLoading(true);
-      const res = await adminAPI.getStudents({ page: 1, limit: 10000, mentorPicker: true });
-      if (res.data?.success) {
-        setStudents(res.data.data.students || []);
+      if (isMentor) {
+        const res = await mentorStaffAPI.getStudents();
+        if (res.data?.success) {
+          setStudents(
+            (res.data.data.students || []).map((s: StudentRow) => ({
+              _id: s._id,
+              name: s.name,
+              email: s.email,
+            }))
+          );
+        }
+      } else {
+        const res = await adminAPI.getStudents({ page: 1, limit: 10000, mentorPicker: true });
+        if (res.data?.success) {
+          setStudents(res.data.data.students || []);
+        }
       }
     } catch {
-      setError("Failed to load students");
+      setError(isMentor ? "Failed to load your students" : "Failed to load students");
     } finally {
       setStudentsLoading(false);
     }
-  }, []);
+  }, [isMentor]);
 
   const loadList = useCallback(async () => {
     try {
@@ -324,14 +343,25 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
       medium,
     };
 
-    navigate("/admin/topic-practice", { state: handoff });
+    navigate(isMentor ? "/mentor-dashboard/topic-practice" : "/admin/topic-practice", {
+      state: handoff,
+    });
   };
 
   const handleDelete = async (id: string) => {
+    if (
+      !window.confirm(
+        isMentor
+          ? "Remove this plan from your students? Other mentors' students on this module stay assigned."
+          : "Delete this syllabus target for all assigned students?"
+      )
+    ) {
+      return;
+    }
     try {
       setDeletingId(id);
       await syllabusTargetsAPI.delete(id);
-      setSuccess("Target removed");
+      setSuccess(isMentor ? "Plan removed from your students" : "Target removed");
       await loadList();
     } catch {
       setError("Failed to delete target");
@@ -364,7 +394,9 @@ export const SyllabusTargetsAdminPage: React.FC = () => {
       <div>
         <h1 className={`text-2xl md:text-3xl font-bold ${text}`}>Syllabus Targets</h1>
         <p className={`mt-1 text-sm ${muted}`}>
-          MentorsDaily Foundation Plan (CSE 2028) — subject → module → chapters, with study days. Assign modules to students for their home dashboard.
+          {isMentor
+            ? "Assign modules and generate topic tests for students under you. You can also remove plans from your roster."
+            : "MentorsDaily Foundation Plan (CSE 2028) — subject → module → chapters, with study days. Assign modules to students for their home dashboard."}
         </p>
       </div>
 

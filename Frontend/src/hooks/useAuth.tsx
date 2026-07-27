@@ -9,6 +9,7 @@ export type User = {
   email: string;
   phone?: string;
   city?: string;
+  gender?: string;
   attempt?: string;
   targetYear?: string;
   prepStartDate?: string;
@@ -65,13 +66,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(nextToken);
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ user: nextUser, token: nextToken }));
 
-    // Redirect based on user role and password change status
-    if (nextUser.role === "admin") {
+    // Force password setup before sending a reset/new user into their main area.
+    if (nextUser.mustChangePassword) {
+      navigate("/change-password", { replace: true });
+    } else if (nextUser.role === "admin") {
       navigate("/admin/dashboard", { replace: true });
     } else if (nextUser.role === "mentor") {
       navigate("/mentor-dashboard", { replace: true });
-    } else if (nextUser.mustChangePassword) {
-      navigate("/change-password", { replace: true });
     } else {
       // For students, land on Home dashboard first.
       navigate("/home", { replace: true });

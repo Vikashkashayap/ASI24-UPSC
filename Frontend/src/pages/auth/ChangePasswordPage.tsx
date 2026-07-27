@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { authAPI } from "../../services/api";
 
 export const ChangePasswordPage: React.FC = () => {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const { user, logout } = useAuth();
@@ -28,12 +31,18 @@ export const ChangePasswordPage: React.FC = () => {
             await authAPI.changePassword(newPassword);
             // Update local storage to reflect password change
             const stored = localStorage.getItem("upsc_mentor_auth");
+            let nextPath = "/home";
             if (stored) {
                 const parsed = JSON.parse(stored);
                 parsed.user.mustChangePassword = false;
+                if (parsed.user?.role === "mentor") {
+                    nextPath = "/mentor-dashboard";
+                } else if (parsed.user?.role === "admin") {
+                    nextPath = "/admin/dashboard";
+                }
                 localStorage.setItem("upsc_mentor_auth", JSON.stringify(parsed));
             }
-            navigate("/home", { replace: true });
+            navigate(nextPath, { replace: true });
         } catch (err: any) {
             setError(err.response?.data?.message || "Failed to change password");
         } finally {
@@ -63,27 +72,47 @@ export const ChangePasswordPage: React.FC = () => {
                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                 New Password
                             </label>
-                            <input
-                                type="password"
-                                required
-                                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-500 text-white bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                placeholder="New Password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showNewPassword ? "text" : "password"}
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-500 text-white bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    placeholder="New Password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNewPassword((v) => !v)}
+                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200"
+                                    aria-label={showNewPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                 Confirm New Password
                             </label>
-                            <input
-                                type="password"
-                                required
-                                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-500 text-white bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    required
+                                    className="appearance-none rounded-lg relative block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-500 text-white bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword((v) => !v)}
+                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200"
+                                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
 

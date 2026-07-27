@@ -4,6 +4,7 @@ import {
   login,
   changePassword,
   me,
+  updateProfile,
   registerSendOtp,
   verifyRegisterOtp,
   resendRegisterOtp,
@@ -23,5 +24,6 @@ router.get("/google", googleAuth);
 router.get("/google/callback", googleAuthCallback);
 router.post("/change-password", authMiddleware, changePassword);
 router.get("/me", authMiddleware, me);
+router.patch("/profile", authMiddleware, updateProfile);
 
 export default router;

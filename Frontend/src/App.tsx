@@ -69,6 +69,14 @@ const MentorStudentsPage = lazyPage(
   () => import("./pages/mentor/MentorStudentsPage"),
   "MentorStudentsPage"
 );
+const MentorTopicPracticePage = lazyPage(
+  () => import("./pages/mentor/MentorTopicPracticePage"),
+  "MentorTopicPracticePage"
+);
+const MentorSyllabusTargetsPage = lazyPage(
+  () => import("./pages/mentor/MentorSyllabusTargetsPage"),
+  "MentorSyllabusTargetsPage"
+);
 
 // Admin
 const AdminDashboardPage = lazyPage(() => import("./pages/admin/AdminDashboardPage"), "AdminDashboardPage");
@@ -174,6 +182,8 @@ function App() {
                 <Route index element={<MentorDashboardPage />} />
                 <Route path="students" element={<MentorStudentsPage />} />
                 <Route path="students/:studentId" element={<StudentDetailPage />} />
+                <Route path="topic-practice" element={<MentorTopicPracticePage />} />
+                <Route path="syllabus-targets" element={<MentorSyllabusTargetsPage />} />
               </Route>
             </Route>
             <Route

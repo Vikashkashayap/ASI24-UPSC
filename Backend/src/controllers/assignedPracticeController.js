@@ -17,6 +17,7 @@ import { batchTranslatePracticeQuestionsToHindi } from "../services/testGenerati
 import SourceUrl from "../models/SourceUrl.js";
 import ContentChunk from "../models/ContentChunk.js";
 import { retrieverService } from "../services/ai/retriever.service.js";
+import { validateStudentIdsForActor } from "../utils/mentorRosterAccess.js";
 
 const GS_SUBJECTS = [
   "Polity",
@@ -490,7 +491,7 @@ export const assignStudentsToPractice = async (req, res) => {
       });
     }
 
-    const validation = await validateStudentIds(studentIds);
+    const validation = await validateStudentIdsForActor(req.user, studentIds);
     if (!validation.ok) {
       return res.status(400).json({ success: false, message: validation.message });
     }
@@ -500,8 +501,15 @@ export const assignStudentsToPractice = async (req, res) => {
       startedTests.map((t) => String(t.userId)).filter(Boolean)
     );
     const newIdSet = new Set(validation.uniqueIds);
+    const isMentor = req.user?.role === "mentor";
+    const rosterSet = validation.rosterIds || null;
 
-    for (const startedId of startedUserIds) {
+    // Mentors can only add/remove their own roster students; keep others intact.
+    const startedRelevant = isMentor && rosterSet
+      ? [...startedUserIds].filter((uid) => rosterSet.has(uid))
+      : [...startedUserIds];
+
+    for (const startedId of startedRelevant) {
       if (!newIdSet.has(startedId)) {
         return res.status(400).json({
           success: false,
@@ -512,7 +520,14 @@ export const assignStudentsToPractice = async (req, res) => {
     }
 
     const wasAssigned = (record.assignedStudentIds || []).length > 0;
-    record.assignedStudentIds = validation.students.map((s) => s._id);
+    if (isMentor && rosterSet) {
+      const outsideRoster = (record.assignedStudentIds || []).filter(
+        (sid) => !rosterSet.has(String(sid))
+      );
+      record.assignedStudentIds = [...outsideRoster, ...validation.students.map((s) => s._id)];
+    } else {
+      record.assignedStudentIds = validation.students.map((s) => s._id);
+    }
     await record.save();
 
     const studentList = validation.students.map((s) => ({
