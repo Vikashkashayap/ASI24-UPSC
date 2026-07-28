@@ -59,7 +59,42 @@ const TOKEN_ALIASES = {
   evolution: ["evolve", "evolved", "development", "growth", "transition", "reform", "reforms"],
   indian: ["india"],
   india: ["indian"],
+  geographical: ["geography", "geographic", "geographically", "physiography", "physiographic"],
+  geography: ["geographical", "geographic", "geographically", "physiography", "physiographic"],
+  geographic: ["geography", "geographical", "geographically"],
+  physiography: ["physiographic", "geographical", "geography"],
+  setting: ["location", "locale", "physiography", "terrain", "landscape"],
 };
+
+/**
+ * Chapter-title filler — alone these do not identify a UPSC topic.
+ * When the only distinctive words are weak, use soft on-topic checks.
+ */
+const WEAK_TOPIC_TOKENS = new Set([
+  "setting",
+  "settings",
+  "introduction",
+  "overview",
+  "nature",
+  "aspect",
+  "aspects",
+  "basics",
+  "basic",
+  "concept",
+  "concepts",
+  "meaning",
+  "scope",
+  "feature",
+  "features",
+  "general",
+  "background",
+  "context",
+  "framework",
+  "outline",
+  "fundamentals",
+  "elements",
+  "dimensions",
+]);
 
 /**
  * Extra domain phrases keyed by normalized topic phrase.
@@ -143,17 +178,69 @@ const TOPIC_PHRASE_HINTS = {
     "conscience",
     "attitude",
   ],
+  "geographical setting": [
+    "geography",
+    "geographical",
+    "geographic",
+    "physiography",
+    "physiographic",
+    "himalaya",
+    "himalayas",
+    "indo-gangetic",
+    "indo gangetic",
+    "gangetic plain",
+    "peninsular india",
+    "deccan plateau",
+    "indian plate",
+    "plate tectonics",
+    "latitudinal",
+    "longitudinal",
+    "tropic of cancer",
+    "standard meridian",
+    "indian ocean",
+    "arabian sea",
+    "bay of bengal",
+    "western ghats",
+    "eastern ghats",
+    "thar desert",
+    "monsoon",
+    "drainage",
+    "river system",
+    "ganga",
+    "brahmaputra",
+    "indus",
+    "coastal plain",
+    "continental shelf",
+    "location of india",
+    "size of india",
+    "extent of india",
+    "neighbours of india",
+    "border",
+    "frontier",
+    "relief",
+    "terrain",
+    "landform",
+    "landforms",
+    "climate of india",
+    "soil of india",
+    "natural vegetation",
+  ],
 };
 
 /** If question hits these AND misses topic tokens, treat as clear off-topic (soft mode). */
 const CLEAR_OFFTOPIC_MARKERS = [
   "preamble of the constitution",
   "preamble to the constitution",
+  "preamble of the constitution of india",
   "fundamental rights",
+  "fundamental right",
   "directive principles",
   "dpsp",
   "supreme court of india was established",
   "which schedule of the constitution",
+  "article 32",
+  "basic structure doctrine",
+  "union public service commission",
 ];
 
 function editDistance(a, b) {
@@ -230,12 +317,35 @@ function textHasToken(haystack, token) {
   if (haystack.includes(t)) return true;
   if (t.length >= 6 && !t.includes(" ")) {
     const words = haystack.split(/[^a-z0-9]+/).filter((w) => w.length >= 5);
+    const stemLen = Math.min(7, t.length);
+    const stem = t.slice(0, stemLen);
     for (const w of words) {
-      if (Math.abs(w.length - t.length) > 1) continue;
+      if (Math.abs(w.length - t.length) > 1) {
+        // shared stem: geographical ↔ geography
+        if (stemLen >= 6 && w.length >= 6 && w.startsWith(stem.slice(0, 6))) return true;
+        continue;
+      }
       if (editDistance(w, t) <= 1) return true;
+      if (stemLen >= 6 && w.startsWith(stem.slice(0, 6))) return true;
     }
   }
   return false;
+}
+
+/**
+ * True when the chapter title is mostly filler ("Introduction", "The Geographical Setting").
+ * Strict keyword filters kill valid MCQs for these — soft mode is safer.
+ * Uses raw topic words only (aliases must not make a vague title look distinctive).
+ */
+export function isAbstractChapterTopic(topic) {
+  const raw = String(topic || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length >= 3 && !FILLER_STOP.has(t));
+  if (!raw.length) return true;
+  const distinctive = raw.filter((t) => !WEAK_TOPIC_TOKENS.has(t) && t.length >= 5);
+  return distinctive.length <= 1;
 }
 
 /**
@@ -313,7 +423,8 @@ function questionBlob(question) {
  * @param {{ soft?: boolean }} [opts] soft=true → only drop clear cross-topic leaks
  */
 export function isQuestionOnTopic(question, topic, opts = {}) {
-  const soft = Boolean(opts.soft);
+  // Abstract chapter titles rarely appear verbatim in stems — always soft-check
+  const soft = Boolean(opts.soft) || isAbstractChapterTopic(topic);
   const tokens = tokenizeTopic(topic);
   const phrases = phraseHintsForTopic(topic);
   if (!tokens.length && !phrases.length) return true;
@@ -328,7 +439,7 @@ export function isQuestionOnTopic(question, topic, opts = {}) {
   if (hitCount >= 1) return true;
 
   if (soft) {
-    // LLM open-syllabus: trust prompt TOPIC LOCK unless clearly another chapter
+    // Trust prompt TOPIC LOCK / KB grounding unless clearly another chapter
     const clearLeak = CLEAR_OFFTOPIC_MARKERS.some((m) => hay.includes(m));
     return !clearLeak;
   }
@@ -344,12 +455,13 @@ export function isQuestionOnTopic(question, topic, opts = {}) {
  */
 export function filterQuestionsByTopic(questions, topic, opts = {}) {
   const list = Array.isArray(questions) ? questions : [];
-  const kept = list.filter((q) => isQuestionOnTopic(q, topic, opts));
+  const soft = Boolean(opts.soft) || isAbstractChapterTopic(topic);
+  const kept = list.filter((q) => isQuestionOnTopic(q, topic, { ...opts, soft }));
   return {
     questions: kept,
     dropped: list.length - kept.length,
     tokens: tokenizeTopic(topic),
-    soft: Boolean(opts.soft),
+    soft,
   };
 }
 
@@ -359,4 +471,5 @@ export default {
   filterChunksByTopic,
   isQuestionOnTopic,
   filterQuestionsByTopic,
+  isAbstractChapterTopic,
 };

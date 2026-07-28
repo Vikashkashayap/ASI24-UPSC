@@ -1,9 +1,10 @@
 /**
  * Student Module Targets → chapter practice:
- * - Generate 30 Hard MCQs from Admin Knowledge Base RAG only (kbOnly)
+ * - Prefer Admin KB / RAG for 30 Hard MCQs; if topic missing/short → LLM open-syllabus (no hard fail)
+ * - Always bilingual (EN + HI) for chapter practice
  * - Show 20 unique questions (teaching explanations: correct + all wrong options)
  * - Prefetch related UPSC topics for the *next* chapter into cache
- * Module Final (50Q): chapter bank + RAG top-up from same KB, polished explanations
+ * Module Final (50Q): chapter bank + RAG/LLM top-up, polished explanations
  */
 
 import Test from "../models/Test.js";
@@ -343,8 +344,8 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 
 /**
  * Create (or reuse-from-cache) a chapter practice test.
- * Generate 30 Hard MCQs from Admin Knowledge Base RAG only (kbOnly),
- * then show 20 unique questions with teaching explanations (all options).
+ * Prefer Admin KB/RAG for 30 Hard MCQs; if topic missing/short → LLM fallback.
+ * Always bilingual (EN + HI). Show 20 unique questions with teaching explanations.
  *
  * Retake / forceCache: always reuse the saved paper for this topic from DB
  * (same student's prior attempt first, else any prior GS Hard paper).
@@ -405,6 +406,7 @@ export async function createChapterPracticeTest({
 
   let questions;
   let fromCache = false;
+  let generationSource = "kb_or_llm";
 
   if (existingTest?.questions?.length >= SHOW_COUNT) {
     const cached = filterStudentReadyQuestions(
@@ -435,7 +437,7 @@ export async function createChapterPracticeTest({
 
   if (!fromCache) {
     console.log(
-      `[chapterPractice] generate ${GENERATE_COUNT}Q from Admin KB RAG (kbOnly) → show ${SHOW_COUNT}`
+      `[chapterPractice] generate ${GENERATE_COUNT}Q from Admin KB RAG (LLM fallback if missing) → show ${SHOW_COUNT}`
     );
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
@@ -445,13 +447,15 @@ export async function createChapterPracticeTest({
       difficulty,
       batchSize: BATCH_SIZE,
       minAcceptable: MIN_ACCEPTABLE,
-      kbOnly: true,
+      kbOnly: false,
+      allowLlmFallback: true,
+      ensureHindi: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
       const err = new Error(
         generationResult.error ||
-          `Could not generate KB/RAG questions for "${topicNormalized}" under ${kbSubject}. Sync website notes / upload PDFs in Knowledge Base, then try again.`
+          `Could not generate questions for "${topicNormalized}" under ${kbSubject}. Please try again.`
       );
       err.status = 400;
       throw err;
@@ -463,16 +467,17 @@ export async function createChapterPracticeTest({
     const hardFloor = Math.min(MIN_ACCEPTABLE, 18);
     if (pool.length < hardFloor) {
       const err = new Error(
-        `Only ${pool.length} usable KB questions for "${topicNormalized}" (need ${hardFloor}+). Sync more Knowledge Base content for this topic.`
+        `Only ${pool.length} usable questions for "${topicNormalized}" (need ${hardFloor}+). Please try again.`
       );
       err.status = 400;
       throw err;
     }
 
     questions = pickBalancedPatternSet(pool, SHOW_COUNT);
+    generationSource = generationResult.source || "kb_or_llm";
 
     console.log(
-      `[chapterPractice] RAG ${generationResult.source || "knowledge_base"}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length}`
+      `[chapterPractice] ${generationSource}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length}`
     );
   }
 
@@ -507,7 +512,7 @@ export async function createChapterPracticeTest({
       kbSubject,
       generatedCount: GENERATE_COUNT,
       shownCount: questions.length,
-      source: fromCache ? "cache" : "knowledge_base_rag",
+      source: fromCache ? "cache" : generationSource,
     },
     fromCache,
   };
@@ -548,7 +553,9 @@ async function generateModuleFinalTopUp({
       difficulty: "Hard",
       batchSize: Math.min(5, want),
       minAcceptable: 1,
-      kbOnly: true,
+      kbOnly: false,
+      allowLlmFallback: true,
+      ensureHindi: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -582,7 +589,9 @@ async function generateModuleFinalTopUp({
         difficulty: "Hard",
         batchSize: 5,
         minAcceptable: 1,
-        kbOnly: true,
+        kbOnly: false,
+        allowLlmFallback: true,
+        ensureHindi: true,
       });
       if (!generationResult.success || !generationResult.questions?.length) continue;
       const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
@@ -595,7 +604,7 @@ async function generateModuleFinalTopUp({
 
 /**
  * Module Final (50Q): reuse chapter-bank when teaching-quality, fill shortfall from
- * Admin Knowledge Base RAG (kbOnly), polish all explanations (50–100 words, all options).
+ * Admin KB/RAG (LLM fallback if topic missing), polish all explanations (50–100 words, all options).
  */
 export async function createModuleFinalTestFromChapterBank({
   userId,

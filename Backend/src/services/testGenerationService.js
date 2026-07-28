@@ -59,6 +59,10 @@ async function generateTestQuestionsFromKnowledgeBase({
   batchSize: batchSizeOverride,
   minAcceptable,
   kbOnly = false,
+  /** Prefer KB/RAG first; if missing or short, always allow LLM (overrides PRELIMS_FORCE_KB_ONLY). */
+  allowLlmFallback = false,
+  /** Force bilingual Hindi even when PRACTICE_GEN_BATCH_HINDI=false. */
+  ensureHindi = false,
 }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -74,11 +78,12 @@ async function generateTestQuestionsFromKnowledgeBase({
   const primarySubject = String(subjectsList[0] || "").trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
-  // Modular targets / Module Final: KB-only. Other GS paths may LLM-fallback unless PRELIMS_FORCE_KB_ONLY.
+  // Prefer KB/RAG; LLM open-syllabus when topic missing/short (unless strict kbOnly without allowLlmFallback).
   const forceKbOnly =
-    Boolean(kbOnly) ||
-    String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
-  const allowOpenKnowledge = !forceKbOnly;
+    !allowLlmFallback &&
+    (Boolean(kbOnly) ||
+      String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true");
+  const allowOpenKnowledge = !forceKbOnly || Boolean(allowLlmFallback);
 
   if (!primarySubject || !topicQuery) {
     throw new Error("Subject and topic are required for knowledge-base generation");
@@ -147,7 +152,9 @@ async function generateTestQuestionsFromKnowledgeBase({
   let stallRounds = 0;
 
   if (forceKbOnly) {
-    console.warn("⚠️ PRELIMS_FORCE_KB_ONLY=true — LLM fallback disabled (KB-only)");
+    console.warn("⚠️ PRELIMS_FORCE_KB_ONLY / kbOnly — LLM fallback disabled (KB-only)");
+  } else if (allowLlmFallback) {
+    console.log("ℹ️ LLM fallback enabled — if KB/RAG miss or shortfall, open-syllabus will fill");
   }
 
   console.log(
@@ -192,9 +199,25 @@ async function generateTestQuestionsFromKnowledgeBase({
 
     // LLM open-syllabus already has TOPIC LOCK in the prompt — soft filter only
     // (strict keyword filter was dropping valid Economy Qs that don't say "evolution")
-    const onTopic = filterQuestionsByTopic(mapped, topicQuery, {
+    // Abstract chapter titles (e.g. "The Geographical Setting") also use soft via isQuestionOnTopic
+    let onTopic = filterQuestionsByTopic(mapped, topicQuery, {
       soft: Boolean(openKnowledge),
     });
+    // KB strict filter too aggressive for this topic — soft re-check before discarding the batch
+    if (
+      !openKnowledge &&
+      mapped.length > 0 &&
+      onTopic.dropped > 0 &&
+      onTopic.questions.length < Math.ceil(mapped.length * 0.5)
+    ) {
+      const softPass = filterQuestionsByTopic(mapped, topicQuery, { soft: true });
+      if (softPass.questions.length > onTopic.questions.length) {
+        console.warn(
+          `⚠️ Prelims batch ${round + 1}: relaxed topic filter ${onTopic.questions.length}→${softPass.questions.length} for "${topicQuery}" (KB soft)`
+        );
+        onTopic = softPass;
+      }
+    }
     if (onTopic.dropped > 0) {
       console.warn(
         `⚠️ Prelims batch ${round + 1}: dropped ${onTopic.dropped} off-topic question(s) for "${topicQuery}" (${openKnowledge ? "LLM-soft" : "KB"})`
@@ -303,6 +326,34 @@ async function generateTestQuestionsFromKnowledgeBase({
     }
   }
 
+  // KB/RAG shortfall → LLM open-syllabus top-up so practice never fails empty
+  if (validatedQuestions.length < minKeep && allowOpenKnowledge) {
+    const shortfall = minKeep - validatedQuestions.length;
+    const topUpRounds = Math.min(6, Math.ceil(shortfall / Math.max(1, batchSize)) + 2);
+    console.warn(
+      `⚠️ Prelims short ${validatedQuestions.length}/${minKeep} for "${topicQuery}" — LLM top-up (${topUpRounds} rounds)`
+    );
+    preferOpenKnowledge = true;
+    openKnowledgeUsed = true;
+    for (let i = 0; i < topUpRounds && validatedQuestions.length < minKeep; i += 1) {
+      const need = Math.min(batchSize, count - validatedQuestions.length);
+      const kept = await runBatch({
+        need,
+        round: maxBatchRounds + i,
+        openKnowledge: true,
+        contextText: "",
+        ragSource: "",
+      });
+      if (!kept.length) continue;
+      validatedQuestions = dedupeMockPaperQuestions([...validatedQuestions, ...kept], {
+        csat: false,
+      }).slice(0, count);
+      console.log(
+        `📈 Prelims LLM top-up: ${validatedQuestions.length}/${count} (round ${i + 1}/${topUpRounds})`
+      );
+    }
+  }
+
   if (validatedQuestions.length === 0) {
     throw new Error(
       `Could not generate on-topic questions for "${topicQuery}". Please try again or refine the topic.`
@@ -331,7 +382,7 @@ async function generateTestQuestionsFromKnowledgeBase({
   // Practice-style: English explanation 50–100 words (correct + all wrong options)
   readyQuestions = await ensurePrelimsExplanationsPracticeStyle(apiKey, readyQuestions);
 
-  if (isPracticeBatchHindiEnabled()) {
+  if (isPracticeBatchHindiEnabled() || ensureHindi) {
     console.log(`🌐 Prelims RAG: translating ${readyQuestions.length} questions to Hindi (practice-style)…`);
     readyQuestions = await batchTranslatePracticeQuestionsToHindi(
       apiKey,
@@ -3447,8 +3498,12 @@ export const generateTestQuestions = async ({
   currentAffairsPeriod,
   batchSize: batchSizeParam,
   minAcceptable,
-  /** When true: Admin KB / RAG only — no open-syllabus LLM (Module Targets). */
+  /** When true: Admin KB / RAG only — no open-syllabus LLM (unless allowLlmFallback). */
   kbOnly = false,
+  /** Prefer KB first; if topic missing/short in RAG/KB, generate via LLM instead of failing. */
+  allowLlmFallback = false,
+  /** Force Hindi bilingual fields for practice (even if PRACTICE_GEN_BATCH_HINDI=false). */
+  ensureHindi = false,
 }) => {
   try {
     if (isPrelimsRagEnabled(examType)) {
@@ -3460,6 +3515,8 @@ export const generateTestQuestions = async ({
         batchSize: batchSizeParam,
         minAcceptable,
         kbOnly,
+        allowLlmFallback,
+        ensureHindi,
       });
     }
 
