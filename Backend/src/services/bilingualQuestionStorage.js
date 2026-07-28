@@ -144,6 +144,7 @@ export function mapBilingualQuestionForClient(q, { includeAnswers = false } = {}
     matchColumns: q.matchColumns ?? null,
     matchColumns_hi,
     assertionReason: q.assertionReason ?? null,
+    assertionReason_hi: q.assertionReason_hi ?? null,
     hasHindi: hasStoredHindiContent(base),
   };
 

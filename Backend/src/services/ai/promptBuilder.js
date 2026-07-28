@@ -27,10 +27,11 @@ For EVERY question you MUST follow this exact order — NEVER reverse it:
 STEP 1 — Decide the SINGLE factually correct OPTION TEXT from CONTEXT.
 STEP 2 — Write options A–D. Put that correct text under EXACTLY one letter.
 STEP 3 — Set "answer" = that letter ONLY (A|B|C|D). Do not pick a letter first then invent text.
-STEP 4 — Write "explanation" that DEFENDS ONLY that same letter + same option text.
+STEP 4 — Write "explanation" that teaches the student (UPSC PYQ / coaching style):
          - First sentence MUST be: Option {answer} ("{exact option text}") is correct.
-         - Then justify from CONTEXT (why that option text is right).
-         - Briefly say why the other three options are wrong.
+         - Then explain WHY that option is right (from CONTEXT).
+         - Then briefly explain WHY each wrong option (the other three) is wrong — so concepts clear.
+         - Target 50–70 English words; hard max 100 words. Dense, no fluff.
          - NEVER say another letter is correct.
          - NEVER defend a different option than "answer".
          - NEVER shuffle option texts after setting "answer".
@@ -38,6 +39,7 @@ STEP 4 — Write "explanation" that DEFENDS ONLY that same letter + same option 
 SELF-CHECK before emitting each item (mandatory — re-read options after writing answer):
 □ options[answer] text is the ONE option CONTEXT supports as correct.
 □ explanation opens with that same letter and quotes that same option text.
+□ explanation covers correct reason + why the other three options fail.
 □ explanation does NOT claim Option X is correct when answer is Y.
 □ If you realize another letter's text is actually right → CHANGE "answer" to that letter (do not leave a mismatch).
 If ANY check fails → fix the JSON before output. Do not ship mismatched items.
@@ -46,6 +48,7 @@ FORBIDDEN (instant fail):
 - answer = "B" but explanation says "Option A is correct"
 - answer letter points to wrong / empty option text
 - explanation praises one option while "answer" marks another
+- explanation only for correct option with zero mention of wrong options
 - swapping option texts between letters after answer is set
 - two options that are identical or trivially the same meaning
 - incomplete stems (intro-only without statements / lists / events)
@@ -55,7 +58,7 @@ OUTPUT each item MUST have:
 - question (COMPLETE stem)
 - options {A,B,C,D}
 - answer (exactly "A"|"B"|"C"|"D" — letter of the correct option text)
-- explanation (50–70 words; must open with Option {answer} and defend only that letter; include 1–2 concrete UPSC PYQ-style facts from CONTEXT)
+- explanation (50–100 words; open with Option {answer}; justify correct + eliminate all three wrong options; 1–2 concrete facts from CONTEXT)
 - sourceParagraph (≤20 words verbatim from CONTEXT supporting the answer)
 - difficulty ("easy"|"moderate"|"hard")
 - questionType
@@ -98,11 +101,11 @@ TOPIC LOCK (mandatory):
 CRITICAL CONSISTENCY LOCK:
 1. Decide which option TEXT is correct first.
 2. Place that text under one letter; set "answer" to THAT letter (A|B|C|D).
-3. Explanation MUST open with: Option {answer} ("{option text}") is correct. — then defend ONLY that letter (50–70 words).
-4. Never let explanation defend a different letter than "answer".
+3. Explanation MUST open with: Option {answer} ("{option text}") is correct. Then why it is right AND why each of the other three options is wrong (50–100 words total).
+4. Never let explanation claim a different letter is correct than "answer".
 5. Before output: re-check options[answer] is truly correct; if not, fix "answer".
 
-Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–70 words), sourceParagraph ("syllabus"), difficulty, questionType.
+Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–100 words covering all options), sourceParagraph ("syllabus"), difficulty, questionType.
 COMPLETE stems. Set questionType to EXACTLY one of:
 statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
 Cover the Mix evenly — do not skip patterns. No duplicate stems.`;
@@ -164,7 +167,7 @@ HARD RULES:
 1. TOPIC LOCK: every question MUST be about "${topic}" only — no off-topic drift within the same subject.
 2. ${patternRules}
 3. Decide correct OPTION TEXT first, then set answer = that letter.
-4. explanation MUST start with: Option {answer} ("{that option text}") is correct. (50–70 words)
+4. explanation MUST start with: Option {answer} ("{that option text}") is correct. Then justify why correct AND why each wrong option fails (50–100 words).
 5. answer letter ↔ option text ↔ explanation must match.
 JSON array only.`;
   }
@@ -176,13 +179,13 @@ Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (knowledge base).
 HARD RULES (student safety):
 1. Decide correct OPTION TEXT from CONTEXT first, then set answer = that letter.
 2. answer = letter of the option TEXT that CONTEXT supports (options[answer] must be that text).
-3. explanation = 50–70 words; MUST start with: Option {answer} ("{that option text}") is correct.
+3. explanation = 50–100 words; MUST start with: Option {answer} ("{that option text}") is correct.
 4. explanation must NEVER say a different letter is correct.
 5. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME. If wrong, fix answer.
 6. TOPIC LOCK: Every question MUST be directly about "${topic}". If CONTEXT is about a different sub-topic (e.g. Preamble when Topic is Cabinet), IGNORE that CONTEXT and return [] — do NOT invent off-topic MCQs.
 7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
 8. ${patternRules}
-9. In explanation, include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
+9. Explanation MUST teach: why the correct option is right + why EACH of the other three options is wrong (aspirant-level elimination). Include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
 
 JSON array only.
 

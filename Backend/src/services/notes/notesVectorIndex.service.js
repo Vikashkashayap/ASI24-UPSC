@@ -136,7 +136,7 @@ export async function indexChapterInVectorDb(chapterId, opts = {}) {
   if (!isReady()) {
     chapter.embeddingStatus = "skipped";
     chapter.embeddingError =
-      "Set QDRANT_URL and JINA_API_KEY (or other EMBEDDING_PROVIDER credentials)";
+      "Set QDRANT_URL and OPENAI_API_KEY / OPENROUTER_API_KEY (EMBEDDING_PROVIDER=openai)";
     await chapter.save();
     return {
       chapterId: chapter._id,

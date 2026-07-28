@@ -18,12 +18,13 @@ const JINA_TASKS = {
 };
 
 /**
- * Pluggable embedding service — default: Jina AI (jina-embeddings-v4).
- * Switch providers via EMBEDDING_PROVIDER=jina|openai|voyage without changing the RAG pipeline.
+ * Pluggable embedding service — default: OpenAI (text-embedding-3-small).
+ * Switch providers via EMBEDDING_PROVIDER=openai|jina|voyage without changing the RAG pipeline.
+ * OpenRouter keys (sk-or-…) auto-route to https://openrouter.ai/api/v1.
  */
 class EmbeddingService {
   constructor() {
-    this.provider = String(process.env.EMBEDDING_PROVIDER || "jina").trim().toLowerCase();
+    this.provider = String(process.env.EMBEDDING_PROVIDER || "openai").trim().toLowerCase();
     this.disabled = false;
     this.warned = false;
     this.timeoutMs = parseInt(process.env.EMBEDDING_TIMEOUT_MS, 10) || 30_000;
@@ -38,12 +39,7 @@ class EmbeddingService {
   _initProvider() {
     switch (this.provider) {
       case "openai":
-        this.model = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
-        this.baseUrl = String(process.env.OPENAI_BASE_URL || DEFAULT_OPENAI_URL).replace(/\/$/, "");
-        this.embedUrl = `${this.baseUrl}/embeddings`;
-        this.apiKey = this._resolveOpenAiApiKey();
-        this.dimension =
-          parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) || 1536;
+        this._initOpenAi();
         break;
 
       case "voyage":
@@ -55,7 +51,6 @@ class EmbeddingService {
         break;
 
       case "jina":
-      default:
         this.provider = "jina";
         this.model = process.env.JINA_MODEL || "jina-embeddings-v4";
         this.embedUrl = process.env.JINA_API_URL || DEFAULT_JINA_URL;
@@ -68,7 +63,46 @@ class EmbeddingService {
             10
           ) || 1024;
         break;
+
+      default:
+        this.provider = "openai";
+        this._initOpenAi();
+        break;
     }
+  }
+
+  _initOpenAi() {
+    this.provider = "openai";
+    const explicitKey = String(process.env.OPENAI_API_KEY || "").trim();
+    const openRouterKey = String(process.env.OPENROUTER_API_KEY || "").trim();
+    let baseUrl = String(process.env.OPENAI_BASE_URL || "").trim().replace(/\/$/, "");
+
+    const keyLooksOpenRouter = explicitKey.startsWith("sk-or-");
+    const useOpenRouter =
+      /openrouter\.ai/i.test(baseUrl) ||
+      keyLooksOpenRouter ||
+      (!explicitKey && Boolean(openRouterKey));
+
+    if (useOpenRouter && !baseUrl) {
+      baseUrl = "https://openrouter.ai/api/v1";
+    }
+    if (!baseUrl) baseUrl = DEFAULT_OPENAI_URL;
+
+    this.baseUrl = baseUrl;
+    this.embedUrl = `${this.baseUrl}/embeddings`;
+    this.apiKey = useOpenRouter
+      ? keyLooksOpenRouter
+        ? explicitKey
+        : openRouterKey || explicitKey
+      : explicitKey || (/openrouter\.ai/i.test(baseUrl) ? openRouterKey : "");
+
+    let model = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+    if (/openrouter\.ai/i.test(this.baseUrl) && !model.includes("/")) {
+      model = `openai/${model}`;
+    }
+    this.model = model;
+    this.dimension =
+      parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) || 1536;
   }
 
   getModelName() {
@@ -95,11 +129,7 @@ class EmbeddingService {
   }
 
   _resolveOpenAiApiKey() {
-    const explicit = String(process.env.OPENAI_API_KEY || "").trim();
-    if (explicit) return explicit;
-    const openRouter = String(process.env.OPENROUTER_API_KEY || "").trim();
-    if (openRouter && /openrouter\.ai/i.test(this.baseUrl)) return openRouter;
-    return "";
+    return this.apiKey || "";
   }
 
   _disableWithWarning(message) {
@@ -133,6 +163,10 @@ class EmbeddingService {
 
   _isRetryableStatus(status) {
     return status === 429 || status === 502 || status === 503 || status === 504;
+  }
+
+  _supportsDimensionsParam() {
+    return /text-embedding-3/i.test(this.model || "");
   }
 
   async _fetchWithTimeout(url, options) {
@@ -228,13 +262,19 @@ class EmbeddingService {
       Authorization: `Bearer ${this.apiKey}`,
     };
 
+    const body = {
+      model: this.model,
+      input: texts.length === 1 ? texts[0] : texts,
+    };
+    // text-embedding-3-* supports custom dimensions (match Qdrant vector size)
+    if (this._supportsDimensionsParam() && this.dimension) {
+      body.dimensions = this.dimension;
+    }
+
     const response = await this._fetchWithTimeout(this.embedUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        model: this.model,
-        input: texts.length === 1 ? texts[0] : texts,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -261,12 +301,12 @@ class EmbeddingService {
 
   async _embedProviderBatch(texts, opts = {}) {
     switch (this.provider) {
-      case "openai":
-      case "voyage":
-        return this._callOpenAiCompatible(texts);
       case "jina":
-      default:
         return this._callJina(texts, opts.task);
+      case "voyage":
+      case "openai":
+      default:
+        return this._callOpenAiCompatible(texts);
     }
   }
 

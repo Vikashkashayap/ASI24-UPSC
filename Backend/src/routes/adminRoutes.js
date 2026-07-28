@@ -76,6 +76,9 @@ import {
   notesVectorHealth,
   searchNotesChunks,
   deleteNotesChapter,
+  syncAllWebsiteNotes,
+  getSyncAllWebsiteNotesStatus,
+  promoteWebsiteNotesToKb,
 } from "../controllers/notesController.js";
 import {
   getAllPlans,
@@ -176,6 +179,9 @@ router.get("/notes/topics", listNotesTopics);
 router.get("/notes/topics/:topicId/preview", previewNotesTopic);
 router.post("/notes/sync-chapter", syncNotesChapter);
 router.post("/notes/sync-by-slug", syncNotesBySlug);
+router.post("/notes/sync-all-website", syncAllWebsiteNotes);
+router.get("/notes/sync-all-website/status", getSyncAllWebsiteNotesStatus);
+router.post("/notes/promote-to-kb", promoteWebsiteNotesToKb);
 router.post("/notes/repair-chapter/:chapterId", repairNotesChapter);
 router.post("/notes/sync-topic/:topicId", syncNotesTopic);
 router.post("/notes/upload-pdf", (req, res, next) => {

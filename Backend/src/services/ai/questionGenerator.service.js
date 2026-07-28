@@ -355,10 +355,11 @@ function normalizeNotesQuestion(q, meta = {}) {
   } else if (explanationRaw) {
     const cleaned = explanationRaw.replace(/\s+/g, " ").trim();
     const words = cleaned.split(/\s+/).filter(Boolean);
+    const maxW = Math.max(70, parseInt(process.env.QG_EXPLAIN_MAX_WORDS, 10) || 100);
     explanation =
-      words.length <= 75
-        ? cleaned.slice(0, 900)
-        : `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`.slice(0, 900);
+      words.length <= maxW
+        ? cleaned.slice(0, 1200)
+        : `${words.slice(0, maxW).join(" ").replace(/[.,;:]+$/, "")}.`.slice(0, 1200);
   }
 
   // Short source quote only — never dump long notes into UI "Source"
@@ -749,15 +750,16 @@ export async function generateQuestionsFromContextBatch({
 
       const questions = (result.questions || []).map((q) => {
         const explanationText = String(q.explanation || q.explanation_en || "").trim();
-        // Prefer compact 50–70 word body for UI when structured detail exists
+        // Prefer 50–100 word teaching body for UI (correct + wrong options)
         const detail =
           q.explanationStructured?.detailedExplanation ||
           explanationText.split("\n").find((l) => l && !/^Correct Answer:/i.test(l)) ||
           explanationText;
         const words = String(detail).replace(/\s+/g, " ").trim().split(/\s+/).filter(Boolean);
+        const maxW = Math.max(70, parseInt(process.env.QG_EXPLAIN_MAX_WORDS, 10) || 100);
         const compactExplain =
-          words.length > 75
-            ? `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`
+          words.length > maxW
+            ? `${words.slice(0, maxW).join(" ").replace(/[.,;:]+$/, "")}.`
             : String(detail).replace(/\s+/g, " ").trim();
 
         return ensureEnglishBilingualFields({

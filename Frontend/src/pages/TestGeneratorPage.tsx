@@ -175,7 +175,7 @@ const TestGeneratorPage: React.FC = () => {
                 UPSC Prelims Test Generator
               </h1>
               <p className={`text-xs md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"} hidden sm:block`}>
-                Generate AI-powered UPSC Prelims MCQs and test your knowledge
+                Generate UPSC Prelims MCQs from your Knowledge Base for the topic you choose
               </p>
             </div>
           </div>
@@ -222,7 +222,7 @@ const TestGeneratorPage: React.FC = () => {
                 Test Configuration
               </CardTitle>
               <CardDescription className="mt-0.5 md:mt-1 text-xs md:text-sm">
-                Select your preferences to generate a customized test
+                Questions are grounded in your Admin Knowledge Base for the selected subject &amp; topic
               </CardDescription>
             </div>
           </div>
@@ -377,10 +377,10 @@ const TestGeneratorPage: React.FC = () => {
               </div>
               <div>
                 <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                  AI-Powered
+                  Knowledge Base
                 </div>
                 <div className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                  Expert questions
+                  Admin RAG sources
                 </div>
               </div>
             </div>

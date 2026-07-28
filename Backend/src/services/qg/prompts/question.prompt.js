@@ -40,12 +40,15 @@ QUESTION TYPES (vary across the batch):
 - elimination: options like "1 and 2 only" that reward careful reading
 - direct_conceptual: deep concept, not a trivia one-liner
 
-OPTION QUALITY:
-- Wrong options must challenge serious aspirants
+OPTION QUALITY (accuracy-critical):
+- Wrong options must challenge serious aspirants — near-miss distractors (wrong year, wrong article, partial truth, swapped cause/effect) grounded in the SAME domain as CONTEXT
+- Never use absurd, random, or off-topic distractors; never invent schemes/names/dates not in CONTEXT for wrong options either
 - Avoid "all of the above" / "none of the above" unless CONTEXT clearly supports it
-- No two options may be identical or trivially synonymous
+- No two options may be identical, trivially synonymous, or differ only by filler words
+- Each option text ≥ 3 meaningful words (except standard codes like "1 and 2 only")
 - For chronology prefer 3 ordered codes (A–C); pad D only if needed
 - Option texts must be mutually exclusive (exactly one correct)
+- After writing options, re-read CONTEXT and confirm ONLY the marked correctAnswer is supported
 
 OUTPUT JSON:
 {"questions":[{

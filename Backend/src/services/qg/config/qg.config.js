@@ -3,7 +3,7 @@
  * Accuracy over speed. Never generate without retrieved context.
  *
  * Quality profiles (QG_QUALITY_PROFILE):
- *   best_pro  — highest accuracy, locked answer↔explanation, 50–70 word explain
+ *   best_pro  — highest accuracy, locked answer↔explanation, 50–100 word explain (all options)
  *   balanced  — default-ish thresholds, still consistency-locked
  *   fast      — looser gates for throughput
  *
@@ -33,7 +33,7 @@ const QUALITY_PROFILES = {
     duplicateSimilarityThreshold: 0.88,
     maxRegenerateAttempts: 3,
     explanationMinWords: 50,
-    explanationMaxWords: 70,
+    explanationMaxWords: 100,
     requireAnswerExplanationLock: true,
     rejectOnOptionAnswerMismatch: true,
     genTemperature: 0.2,
@@ -45,7 +45,7 @@ const QUALITY_PROFILES = {
     duplicateSimilarityThreshold: 0.88,
     maxRegenerateAttempts: 2,
     explanationMinWords: 50,
-    explanationMaxWords: 70,
+    explanationMaxWords: 100,
     requireAnswerExplanationLock: true,
     rejectOnOptionAnswerMismatch: true,
     genTemperature: 0.25,
@@ -56,8 +56,8 @@ const QUALITY_PROFILES = {
     minFactConfidence: 0.4,
     duplicateSimilarityThreshold: 0.9,
     maxRegenerateAttempts: 1,
-    explanationMinWords: 40,
-    explanationMaxWords: 80,
+    explanationMinWords: 50,
+    explanationMaxWords: 100,
     requireAnswerExplanationLock: true,
     rejectOnOptionAnswerMismatch: false,
     genTemperature: 0.3,
@@ -98,15 +98,21 @@ export const QG_CONFIG = {
   },
 
   context: {
-    maxTokens: envInt("QG_CONTEXT_MAX_TOKENS", 2800),
-    maxChars: envInt("QG_CONTEXT_MAX_CHARS", 12000),
+    maxTokens: envInt("QG_CONTEXT_MAX_TOKENS", 1800),
+    maxChars: envInt("QG_CONTEXT_MAX_CHARS", 5500),
+    /** Per-stage hard caps (chars) — biggest lever for input-token cost */
+    genMaxChars: envInt("QG_GEN_CONTEXT_CHARS", 3600),
+    verifyMaxChars: envInt("QG_VERIFY_CONTEXT_CHARS", 1400),
+    factCheckMaxChars: envInt("QG_FACTCHECK_CONTEXT_CHARS", 1200),
   },
 
   generation: {
-    maxQuestionsPerCall: envInt("QG_MAX_QUESTIONS_PER_CALL", 5),
+    maxQuestionsPerCall: envInt("QG_MAX_QUESTIONS_PER_CALL", 8),
     maxRegenerateAttempts: envInt("QG_MAX_REGENERATE", profile.maxRegenerateAttempts),
     temperature: envFloat("QG_GEN_TEMPERATURE", profile.genTemperature),
     verifyTemperature: envFloat("QG_VERIFY_TEMPERATURE", profile.verifyTemperature),
+    /** Parallel verify/explain/fact-check across questions in a batch. */
+    verifyConcurrency: envInt("QG_VERIFY_CONCURRENCY", 4),
     /** Hard rule: never invent from open syllabus when KB is empty. */
     allowOpenKnowledge: envBool("PRACTICE_ALLOW_OPEN_KNOWLEDGE", false),
     minContextChars: envInt("QG_MIN_CONTEXT_CHARS", 120),
@@ -126,6 +132,14 @@ export const QG_CONFIG = {
       "QG_REJECT_OPTION_ANSWER_MISMATCH",
       profile.rejectOnOptionAnswerMismatch
     ),
+    /**
+     * Topic Practice: skip separate fact-check LLM when verifier is confident.
+     * Keeps answer/option accuracy gate; cuts ~1 LLM call per question.
+     */
+    practiceSkipFactCheck: envBool("QG_PRACTICE_SKIP_FACTCHECK", true),
+    practiceSkipFactConfidence: envFloat("QG_PRACTICE_SKIP_FACT_CONFIDENCE", 0.72),
+    /** Topic Practice: skip separate explanation LLM (inline locked explain). */
+    practiceInlineExplain: envBool("QG_PRACTICE_INLINE_EXPLAIN", true),
   },
 
   cache: {
@@ -140,10 +154,11 @@ export const QG_CONFIG = {
    * Override via QG_MODEL_* env when you want Best Pro quality.
    */
   models: {
+    /** Stronger model for stems/options; flash-lite stays on verify/explain for speed. */
     question:
       process.env.QG_MODEL_QUESTION ||
       process.env.OPENROUTER_PRACTICE_MODEL ||
-      "google/gemini-2.5-flash-lite",
+      "google/gemini-2.5-flash",
     verification:
       process.env.QG_MODEL_VERIFICATION ||
       process.env.OPENROUTER_PRACTICE_MODEL ||

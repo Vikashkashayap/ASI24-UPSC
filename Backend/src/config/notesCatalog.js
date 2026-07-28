@@ -14,6 +14,7 @@ export const UPSC_NOTES_CATALOG = [
       { title: "Ancient History", slug: "ancient-history", topicCount: 12 },
       { title: "Medieval History", slug: "medieval-history", topicCount: 8 },
       { title: "Modern History", slug: "modern-history", topicCount: 19 },
+      { title: "Post Independence India", slug: "post-independence", topicCount: 18 },
       { title: "World History", slug: "world-history", topicCount: 18 },
     ],
   },
@@ -21,24 +22,24 @@ export const UPSC_NOTES_CATALOG = [
     gsPaper: "GS Paper 1",
     subject: "Geography",
     chapters: [
-      { title: "Indian Geography", slug: "geography", topicCount: 7 },
+      { title: "Indian Geography", slug: "geography", topicCount: 17 },
       { title: "World Geography", slug: "world-geography", topicCount: 14 },
     ],
   },
   {
     gsPaper: "GS Paper 1",
     subject: "Art & Culture",
-    chapters: [{ title: "Art & Culture", slug: "art-culture", topicCount: 5 }],
+    chapters: [{ title: "Art & Culture", slug: "art-culture", topicCount: 27 }],
   },
   {
     gsPaper: "GS Paper 1",
     subject: "Society",
-    chapters: [{ title: "Indian Society", slug: "society", topicCount: 8 }],
+    chapters: [{ title: "Indian Society", slug: "society", topicCount: 9 }],
   },
   {
     gsPaper: "GS Paper 2",
     subject: "Polity",
-    chapters: [{ title: "Indian Polity & Constitution", slug: "indian-polity", topicCount: 38 }],
+    chapters: [{ title: "Indian Polity & Constitution", slug: "indian-polity", topicCount: 30 }],
   },
   {
     gsPaper: "GS Paper 2",
@@ -48,22 +49,22 @@ export const UPSC_NOTES_CATALOG = [
   {
     gsPaper: "GS Paper 2",
     subject: "International Relations",
-    chapters: [{ title: "International Relations", slug: "international-relations", topicCount: 4 }],
+    chapters: [{ title: "International Relations", slug: "international-relations", topicCount: 16 }],
   },
   {
     gsPaper: "GS Paper 3",
     subject: "Economy",
-    chapters: [{ title: "Indian Economy", slug: "economy", topicCount: 22 }],
+    chapters: [{ title: "Indian Economy", slug: "economy", topicCount: 24 }],
   },
   {
     gsPaper: "GS Paper 3",
     subject: "Environment",
-    chapters: [{ title: "Environment & Ecology", slug: "environment", topicCount: 6 }],
+    chapters: [{ title: "Environment & Ecology", slug: "environment", topicCount: 39 }],
   },
   {
     gsPaper: "GS Paper 3",
     subject: "Science & Tech",
-    chapters: [{ title: "Science & Technology", slug: "science-technology", topicCount: 5 }],
+    chapters: [{ title: "Science & Technology", slug: "science-technology", topicCount: 18 }],
   },
   {
     gsPaper: "GS Paper 3",
@@ -135,6 +136,25 @@ export function getFullCatalog() {
   }));
 }
 
+/** Subject cards for admin UI — chapter + topic totals. */
+export function getCatalogSubjectSummaries() {
+  return UPSC_NOTES_CATALOG.map((row) => {
+    const topicCount = row.chapters.reduce((sum, c) => sum + (c.topicCount || 0), 0);
+    return {
+      gsPaper: row.gsPaper,
+      subject: row.subject,
+      chapterCount: row.chapters.length,
+      topicCount,
+      chapters: row.chapters.map((c) => ({
+        title: c.title,
+        slug: c.slug,
+        url: `${NOTES_BASE_URL}/${c.slug}`,
+        topicCount: c.topicCount || 0,
+      })),
+    };
+  });
+}
+
 export default {
   NOTES_BASE_URL,
   UPSC_NOTES_CATALOG,
@@ -142,4 +162,5 @@ export default {
   getTotalChapterCount,
   getCatalogChapters,
   getFullCatalog,
+  getCatalogSubjectSummaries,
 };

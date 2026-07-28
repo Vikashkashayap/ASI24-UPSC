@@ -4,7 +4,7 @@
  */
 
 const PLACEHOLDER_RE =
-  /^(?:[—–\-−•·.…]{1,6}|n\/?a|na|tbd|todo|null|undefined|none|blank|empty|\[object object\]|\.\.\.|…)$/i;
+  /^(?:[—–\-−•·.…]{1,6}|n\/?a|na|tbd|todo|null|undefined|none|blank|empty|missing(?:\s+item)?|\[object object\]|\.\.\.|…)$/i;
 
 export function isPlaceholderItemText(value) {
   const s = String(value ?? "")
@@ -184,10 +184,21 @@ export function isCompleteUpscStem(q) {
   }
 
   if (looksMatch) {
-    const a = (q?.matchColumns?.columnA || []).map(coerceStemItemText).filter((x) => x.length >= 2);
-    const b = (q?.matchColumns?.columnB || []).map(coerceStemItemText).filter((x) => x.length >= 2);
-    if (a.length >= 2 && b.length >= 2) return true;
-    return countSubstantiveLetterItems(text) >= 2 && countSubstantiveNumberedItems(text) >= 2;
+    const aRaw = (q?.matchColumns?.columnA || []).map(coerceStemItemText);
+    const bRaw = (q?.matchColumns?.columnB || []).map(coerceStemItemText);
+    const a = aRaw.filter((x) => x.length >= 2);
+    const b = bRaw.filter((x) => x.length >= 2);
+    // Reject uneven / sparse lists — UI would show "Missing item" for empty slots
+    const slots = Math.max(aRaw.length, bRaw.length);
+    if (slots >= 2) {
+      const emptySlots = Array.from({ length: slots }, (_, i) => !aRaw[i] || !bRaw[i]).filter(Boolean)
+        .length;
+      if (emptySlots > 0) return false;
+    }
+    if (a.length >= 3 && b.length >= 3 && a.length === b.length) return true;
+    const letters = countSubstantiveLetterItems(text);
+    const nums = countSubstantiveNumberedItems(text);
+    return letters >= 3 && nums >= 3 && letters === nums;
   }
 
   if (looksAR) {
@@ -219,6 +230,7 @@ export function isStudentReadyMcq(q) {
   if (!q || typeof q !== "object") return false;
   const stem = String(q.question_en || q.question || "").trim();
   if (!stem || !isCompleteUpscStem(q)) return false;
+  if (/missing\s+item/i.test(stem)) return false;
 
   const opts = q.options_en || q.options || {};
   const type = String(q.questionType || "").toLowerCase();

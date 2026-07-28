@@ -26,6 +26,7 @@ interface ExamQuestionBodyProps {
     matchColumns?: { columnA: string[]; columnB: string[] } | null;
   matchColumns_hi?: { columnA: string[]; columnB: string[] } | null;
     assertionReason?: { assertion: string; reason: string } | null;
+    assertionReason_hi?: { assertion: string; reason: string } | null;
     tableData?: { headers: string[]; rows: string[][] } | null;
   };
   compact?: boolean;
@@ -126,14 +127,7 @@ function MatchFollowingTable({
                       ).trim()
                     : String(item || "").trim();
               const safe = label && label !== "[object Object]" && !/^([—–\-−…]|\.\.\.)$/.test(label) ? label : "";
-              if (!safe) {
-                return (
-                  <li key={i} className="flex gap-2 break-words leading-relaxed opacity-60">
-                    <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
-                    <span className={`${itemTextClass} italic`}>Missing item</span>
-                  </li>
-                );
-              }
+              if (!safe) return null;
               return (
                 <li key={i} className="flex gap-2 break-words leading-relaxed">
                   <span className={numClass}>{String.fromCharCode(65 + i)}.</span>
@@ -160,8 +154,7 @@ function MatchFollowingTable({
             {listIILabel}
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
-            {Array.from({ length: Math.max(data.columnB.length, data.columnA.length, 1) }, (_, i) => {
-              const raw = data.columnB[i] as unknown;
+            {data.columnB.map((raw, i) => {
               const label =
                 typeof raw === "string"
                   ? raw.trim()
@@ -174,12 +167,11 @@ function MatchFollowingTable({
                       ).trim()
                     : String(raw || "").trim();
               const item = label && label !== "[object Object]" && !/^([—–\-−…]|\.\.\.)$/.test(label) ? label : "";
+              if (!item) return null;
               return (
                 <li key={i} className="flex gap-2 break-words leading-relaxed">
                   <span className={numClassII}>{i + 1}.</span>
-                  <span className={`${itemTextClass}${item ? "" : " italic opacity-60"}`}>
-                    {item || "Missing item"}
-                  </span>
+                  <span className={itemTextClass}>{item}</span>
                 </li>
               );
             })}
@@ -380,14 +372,26 @@ function getAssertionStemText(
   question: ExamQuestionBodyProps["question"],
   lang: "en" | "hi"
 ): string | null {
-  const text =
-    lang === "hi"
-      ? getQuestionHindi(question, { strict: true })
-      : getQuestionEnglish(question);
+  if (lang === "hi") {
+    const arHi = question.assertionReason_hi;
+    if (arHi?.assertion && arHi?.reason) {
+      return buildAssertionReasonStem({
+        assertion: arHi.assertion,
+        reason: arHi.reason,
+      });
+    }
+    const text = getQuestionHindi(question, { strict: true });
+    if (text && isAssertionReasonText(text)) return text;
+    // Soft accept: Hindi stem with अभिकथन/कारण even if getQuestionHindi strict cleared it
+    const rawHi = String(question.question_hi || "").trim();
+    if (rawHi && isAssertionReasonText(rawHi)) return rawHi;
+    return null;
+  }
 
+  const text = getQuestionEnglish(question);
   if (text && isAssertionReasonText(text)) return text;
 
-  if (lang === "en" && question.assertionReason?.assertion) {
+  if (question.assertionReason?.assertion) {
     return buildAssertionReasonStem({
       assertion: question.assertionReason.assertion,
       reason: question.assertionReason.reason || "",
@@ -870,6 +874,26 @@ type ExplanationFields = {
   conceptualSource?: string;
 };
 
+const GENERIC_WRONG_EXPLAIN_RE =
+  /see the correct option explanation above|common distractor for this topic|does not match the notes on this point|does not match the notes and is a common/i;
+
+function isGenericWrongExplanation(text: string): boolean {
+  const t = String(text || "").trim();
+  if (!t) return true;
+  if (GENERIC_WRONG_EXPLAIN_RE.test(t)) return true;
+  // Too short to be a real teaching explanation
+  if (t.split(/\s+/).filter(Boolean).length < 18) return true;
+  return false;
+}
+
+function isUselessSource(text?: string | null): boolean {
+  const t = String(text || "").trim();
+  if (!t) return true;
+  if (/^(generated|ai|llm|n\/?a|none|null|undefined|source)$/i.test(t)) return true;
+  if (t.length < 12) return true;
+  return false;
+}
+
 function hasPerOptionExplanations(
   question: ExplanationFields,
   optionKeys: OptionKey[],
@@ -878,15 +902,37 @@ function hasPerOptionExplanations(
   const raw = question.explanation_en ?? question.explanation;
   if (!raw || typeof raw === "string") return false;
 
-  const incorrectWithText = optionKeys.filter(
-    (opt) =>
-      opt !== correctKey &&
-      (getExplanationByLang(question, "en", opt) || getExplanationByLang(question, "hi", opt))
-  );
-  if (incorrectWithText.length > 0) return true;
+  const realWrong = optionKeys.filter((opt) => {
+    if (opt === correctKey) return false;
+    const en = getExplanationByLang(question, "en", opt);
+    const hi = getExplanationByLang(question, "hi", opt);
+    if (en && !isGenericWrongExplanation(en)) return true;
+    if (hi && !isGenericWrongExplanation(hi)) return true;
+    return false;
+  });
+  return realWrong.length >= 2;
+}
 
-  const enTexts = optionKeys.map((opt) => getExplanationByLang(question, "en", opt)).filter(Boolean);
-  return enTexts.length >= 2 && new Set(enTexts).size > 1;
+function getFullTeachingExplanation(question: ExplanationFields, correctKey?: OptionKey): string {
+  const raw = question.explanation_en ?? question.explanation;
+  if (typeof raw === "string" && raw.trim()) return raw.trim();
+  if (raw && typeof raw === "object" && correctKey) {
+    const correct = String(raw[correctKey] || "").trim();
+    if (correct && !isGenericWrongExplanation(correct)) {
+      // Prefer full combined teaching if correct alone is short but others exist as stubs
+      const parts = (["A", "B", "C", "D"] as OptionKey[])
+        .map((k) => String(raw[k] || "").trim())
+        .filter((t) => t && !isGenericWrongExplanation(t));
+      if (parts.length >= 2) return parts.join(" ");
+      return correct;
+    }
+    const joined = (["A", "B", "C", "D"] as OptionKey[])
+      .map((k) => String(raw[k] || "").trim())
+      .filter(Boolean)
+      .join(" ");
+    return joined;
+  }
+  return getExplanationByLang(question, "en", correctKey) || "";
 }
 
 export const ExamReviewExplanation: React.FC<{
@@ -898,20 +944,27 @@ export const ExamReviewExplanation: React.FC<{
   const optionKeys: OptionKey[] = ["A", "B", "C", "D"];
 
   const hasPerOption = hasPerOptionExplanations(question, optionKeys, correctKey);
+  const teachingText = getFullTeachingExplanation(question, correctKey);
+  const teachingHi = correctKey ? getExplanationByLang(question, "hi", correctKey) : "";
 
   const headerClass = paperMode
     ? "upsc-exam-serif text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-black/70"
     : "text-xs font-bold uppercase tracking-wide text-slate-500";
+
+  const showSource = !isUselessSource(question.conceptualSource);
+  const showElimination =
+    Boolean(question.eliminationLogic?.trim()) &&
+    !isGenericWrongExplanation(question.eliminationLogic || "");
 
   return (
     <div
       className={
         paperMode
           ? "upsc-paper-explanation upsc-exam-serif"
-          : "rounded-lg border border-blue-200 bg-blue-50/80 p-3"
+          : "rounded-xl border-2 border-blue-200 bg-gradient-to-b from-blue-50 to-white p-3 sm:p-4 shadow-sm"
       }
     >
-      <div className={`${headerClass} mb-2 flex flex-wrap items-center gap-x-2 gap-y-0.5`}>
+      <div className={`${headerClass} mb-3 flex flex-wrap items-center gap-x-2 gap-y-0.5`}>
         <span>Explanation / व्याख्या</span>
         <span className="font-normal normal-case text-[10px] text-black/50">
           सही: ({question.correctAnswer?.toLowerCase()})
@@ -927,102 +980,119 @@ export const ExamReviewExplanation: React.FC<{
         </span>
       </div>
 
-      <div className="space-y-2">
-        {hasPerOption ? (
-          optionKeys.map((opt) => {
-            const hiText = getExplanationByLang(question, "hi", opt);
-            const enText = getExplanationByLang(question, "en", opt);
-            if (!hiText && !enText) return null;
-            const isCorrect = opt === question.correctAnswer;
-            const isUserWrong = opt === userAnswer && !isCorrect;
-            return (
-              <div
-                key={opt}
-                className={
-                  paperMode
-                    ? `upsc-paper-explanation-item ${isCorrect ? "upsc-paper-explanation-correct" : isUserWrong ? "upsc-paper-explanation-wrong" : ""}`
-                    : `p-2 rounded-lg border text-xs sm:text-sm ${
-                        isCorrect
-                          ? "border-green-500 bg-green-50"
-                          : isUserWrong
-                            ? "border-red-400 bg-red-50"
-                            : "border-slate-200 bg-white/80"
-                      }`
-                }
-              >
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className={`font-semibold text-[11px] ${isCorrect ? "text-green-700" : isUserWrong ? "text-red-700" : "text-slate-600"}`}>
-                    ({opt.toLowerCase()})
-                  </span>
-                  {isCorrect ? (
-                    <span className="text-[9px] font-bold uppercase text-green-700 bg-green-100 px-1.5 py-0.5 rounded">
-                      Correct / सही — क्यों सही
-                    </span>
-                  ) : (
-                    <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                      isUserWrong ? "text-red-700 bg-red-100" : "text-slate-600 bg-slate-100"
-                    }`}>
-                      Wrong / गलत — क्यों गलत
-                    </span>
-                  )}
-                  {isUserWrong ? (
-                    <span className="text-[9px] font-semibold text-red-600">
-                      आपका जवाब / Your answer
-                    </span>
-                  ) : null}
-                </div>
-                {hiText ? (
-                  <p className="break-words text-[11px] sm:text-xs leading-relaxed mb-1 text-black/85">
-                    <span className="font-bold text-[9px] uppercase text-black/50 mr-1.5">हिंदी</span>
-                    {hiText}
-                  </p>
-                ) : null}
-                {enText ? (
-                  <p className="break-words text-[11px] sm:text-xs leading-relaxed text-black/70">
-                    <span className="font-bold text-[9px] uppercase text-black/45 mr-1.5">English</span>
-                    {enText}
-                  </p>
-                ) : null}
-              </div>
-            );
-          })
-        ) : correctKey ? (
-          <div className={paperMode ? "upsc-paper-explanation-item upsc-paper-explanation-correct" : "p-2 rounded-lg border border-green-500 bg-green-50"}>
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="font-semibold text-[11px] text-green-700">({correctKey.toLowerCase()})</span>
-              <span className="text-[9px] font-bold uppercase text-green-700 bg-green-100 px-1.5 py-0.5 rounded">
-                Correct / सही — क्यों सही
+      <div className="space-y-2.5">
+        {/* Correct — always first, high visual emphasis */}
+        {correctKey ? (
+          <div
+            className={
+              paperMode
+                ? "upsc-paper-explanation-item upsc-paper-explanation-correct"
+                : "p-3 sm:p-4 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200/80 shadow-sm"
+            }
+          >
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-[11px] font-bold">
+                {correctKey}
               </span>
+              <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-emerald-800 bg-emerald-200/80 px-2 py-0.5 rounded-md">
+                Correct answer / सही उत्तर — क्यों सही
+              </span>
+              {userAnswer === correctKey ? (
+                <span className="text-[10px] font-semibold text-emerald-700">आपका जवाब सही ✓</span>
+              ) : null}
             </div>
-            {getExplanationByLang(question, "hi", correctKey) ? (
-              <p className="break-words text-[11px] sm:text-xs leading-relaxed mb-1 text-black/85">
-                <span className="font-bold text-[9px] uppercase text-black/50 mr-1.5">हिंदी</span>
-                {getExplanationByLang(question, "hi", correctKey)}
+            {teachingHi && !isGenericWrongExplanation(teachingHi) ? (
+              <p className="break-words text-[12px] sm:text-sm leading-relaxed mb-2 text-emerald-950 font-medium">
+                <span className="font-bold text-[9px] uppercase text-emerald-700/70 mr-1.5">हिंदी</span>
+                {teachingHi}
               </p>
             ) : null}
-            {getExplanationByLang(question, "en", correctKey) ? (
-              <p className="break-words text-[11px] sm:text-xs leading-relaxed text-black/70">
-                <span className="font-bold text-[9px] uppercase text-black/45 mr-1.5">English</span>
-                {getExplanationByLang(question, "en", correctKey)}
+            {teachingText ? (
+              <p className="break-words text-[12px] sm:text-sm leading-relaxed text-emerald-950/90">
+                {!teachingHi || isGenericWrongExplanation(teachingHi) ? null : (
+                  <span className="font-bold text-[9px] uppercase text-emerald-700/60 mr-1.5">English</span>
+                )}
+                {hasPerOption
+                  ? getExplanationByLang(question, "en", correctKey) || teachingText
+                  : teachingText}
               </p>
-            ) : null}
-            {userAnswer && userAnswer !== correctKey ? (
-              <p className="mt-2 text-[10px] sm:text-[11px] text-red-700 border-t border-red-200 pt-2">
-                आपने ({userAnswer.toLowerCase()}) चुना — गलत। / You chose ({userAnswer.toLowerCase()}) — incorrect.
-              </p>
-            ) : null}
+            ) : (
+              <p className="text-xs text-emerald-800/70 italic">Explanation unavailable for this question.</p>
+            )}
           </div>
         ) : null}
+
+        {/* Wrong options — only real teaching text, never generic stubs */}
+        {hasPerOption
+          ? optionKeys
+              .filter((opt) => opt !== correctKey)
+              .map((opt) => {
+                const hiText = getExplanationByLang(question, "hi", opt);
+                const enText = getExplanationByLang(question, "en", opt);
+                const hiOk = hiText && !isGenericWrongExplanation(hiText);
+                const enOk = enText && !isGenericWrongExplanation(enText);
+                if (!hiOk && !enOk) return null;
+                const isUserWrong = opt === userAnswer;
+                return (
+                  <div
+                    key={opt}
+                    className={
+                      paperMode
+                        ? `upsc-paper-explanation-item ${isUserWrong ? "upsc-paper-explanation-wrong" : ""}`
+                        : `p-2.5 sm:p-3 rounded-lg border text-xs sm:text-sm ${
+                            isUserWrong
+                              ? "border-red-400 bg-red-50"
+                              : "border-slate-200 bg-white/90"
+                          }`
+                    }
+                  >
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span
+                        className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                          isUserWrong ? "bg-red-500 text-white" : "bg-slate-200 text-slate-700"
+                        }`}
+                      >
+                        {opt}
+                      </span>
+                      <span
+                        className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                          isUserWrong ? "text-red-700 bg-red-100" : "text-slate-600 bg-slate-100"
+                        }`}
+                      >
+                        Wrong / गलत — क्यों गलत
+                      </span>
+                      {isUserWrong ? (
+                        <span className="text-[9px] font-semibold text-red-600">आपका जवाब / Your answer</span>
+                      ) : null}
+                    </div>
+                    {hiOk ? (
+                      <p className="break-words text-[11px] sm:text-xs leading-relaxed mb-1 text-black/85">
+                        <span className="font-bold text-[9px] uppercase text-black/50 mr-1.5">हिंदी</span>
+                        {hiText}
+                      </p>
+                    ) : null}
+                    {enOk ? (
+                      <p className="break-words text-[11px] sm:text-xs leading-relaxed text-black/75">
+                        {hiOk ? (
+                          <span className="font-bold text-[9px] uppercase text-black/45 mr-1.5">English</span>
+                        ) : null}
+                        {enText}
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })
+          : null}
       </div>
 
-      {(question.eliminationLogic || question.conceptualSource) && (
-        <div className="mt-2 pt-2 border-t border-black/10 space-y-1 text-[10px] sm:text-[11px] text-black/65">
-          {question.eliminationLogic ? (
+      {(showElimination || showSource) && (
+        <div className="mt-2.5 pt-2 border-t border-black/10 space-y-1 text-[10px] sm:text-[11px] text-black/65">
+          {showElimination ? (
             <p>
               <span className="font-semibold">Elimination:</span> {question.eliminationLogic}
             </p>
           ) : null}
-          {question.conceptualSource ? (
+          {showSource ? (
             <p>
               <span className="font-semibold">Source:</span> {question.conceptualSource}
             </p>

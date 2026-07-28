@@ -9,8 +9,12 @@ export const RAG_CONFIG = {
   legacyCollectionAlias: "upsc_prelims",
   vectorSize:
     parseInt(process.env.QDRANT_VECTOR_SIZE || process.env.EMBEDDING_DIMENSION, 10) || 1024,
-  embeddingProvider: process.env.EMBEDDING_PROVIDER || "jina",
-  embeddingModel: process.env.JINA_MODEL || process.env.EMBEDDING_MODEL || "jina-embeddings-v4",
+  embeddingProvider: process.env.EMBEDDING_PROVIDER || "openai",
+  embeddingModel:
+    process.env.OPENAI_EMBEDDING_MODEL ||
+    process.env.JINA_MODEL ||
+    process.env.EMBEDDING_MODEL ||
+    "text-embedding-3-small",
   exam: process.env.RAG_EXAM || "UPSC Prelims",
   language: process.env.RAG_DEFAULT_LANGUAGE || "en",
 

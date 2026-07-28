@@ -1,8 +1,9 @@
 /**
  * Student Module Targets → chapter practice:
- * - Generate 30 Hard MCQs (10×3 batches): KB first, LLM if topic not in KB
- * - Show 20 unique questions to the student
+ * - Generate 30 Hard MCQs from Admin Knowledge Base RAG only (kbOnly)
+ * - Show 20 unique questions (teaching explanations: correct + all wrong options)
  * - Prefetch related UPSC topics for the *next* chapter into cache
+ * Module Final (50Q): chapter bank + RAG top-up from same KB, polished explanations
  */
 
 import Test from "../models/Test.js";
@@ -15,6 +16,8 @@ import {
   dedupeQuestionsByStem,
   buildQuestionFingerprints,
   filterOutPriorRepeats,
+  ensurePrelimsExplanationsPracticeStyle,
+  hasTeachingExplanation,
 } from "../services/testGenerationService.js";
 import { pickBilingualQuestionFields, filterStudentReadyQuestions } from "../services/questionTranslationService.js";
 import { searchKnowledgeBase } from "../rag/services/search.service.js";
@@ -340,8 +343,8 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 
 /**
  * Create (or reuse-from-cache) a chapter practice test.
- * Generate 30 Hard MCQs in 10×3 batches (KB first, LLM if topic missing),
- * then show 20 unique questions to the student.
+ * Generate 30 Hard MCQs from Admin Knowledge Base RAG only (kbOnly),
+ * then show 20 unique questions with teaching explanations (all options).
  */
 export async function createChapterPracticeTest({
   userId,
@@ -370,7 +373,7 @@ export async function createChapterPracticeTest({
     return unique;
   };
 
-  // Reuse prior GS Hard paper for same subject+topic (shuffle, take SHOW_COUNT)
+  // Reuse prior GS Hard paper only when explanations are teaching-quality
   const topicRegex = new RegExp(
     `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
     "i"
@@ -400,22 +403,25 @@ export async function createChapterPracticeTest({
         })
       )
     );
-    if (cached.length >= SHOW_COUNT) {
+    const teachingOk =
+      cached.length >= SHOW_COUNT &&
+      cached.filter((q) => hasTeachingExplanation(q)).length >= Math.ceil(SHOW_COUNT * 0.7);
+    if (teachingOk) {
       fromCache = true;
       questions = pickBalancedPatternSet(cached, SHOW_COUNT);
       console.log(
-        `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}")`
+        `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}", teaching explanations OK)`
       );
     } else {
       console.warn(
-        `[chapterPractice] cache had blank/incomplete stems (${cached.length}/${SHOW_COUNT} usable) — regenerating`
+        `[chapterPractice] cache skipped — weak/short explanations (${cached.filter((q) => hasTeachingExplanation(q)).length}/${cached.length}) — regenerating from Admin KB RAG`
       );
     }
   }
 
   if (!fromCache) {
     console.log(
-      `[chapterPractice] generate ${GENERATE_COUNT}Q in ${BATCH_SIZE}×${Math.ceil(GENERATE_COUNT / BATCH_SIZE)} batches → show ${SHOW_COUNT} (KB+LLM fallback)`
+      `[chapterPractice] generate ${GENERATE_COUNT}Q from Admin KB RAG (kbOnly) → show ${SHOW_COUNT}`
     );
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
@@ -425,12 +431,13 @@ export async function createChapterPracticeTest({
       difficulty,
       batchSize: BATCH_SIZE,
       minAcceptable: MIN_ACCEPTABLE,
+      kbOnly: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
       const err = new Error(
         generationResult.error ||
-          `Could not generate questions for "${topicNormalized}" under ${kbSubject}. Please try again.`
+          `Could not generate KB/RAG questions for "${topicNormalized}" under ${kbSubject}. Sync website notes / upload PDFs in Knowledge Base, then try again.`
       );
       err.status = 400;
       throw err;
@@ -439,11 +446,10 @@ export async function createChapterPracticeTest({
     const rawPool = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
     const pool = filterStudentReadyQuestions(uniquePool(rawPool));
 
-    // Prefer 20; if quality filters ate a few, still ship ≥18 so UI is not stuck
     const hardFloor = Math.min(MIN_ACCEPTABLE, 18);
     if (pool.length < hardFloor) {
       const err = new Error(
-        `Only ${pool.length} usable questions for "${topicNormalized}" (need ${hardFloor}+). Please try again.`
+        `Only ${pool.length} usable KB questions for "${topicNormalized}" (need ${hardFloor}+). Sync more Knowledge Base content for this topic.`
       );
       err.status = 400;
       throw err;
@@ -452,7 +458,7 @@ export async function createChapterPracticeTest({
     questions = pickBalancedPatternSet(pool, SHOW_COUNT);
 
     console.log(
-      `[chapterPractice] raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} (no repeats, balanced patterns)`
+      `[chapterPractice] RAG ${generationResult.source || "knowledge_base"}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length}`
     );
   }
 
@@ -464,6 +470,8 @@ export async function createChapterPracticeTest({
     difficulty,
     questions,
     totalQuestions: questions.length,
+    // 50Q → 60 min; 20Q → 24 min (proportional)
+    durationMinutes: Math.max(15, Math.round((questions.length * 60) / 50)),
   });
   await test.save();
 
@@ -475,6 +483,7 @@ export async function createChapterPracticeTest({
       topic: test.topic,
       difficulty: test.difficulty,
       totalQuestions: test.totalQuestions,
+      durationMinutes: test.durationMinutes,
       questions: test.questions.map((q) =>
         mapBilingualQuestionForClient(q, { includeAnswers: false })
       ),
@@ -484,6 +493,7 @@ export async function createChapterPracticeTest({
       kbSubject,
       generatedCount: GENERATE_COUNT,
       shownCount: questions.length,
+      source: fromCache ? "cache" : "knowledge_base_rag",
     },
     fromCache,
   };
@@ -524,6 +534,7 @@ async function generateModuleFinalTopUp({
       difficulty: "Hard",
       batchSize: Math.min(5, want),
       minAcceptable: 1,
+      kbOnly: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -557,6 +568,7 @@ async function generateModuleFinalTopUp({
         difficulty: "Hard",
         batchSize: 5,
         minAcceptable: 1,
+        kbOnly: true,
       });
       if (!generationResult.success || !generationResult.questions?.length) continue;
       const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
@@ -568,8 +580,8 @@ async function generateModuleFinalTopUp({
 }
 
 /**
- * Module Final (50Q): reuse unique chapter-bank questions from DB,
- * then RAG-generate only the shortfall so the paper always reaches showCount.
+ * Module Final (50Q): reuse chapter-bank when teaching-quality, fill shortfall from
+ * Admin Knowledge Base RAG (kbOnly), polish all explanations (50–100 words, all options).
  */
 export async function createModuleFinalTestFromChapterBank({
   userId,
@@ -595,7 +607,6 @@ export async function createModuleFinalTestFromChapterBank({
     topic: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
   }));
 
-  // Prefer this student's chapter papers; also allow shared bank for same topics
   const tests = await Test.find({
     examType: "GS",
     difficulty: "Hard",
@@ -611,8 +622,6 @@ export async function createModuleFinalTestFromChapterBank({
     .lean();
 
   const chapterTests = tests.filter((t) => !/module final/i.test(String(t.topic || "")));
-
-  // Prefer this student's papers, then others
   const ordered = [
     ...chapterTests.filter((t) => String(t.userId || "") === String(userId)),
     ...chapterTests.filter((t) => String(t.userId || "") !== String(userId)),
@@ -629,19 +638,20 @@ export async function createModuleFinalTestFromChapterBank({
     }
   }
 
-  const bankUnique = filterStudentReadyQuestions(dedupeQuestionsByStem(dedupeQuestions(pool)));
-  console.log(
-    `[moduleFinal] ${moduleId}: chapter topics=${topicNames.length}, pool=${pool.length}, bankUnique=${bankUnique.length}, need=${showCount}`
-  );
-
-  if (bankUnique.length === 0) {
-    const err = new Error(
-      `No saved chapter questions for module final. Finish chapter tests first.`
-    );
-    err.status = 400;
-    throw err;
+  let bankUnique = filterStudentReadyQuestions(dedupeQuestionsByStem(dedupeQuestions(pool)));
+  const bankTeaching = bankUnique.filter((q) => hasTeachingExplanation(q));
+  if (bankTeaching.length >= Math.min(20, Math.floor(showCount * 0.4))) {
+    bankUnique = [
+      ...bankTeaching,
+      ...bankUnique.filter((q) => !hasTeachingExplanation(q)),
+    ];
   }
 
+  console.log(
+    `[moduleFinal] ${moduleId}: topics=${topicNames.length}, pool=${pool.length}, bank=${bankUnique.length} (teaching=${bankTeaching.length}), need=${showCount}`
+  );
+
+  // If no chapter bank yet, still build entirely from Admin KB RAG across module topics
   let combined = filterStudentReadyQuestions([...bankUnique]);
   let generatedCount = 0;
   let fromGeneration = false;
@@ -660,24 +670,61 @@ export async function createModuleFinalTestFromChapterBank({
     generatedCount = Math.max(0, combined.length - bankUnique.length);
     fromGeneration = generatedCount > 0;
     console.log(
-      `[moduleFinal] after top-up: bank=${bankUnique.length} + generated≈${generatedCount} → combined=${combined.length}`
+      `[moduleFinal] after RAG top-up: bank=${bankUnique.length} + generated≈${generatedCount} → ${combined.length}`
     );
+  }
+
+  const weakCount = combined.filter((q) => !hasTeachingExplanation(q)).length;
+  if (weakCount > Math.floor(showCount * 0.3) && combined.length >= Math.min(showCount, 10)) {
+    console.log(`[moduleFinal] ${weakCount} weak explanations — RAG refresh`);
+    const extra = await generateModuleFinalTopUp({
+      kbSubject,
+      topicNames,
+      need: Math.min(20, weakCount),
+      excludeQuestions: combined,
+    });
+    if (extra.length) {
+      const teachingExtra = extra.filter((q) => hasTeachingExplanation(q));
+      combined = filterStudentReadyQuestions(
+        dedupeQuestionsByStem(
+          dedupeQuestions([
+            ...combined.filter((q) => hasTeachingExplanation(q)),
+            ...teachingExtra,
+            ...combined,
+            ...extra,
+          ])
+        )
+      );
+      fromGeneration = true;
+      generatedCount += teachingExtra.length;
+    }
   }
 
   if (combined.length < showCount) {
     const err = new Error(
-      `Could not build a ${showCount}Q module final (have ${combined.length}: ${bankUnique.length} from chapter bank` +
-        `${generatedCount ? ` + ${generatedCount} newly generated` : ""}). Try again or sync more Knowledge Base content.`
+      `Could not build a ${showCount}Q module final from Knowledge Base (have ${combined.length}` +
+        `${bankUnique.length ? `: ${bankUnique.length} chapter bank` : ""}` +
+        `${generatedCount ? ` + ${generatedCount} RAG` : ""}). Sync notes/PDFs for this module, then retry.`
     );
     err.status = 400;
     throw err;
   }
 
-  const picked = [...combined]
+  let picked = [...combined]
     .map((value) => ({ value, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
     .slice(0, showCount)
     .map(({ value }) => value);
+
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (apiKey) {
+    try {
+      picked = await ensurePrelimsExplanationsPracticeStyle(apiKey, picked);
+      console.log(`[moduleFinal] polished ${picked.length} explanations (all-option teaching)`);
+    } catch (err) {
+      console.warn("[moduleFinal] explanation polish failed:", err?.message || err);
+    }
+  }
 
   const finalTopic = `${moduleId} Module Final — ${moduleName}`.trim();
   const test = new Test({
@@ -688,11 +735,13 @@ export async function createModuleFinalTestFromChapterBank({
     difficulty: "Hard",
     questions: picked,
     totalQuestions: picked.length,
+    // Module Final 50Q → 1 hour; other counts scale (60 min per 50Q)
+    durationMinutes: Math.max(15, Math.round((picked.length * 60) / 50)),
   });
   await test.save();
 
   console.log(
-    `[moduleFinal] created ${picked.length}Q (bank=${Math.min(bankUnique.length, showCount)}, generated=${Math.max(0, picked.length - Math.min(bankUnique.length, showCount))}, fromGeneration=${fromGeneration})`
+    `[moduleFinal] created ${picked.length}Q in ${test.durationMinutes}min (bank=${bankUnique.length}, RAG=${generatedCount}, fromGeneration=${fromGeneration})`
   );
 
   return {
@@ -703,17 +752,19 @@ export async function createModuleFinalTestFromChapterBank({
       topic: test.topic,
       difficulty: test.difficulty,
       totalQuestions: test.totalQuestions,
+      durationMinutes: test.durationMinutes,
       questions: test.questions.map((q) =>
         mapBilingualQuestionForClient(q, { includeAnswers: false })
       ),
       createdAt: test.createdAt,
-      fromChapterBank: true,
+      fromChapterBank: bankUnique.length > 0,
       fromGeneration,
       bankCount: bankUnique.length,
       generatedCount,
       moduleId,
       moduleName,
       poolSize: combined.length,
+      source: "knowledge_base_rag",
     },
   };
 }

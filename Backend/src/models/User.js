@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
     // Authorization role used across the app (admin vs non-admin)
     role: {
       type: String,
-      enum: ["student", "agent", "admin", "mentor"],
+      enum: ["student", "agent", "admin", "mentor", "editor", "super_admin"],
       default: "student",
     },
     /** Set for students assigned to a human mentor (User id with role mentor) */

@@ -1,6 +1,7 @@
 /**
  * Structured explanation generation prompt.
- * Target: 50–70 words detailedExplanation, locked to verified correctAnswer.
+ * Target: 50–100 words detailedExplanation (prefer 50–70), locked to verified correctAnswer.
+ * Must teach why correct is right and why each wrong option fails.
  */
 
 import { QG_CONFIG } from "../config/qg.config.js";
@@ -24,14 +25,14 @@ The verified correctAnswer letter is LOCKED. You must NEVER change it.
 Rules:
 1. Use ONLY the provided CONTEXT and the VERIFIED question.
 2. Never invent background facts outside CONTEXT.
-3. Explain why the LOCKED option is right AND why each wrong option is wrong.
-4. detailedExplanation MUST be ${minW}–${maxW} words (count carefully). Exam-oriented, no fluff.
+3. detailedExplanation MUST be ${minW}–${maxW} words (count carefully). Exam-oriented teaching style.
+4. Explain why the LOCKED option is right AND why EACH wrong option is wrong (student concept clarity).
 5. Return ONLY valid JSON.
 
 OUTPUT:
 {
   "correctAnswer":"A|B|C|D",
-  "detailedExplanation":"${minW}–${maxW} words; MUST open with Option {letter} and defend ONLY that letter",
+  "detailedExplanation":"${minW}–${maxW} words; MUST open with Option {letter}; justify correct + eliminate all three wrong options",
   "relevantBackground":"1–2 short sentences of CONTEXT-supported background (or empty string)",
   "whyWrong":{
     "A":"...",
@@ -80,7 +81,8 @@ ${JSON.stringify(
 Write a structured explanation.
 - Set correctAnswer to "${ans}" exactly.
 - detailedExplanation: ${minW}–${maxW} words, MUST start with: Option ${ans} ("${String(correctText).slice(0, 120)}") is correct.
-- Defend ONLY Option ${ans}. Never say another letter is correct.
+- Then explain why Option ${ans} is right AND why ${wrongKeys.join(", ")} are each wrong (concept clarity).
+- Never say another letter is correct.
 - whyWrong: explain ${wrongKeys.join(", ")} only; set whyWrong.${ans} to "".
 JSON only.`;
 }

@@ -3,6 +3,11 @@ import { syncChapterFromUrl, syncTopicFromUrl, repairChapterTopicNames } from ".
 import { uploadPdfChapter } from "../services/notes/notesPdfUpload.service.js";
 import { syncChapterFromPdf } from "../services/notes/notesPdfSync.service.js";
 import { indexChapterInVectorDb, indexTopicInVectorDb } from "../services/notes/notesVectorIndex.service.js";
+import {
+  startWebsiteNotesSyncBackground,
+  getWebsiteNotesSyncStatus,
+} from "../services/notes/syncAllWebsiteNotes.service.js";
+import { promoteAllSyncedWebsiteNotesToKb } from "../services/notes/promoteWebsiteNotesToKb.service.js";
 import { embeddingService } from "../services/ai/embedding.service.js";
 import { qdrantService } from "../services/ai/qdrant.service.js";
 import { retrieverService } from "../services/ai/retriever.service.js";
@@ -20,12 +25,12 @@ export const getNotesCatalog = async (_req, res) => {
       .lean();
     const byUrl = new Map(synced.map((c) => [c.url.replace(/\/$/, ""), c]));
 
-    const data = catalog.map((group) => ({
-      ...group,
-      chapters: group.chapters.map((ch) => {
+    const data = catalog.map((group) => {
+      const chapters = group.chapters.map((ch) => {
         const db = byUrl.get(ch.url.replace(/\/$/, ""));
         return {
           ...ch,
+          expectedTopicCount: ch.expectedTopicCount || 0,
           synced: db?.status === "synced",
           status: db?.status || "not_synced",
           _id: db?._id || null,
@@ -33,8 +38,17 @@ export const getNotesCatalog = async (_req, res) => {
           chunkCount: db?.chunkCount || 0,
           lastSyncedAt: db?.lastSyncedAt || null,
         };
-      }),
-    }));
+      });
+      return {
+        ...group,
+        chapters,
+        topicCount: chapters.reduce(
+          (sum, c) => sum + (c.expectedTopicCount || c.topicCount || 0),
+          0
+        ),
+        chapterCount: chapters.length,
+      };
+    });
 
     res.json({ success: true, data });
   } catch (error) {
@@ -509,5 +523,81 @@ export const deleteNotesChapter = async (req, res) => {
     console.error("deleteNotesChapter:", error);
     const status = error.statusCode || 500;
     res.status(status).json({ success: false, message: error.message || "Failed to remove PDF" });
+  }
+};
+
+/**
+ * POST /api/admin/notes/sync-all-website
+ * Background sync + embed of notes.mentorsdaily.com catalog.
+ * Body: {
+ *   subjects?: string[],
+ *   force?: boolean,           // re-fetch updated notes (skip cache)
+ *   chunking?: { minWords?, maxWords?, overlapWords? }
+ * }
+ */
+export const syncAllWebsiteNotes = async (req, res) => {
+  try {
+    const subjects = Array.isArray(req.body?.subjects) ? req.body.subjects : undefined;
+    const force = Boolean(req.body?.force);
+    const chunking =
+      req.body?.chunking && typeof req.body.chunking === "object"
+        ? req.body.chunking
+        : undefined;
+    const adminId = req.user?._id ?? req.user?.id;
+    const started = startWebsiteNotesSyncBackground({
+      subjects,
+      force,
+      chunking,
+      createdBy: adminId,
+    });
+    const scope =
+      subjects?.length > 0 ? `subjects: ${subjects.join(", ")}` : "all subjects";
+    res.status(202).json({
+      success: true,
+      message: force
+        ? `Re-syncing updated notes (${scope}) in background (chunk + embed).`
+        : `Syncing notes.mentorsdaily.com (${scope}) in background (chunk + embed).`,
+      data: started,
+    });
+  } catch (error) {
+    console.error("syncAllWebsiteNotes:", error);
+    const status = error.statusCode || 500;
+    res.status(status).json({
+      success: false,
+      message: error.message || "Failed to start website notes sync",
+    });
+  }
+};
+
+/**
+ * GET /api/admin/notes/sync-all-website/status
+ */
+export const getSyncAllWebsiteNotesStatus = async (_req, res) => {
+  try {
+    res.json({ success: true, data: getWebsiteNotesSyncStatus() });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message || "Failed to get status" });
+  }
+};
+
+/**
+ * POST /api/admin/notes/promote-to-kb
+ * Promote already-synced website chapters into Knowledge Base documents.
+ */
+export const promoteWebsiteNotesToKb = async (req, res) => {
+  try {
+    const adminId = req.user?._id ?? req.user?.id;
+    const data = await promoteAllSyncedWebsiteNotesToKb({ userId: adminId });
+    res.json({
+      success: true,
+      message: `Promoted ${data.ok}/${data.total} website chapters into Knowledge Base`,
+      data,
+    });
+  } catch (error) {
+    console.error("promoteWebsiteNotesToKb:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to promote website notes to KB",
+    });
   }
 };

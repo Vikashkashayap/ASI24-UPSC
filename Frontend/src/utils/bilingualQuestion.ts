@@ -110,7 +110,10 @@ export function isIncompleteHindiStem(hi: string, en: string): boolean {
 
   // Assertion-reason: both A and R must exist in Hindi when English has them
   if (/assertion\s*\(A\)/i.test(e) && /reason\s*\(R\)/i.test(e)) {
-    if (!/assertion\s*\(A\)|अभिकथन\s*\(A\)/i.test(h) || !/reason\s*\(R\)|कारण\s*\(R\)/i.test(h)) {
+    if (
+      !/(?:assertion|अभिकथन|कथन)\s*\(A\)/i.test(h) ||
+      !/(?:reason|कारण)\s*\(R\)/i.test(h)
+    ) {
       return true;
     }
   }

@@ -304,6 +304,7 @@ export function pickBilingualQuestionFields(q) {
     matchColumns: base.matchColumns,
     matchColumns_hi: base.matchColumns_hi ?? undefined,
     assertionReason: base.assertionReason,
+    assertionReason_hi: base.assertionReason_hi ?? undefined,
     eliminationLogic: base.eliminationLogic,
     conceptualSource: base.conceptualSource,
     difficulty: base.difficulty,

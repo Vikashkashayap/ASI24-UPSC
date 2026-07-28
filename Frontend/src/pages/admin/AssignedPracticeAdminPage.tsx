@@ -28,9 +28,13 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { useTheme } from "../../hooks/useTheme";
 import { assignedPracticeAPI, adminAPI, mentorStaffAPI, notesAPI, type NotesChapter, type NotesTopic, type PreviewQuestion, type GenerationProgress } from "../../services/api";
+import { knowledgeAPI } from "../../features/knowledge/api";
+import { testBuilderAPI } from "../../features/testBuilder/api";
+import type { KbSubject, KbChapter, KbTopic } from "../../features/knowledge/types";
 import { PRELIM_MOCK_PATTERNS } from "../../constants/testGenerator";
 import {
   isSyllabusToTopicPracticeHandoff,
+  resolveKbSubjectFromSyllabus,
   resolveNotesSubjectFromSyllabus,
   type SyllabusToTopicPracticeHandoff,
 } from "../../utils/syllabusTopicPracticeHandoff";
@@ -142,10 +146,82 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
     medium?: "en" | "hi";
   } | null>(null);
 
-  // Step 1 — generate (notes-linked)
+  // Step 1 — generate from Knowledge Base (PDFs)
+  const [kbSubjects, setKbSubjects] = useState<KbSubject[]>([]);
+  const [kbChapters, setKbChapters] = useState<KbChapter[]>([]);
+  const [kbTopics, setKbTopics] = useState<KbTopic[]>([]);
+  const [kbSubjectId, setKbSubjectId] = useState("");
+  const [kbChapterId, setKbChapterId] = useState("");
+  const [kbTopicId, setKbTopicId] = useState("");
+  const [kbDocCount, setKbDocCount] = useState(0);
+  const [kbDocs, setKbDocs] = useState<Array<{ _id: string; title: string }>>([]);
+  const [kbDocCountsBySubject, setKbDocCountsBySubject] = useState<Record<string, number>>({});
+  const [kbLoading, setKbLoading] = useState(true);
   const [notesSubjects, setNotesSubjects] = useState<string[]>([]);
   const [notesSubjectsLoading, setNotesSubjectsLoading] = useState(true);
+  const handoffAppliedRef = useRef(false);
   const [subject, setSubject] = useState("");
+
+  /** KB + Notes subjects so Economy etc. always appear in the dropdown. */
+  const practiceSubjectOptions = useMemo(() => {
+    type Opt = { id: string; name: string; source: "kb" | "notes"; pdfCount: number };
+    const byName = new Map<string, Opt>();
+
+    for (const s of kbSubjects) {
+      byName.set(s.name.toLowerCase(), {
+        id: s._id,
+        name: s.name,
+        source: "kb",
+        pdfCount: kbDocCountsBySubject[s._id] || 0,
+      });
+    }
+
+    for (const name of notesSubjects) {
+      const key = name.toLowerCase();
+      if (byName.has(key)) continue;
+      byName.set(key, {
+        id: `notes::${name}`,
+        name,
+        source: "notes",
+        pdfCount: 0,
+      });
+    }
+
+    const handoffName = syllabusHandoffBanner?.subjectName?.trim();
+    if (handoffName) {
+      const mapped =
+        resolveNotesSubjectFromSyllabus(notesSubjects, "", handoffName) || handoffName;
+      const key = mapped.toLowerCase();
+      if (!byName.has(key)) {
+        byName.set(key, {
+          id: `notes::${mapped}`,
+          name: mapped,
+          source: "notes",
+          pdfCount: 0,
+        });
+      }
+    }
+
+    // Keep currently selected subject visible (e.g. notes::Economy right after handoff)
+    if (subject?.trim()) {
+      const key = subject.trim().toLowerCase();
+      if (!byName.has(key)) {
+        byName.set(key, {
+          id: `notes::${subject.trim()}`,
+          name: subject.trim(),
+          source: "notes",
+          pdfCount: 0,
+        });
+      }
+    }
+
+    return Array.from(byName.values()).sort((a, b) => {
+      if (b.pdfCount !== a.pdfCount) return b.pdfCount - a.pdfCount;
+      if (a.source !== b.source) return a.source === "kb" ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [kbSubjects, kbDocCountsBySubject, notesSubjects, syllabusHandoffBanner?.subjectName, subject]);
+
   const [chapters, setChapters] = useState<NotesChapter[]>([]);
   const [chaptersLoading, setChaptersLoading] = useState(false);
   const [chapterId, setChapterId] = useState("");
@@ -217,33 +293,195 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
   useEffect(() => {
     loadStudents();
     loadNotesSubjects();
+    loadKbSubjects();
   }, []);
+
+  const loadKbSubjects = async () => {
+    setKbLoading(true);
+    try {
+      const [subRes, docRes] = await Promise.all([
+        knowledgeAPI.subjects.list(),
+        knowledgeAPI.list({
+          processingStatus: "Completed",
+          limit: 100,
+        }),
+      ]);
+      const allSubjects = subRes.data.data || [];
+      const docs = docRes.data.data?.items || [];
+
+      const counts: Record<string, number> = {};
+      for (const d of docs) {
+        const sid =
+          typeof d.subjectId === "object" && d.subjectId
+            ? String(d.subjectId._id)
+            : d.subjectId
+              ? String(d.subjectId)
+              : "";
+        if (!sid) continue;
+        counts[sid] = (counts[sid] || 0) + 1;
+      }
+      setKbDocCountsBySubject(counts);
+
+      // Prefer subjects that have completed PDFs; keep others at end
+      const sorted = [...allSubjects].sort((a, b) => {
+        const ca = counts[a._id] || 0;
+        const cb = counts[b._id] || 0;
+        if (cb !== ca) return cb - ca;
+        return (a.sortOrder || 0) - (b.sortOrder || 0) || a.name.localeCompare(b.name);
+      });
+      setKbSubjects(sorted);
+
+      // Never overwrite handoff subject with "first subject that has PDFs" (History)
+      if (!syllabusHandoffRef.current && !handoffAppliedRef.current) {
+        const withDocs = sorted.find((s) => (counts[s._id] || 0) > 0);
+        const pick = withDocs || sorted[0];
+        if (pick) {
+          setKbSubjectId(pick._id);
+          setSubject(pick.name);
+        }
+      }
+    } catch {
+      /* KB subjects optional until Knowledge Base seeded */
+    } finally {
+      setKbLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadList();
   }, [listPage, listFilter, listSubject]);
 
-  /** Apply Syllabus Targets → Topic Practice handoff once notes subjects are ready. */
+  /** Load KB chapters / topics / completed docs when subject changes */
+  useEffect(() => {
+    // Notes-only synthetic subjects (notes::Economy) have no KB chapters/PDFs
+    if (!kbSubjectId || String(kbSubjectId).startsWith("notes::")) {
+      setKbChapters([]);
+      setKbTopics([]);
+      setKbChapterId("");
+      setKbTopicId("");
+      setKbDocCount(0);
+      setKbDocs([]);
+      if (String(kbSubjectId).startsWith("notes::")) {
+        const name = String(kbSubjectId).replace(/^notes::/, "").trim();
+        if (name) setSubject(name);
+      }
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const sub = kbSubjects.find((s) => s._id === kbSubjectId);
+        if (sub) setSubject(sub.name);
+        const [chRes, topRes, docRes] = await Promise.all([
+          knowledgeAPI.chapters.list(kbSubjectId),
+          knowledgeAPI.topics.list({ subjectId: kbSubjectId }),
+          knowledgeAPI.list({
+            subjectId: kbSubjectId,
+            processingStatus: "Completed",
+            limit: 50,
+          }),
+        ]);
+        if (cancelled) return;
+        const items = docRes.data.data?.items || [];
+        setKbChapters(chRes.data.data || []);
+        setKbTopics(topRes.data.data || []);
+        setKbDocs(items.map((d) => ({ _id: d._id, title: d.title || d.originalFileName || "Untitled" })));
+        setKbDocCount(docRes.data.data?.total ?? items.length);
+        setKbChapterId("");
+        setKbTopicId("");
+      } catch {
+        if (!cancelled) {
+          setKbChapters([]);
+          setKbTopics([]);
+          setKbDocCount(0);
+          setKbDocs([]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [kbSubjectId, kbSubjects]);
+
+  useEffect(() => {
+    if (!kbChapterId) {
+      // keep subject-level topics already loaded
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const topRes = await knowledgeAPI.topics.list({
+          subjectId: kbSubjectId,
+          chapterId: kbChapterId,
+        });
+        if (!cancelled) setKbTopics(topRes.data.data || []);
+        setKbTopicId("");
+      } catch {
+        if (!cancelled) setKbTopics([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [kbChapterId, kbSubjectId]);
+
+  /** Apply Syllabus Targets → Topic Practice handoff once notes + KB subjects are ready. */
   useEffect(() => {
     const handoff = syllabusHandoffRef.current;
-    if (!handoff || notesSubjectsLoading) return;
+    if (!handoff || notesSubjectsLoading || kbLoading) return;
 
-    syllabusHandoffRef.current = null;
+    const subjectLabel = String(handoff.subjectName || "").trim() || handoff.subjectKey;
 
-    if (handoff.topicKeyword?.trim()) setTopicKeyword(handoff.topicKeyword.trim());
-    if (handoff.testName?.trim()) setTestName(handoff.testName.trim());
+    // Test name always includes subject name
+    const ensuredTestName = (() => {
+      const raw = String(handoff.testName || "").trim();
+      if (!raw) return `${subjectLabel} — practice`;
+      if (subjectLabel && !raw.toLowerCase().includes(subjectLabel.toLowerCase())) {
+        return `${subjectLabel} — ${raw}`;
+      }
+      return raw;
+    })();
+    setTestName(ensuredTestName);
+
+    const rawTopic = String(handoff.topicKeyword || "").trim();
+    const ensuredTopic =
+      rawTopic && subjectLabel && !rawTopic.toLowerCase().startsWith(subjectLabel.toLowerCase())
+        ? `${subjectLabel}: ${rawTopic}`
+        : rawTopic || subjectLabel;
+    if (ensuredTopic) setTopicKeyword(ensuredTopic);
+
     if (handoff.studentIds?.length) {
       setSelectedStudentIds(new Set(handoff.studentIds));
     }
 
-    const matched =
+    // Resolve display/generation subject name (Economy, Polity, …)
+    const resolvedName =
       resolveNotesSubjectFromSyllabus(notesSubjects, handoff.subjectKey, handoff.subjectName) ||
-      notesSubjects[0] ||
-      "";
-    if (matched) setSubject(matched);
+      resolveKbSubjectFromSyllabus(kbSubjects, handoff.subjectKey, handoff.subjectName)?.name ||
+      subjectLabel;
+
+    // Pick from merged KB+Notes options so Economy shows even with 0 PDFs
+    const kbMatch = resolveKbSubjectFromSyllabus(
+      kbSubjects,
+      handoff.subjectKey,
+      handoff.subjectName
+    );
+    if (kbMatch) {
+      setKbSubjectId(kbMatch._id);
+      setSubject(kbMatch.name);
+    } else {
+      // Notes-only / missing KB row → synthetic id so dropdown can select Economy
+      const notesId = `notes::${resolvedName}`;
+      setKbSubjectId(notesId);
+      setSubject(resolvedName);
+    }
+
+    handoffAppliedRef.current = true;
+    syllabusHandoffRef.current = null;
 
     setSyllabusHandoffBanner({
-      subjectName: handoff.subjectName,
+      subjectName: subjectLabel,
       moduleLabels: handoff.moduleLabels || [],
       chapterCount: handoff.chapterNames?.length || 0,
       studentCount: handoff.studentIds?.length || 0,
@@ -251,11 +489,13 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
     });
     setFlowStep("form");
     setSuccess(
-      `Topics from Syllabus Targets loaded${
-        handoff.moduleLabels?.length ? ` (${handoff.moduleLabels.join(", ")})` : ""
+      `Topics from Syllabus Targets loaded — Subject: ${resolvedName}${
+        kbMatch ? ` (KB)` : " (Notes / website sync)"
+      }${
+        handoff.moduleLabels?.length ? ` · ${handoff.moduleLabels.join(", ")}` : ""
       }${handoff.medium === "hi" ? " · हिंदी medium" : ""}. Review keyword → Generate → Assign.`
     );
-  }, [notesSubjects, notesSubjectsLoading]);
+  }, [notesSubjects, notesSubjectsLoading, kbSubjects, kbLoading]);
 
   useEffect(() => {
     if (!generationTestId) return;
@@ -908,7 +1148,19 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subjectStr = subject || "";
+    const selectedOpt = practiceSubjectOptions.find((o) => o.id === kbSubjectId);
+    const isNotesOnly =
+      Boolean(selectedOpt?.source === "notes") || String(kbSubjectId).startsWith("notes::");
+    const subjectStr =
+      selectedOpt?.name ||
+      kbSubjects.find((s) => s._id === kbSubjectId)?.name ||
+      subject ||
+      "";
+    const chapterName =
+      kbChapters.find((c) => c._id === kbChapterId)?.name || "";
+    const topicFromSelect =
+      kbTopics.find((t) => t._id === kbTopicId)?.name || "";
+    const topicStr = (topicKeyword || topicFromSelect).trim();
 
     if (!testNameTrimmed) {
       setError("Enter a name for this test");
@@ -918,64 +1170,166 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
       setError("Select a subject");
       return;
     }
-    if (!knowledgeReady) {
-      setError("No knowledge yet. Upload PDF(s) and/or sync website notes for this subject.");
+    if (!topicStr || topicStr.length < 2) {
+      setError("Choose a topic or type a topic keyword (min 2 characters)");
       return;
     }
-    if (!keywordMode) {
-      setError("Enter a topic keyword (at least 2 characters) to search knowledge and generate questions");
+    // Notes/website-synced subjects (Economy etc.) can generate via RAG without KB PDFs
+    if (!isNotesOnly && kbDocCount <= 0) {
+      setError(
+        "No completed Knowledge Base PDFs for this subject. Upload & Process PDFs in Knowledge Base, or pick a Notes subject (e.g. Economy)."
+      );
       return;
     }
-    if (keywordMatch && keywordMatch.matchedChunks === 0) {
-      setError(`No matching content for "${keywordTrimmed}" in PDF/notes knowledge. Try another keyword.`);
-      return;
-    }
-    if (patternsToInclude.length === 0) {
-      setError("Select at least one question pattern");
-      return;
-    }
+
+    const poolTarget = questionCount + 10;
+    const totalBatches = Math.max(1, Math.ceil(poolTarget / 10));
+
     setError(null);
     setSuccess(null);
     setGenerating(true);
+    setPreviewQuestions([]);
+    setBackupQuestions([]);
+    setGenerationStatus({
+      totalBatches,
+      completedBatches: 0,
+      currentBatch: 0,
+      generatedQuestions: 0,
+      currentStep: "searching_knowledge",
+      readingNotes: false,
+      cleaningHtml: false,
+      isComplete: false,
+    });
+
     try {
-      const res = await assignedPracticeAPI.generate({
+      const res = await testBuilderAPI.buildAndCreate({
         subject: subjectStr,
-        topic: keywordTrimmed,
+        topic: topicStr,
+        chapter: chapterName || undefined,
+        query: topicStr,
+        count: questionCount,
         title: testNameTrimmed,
-        searchQuery: keywordTrimmed,
         difficulty,
-        patternsToInclude,
-        questionCount,
+        allowGeneration: true,
+        async: true,
       });
-      if (res.data.success && res.data.data) {
-        const data = res.data.data;
-        setGenerationTestId(data._id);
-        setGenerationStatus({
-          completedBatches: data.generationProgress?.completedBatches || 0,
-          totalBatches: data.generationProgress?.totalBatches || Math.ceil(questionCount / 10),
-          generatedQuestions: data.generationProgress?.generatedQuestions || 0,
-          currentBatch: data.generationProgress?.currentBatch || 0,
-        });
-        setActiveTest({
-          _id: data._id,
-          subject: data.subject,
-          topic: data.topic,
-          title: data.title || testNameTrimmed,
-          totalQuestions: data.totalQuestions || questionCount,
-          difficulty: data.difficulty || difficulty,
-        });
-        setSuccess(
-          `Searching ${subjectStr} knowledge for "${keywordTrimmed}" and generating ${questionCount} questions via RAG…`
-        );
-        loadList();
-      } else {
-        setError(res.data.message || "Failed to generate test");
+      const payload = res.data?.data as {
+        test?: { _id: string };
+        poolTarget?: number;
+        showCount?: number;
+      };
+      const testId = payload?.test?._id;
+      if (!testId) {
+        setError("Failed to start generation");
         setGenerating(false);
+        setGenerationStatus(null);
+        return;
       }
+
+      setActiveTest({
+        _id: testId,
+        subject: subjectStr,
+        topic: topicStr,
+        title: testNameTrimmed,
+        totalQuestions: questionCount,
+        difficulty,
+      });
+
+      // Poll until ready / failed — show batch progress on UI
+      let polls = 0;
+      const maxPolls = 360; // ~12 min at 2s
+      const poll = async (): Promise<void> => {
+        polls += 1;
+        if (polls > maxPolls) {
+          throw new Error("Generation timed out — open the test from the list or try again");
+        }
+        const full = await assignedPracticeAPI.getById(testId);
+        const data = full.data?.data;
+        if (!full.data?.success || !data) {
+          throw new Error("Failed to load generation status");
+        }
+
+        const gp = data.generationProgress || {};
+        const uniqueSoFar = gp.generatedQuestions || 0;
+        setGenerationStatus({
+          totalBatches: gp.totalBatches || totalBatches,
+          completedBatches: gp.completedBatches || 0,
+          currentBatch: gp.currentBatch || 0,
+          generatedQuestions: uniqueSoFar,
+          currentStep: gp.currentStep || "generating_questions",
+          readingNotes: Boolean(gp.readingNotes),
+          cleaningHtml: Boolean(gp.cleaningHtml),
+          isComplete: Boolean(gp.isComplete),
+          failedBatches: gp.failedBatches || 0,
+        });
+
+        // Live preview while generating
+        if (Array.isArray(data.questions) && data.questions.length) {
+          setPreviewQuestions(
+            data.questions.map((q: PreviewQuestion, i: number) => ({
+              ...q,
+              index: q.index || i + 1,
+            }))
+          );
+        }
+
+        if (data.status === "failed") {
+          throw new Error(
+            data.errorMessage ||
+              "Question generation failed — try another topic keyword"
+          );
+        }
+
+        if (data.status === "ready" && gp.isComplete) {
+          const qs = (data.questions || []).map((q: PreviewQuestion, i: number) => ({
+            ...q,
+            index: q.index || i + 1,
+          }));
+          setPreviewQuestions(qs);
+          setBackupQuestions(Array.isArray(data.backupQuestions) ? data.backupQuestions : []);
+          setPreviewPage(1);
+          setActiveTest({
+            _id: data._id,
+            subject: data.subject,
+            topic: data.topic,
+            title: data.title || testNameTrimmed,
+            totalQuestions: data.totalQuestions || qs.length,
+            difficulty: data.difficulty || difficulty,
+            generationStats: data.generationStats
+              ? {
+                  notesSource: data.generationStats.notesSource,
+                  chunksRetrieved: data.generationStats.chunksRetrieved,
+                  totalTokens: data.generationStats.totalTokens,
+                }
+              : undefined,
+          });
+          setFlowStep("preview");
+          const dupes = data.generationStats?.ragSources?.duplicatesRemoved;
+          setSuccess(
+            `${qs.length} unique questions ready (generated pool ${poolTarget}, removed duplicates${
+              dupes != null ? `: ${dupes}` : ""
+            }) · "${topicStr}" — review then assign.`
+          );
+          setListPage(1);
+          loadList({ page: 1 });
+          return;
+        }
+
+        await new Promise((r) => setTimeout(r, 2000));
+        return poll();
+      };
+
+      await poll();
     } catch (err: unknown) {
-      const ax = err as { response?: { data?: { message?: string } } };
-      setError(ax.response?.data?.message || "Failed to generate test");
+      const ax = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(
+        ax.response?.data?.message ||
+          ax.message ||
+          "Failed to generate test from Knowledge Base"
+      );
+    } finally {
       setGenerating(false);
+      setGenerationStatus(null);
     }
   };
 
@@ -1112,8 +1466,9 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
   const renderGenerationProgress = () => {
     if (!generationStatus) return null;
     const gs = generationStatus;
-    const targetQ = activeTest?.totalQuestions || questionCount;
-    const totalBatches = Math.max(1, gs.totalBatches || Math.ceil(targetQ / 10));
+    const showQ = activeTest?.totalQuestions || questionCount;
+    const poolTarget = showQ + 10;
+    const totalBatches = Math.max(1, gs.totalBatches || Math.ceil(poolTarget / 10));
     const completed = Math.min(
       totalBatches,
       Math.max(0, Number(gs.completedBatches) || 0)
@@ -1122,20 +1477,30 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
       totalBatches,
       Math.max(completed, Number(gs.currentBatch) || 0)
     );
+    const generated = Math.min(poolTarget, Number(gs.generatedQuestions) || 0);
+    const remaining = Math.max(0, poolTarget - generated);
     const batchDone = (n: number) =>
       completed >= n || Boolean(gs.batchSteps?.[String(n - 1)]);
-    const showAllBatches = totalBatches <= 6;
+    const showAllBatches = totalBatches <= 8;
     const isFinalizing =
       gs.currentStep === "finalizing" ||
       gs.currentStep === "translating_hindi" ||
-      (gs.generatedQuestions || 0) >= targetQ;
+      generated >= poolTarget;
     const steps = [
-      { key: "reading", label: "Reading Notes", done: Boolean(gs.readingNotes) },
-      { key: "cleaning", label: "Cleaning HTML", done: Boolean(gs.cleaningHtml) },
+      {
+        key: "reading",
+        label: "Reading Knowledge Base / notes",
+        done: Boolean(gs.readingNotes),
+      },
+      {
+        key: "cleaning",
+        label: "Preparing context",
+        done: Boolean(gs.cleaningHtml),
+      },
       ...(showAllBatches
         ? Array.from({ length: totalBatches }, (_, i) => ({
             key: `batch-${i + 1}`,
-            label: `Generating Batch ${i + 1} of ${totalBatches}`,
+            label: `Generating batch ${i + 1} of ${totalBatches}`,
             done: batchDone(i + 1) || isFinalizing,
           }))
         : [
@@ -1146,22 +1511,51 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
             },
           ]),
       {
+        key: "dedupe",
+        label: "Removing duplicate questions",
+        done: isFinalizing || Boolean(gs.isComplete),
+      },
+      {
         key: "done",
-        label:
-          gs.currentStep === "translating_hindi"
-            ? "Translating Hindi…"
-            : isFinalizing && !gs.isComplete
-              ? "Finalizing…"
-              : "Completed",
+        label: gs.isComplete
+          ? `Ready — showing ${showQ} unique (from pool ${poolTarget})`
+          : isFinalizing
+            ? "Finalizing unique set…"
+            : "Completed",
         done: Boolean(gs.isComplete),
       },
     ];
 
     return (
-      <div className={`rounded-lg border p-3 space-y-2 ${isDark ? "border-blue-800/40 bg-blue-950/20" : "border-blue-200 bg-blue-50"}`}>
-        <p className={`text-sm font-medium ${isDark ? "text-blue-200" : "text-blue-900"}`}>
-          Generating {targetQ} questions from MentorsDaily Notes
-        </p>
+      <div className={`rounded-lg border p-3 space-y-3 ${isDark ? "border-blue-800/40 bg-blue-950/20" : "border-blue-200 bg-blue-50"}`}>
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <p className={`text-sm font-medium ${isDark ? "text-blue-200" : "text-blue-900"}`}>
+              Generating unique questions
+            </p>
+            <p className={`text-xs mt-0.5 ${isDark ? "text-blue-300/80" : "text-blue-800/80"}`}>
+              Pool {poolTarget} · final show {showQ} · no duplicates
+            </p>
+          </div>
+          <div className="text-right">
+            <p className={`text-2xl font-bold tabular-nums ${isDark ? "text-blue-100" : "text-blue-900"}`}>
+              {generated}
+              <span className={`text-base font-semibold ${isDark ? "text-blue-400" : "text-blue-600"}`}>
+                /{poolTarget}
+              </span>
+            </p>
+            <p className={`text-xs ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
+              {remaining > 0 ? `${remaining} remaining` : "pool complete"}
+              {completed > 0 ? ` · batch ${Math.max(completed, current)}/${totalBatches}` : ""}
+            </p>
+          </div>
+        </div>
+        <div className={`h-2.5 rounded-full overflow-hidden ${isDark ? "bg-slate-700" : "bg-slate-200"}`}>
+          <div
+            className="h-full bg-blue-600 transition-all duration-500"
+            style={{ width: `${Math.min(100, (generated / Math.max(1, poolTarget)) * 100)}%` }}
+          />
+        </div>
         <ul className="space-y-1">
           {steps.map((step) => (
             <li key={step.key} className={`flex items-center gap-2 text-xs ${isDark ? "text-blue-200" : "text-blue-800"}`}>
@@ -1176,15 +1570,6 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
             </li>
           ))}
         </ul>
-        <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-slate-700" : "bg-slate-200"}`}>
-          <div
-            className="h-full bg-blue-600 transition-all"
-            style={{ width: `${Math.min(100, (gs.generatedQuestions / Math.max(1, targetQ)) * 100)}%` }}
-          />
-        </div>
-        <p className={`text-xs ${isDark ? "text-blue-300/80" : "text-blue-700"}`}>
-          Questions Generated: {gs.generatedQuestions}/{targetQ}
-        </p>
       </div>
     );
   };
@@ -1267,7 +1652,7 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
               : "Select students to assign this practice test. They will see it under Practice Test."
             : isMentor
               ? "Generate MCQs from Knowledge Base → Preview & edit → Assign to your students only."
-              : "Uses central Knowledge Base (notes + PDFs) → AI generates 50 or 100 MCQs (RAG) → Preview & edit → Assign students"}
+              : "Upload PDFs in Knowledge Base → pick subject & topic here → generate questions → Preview → Assign students"}
         </p>
         {flowStep === "form" && !isMentor && (
           <Link
@@ -1356,7 +1741,7 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
                 : ""}
             </p>
             <p className={`text-xs mt-1.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              Topic keyword and test name are prefilled. Generate questions, then assign to students.
+              Subject <b>{syllabusHandoffBanner.subjectName}</b> is selected below. Test name & topic keyword include the subject — generate, then assign.
             </p>
           </div>
           <button
@@ -1372,17 +1757,16 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
         </div>
       )}
 
-      {/* Step 1 — Generate */}
+      {/* Step 1 — Generate from Knowledge Base */}
       {flowStep === "form" && (
         <Card className={isDark ? "bg-slate-800/50 border-slate-700" : ""}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="w-5 h-5 text-blue-500" />
-              Step 1 — Generate Test
+              Step 1 — Generate from Knowledge Base
             </CardTitle>
             <CardDescription>
-              Knowledge comes from the central Knowledge Base (website notes + PDFs per subject). Give the test a
-              name, type a topic keyword — we RAG-search then generate from matched chunks.
+              Upload PDFs in Knowledge Base → choose subject & topic here → questions generate from that KB content.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -1396,48 +1780,99 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
                   value={testName}
                   onChange={(e) => setTestName(e.target.value)}
                   disabled={generating}
-                  placeholder='e.g. "Preamble — Polity Drill", "Basic Structure Set A"'
+                  placeholder='e.g. "Economy — Banking Drill"'
                   className={`w-full px-4 py-2.5 rounded-lg border text-sm ${inputCls}`}
                 />
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                  This name is shown in the practice list and when assigning to students.
-                </p>
               </div>
 
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  Subject (from Notes)
-                </label>
-                {notesSubjectsLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Loading subjects…
-                  </div>
-                ) : notesSubjects.length === 0 ? (
-                  <p className={`text-sm ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                    No synced subjects yet. Add a chapter URL from notes.mentorsdaily.com below.
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    Subject <span className="text-red-500">*</span>
+                    {syllabusHandoffBanner?.subjectName ? (
+                      <span className={`ml-2 text-xs font-normal ${isDark ? "text-sky-300" : "text-sky-700"}`}>
+                        (Syllabus: {syllabusHandoffBanner.subjectName})
+                      </span>
+                    ) : null}
+                  </label>
+                  {kbLoading && notesSubjectsLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Loading subjects…
+                    </div>
+                  ) : practiceSubjectOptions.length === 0 ? (
+                    <p className={`text-sm ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                      No subjects. Add subjects in Knowledge Base or sync website notes first.
+                    </p>
+                  ) : (
+                    <select
+                      value={
+                        practiceSubjectOptions.some((o) => o.id === kbSubjectId)
+                          ? kbSubjectId
+                          : practiceSubjectOptions.find(
+                              (o) => o.name.toLowerCase() === subject.toLowerCase()
+                            )?.id || ""
+                      }
+                      onChange={(e) => {
+                        const id = e.target.value;
+                        setKbSubjectId(id);
+                        const row = practiceSubjectOptions.find((s) => s.id === id);
+                        if (row) setSubject(row.name);
+                      }}
+                      disabled={generating}
+                      className={`w-full px-4 py-2.5 rounded-lg border ${inputCls}`}
+                    >
+                      {practiceSubjectOptions.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                          {s.pdfCount > 0
+                            ? ` (${s.pdfCount} PDF)`
+                            : s.source === "notes"
+                              ? " (Notes)"
+                              : ""}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                    {subject
+                      ? `Generating for: ${subject}${
+                          String(kbSubjectId).startsWith("notes::")
+                            ? " · website notes / Intelligence RAG"
+                            : ""
+                        }`
+                      : "KB PDFs + Notes subjects (Economy, Geography…)"}
                   </p>
-                ) : (
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    Chapter (optional)
+                  </label>
                   <select
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    disabled={generating}
+                    value={kbChapterId}
+                    onChange={(e) => setKbChapterId(e.target.value)}
+                    disabled={generating || !kbSubjectId}
                     className={`w-full px-4 py-2.5 rounded-lg border ${inputCls}`}
                   >
-                    {notesSubjects.map((s) => (
-                      <option key={s} value={s}>{s}</option>
+                    <option value="">All chapters</option>
+                    {kbChapters.map((c) => (
+                      <option key={c._id} value={c._id}>{c.name}</option>
                     ))}
                   </select>
-                )}
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                  {notesSubjects.length} UPSC subjects · GS Paper 1–4 + Current Affairs
-                </p>
+                </div>
               </div>
 
-              <div>
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                  <label className={`block text-sm font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                    Subject knowledge
-                  </label>
+              <div
+                className={`rounded-lg border px-3 py-3 text-sm ${
+                  isDark ? "border-slate-600 bg-slate-900/40" : "border-slate-200 bg-slate-50"
+                }`}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className={`font-medium ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                    Knowledge Base content for this subject
+                    <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                      {kbDocCount} completed PDF{kbDocCount === 1 ? "" : "s"}
+                    </span>
+                  </p>
                   {!isMentor && (
                     <Link
                       to="/admin/knowledge-base"
@@ -1446,206 +1881,78 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
                       }`}
                     >
                       <Database className="w-3 h-3" />
-                      Manage in Knowledge Base
+                      Upload / manage PDFs
                     </Link>
                   )}
                 </div>
-                {chaptersLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Loading knowledge…
-                  </div>
-                ) : !subject ? (
-                  <p className={`text-sm ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    Select a subject to use its PDF + notes knowledge.
+                {kbDocs.length > 0 ? (
+                  <ul className={`mt-2 space-y-1 text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                    {kbDocs.slice(0, 8).map((d) => (
+                      <li key={d._id} className="truncate flex items-center gap-1.5">
+                        <FileText className="w-3 h-3 shrink-0" />
+                        {d.title}
+                      </li>
+                    ))}
+                    {kbDocs.length > 8 && (
+                      <li className="opacity-70">+{kbDocs.length - 8} more…</li>
+                    )}
+                  </ul>
+                ) : String(kbSubjectId).startsWith("notes::") ? (
+                  <p className={`mt-1.5 text-xs ${isDark ? "text-sky-300" : "text-sky-700"}`}>
+                    Notes / website sync subject — questions generate from Intelligence RAG (no KB PDF required).
                   </p>
                 ) : (
-                  <div
-                    className={`rounded-lg border px-3 py-3 text-sm ${
-                      isDark ? "border-slate-600 bg-slate-900/40" : "border-slate-200 bg-slate-50"
-                    }`}
-                  >
-                    <p className={`font-medium ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                      {subject}
-                      <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                        {chapters.length} source{chapters.length !== 1 ? "s" : ""} · {subjectChunkTotal} chunks
-                        {pdfKnowledgeCount > 0 ? ` · ${pdfKnowledgeCount} PDF` : ""}
-                      </span>
-                    </p>
-                    {chapters.length > 0 ? (
-                      <ul className={`mt-2 space-y-2 text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                        {chapters.map((c) => {
-                          const isWeb = /^https?:\/\//i.test(String(c.url || ""));
-                          const isPdf =
-                            c.sourceType === "pdf" ||
-                            c.hasPdf ||
-                            String(c.url || "").startsWith("pdf://");
-                          const isSyncing = syncingChapterUrl === c.url;
-                          return (
-                            <li
-                              key={c._id || c.url}
-                              className="flex flex-wrap items-center justify-between gap-2"
-                            >
-                              <span className="min-w-0 flex-1">
-                                <span className={`font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                                  {c.title}
-                                </span>
-                                {isPdf && (
-                                  <span className={`ml-1.5 text-[10px] font-semibold uppercase ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                                    PDF
-                                  </span>
-                                )}
-                                {isWeb && !isPdf && (
-                                  <span className={`ml-1.5 text-[10px] font-semibold uppercase ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                                    WEB
-                                  </span>
-                                )}
-                                <span className="ml-2">
-                                  {c.synced
-                                    ? `${c.topicCount || 0} topics · ${c.chunkCount || 0} chunks`
-                                    : "not synced yet"}
-                                </span>
-                              </span>
-                              {isWeb && !isPdf && (
-                                <button
-                                  type="button"
-                                  disabled={generating || uploadingPdf || !!syncingChapterUrl}
-                                  onClick={() => void handleSyncChapter(c)}
-                                  className={`inline-flex items-center gap-1 shrink-0 text-xs font-medium ${
-                                    isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
-                                  } disabled:opacity-50`}
-                                >
-                                  {isSyncing ? (
-                                    <Loader2 className="w-3 h-3 animate-spin" />
-                                  ) : (
-                                    <RefreshCw className="w-3 h-3" />
-                                  )}
-                                  {c.synced ? "Re-sync website" : "Sync from website"}
-                                </button>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <p className={`mt-1 text-xs ${isDark ? "text-amber-300" : "text-amber-700"}`}>
-                        No knowledge yet for this subject. Sync from notes website or add PDF(s) below.
-                      </p>
-                    )}
-                    <p className={`mt-2 text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                      Keyword search runs across <strong>all</strong> of {subject} (PDF + website) — RAG uses
-                      matching chunks only.
-                    </p>
-                  </div>
-                )}
-                {subject && (
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <input
-                      ref={pdfAddInputRef}
-                      type="file"
-                      accept="application/pdf,.pdf"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        const list = Array.from(e.target.files || []);
-                        if (list.length) void handleUploadPdf(list, { replaceChapter: false });
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 text-xs"
-                      disabled={!subject || generating || uploadingPdf || !!syncingChapterUrl}
-                      onClick={() => void handleSyncAllWebsiteChapters()}
-                    >
-                      {syncingChapterUrl && webChaptersPendingSync.length > 0 ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
-                      ) : (
-                        <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                      )}
-                      Sync website notes
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-8 text-xs"
-                      disabled={!subject || generating || uploadingPdf || !!syncingChapterUrl}
-                      onClick={() => pdfAddInputRef.current?.click()}
-                    >
-                      {uploadingPdf ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
-                      ) : (
-                        <Upload className="w-3.5 h-3.5 mr-1" />
-                      )}
-                      {uploadingPdf ? "Uploading PDF(s)…" : "Add PDF(s) to knowledge"}
-                    </Button>
-                  </div>
+                  <p className={`mt-1.5 text-xs ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                    Is subject pe completed PDF nahi hai. Knowledge Base me Economy / Geography select karke dekho, ya PDF upload + Process karo.
+                  </p>
                 )}
               </div>
 
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  Topic keyword <span className="text-red-500">*</span>
-                  <span className={`ml-2 font-normal text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    search PDF + website knowledge (RAG)
-                  </span>
-                </label>
-                <div className="relative">
-                  <Search
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}
-                  />
-                  <input
-                    type="text"
-                    value={topicKeyword}
-                    onChange={(e) => setTopicKeyword(e.target.value)}
-                    disabled={generating || uploadingPdf || !subject || !knowledgeReady}
-                    placeholder='e.g. "Basic Structure Doctrine", "Preamble", "Article 368"'
-                    className={`w-full pl-10 pr-3 py-2.5 rounded-lg border text-sm ${inputCls}`}
-                  />
-                </div>
-                <p className={`mt-1.5 text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                  Type the topic — we retrieve matching chunks from the vector DB for this subject, then
-                  generate questions only from that retrieved content (knowledge base first).
-                </p>
-                {keywordMode && (
-                  <div
-                    className={`mt-2 rounded-lg border px-3 py-2 text-xs ${
-                      keywordMatch && keywordMatch.matchedChunks > 0
-                        ? isDark
-                          ? "border-green-800/50 bg-green-950/20 text-green-200"
-                          : "border-green-200 bg-green-50 text-green-800"
-                        : isDark
-                          ? "border-amber-800/50 bg-amber-950/20 text-amber-200"
-                          : "border-amber-200 bg-amber-50 text-amber-800"
-                    }`}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    Topic (from KB list)
+                  </label>
+                  <select
+                    value={kbTopicId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      setKbTopicId(id);
+                      const t = kbTopics.find((x) => x._id === id);
+                      if (t?.name) setTopicKeyword(t.name);
+                    }}
+                    disabled={generating || !kbSubjectId}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${inputCls}`}
                   >
-                    {keywordSearching ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching knowledge base…
-                      </span>
-                    ) : keywordMatch ? (
-                      <>
-                        <p className="font-medium">
-                          {keywordMatch.matchedChunks > 0
-                            ? `Matched ${keywordMatch.matchedChunks} chunk(s) via ${keywordMatch.source} (RAG top-k only)`
-                            : `No chunks matched "${keywordTrimmed}" in PDF/notes knowledge`}
-                        </p>
-                        {keywordMatch.preview?.length > 0 && (
-                          <ul className="mt-1.5 space-y-1 opacity-90">
-                            {keywordMatch.preview.map((p, i) => (
-                              <li key={i} className="truncate">
-                                {p.heading ? `${p.heading}: ` : ""}
-                                {p.excerpt}
-                                {p.page != null ? ` (p.${p.page})` : ""}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </>
-                    ) : (
-                      <span>Enter at least 2 characters to search…</span>
-                    )}
+                    <option value="">
+                      {kbTopics.length ? "Select topic or type below" : "No KB topics yet — type keyword →"}
+                    </option>
+                    {kbTopics.map((t) => (
+                      <option key={t._id} value={t._id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    Topic / keyword <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Search
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}
+                    />
+                    <input
+                      type="text"
+                      value={topicKeyword}
+                      onChange={(e) => setTopicKeyword(e.target.value)}
+                      disabled={generating || !kbSubjectId}
+                      placeholder='e.g. "Fiscal deficit", "Monsoon", "Banking"'
+                      className={`w-full pl-10 pr-3 py-2.5 rounded-lg border text-sm ${inputCls}`}
+                    />
                   </div>
-                )}
+                  <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                    Is topic ke hisaab se Knowledge Base PDF content se questions banenge.
+                  </p>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1684,74 +1991,103 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
                         }`}
                       >
                         {n} Q
+                        <span className="block text-[10px] font-normal opacity-90">
+                          gen {n + 10} · show {n}
+                        </span>
                       </button>
                     ))}
                   </div>
-                  <p className={`text-xs mt-1.5 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
-                    {questionCount === 100
-                      ? "Full-length set (~120 pool → 100 shown)"
-                      : "Standard set (~70 pool → 50 shown, extras avoid repeats)"}
+                  <p className={`text-xs mt-1 ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                    Extra 10 generated for buffer; system refills until {questionCount} unique are ready.
                   </p>
                 </div>
               </div>
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                  Patterns to include
-                </label>
-                <p className={`text-xs mb-2 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                  Equal weightage: {questionCount} questions split evenly across selected patterns
-                  {patternsToInclude.length > 0
-                    ? ` (~${Math.round(questionCount / patternsToInclude.length)} each if ${patternsToInclude.length} selected).`
-                    : "."}{" "}
-                  Leave all selected for the full UPSC mix, or choose specific patterns.
-                </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {PRELIM_MOCK_PATTERNS.map((p) => (
-                    <label key={p.id} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={patternsToInclude.includes(p.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setPatternsToInclude((prev) => [...prev, p.id]);
-                          else setPatternsToInclude((prev) => prev.filter((id) => id !== p.id));
-                        }}
-                        disabled={generating}
-                        className="rounded border-slate-400 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className={`text-sm ${isDark ? "text-slate-300" : "text-slate-700"}`}>{p.label}</span>
-                    </label>
-                  ))}
+
+              {generating && (
+                <div className="space-y-3">
+                  {renderGenerationProgress()}
+                  {previewQuestions.length > 0 && (
+                    <div
+                      className={`rounded-xl border p-3 space-y-2 ${
+                        isDark ? "border-slate-700 bg-slate-900/40" : "border-slate-200 bg-white"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p
+                          className={`text-sm font-semibold flex items-center gap-2 ${
+                            isDark ? "text-slate-100" : "text-slate-900"
+                          }`}
+                        >
+                          <BookOpen className="w-4 h-4 text-blue-500" />
+                          Live preview · {previewQuestions.length} question
+                          {previewQuestions.length === 1 ? "" : "s"} so far
+                        </p>
+                        <span className={`text-xs ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                          Updates each batch
+                        </span>
+                      </div>
+                      <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+                        {previewQuestions.slice(0, 12).map((q, i) => (
+                          <div
+                            key={`live-${i}-${String(q.question || "").slice(0, 24)}`}
+                            className={`rounded-lg border px-3 py-2 text-xs ${
+                              isDark ? "border-slate-700 bg-slate-800/50" : "border-slate-100 bg-slate-50"
+                            }`}
+                          >
+                            <p className={`font-medium mb-1 ${isDark ? "text-slate-200" : "text-slate-800"}`}>
+                              Q{q.index || i + 1}. {String(q.question || "").slice(0, 180)}
+                              {String(q.question || "").length > 180 ? "…" : ""}
+                            </p>
+                            <div className={`grid grid-cols-2 gap-x-3 gap-y-0.5 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+                              {(["A", "B", "C", "D"] as const).map((k) => (
+                                <span key={k}>
+                                  <span
+                                    className={
+                                      q.correctAnswer === k
+                                        ? "text-green-600 font-semibold"
+                                        : ""
+                                    }
+                                  >
+                                    {k}.
+                                  </span>{" "}
+                                  {String(q.options?.[k] || "—" ).slice(0, 60)}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                        {previewQuestions.length > 12 && (
+                          <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-500"}`}>
+                            +{previewQuestions.length - 12} more — full review after generation
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              {keywordMode && (
-                <p className={`text-xs ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                  Will generate a <strong>{questionCount === 100 ? 120 : 70}-question pool</strong>, keep the best{" "}
-                  <strong>{questionCount}</strong> from keyword <strong>&quot;{keywordTrimmed}&quot;</strong>
-                  {testNameTrimmed ? <> · named <strong>&quot;{testNameTrimmed}&quot;</strong></> : null}{" "}
-                  using <strong>{patternsToInclude.length}</strong> pattern
-                  {patternsToInclude.length !== 1 ? "s" : ""} ({selectedPatternsLabel}).
-                </p>
               )}
-              {generating && renderGenerationProgress()}
+
               <Button
                 type="submit"
                 disabled={
                   generating ||
-                  uploadingPdf ||
                   !testNameTrimmed ||
-                  !subject ||
-                  !knowledgeReady ||
-                  !keywordMode ||
-                  patternsToInclude.length === 0 ||
-                  keywordSearching ||
-                  (keywordMatch != null && keywordMatch.matchedChunks === 0)
+                  !kbSubjectId ||
+                  topicKeyword.trim().length < 2 ||
+                  (!String(kbSubjectId).startsWith("notes::") &&
+                    practiceSubjectOptions.find((o) => o.id === kbSubjectId)?.source !== "notes" &&
+                    kbDocCount <= 0)
                 }
                 className="w-full sm:w-auto"
               >
                 {generating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                 {generating
-                  ? "Generating via RAG…"
-                  : `Generate ${questionCount}Q for "${keywordTrimmed.slice(0, 28)}${keywordTrimmed.length > 28 ? "…" : ""}"`}
+                  ? generationStatus
+                    ? `${generationStatus.generatedQuestions || 0}/${questionCount + 10} unique · ${Math.max(0, questionCount + 10 - (generationStatus.generatedQuestions || 0))} left`
+                    : "Generating…"
+                  : String(kbSubjectId).startsWith("notes::")
+                    ? `Generate ${questionCount}Q from Notes / RAG`
+                    : `Generate ${questionCount}Q from Knowledge Base`}
               </Button>
             </form>
           </CardContent>
@@ -1764,20 +2100,14 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <BookOpen className="w-5 h-5 text-blue-500" />
-              Preview — {activeTest.totalQuestions} Questions from Notes
+              Preview — {activeTest.totalQuestions} Questions from Knowledge Base
               {generating && <Loader2 className="w-4 h-4 animate-spin text-blue-500" />}
             </CardTitle>
             <CardDescription>
               <strong>{activeTest.title}</strong>
               {" · "}
               <strong>{activeTest.subject}</strong> → <strong>{activeTest.topic}</strong>
-              {patternsToInclude.length > 0 && (
-                <>
-                  {" "}
-                  · Patterns: <strong>{patternsToInclude.length}</strong> selected
-                </>
-              )}
-              . Review, edit, or regenerate before assigning.
+              . Review, edit, then assign students.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -1785,7 +2115,7 @@ export function AssignedPracticeAdminPage({ mode = "admin" }: AssignedPracticeAd
 
             <div className={`rounded-lg border px-3 py-2 text-xs flex flex-wrap gap-2 items-center ${isDark ? "border-blue-800/40 bg-blue-950/20 text-blue-200" : "border-blue-200 bg-blue-50 text-blue-800"}`}>
               <span className="font-medium">
-                📚 Knowledge base RAG (top chunks only — not full PDF)
+                Knowledge Base (bank questions + AI from PDF chunks if needed)
               </span>
               {activeTest?.generationStats?.notesSource ? (
                 <>

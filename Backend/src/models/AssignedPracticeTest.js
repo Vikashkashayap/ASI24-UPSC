@@ -187,6 +187,18 @@ const assignedPracticeTestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    /** Built from Question Intelligence session (Test Builder phase) */
+    qiSessionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "QiSession",
+      default: null,
+      index: true,
+    },
+    builderSource: {
+      type: String,
+      enum: ["", "question_intelligence", "legacy_rag", "manual"],
+      default: "",
+    },
     errorMessage: {
       type: String,
       default: "",

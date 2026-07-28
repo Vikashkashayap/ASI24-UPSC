@@ -12,6 +12,7 @@ import {
 } from "../validators/question.validator.js";
 import { QG_CONFIG } from "../config/qg.config.js";
 import { questionFingerprint } from "./duplicateDetector.service.js";
+import { trimContextForLlm } from "../utils/contextTrim.js";
 
 function normalizeDifficulty(d) {
   const v = String(d || "medium").toLowerCase();
@@ -158,7 +159,12 @@ export function normalizeGeneratedQuestion(raw, meta = {}) {
  * }} params
  */
 export async function generateQuestionsStage(params = {}) {
-  const contextText = String(params.contextText || "").trim();
+  const rawContext = String(params.contextText || "").trim();
+  const contextText = trimContextForLlm(rawContext, {
+    query: [params.subject, params.topic, params.chapter].filter(Boolean).join(" "),
+    maxChars: QG_CONFIG.context.genMaxChars,
+    preferSourceSpan: false,
+  });
   if (contextText.length < QG_CONFIG.generation.minContextChars) {
     return {
       success: false,

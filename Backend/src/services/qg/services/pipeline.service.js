@@ -29,12 +29,40 @@ import {
   lockExplanationToAnswer,
   checkAnswerExplanationConsistency,
 } from "../utils/consistency.js";
+import { buildInlinePracticeExplanation } from "../utils/practiceExplain.js";
 
 function normalizeDifficultyLabel(d) {
   const v = String(d || "medium").toLowerCase();
   if (v === "easy") return "Easy";
   if (v === "hard") return "Hard";
   return "Medium";
+}
+
+/** Run async work over items with a fixed concurrency pool. */
+async function mapWithConcurrency(items, concurrency, fn) {
+  const list = Array.isArray(items) ? items : [];
+  if (!list.length) return [];
+  const results = new Array(list.length);
+  let next = 0;
+  const workers = Math.max(1, Math.min(concurrency || 1, list.length));
+
+  async function worker() {
+    while (true) {
+      const i = next;
+      next += 1;
+      if (i >= list.length) break;
+      results[i] = await fn(list[i], i);
+    }
+  }
+
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+  return results;
+}
+
+function mergeTimings(target, local = {}) {
+  for (const [k, v] of Object.entries(local)) {
+    target[k] = (target[k] || 0) + (Number(v) || 0);
+  }
 }
 
 /**
@@ -90,11 +118,23 @@ async function processOneQuestion({
   timings,
 }) {
   const started = Date.now();
+  const localTimings = {
+    generationMs: 0,
+    verificationMs: 0,
+    explanationMs: 0,
+    factCheckMs: 0,
+  };
   let regenerations = 0;
   let question = { ...draft };
   let verification = null;
   let explanation = null;
   let factCheck = null;
+  const practiceMode = Boolean(meta.practiceMode);
+
+  const finish = (payload) => {
+    if (timings) mergeTimings(timings, localTimings);
+    return { ...payload, durationMs: Date.now() - started };
+  };
 
   // Duplicate gate
   const dup = await findSimilarQuestion({
@@ -103,13 +143,12 @@ async function processOneQuestion({
     topic: meta.topic,
   });
   if (dup.isDuplicate) {
-    return {
+    return finish({
       accepted: false,
       reason: "duplicate",
       duplicate: dup,
       regenerations: 0,
-      durationMs: Date.now() - started,
-    };
+    });
   }
 
   for (let attempt = 0; attempt <= QG_CONFIG.generation.maxRegenerateAttempts; attempt += 1) {
@@ -127,30 +166,28 @@ async function processOneQuestion({
         existingFingerprints: [questionFingerprint(question.question)],
       });
       if (!regen.questions?.length) {
-        return {
+        return finish({
           accepted: false,
           reason: "regeneration_failed",
           regenerations,
-          durationMs: Date.now() - started,
-        };
+        });
       }
       question = regen.questions[0];
-      timings.generationMs += regen.durationMs || 0;
+      localTimings.generationMs += regen.durationMs || 0;
     }
 
     const verifyStarted = Date.now();
     verification = await verifyAnswerStage({ question, contextText });
-    timings.verificationMs += Date.now() - verifyStarted;
+    localTimings.verificationMs += Date.now() - verifyStarted;
 
     if (verification.verdict === "reject") {
       if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
+      return finish({
         accepted: false,
         reason: "verification_rejected",
         verification,
         regenerations,
-        durationMs: Date.now() - started,
-      };
+      });
     }
 
     // Lock verified letter onto the question BEFORE explanation
@@ -165,13 +202,12 @@ async function processOneQuestion({
     const optionLock = lockAnswerToOptions(question);
     if (!optionLock.ok) {
       if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
+      return finish({
         accepted: false,
         reason: "option_answer_mismatch",
         verification,
         regenerations,
-        durationMs: Date.now() - started,
-      };
+      });
     }
     question.options = optionLock.options;
     question.options_en = { ...optionLock.options };
@@ -179,35 +215,37 @@ async function processOneQuestion({
     question.answer = optionLock.correctAnswer;
 
     const explainStarted = Date.now();
-    explanation = await generateExplanationStage({
-      question,
-      contextText,
-      meta,
-    });
-    timings.explanationMs += Date.now() - explainStarted;
+    if (practiceMode && QG_CONFIG.quality.practiceInlineExplain !== false) {
+      explanation = buildInlinePracticeExplanation(question, verification, contextText);
+    } else {
+      explanation = await generateExplanationStage({
+        question,
+        contextText,
+        meta,
+      });
+    }
+    localTimings.explanationMs += Date.now() - explainStarted;
 
     if (!explanation.success) {
       if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
+      return finish({
         accepted: false,
         reason: "explanation_failed",
         verification,
         regenerations,
-        durationMs: Date.now() - started,
-      };
+      });
     }
 
     // Force explanation ↔ answer lock (fixes letter/explain drift)
     const expLock = lockExplanationToAnswer(explanation.structured, question);
     if (!expLock.ok) {
       if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
+      return finish({
         accepted: false,
         reason: "explanation_answer_mismatch",
         verification,
         regenerations,
-        durationMs: Date.now() - started,
-      };
+      });
     }
     explanation.structured = expLock.structured;
     explanation.text = formatExplanationText(expLock.structured, question.correctAnswer);
@@ -215,33 +253,47 @@ async function processOneQuestion({
     const consistency = checkAnswerExplanationConsistency(question, explanation.structured);
     if (!consistency.ok) {
       if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
+      return finish({
         accepted: false,
         reason: consistency.reason || "consistency_failed",
         verification,
         regenerations,
-        durationMs: Date.now() - started,
-      };
+      });
     }
 
-    const factStarted = Date.now();
-    factCheck = await factCheckStage({
-      question,
-      explanation: explanation.structured,
-      contextText,
-    });
-    timings.factCheckMs += Date.now() - factStarted;
+    const skipFact =
+      practiceMode &&
+      QG_CONFIG.quality.practiceSkipFactCheck &&
+      Number(verification.confidence || 0) >= QG_CONFIG.quality.practiceSkipFactConfidence &&
+      !(verification.optionIssues || []).length &&
+      !verification.hallucinationDetected;
 
-    if (factCheck.verdict === "reject") {
-      if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
-      return {
-        accepted: false,
-        reason: "fact_check_rejected",
-        verification,
-        factCheck,
-        regenerations,
-        durationMs: Date.now() - started,
+    if (skipFact) {
+      factCheck = {
+        verdict: "accept",
+        confidence: verification.confidence,
+        skipped: true,
+        reason: "practice_high_confidence_verify",
       };
+    } else {
+      const factStarted = Date.now();
+      factCheck = await factCheckStage({
+        question,
+        explanation: explanation.structured,
+        contextText,
+      });
+      localTimings.factCheckMs += Date.now() - factStarted;
+
+      if (factCheck.verdict === "reject") {
+        if (attempt < QG_CONFIG.generation.maxRegenerateAttempts) continue;
+        return finish({
+          accepted: false,
+          reason: "fact_check_rejected",
+          verification,
+          factCheck,
+          regenerations,
+        });
+      }
     }
 
     break;
@@ -256,7 +308,7 @@ async function processOneQuestion({
   });
 
   if (!scores.passesThreshold) {
-    return {
+    return finish({
       accepted: false,
       reason: scores.consistencyOk === false || scores.answerOptionOk === false
         ? "consistency_below_threshold"
@@ -265,8 +317,7 @@ async function processOneQuestion({
       verification,
       factCheck,
       regenerations,
-      durationMs: Date.now() - started,
-    };
+    });
   }
 
   const generationTimeMs = Date.now() - started;
@@ -302,15 +353,14 @@ async function processOneQuestion({
     },
   });
 
-  return {
+  return finish({
     accepted: true,
     question: enriched,
     scores,
     verification,
     factCheck,
     regenerations,
-    durationMs: generationTimeMs,
-  };
+  });
 }
 
 /**
@@ -440,6 +490,7 @@ export async function runQuestionPipeline(params = {}) {
     language: params.language || QG_CONFIG.language,
     exam: QG_CONFIG.exam,
     patternsToInclude: params.patternsToInclude || [],
+    practiceMode: Boolean(params.practiceMode),
   };
 
   const accepted = [];
@@ -447,8 +498,12 @@ export async function runQuestionPipeline(params = {}) {
   let regenerations = 0;
   let duplicatesSkipped = 0;
   const fingerprints = [];
+  const verifyConcurrency = Math.max(
+    1,
+    Math.min(8, Number(QG_CONFIG.generation.verifyConcurrency) || 4)
+  );
 
-  // Generate in small batches then verify each
+  // Generate in batches, then verify/explain in parallel (major speed win)
   while (accepted.length < count) {
     const need = Math.min(
       QG_CONFIG.generation.maxQuestionsPerCall,
@@ -474,27 +529,29 @@ export async function runQuestionPipeline(params = {}) {
       break;
     }
 
-    for (const draft of generated.questions) {
-      if (accepted.length >= count) break;
-
-      const result = await processOneQuestion({
+    const drafts = generated.questions.slice(0, Math.max(need, count - accepted.length + 2));
+    const batchResults = await mapWithConcurrency(drafts, verifyConcurrency, (draft) =>
+      processOneQuestion({
         draft,
         contextText,
         chunks,
         meta,
         timings,
-      });
+      })
+    );
 
+    for (const result of batchResults) {
+      if (!result) continue;
       regenerations += result.regenerations || 0;
 
-      if (result.accepted) {
+      if (result.accepted && accepted.length < count) {
         accepted.push(result.question);
         fingerprints.push(questionFingerprint(result.question.question));
-      } else {
+      } else if (!result.accepted) {
         if (result.reason === "duplicate") duplicatesSkipped += 1;
         rejected.push({
           reason: result.reason,
-          question: draft.question?.slice?.(0, 120),
+          question: result.question?.question?.slice?.(0, 120) || drafts[0]?.question?.slice?.(0, 120),
         });
       }
     }
@@ -607,6 +664,7 @@ export async function runQuestionPipeline(params = {}) {
 /**
  * Compatibility entry for Topic Practice batches that already have context.
  * Runs generate → verify → explain → fact-check (skips retrieval).
+ * practiceMode=true: parallel verify + skip fact-check when verifier is confident.
  */
 export async function generateVerifiedFromContext({
   contextText,
@@ -619,6 +677,7 @@ export async function generateVerifiedFromContext({
   batchSize = 5,
   patternsToInclude = [],
   retrievalSource = "provided",
+  practiceMode = false,
 } = {}) {
   return runQuestionPipeline({
     contextText,
@@ -633,6 +692,7 @@ export async function generateVerifiedFromContext({
     patternsToInclude,
     persist: false,
     retrievalSource,
+    practiceMode,
   });
 }
 

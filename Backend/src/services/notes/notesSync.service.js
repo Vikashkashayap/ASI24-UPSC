@@ -13,9 +13,31 @@ import {
   extractTitleFromTopicPageHtml,
   resolveTopicName,
 } from "./notesHtmlParser.js";
+import { qdrantService } from "../ai/qdrant.service.js";
 
 // re-export for callers that imported from this module
 export { indexTopicInVectorDb, indexChapterInVectorDb };
+
+async function removeStaleTopics(chapterId, keepTopicIds) {
+  const keep = new Set((keepTopicIds || []).map((id) => String(id)));
+  const stale = await ContentTopic.find({ sourceUrlId: chapterId }).select("_id").lean();
+  const toRemove = stale.filter((t) => !keep.has(String(t._id)));
+  if (!toRemove.length) return 0;
+
+  const ids = toRemove.map((t) => t._id);
+  if (qdrantService.isConfigured()) {
+    for (const id of ids) {
+      try {
+        await qdrantService.deleteNoteChunks(String(id));
+      } catch (err) {
+        console.warn("[notesSync] qdrant delete stale topic failed:", err.message);
+      }
+    }
+  }
+  await ContentChunk.deleteMany({ topicId: { $in: ids } });
+  await ContentTopic.deleteMany({ _id: { $in: ids } });
+  return ids.length;
+}
 
 /**
  * Fetch a notes page and extract main article text.
@@ -60,13 +82,34 @@ function catalogTitleForUrl(url, subject, fallbackTitle) {
 
 /**
  * Sync a chapter URL from notes.mentorsdaily.com into MongoDB.
+ * Re-fetches EVERY topic under the chapter (e.g. all 24 Indian Economy topics).
+ * @param {{
+ *   url: string,
+ *   subject: string,
+ *   title?: string,
+ *   createdBy?: unknown,
+ *   chunking?: { minWords?: number, maxWords?: number, overlapWords?: number },
+ *   onProgress?: (info: { topicIndex: number, topicTotal: number, topicTitle?: string, topicUrl?: string }) => void
+ * }} params
  */
-export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
+export async function syncChapterFromUrl({
+  url,
+  subject,
+  title,
+  createdBy,
+  chunking,
+  onProgress,
+}) {
   const chapterUrl = String(url || "").trim().replace(/\/$/, "");
   const subjectStr = String(subject || "").trim();
   if (!chapterUrl || !subjectStr) {
     throw new Error("url and subject are required");
   }
+  const chunkOpts = {
+    ...(chunking?.minWords != null ? { minWords: Number(chunking.minWords) } : {}),
+    ...(chunking?.maxWords != null ? { maxWords: Number(chunking.maxWords) } : {}),
+    ...(chunking?.overlapWords != null ? { overlapWords: Number(chunking.overlapWords) } : {}),
+  };
 
   let chapter = await SourceUrl.findOne({ url: chapterUrl });
   const resolvedTitle =
@@ -101,9 +144,19 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
     }
 
     let totalChunks = 0;
+    const keptTopicIds = [];
 
     for (let i = 0; i < topicLinks.length; i += 1) {
       const { url: topicUrl, slug, title: cardTitle } = topicLinks[i];
+      if (typeof onProgress === "function") {
+        onProgress({
+          topicIndex: i + 1,
+          topicTotal: topicLinks.length,
+          topicTitle: cardTitle || slug,
+          topicUrl,
+        });
+      }
+
       const { text: pageText, html: topicHtml } = await fetchPageContent(topicUrl);
       if (!pageText || pageText.length < 80) continue;
 
@@ -136,8 +189,9 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
         topic.subject = subjectStr;
       }
       await topic.save();
+      keptTopicIds.push(topic._id);
 
-      const chunks = splitIntoChunks(pageText, { heading: name });
+      const chunks = splitIntoChunks(pageText, { heading: name, ...chunkOpts });
       const saved = await notesService.saveTopicChunks(
         topic._id,
         chapter._id,
@@ -147,15 +201,21 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
       totalChunks += saved;
     }
 
+    const removed = await removeStaleTopics(chapter._id, keptTopicIds);
+    if (removed) {
+      console.log(
+        `[notesSync] removed ${removed} stale topic(s) from ${subjectStr}/${resolvedTitle}`
+      );
+    }
+
     chapter.status = "synced";
-    chapter.topicCount = topicLinks.length;
+    chapter.topicCount = keptTopicIds.length;
     chapter.chunkCount = totalChunks;
     chapter.lastSyncedAt = new Date();
     chapter.lastSyncError = null;
     chapter.contentHash = hashContent(chapterHtml);
     await chapter.save();
 
-    // Step 3: hash-gated Jina embeddings → Qdrant (skips if embedding deps missing)
     let embedding = null;
     try {
       embedding = await indexChapterInVectorDb(chapter._id, { force: true });
@@ -173,6 +233,7 @@ export async function syncChapterFromUrl({ url, subject, title, createdBy }) {
       chunkCount: chapter.chunkCount,
       status: chapter.status,
       embedding,
+      removedTopics: removed,
     };
   } catch (err) {
     chapter.status = "failed";

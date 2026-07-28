@@ -26,16 +26,16 @@ import {
   filterStudentReadyQuestions,
 } from "./questionTranslationService.js";
 import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
-import { retrieverService } from "./ai/retriever.service.js";
 import { generateQuestionsFromContextBatch } from "./ai/questionGenerator.service.js";
 import { questionPatternEngine } from "./ai/questionPatternEngine.js";
+import { getContextForPractice } from "./ai/kbContext.service.js";
 import {
   extractClaimedCorrectLetter,
   lockPlainExplanationToAnswer,
 } from "./qg/utils/consistency.js";
 import { filterQuestionsByTopic } from "./qg/utils/topicRelevance.js";
 
-/** GS Prelims uses Knowledge Base RAG by default (same stack as Topic Practice). Set PRELIMS_USE_RAG=false for legacy open LLM. */
+/** GS Prelims uses Admin Knowledge Base RAG (Intelligence hybrid). Set PRELIMS_USE_RAG=false for legacy open LLM. */
 export function isPrelimsRagEnabled(examType) {
   return examType === "GS" && process.env.PRELIMS_USE_RAG !== "false";
 }
@@ -48,7 +48,8 @@ function normalizePrelimsDifficulty(difficulty) {
 }
 
 /**
- * GS Prelims: prefer on-topic Knowledge Base RAG; if topic missing from KB, fall back to LLM.
+ * GS Prelims: prefer Admin Knowledge Base (Intelligence hybrid RAG) for the selected
+ * subject + topic; if topic missing from KB, fall back to LLM (unless kbOnly / PRELIMS_FORCE_KB_ONLY).
  */
 async function generateTestQuestionsFromKnowledgeBase({
   subjects,
@@ -57,6 +58,7 @@ async function generateTestQuestionsFromKnowledgeBase({
   difficulty = "Moderate",
   batchSize: batchSizeOverride,
   minAcceptable,
+  kbOnly = false,
 }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -72,41 +74,46 @@ async function generateTestQuestionsFromKnowledgeBase({
   const primarySubject = String(subjectsList[0] || "").trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
-  // Student generator: always allow LLM when KB misses / is weak.
-  // Old PRELIMS_ALLOW_OPEN_KNOWLEDGE=false caused stuck empty loops — ignored here.
-  // Set PRELIMS_FORCE_KB_ONLY=true only if you truly want KB-only (no LLM).
-  const forceKbOnly = String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
+  // Modular targets / Module Final: KB-only. Other GS paths may LLM-fallback unless PRELIMS_FORCE_KB_ONLY.
+  const forceKbOnly =
+    Boolean(kbOnly) ||
+    String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
   const allowOpenKnowledge = !forceKbOnly;
 
   if (!primarySubject || !topicQuery) {
     throw new Error("Subject and topic are required for knowledge-base generation");
   }
 
-  const probe = await retrieverService.getContextForSubjectQuery({
+  // Admin KB + Intelligence hybrid (same stack as QI / Test Builder)
+  const probe = await getContextForPractice({
     subject: primarySubject,
-    query: topicQuery,
+    topic: topicQuery,
     batchIndex: 0,
   });
   const probeHasOnTopicKb = Boolean(probe.contextText && probe.contextText.length >= 80);
-  // Keyword-only retrieval (e.g. Jina embeddings down) is often weakly related — prefer LLM sooner
+  // Keyword/mongo-only retrieval is often weakly related — prefer LLM sooner
   const probeSource = String(probe.source || "");
   const probeWeakRetrieval =
     probeHasOnTopicKb &&
-    !/qdrant|hybrid|vector/i.test(probeSource) &&
+    !/knowledge_intelligence|knowledge_hybrid|qdrant|hybrid|vector|notes/i.test(probeSource) &&
     /keyword|metadata|mongo/i.test(probeSource);
 
   if (!probeHasOnTopicKb) {
     if (!allowOpenKnowledge) {
       throw new Error(
-        `No matching content found in Knowledge Base for "${topicQuery}" under ${primarySubject}. Sync website notes or upload PDFs in Admin → Knowledge Base, then try again.`
+        `No matching content found in Knowledge Base for "${topicQuery}" under ${primarySubject}. Upload PDFs in Admin → Knowledge Base (and wait for processing), then try again.`
       );
     }
     console.warn(
-      `📭 No on-topic KB for "${topicQuery}" (${primarySubject}) — using LLM open-syllabus fallback`
+      `📭 No on-topic Admin KB for "${topicQuery}" (${primarySubject}) — using LLM open-syllabus fallback`
     );
   } else if (probeWeakRetrieval && allowOpenKnowledge) {
     console.warn(
       `📭 Weak KB retrieval for "${topicQuery}" (source=${probeSource}) — preferring LLM open-syllabus`
+    );
+  } else if (probeHasOnTopicKb) {
+    console.log(
+      `📚 Admin KB probe OK for "${topicQuery}" (${probe.subject || primarySubject}) source=${probeSource} chunks=${probe.chunks?.length || 0}`
     );
   }
 
@@ -206,9 +213,9 @@ async function generateTestQuestionsFromKnowledgeBase({
     let ragSource = "";
 
     if (!openKnowledge) {
-      const rag = await retrieverService.getContextForSubjectQuery({
+      const rag = await getContextForPractice({
         subject: primarySubject,
-        query: topicQuery,
+        topic: topicQuery,
         batchIndex: round,
         excludeChunkIds: [...usedChunkIds],
       });
@@ -218,7 +225,7 @@ async function generateTestQuestionsFromKnowledgeBase({
       if (kbEmpty) {
         if (!allowOpenKnowledge) {
           console.warn(
-            `⚠️ Prelims batch ${round + 1}: no on-topic KB chunks — skipping (open knowledge disabled)`
+            `⚠️ Prelims batch ${round + 1}: no on-topic Admin KB chunks — skipping (open knowledge disabled)`
           );
           stallRounds += 1;
           if (stallRounds >= 5) break;
@@ -228,13 +235,13 @@ async function generateTestQuestionsFromKnowledgeBase({
         preferOpenKnowledge = true;
         openKnowledgeUsed = true;
         console.warn(
-          `⚠️ Prelims batch ${round + 1}: no on-topic KB — switching to LLM open-syllabus`
+          `⚠️ Prelims batch ${round + 1}: no on-topic Admin KB — switching to LLM open-syllabus`
         );
       } else {
         contextText = rag.contextText || "";
-        ragSource = rag.source || "kb";
+        ragSource = rag.source || "knowledge_intelligence";
         console.log(
-          `📚 Prelims batch ${round + 1}: KB source=${ragSource} chunks=${rag.chunks?.length || 0} ~${rag.tokens || 0} tokens`
+          `📚 Prelims batch ${round + 1}: Admin KB source=${ragSource} chunks=${rag.chunks?.length || 0} ~${rag.tokens || 0} tokens`
         );
       }
     } else {
@@ -321,7 +328,7 @@ async function generateTestQuestionsFromKnowledgeBase({
 
   let readyQuestions = finalizeGeneratedQuestions(validatedQuestions);
 
-  // Practice-style: English explanation 50–70 words, then Hindi (stem + options + explanation)
+  // Practice-style: English explanation 50–100 words (correct + all wrong options)
   readyQuestions = await ensurePrelimsExplanationsPracticeStyle(apiKey, readyQuestions);
 
   if (isPracticeBatchHindiEnabled()) {
@@ -338,7 +345,7 @@ async function generateTestQuestionsFromKnowledgeBase({
     /[\u0900-\u097F]/.test(String(q.question_hi || ""))
   ).length;
   console.log(
-    `✅ Prelims RAG ready: ${readyQuestions.length}Q (${withHi} with Hindi, explanations 50–70 words)`
+    `✅ Prelims RAG ready: ${readyQuestions.length}Q (${withHi} with Hindi, explanations 50–100 words, all-option teaching)`
   );
 
   return {
@@ -349,15 +356,50 @@ async function generateTestQuestionsFromKnowledgeBase({
   };
 }
 
-/** Plain English explanation text from string or per-option object. */
+/** True when explanation teaches correct + wrong options (per-option or long teaching text). */
+export function hasTeachingExplanation(q) {
+  const raw = q?.explanation_en ?? q?.explanation;
+  if (raw && typeof raw === "object") {
+    const keys = ["A", "B", "C", "D"];
+    const answer = String(q.correctAnswer || q.answer || "A").toUpperCase();
+    const correctWords = String(raw[answer] || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    if (correctWords >= 80) return true;
+    const filled = keys.filter((k) => {
+      const t = String(raw[k] || "").trim();
+      if (!t || /common distractor|see the correct option/i.test(t)) return false;
+      return t.split(/\s+/).filter(Boolean).length >= 25;
+    });
+    return filled.length >= 3;
+  }
+  const text = String(raw || "").replace(/\s+/g, " ").trim();
+  if (!text) return false;
+  const words = text.split(/\s+/).filter(Boolean).length;
+  if (words < 80) return false;
+  const mentionsWrong =
+    /\boption\s+[a-d]\b.*\b(incorrect|wrong|not|fail|eliminat|distract)/i.test(text) ||
+    (/\boption\s+[a-d]\b/gi.test(text) && (text.match(/\boption\s+[a-d]\b/gi) || []).length >= 2);
+  return mentionsWrong || words >= 100;
+}
+
+/** Combined English explanation text from string or per-option object. */
 function getPlainExplanationText(q) {
   const raw = q?.explanation_en ?? q?.explanation;
   if (!raw) return "";
   if (typeof raw === "string") return raw.replace(/\s+/g, " ").trim();
   if (typeof raw === "object") {
+    const keys = ["A", "B", "C", "D"];
+    const parts = keys
+      .map((k) => {
+        const t = String(raw[k] || "").trim();
+        return t ? `Option ${k}: ${t}` : "";
+      })
+      .filter(Boolean);
+    if (parts.length) return parts.join(" ").replace(/\s+/g, " ").trim();
     const ca = String(q.correctAnswer || q.answer || "A").toUpperCase();
-    const pick = raw[ca] || raw.A || raw.B || raw.C || raw.D || "";
-    return String(pick).replace(/\s+/g, " ").trim();
+    return String(raw[ca] || raw.A || "").replace(/\s+/g, " ").trim();
   }
   return "";
 }
@@ -370,40 +412,131 @@ function countExplanationWords(text) {
     .filter(Boolean).length;
 }
 
-/** Cap at 70 words (hard UI range). */
+/** Cap explanation length (default 150 words for teaching clarity). */
 function clampExplanationToSeventy(text) {
   const cleaned = String(text || "").replace(/\s+/g, " ").trim();
   const words = cleaned.split(/\s+/).filter(Boolean);
-  if (words.length <= 70) return cleaned;
-  return `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`;
+  const maxW = Math.max(100, parseInt(process.env.QG_EXPLAIN_MAX_WORDS, 10) || 150);
+  if (words.length <= maxW) return cleaned;
+  return `${words.slice(0, maxW).join(" ").replace(/[.,;:]+$/, "")}.`;
+}
+
+function isGenericStubExplanation(text) {
+  const t = String(text || "").trim();
+  if (!t) return true;
+  if (
+    /see the correct option explanation above|common distractor for this topic|does not match the notes and is a common/i.test(
+      t
+    )
+  ) {
+    return true;
+  }
+  return t.split(/\s+/).filter(Boolean).length < 18;
+}
+
+/** Build {A,B,C,D} teaching explanations from a locked paragraph or existing object. */
+function toPerOptionExplanations(q, explanationText) {
+  const answer = String(q.correctAnswer || q.answer || "A").toUpperCase().charAt(0) || "A";
+  const opts = q.options_en || q.options || {};
+  const existing = q.explanation_en ?? q.explanation;
+  if (existing && typeof existing === "object") {
+    const out = { A: "", B: "", C: "", D: "" };
+    for (const k of ["A", "B", "C", "D"]) {
+      const t = String(existing[k] || "").trim();
+      out[k] = t && !isGenericStubExplanation(t) ? clampExplanationToSeventy(t) : "";
+    }
+    const real = ["A", "B", "C", "D"].filter((k) => countExplanationWords(out[k]) >= 18);
+    if (real.length >= 3 || (out[answer] && countExplanationWords(out[answer]) >= 40)) {
+      // If wrong stubs were cleared, put full teaching on correct when only correct remains
+      if (real.length === 1 && real[0] === answer) {
+        const locked = lockPlainExplanationToAnswer(
+          explanationText || getPlainExplanationText(q) || out[answer],
+          q
+        );
+        out[answer] = clampExplanationToSeventy(locked.explanation || out[answer]);
+      }
+      return out;
+    }
+  }
+
+  const locked = lockPlainExplanationToAnswer(explanationText || getPlainExplanationText(q), q);
+  const text = clampExplanationToSeventy(locked.explanation || explanationText || "");
+  const out = { A: "", B: "", C: "", D: "" };
+
+  // Prefer splitting "Option X …" segments when present
+  const segments = {};
+  const re = /\bOption\s+([A-D])\b[\s\S]*?(?=\bOption\s+[A-D]\b|$)/gi;
+  let m;
+  const full = text;
+  while ((m = re.exec(full)) !== null) {
+    const letter = m[1].toUpperCase();
+    const bit = String(m[0] || "").trim();
+    if (bit && !isGenericStubExplanation(bit)) {
+      segments[letter] = (segments[letter] ? `${segments[letter]} ` : "") + bit;
+    }
+  }
+
+  for (const k of ["A", "B", "C", "D"]) {
+    if (segments[k] && countExplanationWords(segments[k]) >= 18) {
+      out[k] = clampExplanationToSeventy(segments[k]);
+    }
+  }
+
+  // Put the full teaching paragraph on the correct option (100–150 words target)
+  if (!out[answer] || countExplanationWords(out[answer]) < 40) {
+    out[answer] = text;
+  }
+
+  // Do NOT invent generic stubs for wrong options — leave empty so UI hides them
+  // until polish pass fills real elimination text
+  return out;
 }
 
 function applyLockedPrelimsExplanation(q, explanationText) {
-  const locked = lockPlainExplanationToAnswer(explanationText, q);
-  const text = clampExplanationToSeventy(locked.explanation || explanationText || "");
+  const perOpt = toPerOptionExplanations(q, explanationText);
+  // Clear useless "generated" source noise
+  const src = String(q.conceptualSource || "").trim();
+  const cleanSrc =
+    !src || /^(generated|ai|llm|n\/?a|none)$/i.test(src) ? undefined : q.conceptualSource;
   return {
     ...q,
-    explanation: text,
-    explanation_en: text,
+    explanation: perOpt,
+    explanation_en: perOpt,
+    ...(cleanSrc === undefined ? { conceptualSource: undefined } : {}),
   };
 }
 
 function needsPrelimsExplanationRewrite(q) {
   const answer = String(q.correctAnswer || q.answer || "").toUpperCase();
+  const raw = q?.explanation_en ?? q?.explanation;
+  const minW = Math.max(80, parseInt(process.env.QG_EXPLAIN_MIN_WORDS, 10) || 100);
+  const maxW = Math.max(120, parseInt(process.env.QG_EXPLAIN_MAX_WORDS, 10) || 150);
+
+  if (raw && typeof raw === "object") {
+    const correctText = String(raw[answer] || "").trim();
+    if (!correctText || isGenericStubExplanation(correctText)) return true;
+    if (countExplanationWords(correctText) < minW) return true;
+    const realWrong = ["A", "B", "C", "D"].filter(
+      (k) => k !== answer && !isGenericStubExplanation(raw[k]) && countExplanationWords(raw[k]) >= 25
+    );
+    // Prefer rewrite when wrong options lack real elimination text
+    if (realWrong.length < 2) return true;
+    return false;
+  }
   const text = getPlainExplanationText(q);
   const words = countExplanationWords(text);
-  if (!text || words < 50 || words > 70) return true;
+  if (!text || words < minW || words > maxW + 60) return true;
   if (!answer) return true;
   const claimed = extractClaimedCorrectLetter(text);
   if (claimed && claimed !== answer) return true;
-  if (!new RegExp(`^\\s*Option\\s+${answer}\\b`, "i").test(text)) return true;
+  if (!new RegExp(`Option\\s+${answer}\\b`, "i").test(text)) return true;
   return false;
 }
 
 /**
- * Practice-style explanations: force 50–70 words, correct-option lock, UPSC PYQ facts.
+ * Practice-style explanations: 50–100 words, all-options teaching, correct-option lock.
  */
-async function ensurePrelimsExplanationsPracticeStyle(apiKey, questions) {
+export async function ensurePrelimsExplanationsPracticeStyle(apiKey, questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
 
   let out = questions.map((q) => applyLockedPrelimsExplanation(q, getPlainExplanationText(q)));
@@ -414,12 +547,12 @@ async function ensurePrelimsExplanationsPracticeStyle(apiKey, questions) {
   });
 
   if (!rewriteIdx.length) {
-    console.log(`📝 Prelims explanations: all ${out.length} already 50–70 words + correct-option lock`);
+    console.log(`📝 Prelims explanations: all ${out.length} already 100–150 words + real option teaching`);
     return out.map((q) => pickBilingualQuestionFields(q));
   }
 
   console.log(
-    `📝 Prelims explanations: polishing ${rewriteIdx.length}/${out.length} to 50–70 words with UPSC facts…`
+    `📝 Prelims explanations: polishing ${rewriteIdx.length}/${out.length} to 100–150 words (correct + why each wrong)…`
   );
 
   const payload = rewriteIdx.map((i) => {
@@ -442,19 +575,20 @@ async function ensurePrelimsExplanationsPracticeStyle(apiKey, questions) {
     };
   });
 
-  const systemPrompt = `You write UPSC CSE Prelims (PYQ-standard) MCQ explanations.
-Return ONLY a JSON array. Each item: { "id": number, "explanation": string }.
+  const systemPrompt = `You write UPSC CSE Prelims MCQ explanations for student concept clarity.
+Return ONLY a JSON array. Each item:
+{ "id": number, "explanations": { "A": string, "B": string, "C": string, "D": string } }
 
-HARD RULES for every explanation:
-1. Exactly 50–70 English words (count carefully).
-2. The given "answer" letter and "correctOptionText" are LOCKED — do not change which option is correct.
-3. MUST start with: Option {answer} ("{correctOptionText}") is correct.
-4. Defend ONLY that answer letter — never claim another letter is correct; never rewrite so Option X looks right when answer is Y.
-5. Include 1–2 concrete UPSC-style facts (names, years, articles, schemes, places, committees, or causes/effects) grounded in the question domain / sourceHint.
-6. Briefly say why 1–2 wrong options fail (aspirant-level distractors).
-7. No markdown, no Hindi, no bullet points. Same id order/count as input.`;
+HARD RULES:
+1. Cover ALL four options A–D with REAL reasons (never say "common distractor" or "see correct explanation above").
+2. CORRECT option ("answer"): 100–150 English words. Start with: Option {answer} ("{correctOptionText}") is correct.
+   Explain WHY it is right with UPSC facts (Act/year/article/scheme/definition). Also briefly eliminate the other three inside this paragraph if needed for clarity.
+3. EACH WRONG option: 35–60 English words. Start with: Option {letter} ("…") is incorrect because…
+   Give a concrete elimination reason tied to the concept (not filler).
+4. Answer letter + correctOptionText are LOCKED — never claim another letter is correct.
+5. No markdown, no Hindi, no bullets. Same id order/count as input.`;
 
-  const chunkSize = 5;
+  const chunkSize = 4;
   for (let start = 0; start < payload.length; start += chunkSize) {
     const chunk = payload.slice(start, start + chunkSize);
     try {
@@ -462,8 +596,8 @@ HARD RULES for every explanation:
         apiKey,
         model: getPracticeTranslationModel(),
         systemPrompt,
-        userPrompt: `Rewrite these explanations to EXACTLY 50–70 words. Match correct option letter+text. Add UPSC PYQ-style facts:\n${JSON.stringify(chunk)}`,
-        maxTokens: Math.min(4000, 350 * chunk.length + 400),
+        userPrompt: `Write full per-option explanations (correct 100–150 words; each wrong 35–60 words). Match answer letter+text:\n${JSON.stringify(chunk)}`,
+        maxTokens: Math.min(7000, 900 * chunk.length + 500),
         apiTitle: "UPSC Mentor - Prelims Explanation Polish",
       });
 
@@ -481,8 +615,20 @@ HARD RULES for every explanation:
       const rows = Array.isArray(parsed) ? parsed : parsed?.explanations || [];
       for (const row of rows) {
         const id = Number(row?.id);
+        if (!Number.isInteger(id) || !out[id]) continue;
+        const per =
+          row?.explanations && typeof row.explanations === "object"
+            ? row.explanations
+            : null;
+        if (per && ["A", "B", "C", "D"].every((k) => String(per[k] || "").trim().length >= 20)) {
+          out[id] = applyLockedPrelimsExplanation(
+            { ...out[id], explanation: per, explanation_en: per },
+            getPlainExplanationText({ ...out[id], explanation: per })
+          );
+          continue;
+        }
         const polished = String(row?.explanation || "").trim();
-        if (!Number.isInteger(id) || !out[id] || countExplanationWords(polished) < 40) continue;
+        if (countExplanationWords(polished) < 80) continue;
         out[id] = applyLockedPrelimsExplanation(out[id], polished);
       }
     } catch (err) {
@@ -495,9 +641,9 @@ HARD RULES for every explanation:
 
   const stillBad = out.filter((q) => needsPrelimsExplanationRewrite(q)).length;
   if (stillBad) {
-    console.warn(`⚠️ Prelims explanations: ${stillBad} still outside 50–70 / option-lock after polish`);
+    console.warn(`⚠️ Prelims explanations: ${stillBad} still outside 50–100 / option-lock after polish`);
   } else {
-    console.log(`✅ Prelims explanations: all ${out.length} are 50–70 words with correct-option match`);
+    console.log(`✅ Prelims explanations: all ${out.length} are 50–100 words with all-option teaching`);
   }
 
   return out.map((q) => pickBilingualQuestionFields(q));
@@ -517,16 +663,17 @@ const ANSWER_OPTION_LOCK = `
 ANSWER↔OPTION LOCK (mandatory — never ship a mismatch):
 1. Decide the correct OPTION TEXT first, then place it under one letter (A|B|C|D).
 2. Set "answer" to THAT letter only. Do not pick a letter first then invent text.
-3. explanation must defend ONLY that letter (start: Option {answer} ("{exact options text}") is correct).
-4. Never say Option X is correct when answer is Y. Never swap option texts after setting answer.
-5. Self-check before emit: options[answer] is the true correct text.`;
+3. explanation MUST open with: Option {answer} ("{exact options text}") is correct.
+4. Then explain WHY correct is right AND WHY each of the other three options is wrong (teaching style).
+5. Target 50–70 words; hard max 100. Never say Option X is correct when answer is Y.
+6. Self-check before emit: options[answer] is the true correct text.`;
 
 const PRELIMS_COMPACT_JSON_RULES = `
 JSON array only. Each object (no extra text):
 - question_en, question_hi (Devanagari, same meaning)
 - options_en, options_hi: { "A","B","C","D" } — letter mapping identical in EN/HI (A_hi translates A_en, never reorder)
 - answer: A|B|C|D — letter of the correct option text
-- explanation: one short English sentence why the correct option is right (max 25 words). Do NOT include explanation_hi.
+- explanation: 50–100 English words teaching explanation — correct reason + why each wrong option fails. Do NOT include explanation_hi.
 ${ANSWER_OPTION_LOCK}`;
 
 const BILINGUAL_JSON_RULES_FULL = `
@@ -545,7 +692,7 @@ function getPrelimsJsonRules() {
 
 function getPracticeJsonRules() {
   if (isPracticeEnglishOnly()) {
-    return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D = letter of correct option text), explanation (max 15 words, defend that same letter only).
+    return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D = letter of correct option text), explanation (50–100 English words: open with Option {answer} is correct; justify why correct AND why EACH of the other three options is wrong — student concept clarity).
 ${ANSWER_OPTION_LOCK}`;
   }
   return getPrelimsJsonRules();
@@ -2623,12 +2770,38 @@ Subject: ${subject}. Topic: "${topic}". Difficulty: ${diffLine}.
 Patterns (balanced, topic-focused): ${patterns}.
 ${getPracticeJsonRules()}
 Per question: questionType (statement|match|assertion|chronology|pair|map|direct|odd_one_out). Use matchColumns or assertionReason only when needed.
-"explanation": one short English sentence for the correct option only (max 15 words) — must match "answer" letter + that option's text.${bilingualNote}
+"explanation": 50–100 English words for student concept clarity — MUST start with Option {answer} ("…") is correct; then why it is right AND why EACH of the other three options is wrong.${bilingualNote}
 Return ONLY a JSON array. No markdown. Unique concept per question.`;
 }
 
 function practiceQuestionHasHindiStem(q) {
-  return /[\u0900-\u097F]/.test(String(q?.question_hi || ""));
+  const hi = String(q?.question_hi || "");
+  if (!/[\u0900-\u097F]/.test(hi)) return false;
+  const en = String(q?.question_en || q?.question || "");
+  const isMatch =
+    Boolean(q?.matchColumns?.columnA?.length >= 2) ||
+    /match\s+the\s+following|list\s*[-–—]?\s*i\b/i.test(en);
+  if (isMatch) {
+    const a = (q.matchColumns_hi?.columnA || []).filter((x) => String(x || "").trim());
+    const b = (q.matchColumns_hi?.columnB || []).filter((x) => String(x || "").trim());
+    if (a.length < 2 || b.length < 2) return false;
+    return [...a, ...b].some((t) => /[\u0900-\u097F]/.test(String(t || "")));
+  }
+  const isAR =
+    Boolean(q?.assertionReason?.assertion) ||
+    (/assertion\s*\(A\)/i.test(en) && /reason\s*\(R\)/i.test(en));
+  if (isAR) {
+    return (
+      /(?:अभिकथन|कथन|assertion)\s*\(A\)/i.test(hi) &&
+      /(?:कारण|reason)\s*\(R\)/i.test(hi)
+    );
+  }
+  const enNums = (en.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+  if (enNums >= 2) {
+    const hiNums = (hi.match(/(?:^|\n)\s*\d+[.)]\s+\S+/g) || []).length;
+    if (hiNums < Math.min(2, enNums)) return false;
+  }
+  return true;
 }
 
 function buildPracticeHindiTranslatePayload(q, idx) {
@@ -2638,19 +2811,39 @@ function buildPracticeHindiTranslatePayload(q, idx) {
   const isMatch =
     Boolean(matchColumns) ||
     /match\s+the\s+following|list\s*[-–—]?\s*i\b|सूची\s*[-–—]?\s*i/i.test(enQ);
-  const numbered = isMatch
+  const isAR =
+    Boolean(q.assertionReason?.assertion && q.assertionReason?.reason) ||
+    (/assertion\s*\(A\)/i.test(enQ) && /reason\s*\(R\)/i.test(enQ));
+  const numbered = isMatch || isAR
     ? []
     : (enQ.match(/(?:^|\n)\s*\d+[.)]\s+.+/g) || []).map((l) =>
         l.replace(/^\s*\d+[.)]\s+/, "").trim()
       );
+
+  let assertionReason = null;
+  if (isAR) {
+    let assertion = String(q.assertionReason?.assertion || "").trim();
+    let reason = String(q.assertionReason?.reason || "").trim();
+    if (!assertion || !reason) {
+      const aM = enQ.match(/Assertion\s*\(A\)\s*:\s*([\s\S]*?)(?=Reason\s*\(R\)|$)/i);
+      const rM = enQ.match(/Reason\s*\(R\)\s*:\s*([\s\S]*?)(?=\n(?:In the context|Which of the)|$)/i);
+      assertion = assertion || String(aM?.[1] || "").trim();
+      reason = reason || String(rM?.[1] || "").trim();
+    }
+    if (assertion && reason) assertionReason = { assertion, reason };
+  }
+
   return {
     id: idx,
     question: matchColumns
       ? enQ.split("\n")[0].trim() || "Match the following:"
-      : enQ,
+      : assertionReason
+        ? `Assertion (A): ${assertionReason.assertion}\nReason (R): ${assertionReason.reason}`
+        : enQ,
     options: q.options_en || q.options,
     explanation: String(q.explanation_en || q.explanation || "").trim().slice(0, 500),
     ...(matchColumns ? { matchColumns } : {}),
+    ...(assertionReason ? { assertionReason } : {}),
     ...(numbered.length >= 2 ? { numberedItems: numbered } : {}),
   };
 }
@@ -2682,6 +2875,28 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
       columnB.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
       lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
       mergedQ.question_hi = lines.join("\n");
+      appliedStem = true;
+    }
+  }
+
+  // Assertion-reason structured Hindi
+  const arHi = row.assertionReason_hi || row.assertionReason;
+  if (
+    !appliedStem &&
+    arHi &&
+    typeof arHi === "object" &&
+    String(arHi.assertion || "").trim() &&
+    String(arHi.reason || "").trim()
+  ) {
+    const a = coerceListItemText(arHi.assertion);
+    const r = coerceListItemText(arHi.reason);
+    if (/[\u0900-\u097F]/.test(a) && /[\u0900-\u097F]/.test(r)) {
+      mergedQ.assertionReason_hi = { assertion: a, reason: r };
+      mergedQ.question_hi = [
+        `अभिकथन (A): ${a}`,
+        `कारण (R): ${r}`,
+        "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?",
+      ].join("\n");
       appliedStem = true;
     }
   }
@@ -2808,6 +3023,7 @@ LETTER LOCK: options_hi.A MUST translate options.A (same for B/C/D). Never swap,
 If matchColumns present: this is a MATCH question (List-I / List-II). You MUST return matchColumns_hi:{columnA:[],columnB:[]} with the SAME lengths as English, each entry a PLAIN STRING. Also set question_hi to full stem with:
 "निम्नलिखित का मिलान कीजिए:" + "सूची-I" + "A. …" lines + "सूची-II" + "1. …" lines + "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
 NEVER turn a match question into statement-based Hindi (no "उपर्युक्त कथनों में से कौन-सा/से सही").
+If English question is Assertion-Reason: question_hi MUST use "अभिकथन (A): …" and "कारण (R): …" (full Devanagari bodies) + Hindi prompt. Never leave Assertion/Reason in English.
 If numberedItems present (and NO matchColumns): return numberedItems_hi as PLAIN STRINGS only, same length. question_hi MUST include intro + "1. ..\\n2. .." lines (never intro-only, never "[object Object]").
 Same count/order. No markdown. Complete Hindi only — never half/truncated lists.`;
   const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
@@ -2930,10 +3146,85 @@ export async function batchTranslatePracticeQuestionsToHindi(apiKey, model, ques
   console.log(`🌐 Hindi translation done: ${withHi}/${merged.length} questions have question_hi`);
   if (withHi < merged.length) {
     console.warn(
-      `⚠️ Hindi still missing for ${merged.length - withHi} question(s) after retries`
+      `⚠️ Hindi still missing for ${merged.length - withHi} question(s) after retries — running structured fill`
     );
+    await fillMissingStructuredHindi(merged);
   }
   return merged.map(ensureEnglishBilingualFields);
+}
+
+/** Last-resort: translate match/AR fields via cheap translateMany when LLM Hindi batch missed them.
+ * Caps work so generation never hangs for minutes.
+ */
+async function fillMissingStructuredHindi(merged) {
+  try {
+    const { translateManyToHindi } = await import("./translateToHindi.js");
+    const missingIdx = [];
+    for (let i = 0; i < merged.length; i += 1) {
+      if (!practiceQuestionHasHindiStem(merged[i])) missingIdx.push(i);
+    }
+    // Cap: at most 10 questions — rest stay English; client UI can fill
+    const todo = missingIdx.slice(0, 10);
+    if (!todo.length) return;
+    console.log(`[hindi-fill] structured fill for ${todo.length}/${missingIdx.length} missing`);
+
+    const started = Date.now();
+    const HARD_MS = 45000;
+
+    for (const i of todo) {
+      if (Date.now() - started > HARD_MS) {
+        console.warn("[hindi-fill] time budget exceeded — stopping early");
+        break;
+      }
+      if (practiceQuestionHasHindiStem(merged[i])) continue;
+      const q = merged[i];
+      const en = String(q.question_en || q.question || "");
+
+      const colA = (q.matchColumns?.columnA || []).map((x) => coerceListItemText(x)).filter(Boolean);
+      const colB = (q.matchColumns?.columnB || []).map((x) => coerceListItemText(x)).filter(Boolean);
+      if (colA.length >= 2 && colB.length >= 2) {
+        const translated = await translateManyToHindi([...colA, ...colB]);
+        const columnA = translated.slice(0, colA.length);
+        const columnB = translated.slice(colA.length);
+        q.matchColumns_hi = { columnA, columnB };
+        q.question_hi = [
+          "निम्नलिखित का मिलान कीजिए:",
+          "सूची-I",
+          ...columnA.map((item, idx) => `${String.fromCharCode(65 + idx)}. ${item}`),
+          "सूची-II",
+          ...columnB.map((item, idx) => `${idx + 1}. ${item}`),
+          "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
+        ].join("\n");
+        continue;
+      }
+
+      let assertion = String(q.assertionReason?.assertion || "").trim();
+      let reason = String(q.assertionReason?.reason || "").trim();
+      if (!assertion || !reason) {
+        const aM = en.match(/Assertion\s*\(A\)\s*:\s*([\s\S]*?)(?=Reason\s*\(R\)|$)/i);
+        const rM = en.match(/Reason\s*\(R\)\s*:\s*([\s\S]*?)(?=\n(?:In the context|Which of the)|$)/i);
+        assertion = assertion || String(aM?.[1] || "").trim();
+        reason = reason || String(rM?.[1] || "").trim();
+      }
+      if (assertion && reason) {
+        const [aHi, rHi] = await translateManyToHindi([assertion, reason]);
+        q.assertionReason_hi = { assertion: aHi, reason: rHi };
+        q.question_hi = [
+          `अभिकथन (A): ${aHi}`,
+          `कारण (R): ${rHi}`,
+          "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?",
+        ].join("\n");
+        continue;
+      }
+
+      if (en.length >= 20) {
+        const [hi] = await translateManyToHindi([en.slice(0, 800)]);
+        if (/[\u0900-\u097F]/.test(hi)) q.question_hi = hi;
+      }
+    }
+  } catch (err) {
+    console.warn("fillMissingStructuredHindi failed:", err?.message || err);
+  }
 }
 
 async function generateTopicPracticeBatch(
@@ -3076,7 +3367,7 @@ export const generateAssignedPracticeQuestions = async ({
       throw new Error("No valid UPSC questions generated. Please try again.");
     }
 
-    const minAcceptable = Math.max(displayCount - 5, Math.floor(displayCount * 0.9));
+    const minAcceptable = displayCount;
     if (finalQuestions.length < minAcceptable) {
       throw new Error(
         `Only ${finalQuestions.length} of ${displayCount} questions were generated. Please try again.`
@@ -3156,6 +3447,8 @@ export const generateTestQuestions = async ({
   currentAffairsPeriod,
   batchSize: batchSizeParam,
   minAcceptable,
+  /** When true: Admin KB / RAG only — no open-syllabus LLM (Module Targets). */
+  kbOnly = false,
 }) => {
   try {
     if (isPrelimsRagEnabled(examType)) {
@@ -3166,6 +3459,7 @@ export const generateTestQuestions = async ({
         difficulty,
         batchSize: batchSizeParam,
         minAcceptable,
+        kbOnly,
       });
     }
 

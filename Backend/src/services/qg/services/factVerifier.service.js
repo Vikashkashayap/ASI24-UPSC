@@ -7,16 +7,24 @@ import {
   buildFactCheckSystemPrompt,
   buildFactCheckUserPrompt,
 } from "../prompts/factCheck.prompt.js";
+import { QG_CONFIG } from "../config/qg.config.js";
+import { trimContextForLlm } from "../utils/contextTrim.js";
 
 /**
  * @param {{ question: object, explanation: object|string, contextText: string }} params
  */
 export async function factCheckStage({ question, explanation, contextText } = {}) {
+  const slimContext = trimContextForLlm(contextText, {
+    question,
+    maxChars: QG_CONFIG.context.factCheckMaxChars,
+    preferSourceSpan: true,
+  });
+
   const llm = await callStageLlm({
     stage: "factCheck",
     systemPrompt: buildFactCheckSystemPrompt(),
-    userPrompt: buildFactCheckUserPrompt({ question, explanation, context: contextText }),
-    maxTokens: 1200,
+    userPrompt: buildFactCheckUserPrompt({ question, explanation, context: slimContext }),
+    maxTokens: 800,
   });
 
   const parsed = llm.parsed || {};

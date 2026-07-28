@@ -509,7 +509,9 @@ export function resolveMatchColumns(
       );
       const aOk = columnA.filter(Boolean).length;
       const bOk = columnB.filter(Boolean).length;
-      if (aOk >= 2 && bOk >= 2) {
+      const hasHi = [...columnA, ...columnB].some((t) => /[\u0900-\u097F]/.test(t));
+      // Only accept Hindi structured lists when they actually contain Devanagari
+      if (aOk >= 2 && bOk >= 2 && aOk === bOk && !columnA.some((t, i) => !t || !columnB[i]) && hasHi) {
         return {
           intro: "निम्नलिखित का मिलान कीजिए:",
           columnA,
@@ -525,41 +527,20 @@ export function resolveMatchColumns(
     const hiLooksLikeWrongStatement =
       /उपर्युक्त कथनों|कौन-सा\/से सही|which of the (following )?statements/i.test(hiText) &&
       !hiLooksLikeMatch;
-    if (hiText && !hiLooksLikeWrongStatement) {
+    if (hiText && !hiLooksLikeWrongStatement && /[\u0900-\u097F]/.test(hiText)) {
       const parsed = parseMatchFollowingFromText(hiText) || parseMatchParagraph(hiText);
-      if (parsed && parsed.columnA.filter(Boolean).length >= 2 && parsed.columnB.filter(Boolean).length >= 2) {
+      if (
+        parsed &&
+        parsed.columnA.filter(Boolean).length >= 2 &&
+        parsed.columnB.filter(Boolean).length >= 2 &&
+        parsed.columnA.filter(Boolean).length === parsed.columnB.filter(Boolean).length &&
+        // Require Devanagari in list bodies — don't show English under हिंदी label
+        [...parsed.columnA, ...parsed.columnB].some((t) => /[\u0900-\u097F]/.test(String(t || "")))
+      ) {
         return parsed;
       }
     }
-    // Fall back to English structured lists / parsed EN stem with Hindi labels
-    if (question.matchColumns?.columnA?.length) {
-      const { columnA, columnB } = normalizeCols(
-        question.matchColumns.columnA || [],
-        question.matchColumns.columnB || []
-      );
-      if (columnA.filter(Boolean).length >= 2 && columnB.filter(Boolean).length >= 2) {
-        return {
-          intro: "निम्नलिखित का मिलान कीजिए:",
-          columnA,
-          columnB,
-          prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
-        };
-      }
-    }
-    const enText = String(question.question_en || question.question || "").trim();
-    const enParsed = parseMatchFollowingFromText(enText) || parseMatchParagraph(enText);
-    if (
-      enParsed &&
-      enParsed.columnA.filter(Boolean).length >= 2 &&
-      enParsed.columnB.filter(Boolean).length >= 2
-    ) {
-      return {
-        intro: "निम्नलिखित का मिलान कीजिए:",
-        columnA: enParsed.columnA,
-        columnB: enParsed.columnB,
-        prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
-      };
-    }
+    // Do NOT fall back to English columns under Hindi label (causes EN text in हिंदी panel)
     return null;
   }
 
@@ -568,7 +549,15 @@ export function resolveMatchColumns(
       question.matchColumns.columnA || [],
       question.matchColumns.columnB || []
     );
-    if (columnA.filter(Boolean).length >= 2 && columnB.filter(Boolean).length >= 2) {
+    const aOk = columnA.filter(Boolean).length;
+    const bOk = columnB.filter(Boolean).length;
+    // Require complete paired lists — never pad with Missing item
+    if (
+      aOk >= 3 &&
+      bOk >= 3 &&
+      aOk === bOk &&
+      !columnA.some((t, i) => !t || !columnB[i])
+    ) {
       return {
         intro: "Match the following:",
         columnA,
@@ -578,7 +567,16 @@ export function resolveMatchColumns(
     }
   }
   const text = String(question.question_en || question.question || "").trim();
-  return parseMatchFollowingFromText(text);
+  const parsed = parseMatchFollowingFromText(text);
+  if (
+    parsed &&
+    parsed.columnA.filter(Boolean).length >= 3 &&
+    parsed.columnB.filter(Boolean).length >= 3 &&
+    parsed.columnA.filter(Boolean).length === parsed.columnB.filter(Boolean).length
+  ) {
+    return parsed;
+  }
+  return null;
 }
 
 /** Flatten match columns into translatable plain text (for Hindi batch translation). */
@@ -604,12 +602,12 @@ export function buildAssertionReasonStem(ar: {
   prompt?: string;
 }): string {
   const isHi = /[\u0900-\u097F]/.test(`${ar.assertion}${ar.reason}`);
-  const aLabel = isHi ? "कथन (A)" : "Assertion (A)";
+  const aLabel = isHi ? "अभिकथन (A)" : "Assertion (A)";
   const rLabel = isHi ? "कारण (R)" : "Reason (R)";
   const prompt =
     ar.prompt ||
     (isHi
-      ? "उपर्युक्त कथन (अ) और कारण (र) के संबंध में निम्नलिखित में से कौन-सा सही है?"
+      ? "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?"
       : "In the context of the above, which of the following is correct?");
   return `${aLabel}: ${ar.assertion}\n${rLabel}: ${ar.reason}\n${prompt}`;
 }

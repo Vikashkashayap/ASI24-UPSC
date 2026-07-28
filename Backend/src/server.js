@@ -31,6 +31,15 @@ import ragRoutes from "./rag/routes/ragRoutes.js";
 import { uploadPdf as ragUploadPdf } from "./rag/controllers/ragController.js";
 import { ragPdfUpload } from "./rag/middleware/uploadPdf.js";
 import { requireAdmin } from "./middleware/adminMiddleware.js";
+import knowledgeRoutes from "./knowledge/routes/knowledge.routes.js";
+import { ensureKnowledgeTaxonomySeeded } from "./knowledge/seed/seedTaxonomy.js";
+import processingRoutes from "./processing/routes/processing.routes.js";
+import { startProcessingEngine } from "./processing/index.js";
+import intelligenceRoutes from "./intelligence/routes/intelligence.routes.js";
+import searchAliasRoutes from "./intelligence/routes/search.routes.js";
+import { startIntelligenceEngine } from "./intelligence/index.js";
+import qiRoutes from "./questionIntelligence/routes/qi.routes.js";
+import testBuilderRoutes from "./testBuilder/routes/testBuilder.routes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
@@ -73,6 +82,11 @@ app.use(express.json());
 
 connectDB();
 
+// Seed Knowledge Base subjects/categories (non-fatal)
+ensureKnowledgeTaxonomySeeded().catch((err) => {
+  console.warn("[knowledge] taxonomy seed failed:", err?.message || err);
+});
+
 // Proactively create collection (non-fatal if it fails)
 if (qdrantService.isConfigured()) {
   const autoCreate =
@@ -106,7 +120,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-/** Full system health — MongoDB, Qdrant, Jina embeddings, OpenRouter LLM */
+/** Full system health — MongoDB, Qdrant, embeddings, OpenRouter LLM */
 app.get("/health", async (_req, res) => {
   try {
     const health = await getSystemHealth();
@@ -120,7 +134,7 @@ app.get("/health", async (_req, res) => {
       mongodb: "disconnected",
       qdrant: "disconnected",
       embedding: "disconnected",
-      embeddingProvider: "Jina AI",
+      embeddingProvider: "OpenAI",
       llm: "disconnected",
       error: err?.message || "Health check failed",
     });
@@ -164,6 +178,23 @@ app.use("/api/syllabus-targets", syllabusTargetRoutes);
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin", adminRoutes);
 
+// Enterprise Knowledge Base (upload + taxonomy)
+app.use("/api/knowledge", knowledgeRoutes);
+
+// AI Knowledge Processing Engine (queues + workers)
+app.use("/api/processing", processingRoutes);
+
+// AI Knowledge Intelligence (embeddings + hybrid search)
+app.use("/api/intelligence", intelligenceRoutes);
+// Spec alias paths: POST /api/search, /api/search/topic, …
+app.use("/api/search", searchAliasRoutes);
+
+// Question Intelligence Engine (select bank + generate only if required)
+app.use("/api/question-intelligence", qiRoutes);
+
+// Test Builder — QI sessions → assignable practice tests (student Prelims Test)
+app.use("/api/test-builder", testBuilderRoutes);
+
 // Shared Knowledge Base RAG (search + generate + admin manage)
 app.use("/api/rag", ragRoutes);
 // Prompt alias: POST /api/admin/upload-pdf → same pipeline as Knowledge Base PDF ingest
@@ -188,6 +219,15 @@ setInterval(() => {
 
 // Start current affairs daily pipeline (6 AM Asia/Kolkata)
 startCurrentAffairsCron();
+
+// Start AI Knowledge Processing Engine (BullMQ or inline fallback)
+startProcessingEngine().catch((err) => {
+  console.error("[processing] engine failed to start:", err?.message || err);
+});
+
+startIntelligenceEngine().catch((err) => {
+  console.error("[intelligence] engine failed to start:", err?.message || err);
+});
 
 /* -------------------- SERVER -------------------- */
 

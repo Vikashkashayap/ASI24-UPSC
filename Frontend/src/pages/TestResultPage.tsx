@@ -19,6 +19,7 @@ import {
 import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
 import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
+import { useClientSideHindiQuestions } from "../hooks/useClientSideHindiQuestions";
 import { testAPI } from "../services/api";
 
 interface QuestionResult {
@@ -154,6 +155,11 @@ const TestResultPage: React.FC = () => {
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [result, setResult] = useState<TestResult | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { questions: displayQuestions, translating: translatingHi } = useClientSideHindiQuestions(
+    (result?.questions || []) as QuestionResult[],
+    examLang,
+    currentIndex
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -246,7 +252,7 @@ const TestResultPage: React.FC = () => {
 
   if (!result) return null;
 
-  const currentQuestion = result.questions[currentIndex];
+  const currentQuestion = displayQuestions[currentIndex] || result.questions[currentIndex];
   const optionKeys = getQuestionOptionKeys(currentQuestion);
   const totalMarks = result.totalMarks ?? result.totalQuestions * 2;
   const paletteColsDesktop = examPaletteCols(result.totalQuestions, false);
@@ -282,6 +288,9 @@ const TestResultPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
+            {translatingHi ? (
+              <span className="text-[9px] text-slate-400 hidden sm:inline">हिंदी…</span>
+            ) : null}
             <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 text-blue-700 font-semibold text-[10px] sm:text-xs">
               <Award className="w-3.5 h-3.5 shrink-0" />
               {result.score.toFixed(2)}/{totalMarks}

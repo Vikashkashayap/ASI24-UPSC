@@ -16,8 +16,10 @@ interface Props {
   compact?: boolean;
 }
 
-function partLabel(role: "A" | "R", _theme: Theme): string {
-  return role === "A" ? "Assertion (A)" : "Reason (R)";
+function partLabel(role: "A" | "R", textHint = ""): string {
+  const hi = /[\u0900-\u097F]/.test(textHint);
+  if (role === "A") return hi ? "अभिकथन (A)" : "Assertion (A)";
+  return hi ? "कारण (R)" : "Reason (R)";
 }
 
 function renderParts(parts: UpscStemPart[], theme: Theme, className: string, compact = false) {
@@ -45,7 +47,13 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string, com
           );
         }
         if (part.type === "statement") {
-          const stmtText = String(part.text || "").trim();
+          // Strip duplicate leading "3." when body already starts with the same number
+          let stmtText = String(part.text || "").trim();
+          if (isBlankUpscItemText(stmtText)) return null;
+          stmtText = stmtText
+            .replace(new RegExp(`^${part.number}[.)]\\s*`, "i"), "")
+            .replace(/^\d+[.)]\s+/, "")
+            .trim();
           if (isBlankUpscItemText(stmtText)) return null;
           return (
             <div key={`stmt-${part.number}-${index}`} className="flex gap-2 sm:gap-3 pl-0 sm:pl-1">
@@ -74,7 +82,7 @@ function renderParts(parts: UpscStemPart[], theme: Theme, className: string, com
                   theme === "dark" ? "text-blue-400" : "text-blue-700"
                 }`}
               >
-                {partLabel(part.role, theme)}
+                {partLabel(part.role, part.text)}
               </div>
               <p className={stmtClass}>{part.text}</p>
             </div>

@@ -482,9 +482,66 @@ export const notesAPI = {
     api.post("/api/admin/notes/sync-chapter", data),
   syncBySlug: (data: { slug: string; subject: string; title?: string }) =>
     api.post("/api/admin/notes/sync-by-slug", data),
+  /** Sync + embed notes.mentorsdaily.com catalog (background job). */
+  syncAllWebsite: (data?: {
+    subjects?: string[];
+    /** Re-fetch + re-chunk updated notes (do not skip already-synced chapters). */
+    force?: boolean;
+    chunking?: { minWords?: number; maxWords?: number; overlapWords?: number };
+  }) => api.post("/api/admin/notes/sync-all-website", data || {}, { timeout: 60000 }),
+  syncAllWebsiteStatus: () =>
+    api.get<{
+      success: boolean;
+      data: {
+        running: boolean;
+        startedAt?: string | null;
+        finishedAt?: string | null;
+        total: number;
+        done: number;
+        failed: number;
+        skipped?: number;
+        current?: { subject?: string; title?: string; url?: string } | null;
+        error?: string | null;
+        baseUrl?: string;
+        force?: boolean;
+        subjects?: string[];
+        chunking?: { minWords?: number; maxWords?: number; overlapWords?: number } | null;
+        topicsDone?: number;
+        topicsTotal?: number;
+        currentTopic?: {
+          subject?: string;
+          chapter?: string;
+          title?: string;
+          index?: number;
+          total?: number;
+        } | null;
+        results?: Array<Record<string, unknown>>;
+      };
+    }>("/api/admin/notes/sync-all-website/status"),
+  getCatalog: () =>
+    api.get<{
+      success: boolean;
+      data: Array<{
+        gsPaper?: string;
+        subject: string;
+        topicCount?: number;
+        chapterCount?: number;
+        chapters: Array<{
+          title: string;
+          slug?: string;
+          url?: string;
+          expectedTopicCount?: number;
+          topicCount?: number;
+          status?: string;
+          synced?: boolean;
+        }>;
+      }>;
+    }>("/api/admin/notes/catalog"),
+  /** Promote synced website chapters into Knowledge Base documents. */
+  promoteWebsiteToKb: () =>
+    api.post("/api/admin/notes/promote-to-kb", {}, { timeout: 600000 }),
   repairChapter: (chapterId: string) =>
     api.post(`/api/admin/notes/repair-chapter/${chapterId}`),
-  getCatalog: () => api.get("/api/admin/notes/catalog"),
   syncTopic: (topicId: string, url?: string) =>
     api.post(`/api/admin/notes/sync-topic/${topicId}`, url ? { url } : {}),
   /** Upload one or many PDFs into subject knowledge (RAG searchable with website notes). */

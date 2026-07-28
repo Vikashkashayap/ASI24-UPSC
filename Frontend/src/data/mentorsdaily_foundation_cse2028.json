@@ -3,7 +3,7 @@
     "title": "MentorsDaily Foundation Plan — Full Syllabus (CSE 2028 · 4h Tier)",
     "source": "mentorsdaily-full-syllabus-cse2028.html",
     "subjects": 18,
-    "modules": 131
+    "modules": 95
   },
   "subjects": [
     {
@@ -12,22 +12,22 @@
       "primary_source": "Indian Polity — M. Laxmikanth, 7th edition (80 chapters)",
       "source_note": "Chapter numbering follows 7th edition print copy — Notes team to verify against the edition in MD repository before portal load.",
       "chips": [
-        "16 modules",
+        "20 modules",
         "2.5 months",
-        "16 × 50 Q module tests",
+        "20 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "P1",
           "module_name": "Constitutional Foundations",
-          "chapter_range": "Ch 1–5",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Constituent Assembly + features = fixed prelims zone.",
+          "focus": "Constituent Assembly, features & Preamble — fixed prelims zone.",
           "chapters": [
             {
               "chapter": "1",
@@ -44,29 +44,29 @@
             {
               "chapter": "4",
               "name": "Preamble of the Constitution"
-            },
-            {
-              "chapter": "5",
-              "name": "Union and its Territory"
             }
           ],
           "chips": [
-            "Ch 1–5",
-            "~10 h · 4 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "P2",
-          "module_name": "Citizenship to Amendment",
-          "chapter_range": "Ch 6–10",
-          "estimated_hours": 12,
-          "estimated_days": 5,
-          "duration_label": "~12 h · 5 days",
+          "module_name": "Territory, Rights & Directive Principles",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "FR vs DPSP comparison chart mandatory. Article-number drilling.",
+          "focus": "FR vs DPSP comparison chart mandatory; article-number drilling.",
           "chapters": [
+            {
+              "chapter": "5",
+              "name": "Union and its Territory"
+            },
             {
               "chapter": "6",
               "name": "Citizenship"
@@ -78,7 +78,25 @@
             {
               "chapter": "8",
               "name": "Directive Principles of State Policy"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 5–8",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P3",
+          "module_name": "Duties, Amendments & Parliamentary System",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Basic structure doctrine — landmark cases timeline.",
+          "chapters": [
             {
               "chapter": "9",
               "name": "Fundamental Duties"
@@ -86,25 +104,7 @@
             {
               "chapter": "10",
               "name": "Amendment of the Constitution"
-            }
-          ],
-          "chips": [
-            "Ch 6–10",
-            "~12 h · 5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "P3",
-          "module_name": "Structure of the Polity",
-          "chapter_range": "Ch 11–15",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Landmark cases timeline for basic structure.",
-          "chapters": [
+            },
             {
               "chapter": "11",
               "name": "Basic Structure of the Constitution"
@@ -112,7 +112,25 @@
             {
               "chapter": "12",
               "name": "Parliamentary System"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 9–12",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P4",
+          "module_name": "Federalism & Emergency Provisions",
+          "chapter_range": "Ch 13–16",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Centre–State relations + emergency articles are high-yield.",
+          "chapters": [
             {
               "chapter": "13",
               "name": "Federal System"
@@ -124,29 +142,29 @@
             {
               "chapter": "15",
               "name": "Inter-State Relations"
+            },
+            {
+              "chapter": "16",
+              "name": "Emergency Provisions"
             }
           ],
           "chips": [
-            "Ch 11–15",
-            "~10 h · 4 days",
+            "Ch 13–16",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P4",
-          "module_name": "Emergency & Union Executive I",
-          "chapter_range": "Ch 16–20",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
+          "module_code": "P5",
+          "module_name": "Union Executive",
+          "chapter_range": "Ch 17–20",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Presidential powers — veto, ordinance, pardon — statement questions recur.",
+          "focus": "President's powers & ordinance route — recurring prelims.",
           "chapters": [
-            {
-              "chapter": "16",
-              "name": "Emergency Provisions"
-            },
             {
               "chapter": "17",
               "name": "President"
@@ -165,21 +183,21 @@
             }
           ],
           "chips": [
-            "Ch 16–20",
-            "~10 h · 4 days",
+            "Ch 17–20",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P5",
-          "module_name": "Parliament",
-          "chapter_range": "Ch 21–25",
-          "estimated_hours": 11,
-          "estimated_days": 4,
-          "duration_label": "~11 h · 4 days",
+          "module_code": "P6",
+          "module_name": "Parliament & Its Machinery",
+          "chapter_range": "Ch 21–24",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Ch 22 is the longest chapter in the book — split across 2 days.",
+          "focus": "Committees and motions — map procedure to articles.",
           "chapters": [
             {
               "chapter": "21",
@@ -196,29 +214,29 @@
             {
               "chapter": "24",
               "name": "Parliamentary Forums"
-            },
-            {
-              "chapter": "25",
-              "name": "Parliamentary Group"
             }
           ],
           "chips": [
-            "Ch 21–25",
-            "~11 h · 4 days",
+            "Ch 21–24",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P6",
-          "module_name": "Union Judiciary & Governor",
-          "chapter_range": "Ch 26–30",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
+          "module_code": "P7",
+          "module_name": "Judiciary — Structure & Powers",
+          "chapter_range": "Ch 25–28",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Governor's discretionary powers — mains + prelims both.",
+          "focus": "Judicial review, activism, PIL — GS-II mains linkage.",
           "chapters": [
+            {
+              "chapter": "25",
+              "name": "Parliamentary Group"
+            },
             {
               "chapter": "26",
               "name": "Supreme Court"
@@ -230,7 +248,25 @@
             {
               "chapter": "28",
               "name": "Judicial Activism"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 25–28",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P8",
+          "module_name": "Governor & State Executive",
+          "chapter_range": "Ch 29–32",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Governor's discretion — current-affairs heavy.",
+          "chapters": [
             {
               "chapter": "29",
               "name": "Public Interest Litigation"
@@ -238,25 +274,7 @@
             {
               "chapter": "30",
               "name": "Governor"
-            }
-          ],
-          "chips": [
-            "Ch 26–30",
-            "~10 h · 4 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "P7",
-          "module_name": "State Government",
-          "chapter_range": "Ch 31–35",
-          "estimated_hours": 9,
-          "estimated_days": 4,
-          "duration_label": "~9 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Compare Union vs State provisions side by side.",
-          "chapters": [
+            },
             {
               "chapter": "31",
               "name": "Chief Minister"
@@ -264,7 +282,25 @@
             {
               "chapter": "32",
               "name": "State Council of Ministers"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 29–32",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P9",
+          "module_name": "State Legislature, Courts & J&K",
+          "chapter_range": "Ch 33–36",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Art 370 developments — update from news layer.",
+          "chapters": [
             {
               "chapter": "33",
               "name": "State Legislature"
@@ -276,29 +312,29 @@
             {
               "chapter": "35",
               "name": "Subordinate Courts"
+            },
+            {
+              "chapter": "36",
+              "name": "Jammu & Kashmir (incl. Art 370 developments)"
             }
           ],
           "chips": [
-            "Ch 31–35",
-            "~9 h · 4 days",
+            "Ch 33–36",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P8",
+          "module_code": "P10",
           "module_name": "Special Provisions & Local Government",
-          "chapter_range": "Ch 36–40",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
+          "chapter_range": "Ch 37–40",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "73rd/74th Amendment details — high-frequency PYQ area.",
+          "focus": "73rd/74th Amendments — flowchart of tiers.",
           "chapters": [
-            {
-              "chapter": "36",
-              "name": "Jammu & Kashmir (incl. Art 370 developments)"
-            },
             {
               "chapter": "37",
               "name": "Special Provisions for Some States"
@@ -317,21 +353,21 @@
             }
           ],
           "chips": [
-            "Ch 36–40",
-            "~10 h · 4 days",
+            "Ch 37–40",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P9",
-          "module_name": "Constitutional Bodies I",
-          "chapter_range": "Ch 41–45",
+          "module_code": "P11",
+          "module_name": "Scheduled Areas & Electoral/Service Bodies",
+          "chapter_range": "Ch 41–44",
           "estimated_hours": 9,
-          "estimated_days": 4,
-          "duration_label": "~9 h · 4 days",
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Composition–appointment–removal table for every body.",
+          "focus": "ECI, UPSC, SPSC — composition & removal grids.",
           "chapters": [
             {
               "chapter": "41",
@@ -348,29 +384,29 @@
             {
               "chapter": "44",
               "name": "State PSC"
-            },
-            {
-              "chapter": "45",
-              "name": "Finance Commission"
             }
           ],
           "chips": [
-            "Ch 41–45",
-            "~9 h · 4 days",
+            "Ch 41–44",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P10",
-          "module_name": "Constitutional Bodies II",
-          "chapter_range": "Ch 46–50",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "P12",
+          "module_name": "Finance, GST & Welfare Commissions",
+          "chapter_range": "Ch 45–48",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Constitutional vs statutory status — classic trap zone.",
+          "focus": "Finance Commission + GST Council — fiscal federalism hook.",
           "chapters": [
+            {
+              "chapter": "45",
+              "name": "Finance Commission"
+            },
             {
               "chapter": "46",
               "name": "GST Council"
@@ -382,7 +418,25 @@
             {
               "chapter": "48",
               "name": "National Commission for STs"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 45–48",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P13",
+          "module_name": "Backward-Class Bodies & Audit Institutions",
+          "chapter_range": "Ch 49–52",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "CAG & AG — constitutional status vs functions.",
+          "chapters": [
             {
               "chapter": "49",
               "name": "National Commission for BCs"
@@ -390,25 +444,7 @@
             {
               "chapter": "50",
               "name": "Special Officer for Linguistic Minorities"
-            }
-          ],
-          "chips": [
-            "Ch 46–50",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "P11",
-          "module_name": "Law Officers & Non-Constitutional Bodies I",
-          "chapter_range": "Ch 51–55",
-          "estimated_hours": 9,
-          "estimated_days": 4,
-          "duration_label": "~9 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "CAG audit powers link to Governance block.",
-          "chapters": [
+            },
             {
               "chapter": "51",
               "name": "CAG"
@@ -416,7 +452,25 @@
             {
               "chapter": "52",
               "name": "Attorney General of India"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 49–52",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P14",
+          "module_name": "Advisory & Rights Institutions",
+          "chapter_range": "Ch 53–56",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "NITI Aayog vs erstwhile Planning Commission.",
+          "chapters": [
             {
               "chapter": "53",
               "name": "Advocate General of the State"
@@ -428,29 +482,29 @@
             {
               "chapter": "55",
               "name": "NHRC"
+            },
+            {
+              "chapter": "56",
+              "name": "SHRC"
             }
           ],
           "chips": [
-            "Ch 51–55",
-            "~9 h · 4 days",
+            "Ch 53–56",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P12",
-          "module_name": "Non-Constitutional Bodies II",
-          "chapter_range": "Ch 56–60",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "P15",
+          "module_name": "Information & Anti-Corruption Bodies I",
+          "chapter_range": "Ch 57–60",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "RTI–CIC link; CVC–CBI–Lokpal accountability chain.",
+          "focus": "CIC/SIC/CVC/CBI — statutory vs non-statutory sort.",
           "chapters": [
-            {
-              "chapter": "56",
-              "name": "SHRC"
-            },
             {
               "chapter": "57",
               "name": "Central Information Commission"
@@ -469,21 +523,21 @@
             }
           ],
           "chips": [
-            "Ch 56–60",
-            "~8 h · 3 days",
+            "Ch 57–60",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P13",
-          "module_name": "Accountability Institutions & Misc Provisions",
-          "chapter_range": "Ch 61–65",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "P16",
+          "module_name": "Anti-Corruption & Disaster Bodies II",
+          "chapter_range": "Ch 61–64",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "NDMA links forward to Disaster Management module.",
+          "focus": "Lokpal, NIA, NDMA — parent-act mapping.",
           "chapters": [
             {
               "chapter": "61",
@@ -500,29 +554,29 @@
             {
               "chapter": "64",
               "name": "Co-operative Societies"
-            },
-            {
-              "chapter": "65",
-              "name": "Official Language"
             }
           ],
           "chips": [
-            "Ch 61–65",
-            "~8 h · 3 days",
+            "Ch 61–64",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P14",
-          "module_name": "Services, Tribunals & Classes",
-          "chapter_range": "Ch 66–70",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "P17",
+          "module_name": "Language, Services & State Liabilities",
+          "chapter_range": "Ch 65–68",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Tribunals (Art 323A/B) frequently tested.",
+          "focus": "Often-skipped Laxmikanth tail — direct prelims picks.",
           "chapters": [
+            {
+              "chapter": "65",
+              "name": "Official Language"
+            },
             {
               "chapter": "66",
               "name": "Public Services"
@@ -534,7 +588,25 @@
             {
               "chapter": "68",
               "name": "Special Provisions Relating to Certain Classes"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 65–68",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P18",
+          "module_name": "Political Parties & Elections",
+          "chapter_range": "Ch 69–72",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Party system + election machinery.",
+          "chapters": [
             {
               "chapter": "69",
               "name": "Political Parties"
@@ -542,25 +614,7 @@
             {
               "chapter": "70",
               "name": "Role of Regional Parties"
-            }
-          ],
-          "chips": [
-            "Ch 66–70",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "P15",
-          "module_name": "Elections & Political Dynamics",
-          "chapter_range": "Ch 71–75",
-          "estimated_hours": 9,
-          "estimated_days": 4,
-          "duration_label": "~9 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Electoral reforms = evergreen mains topic.",
-          "chapters": [
+            },
             {
               "chapter": "71",
               "name": "Elections"
@@ -568,7 +622,25 @@
             {
               "chapter": "72",
               "name": "Election Laws"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 69–72",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "P19",
+          "module_name": "Electoral Reforms & Government Formation",
+          "chapter_range": "Ch 73–76",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Anti-defection & coalition dynamics — mains oriented.",
+          "chapters": [
             {
               "chapter": "73",
               "name": "Electoral Reforms"
@@ -580,29 +652,29 @@
             {
               "chapter": "75",
               "name": "Coalition Government"
+            },
+            {
+              "chapter": "76",
+              "name": "Anti-Defection Law"
             }
           ],
           "chips": [
-            "Ch 71–75",
-            "~9 h · 4 days",
+            "Ch 73–76",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "P16",
-          "module_name": "Working of the Polity",
-          "chapter_range": "Ch 76–80",
+          "module_code": "P20",
+          "module_name": "Pressure Groups, Integration & Foreign Policy",
+          "chapter_range": "Ch 77–80",
           "estimated_hours": 9,
-          "estimated_days": 4,
-          "duration_label": "~9 h · 4 days",
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Close with complete article-number revision sheet.",
+          "focus": "Closes with appendices + full-book PYQ sweep.",
           "chapters": [
-            {
-              "chapter": "76",
-              "name": "Anti-Defection Law"
-            },
             {
               "chapter": "77",
               "name": "Pressure Groups"
@@ -621,8 +693,8 @@
             }
           ],
           "chips": [
-            "Ch 76–80",
-            "~9 h · 4 days",
+            "Ch 77–80",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -634,23 +706,22 @@
       "primary_source": "Ancient India — R.S. Sharma, Old NCERT Class XI (27 chapters, 184 pages) — verified from PDF",
       "source_note": null,
       "chips": [
-        "7 modules",
+        "6 modules",
         "4 weeks",
-        "7 × 50 Q module tests",
-        "1 × 100 Q FLT",
-        "✔ verified from source PDF"
+        "6 × 50 Q module tests",
+        "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "A1",
-          "module_name": "Foundations & Prehistory",
-          "chapter_range": "Ch 1–5 · 32 pp",
-          "estimated_hours": 10.5,
-          "estimated_days": 4,
-          "duration_label": "~10.5 h · 4 days",
+          "module_name": "Sources, Geography & the Stone Age",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Sources table; site–culture matching is a prelims staple.",
+          "focus": "Source typology — archaeological vs literary.",
           "chapters": [
             {
               "chapter": "1",
@@ -667,29 +738,29 @@
             {
               "chapter": "4",
               "name": "The Stone Age"
-            },
-            {
-              "chapter": "5",
-              "name": "The Stone-Copper (Chalcolithic) Phase"
             }
           ],
           "chips": [
-            "Ch 1–5 · 32 pp",
-            "~10.5 h · 4 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "A2",
-          "module_name": "Harappa & the Vedic Age",
-          "chapter_range": "Ch 6–8 · 27 pp",
+          "module_name": "Chalcolithic to the Later Vedic Age",
+          "chapter_range": "Ch 5–8",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Harappan site–feature table; Rig Vedic vs Later Vedic chart.",
+          "focus": "Harappa town-planning + Vedic transition to state.",
           "chapters": [
+            {
+              "chapter": "5",
+              "name": "The Stone-Copper (Chalcolithic) Phase"
+            },
             {
               "chapter": "6",
               "name": "The Harappan Civilization"
@@ -704,21 +775,21 @@
             }
           ],
           "chips": [
-            "Ch 6–8 · 27 pp",
+            "Ch 5–8",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "A3",
-          "module_name": "Religious Revolution & Rise of Magadha",
-          "chapter_range": "Ch 9–12 · 26 pp",
-          "estimated_hours": 8.5,
+          "module_name": "Religious Movements & Early States",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
           "estimated_days": 3.5,
-          "duration_label": "~8.5 h · 3.5 days",
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Doctrine comparison; councils; mahajanapada–capital pairs.",
+          "focus": "Jainism/Buddhism + Mahajanapadas — high yield.",
           "chapters": [
             {
               "chapter": "9",
@@ -738,21 +809,21 @@
             }
           ],
           "chips": [
-            "Ch 9–12 · 26 pp",
-            "~8.5 h · 3.5 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "A4",
-          "module_name": "The Mauryas & Central Asian Contacts",
-          "chapter_range": "Ch 13–15 · 28 pp",
+          "module_name": "Mauryas & the Post-Maurya Age",
+          "chapter_range": "Ch 13–16",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Asokan edicts; what each Central Asian dynasty introduced.",
+          "focus": "Ashokan edicts + Central Asian contacts.",
           "chapters": [
             {
               "chapter": "13",
@@ -765,29 +836,29 @@
             {
               "chapter": "15",
               "name": "Central Asian Contacts and Their Results"
+            },
+            {
+              "chapter": "16",
+              "name": "The Age of the Satavahanas"
             }
           ],
           "chips": [
-            "Ch 13–15 · 28 pp",
+            "Ch 13–16",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "A5",
-          "module_name": "Deccan & the Deep South",
-          "chapter_range": "Ch 16–18 · 20 pp",
-          "estimated_hours": 6.5,
-          "estimated_days": 2.5,
-          "duration_label": "~6.5 h · 2.5 days",
+          "module_name": "Deep South, Trade & Rise of the Guptas",
+          "chapter_range": "Ch 17–20",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Sangam terms; Indo-Roman trade ports.",
+          "focus": "Sangam age + Gupta polity and economy.",
           "chapters": [
-            {
-              "chapter": "16",
-              "name": "The Age of the Satavahanas"
-            },
             {
               "chapter": "17",
               "name": "The Dawn of History in the Deep South"
@@ -795,25 +866,7 @@
             {
               "chapter": "18",
               "name": "Crafts, Trade and Towns in the Post-Maurya Age"
-            }
-          ],
-          "chips": [
-            "Ch 16–18 · 20 pp",
-            "~6.5 h · 2.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "A6",
-          "module_name": "The Gupta Age & Harsha",
-          "chapter_range": "Ch 19–22 · 22 pp",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Gupta science & literature table; land grants begin here.",
-          "chapters": [
+            },
             {
               "chapter": "19",
               "name": "The Rise and Growth of the Gupta Empire"
@@ -821,7 +874,25 @@
             {
               "chapter": "20",
               "name": "Life in the Gupta Age"
-            },
+            }
+          ],
+          "chips": [
+            "Ch 17–20",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "A6",
+          "module_name": "Post-Gupta India, Culture & Legacy",
+          "chapter_range": "Ch 21–27",
+          "estimated_hours": 15,
+          "estimated_days": 6,
+          "duration_label": "~15 h · 6 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Cultural contacts + science legacy — folds the tail chapters.",
+          "chapters": [
             {
               "chapter": "21",
               "name": "Spread of Civilization in Eastern India"
@@ -829,25 +900,7 @@
             {
               "chapter": "22",
               "name": "Harsha and His Times"
-            }
-          ],
-          "chips": [
-            "Ch 19–22 · 22 pp",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "A7",
-          "module_name": "Transformation & Legacy",
-          "chapter_range": "Ch 23–27 · 26 pp",
-          "estimated_hours": 8.5,
-          "estimated_days": 3.5,
-          "duration_label": "~8.5 h · 3.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Ch 25–27 = statement-question goldmine; full notes, no skimming. Bridges into Medieval M1.",
-          "chapters": [
+            },
             {
               "chapter": "23",
               "name": "Formation of New States and Rural Expansion in the Peninsula"
@@ -870,8 +923,8 @@
             }
           ],
           "chips": [
-            "Ch 23–27 · 26 pp",
-            "~8.5 h · 3.5 days",
+            "Ch 21–27",
+            "~15 h · 6 days",
             "Test: 50 Q"
           ]
         }
@@ -883,23 +936,22 @@
       "primary_source": "Medieval India — Satish Chandra, Old NCERT combined edition (19 chapters, ~325 pages) — verified from PDF",
       "source_note": null,
       "chips": [
-        "9 modules",
+        "4 modules",
         "5 weeks",
-        "9 × 50 Q module tests",
-        "1 × 100 Q FLT",
-        "✔ verified from source PDF"
+        "4 × 50 Q module tests",
+        "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "M1",
-          "module_name": "Eighth-Century World & the Three Empires",
-          "chapter_range": "Ch 1–3",
+          "module_name": "Early Medieval India (8th–12th c.)",
+          "chapter_range": "Ch 1–4",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Tripartite struggle; Chola administration + navy — recur in prelims & mains.",
+          "focus": "Tripartite struggle + Cholas + society.",
           "chapters": [
             {
               "chapter": "1",
@@ -912,51 +964,33 @@
             {
               "chapter": "3",
               "name": "The Chola Empire"
+            },
+            {
+              "chapter": "4",
+              "name": "Economic and Social Life, Education and Religious Beliefs (800–1200)"
             }
           ],
           "chips": [
-            "Ch 1–3",
+            "Ch 1–4",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "M2",
-          "module_name": "Society & the Age of Conflict",
-          "chapter_range": "Ch 4–5",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Feudalism debate; reasons for Turkish success — analytical notes.",
-          "chapters": [
-            {
-              "chapter": "4",
-              "name": "Economic and Social Life, Education and Religious Beliefs (800–1200)"
-            },
-            {
-              "chapter": "5",
-              "name": "The Age of Conflict (Ghaznavids and Ghurids)"
-            }
-          ],
-          "chips": [
-            "Ch 4–5",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "M3",
           "module_name": "The Delhi Sultanat",
-          "chapter_range": "Ch 6–7",
+          "chapter_range": "Ch 5–8",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Alauddin's market reforms; Muhammad Tughlaq's projects — perennial questions.",
+          "focus": "Khalji–Tughlaq administration & economy.",
           "chapters": [
+            {
+              "chapter": "5",
+              "name": "The Age of Conflict (Ghaznavids and Ghurids)"
+            },
             {
               "chapter": "6",
               "name": "The Delhi Sultanat I (13th century)"
@@ -964,51 +998,33 @@
             {
               "chapter": "7",
               "name": "The Delhi Sultanat II (Khalji and Tughlaq)"
+            },
+            {
+              "chapter": "8",
+              "name": "Government, Economic and Social Life under the Sultanat"
             }
           ],
           "chips": [
-            "Ch 6–7",
+            "Ch 5–8",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "M4",
-          "module_name": "Sultanat State & the Southern Powers",
-          "chapter_range": "Ch 8–9",
+          "module_code": "M3",
+          "module_name": "Vijayanagara, Bahmanis & the Coming of the Mughals",
+          "chapter_range": "Ch 9–12",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Iqta system; Vijayanagara administration — high yield both papers.",
+          "focus": "Deccan powers + Portuguese arrival.",
           "chapters": [
-            {
-              "chapter": "8",
-              "name": "Government, Economic and Social Life under the Sultanat"
-            },
             {
               "chapter": "9",
               "name": "The Age of Vijayanagara and the Bahmanids, Coming of the Portuguese"
-            }
-          ],
-          "chips": [
-            "Ch 8–9",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "M5",
-          "module_name": "Fifteenth Century & Sultanat-Era Culture",
-          "chapter_range": "Ch 10–11",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "★ Ch 11 = architecture + bhakti/sufi — among highest-yield chapters of the book.",
-          "chapters": [
+            },
             {
               "chapter": "10",
               "name": "Struggle for Empire in North India I (c. 1400–1525)"
@@ -1016,51 +1032,33 @@
             {
               "chapter": "11",
               "name": "Cultural Development in India (13th–15th centuries)"
-            }
-          ],
-          "chips": [
-            "Ch 10–11",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "M6",
-          "module_name": "Mughal Foundation & Akbar",
-          "chapter_range": "Ch 12–13",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Sher Shah's administration; Akbar's mansab/jagir + religious policy.",
-          "chapters": [
+            },
             {
               "chapter": "12",
               "name": "Struggle for Empire in North India II: Mughals and Afghans (1525–1555)"
-            },
-            {
-              "chapter": "13",
-              "name": "Consolidation of the Mughal Empire: Age of Akbar"
             }
           ],
           "chips": [
-            "Ch 12–13",
-            "~10 h · 4 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "M7",
-          "module_name": "Deccan & the Seventeenth Century",
-          "chapter_range": "Ch 14–15",
-          "estimated_hours": 9,
-          "estimated_days": 3.5,
-          "duration_label": "~9 h · 3.5 days",
+          "module_code": "M4",
+          "module_name": "The Mughal Empire — Rise, Culture & Decline",
+          "chapter_range": "Ch 13–19",
+          "estimated_hours": 15,
+          "estimated_days": 6,
+          "duration_label": "~15 h · 6 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Deccani culture; Jahangir–Shah Jahan political developments.",
+          "focus": "Akbar to Aurangzeb + disintegration — folds the tail chapters.",
           "chapters": [
+            {
+              "chapter": "13",
+              "name": "Consolidation of the Mughal Empire: Age of Akbar"
+            },
             {
               "chapter": "14",
               "name": "The Deccan and South India (up to 1656)"
@@ -1068,25 +1066,7 @@
             {
               "chapter": "15",
               "name": "India in the First Half of the Seventeenth Century"
-            }
-          ],
-          "chips": [
-            "Ch 14–15",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "M8",
-          "module_name": "Mughal Economy, Society & Culture",
-          "chapter_range": "Ch 16–17",
-          "estimated_hours": 9,
-          "estimated_days": 3.5,
-          "duration_label": "~9 h · 3.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "★ Highest-yield module of the subject — full note-making.",
-          "chapters": [
+            },
             {
               "chapter": "16",
               "name": "Economic and Social Life under the Mughals"
@@ -1094,25 +1074,7 @@
             {
               "chapter": "17",
               "name": "Cultural and Religious Developments"
-            }
-          ],
-          "chips": [
-            "Ch 16–17",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "M9",
-          "module_name": "Climax & Disintegration",
-          "chapter_range": "Ch 18–19",
-          "estimated_hours": 9,
-          "estimated_days": 3.5,
-          "duration_label": "~9 h · 3.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Aurangzeb's Deccan policy; rise of Marathas; decline debate for mains.",
-          "chapters": [
+            },
             {
               "chapter": "18",
               "name": "Climax and Disintegration of the Mughal Empire I"
@@ -1123,8 +1085,8 @@
             }
           ],
           "chips": [
-            "Ch 18–19",
-            "~9 h · 3.5 days",
+            "Ch 13–19",
+            "~15 h · 6 days",
             "Test: 50 Q"
           ]
         }
@@ -1136,22 +1098,22 @@
       "primary_source": "History of Modern India — Bipan Chandra (14 chapters) + Spectrum as revision layer",
       "source_note": null,
       "chips": [
-        "8 modules",
+        "3 modules",
         "1.25 months",
-        "8 × 50 Q module tests",
+        "3 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "MO1",
-          "module_name": "Eighteenth-Century India",
-          "chapter_range": "Ch 1–2",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_name": "Mughal Decline to Company Conquest",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Continuity with Medieval M9 — schedule back-to-back.",
+          "focus": "18th-century power vacuum + British ascendancy.",
           "chapters": [
             {
               "chapter": "1",
@@ -1160,25 +1122,7 @@
             {
               "chapter": "2",
               "name": "Indian States and Society in the 18th Century"
-            }
-          ],
-          "chips": [
-            "Ch 1–2",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "MO2",
-          "module_name": "European Penetration & Company Rule",
-          "chapter_range": "Ch 3–4",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Carnatic wars, Anglo-Mysore/Maratha/Sikh wars — chronology charts.",
-          "chapters": [
+            },
             {
               "chapter": "3",
               "name": "European Penetration and the British Conquest of India"
@@ -1189,21 +1133,21 @@
             }
           ],
           "chips": [
-            "Ch 3–4",
-            "~10 h · 4 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "MO3",
-          "module_name": "Administration & Awakening",
-          "chapter_range": "Ch 5–6",
+          "module_code": "MO2",
+          "module_name": "British Rule, Reform & the Revolt of 1857",
+          "chapter_range": "Ch 5–8",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Reformers–organisations–publications table.",
+          "focus": "Administrative structure + 1857 causes/impact.",
           "chapters": [
             {
               "chapter": "5",
@@ -1212,25 +1156,7 @@
             {
               "chapter": "6",
               "name": "Social and Cultural Awakening in the First Half of the 19th Century"
-            }
-          ],
-          "chips": [
-            "Ch 5–6",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "MO4",
-          "module_name": "1857 & After",
-          "chapter_range": "Ch 7–8",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Causes–course–leaders–consequences framework.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "The Revolt of 1857"
@@ -1241,21 +1167,21 @@
             }
           ],
           "chips": [
-            "Ch 7–8",
-            "~8 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "MO5",
-          "module_name": "Economic Critique & Reform",
-          "chapter_range": "Ch 9–10",
-          "estimated_hours": 9,
-          "estimated_days": 3.5,
-          "duration_label": "~9 h · 3.5 days",
+          "module_code": "MO3",
+          "module_name": "Economic Impact to Freedom (1858–1947) + Spectrum Sweep",
+          "chapter_range": "Ch 9–14 +",
+          "estimated_hours": 15,
+          "estimated_days": 6,
+          "duration_label": "~15 h · 6 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Drain of wealth; land revenue systems comparison.",
+          "focus": "National movement phases — event–leader–session chart; closes with Spectrum revision.",
           "chapters": [
             {
               "chapter": "9",
@@ -1264,47 +1190,11 @@
             {
               "chapter": "10",
               "name": "Growth of New India: Religious and Social Reform after 1858"
-            }
-          ],
-          "chips": [
-            "Ch 9–10",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "MO6",
-          "module_name": "Rise of Nationalism",
-          "chapter_range": "Ch 11",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Moderates — methods, demands, evaluation.",
-          "chapters": [
+            },
             {
               "chapter": "11",
               "name": "The Nationalist Movement (1858–1905)"
-            }
-          ],
-          "chips": [
-            "Ch 11",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "MO7",
-          "module_name": "Extremism to Home Rule",
-          "chapter_range": "Ch 12–13",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Swadeshi, Home Rule, NCM — session–year–resolution drilling.",
-          "chapters": [
+            },
             {
               "chapter": "12",
               "name": "The Nationalist Movement (1905–1918)"
@@ -1312,25 +1202,7 @@
             {
               "chapter": "13",
               "name": "The Struggle for Swaraj I (1919–1927)"
-            }
-          ],
-          "chips": [
-            "Ch 12–13",
-            "~10 h · 4 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "MO8",
-          "module_name": "Towards Freedom + Spectrum Sweep",
-          "chapter_range": "Ch 14 + revision",
-          "estimated_hours": 11,
-          "estimated_days": 4.5,
-          "duration_label": "~11 h · 4.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "CDM→Quit India→Partition. Spectrum pass locks the chronology.",
-          "chapters": [
+            },
             {
               "chapter": "14",
               "name": "The Struggle for Swaraj II (1927–1947)"
@@ -1341,8 +1213,8 @@
             }
           ],
           "chips": [
-            "Ch 14 + revision",
-            "~11 h · 4.5 days",
+            "Ch 9–14 +",
+            "~15 h · 6 days",
             "Test: 50 Q"
           ]
         }
@@ -1354,22 +1226,22 @@
       "primary_source": "NCERT XII — Politics in India Since Independence (9 chapters)",
       "source_note": null,
       "chips": [
-        "3 modules",
+        "2 modules",
         "2 weeks",
-        "3 × 50 Q module tests",
+        "2 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "PI1",
-          "module_name": "Nation Building",
-          "chapter_range": "Ch 1–3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Nation-Building & One-Party Dominance",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Integration of states; linguistic reorganisation.",
+          "focus": "Integration, planning, early foreign policy.",
           "chapters": [
             {
               "chapter": "1",
@@ -1382,29 +1254,29 @@
             {
               "chapter": "3",
               "name": "Politics of Planned Development"
+            },
+            {
+              "chapter": "4",
+              "name": "India's External Relations"
             }
           ],
           "chips": [
-            "Ch 1–3",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "PI2",
-          "module_name": "Consolidation & Crisis",
-          "chapter_range": "Ch 4–6",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Crisis, Movements & Contemporary Politics",
+          "chapter_range": "Ch 5–9",
+          "estimated_hours": 11,
+          "estimated_days": 4.5,
+          "duration_label": "~11 h · 4.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Wars of 1962/65/71; Emergency — causes and consequences.",
+          "focus": "Emergency + mandal/mandir + coalition era.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "India's External Relations"
-            },
             {
               "chapter": "5",
               "name": "Challenges to and Restoration of the Congress System"
@@ -1412,25 +1284,7 @@
             {
               "chapter": "6",
               "name": "The Crisis of Democratic Order (Emergency)"
-            }
-          ],
-          "chips": [
-            "Ch 4–6",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "PI3",
-          "module_name": "New Politics",
-          "chapter_range": "Ch 7–9",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Links forward to Polity P15–16 and Governance.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "Rise of Popular Movements"
@@ -1445,8 +1299,8 @@
             }
           ],
           "chips": [
-            "Ch 7–9",
-            "~7 h · 3 days",
+            "Ch 5–9",
+            "~11 h · 4.5 days",
             "Test: 50 Q"
           ]
         }
@@ -1467,10 +1321,10 @@
         {
           "module_code": "WH1",
           "module_name": "Revolutions & Industrialisation",
-          "chapter_range": "Notes Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
           "focus": "Event–cause–impact framework; GS1 mains oriented.",
@@ -1493,18 +1347,18 @@
             }
           ],
           "chips": [
-            "Notes Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "WH2",
-          "module_name": "Nationalism, Imperialism & World Wars",
-          "chapter_range": "Notes Unit 2",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_name": "Nationalism, Imperialism & the World Wars",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
           "focus": "Inter-war timeline chart.",
@@ -1527,18 +1381,18 @@
             }
           ],
           "chips": [
-            "Notes Unit 2",
-            "~8 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "WH3",
-          "module_name": "Post-War World",
-          "chapter_range": "Notes Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "The Post-War World",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
           "focus": "Decolonization case studies — direct mains questions.",
@@ -1561,8 +1415,8 @@
             }
           ],
           "chips": [
-            "Notes Unit 3",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -1574,22 +1428,22 @@
       "primary_source": "NCERT Fine Arts XI — An Introduction to Indian Art (8 ch) + Indian Art and Culture — Nitin Singhania (33 ch)",
       "source_note": "Singhania chapter numbers indicative — map to the edition in MD repository at portal load.",
       "chips": [
-        "6 modules",
+        "8 modules",
         "1 month",
-        "6 × 50 Q module tests",
+        "8 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "AC1",
-          "module_name": "Visual Arts Foundation (NCERT)",
-          "chapter_range": "NCERT Ch 1–8",
+          "module_name": "Visual Arts — Prehistoric to Post-Mauryan (NCERT)",
+          "chapter_range": "4 units",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "NCERT first — it is the examiner's own reference for image-based questions.",
+          "focus": "NCERT first — examiner's own reference for image questions.",
           "chapters": [
             {
               "chapter": "1",
@@ -1606,7 +1460,25 @@
             {
               "chapter": "4",
               "name": "Post-Mauryan Trends in Art & Architecture"
-            },
+            }
+          ],
+          "chips": [
+            "4 units",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "AC2",
+          "module_name": "Murals, Temples & Indo-Islamic Art (NCERT)",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Temple style–feature–example triads.",
+          "chapters": [
             {
               "chapter": "5",
               "name": "Later Mural Traditions"
@@ -1625,21 +1497,21 @@
             }
           ],
           "chips": [
-            "NCERT Ch 1–8",
+            "4 units",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "AC2",
-          "module_name": "Architecture (Singhania)",
-          "chapter_range": "Singhania Ch 1–4",
+          "module_code": "AC3",
+          "module_name": "Indian Architecture (Singhania)",
+          "chapter_range": "4 units",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Style–feature–example triads; map temple sites.",
+          "focus": "Nagara/Dravida/Vesara + cave + colonial styles.",
           "chapters": [
             {
               "chapter": "1",
@@ -1659,18 +1531,18 @@
             }
           ],
           "chips": [
-            "Singhania Ch 1–4",
+            "4 units",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "AC3",
-          "module_name": "Sculpture, Painting & Crafts",
-          "chapter_range": "Singhania Ch 5–9",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "AC4",
+          "module_name": "Sculpture, Pottery, Painting & Crafts",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
           "focus": "Painting school–region–patron table.",
@@ -1690,29 +1562,29 @@
             {
               "chapter": "8",
               "name": "Handicrafts"
-            },
-            {
-              "chapter": "9",
-              "name": "UNESCO tangible heritage sites"
             }
           ],
           "chips": [
-            "Singhania Ch 5–9",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "AC4",
-          "module_name": "Performing Arts",
-          "chapter_range": "Singhania Ch 10–15",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "AC5",
+          "module_name": "Heritage Sites, Music & Dance",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Classical dance — state–exponent pairs; GI-type matching.",
+          "focus": "UNESCO tangible list + classical music/dance.",
           "chapters": [
+            {
+              "chapter": "9",
+              "name": "UNESCO tangible heritage sites"
+            },
             {
               "chapter": "10",
               "name": "Indian music (Hindustani & Carnatic)"
@@ -1724,7 +1596,25 @@
             {
               "chapter": "12",
               "name": "Theatre forms"
-            },
+            }
+          ],
+          "chips": [
+            "4 units",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "AC6",
+          "module_name": "Theatre, Puppetry, Martial Arts & Languages",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "State–exponent pairs; intangible heritage list.",
+          "chapters": [
             {
               "chapter": "13",
               "name": "Puppetry"
@@ -1736,29 +1626,29 @@
             {
               "chapter": "15",
               "name": "UNESCO intangible heritage list"
+            },
+            {
+              "chapter": "16",
+              "name": "Languages of India"
             }
           ],
           "chips": [
-            "Singhania Ch 10–15",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "AC5",
-          "module_name": "Language, Literature & Thought",
-          "chapter_range": "Singhania Ch 16–21",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "AC7",
+          "module_name": "Literature, Religion & Reform Movements",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
           "focus": "Six schools of philosophy — every-year prelims candidate.",
           "chapters": [
-            {
-              "chapter": "16",
-              "name": "Languages of India"
-            },
             {
               "chapter": "17",
               "name": "Sanskrit, Pali-Prakrit and regional literature"
@@ -1774,29 +1664,29 @@
             {
               "chapter": "20",
               "name": "Bhakti and Sufi movements"
-            },
-            {
-              "chapter": "21",
-              "name": "Indian cinema (brief)"
             }
           ],
           "chips": [
-            "Singhania Ch 16–21",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "AC6",
-          "module_name": "Living Culture",
-          "chapter_range": "Singhania Ch 22–33 (selective)",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "AC8",
+          "module_name": "Cinema, Festivals & Living Culture",
+          "chapter_range": "6 units",
+          "estimated_hours": 13,
+          "estimated_days": 5,
+          "duration_label": "~13 h · 5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Merge with current-affairs culture compilation before test.",
+          "focus": "Merge with current-affairs culture compilation — folds the tail chapters.",
           "chapters": [
+            {
+              "chapter": "21",
+              "name": "Indian cinema (brief)"
+            },
             {
               "chapter": "22",
               "name": "Fairs and festivals"
@@ -1819,8 +1709,8 @@
             }
           ],
           "chips": [
-            "Singhania Ch 22–33 (selective)",
-            "~7 h · 3 days",
+            "6 units",
+            "~13 h · 5 days",
             "Test: 50 Q"
           ]
         }
@@ -1832,22 +1722,22 @@
       "primary_source": "NCERT XI — India: Physical Environment (7 ch) + NCERT XII — India: People and Economy (12 ch) + atlas work",
       "source_note": null,
       "chips": [
-        "8 modules",
+        "5 modules",
         "1 month",
-        "8 × 50 Q module tests",
+        "5 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "IG1",
-          "module_name": "Location & Physiography",
-          "chapter_range": "IPE Ch 1–2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Location, Physiography, Drainage & Climate",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Physiographic divisions with map plotting.",
+          "focus": "Anchor with atlas work from day one.",
           "chapters": [
             {
               "chapter": "1",
@@ -1856,51 +1746,33 @@
             {
               "chapter": "2",
               "name": "Structure and Physiography"
+            },
+            {
+              "chapter": "3",
+              "name": "Drainage System"
+            },
+            {
+              "chapter": "4",
+              "name": "Climate"
             }
           ],
           "chips": [
-            "IPE Ch 1–2",
-            "~7 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "IG2",
-          "module_name": "Drainage",
-          "chapter_range": "IPE Ch 3",
-          "estimated_hours": 6,
-          "estimated_days": 2.5,
-          "duration_label": "~6 h · 2.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "River systems — origin, tributaries, projects. Map-heavy day.",
-          "chapters": [
-            {
-              "chapter": "3",
-              "name": "Drainage System"
-            }
-          ],
-          "chips": [
-            "IPE Ch 3",
-            "~6 h · 2.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IG3",
-          "module_name": "Climate, Vegetation & Soils",
-          "chapter_range": "IPE Ch 4–5 + soils",
+          "module_name": "Vegetation, Soils & Natural Hazards",
+          "chapter_range": "4 units",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Monsoon mechanism — mains favourite; link to WG5.",
+          "focus": "Closes physical India with a map consolidation test.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "Climate"
-            },
             {
               "chapter": "5",
               "name": "Natural Vegetation"
@@ -1908,25 +1780,7 @@
             {
               "chapter": "+",
               "name": "Soils of India (MD Notes supplement)"
-            }
-          ],
-          "chips": [
-            "IPE Ch 4–5 + soils",
-            "~9 h · 3.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IG4",
-          "module_name": "Hazards & Map Consolidation",
-          "chapter_range": "IPE Ch 6–7",
-          "estimated_hours": 6,
-          "estimated_days": 2.5,
-          "duration_label": "~6 h · 2.5 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Feeds Disaster Management module IS8.",
-          "chapters": [
+            },
             {
               "chapter": "6",
               "name": "Natural Hazards and Disasters"
@@ -1937,21 +1791,21 @@
             }
           ],
           "chips": [
-            "IPE Ch 6–7",
-            "~6 h · 2.5 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IG5",
-          "module_name": "People",
-          "chapter_range": "IPE(XII) Ch 1–4",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IG3",
+          "module_name": "Population, Migration & Settlements",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Census-2011 data points; link to Society S3.",
+          "focus": "Census & HDI data — keep current.",
           "chapters": [
             {
               "chapter": "1",
@@ -1971,21 +1825,21 @@
             }
           ],
           "chips": [
-            "IPE(XII) Ch 1–4",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IG6",
-          "module_name": "Agriculture & Water",
-          "chapter_range": "IPE(XII) Ch 5–6",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IG4",
+          "module_name": "Agriculture, Resources & Industry",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Cropping seasons/patterns; irrigation — prelims recur.",
+          "focus": "Crop–region–climate + mineral belts mapping.",
           "chapters": [
             {
               "chapter": "5",
@@ -1994,25 +1848,7 @@
             {
               "chapter": "6",
               "name": "Water Resources"
-            }
-          ],
-          "chips": [
-            "IPE(XII) Ch 5–6",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IG7",
-          "module_name": "Resources & Industry",
-          "chapter_range": "IPE(XII) Ch 7–8",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Mineral belts on map; industrial location factors.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "Mineral and Energy Resources"
@@ -2023,21 +1859,21 @@
             }
           ],
           "chips": [
-            "IPE(XII) Ch 7–8",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IG8",
+          "module_code": "IG5",
           "module_name": "Planning, Transport & Trade",
-          "chapter_range": "IPE(XII) Ch 9–12",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Close with full-India mapping test.",
+          "focus": "Selected-issues chapter — direct GS1/GS3 linkage.",
           "chapters": [
             {
               "chapter": "9",
@@ -2057,8 +1893,8 @@
             }
           ],
           "chips": [
-            "IPE(XII) Ch 9–12",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -2070,22 +1906,22 @@
       "primary_source": "NCERT XI — Fundamentals of Physical Geography (16 ch) + NCERT XII — Fundamentals of Human Geography (10 ch) + G.C. Leong (climatology only) + atlas",
       "source_note": null,
       "chips": [
-        "12 modules",
+        "7 modules",
         "1.25 months",
-        "12 × 50 Q module tests",
+        "7 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "WG1",
-          "module_name": "Earth & Its Interior",
-          "chapter_range": "FPG Ch 1–3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Earth's Origin & Interior",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Seismic waves — discontinuities diagram.",
+          "focus": "Plate tectonics — diagram-heavy foundation.",
           "chapters": [
             {
               "chapter": "1",
@@ -2098,51 +1934,33 @@
             {
               "chapter": "3",
               "name": "Interior of the Earth"
+            },
+            {
+              "chapter": "4",
+              "name": "Distribution of Oceans and Continents (plate tectonics)"
             }
           ],
           "chips": [
-            "FPG Ch 1–3",
-            "~7 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "WG2",
-          "module_name": "Continents, Rocks & Tectonics",
-          "chapter_range": "FPG Ch 4–5",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Plate boundaries — landform associations.",
-          "chapters": [
-            {
-              "chapter": "4",
-              "name": "Distribution of Oceans and Continents (plate tectonics)"
-            },
-            {
-              "chapter": "5",
-              "name": "Minerals and Rocks"
-            }
-          ],
-          "chips": [
-            "FPG Ch 4–5",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG3",
-          "module_name": "Geomorphology",
-          "chapter_range": "FPG Ch 6–7",
+          "module_name": "Rocks, Geomorphology & the Atmosphere",
+          "chapter_range": "4 units",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Landform–agent matching; diagram-based notes.",
+          "focus": "Landform evolution + atmosphere structure.",
           "chapters": [
+            {
+              "chapter": "5",
+              "name": "Minerals and Rocks"
+            },
             {
               "chapter": "6",
               "name": "Geomorphic Processes"
@@ -2150,51 +1968,33 @@
             {
               "chapter": "7",
               "name": "Landforms and their Evolution"
+            },
+            {
+              "chapter": "8",
+              "name": "Composition and Structure of Atmosphere"
             }
           ],
           "chips": [
-            "FPG Ch 6–7",
+            "4 units",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "WG4",
-          "module_name": "Atmosphere & Temperature",
-          "chapter_range": "FPG Ch 8–9",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "WG3",
+          "module_name": "Insolation, Circulation & Weather",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Heat budget diagram from memory.",
+          "focus": "Leong supplement — pressure belts, winds, cyclones.",
           "chapters": [
-            {
-              "chapter": "8",
-              "name": "Composition and Structure of Atmosphere"
-            },
             {
               "chapter": "9",
               "name": "Solar Radiation, Heat Balance and Temperature"
-            }
-          ],
-          "chips": [
-            "FPG Ch 8–9",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG5",
-          "module_name": "Circulation & Precipitation",
-          "chapter_range": "FPG Ch 10–11 + Leong",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Jet streams, ENSO, cyclones — annual prelims presence.",
-          "chapters": [
+            },
             {
               "chapter": "10",
               "name": "Atmospheric Circulation and Weather Systems"
@@ -2209,21 +2009,21 @@
             }
           ],
           "chips": [
-            "FPG Ch 10–11 + Leong",
-            "~10 h · 4 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "WG6",
-          "module_name": "World Climates",
-          "chapter_range": "FPG Ch 12 + Leong",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "WG4",
+          "module_name": "Climate Change & the Oceans",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Climate type — natural vegetation — region triads.",
+          "focus": "Koppen regions + ocean water movements.",
           "chapters": [
             {
               "chapter": "12",
@@ -2232,25 +2032,7 @@
             {
               "chapter": "+",
               "name": "G.C. Leong — climate types (Koppen regions)"
-            }
-          ],
-          "chips": [
-            "FPG Ch 12 + Leong",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG7",
-          "module_name": "Oceanography",
-          "chapter_range": "FPG Ch 13–14",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Currents map; El Nino linkage.",
-          "chapters": [
+            },
             {
               "chapter": "13",
               "name": "Water (Oceans)"
@@ -2261,21 +2043,21 @@
             }
           ],
           "chips": [
-            "FPG Ch 13–14",
-            "~7 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "WG8",
-          "module_name": "Life on Earth",
-          "chapter_range": "FPG Ch 15–16",
-          "estimated_hours": 6,
-          "estimated_days": 2.5,
-          "duration_label": "~6 h · 2.5 days",
+          "module_code": "WG5",
+          "module_name": "Biosphere & Foundations of Human Geography",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Overlaps Environment EN1/EN3 — schedule before Environment.",
+          "focus": "Biodiversity bridges into human geography.",
           "chapters": [
             {
               "chapter": "15",
@@ -2284,25 +2066,7 @@
             {
               "chapter": "16",
               "name": "Biodiversity and Conservation"
-            }
-          ],
-          "chips": [
-            "FPG Ch 15–16",
-            "~6 h · 2.5 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG9",
-          "module_name": "Human Geography & Population",
-          "chapter_range": "FHG Ch 1–4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Demographic transition model.",
-          "chapters": [
+            },
             {
               "chapter": "1",
               "name": "Human Geography: Nature and Scope"
@@ -2310,7 +2074,25 @@
             {
               "chapter": "2",
               "name": "The World Population: Distribution, Density and Growth"
-            },
+            }
+          ],
+          "chips": [
+            "4 units",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "WG6",
+          "module_name": "Population & Economic Activities",
+          "chapter_range": "4 units",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "Activity typologies — primary to quaternary.",
+          "chapters": [
             {
               "chapter": "3",
               "name": "Population Composition"
@@ -2318,25 +2100,7 @@
             {
               "chapter": "4",
               "name": "Human Development"
-            }
-          ],
-          "chips": [
-            "FHG Ch 1–4",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG10",
-          "module_name": "Economic Activities",
-          "chapter_range": "FHG Ch 5–7",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Agriculture types — region examples.",
-          "chapters": [
+            },
             {
               "chapter": "5",
               "name": "Primary Activities"
@@ -2344,29 +2108,29 @@
             {
               "chapter": "6",
               "name": "Secondary Activities"
-            },
-            {
-              "chapter": "7",
-              "name": "Tertiary and Quaternary Activities"
             }
           ],
           "chips": [
-            "FHG Ch 5–7",
-            "~8 h · 3 days",
+            "4 units",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "WG11",
-          "module_name": "Transport, Trade & Settlements",
-          "chapter_range": "FHG Ch 8–10",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "WG7",
+          "module_name": "Services, Settlements & World Mapping",
+          "chapter_range": "6 units",
+          "estimated_hours": 13,
+          "estimated_days": 5,
+          "duration_label": "~13 h · 5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Trans-continental railways, sea routes — map work.",
+          "focus": "Continent-wise mapping + strategic places — folds the mapping sittings.",
           "chapters": [
+            {
+              "chapter": "7",
+              "name": "Tertiary and Quaternary Activities"
+            },
             {
               "chapter": "8",
               "name": "Transport and Communication"
@@ -2378,25 +2142,7 @@
             {
               "chapter": "10",
               "name": "Human Settlements"
-            }
-          ],
-          "chips": [
-            "FHG Ch 8–10",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "WG12",
-          "module_name": "World Mapping Consolidation",
-          "chapter_range": "Atlas programme",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Closes with full world mapping test.",
-          "chapters": [
+            },
             {
               "chapter": "+",
               "name": "Continent-wise physical mapping (7 sittings)"
@@ -2407,8 +2153,8 @@
             }
           ],
           "chips": [
-            "Atlas programme",
-            "~8 h · 3 days",
+            "6 units",
+            "~13 h · 5 days",
             "Test: 50 Q"
           ]
         }
@@ -2417,351 +2163,215 @@
     {
       "id": "economy",
       "name": "Economy",
-      "primary_source": "Indian Economy — Ramesh Singh, latest annual edition + Economic Survey linkage",
-      "source_note": "Ramesh Singh chapter titles indicative — verify against the annual edition purchased for the repository.",
+      "primary_source": "Indian Economy — MentorsDaily notes series (24 chapters) + Economic Survey & Union Budget linkage",
+      "source_note": "Chapters mirror the 24-topic MentorsDaily economy notes set — refresh Economic Survey & Union Budget chapters to the current year at portal load.",
       "chips": [
-        "14 modules",
+        "6 modules",
         "2 months",
-        "14 × 50 Q module tests",
+        "6 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "E1",
-          "module_name": "Concepts, Growth & Development",
-          "chapter_range": "Ch 1–2",
+          "module_name": "Foundations of Economics",
+          "chapter_range": "Ch 1–4",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "GDP/GNP/NNP calculation clarity before anything else.",
+          "focus": "Core concepts + national income accounting — build the vocabulary.",
           "chapters": [
             {
               "chapter": "1",
-              "name": "Economics and the Economy (concepts, sectors, national income)"
+              "name": "Introduction to Economics"
             },
             {
               "chapter": "2",
+              "name": "National Income"
+            },
+            {
+              "chapter": "3",
               "name": "Growth, Development and Happiness"
+            },
+            {
+              "chapter": "4",
+              "name": "Evolution of the Indian Economy"
             }
           ],
           "chips": [
-            "Ch 1–2",
+            "Ch 1–4",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "E2",
-          "module_name": "Evolution & Planning",
-          "chapter_range": "Ch 3–4",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Plan-wise objectives table.",
-          "chapters": [
-            {
-              "chapter": "3",
-              "name": "Evolution of the Indian Economy"
-            },
-            {
-              "chapter": "4",
-              "name": "Economic Planning"
-            }
-          ],
-          "chips": [
-            "Ch 3–4",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E3",
-          "module_name": "Planning in India & Reforms",
-          "chapter_range": "Ch 5–6",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "1991 reforms — causes and components.",
-          "chapters": [
-            {
-              "chapter": "5",
-              "name": "Planning in India (incl. NITI Aayog)"
-            },
-            {
-              "chapter": "6",
-              "name": "Economic Reforms (LPG)"
-            }
-          ],
-          "chips": [
-            "Ch 5–6",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E4",
-          "module_name": "Inflation & Monetary Concepts",
-          "chapter_range": "Ch 7",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "CPI/WPI, MPC — every-year prelims zone.",
-          "chapters": [
-            {
-              "chapter": "7",
-              "name": "Inflation and Business Cycle"
-            }
-          ],
-          "chips": [
-            "Ch 7",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E5",
-          "module_name": "Agriculture",
-          "chapter_range": "Ch 8",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "MSP, subsidies, PDS — prelims + mains + interview.",
-          "chapters": [
-            {
-              "chapter": "8",
-              "name": "Agriculture and Food Management"
-            }
-          ],
-          "chips": [
-            "Ch 8",
-            "~10 h · 4 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E6",
-          "module_name": "Industry & Services",
-          "chapter_range": "Ch 9–10",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "PLI and industrial policy updates from current affairs.",
-          "chapters": [
-            {
-              "chapter": "9",
-              "name": "Industry and Infrastructure-linked policy"
-            },
-            {
-              "chapter": "10",
-              "name": "Services Sector"
-            }
-          ],
-          "chips": [
-            "Ch 9–10",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E7",
-          "module_name": "Infrastructure",
-          "chapter_range": "Ch 11",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "PPP model comparison table.",
-          "chapters": [
-            {
-              "chapter": "11",
-              "name": "Infrastructure (energy, transport, PPP models)"
-            }
-          ],
-          "chips": [
-            "Ch 11",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E8",
-          "module_name": "Banking & RBI",
-          "chapter_range": "Ch 12",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Monetary policy tools; NPA framework — drill hard.",
-          "chapters": [
-            {
-              "chapter": "12",
-              "name": "Banking and the Monetary System"
-            }
-          ],
-          "chips": [
-            "Ch 12",
-            "~10 h · 4 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E9",
-          "module_name": "Financial Markets",
-          "chapter_range": "Ch 13",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "SEBI, instruments, market types.",
-          "chapters": [
-            {
-              "chapter": "13",
-              "name": "Security Markets in India"
-            }
-          ],
-          "chips": [
-            "Ch 13",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E10",
-          "module_name": "External Sector",
-          "chapter_range": "Ch 14",
+          "module_name": "Planning, Reforms & Inflation",
+          "chapter_range": "Ch 5–8",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "BoP accounting; convertibility; FDI vs FPI.",
+          "focus": "Five-Year Plans → NITI Aayog + LPG reforms + inflation.",
           "chapters": [
             {
-              "chapter": "14",
-              "name": "External Sector in India (BoP, exchange rate, trade policy)"
+              "chapter": "5",
+              "name": "Economic Planning"
+            },
+            {
+              "chapter": "6",
+              "name": "Planning in India"
+            },
+            {
+              "chapter": "7",
+              "name": "Economic Reforms"
+            },
+            {
+              "chapter": "8",
+              "name": "Inflation and Business Cycle"
             }
           ],
           "chips": [
-            "Ch 14",
+            "Ch 5–8",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "E11",
-          "module_name": "International Organisations",
-          "chapter_range": "Ch 15",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "WTO agreements — agriculture disputes.",
-          "chapters": [
-            {
-              "chapter": "15",
-              "name": "International Economic Organisations and India (IMF, WB, WTO)"
-            }
-          ],
-          "chips": [
-            "Ch 15",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E12",
-          "module_name": "Public Finance",
-          "chapter_range": "Ch 16–17",
-          "estimated_hours": 10,
-          "estimated_days": 4,
-          "duration_label": "~10 h · 4 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Budget documents; deficit types — fixed prelims question.",
-          "chapters": [
-            {
-              "chapter": "16",
-              "name": "Tax Structure in India (incl. GST)"
-            },
-            {
-              "chapter": "17",
-              "name": "Public Finance in India (budget, deficits, FRBM)"
-            }
-          ],
-          "chips": [
-            "Ch 16–17",
-            "~10 h · 4 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E13",
-          "module_name": "Sustainability & Human Development",
-          "chapter_range": "Ch 18–19",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Indices — compiler table (HDI, MPI, etc.).",
-          "chapters": [
-            {
-              "chapter": "18",
-              "name": "Sustainability and Climate Change: India and the World"
-            },
-            {
-              "chapter": "19",
-              "name": "Human Development in India"
-            }
-          ],
-          "chips": [
-            "Ch 18–19",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "E14",
-          "module_name": "Contemporary Issues & Survey",
-          "chapter_range": "Ch 20–21 + Survey",
+          "module_code": "E3",
+          "module_name": "Real Sectors & Financial Markets",
+          "chapter_range": "Ch 9–12",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Glossary sweep doubles as subject revision.",
+          "focus": "Sectoral engines of growth + money/capital market basics.",
           "chapters": [
             {
-              "chapter": "20",
-              "name": "Burning Socio-Economic Issues"
+              "chapter": "9",
+              "name": "Agriculture and Food Management"
             },
             {
-              "chapter": "21",
-              "name": "Economic Concepts and Terminologies (glossary sweep)"
+              "chapter": "10",
+              "name": "Industry and Infrastructure"
             },
             {
-              "chapter": "+",
-              "name": "Economic Survey — key chapters of the year"
+              "chapter": "11",
+              "name": "Services Sector"
+            },
+            {
+              "chapter": "12",
+              "name": "Indian Financial Market"
             }
           ],
           "chips": [
-            "Ch 20–21 + Survey",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "E4",
+          "module_name": "Banking, Insurance & External Sector",
+          "chapter_range": "Ch 13–16",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "RBI & monetary system + BoP, exchange rate, trade policy.",
+          "chapters": [
+            {
+              "chapter": "13",
+              "name": "Banking in India"
+            },
+            {
+              "chapter": "14",
+              "name": "Insurance in India"
+            },
+            {
+              "chapter": "15",
+              "name": "Security Market in India"
+            },
+            {
+              "chapter": "16",
+              "name": "External Sector in India"
+            }
+          ],
+          "chips": [
+            "Ch 13–16",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "E5",
+          "module_name": "Public Finance, Taxation & Sustainability",
+          "chapter_range": "Ch 17–20",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "IMF/WB/WTO + GST structure + budget, deficits, FRBM.",
+          "chapters": [
+            {
+              "chapter": "17",
+              "name": "International Economic Organisations and India"
+            },
+            {
+              "chapter": "18",
+              "name": "Tax Structure in India"
+            },
+            {
+              "chapter": "19",
+              "name": "Public Finance in India"
+            },
+            {
+              "chapter": "20",
+              "name": "Sustainability and Climate Change: India and the World"
+            }
+          ],
+          "chips": [
+            "Ch 17–20",
+            "~9 h · 3.5 days",
+            "Test: 50 Q"
+          ]
+        },
+        {
+          "module_code": "E6",
+          "module_name": "Human Development & Current Economy",
+          "chapter_range": "Ch 21–24",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
+          "has_module_test": true,
+          "test_label": "Test: 50 Q",
+          "focus": "HDI + current issues + Economic Survey & Budget of the year.",
+          "chapters": [
+            {
+              "chapter": "21",
+              "name": "Human Development in India"
+            },
+            {
+              "chapter": "22",
+              "name": "Burning Socio-Economic Issues"
+            },
+            {
+              "chapter": "23",
+              "name": "Economic Survey"
+            },
+            {
+              "chapter": "24",
+              "name": "Union Budget"
+            }
+          ],
+          "chips": [
+            "Ch 21–24",
             "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
@@ -2774,22 +2384,22 @@
       "primary_source": "Environment — Shankar IAS Academy, latest edition (30 chapters)",
       "source_note": "Shankar chapter grouping indicative — align to latest edition contents page at portal load.",
       "chips": [
-        "8 modules",
+        "7 modules",
         "1 month",
-        "8 × 50 Q module tests",
+        "7 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "EN1",
-          "module_name": "Ecology Fundamentals",
+          "module_name": "Ecology & Ecosystems",
           "chapter_range": "Ch 1–4",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Food chain/web, productivity — concept clarity first.",
+          "focus": "Energy flow, cycles, ecosystem types.",
           "chapters": [
             {
               "chapter": "1",
@@ -2810,7 +2420,7 @@
           ],
           "chips": [
             "Ch 1–4",
-            "~8 h · 3 days",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
@@ -2818,12 +2428,12 @@
           "module_code": "EN2",
           "module_name": "Biodiversity",
           "chapter_range": "Ch 5–8",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Species–status–habitat matching = fixed prelims marks.",
+          "focus": "Hotspots + IUCN categories — prelims dense.",
           "chapters": [
             {
               "chapter": "5",
@@ -2844,7 +2454,7 @@
           ],
           "chips": [
             "Ch 5–8",
-            "~8 h · 3 days",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
@@ -2857,7 +2467,7 @@
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Map every PA that appears in current affairs this year.",
+          "focus": "Protected areas + CBD/CITES/Ramsar.",
           "chapters": [
             {
               "chapter": "9",
@@ -2884,14 +2494,14 @@
         },
         {
           "module_code": "EN4",
-          "module_name": "Climate Change I",
+          "module_name": "Climate Change",
           "chapter_range": "Ch 13–16",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "COP timeline updated to current year.",
+          "focus": "UNFCCC–Kyoto–Paris + India's NDC/missions.",
           "chapters": [
             {
               "chapter": "13",
@@ -2912,20 +2522,20 @@
           ],
           "chips": [
             "Ch 13–16",
-            "~8 h · 3 days",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "EN5",
-          "module_name": "Pollution",
+          "module_name": "Pollution & Waste",
           "chapter_range": "Ch 17–20",
           "estimated_hours": 9,
           "estimated_days": 3.5,
           "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Pollutant–source–effect table; rules with years.",
+          "focus": "NCAP + waste-management rules.",
           "chapters": [
             {
               "chapter": "17",
@@ -2952,14 +2562,14 @@
         },
         {
           "module_code": "EN6",
-          "module_name": "Law & Institutions",
+          "module_name": "Environmental Law & Institutions",
           "chapter_range": "Ch 21–24",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Act–year–provision drilling.",
+          "focus": "EPA/NGT/EIA + forest governance.",
           "chapters": [
             {
               "chapter": "21",
@@ -2980,20 +2590,20 @@
           ],
           "chips": [
             "Ch 21–24",
-            "~8 h · 3 days",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "EN7",
-          "module_name": "Sustainable Systems",
-          "chapter_range": "Ch 25–27",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Sustainability & Environment in News",
+          "chapter_range": "Ch 25–30",
+          "estimated_hours": 13,
+          "estimated_days": 5,
+          "duration_label": "~13 h · 5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Scheme names + targets updated from current affairs.",
+          "focus": "Species/places in news — folds the annual compilation.",
           "chapters": [
             {
               "chapter": "25",
@@ -3006,25 +2616,7 @@
             {
               "chapter": "27",
               "name": "Sustainable development and green economy"
-            }
-          ],
-          "chips": [
-            "Ch 25–27",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "EN8",
-          "module_name": "Current Environment Layer",
-          "chapter_range": "Ch 28–30 + CA",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Merge with the year's CA compilation before module test.",
-          "chapters": [
+            },
             {
               "chapter": "28",
               "name": "Disasters with environmental dimension"
@@ -3039,8 +2631,8 @@
             }
           ],
           "chips": [
-            "Ch 28–30 + CA",
-            "~7 h · 3 days",
+            "Ch 25–30",
+            "~13 h · 5 days",
             "Test: 50 Q"
           ]
         }
@@ -3052,22 +2644,22 @@
       "primary_source": "International Relations — Pavneet Singh, latest edition + current affairs layer",
       "source_note": null,
       "chips": [
-        "8 modules",
+        "5 modules",
         "1 month",
-        "8 × 50 Q module tests",
+        "5 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "IR1",
-          "module_name": "Foundations of Indian Foreign Policy",
-          "chapter_range": "Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Foreign Policy Foundations & the Western Neighbourhood",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Policy-phase timeline with triggering events.",
+          "focus": "NAM to multi-alignment + Pakistan/Afghanistan.",
           "chapters": [
             {
               "chapter": "1",
@@ -3076,25 +2668,7 @@
             {
               "chapter": "2",
               "name": "Doctrines, principles and institutions (MEA, Panchsheel, Gujral etc.)"
-            }
-          ],
-          "chips": [
-            "Unit 1",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IR2",
-          "module_name": "Neighbourhood I",
-          "chapter_range": "Unit 2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Issue-wise (Kashmir, Indus waters, terrorism) not chronology-wise notes.",
-          "chapters": [
+            },
             {
               "chapter": "3",
               "name": "India–Pakistan"
@@ -3105,21 +2679,21 @@
             }
           ],
           "chips": [
-            "Unit 2",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IR3",
-          "module_name": "Neighbourhood II",
-          "chapter_range": "Unit 3",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IR2",
+          "module_name": "Northern & Eastern Neighbourhood",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Border framework agreements; trade asymmetry data.",
+          "focus": "China, Nepal, Bhutan, Bangladesh.",
           "chapters": [
             {
               "chapter": "5",
@@ -3132,29 +2706,29 @@
             {
               "chapter": "7",
               "name": "India–Bhutan"
+            },
+            {
+              "chapter": "8",
+              "name": "India–Bangladesh"
             }
           ],
           "chips": [
-            "Unit 3",
-            "~8 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IR4",
-          "module_name": "Neighbourhood III",
-          "chapter_range": "Unit 4",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IR3",
+          "module_name": "Island Neighbours & the United States",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Connectivity projects map (BBIN, Kaladan, etc.).",
+          "focus": "Sri Lanka, Myanmar, Maldives + India–US.",
           "chapters": [
-            {
-              "chapter": "8",
-              "name": "India–Bangladesh"
-            },
             {
               "chapter": "9",
               "name": "India–Sri Lanka"
@@ -3166,51 +2740,33 @@
             {
               "chapter": "11",
               "name": "India–Maldives"
-            }
-          ],
-          "chips": [
-            "Unit 4",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IR5",
-          "module_name": "Major Powers",
-          "chapter_range": "Unit 5",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Defence + tech + trade tracks separately.",
-          "chapters": [
+            },
             {
               "chapter": "12",
               "name": "India–USA"
-            },
-            {
-              "chapter": "13",
-              "name": "India–Russia"
             }
           ],
           "chips": [
-            "Unit 5",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IR6",
-          "module_name": "East & Extended East",
-          "chapter_range": "Unit 6",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IR4",
+          "module_name": "Major Powers & the Indo-Pacific",
+          "chapter_range": "Ch 13–16",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Indo-Pacific vocabulary — mains answers depend on it.",
+          "focus": "Russia, Japan/Australia + ASEAN/QUAD.",
           "chapters": [
+            {
+              "chapter": "13",
+              "name": "India–Russia"
+            },
             {
               "chapter": "14",
               "name": "India–Japan, Australia, South Korea"
@@ -3225,21 +2781,21 @@
             }
           ],
           "chips": [
-            "Unit 6",
-            "~8 h · 3 days",
+            "Ch 13–16",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IR7",
-          "module_name": "West Asia, Africa & Beyond",
-          "chapter_range": "Unit 7",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IR5",
+          "module_name": "West Asia, Africa & Global Institutions",
+          "chapter_range": "Ch 17–23",
+          "estimated_hours": 15,
+          "estimated_days": 6,
+          "duration_label": "~15 h · 6 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Energy + diaspora + connectivity framing.",
+          "focus": "Groupings + nuclear regimes — folds the tail themes.",
           "chapters": [
             {
               "chapter": "17",
@@ -3252,25 +2808,7 @@
             {
               "chapter": "19",
               "name": "India–Central Asia, Latin America, Europe/EU"
-            }
-          ],
-          "chips": [
-            "Unit 7",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IR8",
-          "module_name": "Institutions & Global Issues",
-          "chapter_range": "Unit 8",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Grouping–members–summits compiler, updated annually.",
-          "chapters": [
+            },
             {
               "chapter": "20",
               "name": "UN and UNSC reform"
@@ -3289,8 +2827,8 @@
             }
           ],
           "chips": [
-            "Unit 8",
-            "~8 h · 3 days",
+            "Ch 17–23",
+            "~15 h · 6 days",
             "Test: 50 Q"
           ]
         }
@@ -3302,22 +2840,22 @@
       "primary_source": "Challenges to Internal Security of India — Ashok Kumar & Vipul (latest ed) + NDMA guidelines + 2nd ARC (Crisis Management)",
       "source_note": null,
       "chips": [
-        "8 modules",
+        "4 modules",
         "1 month",
-        "8 × 50 Q module tests",
+        "4 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "IS1",
-          "module_name": "Security Framework",
-          "chapter_range": "Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Security Framework & J&K",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Agency–ministry–mandate table.",
+          "focus": "Agencies/coordination + cross-border terrorism.",
           "chapters": [
             {
               "chapter": "1",
@@ -3326,25 +2864,7 @@
             {
               "chapter": "2",
               "name": "Security architecture of India (agencies, forces, coordination)"
-            }
-          ],
-          "chips": [
-            "Unit 1",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IS2",
-          "module_name": "J&K & Cross-Border Terrorism",
-          "chapter_range": "Unit 2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Post-370 security developments from current affairs.",
-          "chapters": [
+            },
             {
               "chapter": "3",
               "name": "Jammu & Kashmir militancy — evolution and current phase"
@@ -3355,21 +2875,21 @@
             }
           ],
           "chips": [
-            "Unit 2",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IS3",
-          "module_name": "North-East Insurgency",
-          "chapter_range": "Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "IS2",
+          "module_name": "North-East Insurgency & Left-Wing Extremism",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "State–group–accord–status table.",
+          "focus": "AFSPA debate + SAMADHAN strategy.",
           "chapters": [
             {
               "chapter": "5",
@@ -3378,25 +2898,7 @@
             {
               "chapter": "6",
               "name": "Peace accords and AFSPA debate"
-            }
-          ],
-          "chips": [
-            "Unit 3",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IS4",
-          "module_name": "Left Wing Extremism",
-          "chapter_range": "Unit 4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "District-count trend; two-pronged strategy for mains.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "LWE — origins, spread, current status"
@@ -3407,21 +2909,21 @@
             }
           ],
           "chips": [
-            "Unit 4",
-            "~7 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IS5",
-          "module_name": "Terrorism & Organised Crime",
-          "chapter_range": "Unit 5",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IS3",
+          "module_name": "Terrorism, Organised Crime & Cyber Security",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "FATF process; terror-financing channels diagram.",
+          "focus": "PMLA/FATF + CERT-In/NCIIPC architecture.",
           "chapters": [
             {
               "chapter": "9",
@@ -3430,25 +2932,7 @@
             {
               "chapter": "10",
               "name": "Organised crime — linkages with terrorism, money laundering (PMLA, FATF)"
-            }
-          ],
-          "chips": [
-            "Unit 5",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IS6",
-          "module_name": "Cyber & Communication Security",
-          "chapter_range": "Unit 6",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Cyber incident case studies with year.",
-          "chapters": [
+            },
             {
               "chapter": "11",
               "name": "Cyber security — threats, architecture (CERT-In, NCIIPC)"
@@ -3459,21 +2943,21 @@
             }
           ],
           "chips": [
-            "Unit 6",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "IS7",
-          "module_name": "Borders & Forces",
-          "chapter_range": "Unit 7",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_code": "IS4",
+          "module_name": "Border Management, Forces & Disaster Management",
+          "chapter_range": "Ch 13–17",
+          "estimated_hours": 11,
+          "estimated_days": 4.5,
+          "duration_label": "~11 h · 4.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Border–force–challenge matching; police reform committees.",
+          "focus": "DM Act + 2nd ARC + Sendai — folds DM into the block.",
           "chapters": [
             {
               "chapter": "13",
@@ -3482,25 +2966,7 @@
             {
               "chapter": "14",
               "name": "Security forces — CAPFs, police reforms, private security"
-            }
-          ],
-          "chips": [
-            "Unit 7",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "IS8",
-          "module_name": "Disaster Management",
-          "chapter_range": "Unit 8 (DM)",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Links back to IG4 and Polity P13 (NDMA).",
-          "chapters": [
+            },
             {
               "chapter": "15",
               "name": "DM Act 2005, NDMA framework, NDMP"
@@ -3515,8 +2981,8 @@
             }
           ],
           "chips": [
-            "Unit 8 (DM)",
-            "~8 h · 3 days",
+            "Ch 13–17",
+            "~11 h · 4.5 days",
             "Test: 50 Q"
           ]
         }
@@ -3528,22 +2994,22 @@
       "primary_source": "MD Notes built on NCERT XII — Indian Society + Social Change and Development in India + news layer",
       "source_note": null,
       "chips": [
-        "4 modules",
+        "3 modules",
         "3 weeks",
-        "4 × 50 Q module tests",
+        "3 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "S1",
-          "module_name": "Structure of Indian Society",
-          "chapter_range": "Notes Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Social Structure — Family, Region & Caste",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "NCERT vocabulary is the marking vocabulary — use it.",
+          "focus": "Unity in diversity + caste continuity/change.",
           "chapters": [
             {
               "chapter": "1",
@@ -3556,29 +3022,29 @@
             {
               "chapter": "3",
               "name": "Regionalism and diversity management"
+            },
+            {
+              "chapter": "4",
+              "name": "Caste system — continuity and change"
             }
           ],
           "chips": [
-            "Notes Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "S2",
-          "module_name": "Identity & Fault Lines",
-          "chapter_range": "Notes Unit 2",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_name": "Tribes, Religion, Demography & Women",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Committee/data points per fault line.",
+          "focus": "Communalism/secularism + women's empowerment.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "Caste system — continuity and change"
-            },
             {
               "chapter": "5",
               "name": "Tribes — issues and policy"
@@ -3586,25 +3052,7 @@
             {
               "chapter": "6",
               "name": "Religion, communalism, secularism"
-            }
-          ],
-          "chips": [
-            "Notes Unit 2",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "S3",
-          "module_name": "Population & Women",
-          "chapter_range": "Notes Unit 3",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Census + NFHS data bank; links to IG5.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "Demography and population issues"
@@ -3612,29 +3060,29 @@
             {
               "chapter": "8",
               "name": "Women — status, patriarchy, violence, empowerment"
-            },
-            {
-              "chapter": "9",
-              "name": "Urbanization and migration — social effects"
             }
           ],
           "chips": [
-            "Notes Unit 3",
-            "~8 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "S4",
-          "module_name": "Social Change",
-          "chapter_range": "Notes Unit 4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "S3",
+          "module_name": "Urbanisation, Globalisation & Social Movements",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Every topic needs one example + one data point for mains.",
+          "focus": "Social effects + empowerment movements.",
           "chapters": [
+            {
+              "chapter": "9",
+              "name": "Urbanization and migration — social effects"
+            },
             {
               "chapter": "10",
               "name": "Globalization — social effects"
@@ -3649,8 +3097,8 @@
             }
           ],
           "chips": [
-            "Notes Unit 4",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -3662,22 +3110,22 @@
       "primary_source": "MD Notes — 2nd ARC (4 reports), PRS, PIB, Laxmikanth governance chapters as base",
       "source_note": null,
       "chips": [
-        "4 modules",
+        "3 modules",
         "3 weeks",
-        "4 × 50 Q module tests",
+        "3 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "G1",
-          "module_name": "Governance Foundations",
-          "chapter_range": "Notes Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Good Governance, Transparency & Ethics",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "ARC recommendation → implementation status format.",
+          "focus": "RTI + citizen charters + ARC ethics report.",
           "chapters": [
             {
               "chapter": "1",
@@ -3690,29 +3138,29 @@
             {
               "chapter": "3",
               "name": "Citizens' charters and grievance redressal"
+            },
+            {
+              "chapter": "4",
+              "name": "2nd ARC — Ethics in Governance (key recommendations)"
             }
           ],
           "chips": [
-            "Notes Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "G2",
-          "module_name": "Ethics & Citizen-Centricity in Administration",
-          "chapter_range": "Notes Unit 2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Citizen-Centric & Digital Governance",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Feeds Ethics ET5 directly — schedule before Ethics.",
+          "focus": "Digital India stack + Mission Karmayogi.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "2nd ARC — Ethics in Governance (key recommendations)"
-            },
             {
               "chapter": "5",
               "name": "2nd ARC — Citizen Centric Administration"
@@ -3720,25 +3168,7 @@
             {
               "chapter": "6",
               "name": "Social audit and participatory governance"
-            }
-          ],
-          "chips": [
-            "Notes Unit 2",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "G3",
-          "module_name": "e-Governance & Civil Services",
-          "chapter_range": "Notes Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "e-Governance models with Indian examples.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "2nd ARC — Promoting e-Governance; Digital India stack"
@@ -3746,29 +3176,29 @@
             {
               "chapter": "8",
               "name": "Role of civil services in democracy; reforms (Mission Karmayogi)"
-            },
-            {
-              "chapter": "9",
-              "name": "Institutional and regulatory bodies overview"
             }
           ],
           "chips": [
-            "Notes Unit 3",
-            "~7 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "G4",
-          "module_name": "Development Ecosystem",
-          "chapter_range": "Notes Unit 4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "G3",
+          "module_name": "Institutions, Schemes & Legislation Tracking",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Scheme template: objective–ministry–funding–evaluation.",
+          "focus": "Scheme evaluation + PRS-based bill tracking.",
           "chapters": [
+            {
+              "chapter": "9",
+              "name": "Institutional and regulatory bodies overview"
+            },
             {
               "chapter": "10",
               "name": "SHGs, NGOs, cooperatives — role in development"
@@ -3783,8 +3213,8 @@
             }
           ],
           "chips": [
-            "Notes Unit 4",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -3796,22 +3226,22 @@
       "primary_source": "MD Notes — ministry sources, NITI Aayog, NCERT XII base; annually updated schemes compendium",
       "source_note": null,
       "chips": [
-        "3 modules",
+        "2 modules",
         "2 weeks",
-        "3 × 50 Q module tests",
+        "2 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "SJ1",
-          "module_name": "Vulnerable Sections",
-          "chapter_range": "Notes Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Vulnerable Sections & Health",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Section–act–scheme–body four-column master table.",
+          "focus": "SC/ST/OBC + Ayushman Bharat/POSHAN.",
           "chapters": [
             {
               "chapter": "1",
@@ -3824,29 +3254,29 @@
             {
               "chapter": "3",
               "name": "Related bodies and commissions"
+            },
+            {
+              "chapter": "4",
+              "name": "Health — policy, Ayushman Bharat, nutrition (POSHAN)"
             }
           ],
           "chips": [
-            "Notes Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "SJ2",
-          "module_name": "Health & Education",
-          "chapter_range": "Notes Unit 2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Education, Employment & Welfare Design",
+          "chapter_range": "Ch 5–9",
+          "estimated_hours": 11,
+          "estimated_days": 4.5,
+          "duration_label": "~11 h · 4.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Data from Economic Survey + NFHS.",
+          "focus": "NEP 2020 + DBT vs universalisation debate.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "Health — policy, Ayushman Bharat, nutrition (POSHAN)"
-            },
             {
               "chapter": "5",
               "name": "Education — NEP 2020, schemes, issues"
@@ -3854,25 +3284,7 @@
             {
               "chapter": "6",
               "name": "Skill development and employment programmes"
-            }
-          ],
-          "chips": [
-            "Notes Unit 2",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "SJ3",
-          "module_name": "Poverty & Welfare Design",
-          "chapter_range": "Notes Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Mains-oriented: issue → scheme → gap → reform format.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "Poverty and hunger — measurement and debates"
@@ -3887,8 +3299,8 @@
             }
           ],
           "chips": [
-            "Notes Unit 3",
-            "~7 h · 3 days",
+            "Ch 5–9",
+            "~11 h · 4.5 days",
             "Test: 50 Q"
           ]
         }
@@ -3900,22 +3312,22 @@
       "primary_source": "Lexicon for Ethics, Integrity & Aptitude + MD case-study bank",
       "source_note": null,
       "chips": [
-        "6 modules",
+        "4 modules",
         "1 month",
-        "6 × 50 Q module tests",
+        "4 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "ET1",
-          "module_name": "Ethics Foundations",
-          "chapter_range": "Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Ethics Foundations & Attitude",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Personal definition bank — every keyword gets own 2-line definition + example.",
+          "focus": "Determinants of ethics + moral/political attitudes.",
           "chapters": [
             {
               "chapter": "1",
@@ -3928,29 +3340,29 @@
             {
               "chapter": "3",
               "name": "Human values — lessons from lives of leaders and reformers"
+            },
+            {
+              "chapter": "4",
+              "name": "Attitude — content, structure, function; moral and political attitudes"
             }
           ],
           "chips": [
-            "Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "ET2",
-          "module_name": "Attitude & Aptitude",
-          "chapter_range": "Unit 2",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Aptitude, Values, EI & Thinkers",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Value + civil-service example pairs.",
+          "focus": "Foundational values + moral thinkers grid.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "Attitude — content, structure, function; moral and political attitudes"
-            },
             {
               "chapter": "5",
               "name": "Aptitude and foundational values for civil service"
@@ -3958,25 +3370,7 @@
             {
               "chapter": "6",
               "name": "Integrity, impartiality, objectivity, dedication, empathy, compassion"
-            }
-          ],
-          "chips": [
-            "Unit 2",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "ET3",
-          "module_name": "EI & Thinkers",
-          "chapter_range": "Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Thinker–one-line-doctrine–application table.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "Emotional intelligence — concepts and application"
@@ -3987,21 +3381,21 @@
             }
           ],
           "chips": [
-            "Unit 3",
-            "~7 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "ET4",
-          "module_name": "Public Service Ethics",
-          "chapter_range": "Unit 4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "ET3",
+          "module_name": "Public Service Ethics & Probity",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Dilemma-resolution framework practiced in writing.",
+          "focus": "Dilemmas, accountability, probity basis.",
           "chapters": [
             {
               "chapter": "9",
@@ -4014,29 +3408,29 @@
             {
               "chapter": "11",
               "name": "Laws, rules, regulations as sources of ethical guidance"
+            },
+            {
+              "chapter": "12",
+              "name": "Probity in governance — concept and philosophical basis"
             }
           ],
           "chips": [
-            "Unit 4",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "ET5",
-          "module_name": "Probity",
-          "chapter_range": "Unit 5",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "ET4",
+          "module_name": "Codes, Corruption & Case Studies",
+          "chapter_range": "Ch 13–16",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Direct overlap with Governance G2 — revise together.",
+          "focus": "Case framework: stakeholders → options → evaluation → action.",
           "chapters": [
-            {
-              "chapter": "12",
-              "name": "Probity in governance — concept and philosophical basis"
-            },
             {
               "chapter": "13",
               "name": "Codes of ethics/conduct, citizen charters, work culture"
@@ -4044,25 +3438,7 @@
             {
               "chapter": "14",
               "name": "Challenges of corruption; RTI and transparency"
-            }
-          ],
-          "chips": [
-            "Unit 5",
-            "~7 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "ET6",
-          "module_name": "Case Study Mastery",
-          "chapter_range": "Unit 6",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "From here, fortnightly case-study thread activates.",
-          "chapters": [
+            },
             {
               "chapter": "15",
               "name": "Case-study answer framework (stakeholders → options → evaluation → action)"
@@ -4073,8 +3449,8 @@
             }
           ],
           "chips": [
-            "Unit 6",
-            "~8 h · 3 days",
+            "Ch 13–16",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }
@@ -4086,22 +3462,22 @@
       "primary_source": "MD Notes thread — basics + one year of developments (no market book)",
       "source_note": null,
       "chips": [
-        "4 modules",
+        "3 modules",
         "3 weeks",
-        "4 × 50 Q module tests",
+        "3 × 50 Q module tests",
         "1 × 100 Q FLT"
       ],
       "modules": [
         {
           "module_code": "ST1",
-          "module_name": "Exam-Oriented Science Basics",
-          "chapter_range": "Notes Unit 1",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_name": "Science Basics & Space",
+          "chapter_range": "Ch 1–4",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Only exam-frequency topics — no textbook depth.",
+          "focus": "Exam-oriented physics/chem/bio + ISRO missions.",
           "chapters": [
             {
               "chapter": "1",
@@ -4114,29 +3490,29 @@
             {
               "chapter": "3",
               "name": "Biology basics (cell, genetics, diseases, immunity)"
+            },
+            {
+              "chapter": "4",
+              "name": "Space — ISRO missions, launch vehicles, applications"
             }
           ],
           "chips": [
-            "Notes Unit 1",
-            "~7 h · 3 days",
+            "Ch 1–4",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
           "module_code": "ST2",
-          "module_name": "Strategic Technologies",
-          "chapter_range": "Notes Unit 2",
-          "estimated_hours": 8,
-          "estimated_days": 3,
-          "duration_label": "~8 h · 3 days",
+          "module_name": "Defence, Nuclear & Digital Tech",
+          "chapter_range": "Ch 5–8",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Mission–purpose–orbit/agency table updated annually.",
+          "focus": "DRDO platforms + AI/quantum/blockchain.",
           "chapters": [
-            {
-              "chapter": "4",
-              "name": "Space — ISRO missions, launch vehicles, applications"
-            },
             {
               "chapter": "5",
               "name": "Defence technology — missiles, platforms, DRDO"
@@ -4144,25 +3520,7 @@
             {
               "chapter": "6",
               "name": "Nuclear energy and programme"
-            }
-          ],
-          "chips": [
-            "Notes Unit 2",
-            "~8 h · 3 days",
-            "Test: 50 Q"
-          ]
-        },
-        {
-          "module_code": "ST3",
-          "module_name": "Digital Technologies",
-          "chapter_range": "Notes Unit 3",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
-          "has_module_test": true,
-          "test_label": "Test: 50 Q",
-          "focus": "Tech–application–India-initiative format.",
-          "chapters": [
+            },
             {
               "chapter": "7",
               "name": "IT, AI/ML, robotics"
@@ -4170,29 +3528,29 @@
             {
               "chapter": "8",
               "name": "Telecom (5G/6G), quantum technologies, blockchain"
-            },
-            {
-              "chapter": "9",
-              "name": "Semiconductors and emerging tech policy"
             }
           ],
           "chips": [
-            "Notes Unit 3",
-            "~7 h · 3 days",
+            "Ch 5–8",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         },
         {
-          "module_code": "ST4",
-          "module_name": "Life Sciences & Policy",
-          "chapter_range": "Notes Unit 4",
-          "estimated_hours": 7,
-          "estimated_days": 3,
-          "duration_label": "~7 h · 3 days",
+          "module_code": "ST3",
+          "module_name": "Emerging Tech, Biotech & S&T Policy",
+          "chapter_range": "Ch 9–12",
+          "estimated_hours": 9,
+          "estimated_days": 3.5,
+          "duration_label": "~9 h · 3.5 days",
           "has_module_test": true,
           "test_label": "Test: 50 Q",
-          "focus": "Ethics angles noted for GS4 crossover.",
+          "focus": "Semiconductors, biotech, IPR — GS4 crossover noted.",
           "chapters": [
+            {
+              "chapter": "9",
+              "name": "Semiconductors and emerging tech policy"
+            },
             {
               "chapter": "10",
               "name": "Biotechnology — applications and issues"
@@ -4207,8 +3565,8 @@
             }
           ],
           "chips": [
-            "Notes Unit 4",
-            "~7 h · 3 days",
+            "Ch 9–12",
+            "~9 h · 3.5 days",
             "Test: 50 Q"
           ]
         }

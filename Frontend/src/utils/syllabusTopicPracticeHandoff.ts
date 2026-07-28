@@ -46,6 +46,7 @@ function normalizeLabel(value: string): string {
 /**
  * Resolve the best Notes subject for a syllabus handoff.
  * Prefers explicit key map, then exact / fuzzy name match against available notes subjects.
+ * Never silently falls back to an unrelated subject.
  */
 export function resolveNotesSubjectFromSyllabus(
   notesSubjects: string[],
@@ -70,13 +71,66 @@ export function resolveNotesSubjectFromSyllabus(
   });
   if (fuzzy) return fuzzy;
 
-  // e.g. "Medieval History" → "History"
+  // e.g. "Medieval History" / "Ancient History" → "History"
   if (/\bhistory\b/i.test(name)) {
     const history = notesSubjects.find((s) => normalizeLabel(s) === "history");
     if (history) return history;
   }
 
+  // e.g. "Indian Economy" → "Economy"
+  if (/\beconom/i.test(name) || subjectKey === "economy") {
+    const eco = notesSubjects.find((s) => /econom/i.test(s));
+    if (eco) return eco;
+  }
+
   return mapped && notesSubjects.includes(mapped) ? mapped : null;
+}
+
+/**
+ * Resolve Knowledge Base subject row from syllabus handoff (by key map + fuzzy name).
+ */
+export function resolveKbSubjectFromSyllabus<T extends { _id: string; name: string }>(
+  kbSubjects: T[],
+  subjectKey: string,
+  subjectName: string
+): T | null {
+  if (!kbSubjects.length) return null;
+
+  const mapped = SYLLABUS_KEY_TO_NOTES_SUBJECT[String(subjectKey || "").trim()];
+  if (mapped) {
+    const byMap = kbSubjects.find((s) => s.name.toLowerCase() === mapped.toLowerCase());
+    if (byMap) return byMap;
+  }
+
+  const name = String(subjectName || "").trim();
+  if (name) {
+    const exact = kbSubjects.find((s) => s.name.toLowerCase() === name.toLowerCase());
+    if (exact) return exact;
+
+    const normName = normalizeLabel(name);
+    const fuzzy = kbSubjects.find((s) => {
+      const ns = normalizeLabel(s.name);
+      return ns === normName || normName.includes(ns) || ns.includes(normName);
+    });
+    if (fuzzy) return fuzzy;
+  }
+
+  if (mapped) {
+    const soft = kbSubjects.find((s) => normalizeLabel(s.name).includes(normalizeLabel(mapped)));
+    if (soft) return soft;
+  }
+
+  if (subjectKey === "economy" || /\beconom/i.test(name)) {
+    return kbSubjects.find((s) => /econom/i.test(s.name)) || null;
+  }
+  if (/\bhistory\b/i.test(name) || /^(ancient|medieval|modern|postind|worldhist)$/i.test(subjectKey)) {
+    return kbSubjects.find((s) => normalizeLabel(s.name) === "history") || null;
+  }
+  if (/geo/i.test(subjectKey) || /\bgeography\b/i.test(name)) {
+    return kbSubjects.find((s) => /geograph/i.test(s.name)) || null;
+  }
+
+  return null;
 }
 
 export function isSyllabusToTopicPracticeHandoff(

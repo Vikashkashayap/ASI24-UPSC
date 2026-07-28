@@ -18,6 +18,9 @@ import SourceUrl from "../models/SourceUrl.js";
 import ContentChunk from "../models/ContentChunk.js";
 import { retrieverService } from "../services/ai/retriever.service.js";
 import { validateStudentIdsForActor } from "../utils/mentorRosterAccess.js";
+import {
+  removeDuplicates,
+} from "../questionIntelligence/services/duplicateRemoval.service.js";
 
 const GS_SUBJECTS = [
   "Polity",
@@ -42,8 +45,7 @@ function normalizeAssignedQuestionCount(value) {
 /** Deduplicate + keep only complete stems, capped at target (default 50). */
 function selectFinalPracticeQuestions(questions = [], target = ASSIGNED_QUESTION_COUNT_DEFAULT) {
   const cap = normalizeAssignedQuestionCount(target);
-  const seen = new Set();
-  const out = [];
+  const prepared = [];
   const rejected = [];
 
   for (const raw of questions || []) {
@@ -64,19 +66,33 @@ function selectFinalPracticeQuestions(questions = [], target = ASSIGNED_QUESTION
       continue;
     }
 
-    const key = text
-      .toLowerCase()
-      .replace(/[^a-z0-9\u0900-\u097f]+/g, " ")
-      .trim()
-      .slice(0, 140);
-    if (!key || seen.has(key)) {
-      rejected.push({ ...fixed, backupReason: "duplicate" });
-      continue;
-    }
-    seen.add(key);
-    out.push(pickBilingualQuestionFields({ ...fixed, correctAnswer: answer, answer }));
-    if (out.length >= cap) break;
+    prepared.push({
+      ...fixed,
+      questionText: text,
+      question: text,
+      question_en: fixed.question_en || text,
+      correctAnswer: answer,
+      answer,
+      options: opts,
+    });
   }
+
+  const thr = parseFloat(process.env.QI_DEDUPE_THRESHOLD || "0.75") || 0.75;
+  const { questions: unique, duplicatesRemoved } = removeDuplicates(prepared, { threshold: thr });
+  for (let i = 0; i < duplicatesRemoved; i += 1) {
+    rejected.push({ backupReason: "duplicate" });
+  }
+
+  const out = unique.slice(0, cap).map((q) => {
+    const { questionText, questionHash, ...rest } = q;
+    return pickBilingualQuestionFields({
+      ...rest,
+      question: questionText || rest.question,
+      question_en: rest.question_en || questionText || rest.question,
+      correctAnswer: rest.correctAnswer || rest.answer,
+      answer: rest.correctAnswer || rest.answer,
+    });
+  });
 
   return { questions: out, rejected, target: cap };
 }

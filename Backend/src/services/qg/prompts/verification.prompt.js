@@ -1,69 +1,49 @@
 /**
  * Answer verification prompt — second-pass accuracy gate.
+ * Kept compact to reduce input tokens on every verify call.
  */
 
 export function buildVerificationSystemPrompt() {
-  return `You are a ruthless UPSC Prelims answer key verifier and hallucination detector.
-
-Your job: given a candidate MCQ and the RETRIEVED CONTEXT, decide if the question is valid AND whether the marked correctAnswer letter matches the option text that CONTEXT actually supports.
-
-═══════════════════════════════════════════════════════════
-CONSISTENCY FIRST
-═══════════════════════════════════════════════════════════
-1. Decide which option TEXT is factually correct per CONTEXT alone.
-2. Map that text to its letter (A/B/C/D).
-3. Compare with the marked correctAnswer.
-4. If marked letter ≠ CONTEXT-true letter → verdict=revise and set revisedCorrectAnswer / correctAnswer to the true letter.
-5. answerMatchesMarked=true ONLY if marked letter equals the CONTEXT-true letter.
+  return `UPSC Prelims MCQ verifier. Use CONTEXT only.
 
 Rules:
-1. The correct answer MUST be entailed by CONTEXT alone.
-2. Reject if any option or stem invents facts not supported by CONTEXT.
-3. Reject if options are trivial, identical, or impossible.
-4. Reject if the stem is incomplete (missing statements/lists/events required by the question type).
-5. Prefer REJECT over ACCEPT when uncertain.
-6. ALWAYS fill correctAnswer with the letter that CONTEXT supports (even when rejecting).
-7. Return ONLY valid JSON.
+1. Decide which option TEXT CONTEXT supports, then its letter A–D.
+2. Compare with marked correctAnswer; if wrong but another option is clearly right → verdict=revise + revisedCorrectAnswer.
+3. Reject if stem/options invent facts outside CONTEXT, are incomplete, trivial, or duplicate.
+4. Prefer reject when uncertain. Always set correctAnswer to CONTEXT-supported letter.
+5. JSON only.
 
 OUTPUT:
-{
-  "verdict":"accept"|"reject"|"revise",
-  "correctAnswer":"A|B|C|D",
-  "answerMatchesMarked":true|false,
-  "hallucinationDetected":true|false,
-  "unsupportedClaims":["..."],
-  "optionIssues":["..."],
-  "stemIssues":["..."],
-  "confidence":0.0-1.0,
-  "reason":"one short paragraph",
-  "revisedCorrectAnswer":"A|B|C|D|null"
-}`;
+{"verdict":"accept|reject|revise","correctAnswer":"A|B|C|D","answerMatchesMarked":true|false,"hallucinationDetected":true|false,"unsupportedClaims":[],"optionIssues":[],"stemIssues":[],"confidence":0.0-1.0,"reason":"≤40 words","revisedCorrectAnswer":"A|B|C|D|null"}`;
 }
 
 export function buildVerificationUserPrompt({ question, context }) {
   const q = question || {};
+  const opts = q.options || {};
+  const compactOpts =
+    opts && typeof opts === "object" && !Array.isArray(opts)
+      ? opts
+      : Array.isArray(opts)
+        ? Object.fromEntries(
+            opts.slice(0, 4).map((o, i) => [
+              String(o.label || String.fromCharCode(65 + i)).toUpperCase(),
+              o.text || o.option || "",
+            ])
+          )
+        : opts;
+
   return `CONTEXT:
 """
 ${context}
 """
 
-CANDIDATE QUESTION:
-${JSON.stringify(
-  {
-    question: q.question,
-    options: q.options,
-    correctAnswer: q.correctAnswer,
-    questionType: q.questionType,
-    sourceSpan: q.sourceSpan,
-  },
-  null,
-  2
-)}
+Q: ${String(q.question || "").slice(0, 900)}
+Options: ${JSON.stringify(compactOpts)}
+Marked: ${String(q.correctAnswer || "").toUpperCase().slice(0, 1)}
+Type: ${q.questionType || ""}
+SourceSpan: ${String(q.sourceSpan || "").slice(0, 160)}
 
-Verify against CONTEXT only.
-First decide which option TEXT is correct, then confirm the letter.
-If the marked letter is wrong but one other option is clearly correct, use verdict=revise.
-JSON only.`;
+Verify vs CONTEXT. JSON only.`;
 }
 
 export default { buildVerificationSystemPrompt, buildVerificationUserPrompt };

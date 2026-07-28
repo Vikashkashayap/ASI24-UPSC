@@ -34,9 +34,11 @@ CRITICAL CONSISTENCY LOCK (students must never see a mismatch):
 1. Decide the SINGLE correct OPTION TEXT from CONTEXT first.
 2. Put that text under exactly one letter in options A–D.
 3. Set correctAnswer to THAT letter only (A|B|C|D).
-4. explanation MUST open with: Option {correctAnswer} ("{exact option text}") is correct. — then defend ONLY that letter.
-5. Never mark letter X if option Y's text is the real answer. Never shuffle texts after setting correctAnswer.
-6. Self-check: options[correctAnswer] === the factually correct text; explanation defends the same letter.
+4. explanation MUST open with: Option {correctAnswer} ("{exact option text}") is correct.
+5. Then explain WHY it is right AND WHY EACH of the other three options is wrong (student concept clarity).
+6. Target 50–70 English words; hard max 100. Dense, no fluff.
+7. Never mark letter X if option Y's text is the real answer. Never shuffle texts after setting correctAnswer.
+8. Self-check: options[correctAnswer] === the factually correct text; explanation defends the same letter.
 
 JSON shape:
 {"questions":[{"question":"...","options":{"A":"...","B":"...","C":"...","D":"..."},"correctAnswer":"A","explanation":"..."}]}`;
@@ -54,8 +56,10 @@ ${contextText}
 """
 
 Generate exactly ${count} UPSC Prelims MCQs grounded ONLY in CONTEXT.
-HARD RULE: correctAnswer letter MUST match the option text that CONTEXT supports; explanation must defend that same letter only.
-Each explanation must cite the relevant fact from CONTEXT in 2–4 sentences.`;
+HARD RULES:
+- correctAnswer letter MUST match the option text that CONTEXT supports.
+- explanation (50–100 words) MUST start with Option {correctAnswer} ("…") is correct; then why correct AND why EACH wrong option fails.
+- Never invent outside CONTEXT.`;
 }
 
 function parseLlmJson(raw) {

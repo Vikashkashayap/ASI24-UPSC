@@ -84,10 +84,14 @@ export function lockPlainExplanationToAnswer(explanationText, question = {}) {
     detail = `${lead} ${detail}`.trim();
   }
 
-  // Cap ~75 words for UI compactness
+  // Cap ~100 words (teaching explanation covering all options)
+  const maxWords = Math.max(
+    70,
+    parseInt(process.env.QG_EXPLAIN_MAX_WORDS, 10) || 100
+  );
   const words = detail.split(/\s+/).filter(Boolean);
-  if (words.length > 75) {
-    detail = `${words.slice(0, 70).join(" ").replace(/[.,;:]+$/, "")}.`;
+  if (words.length > maxWords) {
+    detail = `${words.slice(0, maxWords).join(" ").replace(/[.,;:]+$/, "")}.`;
   }
 
   return {
@@ -146,14 +150,14 @@ export function lockExplanationToAnswer(structured, question) {
   }
   locked.whyWrong = why;
 
-  // Strip contradictory lead-ins / wrong-letter claims
+  // Strip contradictory lead-ins / wrong-letter claims (keep locked letter; re-add below)
   let detail = String(locked.detailedExplanation || "").trim();
   detail = detail.replace(/^correct\s*answer\s*:\s*[A-D]\s*[.\-–:]?\s*/i, "").trim();
-  // Remove "Option X is correct/right" when X ≠ locked answer
+  // Remove "Option X is correct/right" only when X ≠ locked answer
   detail = detail
     .replace(
       new RegExp(
-        `\\bOption\\s+[A-D]\\b(?:\\s*\\([^)]*\\))?\\s+is\\s+(?:the\\s+)?(?:correct|right)\\b[^.]*\\.\\s*`,
+        `\\bOption\\s+(?![${correct}])[A-D]\\b(?:\\s*\\([^)]*\\))?\\s+is\\s+(?:the\\s+)?(?:correct|right)\\b[^.]*\\.\\s*`,
         "gi"
       ),
       ""
@@ -161,10 +165,10 @@ export function lockExplanationToAnswer(structured, question) {
     .trim();
 
   const optionText = String(options[correct] || "").trim();
-  const mentionsCorrect = new RegExp(`\\b(?:option\\s+)?${correct}\\b`, "i").test(detail);
-  if (!mentionsCorrect && optionText) {
+  // Do NOT use /i with bare letter A — it matches English article "a"
+  if (!new RegExp(`\\bOption\\s+${correct}\\b`).test(detail) && optionText) {
     detail = `Option ${correct} ("${optionText}") is correct. ${detail}`.trim();
-  } else if (!mentionsCorrect) {
+  } else if (!new RegExp(`\\bOption\\s+${correct}\\b`).test(detail)) {
     detail = `Option ${correct} is correct. ${detail}`.trim();
   }
 

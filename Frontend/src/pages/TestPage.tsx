@@ -16,6 +16,7 @@ import { ExamQuestionBody, ExamOptionRow, examPaletteCols, getQuestionOptionKeys
 import { ExamLanguageToggle } from "../components/exam/ExamLanguageToggle";
 import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
+import { useClientSideHindiQuestions } from "../hooks/useClientSideHindiQuestions";
 import { testAPI, syllabusTargetsAPI } from "../services/api";
 
 interface Question {
@@ -50,9 +51,23 @@ interface TestData {
 type PaletteStatus = "not-visited" | "answered" | "marked" | "answered-marked" | "current";
 
 function formatCountdown(seconds: number): string {
-  const m = Math.floor(seconds / 60);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+/** 50Q → 60 min; 20Q → 24 min (proportional). */
+function resolveExamDurationMinutes(test: { durationMinutes?: number; totalQuestions?: number } | null): number {
+  if (!test) return 60;
+  if (test.durationMinutes != null && Number(test.durationMinutes) > 0) {
+    return Number(test.durationMinutes);
+  }
+  const n = Number(test.totalQuestions) || 20;
+  return Math.max(15, Math.round((n * 60) / 50));
 }
 
 function PalettePanel({
@@ -159,6 +174,11 @@ const TestPage: React.FC = () => {
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [test, setTest] = useState<TestData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { questions: displayQuestions, translating: translatingHi } = useClientSideHindiQuestions(
+    test?.questions || [],
+    examLang,
+    currentIndex
+  );
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [markedIds, setMarkedIds] = useState<Set<string>>(new Set());
   const [visitedIndices, setVisitedIndices] = useState<Set<number>>(new Set([0]));
@@ -171,9 +191,13 @@ const TestPage: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const questionStartTimeRef = useRef(Date.now());
+  const autoSubmitFiredRef = useRef(false);
+  const submitInFlightRef = useRef(false);
 
   useEffect(() => {
     if (id) loadTest();
+    autoSubmitFiredRef.current = false;
+    setTimeElapsed(0);
   }, [id]);
 
   useEffect(() => {
@@ -275,7 +299,8 @@ const TestPage: React.FC = () => {
   };
 
   const handleConfirmSubmit = async () => {
-    if (!test) return;
+    if (!test || submitInFlightRef.current) return;
+    submitInFlightRef.current = true;
     setShowSubmitDialog(false);
     setIsSubmitting(true);
     setError(null);
@@ -330,13 +355,24 @@ const TestPage: React.FC = () => {
       setError(ax.response?.data?.message || "Failed to submit test");
     } finally {
       setIsSubmitting(false);
+      submitInFlightRef.current = false;
     }
   };
 
   const attemptedCount = Object.keys(answers).length;
   const totalMarks = test?.totalMarks ?? (test ? test.totalQuestions * 2 : 0);
-  const durationSec = (test?.durationMinutes ?? 60) * 60;
+  const durationSec = resolveExamDurationMinutes(test) * 60;
   const timeRemaining = Math.max(0, durationSec - timeElapsed);
+
+  // Time over → auto-submit (no manual submit needed)
+  useEffect(() => {
+    if (!test || isLoading || isSubmitting) return;
+    if (timeRemaining > 0) return;
+    if (autoSubmitFiredRef.current) return;
+    autoSubmitFiredRef.current = true;
+    void handleConfirmSubmit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once when timer hits 0
+  }, [timeRemaining, test, isLoading, isSubmitting]);
 
   const paletteStats = useMemo(() => {
     if (!test) return { done: 0, marked: 0, left: 0 };
@@ -397,7 +433,7 @@ const TestPage: React.FC = () => {
 
   if (!test) return null;
 
-  const currentQuestion = test.questions[currentIndex];
+  const currentQuestion = displayQuestions[currentIndex] || test.questions[currentIndex];
   const optionKeys = getQuestionOptionKeys(currentQuestion);
   const isMarked = markedIds.has(currentQuestion._id);
   const paletteColsDesktop = examPaletteCols(test.totalQuestions, false);
@@ -430,6 +466,9 @@ const TestPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
+            {translatingHi ? (
+              <span className="text-[9px] text-slate-400 hidden sm:inline">हिंदी…</span>
+            ) : null}
             <span className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tabular-nums">
               {attemptedCount}/{test.totalQuestions}
             </span>

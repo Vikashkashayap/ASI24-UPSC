@@ -2,7 +2,7 @@ import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -147,6 +147,8 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/mentors': { title: 'Mentors', icon: <Users className="w-5 h-5" /> },
     '/admin/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
     '/admin/knowledge-base': { title: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
+    '/admin/processing': { title: 'Processing Engine', icon: <Activity className="w-5 h-5" /> },
+    '/admin/intelligence': { title: 'Knowledge Intelligence', icon: <Brain className="w-5 h-5" /> },
     '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
@@ -479,9 +481,17 @@ export const DashboardLayout = () => {
                   <Target className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
                 </NavLink>
-                <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Base - Notes & PDFs for RAG">
+                <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Base — upload notes, PDFs & PYQs">
                   <Database className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Knowledge Base</span>}
+                </NavLink>
+                <NavLink to="/admin/processing" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Processing Engine — queues, OCR, parse, chunks">
+                  <Activity className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Processing</span>}
+                </NavLink>
+                <NavLink to="/admin/intelligence" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Intelligence — embeddings & hybrid search">
+                  <Brain className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Intelligence</span>}
                 </NavLink>
                 <NavLink to="/admin/topic-practice" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Topic Practice - Assign tests to students">
                   <ClipboardList className="w-4 h-4 flex-shrink-0" />

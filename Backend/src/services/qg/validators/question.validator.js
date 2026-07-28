@@ -68,6 +68,17 @@ export function validateQuestionStructure(q) {
   const norms = filled.map((k) => options[k].toLowerCase().replace(/\s+/g, " "));
   if (new Set(norms).size !== norms.length) errors.push("duplicate_options");
 
+  // Weak distractors: tiny or near-identical lengthless stubs (except code-style options)
+  const codeLike = /^(?:\d+(?:\s*(?:and|,|only|[-–])\s*\d+)*.*|none of the above|all of the above)$/i;
+  for (const k of filled) {
+    const t = options[k];
+    if (codeLike.test(t)) continue;
+    if (t.split(/\s+/).filter(Boolean).length < 2 && t.length < 8) {
+      errors.push("weak_option_text");
+      break;
+    }
+  }
+
   const correct = normalizeCorrectAnswer(q?.correctAnswer ?? q?.answer);
   if (!correct) errors.push("missing_correct_answer");
   if (correct && !requiredKeys.includes(correct)) errors.push("correct_answer_out_of_range");

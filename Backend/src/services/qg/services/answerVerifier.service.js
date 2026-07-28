@@ -10,16 +10,23 @@ import {
 import { verificationCache, cacheKey } from "./cache.service.js";
 import { QG_CONFIG } from "../config/qg.config.js";
 import { fingerprintHash } from "./duplicateDetector.service.js";
+import { trimContextForLlm } from "../utils/contextTrim.js";
 
 /**
  * @param {{ question: object, contextText: string }} params
  */
 export async function verifyAnswerStage({ question, contextText } = {}) {
+  const slimContext = trimContextForLlm(contextText, {
+    question,
+    maxChars: QG_CONFIG.context.verifyMaxChars,
+    preferSourceSpan: true,
+  });
+
   const key = cacheKey([
     "verify",
     fingerprintHash(question?.question),
     question?.correctAnswer,
-    fingerprintHash(String(contextText || "").slice(0, 800)),
+    fingerprintHash(String(slimContext || "").slice(0, 800)),
   ]);
   const cached = verificationCache.get(key);
   if (cached) return { ...cached, fromCache: true };
@@ -27,8 +34,8 @@ export async function verifyAnswerStage({ question, contextText } = {}) {
   const llm = await callStageLlm({
     stage: "verification",
     systemPrompt: buildVerificationSystemPrompt(),
-    userPrompt: buildVerificationUserPrompt({ question, context: contextText }),
-    maxTokens: 1200,
+    userPrompt: buildVerificationUserPrompt({ question, context: slimContext }),
+    maxTokens: 700,
   });
 
   const parsed = llm.parsed || {};
