@@ -345,12 +345,16 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
  * Create (or reuse-from-cache) a chapter practice test.
  * Generate 30 Hard MCQs from Admin Knowledge Base RAG only (kbOnly),
  * then show 20 unique questions with teaching explanations (all options).
+ *
+ * Retake / forceCache: always reuse the saved paper for this topic from DB
+ * (same student's prior attempt first, else any prior GS Hard paper).
  */
 export async function createChapterPracticeTest({
   userId,
   kbSubject,
   topicName,
   chapterLabel,
+  forceCache = false,
 }) {
   const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
   const testSubject = resolveTestSubject(kbSubject);
@@ -373,12 +377,11 @@ export async function createChapterPracticeTest({
     return unique;
   };
 
-  // Reuse prior GS Hard paper only when explanations are teaching-quality
   const topicRegex = new RegExp(
     `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
     "i"
   );
-  const existingTest = await Test.findOne({
+  const baseCacheQuery = {
     subject: testSubject,
     topic: topicRegex,
     difficulty,
@@ -389,7 +392,16 @@ export async function createChapterPracticeTest({
       { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
       { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
     ],
-  }).sort({ createdAt: -1 });
+  };
+
+  // Retake: prefer this student's own saved paper for the topic; else any prior paper
+  let existingTest = null;
+  if (forceCache && userId) {
+    existingTest = await Test.findOne({ ...baseCacheQuery, userId }).sort({ createdAt: -1 });
+  }
+  if (!existingTest) {
+    existingTest = await Test.findOne(baseCacheQuery).sort({ createdAt: -1 });
+  }
 
   let questions;
   let fromCache = false;
@@ -403,18 +415,20 @@ export async function createChapterPracticeTest({
         })
       )
     );
+    const teachingCount = cached.filter((q) => hasTeachingExplanation(q)).length;
     const teachingOk =
-      cached.length >= SHOW_COUNT &&
-      cached.filter((q) => hasTeachingExplanation(q)).length >= Math.ceil(SHOW_COUNT * 0.7);
-    if (teachingOk) {
+      cached.length >= SHOW_COUNT && teachingCount >= Math.ceil(SHOW_COUNT * 0.7);
+    // Retake always reuses DB paper; first attempt still prefers teaching-quality cache
+    const useCache = cached.length >= SHOW_COUNT && (forceCache || teachingOk);
+    if (useCache) {
       fromCache = true;
       questions = pickBalancedPatternSet(cached, SHOW_COUNT);
       console.log(
-        `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}", teaching explanations OK)`
+        `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}", forceCache=${Boolean(forceCache)}, teaching=${teachingCount}/${cached.length})`
       );
     } else {
       console.warn(
-        `[chapterPractice] cache skipped — weak/short explanations (${cached.filter((q) => hasTeachingExplanation(q)).length}/${cached.length}) — regenerating from Admin KB RAG`
+        `[chapterPractice] cache skipped — weak/short explanations (${teachingCount}/${cached.length}) — regenerating from Admin KB RAG`
       );
     }
   }

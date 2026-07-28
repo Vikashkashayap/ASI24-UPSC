@@ -864,7 +864,7 @@ export const syllabusTargetsAPI = {
       };
     }>(`/api/syllabus-targets/${id}/chapters/complete`, { chapter, completed }),
   /** Tick chapter → 20 Hard RAG questions from Knowledge Base + start test */
-  startChapterPractice: (id: string, chapter: string) =>
+  startChapterPractice: (id: string, chapter: string, opts?: { retake?: boolean }) =>
     api.post<{
       success: boolean;
       message?: string;
@@ -872,6 +872,7 @@ export const syllabusTargetsAPI = {
         testId: string;
         test: { _id: string; subject: string; topic: string; difficulty?: string; totalQuestions: number };
         fromCache?: boolean;
+        retake?: boolean;
         chapter: string;
         topicName: string;
         relatedTopics?: string[];
@@ -881,7 +882,7 @@ export const syllabusTargetsAPI = {
       };
     }>(
       `/api/syllabus-targets/${id}/chapters/practice`,
-      { chapter },
+      { chapter, retake: Boolean(opts?.retake) },
       { timeout: 300000 }
     ),
   /** All chapters done → 50Q final: chapter-bank reuse + RAG top-up for shortfall */

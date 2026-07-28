@@ -727,15 +727,16 @@ export const toggleMySyllabusChapterComplete = async (req, res) => {
 
 /**
  * POST /api/syllabus-targets/:id/chapters/practice
- * Body: { chapter: string }
- * Generate 25 Hard RAG MCQs (5×5 batches), show 20 (does NOT unlock next chapter —
- * unlock happens when the student submits the test via chapters/complete).
- * Prefetches related UPSC topics for the *next* chapter into cache.
+ * Body: { chapter: string, retake?: boolean }
+ * First attempt: generate 30 Hard RAG MCQs, show 20, save to DB.
+ * Retake (or already-completed chapter): reuse saved questions from DB like cache.
+ * Unlock of next chapter still happens on submit via chapters/complete.
  */
 export const startChapterPractice = async (req, res) => {
   try {
     const userId = req.user._id;
     const chapter = typeof req.body?.chapter === "string" ? req.body.chapter.trim() : "";
+    const retakeFlag = req.body?.retake === true || req.body?.retake === "true";
     if (!chapter) {
       return res.status(400).json({ success: false, message: "Chapter is required" });
     }
@@ -804,6 +805,13 @@ export const startChapterPractice = async (req, res) => {
 
     const kbSubject = resolveKbSubject(record.subjectKey, record.subjectName);
 
+    const completionEntry = (record.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
+    const alreadyDone = Boolean(completionEntry?.chapters?.includes(chapter));
+    // Retake button OR chapter already submitted → reuse DB paper (no RAG regen)
+    const forceCache = retakeFlag || alreadyDone;
+
     const payload = {
       targetId: String(record._id),
       subjectKey: record.subjectKey,
@@ -821,6 +829,7 @@ export const startChapterPractice = async (req, res) => {
       batchSize: 10,
       batches: "10×3",
       userId: String(userId),
+      retake: forceCache,
     };
     console.log("\n========== [chapterPractice] REQUEST PAYLOAD ==========");
     console.log(JSON.stringify(payload, null, 2));
@@ -840,11 +849,13 @@ export const startChapterPractice = async (req, res) => {
       kbSubject,
       topicName,
       chapterLabel: chapter,
+      forceCache,
     });
 
     console.log("[chapterPractice] test created", {
       testId: String(test._id),
       fromCache,
+      forceCache,
       topic: topicName,
       questions: test.totalQuestions,
     });
@@ -860,25 +871,24 @@ export const startChapterPractice = async (req, res) => {
       }).catch((err) => console.warn("[startChapterPractice] prefetch:", err.message));
     }
 
-    const entry = (record.chapterCompletions || []).find(
-      (c) => String(c.studentId) === String(userId)
-    );
-
     return res.status(201).json({
       success: true,
       message: fromCache
-        ? "Chapter practice ready (cached questions)"
+        ? forceCache
+          ? "Chapter retake ready (cached questions from DB)"
+          : "Chapter practice ready (cached questions)"
         : "Chapter practice generated from Knowledge Base",
       data: {
         testId: test._id,
         test,
         fromCache,
+        retake: forceCache,
         chapter,
         topicName,
         kbSubject,
         relatedTopics,
         nextChapter: nextLabel,
-        completedChapters: entry?.chapters || [],
+        completedChapters: completionEntry?.chapters || [],
         completed: (record.completedStudentIds || []).some((id) => String(id) === String(userId)),
         payload,
       },

@@ -198,8 +198,13 @@ export function AssignedModuleTargets() {
     setError(null);
   };
 
-  const startChapterPractice = async (target: StudentSyllabusTarget, chapter: string) => {
+  const startChapterPractice = async (
+    target: StudentSyllabusTarget,
+    chapter: string,
+    opts?: { retake?: boolean }
+  ) => {
     const key = `${target._id}::${chapter}`;
+    const retake = Boolean(opts?.retake);
     const payload = {
       targetId: target._id,
       subjectKey: target.subjectKey,
@@ -207,13 +212,14 @@ export function AssignedModuleTargets() {
       moduleId: target.moduleId,
       moduleName: target.moduleName,
       chapter,
+      retake,
     };
     console.log("[ModuleTargets] practice payload →", payload);
 
     try {
       setPracticingKey(key);
       setError(null);
-      const res = await syllabusTargetsAPI.startChapterPractice(target._id, chapter);
+      const res = await syllabusTargetsAPI.startChapterPractice(target._id, chapter, { retake });
       const data = res.data?.data;
       if (!data?.testId) {
         setError("Practice test was not created");
@@ -227,6 +233,8 @@ export function AssignedModuleTargets() {
           targetId: target._id,
           chapter,
           nextChapter: data.nextChapter || null,
+          fromCache: Boolean(data.fromCache),
+          retake: Boolean(data.retake ?? retake),
         },
       });
     } catch (err) {
@@ -578,9 +586,15 @@ export function AssignedModuleTargets() {
                             type="button"
                             className="sd-assigned-test-btn secondary"
                             disabled={Boolean(practicingKey)}
-                            onClick={() => void startChapterPractice(t, line)}
+                            onClick={() => void startChapterPractice(t, line, { retake: true })}
                           >
-                            Retake
+                            {chapterBusy ? (
+                              <>
+                                <Loader2 className="sd-assigned-spin" /> Loading…
+                              </>
+                            ) : (
+                              "Retake"
+                            )}
                           </button>
                         )}
                       </div>
