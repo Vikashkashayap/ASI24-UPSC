@@ -1,3 +1,7 @@
+import {
+  sanitizeHindiMcqFormat,
+} from "./sanitizeHindiMcqFormat";
+
 export type OptionKey = "A" | "B" | "C" | "D";
 
 export type ExamLang = "hi" | "en" | "both";
@@ -23,6 +27,61 @@ export interface BilingualQuestionFields {
 }
 
 const OPTION_KEYS: OptionKey[] = ["A", "B", "C", "D"];
+
+export function hasDevanagari(s: string): boolean {
+  return /[\u0900-\u097F]/.test(s || "");
+}
+
+/** True Hindi text — must contain Devanagari (rejects EN copied into *_hi). */
+export function looksLikeHindiText(s: string): boolean {
+  const t = String(s || "").trim();
+  if (!t) return false;
+  return hasDevanagari(t);
+}
+
+/**
+ * Chronology / code options like "1, 2 and 4 only" or "1-2-3-4" —
+ * language-neutral; must not stay stuck on "अनुवाद हो रहा है…".
+ */
+export function isCodeLikeOptionText(text: string): boolean {
+  const t = String(text || "").trim();
+  if (!t || t.length > 80) return false;
+  const stripped = t
+    .replace(/\b(only|and|or|both|all|none|of|the|above|following|केवल|और|या|सभी)\b/gi, "")
+    .replace(/[\d０-９०-९\s,.\-–—/()]+/g, "")
+    .trim();
+  if (stripped.length <= 2) return true;
+  const compact = t.replace(/\s+/g, "");
+  const digits = (compact.match(/[\d०-९]/g) || []).length;
+  return digits >= 2 && digits >= compact.length * 0.35;
+}
+
+/** Light Hindi gloss for code options (keeps digits; translates only/and). */
+export function glossCodeOptionToHindi(text: string): string {
+  const t = String(text || "").trim();
+  if (!t) return "";
+  if (hasDevanagari(t)) return t;
+  return t
+    .replace(/\bonly\b/gi, "केवल")
+    .replace(/\band\b/gi, "और")
+    .replace(/\bor\b/gi, "या")
+    .replace(/\bboth\b/gi, "दोनों")
+    .replace(/\ball\b/gi, "सभी")
+    .replace(/\bnone\b/gi, "कोई नहीं")
+    .replace(/\bof the above\b/gi, "उपर्युक्त में से")
+    .replace(/\bof the following\b/gi, "निम्नलिखित में से")
+    .trim();
+}
+
+export type ResolvedLangText = {
+  primary: string;
+  secondary?: string;
+  source: "hi" | "en" | "missing";
+};
+
+export function shouldShowBoth(lang?: ExamLang | null): boolean {
+  return !lang || lang === "both";
+}
 
 function flatOptionEn(q: BilingualQuestionFields, key: OptionKey): string {
   const flat = q[`option_${key.toLowerCase()}_en` as keyof BilingualQuestionFields];
@@ -126,10 +185,11 @@ export function getQuestionHindi(
   q: BilingualQuestionFields,
   { strict = true }: { strict?: boolean } = {}
 ): string {
-  const hi = (q.question_hi || "").trim();
+  const hiRaw = (q.question_hi || "").trim();
+  const hi = sanitizeHindiMcqFormat(hiRaw);
   const en = getQuestionEnglish(q);
-  // Broken / half Hindi — fall back to English so student never sees incomplete stem
-  if (hi && (isCorruptedStemText(hi) || isIncompleteHindiStem(hi, en))) {
+  // Broken / half / English-in-Hindi — reject for strict Hindi mode
+  if (hi && (isCorruptedStemText(hi) || isIncompleteHindiStem(hi, en) || !looksLikeHindiText(hi))) {
     return strict ? "" : en;
   }
   if (hi) return hi;
@@ -138,14 +198,14 @@ export function getQuestionHindi(
 }
 
 export function hasStoredHindiQuestion(q: BilingualQuestionFields): boolean {
-  if (q.hasHindi === true) {
-    const hiStem = (q.question_hi || "").trim();
-    if (hiStem && isCorruptedStemText(hiStem)) return false;
-    return true;
-  }
   const hiStem = (q.question_hi || "").trim();
-  if (!hiStem || isCorruptedStemText(hiStem)) return false;
-  return OPTION_KEYS.every((key) => Boolean(flatOptionHi(q, key)));
+  if (!hiStem || isCorruptedStemText(hiStem) || !looksLikeHindiText(hiStem)) return false;
+  return OPTION_KEYS.every((key) => {
+    const en = flatOptionEn(q, key);
+    if (!en) return true;
+    const hi = flatOptionHi(q, key);
+    return Boolean(hi) && looksLikeHindiText(hi);
+  });
 }
 
 export function hasDistinctHindiQuestion(q: BilingualQuestionFields): boolean {
@@ -165,10 +225,17 @@ export function getOptionHindi(
   key: OptionKey,
   { strict = true }: { strict?: boolean } = {}
 ): string {
-  const hi = flatOptionHi(q, key);
-  if (hi) return hi;
+  const hiRaw = flatOptionHi(q, key);
+  const hi = sanitizeHindiMcqFormat(hiRaw);
+  if (hi && looksLikeHindiText(hi)) return hi;
+  if (hi && isCodeLikeOptionText(hi)) return glossCodeOptionToHindi(hi);
+
+  const en = getOptionEnglish(q, key);
+  // Chronology codes are language-neutral — never block Hindi mode on these
+  if (en && isCodeLikeOptionText(en)) return glossCodeOptionToHindi(en);
+
   if (strict) return "";
-  return getOptionEnglish(q, key);
+  return en;
 }
 
 export function hasDistinctHindiOption(q: BilingualQuestionFields, key: OptionKey): boolean {
@@ -187,6 +254,10 @@ export function isBilingualQuestion(q: BilingualQuestionFields): boolean {
 
 export function getQuestionByLang(q: BilingualQuestionFields, lang: ExamLang): string {
   if (lang === "hi") return getQuestionHindi(q, { strict: true });
+  if (lang === "both") {
+    const resolved = resolveStem(q, "both");
+    return resolved.primary;
+  }
   return getQuestionEnglish(q);
 }
 
@@ -196,7 +267,65 @@ export function getOptionByLang(
   lang: ExamLang
 ): string {
   if (lang === "hi") return getOptionHindi(q, key, { strict: true });
+  if (lang === "both") {
+    const resolved = resolveOption(q, key, "both");
+    return resolved.primary;
+  }
   return getOptionEnglish(q, key);
+}
+
+/**
+ * Strict stem resolution for exam UI.
+ * hi → Hindi only (empty if missing); en → English; both → HI primary + EN secondary.
+ */
+export function resolveStem(
+  q: BilingualQuestionFields,
+  lang: ExamLang = "en"
+): ResolvedLangText {
+  const en = getQuestionEnglish(q);
+  const hi = getQuestionHindi(q, { strict: true });
+
+  if (lang === "hi") {
+    if (hi) return { primary: hi, source: "hi" };
+    return { primary: "", source: "missing" };
+  }
+  if (lang === "both") {
+    if (hi && en && hi !== en) return { primary: hi, secondary: en, source: "hi" };
+    if (hi) return { primary: hi, source: "hi" };
+    if (en) return { primary: en, source: "en" };
+    return { primary: "", source: "missing" };
+  }
+  if (en) return { primary: en, source: "en" };
+  if (hi) return { primary: hi, source: "hi" };
+  return { primary: "", source: "missing" };
+}
+
+/**
+ * Strict option resolution — same policy as resolveStem.
+ */
+export function resolveOption(
+  q: BilingualQuestionFields,
+  key: OptionKey,
+  lang: ExamLang = "en"
+): ResolvedLangText {
+  const en = getOptionEnglish(q, key);
+  const hi = getOptionHindi(q, key, { strict: true });
+
+  if (lang === "hi") {
+    if (hi) return { primary: hi, source: "hi" };
+    // Last resort: show English rather than permanent "translating…"
+    if (en) return { primary: en, source: "en" };
+    return { primary: "", source: "missing" };
+  }
+  if (lang === "both") {
+    if (hi && en && hi !== en) return { primary: hi, secondary: en, source: "hi" };
+    if (hi) return { primary: hi, source: "hi" };
+    if (en) return { primary: en, source: "en" };
+    return { primary: "", source: "missing" };
+  }
+  if (en) return { primary: en, source: "en" };
+  if (hi) return { primary: hi, source: "hi" };
+  return { primary: "", source: "missing" };
 }
 
 type ExplanationShape = string | { A?: string; B?: string; C?: string; D?: string } | undefined;
@@ -222,8 +351,37 @@ export function getExplanationByLang(
 
   if (lang === "hi") {
     const hi = pick(q.explanation_hi);
-    if (hi) return hi;
+    if (hi && looksLikeHindiText(hi)) return hi;
     return "";
   }
   return pick(q.explanation_en ?? q.explanation);
+}
+
+/** Strict explanation resolution for review UI. */
+export function resolveExplanation(
+  q: {
+    explanation?: ExplanationShape;
+    explanation_en?: ExplanationShape;
+    explanation_hi?: ExplanationShape;
+    correctAnswer?: string;
+  },
+  lang: ExamLang,
+  optionKey?: OptionKey
+): ResolvedLangText {
+  const en = getExplanationByLang(q, "en", optionKey);
+  const hi = getExplanationByLang(q, "hi", optionKey);
+
+  if (lang === "hi") {
+    if (hi) return { primary: hi, source: "hi" };
+    return { primary: "", source: "missing" };
+  }
+  if (lang === "both") {
+    if (hi && en && hi !== en) return { primary: hi, secondary: en, source: "hi" };
+    if (hi) return { primary: hi, source: "hi" };
+    if (en) return { primary: en, source: "en" };
+    return { primary: "", source: "missing" };
+  }
+  if (en) return { primary: en, source: "en" };
+  if (hi) return { primary: hi, source: "hi" };
+  return { primary: "", source: "missing" };
 }

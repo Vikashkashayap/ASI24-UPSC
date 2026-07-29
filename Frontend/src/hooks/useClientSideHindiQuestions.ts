@@ -6,21 +6,25 @@ import {
   needsClientHindi,
 } from "../utils/clientHindiTranslate";
 
+const MAX_ATTEMPTS_PER_Q = 2;
+
 /**
  * Live exam / result Hindi fill — never blocks forever.
- * Prefetch only current + next question.
+ * Prefetch only current + next question (or all when prefetchAll).
  * Result page: pass includeExplanations so व्याख्या also gets free Google HI.
  */
 export function useClientSideHindiQuestions<T extends ClientMcq>(
   questions: T[],
   lang: ExamLang,
   currentIndex: number,
-  opts: { includeExplanations?: boolean } = {}
+  opts: { includeExplanations?: boolean; prefetchAll?: boolean } = {}
 ): { questions: T[]; translating: boolean } {
   const includeExplanations = opts.includeExplanations === true;
+  const prefetchAll = opts.prefetchAll === true;
   const [overlay, setOverlay] = useState<Record<number, T>>({});
   const [translating, setTranslating] = useState(false);
   const doneRef = useRef<Set<number>>(new Set());
+  const attemptsRef = useRef<Record<number, number>>({});
   const inflightRef = useRef<Set<number>>(new Set());
   const questionsRef = useRef(questions);
   const overlayRef = useRef(overlay);
@@ -31,13 +35,14 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
     () =>
       questions
         .map((q) => String(q._id || q.question_en || q.question || "").slice(0, 40))
-        .join("|") + `|expl:${includeExplanations ? 1 : 0}`,
-    [questions, includeExplanations]
+        .join("|") + `|expl:${includeExplanations ? 1 : 0}|all:${prefetchAll ? 1 : 0}`,
+    [questions, includeExplanations, prefetchAll]
   );
 
   useEffect(() => {
     setOverlay({});
     doneRef.current = new Set();
+    attemptsRef.current = {};
     inflightRef.current = new Set();
     setTranslating(false);
   }, [fingerprint]);
@@ -50,9 +55,9 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
       return;
     }
 
-    const idxs = [currentIndex, currentIndex + 1].filter(
-      (i) => i >= 0 && i < questions.length
-    );
+    const idxs = prefetchAll
+      ? questions.map((_, i) => i)
+      : [currentIndex, currentIndex + 1].filter((i) => i >= 0 && i < questions.length);
 
     let cancelled = false;
 
@@ -67,16 +72,30 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
           continue;
         }
 
+        const attempts = attemptsRef.current[i] || 0;
+        if (attempts >= MAX_ATTEMPTS_PER_Q) {
+          doneRef.current.add(i);
+          continue;
+        }
+
         inflightRef.current.add(i);
         setTranslating(true);
         try {
-          const next = await ensureClientHindiMcq(base, {
-            includeExplanations,
-            deadlineMs: includeExplanations ? 22000 : 16000,
-          });
-          if (cancelled) return;
+          let next = base;
+          while (
+            !cancelled &&
+            (attemptsRef.current[i] || 0) < MAX_ATTEMPTS_PER_Q &&
+            needsClientHindi(next, { includeExplanations })
+          ) {
+            attemptsRef.current[i] = (attemptsRef.current[i] || 0) + 1;
+            next = await ensureClientHindiMcq(next, {
+              includeExplanations,
+              deadlineMs: includeExplanations ? 22000 : 16000,
+            });
+            if (cancelled) return;
+            setOverlay((prev) => ({ ...prev, [i]: next }));
+          }
           doneRef.current.add(i);
-          setOverlay((prev) => ({ ...prev, [i]: next }));
         } catch (err) {
           console.warn("[client-hi] translate failed", err);
           doneRef.current.add(i);
@@ -91,7 +110,7 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
     return () => {
       cancelled = true;
     };
-  }, [wantHi, currentIndex, fingerprint, questions.length, includeExplanations]);
+  }, [wantHi, currentIndex, fingerprint, questions.length, includeExplanations, prefetchAll]);
 
   const merged = useMemo(
     () => questions.map((q, i) => overlay[i] || q),

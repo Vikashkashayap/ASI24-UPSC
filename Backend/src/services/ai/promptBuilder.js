@@ -74,10 +74,14 @@ STEM COMPLETENESS (mandatory — students must see the full question):
 - NEVER output options without a complete stem.
 - NEVER use placeholder dashes for missing content — if CONTEXT is thin, skip that question.
 
-QUALITY BAR (UPSC aspirant / Hard Prelims):
+QUALITY BAR (UPSC aspirant / Hard Prelims — accuracy first):
 - Prefer hard, elimination-based, multi-statement questions over easy recall.
 - Close distractors from the SAME topic; no trivial giveaways.
 - Statements must be precise enough for serious CSE Prelims practice.
+- Facts (years, articles, schemes, bodies, places) MUST match CONTEXT exactly — never approximate.
+- Prefer PYQ-style framing: "With reference to…", "Consider the following statements…", "Which of the following…".
+- One clear concept per question; no compound trivia that confuses aspirants.
+- Wrong options = near-miss UPSC traps (wrong year/article, partial truth, swapped cause/effect) — never absurd.
 
 questionType one of: statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
 Cover Mix evenly — no pattern missing, no duplicate stems.

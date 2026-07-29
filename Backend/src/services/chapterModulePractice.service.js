@@ -450,7 +450,7 @@ export async function createChapterPracticeTest({
       minAcceptable: MIN_ACCEPTABLE,
       kbOnly: false,
       allowLlmFallback: true,
-      ensureHindi: false,
+      ensureHindi: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -556,7 +556,7 @@ async function generateModuleFinalTopUp({
       minAcceptable: 1,
       kbOnly: false,
       allowLlmFallback: true,
-      ensureHindi: false,
+      ensureHindi: true,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -592,7 +592,7 @@ async function generateModuleFinalTopUp({
         minAcceptable: 1,
         kbOnly: false,
         allowLlmFallback: true,
-        ensureHindi: false,
+        ensureHindi: true,
       });
       if (!generationResult.success || !generationResult.questions?.length) continue;
       const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));

@@ -696,8 +696,7 @@ export async function runAssignedPracticeGeneration({
 }
 
 async function translatePracticeQuestionsToHindi(questions) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey || !Array.isArray(questions) || questions.length === 0) return questions;
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
 
   // Skip questions that already have Devanagari stems
   const needHi = [];
@@ -715,6 +714,8 @@ async function translatePracticeQuestionsToHindi(questions) {
   try {
     const { batchTranslatePracticeQuestionsToHindi } = await import("../testGenerationService.js");
     if (typeof batchTranslatePracticeQuestionsToHindi !== "function") return questions;
+    // MT path does not need OpenRouter; LLM path uses key inside batch helper
+    const apiKey = process.env.OPENROUTER_API_KEY || "";
     console.log(`🌐 Practice Hindi: translating ${needHi.length}/${questions.length} missing…`);
     const translated = await batchTranslatePracticeQuestionsToHindi(
       apiKey,

@@ -147,9 +147,11 @@ export function isPracticeEnglishOnly() {
 
 /**
 
- * After English-only gen, add Hindi in 1–2 cheap translation calls (not 50 separate calls).
+ * After English-only gen, add Hindi via free server MT (or LLM if opted in).
 
- * Default true. Set PRACTICE_GEN_BATCH_HINDI=false for English-only tests (lowest cost).
+ * Default true — questions land in DB with question_hi / options_hi.
+
+ * Set PRACTICE_GEN_BATCH_HINDI=false to skip (exam UI client translate only).
 
  */
 

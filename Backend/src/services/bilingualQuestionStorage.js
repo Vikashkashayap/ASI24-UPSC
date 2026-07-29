@@ -54,11 +54,17 @@ function normalizeExplanationObject(raw, correctAnswer = "A") {
   return null;
 }
 
-/** True when Hindi stem + all four Hindi options exist in DB. */
+/** True when Hindi stem + Hindi options exist in DB (must be Devanagari). */
 export function hasStoredHindiContent(q) {
   const base = ensureEnglishBilingualFields(q);
-  if (!String(base.question_hi || "").trim()) return false;
-  return OPTION_KEYS.every((k) => String(base.options_hi?.[k] || "").trim());
+  const hi = String(base.question_hi || "").trim();
+  if (!hi || !/[\u0900-\u097F]/.test(hi)) return false;
+  return OPTION_KEYS.every((k) => {
+    const en = String(base.options_en?.[k] || "").trim();
+    if (!en) return true; // chronology may omit D
+    const opt = String(base.options_hi?.[k] || "").trim();
+    return Boolean(opt) && /[\u0900-\u097F]/.test(opt);
+  });
 }
 
 /** True when question only has English (needs migration or regen for real Hindi). */

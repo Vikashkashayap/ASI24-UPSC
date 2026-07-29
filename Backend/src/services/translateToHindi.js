@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
-import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 import {
   getHindiTranslateProvider,
@@ -22,32 +21,28 @@ const TRANSLATE_TIMEOUT_MS = Math.max(
 
 /**
  * Translate a single English string to Hindi (Devanagari).
- * Default: free MT (0 OpenRouter tokens). LLM only if HINDI_TRANSLATE_PROVIDER=llm.
+ * Uses OpenRouter when HINDI_TRANSLATE_PROVIDER=llm (default for quality).
+ * Free Google MT only when provider=mt explicitly.
  */
 export async function translateToHindi(text) {
   const source = String(text ?? "").trim();
   if (!source) return "";
 
-  if (!isSeparateHindiTranslationEnabled() && !shouldUseFreeMtHindi()) {
-    // client provider: callers should skip; return English fallback
-    if (getHindiTranslateProvider() === "client") return source;
+  if (getHindiTranslateProvider() === "client") {
+    return "";
   }
 
-  if (shouldUseFreeMtHindi() || getHindiTranslateProvider() === "client") {
-    // Even under "client", if this helper is invoked, use free MT (never OpenRouter)
+  if (shouldUseFreeMtHindi()) {
     return mtTranslateToHindi(source);
   }
 
-  if (!shouldUseLlmHindi()) {
-    return mtTranslateToHindi(source);
-  }
-
+  // OpenRouter LLM path (default)
   assertOpenRouterAllowed("translateToHindi");
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    console.warn("translateToHindi: OPENROUTER_API_KEY missing — using free MT");
-    return mtTranslateToHindi(source);
+    console.warn("translateToHindi: OPENROUTER_API_KEY missing — leaving Hindi empty");
+    return "";
   }
 
   const ctrl = new AbortController();
@@ -68,7 +63,7 @@ export async function translateToHindi(text) {
           {
             role: "system",
             content:
-              "You are a professional Hindi translator for UPSC exam content. Translate accurately into formal Hindi (Devanagari). Preserve proper nouns, numbers, dates. Return ONLY the translated text.",
+              "You are a professional Hindi translator for UPSC exam content. Translate accurately into formal Hindi (Devanagari). Preserve proper nouns, numbers, dates, List-I/List-II structure, and Assertion-Reason labels (अभिकथन/कारण). Return ONLY the translated text — no English, no markdown.",
           },
           {
             role: "user",
@@ -87,11 +82,13 @@ export async function translateToHindi(text) {
     }
 
     const data = await response.json();
-    const translated = data?.choices?.[0]?.message?.content?.trim();
-    return translated || source;
+    const translated = data?.choices?.[0]?.message?.content?.trim() || "";
+    // Reject English-as-Hindi leftovers
+    if (translated && /[\u0900-\u097F]/.test(translated)) return translated;
+    return "";
   } catch (error) {
-    console.error("translateToHindi LLM failed, falling back to free MT:", error.message);
-    return mtTranslateToHindi(source);
+    console.error("translateToHindi OpenRouter failed:", error.message);
+    return "";
   } finally {
     clearTimeout(timer);
   }

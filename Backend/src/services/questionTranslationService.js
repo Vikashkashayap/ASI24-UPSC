@@ -133,8 +133,14 @@ export function ensureFullQuestionStem(rawQuestion) {
 /** True when Hindi stem and all four Hindi options are present. */
 export function questionHasBilingualContent(rawQuestion) {
   const q = ensureEnglishBilingualFields(rawQuestion);
-  if (!String(q.question_hi || "").trim()) return false;
-  return OPTION_KEYS.every((key) => String(q.options_hi?.[key] || "").trim());
+  const hi = String(q.question_hi || "").trim();
+  if (!hi || !/[\u0900-\u097F]/.test(hi)) return false;
+  return OPTION_KEYS.every((key) => {
+    const en = String(q.options_en?.[key] || "").trim();
+    if (!en) return true;
+    const opt = String(q.options_hi?.[key] || "").trim();
+    return Boolean(opt) && /[\u0900-\u097F]/.test(opt);
+  });
 }
 
 function normalizeOptionsObject(raw) {
@@ -258,7 +264,7 @@ export function ensureEnglishBilingualFields(question) {
 
 /**
  * Translate one question's text, options, and explanation to Hindi.
- * Never throws — returns English fallbacks on failure.
+ * Never throws — leaves Hindi empty on failure (never copy English into *_hi).
  */
 export async function enrichQuestionWithHindi(rawQuestion) {
   assertOpenRouterAllowed("enrichQuestionWithHindi");
@@ -268,7 +274,7 @@ export async function enrichQuestionWithHindi(rawQuestion) {
     return {
       ...question,
       question_hi: question.question_hi || "",
-      options_hi: normalizeOptionsObject(question.options_hi ?? question.options_en),
+      options_hi: normalizeOptionsObject(question.options_hi),
     };
   }
 
@@ -278,13 +284,15 @@ export async function enrichQuestionWithHindi(rawQuestion) {
         ? Promise.resolve(question.question_hi)
         : translateToHindi(question.question_en),
       question.options_hi?.A
-        ? Promise.resolve(OPTION_KEYS.map((k) => question.options_hi[k] || question.options_en[k]))
+        ? Promise.resolve(OPTION_KEYS.map((k) => question.options_hi[k] || ""))
         : translateManyToHindi(OPTION_KEYS.map((k) => question.options_en[k])),
     ]);
 
     const options_hi = {};
     OPTION_KEYS.forEach((key, idx) => {
-      options_hi[key] = optionValues[idx] || question.options_en[key] || "";
+      const val = String(optionValues[idx] || "").trim();
+      // Reject English-as-Hindi copies
+      options_hi[key] = /[\u0900-\u097F]/.test(val) ? val : "";
     });
 
     let explanation_hi = question.explanation_hi;
@@ -298,19 +306,22 @@ export async function enrichQuestionWithHindi(rawQuestion) {
       explanation_hi = { A: "", B: "", C: "", D: "" };
       if (explKeys.length === 1) {
         const only = explKeys[0];
-        explanation_hi[only] = await translateToHindi(collapsed[only]);
+        const hi = await translateToHindi(collapsed[only]);
+        explanation_hi[only] = /[\u0900-\u097F]/.test(String(hi || "")) ? hi : "";
       } else if (explKeys.length > 1) {
         const translatedExpl = await translateManyToHindi(explKeys.map((k) => collapsed[k]));
         explKeys.forEach((key, idx) => {
-          explanation_hi[key] = translatedExpl[idx] || collapsed[key] || "";
+          const hi = String(translatedExpl[idx] || "").trim();
+          explanation_hi[key] = /[\u0900-\u097F]/.test(hi) ? hi : "";
         });
         explanation_hi = collapseExplanationToCorrect(explanation_hi, question.correctAnswer);
       }
     }
 
+    const hiStem = String(question_hi || "").trim();
     return {
       ...question,
-      question_hi: question_hi || question.question_en,
+      question_hi: /[\u0900-\u097F]/.test(hiStem) ? hiStem : "",
       options_hi,
       ...(explanation_hi ? { explanation_hi } : {}),
     };
@@ -318,8 +329,8 @@ export async function enrichQuestionWithHindi(rawQuestion) {
     console.error("enrichQuestionWithHindi failed:", error.message);
     return {
       ...question,
-      question_hi: question.question_hi || question.question_en,
-      options_hi: normalizeOptionsObject(question.options_hi ?? question.options_en),
+      question_hi: question.question_hi || "",
+      options_hi: normalizeOptionsObject(question.options_hi),
     };
   }
 }

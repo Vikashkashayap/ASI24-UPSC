@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import type { ExamLang } from "../utils/bilingualQuestion";
 
-export type ExamLang = "hi" | "en" | "both";
+export type { ExamLang };
 
 const STORAGE_KEY = "asi24_exam_lang";
-
 export function readExamLang(): ExamLang {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
@@ -11,7 +11,8 @@ export function readExamLang(): ExamLang {
   } catch {
     /* ignore */
   }
-  return "both";
+  // English-only generation — default to English so every Q always shows
+  return "en";
 }
 
 export function useExamLanguage() {

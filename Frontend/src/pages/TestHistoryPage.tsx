@@ -8,6 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ConfirmationDialog } from '../components/ui/dialog';
 import { Pagination } from '../components/ui/pagination';
 import { ExamReviewExplanation } from '../components/exam/ExamQuestionBody';
+import { ExamLanguageToggle } from '../components/exam/ExamLanguageToggle';
+import { useExamLanguage } from '../hooks/useExamLanguage';
+import { useClientSideHindiQuestions } from '../hooks/useClientSideHindiQuestions';
+import { resolveOption, resolveStem } from '../utils/bilingualQuestion';
 
 interface TestHistory {
   _id: string;
@@ -37,6 +41,7 @@ interface TestHistoryResponse {
 const TestHistoryPage: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [history, setHistory] = useState<TestHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,6 +55,13 @@ const TestHistoryPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const itemsPerPage = 10;
+
+  const { questions: historyDisplayQuestions } = useClientSideHindiQuestions(
+    selectedTest?.questions || [],
+    examLang,
+    0,
+    { includeExplanations: true, prefetchAll: true }
+  );
 
   useEffect(() => {
     loadHistory();
@@ -374,8 +386,8 @@ const TestHistoryPage: React.FC = () => {
             theme === "dark" ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
           } border shadow-xl`}>
             {/* Modal Header */}
-            <div className="sticky top-0 flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700 bg-inherit">
-              <div>
+            <div className="sticky top-0 flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700 bg-inherit gap-3">
+              <div className="min-w-0">
                 <h2 className={`text-xl font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                   {selectedTest.topic}
                 </h2>
@@ -383,13 +395,16 @@ const TestHistoryPage: React.FC = () => {
                   {selectedTest.subject} • {selectedTest.difficulty} • {selectedTest.totalQuestions} questions
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowTestDetails(false)}
-              >
-                <X className="w-4 h-4" />
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTestDetails(false)}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Modal Content */}
@@ -450,7 +465,10 @@ const TestHistoryPage: React.FC = () => {
                 <h3 className={`text-lg font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
                   Questions & Answers
                 </h3>
-                {selectedTest.questions.map((question: any, index: number) => (
+                {historyDisplayQuestions.map((question: any, index: number) => {
+                  const stem = resolveStem(question, examLang);
+                  const optionKeys = Object.keys(question.options_en || question.options || {});
+                  return (
                   <Card key={index} className={`${
                     question.userAnswer === question.correctAnswer
                       ? theme === "dark" ? "border-green-700 bg-green-950/20" : "border-green-200 bg-green-50"
@@ -461,13 +479,27 @@ const TestHistoryPage: React.FC = () => {
                         {/* Question */}
                         <div>
                           <p className={`font-medium ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                            Q{index + 1}. {question.question}
+                            Q{index + 1}.{" "}
+                            {examLang === "hi" && stem.source === "missing"
+                              ? "अनुवाद हो रहा है…"
+                              : stem.primary}
                           </p>
+                          {examLang === "both" && stem.secondary ? (
+                            <p className={`text-sm mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                              {stem.secondary}
+                            </p>
+                          ) : null}
                         </div>
 
                         {/* Options */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {Object.entries(question.options).map(([key, value]: [string, any]) => (
+                          {optionKeys.map((key) => {
+                            const opt = resolveOption(question, key as "A" | "B" | "C" | "D", examLang);
+                            const value =
+                              examLang === "hi" && opt.source === "missing"
+                                ? "अनुवाद हो रहा है…"
+                                : opt.primary;
+                            return (
                             <div
                               key={key}
                               className={`p-3 rounded-lg border text-sm ${
@@ -479,6 +511,9 @@ const TestHistoryPage: React.FC = () => {
                               }`}
                             >
                               <span className="font-medium">{key}.</span> {value}
+                              {examLang === "both" && opt.secondary ? (
+                                <span className="block text-xs opacity-70 mt-0.5">{opt.secondary}</span>
+                              ) : null}
                               {key === question.correctAnswer && (
                                 <CheckCircle className="inline w-4 h-4 ml-2 text-green-600" />
                               )}
@@ -486,7 +521,8 @@ const TestHistoryPage: React.FC = () => {
                                 <XCircle className="inline w-4 h-4 ml-2 text-red-600" />
                               )}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         {/* Explanation — bilingual, per-option why (correct / wrong) */}
@@ -496,12 +532,14 @@ const TestHistoryPage: React.FC = () => {
                           <ExamReviewExplanation
                             question={question}
                             userAnswer={question.userAnswer ?? null}
+                            lang={examLang}
                           />
                         )}
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -84,12 +84,16 @@ async function translateChunk(text) {
     const translated = Array.isArray(data?.[0])
       ? data[0].map((row) => (Array.isArray(row) ? String(row[0] || "") : "")).join("")
       : "";
-    const out = translated.trim() || q;
+    const out = translated.trim();
+    if (!out || !hasDevanagari(out)) {
+      // Do not cache or persist English-as-Hindi
+      return "";
+    }
     memory.set(key, out);
     return out;
   } catch (err) {
-    console.warn("[mt-hi] chunk failed, keeping English:", err?.message || err);
-    return q;
+    console.warn("[mt-hi] chunk failed, leaving empty:", err?.message || err);
+    return "";
   } finally {
     clearTimeout(timer);
   }
@@ -115,18 +119,18 @@ export async function mtTranslateManyToHindi(texts) {
 }
 
 /**
- * Which Hindi path to use:
- * - client | none → skip server translate (exam UI free Google translate)
- * - mt | gtx → free server MT (no OpenRouter)
- * - llm → OpenRouter (expensive, opt-in only)
+ * Which Hindi path to use after English generation:
+ * - llm | openrouter → OpenRouter batch translate (quality; default)
+ * - mt | gtx | google → free server Google MT (weaker UPSC Hindi)
+ * - client | none → skip server; exam UI client translate
  */
 export function getHindiTranslateProvider() {
-  const raw = String(process.env.HINDI_TRANSLATE_PROVIDER || "client")
+  const raw = String(process.env.HINDI_TRANSLATE_PROVIDER || "llm")
     .toLowerCase()
     .trim();
-  if (["llm", "openrouter"].includes(raw)) return "llm";
   if (["mt", "gtx", "google"].includes(raw)) return "mt";
-  return "client"; // client | none | anything else
+  if (["client", "none", "off", "skip"].includes(raw)) return "client";
+  return "llm"; // llm | openrouter | default
 }
 
 export function shouldSkipServerHindiTranslation() {

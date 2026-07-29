@@ -28,6 +28,15 @@ import {
 import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
 import { generateQuestionsFromContextBatch } from "./ai/questionGenerator.service.js";
 import { questionPatternEngine } from "./ai/questionPatternEngine.js";
+import {
+  generateUpscPrelimsMockPaper,
+  isUpscPrelimsRagEnabled,
+} from "./ai/upscPrelimsGenerator.service.js";
+import {
+  sanitizeHindiMcqFormat,
+  sanitizeHindiAssertionReason,
+  sanitizeHindiOptions,
+} from "../utils/sanitizeHindiMcqFormat.js";
 import { getContextForPractice } from "./ai/kbContext.service.js";
 import {
   extractClaimedCorrectLetter,
@@ -720,6 +729,14 @@ ANSWER↔OPTION LOCK (mandatory — never ship a mismatch):
 5. Target 50–70 words; hard max 100. Never say Option X is correct when answer is Y.
 6. Self-check before emit: options[answer] is the true correct text.`;
 
+const PRELIMS_ENGLISH_JSON_RULES = `
+JSON array only. Each object (English only — no Hindi fields):
+- question (complete stem)
+- options: { "A","B","C","D" }
+- answer: A|B|C|D — letter of the correct option text
+- explanation: 50–100 English words teaching explanation — correct reason + why each wrong option fails.
+${ANSWER_OPTION_LOCK}`;
+
 const PRELIMS_COMPACT_JSON_RULES = `
 JSON array only. Each object (no extra text):
 - question_en, question_hi (Devanagari, same meaning)
@@ -739,6 +756,10 @@ ${ANSWER_OPTION_LOCK}`;
 const BILINGUAL_JSON_RULES = BILINGUAL_JSON_RULES_FULL;
 
 function getPrelimsJsonRules() {
+  // Default: English-only generation (Hindi filled later by exam UI / optional batch translate)
+  if (isPracticeEnglishOnly()) {
+    return PRELIMS_ENGLISH_JSON_RULES;
+  }
   return usesFullBilingualExplanations() ? BILINGUAL_JSON_RULES_FULL : PRELIMS_COMPACT_JSON_RULES;
 }
 
@@ -747,7 +768,7 @@ function getPracticeJsonRules() {
     return `Each object: question (stem), options{"A","B","C","D"}, answer (A-D = letter of correct option text), explanation (50–100 English words: open with Option {answer} is correct; justify why correct AND why EACH of the other three options is wrong — student concept clarity).
 ${ANSWER_OPTION_LOCK}`;
   }
-  return getPrelimsJsonRules();
+  return usesFullBilingualExplanations() ? BILINGUAL_JSON_RULES_FULL : PRELIMS_COMPACT_JSON_RULES;
 }
 
 function practiceBatchJsonNote() {
@@ -1004,9 +1025,11 @@ Return ONLY a JSON array. No markdown.`;
 }
 
 function buildPrelimsBatchUserPrompt({ examType, need, topic, subjectsText, difficulty }) {
-  const jsonNote = usesFullBilingualExplanations()
-    ? "Bilingual question, options, and explanations. JSON array only."
-    : "Bilingual question and options (EN+HI). English explanation only. JSON array only.";
+  const jsonNote = isPracticeEnglishOnly()
+    ? "English only (question + options + explanation). No Hindi. JSON array only."
+    : usesFullBilingualExplanations()
+      ? "Bilingual question, options, and explanations. JSON array only."
+      : "Bilingual question and options (EN+HI). English explanation only. JSON array only.";
 
   if (examType === "CSAT") {
     return `Generate EXACTLY ${need} UPSC Prelims CSAT MCQs. Topic: ${topic}. ${jsonNote}`;
@@ -1884,6 +1907,40 @@ export const generateFullMockPyoTestQuestions = async ({ yearFrom, yearTo }) => 
   const displayCount = PYQ_DISPLAY_COUNT;
 
   try {
+    // Common path: same KB+RAG+LLM + system prompt as Topic Practice, with PYQ-style topic framing
+    if (isUpscPrelimsRagEnabled()) {
+      const ragResult = await generateUpscPrelimsMockPaper({
+        mode: "pyo",
+        questionCount: displayCount,
+        difficulty: "moderate",
+        yearFrom,
+        yearTo,
+        testName: `Prelims Mock - PYQ ${yearFrom}-${yearTo}`,
+      });
+      if (ragResult.success && ragResult.questions?.length >= displayCount) {
+        const translatedQuestions = finalizeGeneratedQuestions(ragResult.questions.slice(0, displayCount));
+        if (translatedQuestions.length >= displayCount) {
+          console.log(
+            `✅ Full mock PYQ via common KB+RAG: ${translatedQuestions.length}Q (same prompt as Topic Practice)`
+          );
+          return {
+            success: true,
+            questions: translatedQuestions,
+            count: translatedQuestions.length,
+            testName: ragResult.testName || `Prelims Mock - PYQ ${yearFrom}-${yearTo}`,
+            source: "kb_rag_common",
+          };
+        }
+      }
+      if (ragResult.skippedRag) {
+        console.warn("⚠️ PRELIMS_USE_RAG disabled — falling back to open-LLM PYQ mock");
+      } else {
+        console.warn(
+          `⚠️ Common KB+RAG PYQ mock short/failed (${ragResult.error || "unknown"}) — falling back to open-LLM`
+        );
+      }
+    }
+
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = getTestGenerationModel();
 
@@ -2006,6 +2063,42 @@ export const generateFullMockMixTestQuestions = async (opts = {}) => {
   const patternsToInclude = Array.isArray(opts.patternsToInclude) && opts.patternsToInclude.length > 0 ? opts.patternsToInclude : [];
 
   try {
+    // Common path: same KB+RAG+LLM + system prompt as Topic Practice / chapter practice
+    if (isUpscPrelimsRagEnabled()) {
+      const ragResult = await generateUpscPrelimsMockPaper({
+        mode: "mix",
+        questionCount: displayCount,
+        difficulty,
+        patternsToInclude,
+        excludeSnippets,
+        testName: isSectional ? "UPSC GS Sectional Mock (50 Q)" : "UPSC Real Prelims Mock",
+      });
+      if (ragResult.success && ragResult.questions?.length >= displayCount) {
+        const translatedQuestions = finalizeGeneratedQuestions(ragResult.questions.slice(0, displayCount));
+        if (translatedQuestions.length >= displayCount) {
+          console.log(
+            `✅ Full mock MIX via common KB+RAG: ${translatedQuestions.length}Q (same prompt as Topic Practice)`
+          );
+          return {
+            success: true,
+            questions: translatedQuestions,
+            count: translatedQuestions.length,
+            testName:
+              ragResult.testName ||
+              (isSectional ? "Prelims Mock - Sectional 50" : "Prelims Mock - Full Length GS Mix"),
+            source: "kb_rag_common",
+          };
+        }
+      }
+      if (ragResult.skippedRag) {
+        console.warn("⚠️ PRELIMS_USE_RAG disabled — falling back to open-LLM mix generator");
+      } else {
+        console.warn(
+          `⚠️ Common KB+RAG mix short/failed (${ragResult.error || "unknown"}) — falling back to open-LLM`
+        );
+      }
+    }
+
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = getTestGenerationModel();
 
@@ -2450,6 +2543,40 @@ export const generateFullMockTestQuestions = async ({ subject, patternsToInclude
   const patterns = Array.isArray(patternsToInclude) && patternsToInclude.length > 0 ? patternsToInclude : [];
 
   try {
+    // Common path: same KB+RAG+LLM + system prompt as Topic Practice
+    if (isUpscPrelimsRagEnabled()) {
+      const ragResult = await generateUpscPrelimsMockPaper({
+        mode: "subject",
+        subject,
+        questionCount: displayCount,
+        difficulty: "moderate",
+        patternsToInclude: patterns,
+        testName: `Prelims Mock - ${subject}`,
+      });
+      if (ragResult.success && ragResult.questions?.length >= displayCount) {
+        const translatedQuestions = finalizeGeneratedQuestions(ragResult.questions.slice(0, displayCount));
+        if (translatedQuestions.length >= displayCount) {
+          console.log(
+            `✅ Full mock Subject via common KB+RAG: ${translatedQuestions.length}Q (same prompt as Topic Practice)`
+          );
+          return {
+            success: true,
+            questions: translatedQuestions,
+            count: translatedQuestions.length,
+            testName: ragResult.testName || `Prelims Mock - ${subject}`,
+            source: "kb_rag_common",
+          };
+        }
+      }
+      if (ragResult.skippedRag) {
+        console.warn("⚠️ PRELIMS_USE_RAG disabled — falling back to open-LLM subject mock");
+      } else {
+        console.warn(
+          `⚠️ Common KB+RAG subject mock short/failed (${ragResult.error || "unknown"}) — falling back to open-LLM`
+        );
+      }
+    }
+
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = getTestGenerationModel();
 
@@ -2920,9 +3047,9 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
   if (!row || !mergedQ) return false;
   let appliedStem = false;
 
-  const questionHi = String(row.question_hi || row.question || "").trim();
-  const optionsHi = row.options_hi || row.options;
-  const explanationHi = String(row.explanation_hi || "").trim();
+  const questionHi = sanitizeHindiMcqFormat(String(row.question_hi || row.question || "").trim());
+  const optionsHi = sanitizeHindiOptions(row.options_hi || row.options);
+  const explanationHi = sanitizeHindiMcqFormat(String(row.explanation_hi || "").trim());
   const enFull = String(mergedQ.question_en || mergedQ.question || "").replace(/\\n/g, "\n");
   const enIsMatch =
     Boolean(mergedQ.matchColumns?.columnA?.length >= 2) ||
@@ -2948,11 +3075,11 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
   }
 
   // Assertion-reason structured Hindi
-  const arHi = row.assertionReason_hi || row.assertionReason;
+  const arHiRaw = row.assertionReason_hi || row.assertionReason;
+  const arHi = arHiRaw ? sanitizeHindiAssertionReason(arHiRaw) : null;
   if (
     !appliedStem &&
     arHi &&
-    typeof arHi === "object" &&
     String(arHi.assertion || "").trim() &&
     String(arHi.reason || "").trim()
   ) {
@@ -3060,7 +3187,7 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
       C: String(optionsHi.C ?? optionsHi.c ?? "").trim(),
       D: String(optionsHi.D ?? optionsHi.d ?? "").trim(),
     };
-    if (Object.values(hiOpts).some((v) => /[\u0900-\u097F]/.test(v))) {
+    if (Object.values(hiOpts).some((v) => /[\u0900-\u097F]/.test(v) || /[A-D]\s*[-–—]?\s*\d/.test(v))) {
       mergedQ.options_hi = hiOpts;
     }
   }
@@ -3070,6 +3197,18 @@ function applyPracticeHindiRow(mergedQ, row, srcLabel) {
     const words = cleaned.split(/\s+/).filter(Boolean);
     mergedQ.explanation_hi =
       words.length <= 80 ? cleaned.slice(0, 900) : `${words.slice(0, 70).join(" ")}`.slice(0, 900);
+  }
+
+  // Final pass — normalize any remaining ए/बी/सी/डी and leaked A-R options
+  if (mergedQ.question_hi) {
+    mergedQ.question_hi = sanitizeHindiMcqFormat(mergedQ.question_hi);
+  }
+  if (mergedQ.options_hi) {
+    mergedQ.options_hi = sanitizeHindiOptions(mergedQ.options_hi);
+  }
+  if (mergedQ.assertionReason_hi) {
+    const cleanedAr = sanitizeHindiAssertionReason(mergedQ.assertionReason_hi);
+    if (cleanedAr) mergedQ.assertionReason_hi = cleanedAr;
   }
 
   return appliedStem;
@@ -3085,13 +3224,17 @@ async function translatePracticeHindiIndexBatch(apiKey, model, merged, indices, 
   const slice = indices.map((i) => merged[i]);
   const payload = slice.map((q, idx) => buildPracticeHindiTranslatePayload(q, idx));
 
-    const systemPrompt = `UPSC Hindi translator. Return JSON array only.
+    const systemPrompt = `UPSC Hindi translator (formal Devanagari). Return JSON array only.
 For each item return: id, question_hi, options_hi {A,B,C,D}, explanation_hi (50–70 Devanagari words; full teaching explanation, not one line).
 LETTER LOCK: options_hi.A MUST translate options.A (same for B/C/D). Never swap, reorder, or move text between letters — correctAnswer letter stays valid.
-If matchColumns present: this is a MATCH question (List-I / List-II). You MUST return matchColumns_hi:{columnA:[],columnB:[]} with the SAME lengths as English, each entry a PLAIN STRING. Also set question_hi to full stem with:
+MARKER LOCK: ALWAYS keep Latin letters A. B. C. D. and digits 1. 2. 3. 4. as list/option markers. NEVER transliterate to ए/बी/सी/डी. Match codes must look like "A-1, B-2, C-3, D-4" (Latin), never "ए-1, बी-2".
+Complete Hindi only — every numbered statement / list item must be fully translated (never half lists, never leave English sentences inside question_hi).
+If matchColumns present: this is a MATCH question (List-I / List-II). You MUST return matchColumns_hi:{columnA:[],columnB:[]} with the SAME lengths as English, each entry a PLAIN STRING (item text only — no A./B. prefixes inside the string). Also set question_hi to full stem with NEWLINES:
 "निम्नलिखित का मिलान कीजिए:" + "सूची-I" + "A. …" lines + "सूची-II" + "1. …" lines + "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
 NEVER turn a match question into statement-based Hindi (no "उपर्युक्त कथनों में से कौन-सा/से सही").
-If English question is Assertion-Reason: question_hi MUST use "अभिकथन (A): …" and "कारण (R): …" (full Devanagari bodies) + Hindi prompt. Never leave Assertion/Reason in English.
+If English question is Assertion-Reason: return assertionReason_hi:{assertion,reason} as PLAIN bodies only (no options inside). question_hi MUST be exactly:
+"अभिकथन (A): …\\nकारण (R): …\\nउपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?"
+NEVER append options (A)(B)(C)(D) or "नीचे दिए गए कूट" into assertion/reason bodies — options go only in options_hi.
 If numberedItems present (and NO matchColumns): return numberedItems_hi as PLAIN STRINGS only, same length. question_hi MUST include intro + "1. ..\\n2. .." lines (never intro-only, never "[object Object]").
 Same count/order. No markdown. Complete Hindi only — never half/truncated lists.`;
   const userPrompt = `Translate to Hindi:\n${JSON.stringify(payload)}`;
@@ -3205,12 +3348,16 @@ async function batchTranslatePracticeQuestionsViaMt(questions) {
 
       if (/[\u0900-\u097F]/.test(translated[0] || "")) {
         q.question_hi = translated[0];
+      } else {
+        q.question_hi = q.question_hi || "";
       }
+      const pickOptHi = (hi, en) =>
+        /[\u0900-\u097F]/.test(String(hi || "")) ? String(hi).trim() : "";
       q.options_hi = {
-        A: translated[1] || opts.A || "",
-        B: translated[2] || opts.B || "",
-        C: translated[3] || opts.C || "",
-        D: translated[4] || opts.D || "",
+        A: pickOptHi(translated[1], opts.A),
+        B: pickOptHi(translated[2], opts.B),
+        C: pickOptHi(translated[3], opts.C),
+        D: pickOptHi(translated[4], opts.D),
       };
 
       // Correct option only — never duplicate onto A/B/C/D
@@ -3225,14 +3372,18 @@ async function batchTranslatePracticeQuestionsViaMt(questions) {
       if (cols?.columnA?.length >= 2 && cols?.columnB?.length >= 2) {
         const aHi = await mtTranslateManyToHindi(cols.columnA.map((x) => String(x || "")));
         const bHi = await mtTranslateManyToHindi(cols.columnB.map((x) => String(x || "")));
-        q.matchColumns_hi = { columnA: aHi, columnB: bHi };
-        if (!/[\u0900-\u097F]/.test(q.question_hi || "")) {
-          const lines = ["निम्नलिखित का मिलान कीजिए:", "सूची-I"];
-          aHi.forEach((item, idx) => lines.push(`${String.fromCharCode(65 + idx)}. ${item}`));
-          lines.push("सूची-II");
-          bHi.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
-          lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
-          q.question_hi = lines.join("\n");
+        const aOk = aHi.filter((t) => /[\u0900-\u097F]/.test(String(t || "")));
+        const bOk = bHi.filter((t) => /[\u0900-\u097F]/.test(String(t || "")));
+        if (aOk.length >= 2 && bOk.length >= 2) {
+          q.matchColumns_hi = { columnA: aHi, columnB: bHi };
+          if (!/[\u0900-\u097F]/.test(q.question_hi || "")) {
+            const lines = ["निम्नलिखित का मिलान कीजिए:", "सूची-I"];
+            aHi.forEach((item, idx) => lines.push(`${String.fromCharCode(65 + idx)}. ${item}`));
+            lines.push("सूची-II");
+            bHi.forEach((item, idx) => lines.push(`${idx + 1}. ${item}`));
+            lines.push("नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
+            q.question_hi = lines.join("\n");
+          }
         }
       }
 
@@ -3243,13 +3394,15 @@ async function batchTranslatePracticeQuestionsViaMt(questions) {
           String(ar.assertion),
           String(ar.reason),
         ]);
-        q.assertionReason_hi = { assertion: aHi, reason: rHi };
-        if (!/[\u0900-\u097F]/.test(q.question_hi || "")) {
-          q.question_hi = [
-            `अभिकथन (A): ${aHi}`,
-            `कारण (R): ${rHi}`,
-            "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?",
-          ].join("\n");
+        if (/[\u0900-\u097F]/.test(aHi || "") && /[\u0900-\u097F]/.test(rHi || "")) {
+          q.assertionReason_hi = { assertion: aHi, reason: rHi };
+          if (!/[\u0900-\u097F]/.test(q.question_hi || "")) {
+            q.question_hi = [
+              `अभिकथन (A): ${aHi}`,
+              `कारण (R): ${rHi}`,
+              "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?",
+            ].join("\n");
+          }
         }
       }
 
@@ -3269,25 +3422,39 @@ async function batchTranslatePracticeQuestionsViaMt(questions) {
 
 /**
  * One Hindi pass for English practice questions.
- * Default: skip (client free Google) or free MT — LLM only if HINDI_TRANSLATE_PROVIDER=llm.
+ * Default: OpenRouter LLM batches (HINDI_TRANSLATE_PROVIDER=llm).
+ * Set provider=mt for free Google MT, or provider=client to skip server translate.
  */
 export async function batchTranslatePracticeQuestionsToHindi(apiKey, model, questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
 
   if (shouldSkipServerHindiTranslation()) {
     console.log(
-      "🌐 Hindi: server translate skipped (HINDI_TRANSLATE_PROVIDER=client) — 0 OpenRouter tokens"
+      "🌐 Hindi: server translate skipped (HINDI_TRANSLATE_PROVIDER=client) — exam UI free Google translate"
     );
     return questions;
   }
 
-  if (shouldUseFreeMtHindi() || !shouldUseLlmHindi()) {
+  // Explicit free MT only when opted in — never accidental Google path when llm is set
+  if (shouldUseFreeMtHindi() && !shouldUseLlmHindi()) {
     return batchTranslatePracticeQuestionsViaMt(questions);
   }
 
-  // --- Explicit LLM path (expensive, opt-in) ---
-  console.warn(
-    "⚠️ Hindi via OpenRouter LLM (HINDI_TRANSLATE_PROVIDER=llm) — high token cost"
+  if (!shouldUseLlmHindi()) {
+    console.warn(
+      `🌐 Hindi: unknown provider — falling back to OpenRouter LLM for quality`
+    );
+  }
+
+  if (!apiKey) {
+    console.error(
+      "🌐 Hindi OpenRouter: OPENROUTER_API_KEY missing — cannot translate; leaving Hindi empty"
+    );
+    return questions;
+  }
+
+  console.log(
+    `🌐 Hindi via OpenRouter LLM (model=${model}) — ${questions.length} questions`
   );
 
   const merged = questions.map((q) => ({ ...q }));
@@ -3561,7 +3728,8 @@ export const generateAssignedPracticeQuestions = async ({
 
     let translatedQuestions = finalizeGeneratedQuestions(finalQuestions);
 
-    if (isPracticeEnglishOnly() && isPracticeBatchHindiEnabled()) {
+    // After English gen: free MT → question_hi / options_hi stored in DB
+    if (isPracticeBatchHindiEnabled()) {
       translatedQuestions = await batchTranslatePracticeQuestionsToHindi(
         apiKey,
         getPracticeTranslationModel(),

@@ -3,7 +3,8 @@
  * Fast + timeout-safe so the exam never hangs on "हिंदी…".
  */
 
-import { isIncompleteHindiStem } from "./bilingualQuestion";
+import { isIncompleteHindiStem, isCodeLikeOptionText, glossCodeOptionToHindi } from "./bilingualQuestion";
+import { sanitizeHindiMcqFormat, sanitizeHindiOptions, sanitizeHindiAssertionReason } from "./sanitizeHindiMcqFormat";
 
 const CACHE_PREFIX = "md_hi_v3:";
 const memory = new Map<string, string>();
@@ -54,6 +55,14 @@ function stemLooksHindi(s: string): boolean {
   if (!hasDevanagari(t)) return false;
   const hiChars = (t.match(/[\u0900-\u097F]/g) || []).length;
   return hiChars >= 12 || (hiChars >= 6 && t.length < 40);
+}
+
+/** Accept translated text only when it actually contains Devanagari. */
+function acceptHindiOrEmpty(translated: string, sourceEn: string): string {
+  const t = String(translated || "").trim();
+  if (!t) return "";
+  if (stemLooksHindi(t) || (hasDevanagari(t) && t !== sourceEn.trim())) return t;
+  return "";
 }
 
 function chunkText(text: string, maxLen = 450): string[] {
@@ -112,7 +121,9 @@ async function translateChunk(text: string): Promise<string> {
   if (hasDevanagari(q) && !/[A-Za-z]{4,}/.test(q)) return q;
 
   const cached = readCache(q);
-  if (cached) return cached;
+  if (cached) {
+    return hasDevanagari(cached) ? cached : "";
+  }
 
   const url =
     "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=hi&dt=t&q=" +
@@ -125,12 +136,16 @@ async function translateChunk(text: string): Promise<string> {
     const translated = Array.isArray(data?.[0])
       ? data[0].map((row: unknown) => (Array.isArray(row) ? String(row[0] || "") : "")).join("")
       : "";
-    const out = translated.trim() || q;
+    const out = translated.trim();
+    if (!out || !hasDevanagari(out)) {
+      // Do not cache or return English as Hindi
+      return "";
+    }
     writeCache(q, out);
     return out;
   } catch (err) {
-    console.warn("[client-hi] chunk failed, keeping English:", (err as Error)?.message || err);
-    return q; // never hang — show English fragment rather than freeze UI
+    console.warn("[client-hi] chunk failed, leaving empty:", (err as Error)?.message || err);
+    return ""; // never write English into *_hi fields
   }
 }
 
@@ -160,6 +175,7 @@ export type ClientMcq = {
   explanation?: string | { A?: string; B?: string; C?: string; D?: string };
   explanation_en?: string | { A?: string; B?: string; C?: string; D?: string };
   explanation_hi?: string | { A?: string; B?: string; C?: string; D?: string };
+  correctAnswer?: string;
   hasHindi?: boolean;
 };
 
@@ -200,9 +216,17 @@ function assertionHiOk(q: ClientMcq): boolean {
 
 function optionsHiOk(q: ClientMcq): boolean {
   const opts = q.options_hi || {};
-  return ["A", "B", "C", "D"].every((k) =>
-    hasDevanagari(String((opts as Record<string, string>)[k] || ""))
-  );
+  const optsEn = enOpts(q) as Record<string, string>;
+  // Only require Hindi for options that have English content (chronology may omit D)
+  const keys = (["A", "B", "C", "D"] as const).filter((k) => String(optsEn[k] || "").trim());
+  if (keys.length === 0) return false;
+  return keys.every((k) => {
+    const en = String(optsEn[k] || "");
+    const hi = String((opts as Record<string, string>)[k] || "").trim();
+    // Code options (1-2-3 / "1 and 2 only") don't need Devanagari
+    if (isCodeLikeOptionText(en)) return true;
+    return hasDevanagari(hi);
+  });
 }
 
 function looksMatch(q: ClientMcq): boolean {
@@ -354,7 +378,10 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
           reason = reason || String(rM?.[1] || "").trim();
         }
         if (!assertion || !reason) return;
-        const [aHi, rHi] = await Promise.all([translateEnToHi(assertion), translateEnToHi(reason)]);
+        const [aHiRaw, rHiRaw] = await Promise.all([translateEnToHi(assertion), translateEnToHi(reason)]);
+        const aHi = acceptHindiOrEmpty(aHiRaw, assertion);
+        const rHi = acceptHindiOrEmpty(rHiRaw, reason);
+        if (!aHi || !rHi) return;
         assertionReason_hi = { assertion: aHi, reason: rHi };
         question_hi = buildHindiAssertionStem(aHi, rHi);
       })()
@@ -368,10 +395,18 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
           ...(q.matchColumns!.columnA || []).map((t) => String(t || "")),
           ...(q.matchColumns!.columnB || []).map((t) => String(t || "")),
         ];
-        const translated = await mapPool(items, MAX_PARALLEL, (t) => translateEnToHi(t));
+        const translated = await mapPool(items, MAX_PARALLEL, async (t) =>
+          acceptHindiOrEmpty(await translateEnToHi(t), t)
+        );
         const aLen = (q.matchColumns!.columnA || []).length;
         const columnA = translated.slice(0, aLen);
         const columnB = translated.slice(aLen);
+        if (
+          columnA.filter((t) => hasDevanagari(t)).length < 2 ||
+          columnB.filter((t) => hasDevanagari(t)).length < 2
+        ) {
+          return;
+        }
         matchColumns_hi = { columnA, columnB };
         question_hi = buildHindiMatchStem(columnA, columnB);
       })()
@@ -381,7 +416,11 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
   await Promise.all(tasks);
 
   if (!question_hi || !stemLooksHindi(question_hi)) {
-    question_hi = keepExistingStem ? existingHi : await translateEnToHi(stemEn);
+    if (keepExistingStem) {
+      question_hi = existingHi;
+    } else {
+      question_hi = acceptHindiOrEmpty(await translateEnToHi(stemEn), stemEn);
+    }
   }
 
   const existingOpts = q.options_hi || {};
@@ -389,7 +428,15 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
   const optTranslated = await mapPool([...optKeys], MAX_PARALLEL, async (k) => {
     const have = String((existingOpts as Record<string, string>)[k] || "").trim();
     if (hasDevanagari(have)) return have;
-    return translateEnToHi(String(optsEn[k] || ""));
+    const en = String(optsEn[k] || "");
+    if (!en.trim()) return "";
+    // Chronology codes: gloss only/and locally — never leave empty (stuck UI)
+    if (isCodeLikeOptionText(en)) {
+      if (have && isCodeLikeOptionText(have)) return glossCodeOptionToHindi(have);
+      return glossCodeOptionToHindi(en);
+    }
+    const translated = acceptHindiOrEmpty(await translateEnToHi(en), en);
+    return translated || have;
   });
   const options_hi = {
     A: optTranslated[0],
@@ -424,24 +471,32 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
           translated[k] = existing[k];
           return;
         }
-        translated[k] = await translateEnToHi(en.slice(0, 500));
+        translated[k] = acceptHindiOrEmpty(await translateEnToHi(en.slice(0, 500)), en);
       });
       explanation_hi = translated as ClientMcq["explanation_hi"];
     } else if (typeof expEnRaw === "string" && expEnRaw.trim()) {
       if (!hasDevanagari(String(existing[answer] || ""))) {
-        existing[answer] = await translateEnToHi(expEnRaw.slice(0, 500));
+        existing[answer] = acceptHindiOrEmpty(
+          await translateEnToHi(expEnRaw.slice(0, 500)),
+          expEnRaw
+        );
       }
       explanation_hi = existing as ClientMcq["explanation_hi"];
     }
   }
 
-  return {
+  const next = {
     ...q,
-    question_hi,
-    options_hi,
+    question_hi: sanitizeHindiMcqFormat(question_hi),
+    options_hi: sanitizeHindiOptions(options_hi) || options_hi,
     matchColumns_hi,
-    assertionReason_hi,
+    assertionReason_hi: assertionReason_hi
+      ? sanitizeHindiAssertionReason(assertionReason_hi) || assertionReason_hi
+      : assertionReason_hi,
     explanation_hi,
-    hasHindi: true,
+  } as T;
+  return {
+    ...next,
+    hasHindi: !needsClientHindi(next, opts),
   } as T;
 }

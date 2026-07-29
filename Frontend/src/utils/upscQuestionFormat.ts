@@ -142,18 +142,43 @@ function parseAssertionReasonStem(text: string): UpscStemPart[] | null {
   const rSplit = afterA.split(/(?:Reason|कारण)\s*\(R\)\s*:?\s*/i);
   if (rSplit.length < 2) return null;
 
-  const assertion = rSplit[0].trim();
-  const reasonAndRest = rSplit[1].trim();
+  let assertion = rSplit[0].trim();
+  let reasonAndRest = rSplit[1].trim();
+
+  // Strip leaked option banks / code prompts from reason body
+  reasonAndRest = reasonAndRest
+    .replace(/\n?\s*नीचे दिए गए कूट[\s\S]*$/i, "")
+    .replace(/\n?\s*Select the correct answer using the code[\s\S]*$/i, "")
+    .replace(/\n?\s*In the context of the above[\s\S]*$/i, "")
+    .replace(/\n?\s*उपर्युक्त के संदर्भ में[\s\S]*$/i, "")
+    .replace(/\n?\s*\(\s*A\s*\)\s*(?:दोनों|Both)[\s\S]*$/i, "")
+    .replace(/\n?\s*A\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i, "")
+    .trim();
+
   const { body: reason, prompt } = extractTrailingPrompt(reasonAndRest);
 
   // Incomplete A-R (empty assertion or reason) — fall back to plain text
   if (assertion.length < 10 || reason.length < 10) return null;
 
+  // Prefer clean A-R prompt (not a leaked options line)
+  let cleanPrompt = prompt;
+  if (cleanPrompt && /\(\s*[A-D]\s*\)|दोनों A और R|Both A and R/i.test(cleanPrompt)) {
+    cleanPrompt = null;
+  }
+
   const parts: UpscStemPart[] = [
     { type: "assertion", role: "A", text: assertion },
     { type: "assertion", role: "R", text: reason },
   ];
-  if (prompt) parts.push({ type: "prompt", text: prompt });
+  if (cleanPrompt) parts.push({ type: "prompt", text: cleanPrompt });
+  else {
+    parts.push({
+      type: "prompt",
+      text: /[\u0900-\u097F]/.test(text)
+        ? "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?"
+        : "In the context of the above, which of the following is correct?",
+    });
+  }
   return parts;
 }
 
@@ -520,7 +545,14 @@ export function resolveMatchColumns(
         };
       }
     }
-    const hiText = String(question.question_hi || "").trim();
+    const hiText = String(question.question_hi || "")
+      .trim()
+      // Normalize ए/बी/सी/डी → A/B/C/D so match parser can find Latin markers
+      .replace(/(^|[\s,;:(\n])ए\s*([.)\-–—])/g, "$1A$2")
+      .replace(/(^|[\s,;:(\n])बी\s*([.)\-–—])/g, "$1B$2")
+      .replace(/(^|[\s,;:(\n])सी\s*([.)\-–—])/g, "$1C$2")
+      .replace(/(^|[\s,;:(\n])(?:डी|डी़)\s*([.)\-–—])/g, "$1D$2")
+      .replace(/उपर्युक्त कथनों में से कौन-सा\/से सही है\/हैं\??/g, "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:");
     // Reject fake "statement" Hindi that was wrongly generated for a match question
     const hiLooksLikeMatch =
       /सूची\s*[-–—]?\s*i|मिलान|match\s+the\s+following|list\s*[-–—]?\s*i/i.test(hiText);
@@ -551,10 +583,10 @@ export function resolveMatchColumns(
     );
     const aOk = columnA.filter(Boolean).length;
     const bOk = columnB.filter(Boolean).length;
-    // Require complete paired lists — never pad with Missing item
+    // Accept 2+ complete pairs (UPSC often uses 2–4). Never pad with Missing item.
     if (
-      aOk >= 3 &&
-      bOk >= 3 &&
+      aOk >= 2 &&
+      bOk >= 2 &&
       aOk === bOk &&
       !columnA.some((t, i) => !t || !columnB[i])
     ) {
@@ -570,8 +602,8 @@ export function resolveMatchColumns(
   const parsed = parseMatchFollowingFromText(text);
   if (
     parsed &&
-    parsed.columnA.filter(Boolean).length >= 3 &&
-    parsed.columnB.filter(Boolean).length >= 3 &&
+    parsed.columnA.filter(Boolean).length >= 2 &&
+    parsed.columnB.filter(Boolean).length >= 2 &&
     parsed.columnA.filter(Boolean).length === parsed.columnB.filter(Boolean).length
   ) {
     return parsed;

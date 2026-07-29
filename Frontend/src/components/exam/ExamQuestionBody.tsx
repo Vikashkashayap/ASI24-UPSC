@@ -7,10 +7,10 @@ import {
   OptionKey,
   getQuestionEnglish,
   getQuestionHindi,
-  getOptionEnglish,
-  getOptionHindi,
   getExplanationByLang,
   hasDistinctHindiQuestion,
+  resolveOption,
+  shouldShowBoth,
 } from "../../utils/bilingualQuestion";
 import {
   buildAssertionReasonStem,
@@ -19,6 +19,10 @@ import {
   parseMatchFollowingFromText,
   resolveMatchColumns,
 } from "../../utils/upscQuestionFormat";
+import {
+  sanitizeHindiAssertionReason,
+  sanitizeHindiMcqFormat,
+} from "../../utils/sanitizeHindiMcqFormat";
 
 interface ExamQuestionBodyProps {
   question: BilingualQuestionFields & {
@@ -32,6 +36,19 @@ interface ExamQuestionBodyProps {
   compact?: boolean;
   lang?: ExamLang;
   paperMode?: boolean;
+}
+
+/** Shown when lang=hi but Hindi text is not ready yet. */
+function TranslatingPlaceholder({ compact }: { compact?: boolean }) {
+  return (
+    <p
+      className={`text-slate-400 italic animate-pulse ${
+        compact ? "text-sm" : "text-base"
+      }`}
+    >
+      अनुवाद हो रहा है…
+    </p>
+  );
 }
 
 function LangPanel({
@@ -236,7 +253,7 @@ function BilingualMatchView({
 
   if (!enData && !hiData) return null;
 
-  const showBoth = !lang || lang === "both";
+  const showBoth = shouldShowBoth(lang);
   const showLabels = showBoth;
 
   if (showBoth) {
@@ -255,7 +272,6 @@ function BilingualMatchView({
         />
       );
     } else if (!enData) {
-      // Only plain-text Hindi fallback when this is NOT a match question
       const hiText = getQuestionHindi(question, { strict: true });
       if (hiText) {
         blocks.push(
@@ -263,7 +279,6 @@ function BilingualMatchView({
         );
       }
     }
-    // If EN is match but HI missing/broken: hiData already falls back to EN columns via resolveMatchColumns
     if (enData) {
       blocks.push(
         <MatchBlock
@@ -289,12 +304,9 @@ function BilingualMatchView({
     return <div className="space-y-4">{blocks}</div>;
   }
 
-  const hiFirst = lang === "hi";
-  const blocks: React.ReactNode[] = [];
-
-  const pushHi = () => {
+  if (lang === "hi") {
     if (hiData) {
-      blocks.push(
+      return (
         <MatchBlock
           key="hi"
           label="हिंदी"
@@ -306,66 +318,54 @@ function BilingualMatchView({
           hideLabel
         />
       );
-    } else if (!enData) {
-      const hiText = getQuestionHindi(question, { strict: true });
-      if (hiText) {
-        blocks.push(
-          <LangPanel key="hi-fallback" label="हिंदी" text={hiText} compact={compact} accent="blue" paperMode={paperMode} hideLabel />
-        );
-      }
     }
-  };
-  const pushEn = () => {
-    if (enData) {
-      blocks.push(
-        <MatchBlock
-          key="en"
-          label="English"
-          data={enData}
-          tableLang="en"
-          compact={compact}
-          accent="slate"
-          paperMode={paperMode}
-          hideLabel
-        />
-      );
-    } else {
-      const enText = getQuestionEnglish(question);
-      if (enText) {
-        blocks.push(
-          <LangPanel key="en-fallback" label="English" text={enText} compact={compact} accent="slate" paperMode={paperMode} hideLabel />
-        );
-      }
-    }
-  };
-
-  if (hiFirst) {
-    pushHi();
-    if (blocks.length === 0) pushEn();
-  } else {
-    pushEn();
-    if (blocks.length === 0) pushHi();
-  }
-
-  if (blocks.length === 0) {
-    const fallback = getQuestionEnglish(question) || getQuestionHindi(question, { strict: false });
-    if (fallback) {
+    const hiText = getQuestionHindi(question, { strict: true });
+    if (hiText) {
       return (
         <LangPanel
-          key="fallback"
-          label={lang === "hi" ? "हिंदी" : "English"}
-          text={fallback}
+          key="hi-fallback"
+          label="हिंदी"
+          text={hiText}
           compact={compact}
-          accent={lang === "hi" ? "blue" : "slate"}
+          accent="blue"
           paperMode={paperMode}
           hideLabel
         />
       );
     }
-    return null;
+    return <TranslatingPlaceholder compact={compact} />;
   }
 
-  return <div className="space-y-3">{blocks}</div>;
+  // English-only
+  if (enData) {
+    return (
+      <MatchBlock
+        key="en"
+        label="English"
+        data={enData}
+        tableLang="en"
+        compact={compact}
+        accent="slate"
+        paperMode={paperMode}
+        hideLabel
+      />
+    );
+  }
+  const enText = getQuestionEnglish(question);
+  if (enText) {
+    return (
+      <LangPanel
+        key="en-fallback"
+        label="English"
+        text={enText}
+        compact={compact}
+        accent="slate"
+        paperMode={paperMode}
+        hideLabel
+      />
+    );
+  }
+  return null;
 }
 
 function getAssertionStemText(
@@ -373,7 +373,8 @@ function getAssertionStemText(
   lang: "en" | "hi"
 ): string | null {
   if (lang === "hi") {
-    const arHi = question.assertionReason_hi;
+    const arHiRaw = question.assertionReason_hi;
+    const arHi = arHiRaw ? sanitizeHindiAssertionReason(arHiRaw) : null;
     if (arHi?.assertion && arHi?.reason) {
       return buildAssertionReasonStem({
         assertion: arHi.assertion,
@@ -381,9 +382,11 @@ function getAssertionStemText(
       });
     }
     const text = getQuestionHindi(question, { strict: true });
-    if (text && isAssertionReasonText(text)) return text;
-    // Soft accept: Hindi stem with अभिकथन/कारण even if getQuestionHindi strict cleared it
-    const rawHi = String(question.question_hi || "").trim();
+    if (text && isAssertionReasonText(text)) {
+      // Re-parse and strip leaked options from reason body if present
+      return sanitizeHindiMcqFormat(text);
+    }
+    const rawHi = sanitizeHindiMcqFormat(String(question.question_hi || "").trim());
     if (rawHi && isAssertionReasonText(rawHi)) return rawHi;
     return null;
   }
@@ -416,7 +419,7 @@ function BilingualAssertionView({
 
   if (!enStem && !hiStem) return null;
 
-  if (!lang || lang === "both") {
+  if (shouldShowBoth(lang)) {
     if (!lang && !hiStem) {
       return (
         <UpscFormattedQuestionStem
@@ -440,27 +443,37 @@ function BilingualAssertionView({
     return <div className="space-y-3">{blocks}</div>;
   }
 
-  const only = lang === "hi" ? hiStem : enStem;
-  if (!only) {
+  if (lang === "hi") {
+    if (hiStem) {
+      return (
+        <LangPanel
+          key="hi"
+          label="हिंदी"
+          text={hiStem}
+          compact={compact}
+          accent="blue"
+          paperMode={paperMode}
+          hideLabel
+        />
+      );
+    }
+    return <TranslatingPlaceholder compact={compact} />;
+  }
+
+  if (enStem) {
     return (
-      <UpscFormattedQuestionStem
-        text={enStem || hiStem!}
-        theme="light"
+      <LangPanel
+        key="en"
+        label="English"
+        text={enStem}
         compact={compact}
+        accent="slate"
+        paperMode={paperMode}
+        hideLabel
       />
     );
   }
-  return (
-    <LangPanel
-      key={lang}
-      label={lang === "hi" ? "हिंदी" : "English"}
-      text={only}
-      compact={compact}
-      accent={lang === "hi" ? "blue" : "slate"}
-      paperMode={paperMode}
-      hideLabel
-    />
-  );
+  return null;
 }
 
 /** Responsive stem — statement / chronology / plain text */
@@ -512,35 +525,72 @@ export function ExamBilingualStem({
 
   if (!en && !hi) return null;
 
-  // Both languages — UPSC bilingual paper style
-  if (lang === "both" || (!lang && hasDistinctHindiQuestion(question))) {
+  // Both (or unset with distinct Hindi): dual panels with labels
+  if (shouldShowBoth(lang) && hi && en && hi !== en) {
     return (
       <div className="space-y-3">
-        {hi ? (
-          <LangPanel label="हिंदी" text={hi} compact={compact} accent="blue" paperMode={paperMode} />
-        ) : null}
-        {en ? (
-          <LangPanel label="English" text={en} compact={compact} accent="slate" paperMode={paperMode} />
-        ) : null}
+        <LangPanel
+          label="हिंदी"
+          text={hi}
+          compact={compact}
+          accent="blue"
+          paperMode={paperMode}
+        />
+        <LangPanel
+          label="English"
+          text={en}
+          compact={compact}
+          accent="slate"
+          paperMode={paperMode}
+        />
       </div>
     );
   }
 
-  if (lang === "hi" || lang === "en") {
-    const text = lang === "hi" ? hi || en : en || hi;
+  if (lang === "hi") {
+    if (hi) {
+      return (
+        <LangPanel
+          label="हिंदी"
+          text={hi}
+          compact={compact}
+          accent="blue"
+          paperMode={paperMode}
+          hideLabel
+        />
+      );
+    }
+    return <TranslatingPlaceholder compact={compact} />;
+  }
+
+  if (lang === "en") {
     return (
       <LangPanel
-        label={lang === "hi" ? "हिंदी" : "English"}
-        text={text}
+        label="English"
+        text={en || ""}
         compact={compact}
-        accent={lang === "hi" ? "blue" : "slate"}
+        accent="slate"
         paperMode={paperMode}
         hideLabel
       />
     );
   }
 
-  return <UpscFormattedQuestionStem text={en || hi} theme="light" compact={compact} />;
+  // both with only one language, or unset
+  const text = hi || en;
+  if (!text) return null;
+  if (shouldShowBoth(lang) && hasDistinctHindiQuestion(question)) {
+    return (
+      <LangPanel
+        label={hi ? "हिंदी" : "English"}
+        text={text}
+        compact={compact}
+        accent={hi ? "blue" : "slate"}
+        paperMode={paperMode}
+      />
+    );
+  }
+  return <UpscFormattedQuestionStem text={text} theme="light" compact={compact} />;
 }
 
 function hasUsableMatchColumns(cols?: { columnA?: string[]; columnB?: string[] } | null): boolean {
@@ -632,10 +682,13 @@ export const ExamQuestionBody: React.FC<ExamQuestionBodyProps> = ({
   const repaired = repairStemFromColumns(question);
   const isMatch = detectMatch(repaired);
   const isAssertion = detectAssertion(repaired);
+  // Only use structured match view when columns actually resolve (avoids blank Q for 2-pair matches)
+  const hasResolvedMatch =
+    Boolean(resolveMatchColumns(repaired, "en")) || Boolean(resolveMatchColumns(repaired, "hi"));
 
   return (
     <div className={`space-y-2 sm:space-y-3 min-h-0 ${paperMode ? "upsc-exam-serif text-black" : ""}`}>
-      {isMatch ? (
+      {isMatch && hasResolvedMatch ? (
         <BilingualMatchView question={repaired} compact={compact} lang={lang} paperMode={paperMode} />
       ) : isAssertion ? (
         <BilingualAssertionView question={repaired} compact={compact} lang={lang} paperMode={paperMode} />
@@ -708,16 +761,8 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
   lang,
   paperMode,
 }) => {
-  const en = getOptionEnglish(question, optionKey);
-  const hi = getOptionHindi(question, optionKey, { strict: true });
-  const showBoth = (lang === "both" || !lang) && Boolean(hi && en && hi !== en);
-  const singleLang = lang === "hi" || lang === "en";
-  const displayText = singleLang
-    ? lang === "hi"
-      ? hi || en
-      : en || hi
-    : en || hi;
-  const missingHi = lang === "hi" && !hi;
+  const resolved = resolveOption(question, optionKey, lang || "en");
+  const showBilingual = lang === "both" && Boolean(resolved.secondary);
 
   return (
     <button
@@ -745,15 +790,17 @@ export const ExamOptionRow: React.FC<ExamOptionRowProps> = ({
           {selected ? <span className="exam-option-radio-dot" /> : null}
         </span>
         <div className="min-w-0 flex-1 exam-option-text py-0.5">
-          {missingHi ? (
-            <p className="break-words">{en}</p>
-          ) : showBoth ? (
+          {lang === "hi" && resolved.source === "missing" && !resolved.primary ? (
+            <TranslatingPlaceholder compact={compact} />
+          ) : showBilingual ? (
             <div className="space-y-1">
-              <p className="break-words font-medium text-slate-900">{hi}</p>
-              <p className="break-words text-slate-500 text-[12px] sm:text-[13px] leading-relaxed">{en}</p>
+              <p className="break-words font-medium text-slate-900">{resolved.primary}</p>
+              <p className="break-words text-slate-500 text-[12px] sm:text-[13px] leading-relaxed">
+                {resolved.secondary}
+              </p>
             </div>
           ) : (
-            <p className="break-words">{displayText}</p>
+            <p className="break-words">{resolved.primary}</p>
           )}
         </div>
       </div>
@@ -792,16 +839,8 @@ export const ExamReviewOptionRow: React.FC<ExamReviewOptionRowProps> = ({
   lang,
   paperMode,
 }) => {
-  const en = getOptionEnglish(question, optionKey);
-  const hi = getOptionHindi(question, optionKey, { strict: true });
-  const showBoth = (lang === "both" || !lang) && Boolean(hi && en && hi !== en);
-  const singleLang = lang === "hi" || lang === "en";
-  const displayText = singleLang
-    ? lang === "hi"
-      ? hi || en
-      : en || hi
-    : en || hi;
-  const missingHi = lang === "hi" && !hi;
+  const resolved = resolveOption(question, optionKey, lang || "en");
+  const showBilingual = lang === "both" && Boolean(resolved.secondary);
 
   const isCorrect = optionKey === correctAnswer;
   const isUserWrong = optionKey === userAnswer && userAnswer !== correctAnswer;
@@ -842,15 +881,17 @@ export const ExamReviewOptionRow: React.FC<ExamReviewOptionRowProps> = ({
           {optionKey}
         </span>
         <div className="min-w-0 flex-1 exam-option-text py-0.5">
-          {missingHi ? (
-            <p className="break-words leading-relaxed">{en}</p>
-          ) : showBoth ? (
+          {lang === "hi" && resolved.source === "missing" && !resolved.primary ? (
+            <TranslatingPlaceholder compact={compact} />
+          ) : showBilingual ? (
             <div className="space-y-0.5">
-              <p className="break-words leading-relaxed font-medium text-slate-900">{hi}</p>
-              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">{en}</p>
+              <p className="break-words leading-relaxed font-medium text-slate-900">{resolved.primary}</p>
+              <p className="break-words leading-relaxed text-slate-500 text-[10px] sm:text-[11px]">
+                {resolved.secondary}
+              </p>
             </div>
           ) : (
-            <p className="break-words leading-relaxed">{displayText}</p>
+            <p className="break-words leading-relaxed">{resolved.primary}</p>
           )}
         </div>
         <div className="shrink-0 mt-0.5">
@@ -964,9 +1005,13 @@ export const ExamReviewExplanation: React.FC<{
   const hasPerOption = hasPerOptionExplanations(question, optionKeys, correctKey);
   const teachingText = getFullTeachingExplanation(question, correctKey);
   const teachingHi = correctKey ? getExplanationByLang(question, "hi", correctKey) : "";
-  const showHi = (lang === "hi" || lang === "both") && teachingHi && !isGenericWrongExplanation(teachingHi);
+  const showHi =
+    (lang === "hi" || lang === "both") &&
+    Boolean(teachingHi) &&
+    !isGenericWrongExplanation(teachingHi);
   const showEn =
-    (lang === "en" || lang === "both" || !showHi) && Boolean(teachingText);
+    (lang === "en" || lang === "both") && Boolean(teachingText) && !isGenericWrongExplanation(teachingText);
+  const showHiMissing = lang === "hi" && !showHi;
 
   const headerClass = paperMode
     ? "upsc-exam-serif text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-black/70"
@@ -1040,7 +1085,10 @@ export const ExamReviewExplanation: React.FC<{
                   : teachingText}
               </p>
             ) : null}
-            {!showHi && !showEn ? (
+            {showHiMissing ? (
+              <p className="text-xs text-emerald-800/70 italic">अनुवाद हो रहा है…</p>
+            ) : null}
+            {!showHi && !showEn && !showHiMissing ? (
               <p className="text-xs text-emerald-800/70 italic">Explanation unavailable for this question.</p>
             ) : null}
           </div>
@@ -1065,7 +1113,7 @@ export const ExamReviewExplanation: React.FC<{
                   !isGenericWrongExplanation(hiText) &&
                   !explanationsLookSame(hiText, correctHi || correctEn);
                 const enOk =
-                  (lang === "en" || lang === "both" || !hiOk) &&
+                  (lang === "en" || lang === "both") &&
                   enText &&
                   !isGenericWrongExplanation(enText) &&
                   !explanationsLookSame(enText, correctEn);
