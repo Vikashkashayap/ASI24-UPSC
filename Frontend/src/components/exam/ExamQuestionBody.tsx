@@ -882,7 +882,25 @@ function isGenericWrongExplanation(text: string): boolean {
   if (!t) return true;
   if (GENERIC_WRONG_EXPLAIN_RE.test(t)) return true;
   // Too short to be a real teaching explanation
-  if (t.split(/\s+/).filter(Boolean).length < 18) return true;
+  if (t.split(/\s+/).filter(Boolean).length < 12) return true;
+  return false;
+}
+
+/** True when two explanation blobs are the same teaching paragraph (duplicated onto wrong options). */
+function explanationsLookSame(a: string, b: string): boolean {
+  const na = String(a || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+  const nb = String(b || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  if (na.length >= 40 && nb.length >= 40) {
+    if (na.includes(nb.slice(0, 80)) || nb.includes(na.slice(0, 80))) return true;
+  }
   return false;
 }
 
@@ -902,15 +920,20 @@ function hasPerOptionExplanations(
   const raw = question.explanation_en ?? question.explanation;
   if (!raw || typeof raw === "string") return false;
 
+  const correctEn = correctKey ? getExplanationByLang(question, "en", correctKey) : "";
   const realWrong = optionKeys.filter((opt) => {
     if (opt === correctKey) return false;
     const en = getExplanationByLang(question, "en", opt);
     const hi = getExplanationByLang(question, "hi", opt);
-    if (en && !isGenericWrongExplanation(en)) return true;
-    if (hi && !isGenericWrongExplanation(hi)) return true;
+    if (en && !isGenericWrongExplanation(en) && !explanationsLookSame(en, correctEn)) return true;
+    const correctHi = correctKey ? getExplanationByLang(question, "hi", correctKey) : "";
+    if (hi && !isGenericWrongExplanation(hi) && !explanationsLookSame(hi, correctHi || correctEn)) {
+      return true;
+    }
     return false;
   });
-  return realWrong.length >= 2;
+  // Need at least one DISTINCT wrong-option reason (not a copy of correct)
+  return realWrong.length >= 1;
 }
 
 function getFullTeachingExplanation(question: ExplanationFields, correctKey?: OptionKey): string {
@@ -918,19 +941,12 @@ function getFullTeachingExplanation(question: ExplanationFields, correctKey?: Op
   if (typeof raw === "string" && raw.trim()) return raw.trim();
   if (raw && typeof raw === "object" && correctKey) {
     const correct = String(raw[correctKey] || "").trim();
-    if (correct && !isGenericWrongExplanation(correct)) {
-      // Prefer full combined teaching if correct alone is short but others exist as stubs
-      const parts = (["A", "B", "C", "D"] as OptionKey[])
-        .map((k) => String(raw[k] || "").trim())
-        .filter((t) => t && !isGenericWrongExplanation(t));
-      if (parts.length >= 2) return parts.join(" ");
-      return correct;
+    if (correct && !isGenericWrongExplanation(correct)) return correct;
+    // Fallback: first non-empty unique blob
+    for (const k of ["A", "B", "C", "D"] as OptionKey[]) {
+      const t = String(raw[k] || "").trim();
+      if (t && !isGenericWrongExplanation(t)) return t;
     }
-    const joined = (["A", "B", "C", "D"] as OptionKey[])
-      .map((k) => String(raw[k] || "").trim())
-      .filter(Boolean)
-      .join(" ");
-    return joined;
   }
   return getExplanationByLang(question, "en", correctKey) || "";
 }
@@ -939,13 +955,18 @@ export const ExamReviewExplanation: React.FC<{
   question: ExplanationFields;
   userAnswer: string | null;
   paperMode?: boolean;
-}> = ({ question, userAnswer, paperMode }) => {
+  /** When hi/both — show Hindi explanation (client MT fills explanation_hi). */
+  lang?: ExamLang;
+}> = ({ question, userAnswer, paperMode, lang = "both" }) => {
   const correctKey = question.correctAnswer as OptionKey | undefined;
   const optionKeys: OptionKey[] = ["A", "B", "C", "D"];
 
   const hasPerOption = hasPerOptionExplanations(question, optionKeys, correctKey);
   const teachingText = getFullTeachingExplanation(question, correctKey);
   const teachingHi = correctKey ? getExplanationByLang(question, "hi", correctKey) : "";
+  const showHi = (lang === "hi" || lang === "both") && teachingHi && !isGenericWrongExplanation(teachingHi);
+  const showEn =
+    (lang === "en" || lang === "both" || !showHi) && Boolean(teachingText);
 
   const headerClass = paperMode
     ? "upsc-exam-serif text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-black/70"
@@ -1001,36 +1022,53 @@ export const ExamReviewExplanation: React.FC<{
                 <span className="text-[10px] font-semibold text-emerald-700">आपका जवाब सही ✓</span>
               ) : null}
             </div>
-            {teachingHi && !isGenericWrongExplanation(teachingHi) ? (
+            {showHi ? (
               <p className="break-words text-[12px] sm:text-sm leading-relaxed mb-2 text-emerald-950 font-medium">
-                <span className="font-bold text-[9px] uppercase text-emerald-700/70 mr-1.5">हिंदी</span>
+                {lang === "both" ? (
+                  <span className="font-bold text-[9px] uppercase text-emerald-700/70 mr-1.5">हिंदी</span>
+                ) : null}
                 {teachingHi}
               </p>
             ) : null}
-            {teachingText ? (
+            {showEn ? (
               <p className="break-words text-[12px] sm:text-sm leading-relaxed text-emerald-950/90">
-                {!teachingHi || isGenericWrongExplanation(teachingHi) ? null : (
+                {lang === "both" && showHi ? (
                   <span className="font-bold text-[9px] uppercase text-emerald-700/60 mr-1.5">English</span>
-                )}
+                ) : null}
                 {hasPerOption
                   ? getExplanationByLang(question, "en", correctKey) || teachingText
                   : teachingText}
               </p>
-            ) : (
+            ) : null}
+            {!showHi && !showEn ? (
               <p className="text-xs text-emerald-800/70 italic">Explanation unavailable for this question.</p>
-            )}
+            ) : null}
           </div>
         ) : null}
 
-        {/* Wrong options — only real teaching text, never generic stubs */}
+        {/* Wrong options — only DISTINCT short reasons (never paste of correct explanation) */}
         {hasPerOption
           ? optionKeys
               .filter((opt) => opt !== correctKey)
               .map((opt) => {
                 const hiText = getExplanationByLang(question, "hi", opt);
                 const enText = getExplanationByLang(question, "en", opt);
-                const hiOk = hiText && !isGenericWrongExplanation(hiText);
-                const enOk = enText && !isGenericWrongExplanation(enText);
+                const correctEn = correctKey
+                  ? getExplanationByLang(question, "en", correctKey)
+                  : teachingText;
+                const correctHi = correctKey
+                  ? getExplanationByLang(question, "hi", correctKey)
+                  : teachingHi;
+                const hiOk =
+                  (lang === "hi" || lang === "both") &&
+                  hiText &&
+                  !isGenericWrongExplanation(hiText) &&
+                  !explanationsLookSame(hiText, correctHi || correctEn);
+                const enOk =
+                  (lang === "en" || lang === "both" || !hiOk) &&
+                  enText &&
+                  !isGenericWrongExplanation(enText) &&
+                  !explanationsLookSame(enText, correctEn);
                 if (!hiOk && !enOk) return null;
                 const isUserWrong = opt === userAnswer;
                 return (
@@ -1067,13 +1105,15 @@ export const ExamReviewExplanation: React.FC<{
                     </div>
                     {hiOk ? (
                       <p className="break-words text-[11px] sm:text-xs leading-relaxed mb-1 text-black/85">
-                        <span className="font-bold text-[9px] uppercase text-black/50 mr-1.5">हिंदी</span>
+                        {lang === "both" ? (
+                          <span className="font-bold text-[9px] uppercase text-black/50 mr-1.5">हिंदी</span>
+                        ) : null}
                         {hiText}
                       </p>
                     ) : null}
                     {enOk ? (
                       <p className="break-words text-[11px] sm:text-xs leading-relaxed text-black/75">
-                        {hiOk ? (
+                        {lang === "both" && hiOk ? (
                           <span className="font-bold text-[9px] uppercase text-black/45 mr-1.5">English</span>
                         ) : null}
                         {enText}

@@ -239,7 +239,10 @@ function buildFullEnglishStem(q: ClientMcq): string {
   return en;
 }
 
-export function needsClientHindi(q: ClientMcq | null | undefined): boolean {
+export function needsClientHindi(
+  q: ClientMcq | null | undefined,
+  opts: { includeExplanations?: boolean } = {}
+): boolean {
   if (!q) return false;
   const en = buildFullEnglishStem(q);
   if (!en && !q.matchColumns?.columnA?.length) return false;
@@ -251,7 +254,18 @@ export function needsClientHindi(q: ClientMcq | null | undefined): boolean {
   if (!hi || !stemLooksHindi(hi) || isIncompleteHindiStem(hi, en)) return true;
   if (!optionsHiOk(q)) return true;
 
+  if (opts.includeExplanations && !explanationHiOk(q)) return true;
+
   return false;
+}
+
+function explanationHiOk(q: ClientMcq): boolean {
+  const answer = String(q.correctAnswer || "A").toUpperCase().charAt(0);
+  const raw = q.explanation_hi;
+  if (!raw) return false;
+  if (typeof raw === "string") return hasDevanagari(raw);
+  const hi = String((raw as Record<string, string>)[answer] || "").trim();
+  return hasDevanagari(hi);
 }
 
 function buildHindiAssertionStem(assertion: string, reason: string): string {
@@ -282,7 +296,7 @@ export async function ensureClientHindiMcq<T extends ClientMcq>(
   q: T,
   opts: { includeExplanations?: boolean; deadlineMs?: number } = {}
 ): Promise<T> {
-  if (!needsClientHindi(q)) return q;
+  if (!needsClientHindi(q, opts)) return q;
 
   const deadlineMs = opts.deadlineMs ?? 18000;
   const work = ensureClientHindiMcqInner(q, opts);
@@ -384,16 +398,25 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
     D: optTranslated[3],
   };
 
-  // Explanations only when explicitly requested (result page) — never block live exam
+  // Explanations only when explicitly requested (result page) — free Google MT, no OpenRouter
   let explanation_hi: ClientMcq["explanation_hi"] = q.explanation_hi;
   if (includeExplanations) {
+    const answer = String(q.correctAnswer || "A").toUpperCase().charAt(0) as
+      | "A"
+      | "B"
+      | "C"
+      | "D";
     const expEnRaw = q.explanation_en ?? q.explanation;
+    const existing =
+      explanation_hi && typeof explanation_hi === "object"
+        ? ({ ...(explanation_hi as Record<string, string>) } as Record<string, string>)
+        : typeof explanation_hi === "string" && explanation_hi.trim()
+          ? { A: "", B: "", C: "", D: "", [answer]: explanation_hi.trim() }
+          : { A: "", B: "", C: "", D: "" };
+
     if (expEnRaw && typeof expEnRaw === "object") {
-      const existing =
-        explanation_hi && typeof explanation_hi === "object"
-          ? (explanation_hi as Record<string, string>)
-          : {};
       const translated: Record<string, string> = { ...existing };
+      // Prefer correct option; also fill any distinct wrong-option reasons
       await mapPool([...optKeys], 2, async (k) => {
         const en = String((expEnRaw as Record<string, string>)[k] || "").trim();
         if (!en) return;
@@ -401,9 +424,14 @@ async function ensureClientHindiMcqInner<T extends ClientMcq>(
           translated[k] = existing[k];
           return;
         }
-        translated[k] = await translateEnToHi(en.slice(0, 400));
+        translated[k] = await translateEnToHi(en.slice(0, 500));
       });
       explanation_hi = translated as ClientMcq["explanation_hi"];
+    } else if (typeof expEnRaw === "string" && expEnRaw.trim()) {
+      if (!hasDevanagari(String(existing[answer] || ""))) {
+        existing[answer] = await translateEnToHi(expEnRaw.slice(0, 500));
+      }
+      explanation_hi = existing as ClientMcq["explanation_hi"];
     }
   }
 

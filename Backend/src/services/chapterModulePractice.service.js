@@ -345,7 +345,8 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 /**
  * Create (or reuse-from-cache) a chapter practice test.
  * Prefer Admin KB/RAG for 30 Hard MCQs; if topic missing/short → LLM fallback.
- * Always bilingual (EN + HI). Show 20 unique questions with teaching explanations.
+ * English at generate time; Hindi via free client Google translate (0 OpenRouter tokens).
+ * Show 20 unique questions with teaching explanations.
  *
  * Retake / forceCache: always reuse the saved paper for this topic from DB
  * (same student's prior attempt first, else any prior GS Hard paper).
@@ -449,7 +450,7 @@ export async function createChapterPracticeTest({
       minAcceptable: MIN_ACCEPTABLE,
       kbOnly: false,
       allowLlmFallback: true,
-      ensureHindi: true,
+      ensureHindi: false,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -555,7 +556,7 @@ async function generateModuleFinalTopUp({
       minAcceptable: 1,
       kbOnly: false,
       allowLlmFallback: true,
-      ensureHindi: true,
+      ensureHindi: false,
     });
 
     if (!generationResult.success || !generationResult.questions?.length) {
@@ -591,7 +592,7 @@ async function generateModuleFinalTopUp({
         minAcceptable: 1,
         kbOnly: false,
         allowLlmFallback: true,
-        ensureHindi: true,
+        ensureHindi: false,
       });
       if (!generationResult.success || !generationResult.questions?.length) continue;
       const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));

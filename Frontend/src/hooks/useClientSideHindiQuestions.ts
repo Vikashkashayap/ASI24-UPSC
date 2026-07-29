@@ -7,27 +7,32 @@ import {
 } from "../utils/clientHindiTranslate";
 
 /**
- * Live exam Hindi fill — never blocks forever.
+ * Live exam / result Hindi fill — never blocks forever.
  * Prefetch only current + next question.
+ * Result page: pass includeExplanations so व्याख्या also gets free Google HI.
  */
 export function useClientSideHindiQuestions<T extends ClientMcq>(
   questions: T[],
   lang: ExamLang,
-  currentIndex: number
+  currentIndex: number,
+  opts: { includeExplanations?: boolean } = {}
 ): { questions: T[]; translating: boolean } {
+  const includeExplanations = opts.includeExplanations === true;
   const [overlay, setOverlay] = useState<Record<number, T>>({});
   const [translating, setTranslating] = useState(false);
   const doneRef = useRef<Set<number>>(new Set());
   const inflightRef = useRef<Set<number>>(new Set());
   const questionsRef = useRef(questions);
+  const overlayRef = useRef(overlay);
   questionsRef.current = questions;
+  overlayRef.current = overlay;
 
   const fingerprint = useMemo(
     () =>
       questions
         .map((q) => String(q._id || q.question_en || q.question || "").slice(0, 40))
-        .join("|"),
-    [questions]
+        .join("|") + `|expl:${includeExplanations ? 1 : 0}`,
+    [questions, includeExplanations]
   );
 
   useEffect(() => {
@@ -45,7 +50,6 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
       return;
     }
 
-    // Only current + next — keeps UI snappy, avoids rate-limit hangs
     const idxs = [currentIndex, currentIndex + 1].filter(
       (i) => i >= 0 && i < questions.length
     );
@@ -57,8 +61,8 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
         if (cancelled) return;
         if (doneRef.current.has(i) || inflightRef.current.has(i)) continue;
 
-        const base = questionsRef.current[i];
-        if (!base || !needsClientHindi(base)) {
+        const base = overlayRef.current[i] || questionsRef.current[i];
+        if (!base || !needsClientHindi(base, { includeExplanations })) {
           doneRef.current.add(i);
           continue;
         }
@@ -67,16 +71,15 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
         setTranslating(true);
         try {
           const next = await ensureClientHindiMcq(base, {
-            includeExplanations: false,
-            deadlineMs: 16000,
+            includeExplanations,
+            deadlineMs: includeExplanations ? 22000 : 16000,
           });
           if (cancelled) return;
           doneRef.current.add(i);
-          // Always overlay — even partial progress is better than stuck English
           setOverlay((prev) => ({ ...prev, [i]: next }));
         } catch (err) {
           console.warn("[client-hi] translate failed", err);
-          doneRef.current.add(i); // don't retry forever
+          doneRef.current.add(i);
         } finally {
           inflightRef.current.delete(i);
           if (!inflightRef.current.size) setTranslating(false);
@@ -88,7 +91,7 @@ export function useClientSideHindiQuestions<T extends ClientMcq>(
     return () => {
       cancelled = true;
     };
-  }, [wantHi, currentIndex, fingerprint, questions.length]);
+  }, [wantHi, currentIndex, fingerprint, questions.length, includeExplanations]);
 
   const merged = useMemo(
     () => questions.map((q, i) => overlay[i] || q),

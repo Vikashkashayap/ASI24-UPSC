@@ -158,7 +158,8 @@ const TestResultPage: React.FC = () => {
   const { questions: displayQuestions, translating: translatingHi } = useClientSideHindiQuestions(
     (result?.questions || []) as QuestionResult[],
     examLang,
-    currentIndex
+    currentIndex,
+    { includeExplanations: true }
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -342,6 +343,7 @@ const TestResultPage: React.FC = () => {
                 <ExamReviewExplanation
                   question={currentQuestion}
                   userAnswer={currentQuestion.userAnswer}
+                  lang={examLang}
                 />
               </div>
             </UpscExamPaperShell>

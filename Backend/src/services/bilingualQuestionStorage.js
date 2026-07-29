@@ -17,19 +17,39 @@ function normalizeOptionsObject(raw) {
   return options;
 }
 
-function normalizeExplanationObject(raw) {
+function normalizeExplanationObject(raw, correctAnswer = "A") {
   if (!raw) return null;
+  const answer = String(correctAnswer || "A")
+    .toUpperCase()
+    .charAt(0);
+  const letter = ["A", "B", "C", "D"].includes(answer) ? answer : "A";
+  const out = { A: "", B: "", C: "", D: "" };
+
   if (typeof raw === "string") {
     const s = raw.trim();
-    return s ? { A: s, B: s, C: s, D: s } : null;
+    if (!s) return null;
+    out[letter] = s;
+    return out;
   }
   if (typeof raw === "object") {
-    return {
-      A: String(raw.A ?? "").trim(),
-      B: String(raw.B ?? "").trim(),
-      C: String(raw.C ?? "").trim(),
-      D: String(raw.D ?? "").trim(),
-    };
+    const texts = OPTION_KEYS.map((k) => String(raw[k] ?? "").trim()).filter(Boolean);
+    const unique = new Set(texts.map((t) => t.toLowerCase().replace(/\s+/g, " ")));
+    if (unique.size <= 1) {
+      out[letter] = String(raw[letter] ?? texts[0] ?? "").trim();
+      return out[letter] ? out : null;
+    }
+    for (const key of OPTION_KEYS) {
+      out[key] = String(raw[key] ?? "").trim();
+    }
+    const cNorm = out[letter].toLowerCase().replace(/\s+/g, " ");
+    for (const key of OPTION_KEYS) {
+      if (key === letter || !out[key]) continue;
+      const n = out[key].toLowerCase().replace(/\s+/g, " ");
+      if (cNorm && (n === cNorm || (cNorm.length >= 40 && n.includes(cNorm.slice(0, 80))))) {
+        out[key] = "";
+      }
+    }
+    return out;
   }
   return null;
 }
@@ -54,10 +74,11 @@ export function questionNeedsHindiMigration(q) {
 export function normalizeQuestionBilingualFields(q, { hindiFallback = false } = {}) {
   const base = ensureEnglishBilingualFields(q);
   let changed = false;
+  const correctAnswer = base.correctAnswer || "A";
 
   const question_hi = String(base.question_hi || "").trim();
   const options_hi = normalizeOptionsObject(base.options_hi);
-  let explanation_hi = normalizeExplanationObject(base.explanation_hi);
+  let explanation_hi = normalizeExplanationObject(base.explanation_hi, correctAnswer);
 
   let nextHi = question_hi;
   let nextOptionsHi = { ...options_hi };
@@ -75,7 +96,7 @@ export function normalizeQuestionBilingualFields(q, { hindiFallback = false } = 
       }
     }
     if (!nextExplanationHi && base.explanation_en) {
-      nextExplanationHi = normalizeExplanationObject(base.explanation_en);
+      nextExplanationHi = normalizeExplanationObject(base.explanation_en, correctAnswer);
       changed = true;
     }
   }

@@ -147,6 +147,73 @@ function normalizeOptionsObject(raw) {
   return options;
 }
 
+function normExplCompare(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Keep full teaching explanation on the CORRECT option only.
+ * Never paste the same paragraph onto A/B/C/D (UI was showing 4× duplicates).
+ */
+export function collapseExplanationToCorrect(explanation, correctAnswer) {
+  const answer = String(correctAnswer || "A")
+    .toUpperCase()
+    .charAt(0);
+  const letter = ["A", "B", "C", "D"].includes(answer) ? answer : "A";
+  const out = { A: "", B: "", C: "", D: "" };
+
+  if (explanation == null) return out;
+
+  if (typeof explanation === "string") {
+    out[letter] = explanation.trim();
+    return out;
+  }
+
+  if (typeof explanation !== "object") return out;
+
+  const byKey = {};
+  for (const k of OPTION_KEYS) {
+    byKey[k] = String(explanation[k] ?? "").trim();
+  }
+  const nonEmpty = OPTION_KEYS.map((k) => byKey[k]).filter(Boolean);
+  const uniqueNorms = new Set(nonEmpty.map(normExplCompare));
+
+  // Same text on multiple keys → keep only on correct
+  if (uniqueNorms.size <= 1) {
+    out[letter] = byKey[letter] || nonEmpty[0] || "";
+    return out;
+  }
+
+  const correctText = byKey[letter] || "";
+  const correctNorm = normExplCompare(correctText);
+  for (const k of OPTION_KEYS) {
+    const t = byKey[k];
+    if (!t) continue;
+    if (k === letter) {
+      out[k] = t;
+      continue;
+    }
+    const n = normExplCompare(t);
+    // Drop wrong-option slots that are just a copy of the correct teaching paragraph
+    if (
+      correctNorm &&
+      (n === correctNorm ||
+        (correctNorm.length >= 40 && n.includes(correctNorm.slice(0, 80))) ||
+        (n.length >= 40 && correctNorm.includes(n.slice(0, 80))))
+    ) {
+      continue;
+    }
+    out[k] = t;
+  }
+  if (!out[letter] && nonEmpty.length) {
+    out[letter] = byKey[letter] || nonEmpty[0];
+  }
+  return out;
+}
+
 /**
  * Ensure English bilingual fields exist (backward compatible with legacy `question` / `options`).
  * Uses toObject() for Mongoose subdocuments — spread alone drops question_hi / options_hi.
@@ -162,33 +229,30 @@ export function ensureEnglishBilingualFields(question) {
   const question_hi = String(plain.question_hi ?? "").trim();
   const options_en = normalizeOptionsObject(plain.options_en ?? plain.options);
   const options_hi = normalizeOptionsObject(plain.options_hi);
+  const correctAnswer = String(plain.correctAnswer || plain.answer || "A")
+    .toUpperCase()
+    .charAt(0);
 
-  let explanation_en = plain.explanation_en;
-  if (!explanation_en) {
-    if (typeof plain.explanation === "object" && plain.explanation !== null) {
-      explanation_en = {
-        A: String(plain.explanation.A ?? "").trim(),
-        B: String(plain.explanation.B ?? "").trim(),
-        C: String(plain.explanation.C ?? "").trim(),
-        D: String(plain.explanation.D ?? "").trim(),
-      };
-    } else if (typeof plain.explanation === "string") {
-      const str = plain.explanation.trim();
-      explanation_en = { A: str, B: str, C: str, D: str };
-    }
+  let explanation_en = plain.explanation_en ?? plain.explanation;
+  explanation_en = collapseExplanationToCorrect(explanation_en, correctAnswer);
+
+  let explanation_hi = plain.explanation_hi;
+  if (explanation_hi) {
+    explanation_hi = collapseExplanationToCorrect(explanation_hi, correctAnswer);
   }
 
   return {
     ...plain,
+    correctAnswer: ["A", "B", "C", "D"].includes(correctAnswer) ? correctAnswer : "A",
     question: question_en,
     question_en,
     question_hi,
     options: options_en,
     options_en,
     options_hi,
-    explanation: explanation_en ?? plain.explanation,
-    ...(explanation_en ? { explanation_en } : {}),
-    ...(plain.explanation_hi ? { explanation_hi: plain.explanation_hi } : {}),
+    explanation: explanation_en,
+    explanation_en,
+    ...(explanation_hi ? { explanation_hi } : {}),
   };
 }
 
@@ -225,12 +289,23 @@ export async function enrichQuestionWithHindi(rawQuestion) {
 
     let explanation_hi = question.explanation_hi;
     if (!explanation_hi && question.explanation_en) {
-      const explKeys = OPTION_KEYS.filter((k) => question.explanation_en[k]);
-      const translatedExpl = await translateManyToHindi(explKeys.map((k) => question.explanation_en[k]));
+      const collapsed = collapseExplanationToCorrect(
+        question.explanation_en,
+        question.correctAnswer
+      );
+      // Translate only non-empty slots (usually just the correct option)
+      const explKeys = OPTION_KEYS.filter((k) => collapsed[k]);
       explanation_hi = { A: "", B: "", C: "", D: "" };
-      explKeys.forEach((key, idx) => {
-        explanation_hi[key] = translatedExpl[idx] || question.explanation_en[key] || "";
-      });
+      if (explKeys.length === 1) {
+        const only = explKeys[0];
+        explanation_hi[only] = await translateToHindi(collapsed[only]);
+      } else if (explKeys.length > 1) {
+        const translatedExpl = await translateManyToHindi(explKeys.map((k) => collapsed[k]));
+        explKeys.forEach((key, idx) => {
+          explanation_hi[key] = translatedExpl[idx] || collapsed[key] || "";
+        });
+        explanation_hi = collapseExplanationToCorrect(explanation_hi, question.correctAnswer);
+      }
     }
 
     return {

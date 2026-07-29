@@ -2,6 +2,13 @@ import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
 import { isSeparateHindiTranslationEnabled } from "../config/bilingualConfig.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
+import {
+  getHindiTranslateProvider,
+  mtTranslateManyToHindi,
+  mtTranslateToHindi,
+  shouldUseFreeMtHindi,
+  shouldUseLlmHindi,
+} from "./mtTranslateToHindi.js";
 
 const DEFAULT_MODEL =
   process.env.OPENROUTER_TRANSLATION_MODEL ||
@@ -15,22 +22,32 @@ const TRANSLATE_TIMEOUT_MS = Math.max(
 
 /**
  * Translate a single English string to Hindi (Devanagari).
- * Falls back to original text on any failure / timeout.
+ * Default: free MT (0 OpenRouter tokens). LLM only if HINDI_TRANSLATE_PROVIDER=llm.
  */
 export async function translateToHindi(text) {
   const source = String(text ?? "").trim();
   if (!source) return "";
 
-  assertOpenRouterAllowed("translateToHindi");
-
-  if (!isSeparateHindiTranslationEnabled()) {
-    return source;
+  if (!isSeparateHindiTranslationEnabled() && !shouldUseFreeMtHindi()) {
+    // client provider: callers should skip; return English fallback
+    if (getHindiTranslateProvider() === "client") return source;
   }
+
+  if (shouldUseFreeMtHindi() || getHindiTranslateProvider() === "client") {
+    // Even under "client", if this helper is invoked, use free MT (never OpenRouter)
+    return mtTranslateToHindi(source);
+  }
+
+  if (!shouldUseLlmHindi()) {
+    return mtTranslateToHindi(source);
+  }
+
+  assertOpenRouterAllowed("translateToHindi");
 
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    console.warn("translateToHindi: OPENROUTER_API_KEY missing, using English fallback");
-    return source;
+    console.warn("translateToHindi: OPENROUTER_API_KEY missing — using free MT");
+    return mtTranslateToHindi(source);
   }
 
   const ctrl = new AbortController();
@@ -73,8 +90,8 @@ export async function translateToHindi(text) {
     const translated = data?.choices?.[0]?.message?.content?.trim();
     return translated || source;
   } catch (error) {
-    console.error("translateToHindi failed:", error.message);
-    return source;
+    console.error("translateToHindi LLM failed, falling back to free MT:", error.message);
+    return mtTranslateToHindi(source);
   } finally {
     clearTimeout(timer);
   }
@@ -86,6 +103,11 @@ export async function translateToHindi(text) {
 export async function translateManyToHindi(texts) {
   if (!Array.isArray(texts)) return [];
   const list = texts.map((t) => String(t ?? ""));
+
+  if (!shouldUseLlmHindi()) {
+    return mtTranslateManyToHindi(list);
+  }
+
   const out = new Array(list.length);
   let cursor = 0;
   const limit = Math.min(3, Math.max(1, list.length));
