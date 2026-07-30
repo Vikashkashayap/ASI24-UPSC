@@ -51,6 +51,7 @@ const TestGeneratorPage = lazyPage(() => import("./pages/TestGeneratorPage"));
 const PracticeTestPage = lazyPage(() => import("./pages/PracticeTestPage"), "PracticeTestPage");
 const PracticeTestHistoryPage = lazyPage(() => import("./pages/PracticeTestHistoryPage"), "PracticeTestHistoryPage");
 const TestHistoryPage = lazyPage(() => import("./pages/TestHistoryPage"));
+const ModuleChapterHistoryPage = lazyPage(() => import("./pages/ModuleChapterHistoryPage"));
 const TestPage = lazyPage(() => import("./pages/TestPage"));
 const TestResultPage = lazyPage(() => import("./pages/TestResultPage"));
 const ProfilePage = lazyPage(() => import("./pages/ProfilePage"));
@@ -172,6 +173,7 @@ function App() {
               <Route path="practice-test/history" element={<PracticeTestHistoryPage />} />
               <Route path="prelims-mock" element={<PrelimsMockPage />} />
               <Route path="test-history" element={<TestHistoryPage />} />
+              <Route path="module-chapter-history" element={<ModuleChapterHistoryPage />} />
               <Route path="test/:id" element={<TestPage />} />
               <Route path="result/:id" element={<TestResultPage />} />
               <Route path="profile" element={<ProfilePage />} />

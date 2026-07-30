@@ -137,6 +137,9 @@ export interface GenerateFullMockParams {
 export interface PrelimsDailyStatus {
   locked: boolean;
   usedToday: boolean;
+  usedCount: number;
+  remaining: number;
+  limit: number;
   dateKey: string;
   unlocksAt: string;
   bypass?: boolean;
@@ -848,6 +851,26 @@ export const syllabusTargetsAPI = {
         completedCount: number;
       };
     }>("/api/syllabus-targets/mine", { params }),
+  /** Chapter-wise (+ module final) attempts for home View History */
+  listMyChapterHistory: () =>
+    api.get<{
+      success: boolean;
+      data: {
+        attempts: Array<{
+          _id: string;
+          subject: string;
+          topic: string;
+          difficulty?: string;
+          totalQuestions: number;
+          score?: number;
+          accuracy?: number;
+          isSubmitted: boolean;
+          correctAnswers?: number;
+          wrongAnswers?: number;
+          createdAt: string;
+        }>;
+      };
+    }>("/api/syllabus-targets/mine/chapter-history"),
   toggleComplete: (id: string, completed = true) =>
     api.post<{
       success: boolean;
@@ -885,6 +908,32 @@ export const syllabusTargetsAPI = {
       { chapter, retake: Boolean(opts?.retake) },
       { timeout: 300000 }
     ),
+  /** Past attempts for one chapter (topic) under this module target */
+  getChapterHistory: (id: string, chapter: string) =>
+    api.get<{
+      success: boolean;
+      data: {
+        chapter: string;
+        topicName: string;
+        moduleId: string;
+        moduleName: string;
+        attempts: Array<{
+          _id: string;
+          subject: string;
+          topic: string;
+          difficulty?: string;
+          totalQuestions: number;
+          score?: number;
+          accuracy?: number;
+          isSubmitted: boolean;
+          correctAnswers?: number;
+          wrongAnswers?: number;
+          createdAt: string;
+        }>;
+      };
+    }>("/api/syllabus-targets/" + id + "/chapters/history", {
+      params: { chapter },
+    }),
   /** All chapters done → 50Q final: chapter-bank reuse + RAG top-up for shortfall */
   startModuleFinal: (id: string) =>
     api.post<{

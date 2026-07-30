@@ -124,6 +124,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/practice-test/history': { title: 'Modular Test History', icon: <History className="w-5 h-5" /> },
     '/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
     '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
+    '/module-chapter-history': { title: 'Chapter Test History', icon: <History className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },

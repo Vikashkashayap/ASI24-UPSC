@@ -271,12 +271,43 @@ export async function cacheRelatedTopicsForChapter({
 
 /**
  * Warm RAG question cache for a chapter (fire-and-forget friendly).
+ * Skips entirely when a shared Test paper already exists — avoids duplicate LLM spend.
  */
 export async function warmChapterQuestionCache({ kbSubject, topicName }) {
   try {
+    const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
+    if (!topicNormalized || !kbSubject) return;
+
+    const testSubject = resolveTestSubject(kbSubject);
+    const topicRegex = new RegExp(
+      `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+      "i"
+    );
+    const existing = await Test.findOne({
+      subject: testSubject,
+      topic: topicRegex,
+      difficulty: "Hard",
+      examType: "GS",
+      totalQuestions: { $gte: 20 },
+      questions: { $exists: true, $not: { $size: 0 } },
+      $and: [
+        { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+        { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+      ],
+    })
+      .select("_id")
+      .lean();
+
+    if (existing) {
+      console.log(
+        `[chapterPractice] warm skipped — shared Test already exists for "${topicNormalized}" (${existing._id})`
+      );
+      return;
+    }
+
     await generateQuestionsFromRag({
       subject: kbSubject,
-      topic: topicName,
+      topic: topicNormalized,
       difficulty: "Hard",
       count: 30,
       force: false,
@@ -348,8 +379,9 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
  * English at generate time; Hindi via free client Google translate (0 OpenRouter tokens).
  * Show 20 unique questions with teaching explanations.
  *
- * Retake / forceCache: always reuse the saved paper for this topic from DB
- * (same student's prior attempt first, else any prior GS Hard paper).
+ * Shared DB cache: once ANY student generates a paper for this topic, every other
+ * student reuses those questions (new Test doc per student, 0 LLM calls).
+ * Retake prefers that student's own prior paper, else the shared bank.
  */
 export async function createChapterPracticeTest({
   userId,
@@ -396,50 +428,90 @@ export async function createChapterPracticeTest({
     ],
   };
 
-  // Retake: prefer this student's own saved paper for the topic; else any prior paper
-  let existingTest = null;
-  if (forceCache && userId) {
-    existingTest = await Test.findOne({ ...baseCacheQuery, userId }).sort({ createdAt: -1 });
-  }
-  if (!existingTest) {
-    existingTest = await Test.findOne(baseCacheQuery).sort({ createdAt: -1 });
+  /**
+   * Load candidate papers and pick the best usable shared bank.
+   * Prefer: this student's own paper (retake) → highest teaching count → newest.
+   */
+  async function findBestCachedPaper() {
+    const candidates = [];
+
+    if (userId) {
+      const own = await Test.find({ ...baseCacheQuery, userId })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean();
+      candidates.push(...own);
+    }
+
+    const shared = await Test.find(
+      userId ? { ...baseCacheQuery, userId: { $ne: userId } } : baseCacheQuery
+    )
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .lean();
+    candidates.push(...shared);
+
+    let best = null;
+    let bestScore = -1;
+
+    for (const doc of candidates) {
+      const raw = (doc.questions || []).map((value) => {
+        const plain = typeof value.toObject === "function" ? value.toObject() : { ...value };
+        return pickBilingualQuestionFields({ ...plain, userAnswer: null });
+      });
+      const cached = filterStudentReadyQuestions(uniquePool(raw));
+      if (cached.length < SHOW_COUNT) continue;
+
+      const teachingCount = cached.filter((q) => hasTeachingExplanation(q)).length;
+      const isOwn = userId && String(doc.userId || "") === String(userId);
+      // Own retake paper wins; else prefer richer teaching explanations, then size
+      const score =
+        (isOwn && forceCache ? 1_000_000 : 0) +
+        teachingCount * 100 +
+        cached.length +
+        (isOwn ? 50 : 0);
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = { doc, cached, teachingCount, isOwn };
+      }
+    }
+
+    return best;
   }
 
   let questions;
   let fromCache = false;
   let generationSource = "kb_or_llm";
+  let cacheMeta = null;
 
-  if (existingTest?.questions?.length >= SHOW_COUNT) {
-    const cached = filterStudentReadyQuestions(
-      uniquePool(
-        existingTest.questions.map((value) => {
-          const plain = typeof value.toObject === "function" ? value.toObject() : { ...value };
-          return pickBilingualQuestionFields({ ...plain, userAnswer: null });
-        })
-      )
+  const bestPaper = await findBestCachedPaper();
+  if (bestPaper) {
+    // Shared bank: always reuse once a full usable paper exists (any student).
+    // This is the main cost saver — no RAG / Gemini on 2nd+ Start Test for same chapter.
+    fromCache = true;
+    questions = pickBalancedPatternSet(bestPaper.cached, SHOW_COUNT);
+    cacheMeta = {
+      sourceTestId: String(bestPaper.doc._id),
+      sourceUserId: bestPaper.doc.userId ? String(bestPaper.doc.userId) : null,
+      isOwnPaper: bestPaper.isOwn,
+      teaching: bestPaper.teachingCount,
+      pool: bestPaper.cached.length,
+    };
+    console.log(
+      `[chapterPractice] SHARED CACHE HIT → ${questions.length}Q shown` +
+        ` (topic="${topicNormalized}", sourceTest=${cacheMeta.sourceTestId},` +
+        ` own=${cacheMeta.isOwnPaper}, teaching=${cacheMeta.teaching}/${cacheMeta.pool},` +
+        ` forceCache=${Boolean(forceCache)}) — 0 LLM calls`
     );
-    const teachingCount = cached.filter((q) => hasTeachingExplanation(q)).length;
-    const teachingOk =
-      cached.length >= SHOW_COUNT && teachingCount >= Math.ceil(SHOW_COUNT * 0.7);
-    // Retake always reuses DB paper; first attempt still prefers teaching-quality cache
-    const useCache = cached.length >= SHOW_COUNT && (forceCache || teachingOk);
-    if (useCache) {
-      fromCache = true;
-      questions = pickBalancedPatternSet(cached, SHOW_COUNT);
-      console.log(
-        `[chapterPractice] cache hit → ${questions.length} unique shown (topic="${topicNormalized}", forceCache=${Boolean(forceCache)}, teaching=${teachingCount}/${cached.length})`
-      );
-    } else {
-      console.warn(
-        `[chapterPractice] cache skipped — weak/short explanations (${teachingCount}/${cached.length}) — regenerating from Admin KB RAG`
-      );
-    }
+  } else {
+    console.log(
+      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG` +
+        ` (LLM fallback if missing) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
+    );
   }
 
   if (!fromCache) {
-    console.log(
-      `[chapterPractice] generate ${GENERATE_COUNT}Q from Admin KB RAG (LLM fallback if missing) → show ${SHOW_COUNT}`
-    );
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
       topic: topicNormalized,
@@ -478,10 +550,12 @@ export async function createChapterPracticeTest({
     generationSource = generationResult.source || "kb_or_llm";
 
     console.log(
-      `[chapterPractice] ${generationSource}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length}`
+      `[chapterPractice] ${generationSource}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} — saved for shared reuse`
     );
   }
 
+  // Always save a per-student attempt doc (answers/score stay private),
+  // but questions come from shared bank when fromCache=true.
   const test = new Test({
     userId,
     subject: testSubject,
@@ -509,6 +583,7 @@ export async function createChapterPracticeTest({
       ),
       createdAt: test.createdAt,
       fromCache,
+      cacheMeta,
       chapterLabel: chapterLabel || topicNormalized,
       kbSubject,
       generatedCount: GENERATE_COUNT,
@@ -791,4 +866,75 @@ export async function createModuleFinalTestFromChapterBank({
       source: "knowledge_base_rag",
     },
   };
+}
+
+/**
+ * Past chapter practice attempts for one student + topic (retakes included).
+ * Excludes prelims mocks / assigned practice papers.
+ */
+export async function listChapterPracticeHistory({ userId, topicName, limit = 20 }) {
+  const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
+  if (!userId || !topicNormalized) return [];
+
+  const topicRegex = new RegExp(
+    `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+    "i"
+  );
+
+  return Test.find({
+    userId,
+    topic: topicRegex,
+    examType: "GS",
+    $and: [
+      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .limit(Math.min(50, Math.max(1, Number(limit) || 20)))
+    .select(
+      "_id subject topic difficulty totalQuestions score accuracy isSubmitted createdAt correctAnswers wrongAnswers"
+    )
+    .lean();
+}
+
+/**
+ * All chapter / module-final practice attempts for a student's assigned modules.
+ */
+export async function listMyModuleTargetsPracticeHistory({
+  userId,
+  topicNames = [],
+  moduleFinalTopics = [],
+  limit = 40,
+}) {
+  if (!userId) return [];
+
+  const topics = [
+    ...new Set(
+      [...topicNames, ...moduleFinalTopics]
+        .map((t) => String(t || "").trim().replace(/\s+/g, " "))
+        .filter(Boolean)
+    ),
+  ];
+  if (!topics.length) return [];
+
+  const topicOr = topics.map((name) => ({
+    topic: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
+  }));
+
+  return Test.find({
+    userId,
+    examType: "GS",
+    $or: topicOr,
+    $and: [
+      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+    ],
+  })
+    .sort({ createdAt: -1 })
+    .limit(Math.min(200, Math.max(1, Number(limit) || 100)))
+    .select(
+      "_id subject topic difficulty totalQuestions score accuracy isSubmitted createdAt correctAnswers wrongAnswers"
+    )
+    .lean();
 }

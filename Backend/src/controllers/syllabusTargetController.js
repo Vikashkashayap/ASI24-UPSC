@@ -17,6 +17,8 @@ import {
   createModuleFinalTestFromChapterBank,
   prefetchNextChapter,
   loadRelatedTopicsMap,
+  listChapterPracticeHistory,
+  listMyModuleTargetsPracticeHistory,
 } from "../services/chapterModulePractice.service.js";
 import {
   validateStudentIdsForActor,
@@ -578,6 +580,66 @@ export const listMySyllabusTargets = async (req, res) => {
 };
 
 /**
+ * GET /api/syllabus-targets/mine/chapter-history
+ * Chapter-wise (+ module final) practice attempts for home "View History".
+ */
+export const listMyChapterPracticeHistory = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const records = await SyllabusModuleTarget.find({
+      status: "active",
+      assignedStudentIds: userId,
+    })
+      .select("subjectKey subjectName moduleId moduleName topicsPreview")
+      .lean();
+
+    const topicNames = [];
+    const moduleFinalTopics = [];
+    for (const r of records) {
+      for (const line of r.topicsPreview || []) {
+        const name = parseChapterPreviewLine(line).topicName;
+        if (name) topicNames.push(name);
+      }
+      if (r.moduleId && r.moduleName) {
+        moduleFinalTopics.push(`${r.moduleId} Module Final — ${r.moduleName}`.trim());
+      }
+    }
+
+    const attempts = await listMyModuleTargetsPracticeHistory({
+      userId,
+      topicNames,
+      moduleFinalTopics,
+      limit: Number(req.query?.limit) || 100,
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        attempts: attempts.map((t) => ({
+          _id: String(t._id),
+          subject: t.subject,
+          topic: t.topic,
+          difficulty: t.difficulty,
+          totalQuestions: t.totalQuestions,
+          score: t.score,
+          accuracy: t.accuracy,
+          isSubmitted: Boolean(t.isSubmitted),
+          correctAnswers: t.correctAnswers,
+          wrongAnswers: t.wrongAnswers,
+          createdAt: t.createdAt,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("listMyChapterPracticeHistory:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to load chapter history",
+    });
+  }
+};
+
+/**
  * POST /api/syllabus-targets/:id/complete
  * Body: { completed?: boolean }
  */
@@ -860,7 +922,7 @@ export const startChapterPractice = async (req, res) => {
       questions: test.totalQuestions,
     });
 
-    // Prefetch next chapter related topics + warm question cache (non-blocking)
+    // Prefetch next chapter related topics only (question warm skips if Test already in DB)
     const nextLabel = chapterIdx >= 0 && chapterIdx < topics.length - 1 ? topics[chapterIdx + 1] : null;
     if (nextLabel) {
       void prefetchNextChapter({
@@ -876,7 +938,7 @@ export const startChapterPractice = async (req, res) => {
       message: fromCache
         ? forceCache
           ? "Chapter retake ready (cached questions from DB)"
-          : "Chapter practice ready (cached questions)"
+          : "Chapter practice ready (shared DB cache — same paper as other students)"
         : "Chapter practice generated from Knowledge Base",
       data: {
         testId: test._id,
@@ -1011,6 +1073,76 @@ export const startModuleFinal = async (req, res) => {
     return res.status(status).json({
       success: false,
       message: error.message || "Failed to start module final",
+    });
+  }
+};
+
+/**
+ * GET /api/syllabus-targets/:id/chapters/history?chapter=...
+ * Student's past practice attempts for that chapter topic.
+ */
+export const getChapterPracticeHistory = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const chapter = typeof req.query?.chapter === "string" ? req.query.chapter.trim() : "";
+    if (!chapter) {
+      return res.status(400).json({ success: false, message: "Chapter is required" });
+    }
+
+    const record = await SyllabusModuleTarget.findById(req.params.id).lean();
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Target not found" });
+    }
+
+    const isAssigned = (record.assignedStudentIds || []).some((id) => String(id) === String(userId));
+    if (!isAssigned) {
+      return res.status(403).json({ success: false, message: "This target is not assigned to you" });
+    }
+
+    const topics = record.topicsPreview || [];
+    if (topics.length > 0 && !topics.includes(chapter)) {
+      return res.status(400).json({ success: false, message: "Chapter is not part of this module" });
+    }
+
+    const parsed = parseChapterPreviewLine(chapter);
+    const topicName = parsed.topicName;
+    if (!topicName) {
+      return res.status(400).json({ success: false, message: "Could not read chapter topic" });
+    }
+
+    const attempts = await listChapterPracticeHistory({
+      userId,
+      topicName,
+      limit: Number(req.query?.limit) || 20,
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        chapter,
+        topicName,
+        moduleId: record.moduleId,
+        moduleName: record.moduleName,
+        attempts: attempts.map((t) => ({
+          _id: String(t._id),
+          subject: t.subject,
+          topic: t.topic,
+          difficulty: t.difficulty,
+          totalQuestions: t.totalQuestions,
+          score: t.score,
+          accuracy: t.accuracy,
+          isSubmitted: Boolean(t.isSubmitted),
+          correctAnswers: t.correctAnswers,
+          wrongAnswers: t.wrongAnswers,
+          createdAt: t.createdAt,
+        })),
+      },
+    });
+  } catch (error) {
+    console.error("getChapterPracticeHistory:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to load chapter history",
     });
   }
 };

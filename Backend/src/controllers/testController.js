@@ -124,7 +124,7 @@ export const generateFullMockTest = async (req, res) => {
 };
 
 /**
- * Daily lock status for Prelims / Practice test generator (1 per IST day).
+ * Daily lock status for Prelims / Practice test generator (2 per IST day).
  * GET /api/tests/prelims-daily-status
  */
 export const getPrelimsDailyStatus = async (req, res) => {
@@ -154,6 +154,20 @@ export const generateTest = async (req, res) => {
   try {
     const { subjects, topic, examType, questionCount, difficulty, csatCategories, currentAffairsPeriod } = req.body;
     const count = questionCount != null ? parseInt(questionCount, 10) : null;
+
+    // 2 practice tests per calendar day (IST) — enforced before cache / AI
+    const dailyLock = await getPrelimsDailyLockStatus(
+      req.user?._id ?? req.user?.id,
+      req.user?.role
+    );
+    if (dailyLock.locked) {
+      return res.status(403).json({
+        success: false,
+        code: "PRELIMS_DAILY_LIMIT",
+        message: PRELIMS_DAILY_LIMIT_MESSAGE,
+        data: dailyLock,
+      });
+    }
 
     // Validation
     if (!Array.isArray(subjects) || subjects.length === 0 || !topic || !examType || count == null) {

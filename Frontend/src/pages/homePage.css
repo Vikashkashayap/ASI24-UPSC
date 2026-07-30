@@ -346,6 +346,70 @@
   flex-shrink: 0;
 }
 
+.sd-assigned-hd-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sd-assigned-view-history {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #c5d3e0;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: #fff;
+  color: #1f4e79;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sd-assigned-view-history:hover,
+.sd-assigned-view-history.active {
+  background: #eaf1f8;
+  border-color: #1f4e79;
+}
+
+.sd-assigned-top-history {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f4f7fa;
+  border: 1px solid #d7e0ea;
+}
+
+.sd-assigned-top-history-hd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f4e79;
+}
+
+.sd-assigned-top-history-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8a97a8;
+}
+
+.sd-assigned-history-list.top > li {
+  padding: 8px 10px;
+}
+
+.sd-assigned-history-list.top .sd-assigned-history-attempt {
+  width: 100%;
+  font-size: 12px;
+}
+
 .sd-assigned-loading {
   display: flex;
   justify-content: center;
@@ -762,7 +826,7 @@
   gap: 2px;
 }
 
-.sd-assigned-chapter-list li {
+.sd-assigned-chapter-list > li {
   margin: 0;
   padding: 0;
   border: none;
@@ -772,8 +836,9 @@
   color: #5a6a7e;
   line-height: 1.35;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
 }
 
 .sd-assigned-chapter-list li.done .sd-assigned-chapter-label {
@@ -870,8 +935,21 @@
   gap: 6px 8px;
 }
 
-.sd-assigned-chapter-list li.selected {
+.sd-assigned-chapter-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.sd-assigned-chapter-list li.selected,
+.sd-assigned-chapter-list li.current {
   background: rgba(31, 78, 121, 0.06);
+}
+
+.sd-assigned-chapter-list li.current {
+  box-shadow: inset 3px 0 0 #1f4e79;
 }
 
 .sd-assigned-chapter-list li.locked {
@@ -881,6 +959,18 @@
 .sd-assigned-chapter-list li.locked .sd-assigned-chapter-label {
   color: #8a97a8;
   cursor: not-allowed;
+}
+
+.sd-assigned-done-hint {
+  color: #1a7f4b;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.sd-assigned-current-hint {
+  color: #1f4e79;
+  font-weight: 700;
+  font-size: 11px;
 }
 
 .sd-assigned-locked-hint {
@@ -938,6 +1028,94 @@
 
 .sd-assigned-test-btn.secondary:hover:not(:disabled) {
   background: #eaf1f8;
+}
+
+.sd-assigned-test-btn.history {
+  background: transparent;
+  color: #5a6f86;
+  border: 1px solid #d0dae6;
+}
+
+.sd-assigned-test-btn.history:hover:not(:disabled),
+.sd-assigned-test-btn.history.active {
+  background: #eef3f8;
+  color: #1f4e79;
+  border-color: #b8c9da;
+}
+
+.sd-assigned-history-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.sd-assigned-chapter-history {
+  margin: 6px 0 2px 28px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f4f7fa;
+  border: 1px solid #dde5ee;
+}
+
+.sd-assigned-history-empty {
+  margin: 0;
+  font-size: 12px;
+  color: #5a6f86;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sd-assigned-history-empty.error {
+  color: #b42318;
+}
+
+.sd-assigned-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sd-assigned-history-list > li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #e4ebf2;
+  margin: 0;
+  font-size: 11px;
+  color: #3d4f63;
+  line-height: 1.35;
+}
+
+.sd-assigned-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
+  font-size: 11px;
+  color: #3d4f63;
+}
+
+.sd-assigned-history-attempt {
+  font-weight: 700;
+  color: #1f4e79;
+}
+
+.sd-assigned-history-score {
+  font-weight: 600;
+}
+
+.sd-assigned-history-date {
+  color: #8a97a8;
 }
 
 .sd-assigned-test-btn .sd-assigned-spin {

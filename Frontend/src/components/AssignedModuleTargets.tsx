@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, ChevronDown, Loader2, Lock, Target } from "lucide-react";
+import { Check, ChevronDown, History, Loader2, Lock, Target } from "lucide-react";
 import {
   syllabusTargetsAPI,
   type StudentSyllabusTarget,
@@ -21,6 +21,14 @@ function formatDue(iso?: string | null) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
+/** "Ch 5: Topic" → topic name used when saving chapter practice tests. */
+function parseChapterTopicName(line: string): string {
+  const raw = String(line || "").trim();
+  if (!raw) return "";
+  const m = raw.match(/^(?:Ch\.?\s*|अध्\.?\s*)(\d+)\s*[:.\-–—]\s*(.+)$/i);
+  return (m ? m[2] : raw).trim();
 }
 
 function isOverdue(iso?: string | null) {
@@ -507,13 +515,28 @@ export function AssignedModuleTargets() {
                 const key = `${t._id}::${line}`;
                 const selected = selectedKey === key;
                 const chapterBusy = practicingKey === key;
+                /** First unlocked incomplete chapter — always show Start Test */
+                const isCurrent =
+                  !locked &&
+                  !chapterDone &&
+                  !moduleLocked &&
+                  topics.findIndex(
+                    (ch, i) =>
+                      !isChapterLocked(topics, i, doneChapters, t.completed, moduleLocked) &&
+                      !doneChapters.has(ch) &&
+                      !t.completed
+                  ) === idx;
+                const showTestCta =
+                  !chapterDone && !locked && (selected || isCurrent);
+                const topicName = parseChapterTopicName(line);
                 return (
                   <li
                     key={line}
                     className={[
                       chapterDone ? "done" : "",
                       locked ? "locked" : "",
-                      selected ? "selected" : "",
+                      selected || isCurrent ? "selected" : "",
+                      isCurrent ? "current" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}
@@ -538,7 +561,7 @@ export function AssignedModuleTargets() {
                               ? "Submit previous chapter test to unlock"
                               : chapterDone
                                 ? "Click to unmark"
-                                : "Tick to show Test"
+                                : "Tick to select chapter"
                         }
                       >
                         {chapterBusy ? (
@@ -547,7 +570,7 @@ export function AssignedModuleTargets() {
                           <Lock className="sd-assigned-lock-icon" />
                         ) : chapterDone ? (
                           <Check />
-                        ) : selected ? (
+                        ) : selected || isCurrent ? (
                           <span className="sd-assigned-check-selected" />
                         ) : (
                           <span className="sd-assigned-check-empty" />
@@ -561,42 +584,70 @@ export function AssignedModuleTargets() {
                           onClick={() => onChapterTick(t, line, chapterDone, locked)}
                         >
                           {line}
+                          {chapterDone && !locked ? (
+                            <span className="sd-assigned-done-hint"> · Done</span>
+                          ) : null}
                           {locked ? (
                             <span className="sd-assigned-locked-hint"> · Locked</span>
                           ) : null}
+                          {isCurrent ? (
+                            <span className="sd-assigned-current-hint"> · Up next</span>
+                          ) : null}
                         </button>
-                        {selected && !chapterDone && !locked && (
-                          <button
-                            type="button"
-                            className="sd-assigned-test-btn"
-                            disabled={Boolean(practicingKey)}
-                            onClick={() => void startChapterPractice(t, line)}
-                          >
-                            {chapterBusy ? (
-                              <>
-                                <Loader2 className="sd-assigned-spin" /> Generating…
-                              </>
-                            ) : (
-                              "Test"
-                            )}
-                          </button>
-                        )}
-                        {chapterDone && !locked && (
-                          <button
-                            type="button"
-                            className="sd-assigned-test-btn secondary"
-                            disabled={Boolean(practicingKey)}
-                            onClick={() => void startChapterPractice(t, line, { retake: true })}
-                          >
-                            {chapterBusy ? (
-                              <>
-                                <Loader2 className="sd-assigned-spin" /> Loading…
-                              </>
-                            ) : (
-                              "Retake"
-                            )}
-                          </button>
-                        )}
+                        <div className="sd-assigned-chapter-actions">
+                          {showTestCta && (
+                            <button
+                              type="button"
+                              className="sd-assigned-test-btn"
+                              disabled={Boolean(practicingKey)}
+                              onClick={() => void startChapterPractice(t, line)}
+                            >
+                              {chapterBusy ? (
+                                <>
+                                  <Loader2 className="sd-assigned-spin" /> Generating…
+                                </>
+                              ) : (
+                                "Start Test"
+                              )}
+                            </button>
+                          )}
+                          {chapterDone && !locked && (
+                            <>
+                              <button
+                                type="button"
+                                className="sd-assigned-test-btn secondary"
+                                disabled={Boolean(practicingKey)}
+                                onClick={() =>
+                                  void startChapterPractice(t, line, { retake: true })
+                                }
+                              >
+                                {chapterBusy ? (
+                                  <>
+                                    <Loader2 className="sd-assigned-spin" /> Loading…
+                                  </>
+                                ) : (
+                                  "Retake"
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                className="sd-assigned-test-btn history"
+                                disabled={Boolean(practicingKey)}
+                                title="View this chapter's test history"
+                                onClick={() =>
+                                  navigate(
+                                    `/module-chapter-history?topic=${encodeURIComponent(
+                                      topicName || line
+                                    )}`
+                                  )
+                                }
+                              >
+                                <History className="sd-assigned-history-icon" />
+                                History
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -619,7 +670,18 @@ export function AssignedModuleTargets() {
             {completedCount > 0 ? ` · ${completedCount} done` : ""}
           </p>
         </div>
-        <Target className="sd-assigned-hd-icon" aria-hidden />
+        <div className="sd-assigned-hd-actions">
+          <button
+            type="button"
+            className="sd-assigned-view-history"
+            onClick={() => navigate("/module-chapter-history")}
+            title="View chapter-wise test history"
+          >
+            <History className="sd-assigned-history-icon" />
+            View History
+          </button>
+          <Target className="sd-assigned-hd-icon" aria-hidden />
+        </div>
       </div>
 
       {error && <p className="sd-assigned-error">{error}</p>}
