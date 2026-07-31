@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api, dartAPI } from "../services/api";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
@@ -99,6 +100,7 @@ interface DartAnalytics {
 export const PerformanceDashboardPage = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [copyPerformanceData, setCopyPerformanceData] = useState<any | null>(null);
   const [prelimsPerformanceData, setPrelimsPerformanceData] = useState<any | null>(null);
   const [dartAnalytics, setDartAnalytics] = useState<DartAnalytics | null>(null);
@@ -143,6 +145,26 @@ export const PerformanceDashboardPage = () => {
   const copyFilteredHistory = getFilteredHistory(copyPerformanceData);
   const prelimsFilteredHistory = getFilteredHistory(prelimsPerformanceData);
 
+  const activityTrend = useMemo(() => {
+    const map = new Map<string, { date: string; copy: number; prelims: number; label: string }>();
+    const bump = (iso: string, key: "copy" | "prelims", score: number) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return;
+      const day = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+      const row = map.get(day) || { date: day, copy: 0, prelims: 0, label };
+      row[key] = Math.round(Number(score) || 0);
+      map.set(day, row);
+    };
+    for (const item of copyFilteredHistory) {
+      bump(item.createdAt, "copy", item.score ?? item.percentage ?? 0);
+    }
+    for (const item of prelimsFilteredHistory) {
+      bump(item.createdAt, "prelims", item.score ?? item.percentage ?? item.accuracy ?? 0);
+    }
+    return [...map.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-14);
+  }, [copyFilteredHistory, prelimsFilteredHistory]);
+
   const getReadinessColor = (readiness: number) => {
     if (readiness >= 80) return "text-green-600";
     if (readiness >= 60) return "text-blue-600";
@@ -177,587 +199,405 @@ export const PerformanceDashboardPage = () => {
 
   const combinedMetrics = getCombinedMetrics();
 
+  const chartTooltipStyle = {
+    backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
+    border: theme === "dark" ? "1px solid #334155" : "1px solid #e2e8f0",
+    borderRadius: "12px",
+    padding: "10px 12px",
+    boxShadow: theme === "dark" ? "0 10px 25px rgba(0,0,0,0.5)" : "0 10px 25px rgba(0,0,0,0.08)",
+  };
+
+  const emptyChart = (title: string, hint: string, cta?: { label: string; onClick: () => void }) => (
+    <div
+      className={`h-[220px] flex flex-col items-center justify-center text-center px-4 rounded-xl border border-dashed ${
+        theme === "dark" ? "border-slate-600 text-slate-400 bg-slate-900/40" : "border-slate-200 text-slate-500 bg-slate-50"
+      }`}
+    >
+      <BarChart3 className="w-10 h-10 mb-3 opacity-40 text-blue-500" />
+      <p className={`text-sm font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-700"}`}>{title}</p>
+      <p className="text-xs mt-1 max-w-[260px] leading-relaxed opacity-80">{hint}</p>
+      {cta ? (
+        <button
+          type="button"
+          onClick={cta.onClick}
+          className="mt-3 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:brightness-105"
+        >
+          {cta.label}
+        </button>
+      ) : null}
+    </div>
+  );
+
   const renderOverviewTab = () => (
-    <>
-      {/* Combined Performance Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-        <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg shadow-blue-500/10" 
-            : "bg-gradient-to-br from-white to-blue-50/30 border-blue-200/50 shadow-lg shadow-blue-100/50"
-        } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/30 via-blue-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <CardHeader className="pb-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                Overall Average
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
-              }`}>
-                <Target className={`w-4 h-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+    <div className="space-y-6">
+      {/* Metric strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {[
+          {
+            label: "Overall average",
+            value: loading ? "…" : `${combinedMetrics.overallAverage}%`,
+            sub: "Copy + Prelims",
+            icon: Target,
+            tone: "blue",
+          },
+          {
+            label: "Total activities",
+            value: loading ? "…" : String(combinedMetrics.totalActivities),
+            sub: "Tests & evaluations",
+            icon: Activity,
+            tone: "cyan",
+          },
+          {
+            label: "Copy evaluations",
+            value: loading ? "…" : String(combinedMetrics.copyEvaluations),
+            sub: "Mains answers",
+            icon: FileText,
+            tone: "indigo",
+          },
+          {
+            label: "Prelims tests",
+            value: loading ? "…" : String(combinedMetrics.prelimsTests),
+            sub: "MCQ attempts",
+            icon: ClipboardList,
+            tone: "amber",
+          },
+        ].map((m) => {
+          const Icon = m.icon;
+          const tones: Record<string, string> = {
+            blue: theme === "dark" ? "border-blue-500/25 bg-blue-500/10" : "border-blue-100 bg-blue-50/70",
+            cyan: theme === "dark" ? "border-cyan-500/25 bg-cyan-500/10" : "border-cyan-100 bg-cyan-50/70",
+            indigo: theme === "dark" ? "border-indigo-500/25 bg-indigo-500/10" : "border-indigo-100 bg-indigo-50/70",
+            amber: theme === "dark" ? "border-amber-500/25 bg-amber-500/10" : "border-amber-100 bg-amber-50/70",
+          };
+          const iconTone: Record<string, string> = {
+            blue: "text-blue-500",
+            cyan: "text-cyan-500",
+            indigo: "text-indigo-500",
+            amber: "text-amber-500",
+          };
+          return (
+            <div
+              key={m.label}
+              className={`rounded-2xl border p-4 ${tones[m.tone]} ${
+                theme === "dark" ? "" : "shadow-sm"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <p className={`text-[11px] font-bold uppercase tracking-wide ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                  {m.label}
+                </p>
+                <Icon className={`w-4 h-4 ${iconTone[m.tone]}`} />
               </div>
+              <p className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
+                {m.value}
+              </p>
+              <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>{m.sub}</p>
             </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-blue-300 to-blue-500 bg-clip-text text-transparent" 
-                : "from-blue-600 to-blue-800 bg-clip-text text-transparent"
-            }`}>
-              {loading ? "..." : `${combinedMetrics.overallAverage}%`}
-            </div>
-            <div className={`mt-2 text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-              Combined performance
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-cyan-500/20 shadow-lg shadow-cyan-500/10" 
-            : "bg-gradient-to-br from-white to-cyan-50/30 border-cyan-200/50 shadow-lg shadow-cyan-100/50"
-        } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-cyan-500/30 via-cyan-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <CardHeader className="pb-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                Total Activities
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-cyan-500/20" : "bg-cyan-100"
-              }`}>
-                <Activity className={`w-4 h-4 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-cyan-300 to-cyan-500 bg-clip-text text-transparent" 
-                : "from-cyan-600 to-cyan-800 bg-clip-text text-transparent"
-            }`}>
-              {loading ? "..." : combinedMetrics.totalActivities}
-            </div>
-            <div className={`mt-2 text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-              All activities
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-teal-500/20 shadow-lg shadow-teal-500/10" 
-            : "bg-gradient-to-br from-white to-teal-50/30 border-teal-200/50 shadow-lg shadow-teal-100/50"
-        } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-500/30 via-teal-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <CardHeader className="pb-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                Copy Evaluations
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-teal-500/20" : "bg-teal-100"
-              }`}>
-                <FileText className={`w-4 h-4 ${theme === "dark" ? "text-teal-400" : "text-teal-600"}`} />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-teal-300 to-teal-500 bg-clip-text text-transparent" 
-                : "from-teal-600 to-teal-800 bg-clip-text text-transparent"
-            }`}>
-              {loading ? "..." : combinedMetrics.copyEvaluations}
-            </div>
-            <div className={`mt-2 text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-              Mains answers
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg shadow-amber-500/10" 
-            : "bg-gradient-to-br from-white to-amber-50/30 border-amber-200/50 shadow-lg shadow-amber-100/50"
-        } border-2`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/30 via-amber-400/20 to-transparent rounded-full blur-3xl group-hover:blur-[40px] transition-all duration-500" />
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <CardHeader className="pb-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <CardTitle className={`text-xs md:text-sm font-semibold ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                Prelims Tests
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
-              }`}>
-                <ClipboardList className={`w-4 h-4 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className={`text-3xl md:text-4xl font-bold bg-gradient-to-r ${
-              theme === "dark" 
-                ? "from-amber-300 to-amber-500 bg-clip-text text-transparent" 
-                : "from-amber-600 to-amber-800 bg-clip-text text-transparent"
-            }`}>
-              {loading ? "..." : combinedMetrics.prelimsTests}
-            </div>
-            <div className={`mt-2 text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-              MCQ tests
-            </div>
-          </CardContent>
-        </Card>
+          );
+        })}
       </div>
 
-      {/* Activity Type Comparison */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
-            : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
-        }`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-          <CardHeader className="relative z-10 pb-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
-              }`}>
-                <BarChart3 className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-              </div>
-              <div>
-                <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                  Activity Distribution
-                </CardTitle>
-                <CardDescription className="mt-1">Copy evaluations vs Prelims tests</CardDescription>
-              </div>
-            </div>
+      {/* Main graphs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Score trend</CardTitle>
+            <CardDescription>Recent Copy vs Prelims scores</CardDescription>
           </CardHeader>
-          <CardContent className="relative z-10">
-            {combinedMetrics.totalActivities > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'Copy Evaluations', value: combinedMetrics.copyEvaluations, color: '#2563eb' },
-                      { name: 'Prelims Tests', value: combinedMetrics.prelimsTests, color: '#06b6d4' }
-                    ]}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    innerRadius={40}
-                    paddingAngle={5}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    <Cell fill="url(#colorPurple)" />
-                    <Cell fill="url(#colorCyan)" />
-                  </Pie>
+          <CardContent>
+            {activityTrend.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={activityTrend} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorPurple" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#2563eb" stopOpacity={1}/>
-                      <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8}/>
+                    <linearGradient id="ovCopy" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#2563eb" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient id="colorCyan" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#06b6d4" stopOpacity={1}/>
-                      <stop offset="100%" stopColor="#0891b2" stopOpacity={0.8}/>
+                    <linearGradient id="ovPrelim" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#06b6d4" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
-                      border: theme === "dark" ? "1px solid #334155" : "1px solid #e2e8f0",
-                      borderRadius: "12px",
-                      padding: "12px",
-                      boxShadow: theme === "dark" ? "0 10px 25px rgba(0,0,0,0.5)" : "0 10px 25px rgba(0,0,0,0.1)"
-                    }}
-                  />
-                </PieChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Legend />
+                  <Area type="monotone" dataKey="copy" name="Copy %" stroke="#2563eb" fill="url(#ovCopy)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="prelims" name="Prelims %" stroke="#06b6d4" fill="url(#ovPrelim)" strokeWidth={2} />
+                </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className={`h-[250px] flex flex-col items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                <div className={`p-4 rounded-full mb-4 ${
-                  theme === "dark" ? "bg-slate-800" : "bg-slate-100"
-                }`}>
-                  <BarChart3 className="w-12 h-12 opacity-50" />
-                </div>
-                <p className="text-sm font-medium">No activity data yet</p>
-                <p className="text-xs mt-1 opacity-75">Start practicing to see distribution</p>
-              </div>
+              emptyChart(
+                "No score history yet",
+                "Take a prelims test or submit a copy evaluation to unlock your trend graph.",
+                { label: "Start Modular Test", onClick: () => navigate("/practice-test") }
+              )
             )}
           </CardContent>
         </Card>
 
-        <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-cyan-500/20 shadow-lg" 
-            : "bg-gradient-to-br from-white to-cyan-50/20 border-cyan-200/50 shadow-lg"
-        }`}>
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
-          <CardHeader className="relative z-10 pb-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${
-                theme === "dark" ? "bg-cyan-500/20" : "bg-cyan-100"
-              }`}>
-                <TrendingUp className={`w-5 h-5 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
-              </div>
-              <div>
-                <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                  Performance Overview
-                </CardTitle>
-                <CardDescription className="mt-1">Average scores across activities</CardDescription>
-              </div>
-            </div>
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Activity mix</CardTitle>
+            <CardDescription>Copy evaluations vs Prelims tests</CardDescription>
           </CardHeader>
-          <CardContent className="relative z-10">
-            <ResponsiveContainer width="100%" height={250}>
+          <CardContent>
+            {combinedMetrics.totalActivities > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: "Copy", value: combinedMetrics.copyEvaluations },
+                      { name: "Prelims", value: combinedMetrics.prelimsTests },
+                    ].filter((d) => d.value > 0)}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={48}
+                    outerRadius={80}
+                    paddingAngle={4}
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  >
+                    <Cell fill="#2563eb" />
+                    <Cell fill="#06b6d4" />
+                  </Pie>
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart(
+                "No activity yet",
+                "Your mix of mains answers and MCQ tests will appear here.",
+                { label: "Open Copy Evaluation", onClick: () => navigate("/copy-evaluation") }
+              )
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Average by type</CardTitle>
+            <CardDescription>Compare Copy vs Prelims averages</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart
                 data={[
-                  { name: 'Copy Evaluations', score: copyPerformanceData?.averageScore || 0, color: '#2563eb' },
-                  { name: 'Prelims Tests', score: prelimsPerformanceData?.averageScore || 0, color: '#06b6d4' }
+                  { name: "Copy", score: Math.round(copyPerformanceData?.averageScore || 0) },
+                  { name: "Prelims", score: Math.round(prelimsPerformanceData?.averageScore || 0) },
                 ]}
-                margin={{ top: 20, right: 20, left: 0, bottom: 10 }}
+                margin={{ top: 8, right: 8, left: -10, bottom: 0 }}
               >
-                <defs>
-                  <linearGradient id="barGradientPurple" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity={1}/>
-                    <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.8}/>
-                  </linearGradient>
-                  <linearGradient id="barGradientCyan" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#06b6d4" stopOpacity={1}/>
-                    <stop offset="100%" stopColor="#0891b2" stopOpacity={0.8}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid 
-                  strokeDasharray="3 3" 
-                  stroke={theme === "dark" ? "#334155" : "#e2e8f0"}
-                  opacity={0.3}
-                />
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 12, fill: theme === "dark" ? "#94a3b8" : "#64748b" }}
-                  stroke={theme === "dark" ? "#475569" : "#cbd5e1"}
-                />
-                <YAxis 
-                  domain={[0, 100]} 
-                  tick={{ fontSize: 12, fill: theme === "dark" ? "#94a3b8" : "#64748b" }}
-                  stroke={theme === "dark" ? "#475569" : "#cbd5e1"}
-                />
-                <Tooltip 
-                  formatter={(value) => [`${value}%`, "Average Score"]}
-                  contentStyle={{
-                    backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
-                    border: theme === "dark" ? "1px solid #334155" : "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    padding: "12px",
-                    boxShadow: theme === "dark" ? "0 10px 25px rgba(0,0,0,0.5)" : "0 10px 25px rgba(0,0,0,0.1)"
-                  }}
-                />
-                <Bar 
-                  dataKey="score" 
-                  radius={[8, 8, 0, 0]}
-                  fill={(entry: any) => entry.name === 'Copy Evaluations' ? "url(#barGradientPurple)" : "url(#barGradientCyan)"}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                <XAxis dataKey="name" tick={{ fontSize: 12, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                <Tooltip formatter={(v) => [`${v}%`, "Average"]} contentStyle={chartTooltipStyle} />
+                <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+                  <Cell fill="#2563eb" />
+                  <Cell fill="#06b6d4" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">7-day study hours</CardTitle>
+            <CardDescription>From your DART logs</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dartAnalytics?.sevenDayStudyTrend?.length ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <LineChart data={dartAnalytics.sevenDayStudyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Legend />
+                  <Line type="monotone" dataKey="studyHours" stroke="#2563eb" strokeWidth={2.5} name="Study hrs" dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="targetHours" stroke="#6366f1" strokeWidth={2} name="Target hrs" strokeDasharray="4 4" />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart(
+                "No DART study data",
+                "Tap DART in the top bar to log study hours — this graph fills from those entries."
+              )
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Target vs actual</CardTitle>
+            <CardDescription>Daily study hours (DART)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dartAnalytics?.targetVsActual?.length ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={dartAnalytics.targetVsActual} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Legend />
+                  <Bar dataKey="target" fill="#94a3b8" name="Target" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="actual" fill="#2563eb" name="Actual" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart("No target comparison yet", "Keep logging DART for 7 days to compare targets.")
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Subject focus</CardTitle>
+            <CardDescription>Days studied per subject (DART)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dartAnalytics?.subjectFrequency?.length ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart
+                  data={dartAnalytics.subjectFrequency.slice(0, 8)}
+                  layout="vertical"
+                  margin={{ top: 4, right: 12, left: 8, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} opacity={0.5} />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={72}
+                    tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }}
+                  />
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                  <Bar dataKey="count" fill="#6366f1" name="Days" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart("No subject mix yet", "Add subjects in DART to see where your time goes.")
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card className={`relative overflow-hidden border-2 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 shadow-lg" 
-          : "bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 shadow-lg"
-      }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full blur-3xl" />
-        <CardHeader className="relative z-10 pb-4">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
-            }`}>
-              <Zap className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-            </div>
-            <div>
-              <CardTitle className={`text-lg md:text-xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                Quick Actions
-              </CardTitle>
-              <CardDescription className="mt-1">Access detailed performance analysis</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              onClick={() => setActiveTab('copy-evaluation')}
-              className={`group relative p-5 rounded-xl border-2 transition-all duration-300 text-left overflow-hidden hover:scale-[1.02] ${
-                theme === "dark"
-                  ? "border-blue-700/50 bg-gradient-to-br from-blue-900/30 to-blue-800/20 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20"
-                  : "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200/50"
-              }`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${
-                  theme === "dark" ? "bg-blue-500/20 group-hover:bg-blue-500/30" : "bg-blue-100 group-hover:bg-blue-200"
-                } transition-colors`}>
-                  <FileText className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className={`font-bold text-base mb-1 ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                    Copy Evaluation Performance
-                  </h3>
-                  <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                    Detailed mains-style answer analysis
-                  </p>
-                </div>
-                <ArrowUpRight className={`w-5 h-5 mt-1 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 ${
-                  theme === "dark" ? "text-blue-400" : "text-blue-600"
-                }`} />
-              </div>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('prelims')}
-              className={`group relative p-5 rounded-xl border-2 transition-all duration-300 text-left overflow-hidden hover:scale-[1.02] ${
-                theme === "dark"
-                  ? "border-cyan-700/50 bg-gradient-to-br from-cyan-900/30 to-cyan-800/20 hover:border-cyan-500 hover:shadow-lg hover:shadow-cyan-500/20"
-                  : "border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100/50 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-200/50"
-              }`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${
-                  theme === "dark" ? "bg-cyan-500/20 group-hover:bg-cyan-500/30" : "bg-cyan-100 group-hover:bg-cyan-200"
-                } transition-colors`}>
-                  <ClipboardList className={`w-6 h-6 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className={`font-bold text-base mb-1 ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                    Prelims Test Performance
-                  </h3>
-                  <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                    MCQ-based test analysis & readiness
-                  </p>
-                </div>
-                <ArrowUpRight className={`w-5 h-5 mt-1 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 ${
-                  theme === "dark" ? "text-cyan-400" : "text-cyan-600"
-                }`} />
-              </div>
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* DART Analytics Sections */}
-      {dartAnalytics && (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-blue-500/20" : "bg-white border-blue-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">Daily Time Distribution</CardTitle>
-                <CardDescription>Study, Sleep, Work, Waste (avg)</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dartAnalytics.dailyTimeDistribution?.length && dartAnalytics.dailyTimeDistribution[0]?.name !== "No data" ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={dartAnalytics.dailyTimeDistribution}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        label={({ name, value }) => `${name}: ${value}h`}
-                      >
-                        {dartAnalytics.dailyTimeDistribution.map((entry, i) => (
-                          <Cell key={i} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                    Log DART entries to see distribution
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-cyan-500/20" : "bg-white border-cyan-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">7 Day Study Trend</CardTitle>
-                <CardDescription>Study hours over last 7 days</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dartAnalytics.sevenDayStudyTrend?.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <LineChart data={dartAnalytics.sevenDayStudyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
-                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                      <Line type="monotone" dataKey="studyHours" stroke="#2563eb" strokeWidth={2} name="Study (hrs)" />
-                      <Line type="monotone" dataKey="targetHours" stroke="#06b6d4" strokeWidth={2} name="Target (hrs)" strokeDasharray="4 4" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                    Log DART entries to see trend
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-amber-500/20" : "bg-white border-amber-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">Target vs Actual Study</CardTitle>
-                <CardDescription>Last 7 days</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dartAnalytics.targetVsActual?.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={dartAnalytics.targetVsActual} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
-                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <YAxis tick={{ fontSize: 11, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                      <Bar dataKey="target" fill="#94a3b8" name="Target (hrs)" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="actual" fill="#2563eb" name="Actual (hrs)" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                    Log DART entries to see comparison
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-teal-500/20" : "bg-white border-teal-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">Subject Frequency</CardTitle>
-                <CardDescription>Days studied per subject</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dartAnalytics.subjectFrequency?.length ? (
-                  <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={dartAnalytics.subjectFrequency.slice(0, 10)} layout="vertical" margin={{ top: 5, right: 20, left: 60, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#334155" : "#e2e8f0"} />
-                      <XAxis type="number" tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <YAxis type="category" dataKey="name" width={55} tick={{ fontSize: 10, fill: theme === "dark" ? "#94a3b8" : "#64748b" }} />
-                      <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                      <Bar dataKey="count" fill="#14b8a6" name="Days" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className={`h-[220px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                    Log subjects in DART to see frequency
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-cyan-500/20" : "bg-white border-cyan-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Sunrise className="w-4 h-4" /> Wake-up Consistency
-                </CardTitle>
-                <CardDescription>Last 7 days</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dartAnalytics.wakeUpConsistency?.length ? (
-                  <div className="space-y-2">
-                    {dartAnalytics.wakeUpConsistency.map((row, i) => (
-                      <div key={i} className={`flex justify-between items-center py-1.5 px-3 rounded-lg ${theme === "dark" ? "bg-slate-700/50" : "bg-slate-100"}`}>
-                        <span className="text-sm font-medium">{row.date}</span>
-                        <span className={`text-sm ${row.before6 ? "text-green-500" : "text-slate-500"}`}>
-                          {row.wakeUpTime} {row.before6 && "✓ Before 6 AM"}
-                        </span>
-                      </div>
+      {/* Time / emotion row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Daily time distribution</CardTitle>
+            <CardDescription>Study · Sleep · Work · Waste</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dartAnalytics?.dailyTimeDistribution?.length &&
+            dartAnalytics.dailyTimeDistribution[0]?.name !== "No data" ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie
+                    data={dartAnalytics.dailyTimeDistribution}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={78}
+                    label={({ name, value }) => `${name}: ${value}h`}
+                  >
+                    {dartAnalytics.dailyTimeDistribution.map((entry, i) => (
+                      <Cell key={i} fill={entry.color || COLORS[i % COLORS.length]} />
                     ))}
-                  </div>
-                ) : (
-                  <div className={`h-[180px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                    Log wake-up time in DART
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            <Card className={`relative overflow-hidden border-2 ${
-              theme === "dark" ? "bg-slate-800/90 border-indigo-500/20" : "bg-white border-indigo-200/50"
-            }`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">Answer Writing (Last 7 Days)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${theme === "dark" ? "text-indigo-400" : "text-indigo-600"}`}>
-                  {dartAnalytics.answerWritingWeeklyCount ?? 0} days
-                </div>
-                <p className="text-sm text-slate-500 mt-1">Days with answer writing done</p>
-              </CardContent>
-            </Card>
-          </div>
+                  </Pie>
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart("Log DART to unlock this chart", "Time distribution appears after daily logs.")
+            )}
+          </CardContent>
+        </Card>
 
-          <Card className={`relative overflow-hidden border-2 mb-8 ${
-            theme === "dark" ? "bg-slate-800/90 border-slate-600" : "bg-white border-slate-200"
-          }`}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Smile className="w-4 h-4" /> Emotional Status (Mental Health Insights)
-              </CardTitle>
-              <CardDescription>Distribution over logged days</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {dartAnalytics.emotionalStatusPie?.length && dartAnalytics.emotionalStatusPie.some((d) => d.value > 0) ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={dartAnalytics.emotionalStatusPie}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={70}
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {dartAnalytics.emotionalStatusPie.map((_, i) => (
-                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: theme === "dark" ? "#0f172a" : "#fff", borderRadius: "8px" }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className={`h-[200px] flex items-center justify-center ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                  Log emotional status in DART to see insights
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </>
+        <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Smile className="w-4 h-4" /> Mood insights
+            </CardTitle>
+            <CardDescription>Emotional status from DART</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dartAnalytics?.emotionalStatusPie?.some((d) => d.value > 0) ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie
+                    data={dartAnalytics.emotionalStatusPie}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={78}
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {(dartAnalytics.emotionalStatusPie || []).map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={chartTooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              emptyChart("No mood data yet", "Track emotional status in DART for mental-health insights.")
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <button
+          type="button"
+          onClick={() => setActiveTab("copy-evaluation")}
+          className={`text-left rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
+            theme === "dark"
+              ? "border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/15"
+              : "border-blue-100 bg-blue-50/80 hover:bg-blue-50 shadow-sm"
+          }`}
+        >
+          <FileText className="w-5 h-5 text-blue-500 mb-2" />
+          <p className={`font-bold text-sm ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}>Copy Evaluation graphs</p>
+          <p className="text-xs text-slate-500 mt-1">Subject breakdown & score history</p>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("prelims")}
+          className={`text-left rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
+            theme === "dark"
+              ? "border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/15"
+              : "border-cyan-100 bg-cyan-50/80 hover:bg-cyan-50 shadow-sm"
+          }`}
+        >
+          <ClipboardList className="w-5 h-5 text-cyan-500 mb-2" />
+          <p className={`font-bold text-sm ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}>Prelims readiness</p>
+          <p className="text-xs text-slate-500 mt-1">Accuracy, subjects & test trends</p>
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/practice-test")}
+          className={`text-left rounded-2xl border p-4 transition hover:-translate-y-0.5 ${
+            theme === "dark"
+              ? "border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/15"
+              : "border-indigo-100 bg-indigo-50/80 hover:bg-indigo-50 shadow-sm"
+          }`}
+        >
+          <Zap className="w-5 h-5 text-indigo-500 mb-2" />
+          <p className={`font-bold text-sm ${theme === "dark" ? "text-slate-100" : "text-slate-900"}`}>Practice to grow graphs</p>
+          <p className="text-xs text-slate-500 mt-1">Take a modular test and fill this dashboard</p>
+        </button>
+      </div>
+    </div>
   );
 
   const renderCopyEvaluationTab = () => (
@@ -1496,143 +1336,85 @@ export const PerformanceDashboardPage = () => {
         </div>
       </div>
 
-      {/* Header Section - compact on mobile */}
-      <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 mb-4 md:mb-6 border-2 transition-all duration-300 ${
+      {/* Header + timeframe + tabs */}
+      <div className={`rounded-2xl border p-4 md:p-5 ${
         theme === "dark"
-          ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10"
-          : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
+          ? "bg-slate-800/80 border-slate-700"
+          : "bg-white border-slate-200 shadow-sm"
       }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col gap-3 md:gap-5">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 md:gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
-                <div className={`p-2 md:p-2.5 rounded-lg md:rounded-xl shrink-0 ${
-                  theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
-                }`}>
-                  <BarChart3 className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-                </div>
-                <h1 className={`text-xl md:text-4xl font-bold tracking-tight bg-gradient-to-r truncate ${
-                  theme === "dark"
-                    ? "from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent"
-                    : "from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent"
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2.5">
+              <div className={`p-2 rounded-xl shrink-0 ${theme === "dark" ? "bg-blue-500/20" : "bg-blue-50"}`}>
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <h1 className={`text-lg md:text-2xl font-bold tracking-tight truncate ${
+                  theme === "dark" ? "text-slate-50" : "text-slate-900"
                 }`}>
                   Performance Dashboard
                 </h1>
+                <p className={`text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                  Graphs for Copy, Prelims & DART study habits
+                </p>
               </div>
-              <p className={`text-xs md:text-lg mt-1 md:mt-2 md:ml-14 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
-                Comprehensive analysis of your UPSC preparation performance
-              </p>
             </div>
-            {combinedMetrics.totalActivities > 0 && (
-              <div className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl flex-shrink-0 ${
-                theme === "dark" ? "bg-slate-800/50" : "bg-white/50"
-              }`}>
-                <button
-                  onClick={() => setSelectedTimeframe('week')}
-                  className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
-                    selectedTimeframe === 'week'
-                      ? theme === "dark"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                      : theme === "dark"
-                      ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
-                      : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
-                  }`}
-                >
-                  Week
-                </button>
-                <button
-                  onClick={() => setSelectedTimeframe('month')}
-                  className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
-                    selectedTimeframe === 'month'
-                      ? theme === "dark"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                      : theme === "dark"
-                      ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
-                      : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
-                  }`}
-                >
-                  Month
-                </button>
-                <button
-                  onClick={() => setSelectedTimeframe('all')}
-                  className={`px-3 sm:px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 min-h-[44px] touch-manipulation ${
-                    selectedTimeframe === 'all'
-                      ? theme === "dark"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                        : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
-                      : theme === "dark"
-                      ? "bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
-                      : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white"
-                  }`}
-                >
-                  All Time
-                </button>
-              </div>
-            )}
+          </div>
+          <div className={`flex items-center gap-1 p-1 rounded-xl self-start sm:self-auto ${
+            theme === "dark" ? "bg-slate-900/70" : "bg-slate-100"
+          }`}>
+            {([
+              { id: "week" as const, label: "Week" },
+              { id: "month" as const, label: "Month" },
+              { id: "all" as const, label: "All Time" },
+            ]).map((tf) => (
+              <button
+                key={tf.id}
+                type="button"
+                onClick={() => setSelectedTimeframe(tf.id)}
+                className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold min-h-[40px] transition ${
+                  selectedTimeframe === tf.id
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : theme === "dark"
+                    ? "text-slate-400 hover:text-slate-200"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {tf.label}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Tab Navigation - touch-friendly on mobile */}
-      <div className={`relative flex gap-1.5 sm:gap-2 p-1.5 rounded-xl border-2 ${
-        theme === "dark" 
-          ? "bg-slate-800/50 border-slate-700/50" 
-          : "bg-slate-100/50 border-slate-200/50"
-      } mb-4 md:mb-6`}>
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
-            activeTab === 'overview'
-              ? theme === "dark"
-                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-              : theme === "dark"
-              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-          }`}
-        >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            Overview
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab('copy-evaluation')}
-          className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
-            activeTab === 'copy-evaluation'
-              ? theme === "dark"
-                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-              : theme === "dark"
-              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-          }`}
-        >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            <FileText className="w-4 h-4" />
-            Copy Evaluation
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab('prelims')}
-          className={`relative flex-1 px-2 sm:px-4 py-3 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-300 min-h-[44px] touch-manipulation ${
-            activeTab === 'prelims'
-              ? theme === "dark"
-                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-                : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
-              : theme === "dark"
-              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white'
-          }`}
-        >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            <ClipboardList className="w-4 h-4" />
-            Prelims
-          </span>
-        </button>
+        <div className={`flex gap-1 p-1 rounded-xl ${
+          theme === "dark" ? "bg-slate-900/60" : "bg-slate-50"
+        }`}>
+            {([
+            { id: "overview" as const, label: "Overview", Icon: BarChart3 },
+            { id: "copy-evaluation" as const, label: "Copy Eval", Icon: FileText },
+            { id: "prelims" as const, label: "Prelims", Icon: ClipboardList },
+          ]).map((tab) => {
+            const Icon = tab.Icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold min-h-[44px] transition ${
+                  active
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : theme === "dark"
+                    ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-white"
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Tab Content */}

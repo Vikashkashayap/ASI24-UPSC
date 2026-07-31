@@ -631,7 +631,7 @@ export const getTest = async (req, res) => {
 
 /**
  * Get all tests (history) with pagination
- * GET /api/tests?page=1&limit=10
+ * GET /api/tests?page=1&limit=10&subject=Economy
  */
 export const getTests = async (req, res) => {
   try {
@@ -643,38 +643,55 @@ export const getTests = async (req, res) => {
       });
     }
 
-    const { limit = 10, page = 1 } = req.query;
+    const { limit = 10, page = 1, subject = "" } = req.query;
     const skip = (page - 1) * limit;
+    const subjectFilter = String(subject || "").trim();
+
+    const ownership = {
+      $or: [{ userId }, { userId: { $exists: false } }],
+    };
+
+    const query = subjectFilter
+      ? {
+          $and: [
+            ownership,
+            {
+              subject: new RegExp(
+                subjectFilter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                "i"
+              ),
+            },
+          ],
+        }
+      : ownership;
 
     // Include tests with userId or without userId (for backward compatibility)
-    const tests = await Test.find({
-      $or: [
-        { userId },
-        { userId: { $exists: false } }
-      ]
-    })
+    const tests = await Test.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .select("userId subject examType topic difficulty totalQuestions score accuracy isSubmitted createdAt");
 
-    const total = await Test.countDocuments({
-      $or: [
-        { userId },
-        { userId: { $exists: false } }
-      ]
-    });
+    const total = await Test.countDocuments(query);
+
+    const subjects = (
+      await Test.distinct("subject", ownership)
+    )
+      .map((s) => String(s || "").trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
 
     res.json({
       success: true,
       data: {
         tests,
+        subjects,
         pagination: {
           total,
           page: parseInt(page),
           limit: parseInt(limit),
-          pages: Math.ceil(total / limit)
-        }
+          pages: Math.ceil(total / limit) || 1,
+        },
       },
     });
   } catch (error) {

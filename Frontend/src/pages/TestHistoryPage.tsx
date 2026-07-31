@@ -45,6 +45,8 @@ const TestHistoryPage: React.FC = () => {
   const [history, setHistory] = useState<TestHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('');
+  const [subjects, setSubjects] = useState<string[]>([]);
   const [filteredHistory, setFilteredHistory] = useState<TestHistory[]>([]);
   const [selectedTest, setSelectedTest] = useState<any>(null);
   const [showTestDetails, setShowTestDetails] = useState(false);
@@ -54,7 +56,7 @@ const TestHistoryPage: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationData | null>(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
 
   const { questions: historyDisplayQuestions } = useClientSideHindiQuestions(
     selectedTest?.questions || [],
@@ -64,49 +66,53 @@ const TestHistoryPage: React.FC = () => {
   );
 
   useEffect(() => {
-    loadHistory();
-  }, []);
+    loadHistory(1, subjectFilter);
+  }, [subjectFilter]);
 
   const handlePageChange = (page: number) => {
-    loadHistory(page);
+    loadHistory(page, subjectFilter);
   };
 
   // Listen for test completion events
   useEffect(() => {
     const handleTestComplete = () => {
-      loadHistory();
+      loadHistory(currentPage, subjectFilter);
     };
 
     window.addEventListener('test-complete', handleTestComplete);
     return () => {
       window.removeEventListener('test-complete', handleTestComplete);
     };
-  }, []);
+  }, [currentPage, subjectFilter]);
 
-  // Filter history based on search query
+  // Filter current page by search query (subject is handled server-side)
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredHistory(history);
     } else {
+      const q = searchQuery.toLowerCase();
       const filtered = history.filter(test =>
-        test.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        test.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (test.difficulty && test.difficulty.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (test.examType && test.examType.toLowerCase().includes(searchQuery.toLowerCase()))
+        test.topic.toLowerCase().includes(q) ||
+        test.subject.toLowerCase().includes(q) ||
+        (test.difficulty && test.difficulty.toLowerCase().includes(q)) ||
+        (test.examType && test.examType.toLowerCase().includes(q))
       );
       setFilteredHistory(filtered);
     }
   }, [searchQuery, history]);
 
-  const loadHistory = async (page = 1) => {
+  const loadHistory = async (page = 1, subject = subjectFilter) => {
     setLoadingHistory(true);
     try {
-      const response = await testAPI.getTests(page, itemsPerPage);
+      const response = await testAPI.getTests(page, itemsPerPage, subject);
       if (response.data.success) {
-        const data: TestHistoryResponse = response.data.data;
+        const data: TestHistoryResponse & { subjects?: string[] } = response.data.data;
         setHistory(data.tests);
         setPagination(data.pagination);
         setCurrentPage(page);
+        if (Array.isArray(data.subjects)) {
+          setSubjects(data.subjects);
+        }
       }
     } catch (error) {
       console.error('Error loading test history:', error);
@@ -143,7 +149,7 @@ const TestHistoryPage: React.FC = () => {
       const response = await testAPI.deleteTest(testToDelete);
       if (response.data.success) {
         // Reload the current page to get updated pagination
-        await loadHistory(currentPage);
+        await loadHistory(currentPage, subjectFilter);
         // Close modal if the deleted test was being viewed
         if (selectedTest && selectedTest._id === testToDelete) {
           setShowTestDetails(false);
@@ -192,9 +198,9 @@ const TestHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
+    <div className="max-w-7xl mx-auto space-y-5 md:space-y-6 pb-8 px-3 md:px-4">
       {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
+      <div className={`relative overflow-hidden rounded-2xl p-5 md:p-6 border-2 transition-all duration-300 ${
         theme === "dark" 
           ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10" 
           : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
@@ -206,7 +212,7 @@ const TestHistoryPage: React.FC = () => {
           }`}>
             <History className={`w-6 h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
           </div>
-          <div className="flex flex-col gap-1 md:gap-2">
+          <div className="flex flex-col gap-1">
             <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
               theme === "dark" 
                 ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent" 
@@ -214,54 +220,66 @@ const TestHistoryPage: React.FC = () => {
             }`}>
               Test History
             </h1>
-            <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
+            <p className={`text-sm ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
               View and manage your previously generated UPSC Prelims tests
             </p>
           </div>
         </div>
       </div>
 
-      {/* Search Bar */}
-      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-amber-500/20 shadow-lg" 
-          : "bg-gradient-to-br from-white to-amber-50/20 border-amber-200/50 shadow-lg"
-      }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
-        <CardContent className="pt-6 relative z-10">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by topic, subject, or difficulty..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-slate-200"
-                  : "border-slate-300 bg-white"
-              }`}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search + subject filter */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search by topic or difficulty..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={`w-full pl-10 pr-4 py-3 rounded-xl border-2 focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 outline-none transition-shadow ${
+              theme === "dark"
+                ? "bg-slate-800/80 border-slate-700 text-slate-200 placeholder:text-slate-500"
+                : "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 shadow-sm"
+            }`}
+          />
+        </div>
+        <select
+          value={subjectFilter}
+          onChange={(e) => setSubjectFilter(e.target.value)}
+          aria-label="Filter by subject"
+          className={`sm:w-52 shrink-0 px-3 py-3 rounded-xl border-2 focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 outline-none transition-shadow ${
+            theme === "dark"
+              ? "bg-slate-800/80 border-slate-700 text-slate-200"
+              : "bg-white border-slate-200 text-slate-800 shadow-sm"
+          }`}
+        >
+          <option value="">All subjects</option>
+          {subjects.map((subject) => (
+            <option key={subject} value={subject}>
+              {subject}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* History List */}
+      {/* History Grid */}
       {loadingHistory ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="flex justify-center items-center py-16">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
         </div>
       ) : filteredHistory.length === 0 ? (
         <Card>
           <CardContent className="pt-12 pb-12 text-center">
             <FileText className={`w-16 h-16 mx-auto mb-4 ${theme === "dark" ? "text-slate-600" : "text-slate-400"}`} />
             <h3 className={`text-lg font-medium mb-2 ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-              {searchQuery ? 'No tests found' : 'No tests yet'}
+              {searchQuery || subjectFilter ? 'No tests found' : 'No tests yet'}
             </h3>
             <p className={`text-sm mb-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-              {searchQuery ? 'Try adjusting your search query' : 'Generate your first test to see it here'}
+              {searchQuery || subjectFilter
+                ? 'Try adjusting your search or subject filter'
+                : 'Generate your first test to see it here'}
             </p>
-            {!searchQuery && (
+            {!searchQuery && !subjectFilter && (
               <Button
                 onClick={() => navigate('/test-generator')}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
@@ -273,103 +291,166 @@ const TestHistoryPage: React.FC = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {filteredHistory.map((test) => (
-            <Card key={test._id} className="hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
-                        <BookOpen className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className={`font-semibold text-lg ${theme === "dark" ? "text-slate-200" : "text-slate-900"}`}>
-                          {test.topic}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-1 flex-wrap">
-                          <span className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                            {test.subject}
-                          </span>
-                          {test.examType === "CSAT" ? (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
-                              CSAT
-                            </span>
-                          ) : test.difficulty ? (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(test.difficulty)}`}>
-                              {test.difficulty}
-                            </span>
-                          ) : null}
-                          <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                            {test.totalQuestions} questions
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <Calendar className={`w-4 h-4 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`} />
-                          <span className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                            {formatDate(test.createdAt)}
-                          </span>
-                        </div>
-                      </div>
+        <>
+          <div className="flex items-center justify-between gap-2 px-0.5">
+            <p className={`text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+              {pagination?.total ?? filteredHistory.length} test
+              {(pagination?.total ?? filteredHistory.length) === 1 ? "" : "s"}
+              {searchQuery || subjectFilter ? " found" : ""}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 md:gap-4">
+            {filteredHistory.map((test) => (
+              <Card
+                key={test._id}
+                className={`group relative flex flex-col overflow-hidden border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                  theme === "dark"
+                    ? "bg-slate-800/70 border-slate-700/80 hover:border-amber-500/40"
+                    : "bg-white border-slate-200/90 hover:border-amber-300 shadow-sm"
+                }`}
+              >
+                <CardContent className="flex flex-col flex-1 p-4 pt-4">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div
+                      className={`p-2 rounded-lg shrink-0 ${
+                        theme === "dark" ? "bg-amber-900/40" : "bg-amber-50"
+                      }`}
+                    >
+                      <BookOpen
+                        className={`w-[18px] h-[18px] ${
+                          theme === "dark" ? "text-amber-400" : "text-amber-600"
+                        }`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full shrink-0 ${
+                          test.isSubmitted
+                            ? theme === "dark"
+                              ? "bg-emerald-900/40 text-emerald-400"
+                              : "bg-emerald-50 text-emerald-700"
+                            : theme === "dark"
+                              ? "bg-amber-900/40 text-amber-400"
+                              : "bg-amber-50 text-amber-700"
+                        }`}
+                      >
+                        {test.isSubmitted ? "Done" : "In progress"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTest(test._id)}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          theme === "dark"
+                            ? "text-slate-400 hover:text-red-400 hover:bg-red-950/40"
+                            : "text-slate-400 hover:text-red-600 hover:bg-red-50"
+                        }`}
+                        title="Delete test"
+                        aria-label="Delete test"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
 
-                  {/* Score and Actions */}
-                  <div className="flex items-center gap-3">
-                    {test.isSubmitted && test.score !== undefined && (
-                      <div className="text-right">
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="w-4 h-4 text-green-600" />
-                          <span className="font-semibold text-green-600">
-                            {test.score}/{test.totalQuestions}
-                          </span>
-                        </div>
-                        {test.accuracy !== undefined && (
-                          <span className="text-sm text-green-600">
-                            {Math.round(test.accuracy)}% accuracy
-                          </span>
-                        )}
-                      </div>
-                    )}
+                  <h3
+                    className={`font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] ${
+                      theme === "dark" ? "text-slate-100" : "text-slate-900"
+                    }`}
+                    title={test.topic}
+                  >
+                    {test.topic}
+                  </h3>
 
-                    <div className="flex gap-2">
-                      {test.isSubmitted ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate(`/result/${test._id}`)}
-                        >
-                          View Review
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => navigate(`/test/${test._id}`)}
-                          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          Continue Test
-                        </Button>
+                  <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                    <span
+                      className={`text-xs font-medium truncate max-w-[55%] ${
+                        theme === "dark" ? "text-slate-300" : "text-slate-600"
+                      }`}
+                      title={test.subject}
+                    >
+                      {test.subject}
+                    </span>
+                    {test.examType === "CSAT" ? (
+                      <span className="px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300">
+                        CSAT
+                      </span>
+                    ) : test.difficulty ? (
+                      <span
+                        className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold ${getDifficultyColor(
+                          test.difficulty
+                        )}`}
+                      >
+                        {test.difficulty}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div
+                    className={`mt-3 space-y-1.5 text-xs ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 shrink-0" />
+                      <span>{test.totalQuestions} questions</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{formatDate(test.createdAt)}</span>
+                    </div>
+                  </div>
+
+                  {test.isSubmitted && test.score !== undefined ? (
+                    <div
+                      className={`mt-3 flex items-center gap-1.5 rounded-lg px-2.5 py-2 ${
+                        theme === "dark" ? "bg-emerald-900/25" : "bg-emerald-50"
+                      }`}
+                    >
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span className="text-sm font-semibold text-emerald-600">
+                        {test.score}/{test.totalQuestions}
+                      </span>
+                      {test.accuracy !== undefined && (
+                        <span className="text-[11px] text-emerald-600/80 ml-auto">
+                          {Math.round(test.accuracy)}%
+                        </span>
                       )}
+                    </div>
+                  ) : (
+                    <div className="mt-3 h-[38px]" aria-hidden />
+                  )}
 
+                  <div className="mt-auto pt-3">
+                    {test.isSubmitted ? (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleDeleteTest(test._id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="w-full"
+                        onClick={() => navigate(`/result/${test._id}`)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        View Review
                       </Button>
-                    </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => navigate(`/test/${test._id}`)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+                      >
+                        <Play className="mr-1.5 h-3.5 w-3.5" />
+                        Continue
+                      </Button>
+                    )}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Pagination */}
-      {pagination && pagination.pages > 1 && (
+      {pagination && pagination.pages > 1 && !searchQuery && (
         <Pagination
           currentPage={pagination.page}
           totalPages={pagination.pages}

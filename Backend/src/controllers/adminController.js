@@ -9,14 +9,47 @@ import { MentorChat } from "../models/MentorChat.js";
 import { MentorFeedback } from "../models/MentorFeedback.js";
 import { getDartAnalytics, getDart15DayReport, build15DayReportPdf } from "../services/dartService.js";
 
+/**
+ * Legacy unpaid pro accounts (never completed payment) → MD Students with free access.
+ * Only touches accounts created before this cutoff so new self-registrants still must pay.
+ */
+const LEGACY_PRO_TO_MD_CUTOFF = new Date("2026-08-01T00:00:00.000Z");
+
+async function promoteLegacyUnpaidProToMdStudents(adminUserId) {
+  const result = await User.updateMany(
+    {
+      role: "student",
+      accountType: "paid-user",
+      subscriptionStatus: { $ne: "active" },
+      createdAt: { $lt: LEGACY_PRO_TO_MD_CUTOFF },
+    },
+    {
+      $set: {
+        accountType: "admin-created",
+        subscriptionStatus: "active",
+        subscriptionPlanId: null,
+        subscriptionStartDate: new Date(),
+        subscriptionEndDate: null,
+        ...(adminUserId ? { createdBy: adminUserId } : {}),
+      },
+    },
+  );
+  return result;
+}
+
 export const getAllStudents = async (req, res) => {
   try {
     const { search, page = 1, limit = 20 } = req.query;
     const mentorPicker =
       req.query.mentorPicker === "true" || req.query.mentorPicker === true;
 
+    // Move legacy unpaid pro users (Shiva, Sujana, etc.) into MD Students so they appear + have access
+    if (!mentorPicker) {
+      await promoteLegacyUnpaidProToMdStudents(req.user?._id);
+    }
+
     // Build query based on search parameter.
-    // Default: \"free\" / admin-created students list (excludes paid-user).
+    // Default: MD Students (admin-created / free cohort — excludes paid-user).
     // mentorPicker: all registered students (any accountType) for mentor assignment UI.
     let query;
     if (mentorPicker) {
@@ -50,7 +83,7 @@ export const getAllStudents = async (req, res) => {
 
     // Get students with pagination
     const students = await User.find(query)
-      .select("name email createdAt")
+      .select("name email createdAt targetYear")
       .sort({ createdAt: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
@@ -119,6 +152,7 @@ export const getAllStudents = async (req, res) => {
           name: student.name,
           email: student.email,
           createdAt: student.createdAt,
+          targetYear: student.targetYear || "",
           totalEvaluations: evaluationCount,
           latestScore: latestEvaluation?.finalSummary?.overallScore?.percentage || null,
           lastEvaluationDate: latestEvaluation?.createdAt || null,
@@ -155,10 +189,13 @@ export const getAllStudents = async (req, res) => {
   }
 };
 
-// Pro-plan students (self-registered / paid users)
+// Pro-plan students: self-registered paid-user accounts (active + inactive for admin visibility)
 export const getProStudents = async (req, res) => {
   try {
     const { search, page = 1, limit = 20 } = req.query;
+
+    // Keep legacy unpaid accounts from getting stuck only on this list
+    await promoteLegacyUnpaidProToMdStudents(req.user?._id);
 
     let query = {
       role: 'student',
@@ -296,6 +333,94 @@ export const getProStudents = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch pro students',
+    });
+  }
+};
+
+/** Convert a paid-user (pro) student into an admin-created student — free access, no payment. */
+export const moveProStudentToAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const student = await User.findById(id);
+    if (!student || student.role !== 'student') {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found',
+      });
+    }
+
+    if (student.accountType !== 'paid-user') {
+      return res.status(400).json({
+        success: false,
+        message: 'Student is already in Admin Students',
+      });
+    }
+
+    student.accountType = 'admin-created';
+    student.subscriptionStatus = 'active';
+    student.subscriptionPlanId = null;
+    student.subscriptionStartDate = new Date();
+    student.subscriptionEndDate = null;
+    if (req.user?._id) {
+      student.createdBy = req.user._id;
+    }
+    await student.save();
+
+    res.json({
+      success: true,
+      message: 'Student moved to Admin Students. They no longer need to pay.',
+      data: {
+        student: {
+          id: student._id,
+          name: student.name,
+          email: student.email,
+          accountType: student.accountType,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error moving pro student to admin:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to move student to Admin Students',
+    });
+  }
+};
+
+/** Bulk-convert all paid-user students to admin-created (free access). */
+export const moveAllProStudentsToAdmin = async (req, res) => {
+  try {
+    // First promote legacy unpaid, then convert any remaining paid-user (including active)
+    await promoteLegacyUnpaidProToMdStudents(req.user?._id);
+
+    const result = await User.updateMany(
+      { role: 'student', accountType: 'paid-user' },
+      {
+        $set: {
+          accountType: 'admin-created',
+          subscriptionStatus: 'active',
+          subscriptionPlanId: null,
+          subscriptionStartDate: new Date(),
+          subscriptionEndDate: null,
+          ...(req.user?._id ? { createdBy: req.user._id } : {}),
+        },
+      },
+    );
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} pro student(s) moved to MD Students`,
+      data: {
+        matched: result.matchedCount,
+        modified: result.modifiedCount,
+      },
+    });
+  } catch (error) {
+    console.error('Error moving all pro students to admin:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to move pro students to MD Students',
     });
   }
 };
@@ -814,15 +939,19 @@ export const getDashboardStats = async (req, res) => {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // Get total counts
-    const totalStudents = await User.countDocuments({ role: 'student' });
+    // MD Students only (excludes paid-user / Pro Students — same as /admin/students list)
+    const totalStudents = await User.countDocuments({
+      role: 'student',
+      accountType: { $ne: 'paid-user' },
+    });
     const totalEvaluations = await CopyEvaluation.countDocuments({ status: 'completed' });
     const pendingEvaluations = await CopyEvaluation.countDocuments({ status: { $in: ['pending', 'processing'] } });
     const totalPrelimsTests = await Test.countDocuments({ isSubmitted: true });
 
-    // Recent registrations (last 7 days)
+    // Recent registrations (last 7 days) — MD Students only
     const recentRegistrations = await User.countDocuments({
       role: 'student',
+      accountType: { $ne: 'paid-user' },
       createdAt: { $gte: sevenDaysAgo }
     });
 

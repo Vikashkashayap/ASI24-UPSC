@@ -3,6 +3,8 @@ import multer from "multer";
 import {
   getAllStudents,
   getProStudents,
+  moveProStudentToAdmin,
+  moveAllProStudentsToAdmin,
   getStudentById,
   getStudentPrelims,
   getStudentPerformance,
@@ -235,6 +237,8 @@ router.delete("/students/:id", (req, res, next) => {
 router.post("/students", createStudent);
 router.get("/students", getAllStudents);
 router.get("/pro-students", getProStudents);
+router.post("/pro-students/move-all-to-admin", moveAllProStudentsToAdmin);
+router.post("/pro-students/:id/move-to-admin", moveProStudentToAdmin);
 router.get("/students/:id/performance", getStudentPerformance);
 router.get("/students/:id", getStudentById);
 router.get("/students/:id/prelims", getStudentPrelims);

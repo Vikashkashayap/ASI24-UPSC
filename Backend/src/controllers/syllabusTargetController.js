@@ -521,45 +521,35 @@ export const listMySyllabusTargets = async (req, res) => {
       assignedStudentIds: userId,
     }).lean();
 
-    const mapped = await Promise.all(
-      records.map(async (r) => {
-        const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
-        const chapterEntry = (r.chapterCompletions || []).find(
-          (c) => String(c.studentId) === String(userId)
-        );
-        const kbSubject = resolveKbSubject(r.subjectKey, r.subjectName);
-        const topicsPreview = r.topicsPreview || [];
-        let relatedTopicsByChapter = {};
-        try {
-          relatedTopicsByChapter = await loadRelatedTopicsMap(kbSubject, topicsPreview);
-        } catch {
-          relatedTopicsByChapter = {};
-        }
-        return {
-          _id: r._id,
-          subjectKey: r.subjectKey,
-          subjectName: r.subjectName,
-          moduleId: r.moduleId,
-          moduleName: r.moduleName,
-          medium: r.medium === "hi" ? "hi" : "en",
-          estimatedDays: r.estimatedDays,
-          estimatedHours: r.estimatedHours,
-          chapterRange: r.chapterRange || "",
-          durationLabel: r.durationLabel || "",
-          topicCount: r.topicCount,
-          topicsPreview,
-          completedChapters: chapterEntry?.chapters || [],
-          chaptersComplete:
-            topicsPreview.length > 0 &&
-            topicsPreview.every((line) => (chapterEntry?.chapters || []).includes(line)),
-          relatedTopicsByChapter,
-          note: r.note || "",
-          dueDate: r.dueDate || null,
-          completed,
-          createdAt: r.createdAt,
-        };
-      })
-    );
+    const mapped = records.map((r) => {
+      const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
+      const chapterEntry = (r.chapterCompletions || []).find(
+        (c) => String(c.studentId) === String(userId)
+      );
+      const topicsPreview = r.topicsPreview || [];
+      return {
+        _id: r._id,
+        subjectKey: r.subjectKey,
+        subjectName: r.subjectName,
+        moduleId: r.moduleId,
+        moduleName: r.moduleName,
+        medium: r.medium === "hi" ? "hi" : "en",
+        estimatedDays: r.estimatedDays,
+        estimatedHours: r.estimatedHours,
+        chapterRange: r.chapterRange || "",
+        durationLabel: r.durationLabel || "",
+        topicCount: r.topicCount,
+        topicsPreview,
+        completedChapters: chapterEntry?.chapters || [],
+        chaptersComplete:
+          topicsPreview.length > 0 &&
+          topicsPreview.every((line) => (chapterEntry?.chapters || []).includes(line)),
+        note: r.note || "",
+        dueDate: r.dueDate || null,
+        completed,
+        createdAt: r.createdAt,
+      };
+    });
 
     const sorted = sortStudentTargets(mapped);
     const active = sorted.filter((t) => !t.completed);
@@ -906,7 +896,7 @@ export const startChapterPractice = async (req, res) => {
       relatedTopics = [];
     }
 
-    const { test, fromCache } = await createChapterPracticeTest({
+    const { test, fromCache, resumed } = await createChapterPracticeTest({
       userId,
       kbSubject,
       topicName,
@@ -914,10 +904,11 @@ export const startChapterPractice = async (req, res) => {
       forceCache,
     });
 
-    console.log("[chapterPractice] test created", {
+    console.log("[chapterPractice] test ready", {
       testId: String(test._id),
       fromCache,
       forceCache,
+      resumed: Boolean(resumed),
       topic: topicName,
       questions: test.totalQuestions,
     });
@@ -933,17 +924,22 @@ export const startChapterPractice = async (req, res) => {
       }).catch((err) => console.warn("[startChapterPractice] prefetch:", err.message));
     }
 
-    return res.status(201).json({
-      success: true,
-      message: fromCache
+    const message = resumed
+      ? "Resumed your unfinished chapter test"
+      : fromCache
         ? forceCache
           ? "Chapter retake ready (cached questions from DB)"
           : "Chapter practice ready (shared DB cache — same paper as other students)"
-        : "Chapter practice generated from Knowledge Base",
+        : "Chapter practice generated from Knowledge Base";
+
+    return res.status(resumed ? 200 : 201).json({
+      success: true,
+      message,
       data: {
         testId: test._id,
         test,
         fromCache,
+        resumed: Boolean(resumed),
         retake: forceCache,
         chapter,
         topicName,

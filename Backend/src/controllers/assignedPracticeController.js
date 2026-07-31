@@ -1259,6 +1259,7 @@ export const listStudentAssignedPractice = async (req, res) => {
 
 /**
  * GET /api/tests/assigned-practice/history
+ * Query: page, limit, subject
  */
 export const listAssignedPracticeHistory = async (req, res) => {
   try {
@@ -1270,13 +1271,24 @@ export const listAssignedPracticeHistory = async (req, res) => {
     const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 20));
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const skip = (page - 1) * limit;
+    const subjectFilter = String(req.query.subject || "").trim();
 
-    const filter = {
+    const baseFilter = {
       userId,
       assignedPracticeTestId: { $exists: true, $ne: null },
     };
 
-    const [tests, total] = await Promise.all([
+    const filter = subjectFilter
+      ? {
+          ...baseFilter,
+          subject: new RegExp(
+            subjectFilter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            "i"
+          ),
+        }
+      : baseFilter;
+
+    const [tests, total, subjects] = await Promise.all([
       Test.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -1284,6 +1296,7 @@ export const listAssignedPracticeHistory = async (req, res) => {
         .select("subject topic difficulty totalQuestions score accuracy isSubmitted createdAt assignedPracticeTestId")
         .lean(),
       Test.countDocuments(filter),
+      Test.distinct("subject", baseFilter),
     ]);
 
     const practiceIds = [...new Set(tests.map((t) => String(t.assignedPracticeTestId)).filter(Boolean))];
@@ -1314,6 +1327,10 @@ export const listAssignedPracticeHistory = async (req, res) => {
       success: true,
       data: {
         tests: data,
+        subjects: (subjects || [])
+          .map((s) => String(s || "").trim())
+          .filter(Boolean)
+          .sort((a, b) => a.localeCompare(b)),
         pagination: {
           total,
           page,

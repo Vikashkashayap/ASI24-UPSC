@@ -178,9 +178,13 @@ export const testAPI = {
     return api.post(`/api/tests/submit/${id}`, payload);
   },
 
-  getTests: async (page = 1, limit = 10) => {
+  getTests: async (page = 1, limit = 10, subject = "") => {
     return api.get("/api/tests", {
-      params: { page, limit },
+      params: {
+        page,
+        limit,
+        ...(subject ? { subject } : {}),
+      },
     });
   },
 
@@ -294,6 +298,12 @@ export const adminAPI = {
   },
   deleteStudent: async (id: string) => {
     return api.delete(`/api/admin/students/${id}`);
+  },
+  moveProStudentToAdmin: async (id: string) => {
+    return api.post(`/api/admin/pro-students/${id}/move-to-admin`);
+  },
+  moveAllProStudentsToAdmin: async () => {
+    return api.post("/api/admin/pro-students/move-all-to-admin");
   },
   getMentors: () => api.get("/api/admin/mentors"),
   resetMentorPassword: (id: string) => api.post(`/api/admin/mentors/${id}/reset-password`),
@@ -685,7 +695,7 @@ export const assignedPracticeAPI = {
   fillHindi: (id: string) => api.post(`/api/admin/assigned-practice/${id}/fill-hindi`),
   // Student
   listMine: () => api.get("/api/tests/assigned-practice"),
-  getHistory: (params?: { page?: number; limit?: number }) =>
+  getHistory: (params?: { page?: number; limit?: number; subject?: string }) =>
     api.get("/api/tests/assigned-practice/history", { params }),
   startAttempt: (id: string) => api.post(`/api/tests/assigned-practice/${id}/start`),
 };

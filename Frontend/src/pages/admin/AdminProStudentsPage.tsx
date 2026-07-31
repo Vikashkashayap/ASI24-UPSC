@@ -3,7 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { useTheme } from "../../hooks/useTheme";
 import { api } from "../../services/api";
-import { Search, Calendar, ArrowRight, UserMinus, TrendingUp, IndianRupee, Users, Trash2, AlertCircle } from "lucide-react";
+import {
+  Search,
+  Calendar,
+  ArrowRight,
+  UserMinus,
+  TrendingUp,
+  IndianRupee,
+  Users,
+  Trash2,
+  AlertCircle,
+  UserCheck,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { adminAPI } from "../../services/api";
 
@@ -50,6 +61,11 @@ export const AdminProStudentsPage = () => {
   const [studentToDelete, setStudentToDelete] = useState<ProStudent | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [studentToMove, setStudentToMove] = useState<ProStudent | null>(null);
+  const [moveAllConfirm, setMoveAllConfirm] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
+  const [moveError, setMoveError] = useState("");
+  const [moveSuccess, setMoveSuccess] = useState("");
 
   useEffect(() => {
     fetchStudents();
@@ -117,168 +133,255 @@ export const AdminProStudentsPage = () => {
     }
   };
 
+  const handleMoveStudent = async () => {
+    if (!studentToMove) return;
+    try {
+      setIsMoving(true);
+      setMoveError("");
+      const res = await adminAPI.moveProStudentToAdmin(studentToMove._id);
+      if (res.data.success) {
+        setMoveSuccess(`${studentToMove.name} moved to Admin Students`);
+        setStudentToMove(null);
+        fetchStudents();
+      }
+    } catch (err: any) {
+      setMoveError(err?.response?.data?.message || "Failed to move student");
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
+  const handleMoveAll = async () => {
+    try {
+      setIsMoving(true);
+      setMoveError("");
+      const res = await adminAPI.moveAllProStudentsToAdmin();
+      if (res.data.success) {
+        setMoveSuccess(res.data.message || "All pro students moved to Admin Students");
+        setMoveAllConfirm(false);
+        setCurrentPage(1);
+        fetchStudents();
+      }
+    } catch (err: any) {
+      setMoveError(err?.response?.data?.message || "Failed to move students");
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  const summaryStats = [
+    {
+      label: "Total Pro Students",
+      value: String(stats?.totalProStudents ?? pagination?.total ?? 0),
+      icon: Users,
+      iconBg: "bg-emerald-500/10 text-emerald-500",
+    },
+    {
+      label: "Active Subscriptions",
+      value: String(stats?.activeProStudents ?? 0),
+      icon: TrendingUp,
+      iconBg: "bg-indigo-500/10 text-indigo-500",
+    },
+    {
+      label: "Active Plan Revenue",
+      value: formatCurrency(stats?.totalActiveRevenue ?? 0),
+      icon: IndianRupee,
+      iconBg: "bg-amber-500/10 text-amber-500",
+    },
+  ];
+
   return (
     <div
-      className={`min-h-screen p-6 transition-colors duration-500 ${
+      className={`min-h-screen p-4 sm:p-6 transition-colors duration-500 ${
         theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
       } font-sans`}
     >
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-300 to-indigo-400 bg-clip-text text-transparent">
-              Pro Subscribers
-            </h1>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-3xl sm:text-[2rem] font-bold tracking-tight text-emerald-500">
+                Pro Subscribers
+              </h1>
+              {(stats?.totalProStudents ?? pagination?.total) != null && (
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                    theme === "dark"
+                      ? "bg-emerald-500/15 text-emerald-300"
+                      : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
+                  {stats?.totalProStudents ?? pagination?.total ?? 0}
+                </span>
+              )}
+            </div>
             <p
-              className={`mt-2 text-sm font-medium ${
+              className={`mt-1 text-sm ${
                 theme === "dark" ? "text-slate-400" : "text-slate-500"
               }`}
             >
-              View all paid-plan students, monitor active subscriptions, and track revenue.
+              Paid self-registered students only. Move existing users to Admin Students for free access.
             </p>
           </div>
-          <Link to="/admin/dashboard">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <Button
-              variant="outline"
-              className={`h-auto py-3 px-6 rounded-2xl border-2 ${
-                theme === "dark"
-                  ? "border-slate-800 bg-slate-900/60 hover:bg-slate-800"
-                  : "border-slate-200 bg-white hover:bg-slate-100"
-              }`}
+              type="button"
+              onClick={() => {
+                setMoveAllConfirm(true);
+                setMoveError("");
+              }}
+              className="flex-1 sm:flex-none h-11 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2"
             >
-              Admin Dashboard
+              <UserCheck className="h-4 w-4" />
+              <span className="font-semibold text-sm">Move All to Students</span>
             </Button>
-          </Link>
+            <Link to="/admin/dashboard" className="shrink-0">
+              <Button
+                variant="outline"
+                className={`h-11 px-5 rounded-xl border ${
+                  theme === "dark"
+                    ? "border-slate-700 hover:bg-slate-800 text-slate-200"
+                    : "border-slate-200 hover:bg-white text-slate-700"
+                }`}
+              >
+                Dashboard
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card
-            className={`rounded-3xl overflow-hidden border-2 ${
+        {moveSuccess && (
+          <div
+            className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${
               theme === "dark"
-                ? "bg-slate-900/50 border-slate-800 backdrop-blur-md"
-                : "bg-white border-slate-100"
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+                : "bg-emerald-50 border-emerald-200 text-emerald-800"
             }`}
           >
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-400">
-                <Users className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Total Pro Students
-                </p>
-                <p className="text-2xl font-black">
-                  {stats?.totalProStudents ?? (pagination?.total || 0)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            <span className="text-sm font-medium">{moveSuccess}</span>
+            <button
+              type="button"
+              className="text-xs opacity-70 hover:opacity-100"
+              onClick={() => setMoveSuccess("")}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
-          <Card
-            className={`rounded-3xl overflow-hidden border-2 ${
-              theme === "dark"
-                ? "bg-slate-900/50 border-slate-800 backdrop-blur-md"
-                : "bg-white border-slate-100"
-            }`}
-          >
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Active Subscriptions
-                </p>
-                <p className="text-2xl font-black">
-                  {stats?.activeProStudents ?? 0}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card
-            className={`rounded-3xl overflow-hidden border-2 ${
-              theme === "dark"
-                ? "bg-slate-900/50 border-slate-800 backdrop-blur-md"
-                : "bg-white border-slate-100"
-            }`}
-          >
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400">
-                <IndianRupee className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Active Plan Revenue*
-                </p>
-                <p className="text-lg font-black">
-                  {formatCurrency(stats?.totalActiveRevenue || 0)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {summaryStats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card
+                key={stat.label}
+                className={`rounded-2xl border shadow-sm transition-shadow hover:shadow-md ${
+                  theme === "dark"
+                    ? "bg-slate-900/50 border-slate-800"
+                    : "bg-white border-slate-100"
+                }`}
+              >
+                <CardContent className="p-4 sm:p-5 flex items-center gap-3.5">
+                  <div
+                    className={`h-11 w-11 rounded-full flex items-center justify-center shrink-0 ${stat.iconBg}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500 truncate">
+                      {stat.label}
+                    </p>
+                    <p className="text-xl sm:text-2xl font-bold tracking-tight mt-0.5">
+                      {stat.value}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Search */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Card
-            className={`flex-1 transition-all duration-300 ${
+        <form
+          onSubmit={handleSearch}
+          className={`flex items-center gap-2 rounded-2xl border px-3.5 h-12 shadow-sm ${
+            theme === "dark"
+              ? "bg-slate-900/50 border-slate-800"
+              : "bg-white border-slate-200"
+          }`}
+        >
+          <Search
+            className={`h-4 w-4 shrink-0 ${
+              theme === "dark" ? "text-slate-500" : "text-slate-400"
+            }`}
+          />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Find a pro student by name or email..."
+            className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm ${
               theme === "dark"
-                ? "bg-slate-900/40 border-slate-800 backdrop-blur-xl"
-                : "bg-white border-slate-200 shadow-sm"
-            } rounded-[2.5rem] overflow-hidden border-2`}
+                ? "text-slate-100 placeholder:text-slate-600"
+                : "text-slate-900 placeholder:text-slate-400"
+            }`}
+          />
+          <Button
+            type="submit"
+            className="h-8 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shrink-0"
           >
-            <CardContent className="p-2 px-4 flex items-center gap-2">
-              <Search
-                className={`h-5 w-5 ${
-                  theme === "dark" ? "text-slate-500" : "text-slate-400"
-                }`}
-              />
-              <form onSubmit={handleSearch} className="flex-1">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Find a pro student by name or email..."
-                  className={`w-full py-3 bg-transparent border-none focus:outline-none focus:ring-0 ${
-                    theme === "dark"
-                      ? "text-slate-100 placeholder:text-slate-600"
-                      : "text-slate-900 placeholder:text-slate-400"
-                  }`}
-                />
-              </form>
-              <Button
-                type="submit"
-                onClick={handleSearch}
-                className="rounded-2xl px-6 bg-slate-800 hover:bg-slate-700 text-white"
-              >
-                Search
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+            Search
+          </Button>
+        </form>
 
         {error && (
           <div
-            className={`p-5 rounded-3xl border flex items-center gap-4 ${
+            className={`p-4 rounded-2xl border flex items-center gap-3 ${
               theme === "dark"
                 ? "bg-red-500/10 border-red-500/20 text-red-400"
                 : "bg-red-50 border-red-200 text-red-700"
             }`}
           >
-            <span className="font-medium">{error}</span>
+            <span className="text-sm font-medium">{error}</span>
           </div>
         )}
 
-        {/* List */}
+        {!loading && students.length > 0 && (
+          <div className="flex items-center justify-between pt-1">
+            <p
+              className={`text-sm font-medium ${
+                theme === "dark" ? "text-slate-400" : "text-slate-500"
+              }`}
+            >
+              Showing{" "}
+              <span className={theme === "dark" ? "text-slate-200" : "text-slate-800"}>
+                {students.length}
+              </span>
+              {pagination?.total != null && pagination.total !== students.length && (
+                <> of {pagination.total}</>
+              )}{" "}
+              pro students
+            </p>
+          </div>
+        )}
+
+        {/* Grid — 4 profile boxes per row */}
         {loading && students.length === 0 ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className={`h-20 rounded-2xl animate-pulse ${
+                className={`h-72 rounded-2xl animate-pulse ${
                   theme === "dark" ? "bg-slate-900/50" : "bg-slate-200/50"
                 }`}
               />
@@ -305,144 +408,158 @@ export const AdminProStudentsPage = () => {
                 theme === "dark" ? "text-slate-500" : "text-slate-400"
               }`}
             >
-              When students upgrade from pricing, they will appear here.
+              New self-registered students appear here after they pay.
             </p>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {students.map((student) => (
-              <Card
-                key={student._id}
-                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10 hover:border-emerald-500/40 ${
-                  theme === "dark"
-                    ? "bg-slate-900/60 border-slate-800"
-                    : "bg-white border-slate-100"
-                }`}
-              >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                <CardContent className="px-5 py-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-black ${
-                          theme === "dark"
-                            ? "bg-emerald-500/15 text-emerald-300"
-                            : "bg-emerald-100 text-emerald-700"
-                        }`}
-                      >
-                        {student.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold truncate leading-tight">
-                          {student.name}
-                        </h3>
-                        <p className="text-xs truncate mt-0.5 opacity-60">
-                          {student.email}
-                        </p>
-                      </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {students.map((student) => {
+              const isActive = student.subscriptionStatus === "active";
+              return (
+                <Card
+                  key={student._id}
+                  className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-md hover:border-emerald-400/50 ${
+                    theme === "dark"
+                      ? "bg-slate-900/60 border-slate-800"
+                      : "bg-white border-slate-200 shadow-sm"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    title="Delete student"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setStudentToDelete(student);
+                      setDeleteError("");
+                    }}
+                    className={`absolute top-3 right-3 z-10 h-8 w-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all ${
+                      theme === "dark"
+                        ? "text-slate-500 hover:text-red-400 hover:bg-red-500/15"
+                        : "text-slate-400 hover:text-red-500 hover:bg-red-50"
+                    }`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+
+                  <CardContent className="p-5 pt-6 flex flex-col items-center text-center h-full">
+                    <div
+                      className={`h-14 w-14 rounded-full flex items-center justify-center text-lg font-bold mb-3 ring-4 ${
+                        theme === "dark"
+                          ? "bg-emerald-500/20 text-emerald-300 ring-emerald-500/10"
+                          : "bg-emerald-50 text-emerald-700 ring-emerald-50"
+                      }`}
+                    >
+                      {getInitials(student.name)}
                     </div>
-                    <div className="text-right text-[11px]">
-                      <div
-                        className={`inline-flex items-center px-2 py-1 rounded-full font-semibold ${
-                          student.subscriptionStatus === "active"
-                            ? theme === "dark"
-                              ? "bg-emerald-500/15 text-emerald-300"
-                              : "bg-emerald-50 text-emerald-700"
-                            : theme === "dark"
-                            ? "bg-slate-800 text-slate-300"
-                            : "bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {student.subscriptionStatus === "active"
-                          ? "Active"
-                          : "Inactive"}
-                      </div>
-                      <p className="mt-1 opacity-60">
-                        Joined {formatDate(student.createdAt)}
+
+                    <h3 className="text-[15px] font-semibold truncate w-full px-6 leading-tight">
+                      {student.name}
+                    </h3>
+                    <p
+                      className={`text-xs truncate w-full mt-1 ${
+                        theme === "dark" ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
+                      {student.email}
+                    </p>
+
+                    <span
+                      className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                        isActive
+                          ? theme === "dark"
+                            ? "bg-emerald-500/15 text-emerald-300"
+                            : "bg-emerald-50 text-emerald-700"
+                          : theme === "dark"
+                          ? "bg-slate-800 text-slate-300"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {isActive ? "Active" : "Inactive"}
+                    </span>
+
+                    <div
+                      className={`w-full mt-4 rounded-xl overflow-hidden text-left px-3 py-2.5 ${
+                        theme === "dark" ? "bg-slate-800/50" : "bg-slate-50"
+                      }`}
+                    >
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                        Plan
+                      </p>
+                      <p className="text-sm font-semibold truncate mt-0.5">
+                        {student.plan?.name || "—"}
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                        {student.plan
+                          ? `${formatCurrency(student.plan.price)} · ${student.plan.duration}`
+                          : "No plan attached"}
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-1.5 truncate">
+                        {formatDate(student.subscriptionStartDate)} →{" "}
+                        {formatDate(student.subscriptionEndDate)}
                       </p>
                     </div>
-                  </div>
 
-                  <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <div className="flex flex-1 gap-6">
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
-                          Plan
-                        </p>
-                        <p className="text-sm font-semibold">
-                          {student.plan?.name || "—"}
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          {student.plan
-                            ? `${formatCurrency(student.plan.price)} • ${
-                                student.plan.duration
-                              }`
-                            : "No plan attached"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
-                          Period
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          {formatDate(student.subscriptionStartDate)} →{" "}
-                          {formatDate(student.subscriptionEndDate)}
-                        </p>
-                      </div>
+                    <div className="mt-3 w-full">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setStudentToMove(student);
+                          setMoveError("");
+                        }}
+                        className={`w-full rounded-xl h-8 text-xs font-semibold ${
+                          theme === "dark"
+                            ? "border-emerald-800 text-emerald-400 hover:bg-emerald-950/30"
+                            : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                        }`}
+                      >
+                        <UserCheck className="h-3.5 w-3.5 mr-1.5" />
+                        To Students
+                      </Button>
                     </div>
-                    <div className="flex items-center justify-between md:justify-end gap-2 md:min-w-[280px] shrink-0">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold opacity-50">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span>{formatDate(student.createdAt)}</span>
+
+                    <div
+                      className={`mt-auto pt-3 w-full flex items-center justify-between gap-2 border-t ${
+                        theme === "dark" ? "border-slate-800" : "border-slate-100"
+                      }`}
+                    >
+                      <div
+                        className={`flex items-center gap-1.5 text-[11px] ${
+                          theme === "dark" ? "text-slate-500" : "text-slate-400"
+                        }`}
+                      >
+                        <Calendar className="h-3 w-3 shrink-0" />
+                        <span>
+                          {new Date(student.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setStudentToDelete(student);
-                            setDeleteError("");
-                          }}
-                          className={`rounded-xl h-8 px-3 text-xs font-semibold flex items-center gap-1.5 ${
-                            theme === "dark"
-                              ? "border-red-800 text-red-400 hover:bg-red-950/30"
-                              : "border-red-200 text-red-600 hover:bg-red-50"
-                          }`}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          Delete
-                        </Button>
-                        <Link to={`/admin/students/${student._id}`}>
-                          <Button
-                            variant="ghost"
-                            className="rounded-xl h-8 px-3 hover:bg-emerald-500/10 hover:text-emerald-400 flex items-center gap-1.5 text-xs font-semibold"
-                          >
-                            Profile
-                            <ArrowRight className="h-3 w-3" />
-                          </Button>
-                        </Link>
-                      </div>
+                      <Link
+                        to={`/admin/students/${student._id}`}
+                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group/btn"
+                      >
+                        Profile
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
+                      </Link>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="flex justify-center mt-12 mb-8">
+          <div className="flex justify-center mt-8 mb-4">
             <Card
-              className={`rounded-3xl border-2 p-1.5 ${
+              className={`rounded-3xl border p-1.5 shadow-sm ${
                 theme === "dark"
                   ? "bg-slate-900/60 border-slate-800"
-                  : "bg-white border-slate-200 shadow-md"
+                  : "bg-white border-slate-200"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -551,7 +668,98 @@ export const AdminProStudentsPage = () => {
           </Card>
         </div>
       )}
+
+      {studentToMove && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-[#020012]/90 backdrop-blur-xl p-4"
+          onClick={() => !isMoving && setStudentToMove(null)}
+        >
+          <Card
+            className={`w-full max-w-md rounded-[2rem] border-2 shadow-xl ${
+              theme === "dark" ? "bg-slate-900 border-emerald-500/20" : "bg-white border-emerald-100"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader className="flex flex-col items-center pt-8 pb-2 text-center">
+              <div className="p-5 rounded-2xl bg-emerald-500/10 mb-4">
+                <UserCheck className="h-10 w-10 text-emerald-500" />
+              </div>
+              <CardTitle className="text-2xl font-black">Move to Admin Students?</CardTitle>
+              <p className="mt-2 px-6 text-sm opacity-60">
+                Move <span className="font-bold">{studentToMove.name}</span> to Admin Students with free access (no payment required).
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 pt-2 space-y-4">
+              {moveError && (
+                <p className="text-sm text-red-500 text-center">{moveError}</p>
+              )}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl"
+                  onClick={() => setStudentToMove(null)}
+                  disabled={isMoving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                  onClick={handleMoveStudent}
+                  disabled={isMoving}
+                >
+                  {isMoving ? "Moving..." : "Move"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {moveAllConfirm && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-[#020012]/90 backdrop-blur-xl p-4"
+          onClick={() => !isMoving && setMoveAllConfirm(false)}
+        >
+          <Card
+            className={`w-full max-w-md rounded-[2rem] border-2 shadow-xl ${
+              theme === "dark" ? "bg-slate-900 border-emerald-500/20" : "bg-white border-emerald-100"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader className="flex flex-col items-center pt-8 pb-2 text-center">
+              <div className="p-5 rounded-2xl bg-emerald-500/10 mb-4">
+                <Users className="h-10 w-10 text-emerald-500" />
+              </div>
+              <CardTitle className="text-2xl font-black">Move All to Admin Students?</CardTitle>
+              <p className="mt-2 px-6 text-sm opacity-60">
+                All current pro / paid-user students will move to Admin Students and get free access. New self-registered users will still need to pay to appear here.
+              </p>
+            </CardHeader>
+            <CardContent className="p-6 pt-2 space-y-4">
+              {moveError && (
+                <p className="text-sm text-red-500 text-center">{moveError}</p>
+              )}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 rounded-xl"
+                  onClick={() => setMoveAllConfirm(false)}
+                  disabled={isMoving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700"
+                  onClick={handleMoveAll}
+                  disabled={isMoving}
+                >
+                  {isMoving ? "Moving..." : "Move All"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
-

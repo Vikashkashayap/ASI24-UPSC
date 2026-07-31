@@ -2,7 +2,7 @@ import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,15 +15,15 @@ const DartFormModal = lazyNamed(
 
 // Mobile-first nav link: clear active state, comfortable touch targets
 const navLinkClass = ({ isActive, theme, collapsed, muted }: { isActive: boolean; theme: "dark" | "light"; collapsed?: boolean; muted?: boolean }) =>
-  `flex items-center ${collapsed ? "justify-center" : "gap-2.5"} ${collapsed ? "px-2" : "px-2.5"} py-2 rounded-lg text-[13px] font-medium transition-colors duration-150 min-h-[40px] touch-manipulation relative group ${theme === "dark"
+  `flex items-center ${collapsed ? "justify-center" : "gap-2.5"} ${collapsed ? "px-2" : "px-3"} py-2 rounded-xl text-[13px] font-medium transition-all duration-150 min-h-[42px] touch-manipulation relative group ${theme === "dark"
     ? `hover:bg-white/[0.06] active:bg-white/[0.08] ${isActive
-      ? "bg-blue-500/15 text-white before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-[3px] before:rounded-r-full before:bg-blue-400"
+      ? "bg-blue-500/15 text-white shadow-[inset_0_0_0_1px_rgba(96,165,250,0.12)] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-5 before:w-[3px] before:rounded-r-full before:bg-blue-400"
       : muted
         ? "text-slate-500 hover:text-slate-300"
         : "text-slate-300"
     }`
-    : `hover:bg-slate-100 active:bg-slate-200 ${isActive
-      ? "bg-blue-50 text-blue-700 font-semibold before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-[3px] before:rounded-r-full before:bg-blue-600"
+    : `hover:bg-slate-100/90 active:bg-slate-200/80 ${isActive
+      ? "bg-blue-50 text-blue-700 font-semibold shadow-[inset_0_0_0_1px_rgba(37,99,235,0.08)] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-5 before:w-[3px] before:rounded-r-full before:bg-blue-600"
       : muted
         ? "text-slate-500 hover:text-slate-700"
         : "text-slate-600"
@@ -31,10 +31,10 @@ const navLinkClass = ({ isActive, theme, collapsed, muted }: { isActive: boolean
   }`;
 
 const sidebarSectionLabelClass = (theme: "dark" | "light") =>
-  `px-2.5 mb-1 mt-3 text-[10px] font-semibold uppercase tracking-[0.08em] ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`;
+  `px-3 mb-1.5 mt-4 first:mt-1 text-[10px] font-bold uppercase tracking-[0.1em] ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`;
 
 const sidebarNavIconClass = (isActive: boolean, theme: "dark" | "light") =>
-  `w-[17px] h-[17px] flex-shrink-0 stroke-[2] ${isActive
+  `w-[17px] h-[17px] flex-shrink-0 stroke-[2] transition-colors ${isActive
     ? theme === "dark" ? "text-blue-300" : "text-blue-600"
     : theme === "dark" ? "text-slate-400 group-hover:text-slate-200" : "text-slate-500 group-hover:text-slate-700"
   }`;
@@ -101,18 +101,18 @@ const SidebarSection = ({
     {!collapsed && label ? <div className={sidebarSectionLabelClass(theme)}>{label}</div> : null}
     {collapsed && label ? (
       <div
-        className={`mx-auto my-2 h-px w-6 ${theme === "dark" ? "bg-slate-700/80" : "bg-slate-200"}`}
+        className={`mx-auto my-2.5 h-px w-6 ${theme === "dark" ? "bg-slate-700/80" : "bg-slate-200"}`}
         aria-hidden
       />
     ) : null}
-    <div className="space-y-0.5">{children}</div>
+    <div className="space-y-1">{children}</div>
   </div>
 );
 
 
 const getPageTitle = (pathname: string, userRole?: string): { title: string; icon: React.ReactNode } => {
   const studentRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
-    '/home': { title: 'Home', icon: <Home className="w-5 h-5" /> },
+    '/home': { title: 'Daily Targets', icon: <Target className="w-5 h-5" /> },
     '/syllabus': { title: 'Syllabus', icon: <BookOpen className="w-5 h-5" /> },
     '/performance': { title: 'Performance Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
     '/planner': { title: 'Study Planner', icon: <CalendarClock className="w-5 h-5" /> },
@@ -120,9 +120,9 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/copy-evaluation': { title: 'Copy Evaluation', icon: <FileText className="w-5 h-5" /> },
     // '/evaluation-history': { title: 'Evaluation History', icon: <History className="w-5 h-5" /> },
     '/prelims-test': { title: 'Practice Test', icon: <ClipboardList className="w-5 h-5" /> },
-    '/practice-test': { title: 'Modular Test', icon: <Target className="w-5 h-5" /> },
+    '/practice-test': { title: 'Modular Test', icon: <Layers className="w-5 h-5" /> },
     '/practice-test/history': { title: 'Modular Test History', icon: <History className="w-5 h-5" /> },
-    '/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
+    '/prelims-mock': { title: 'Prelims Test Series', icon: <Award className="w-5 h-5" /> },
     '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     '/module-chapter-history': { title: 'Chapter Test History', icon: <History className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
@@ -144,9 +144,9 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
 
   const adminRouteMap: Record<string, { title: string; icon: React.ReactNode }> = {
     '/admin/dashboard': { title: 'Admin Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
-    '/admin/students': { title: 'Students Management', icon: <Users className="w-5 h-5" /> },
+    '/admin/students': { title: 'MD Student', icon: <Users className="w-5 h-5" /> },
     '/admin/mentors': { title: 'Mentors', icon: <Users className="w-5 h-5" /> },
-    '/admin/prelims-mock': { title: 'Prelims Test Series', icon: <Target className="w-5 h-5" /> },
+    '/admin/prelims-mock': { title: 'Prelims Test Series', icon: <Award className="w-5 h-5" /> },
     '/admin/knowledge-base': { title: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
     '/admin/processing': { title: 'Processing Engine', icon: <Activity className="w-5 h-5" /> },
     '/admin/intelligence': { title: 'Knowledge Intelligence', icon: <Brain className="w-5 h-5" /> },
@@ -217,20 +217,26 @@ const SubscriptionCard = ({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       title={planName}
-      className={`w-full text-left flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-colors ${
-        onClick ? "hover:brightness-110 active:scale-[0.99] cursor-pointer" : ""
+      className={`w-full text-left flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-150 ${
+        onClick ? "hover:brightness-[1.03] active:scale-[0.99] cursor-pointer" : ""
       } ${
         theme === "dark"
-          ? "bg-blue-600/90 text-white ring-1 ring-blue-500/40"
-          : "bg-blue-600 text-white ring-1 ring-blue-500/20"
+          ? "bg-gradient-to-br from-blue-600/25 to-blue-500/10 text-blue-100 ring-1 ring-blue-400/25"
+          : "bg-gradient-to-br from-blue-50 to-sky-50 text-blue-900 ring-1 ring-blue-200/80"
       }`}
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
-        <Crown className="w-3.5 h-3.5 text-white" />
+      <span
+        className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${
+          theme === "dark" ? "bg-blue-500/30 text-blue-200" : "bg-blue-600 text-white"
+        }`}
+      >
+        <Crown className="w-3.5 h-3.5" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold leading-snug truncate">{planName}</p>
-        <p className="text-[10px] font-medium text-blue-100/90 truncate">
+        <p className={`text-[12px] font-semibold leading-snug truncate ${theme === "dark" ? "text-white" : "text-blue-950"}`}>
+          {planName}
+        </p>
+        <p className={`text-[10px] font-medium truncate ${theme === "dark" ? "text-blue-200/80" : "text-blue-700/80"}`}>
           Active{expiry ? ` · until ${expiry}` : ""}
         </p>
       </div>
@@ -454,7 +460,7 @@ export const DashboardLayout = () => {
           </div>
         </div>
         <nav
-          className={`${sidebarCollapsed ? "px-2" : "px-2.5"} py-3 space-y-1 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`}
+          className={`${sidebarCollapsed ? "px-2" : "px-3"} py-4 space-y-1 flex-1 overflow-y-auto scroll-smooth scrollbar-hide`}
           onClick={() => setMobileMenuOpen(false)}
         >
 
@@ -466,9 +472,9 @@ export const DashboardLayout = () => {
                   <BarChart3 className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Admin Dashboard</span>}
                 </NavLink>
-                <NavLink to="/admin/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Students Management">
+                <NavLink to="/admin/students" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="MD Student">
                   <Users className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Students</span>}
+                  {!sidebarCollapsed && <span>MD Student</span>}
                 </NavLink>
                 <NavLink to="/admin/mentors" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Mentors">
                   <Users className="w-4 h-4 flex-shrink-0" />
@@ -479,7 +485,7 @@ export const DashboardLayout = () => {
                   {!sidebarCollapsed && <span>Pro Students</span>}
                 </NavLink>
                 <NavLink to="/admin/prelims-mock" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Prelims Mock - Schedule tests">
-                  <Target className="w-4 h-4 flex-shrink-0" />
+                  <Award className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
                 </NavLink>
                 <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Base — upload notes, PDFs & PYQs">
@@ -577,7 +583,7 @@ export const DashboardLayout = () => {
             // Student Navigation
             <>
               {!sidebarCollapsed && (
-                <div className="mb-2 px-0.5">
+                <div className="mb-4 px-0.5">
                   {hasActiveSubscription ? (
                     <SubscriptionCard
                       planName={user?.subscriptionPlan?.name || "Pro Plan"}
@@ -591,10 +597,14 @@ export const DashboardLayout = () => {
                   ) : (
                     <NavLink
                       to="/pricing"
-                      className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-left transition-colors bg-blue-600 hover:bg-blue-700 text-white ring-1 ring-blue-500/20"
+                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all duration-150 ${
+                        theme === "dark"
+                          ? "bg-gradient-to-br from-blue-600/30 to-blue-500/10 text-white ring-1 ring-blue-400/25 hover:from-blue-600/40"
+                          : "bg-gradient-to-br from-blue-600 to-blue-700 text-white ring-1 ring-blue-500/20 hover:brightness-105"
+                      }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 shrink-0">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 shrink-0">
                         <Sparkles className="w-3.5 h-3.5 text-white" />
                       </span>
                       <div className="min-w-0">
@@ -610,10 +620,10 @@ export const DashboardLayout = () => {
                   type="button"
                   title={user?.subscriptionPlan?.name || "Pro Plan"}
                   onClick={() => navigate("/profile")}
-                  className={`mb-2 mx-auto flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+                  className={`mb-3 mx-auto flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
                     theme === "dark"
                       ? "bg-blue-600/20 text-blue-300 hover:bg-blue-600/30"
-                      : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      : "bg-blue-50 text-blue-600 hover:bg-blue-100 ring-1 ring-blue-100"
                   }`}
                 >
                   <Crown className="w-4 h-4" />
@@ -623,9 +633,9 @@ export const DashboardLayout = () => {
               <SidebarSection label="General" theme={theme} collapsed={sidebarCollapsed}>
                 <SidebarNavItem
                   to="/home"
-                  title="Home"
-                  icon={Home}
-                  label="Home"
+                  title="Daily Targets"
+                  icon={Target}
+                  label="Daily Targets"
                   theme={theme}
                   collapsed={sidebarCollapsed}
                   pathname={location.pathname}
@@ -688,7 +698,7 @@ export const DashboardLayout = () => {
                 <SidebarNavItem
                   to="/practice-test"
                   title="Modular Test — admin assigned"
-                  icon={Target}
+                  icon={Layers}
                   label="Modular Test"
                   theme={theme}
                   collapsed={sidebarCollapsed}
@@ -699,7 +709,7 @@ export const DashboardLayout = () => {
                 <SidebarNavItem
                   to="/prelims-mock"
                   title="Prelims Test Series — scheduled tests"
-                  icon={Layers}
+                  icon={Award}
                   label="Prelims Test Series"
                   theme={theme}
                   collapsed={sidebarCollapsed}
@@ -747,12 +757,12 @@ export const DashboardLayout = () => {
 
         {/* Bottom Actions */}
         <div
-          className={`${sidebarCollapsed ? "px-2" : "px-2.5"} py-2.5 border-t flex-shrink-0 ${
+          className={`${sidebarCollapsed ? "px-2" : "px-3"} py-3 border-t flex-shrink-0 ${
             theme === "dark" ? "border-slate-800/80 bg-[#0B1220]" : "border-gray-200 bg-white"
           }`}
         >
           <div className="space-y-0.5">
-            <SidebarNavItem
+            {/* <SidebarNavItem
               to="/profile"
               title="Settings"
               icon={Settings}
@@ -762,7 +772,7 @@ export const DashboardLayout = () => {
               pathname={location.pathname}
               muted
               onNavigate={() => setMobileMenuOpen(false)}
-            />
+            /> */}
             <SidebarNavItem
               to="/help-support"
               title="Help & Support"
@@ -777,8 +787,8 @@ export const DashboardLayout = () => {
             <button
               onClick={logout}
               className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-2.5"} ${
-                sidebarCollapsed ? "px-2" : "px-2.5"
-              } py-2 rounded-lg text-[13px] font-medium transition-colors min-h-[40px] touch-manipulation group ${
+                sidebarCollapsed ? "px-2" : "px-3"
+              } py-2 rounded-xl text-[13px] font-medium transition-colors min-h-[42px] touch-manipulation group ${
                 theme === "dark"
                   ? "text-slate-400 hover:bg-red-500/10 hover:text-red-300"
                   : "text-slate-500 hover:bg-red-50 hover:text-red-600"
@@ -966,13 +976,13 @@ export const DashboardLayout = () => {
               <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full ${theme === "dark" ? "bg-blue-400" : "bg-[#2563eb]"
                 }`} />
             )}
-            <Home className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/home"
+            <Target className={`w-4 h-4 transition-all duration-200 ${location.pathname === "/home"
                 ? "scale-105"
                 : "scale-100"
               }`} />
             <span className={`text-[9px] font-medium leading-tight ${location.pathname === "/home" ? "font-semibold" : "font-normal"
               }`}>
-              Home
+              Targets
             </span>
           </NavLink>
 

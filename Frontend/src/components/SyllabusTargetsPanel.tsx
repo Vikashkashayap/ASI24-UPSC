@@ -734,17 +734,6 @@ function parseDailyHours(value?: string) {
   return 3;
 }
 
-function recommendedSegmentByBackground(background?: string): Segment {
-  const normalized = (background || "").toLowerCase();
-  if (normalized.includes("arts")) return "history";
-  if (normalized.includes("engineering")) return "polity";
-  if (normalized.includes("science")) return "geography";
-  if (normalized.includes("medical")) return "geography";
-  if (normalized.includes("commerce")) return "prelims";
-  if (normalized.includes("law")) return "mains";
-  return "prelims";
-}
-
 function defaultHistoryPartForProfile(background?: string): HistoryPart {
   const normalized = (background || "").toLowerCase();
   if (normalized.includes("arts")) return "modern_history";
@@ -1037,11 +1026,33 @@ function GenericSyllabusSection(props: {
   const { modules, showPrelimsImportance = true } = props;
   return (
     <div className="sd-syll-scroll">
-      {modules.map((module, index) => (
+      <div className="sd-syll-modules-toolbar">
+        <span className="sd-syll-modules-count">
+          {modules.length} module{modules.length === 1 ? "" : "s"}
+        </span>
+        <span className="sd-syll-modules-hint">Tap a module to expand chapters &amp; notes</span>
+      </div>
+      <div className="sd-syll-modules-grid">
+      {modules.map((module, index) => {
+        const topicCount = (module.topics ?? []).length;
+        return (
         <details key={String(module.module_id)} className="sd-syll-block">
           <summary>
             <div className="sd-p-module-summary">
-              <span className="sd-p-module-title">{module.module_name}</span>
+              <div className="sd-p-module-main">
+                <span className="sd-p-module-num">
+                  {String(moduleDisplayNumber(module, index)).padStart(2, "0")}
+                </span>
+                <div className="sd-p-module-copy">
+                  <span className="sd-p-module-title">{module.module_name}</span>
+                  {topicCount > 0 ? (
+                    <span className="sd-p-module-sub">
+                      {topicCount} topic{topicCount === 1 ? "" : "s"}
+                      {module.importance ? ` · ${module.importance}` : ""}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
               <span className="sd-p-module-pills">
                 <span className="sd-p-pill">Module #{moduleDisplayNumber(module, index)}</span>
               </span>
@@ -1175,7 +1186,9 @@ function GenericSyllabusSection(props: {
             ))}
           </div>
         </details>
-      ))}
+        );
+      })}
+      </div>
     </div>
   );
 }
@@ -1271,7 +1284,7 @@ export function SyllabusTargetsPanel({
   title = "Today's Targets",
   studentProfile,
 }: Props & { studentProfile?: StudentProfile }) {
-  const [segment, setSegment] = useState<Segment>(recommendedSegmentByBackground(studentProfile?.educationBackground));
+  const [segment, setSegment] = useState<Segment | null>("prelims");
   const [prelimsSubject, setPrelimsSubject] = useState<PrelimsSubject>("overview");
   const [historyPart, setHistoryPart] = useState<HistoryPart>(() => defaultHistoryPartForProfile(studentProfile?.educationBackground));
   const [geographyPart, setGeographyPart] = useState<GeographyPart>(() =>
@@ -1373,6 +1386,7 @@ export function SyllabusTargetsPanel({
   const dailyTargetsCount = Math.max(2, Math.min(6, Math.round(dailyHours)));
 
   const subtitle = useMemo(() => {
+    if (!segment) return "Pick a subject above to browse modules, topics, and study notes";
     if (segment === "prelims") {
       if (prelimsSubject === "overview") return "Prelims — GS Paper I & CSAT (full topic tree)";
       if (prelimsSubject === "polity") return "Prelims — Indian Polity & Governance (module-wise)";
@@ -1410,18 +1424,20 @@ export function SyllabusTargetsPanel({
 
   return (
     <>
-      <div className="sd-card-hd">
+      <div className="sd-card-hd sd-syll-hd">
         <div>
           <h3>{title}</h3>
           <p className="sd-syll-deck">{subtitle}</p>
-          <p className="sd-syll-deck">{planHint}</p>
+          <p className="sd-syll-deck sd-syll-plan">{planHint}</p>
         </div>
-        <small>{todayLabel}</small>
+        <span className="sd-syll-today-chip">{todayLabel}</span>
       </div>
 
       <div className="sd-syll-meta-bar">
         <span>
-          {segment === "prelims" && prelimsSubject === "polity"
+          {!segment
+            ? "Choose any subject from the list below"
+            : segment === "prelims" && prelimsSubject === "polity"
             ? `Polity v${polityMeta.version ?? "1.x"}`
             : segment === "prelims" && prelimsSubject === "history"
               ? historyMetaSnippet(historyPart, ancientMeta, medievalMeta, modernMeta, worldMeta)
@@ -1506,12 +1522,21 @@ export function SyllabusTargetsPanel({
             role="tab"
             aria-selected={segment === id}
             className={segment === id ? "active" : ""}
-            onClick={() => setSegment(id)}
+            onClick={() => setSegment((prev) => (prev === id ? null : id))}
           >
             {label}
           </button>
         ))}
       </div>
+
+      {!segment ? (
+        <div className="sd-syll-empty-pick">
+          <p className="sd-syll-empty-pick-title">No subject selected</p>
+          <p className="sd-syll-empty-pick-copy">
+            Select Polity, History, Economy, or any other subject from the tabs above to view its modules.
+          </p>
+        </div>
+      ) : null}
 
       {segment === "history" ? (
         <div className="sd-syll-history-group">

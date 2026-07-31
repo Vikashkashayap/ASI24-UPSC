@@ -8,7 +8,6 @@ import { api } from "../../services/api";
 import { useTheme } from "../../hooks/useTheme";
 import {
   ArrowLeft,
-  User,
   Mail,
   Calendar,
   FileText,
@@ -17,7 +16,6 @@ import {
   TrendingDown,
   Activity,
   Target,
-  BookOpen,
   Award,
   AlertTriangle,
   CheckCircle,
@@ -203,12 +201,24 @@ export const StudentDetailPage = () => {
   const [mentorFeedbackMessage, setMentorFeedbackMessage] = useState("");
   const [mentorFeedbackSending, setMentorFeedbackSending] = useState(false);
   const [mentorFeedbackList, setMentorFeedbackList] = useState<Array<{ message: string; createdAt: string }>>([]);
+  const [prelimsPage, setPrelimsPage] = useState(1);
+  const [mainsPage, setMainsPage] = useState(1);
+  const [activityPage, setActivityPage] = useState(1);
+
+  const HISTORY_PAGE_SIZE = 9;
 
   useEffect(() => {
     if (id) {
       fetchStudentData();
     }
   }, [id, timeFilter, isMentorView]);
+
+  // Reset list pages when student / time filter changes
+  useEffect(() => {
+    setPrelimsPage(1);
+    setMainsPage(1);
+    setActivityPage(1);
+  }, [id, timeFilter]);
 
   useEffect(() => {
     if (id && activeTab === "analytics") {
@@ -426,9 +436,236 @@ export const StudentDetailPage = () => {
       }))
     : [];
 
+  const paginateList = <T,>(items: T[] | undefined, page: number) => {
+    const list = items || [];
+    const total = list.length;
+    const totalPages = Math.max(1, Math.ceil(total / HISTORY_PAGE_SIZE));
+    const currentPage = Math.min(Math.max(1, page), totalPages);
+    const start = (currentPage - 1) * HISTORY_PAGE_SIZE;
+    return {
+      items: list.slice(start, start + HISTORY_PAGE_SIZE),
+      total,
+      totalPages,
+      currentPage,
+      hasPrev: currentPage > 1,
+      hasNext: currentPage < totalPages,
+      start: total === 0 ? 0 : start + 1,
+      end: Math.min(start + HISTORY_PAGE_SIZE, total),
+    };
+  };
+
+  const paginatedPrelims = paginateList(prelimsData?.tests, prelimsPage);
+  const paginatedMains = paginateList(mainsData?.evaluations, mainsPage);
+  const paginatedActivity = paginateList(activityData?.activities, activityPage);
+
+  const visiblePageNumbers = (currentPage: number, totalPages: number) => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages = new Set<number>([1, totalPages, currentPage]);
+    for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+      if (i >= 1 && i <= totalPages) pages.add(i);
+    }
+    return Array.from(pages).sort((a, b) => a - b);
+  };
+
+  const renderListPagination = (
+    meta: {
+      total: number;
+      totalPages: number;
+      currentPage: number;
+      hasPrev: boolean;
+      hasNext: boolean;
+      start: number;
+      end: number;
+    },
+    setPage: (page: number) => void
+  ) => {
+    if (meta.total <= HISTORY_PAGE_SIZE) return null;
+    const pages = visiblePageNumbers(meta.currentPage, meta.totalPages);
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 mt-2">
+        <p
+          className={`text-xs sm:text-sm ${
+            theme === "dark" ? "text-slate-400" : "text-slate-500"
+          }`}
+        >
+          Showing{" "}
+          <span className={theme === "dark" ? "text-slate-200" : "text-slate-800"}>
+            {meta.start}–{meta.end}
+          </span>{" "}
+          of {meta.total}
+        </p>
+        <div
+          className={`flex items-center gap-1 rounded-2xl border p-1 ${
+            theme === "dark"
+              ? "bg-slate-900/60 border-slate-800"
+              : "bg-white border-slate-200 shadow-sm"
+          }`}
+        >
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setPage(Math.max(1, meta.currentPage - 1))}
+            disabled={!meta.hasPrev}
+            className="h-9 px-3 rounded-xl text-sm"
+          >
+            Prev
+          </Button>
+          <div className="flex items-center gap-0.5">
+            {pages.map((page, idx) => {
+              const prev = pages[idx - 1];
+              const showEllipsis = prev != null && page - prev > 1;
+              return (
+                <span key={page} className="flex items-center">
+                  {showEllipsis && (
+                    <span
+                      className={`px-1 text-xs ${
+                        theme === "dark" ? "text-slate-500" : "text-slate-400"
+                      }`}
+                    >
+                      …
+                    </span>
+                  )}
+                  <Button
+                    type="button"
+                    variant={meta.currentPage === page ? "default" : "ghost"}
+                    onClick={() => setPage(page)}
+                    className={`h-9 w-9 p-0 rounded-xl text-sm font-semibold ${
+                      meta.currentPage === page
+                        ? "bg-blue-600 hover:bg-blue-700 text-white"
+                        : ""
+                    }`}
+                  >
+                    {page}
+                  </Button>
+                </span>
+              );
+            })}
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setPage(Math.min(meta.totalPages, meta.currentPage + 1))}
+            disabled={!meta.hasNext}
+            className="h-9 px-3 rounded-xl text-sm"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  const timeFilterLabel =
+    timeFilter === "today"
+      ? "Today"
+      : timeFilter === "week"
+        ? "This Week"
+        : timeFilter === "month"
+          ? "This Month"
+          : "All Time";
+
+  const periodFilters: Array<{
+    key: "all" | "today" | "week" | "month";
+    label: string;
+    icon: typeof Activity;
+  }> = [
+    { key: "all", label: "All Time", icon: Activity },
+    { key: "today", label: "Today", icon: Sunrise },
+    { key: "week", label: "This Week", icon: CalendarDays },
+    { key: "month", label: "This Month", icon: CalendarRange },
+  ];
+
+  const summaryStats = performanceSummary
+    ? [
+        {
+          label: "Total Evaluations",
+          value: String(performanceSummary.totalEvaluations),
+          icon: ClipboardCheck,
+          iconBg: "bg-blue-500/10 text-blue-500",
+          valueClass: "",
+        },
+        {
+          label: "Average Score",
+          value: `${Number(performanceSummary.averageScore || 0).toFixed(1)}%`,
+          icon: Target,
+          iconBg: "bg-sky-500/10 text-sky-500",
+          valueClass: "",
+        },
+        {
+          label: "Highest Score",
+          value: `${performanceSummary.highestScore}%`,
+          icon: Award,
+          iconBg: "bg-emerald-500/10 text-emerald-500",
+          valueClass: "text-emerald-500",
+        },
+        {
+          label: "Lowest Score",
+          value: `${performanceSummary.lowestScore}%`,
+          icon: AlertTriangle,
+          iconBg: "bg-amber-500/10 text-amber-500",
+          valueClass: "text-amber-500",
+        },
+        {
+          label: "Improvement",
+          value: `${performanceSummary.improvementPercentage > 0 ? "+" : ""}${performanceSummary.improvementPercentage}%`,
+          icon: performanceSummary.improvementPercentage >= 0 ? TrendingUp : TrendingDown,
+          iconBg:
+            performanceSummary.improvementPercentage >= 0
+              ? "bg-emerald-500/10 text-emerald-500"
+              : "bg-red-500/10 text-red-500",
+          valueClass:
+            performanceSummary.improvementPercentage >= 0
+              ? "text-emerald-500"
+              : "text-red-500",
+        },
+      ]
+    : [];
+
+  const tabs: Array<{
+    key: "overview" | "prelims" | "mains" | "activity" | "analytics";
+    label: string;
+    icon: typeof BarChart3;
+    count?: number;
+  }> = [
+    { key: "overview", label: "Overview", icon: BarChart3 },
+    {
+      key: "prelims",
+      label: "Prelims",
+      icon: FileText,
+      count: prelimsData?.statistics.totalTests || 0,
+    },
+    {
+      key: "mains",
+      label: "Mains",
+      icon: ClipboardCheck,
+      count: mainsData?.statistics.totalEvaluations || 0,
+    },
+    {
+      key: "activity",
+      label: "Activity",
+      icon: Activity,
+      count: activityData?.totalActivities || 0,
+    },
+    { key: "analytics", label: "Analytics (DART)", icon: PieChart },
+  ];
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className={`min-h-screen flex items-center justify-center ${
+          theme === "dark" ? "bg-[#020012]" : "bg-slate-50"
+        }`}
+      >
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -436,449 +673,349 @@ export const StudentDetailPage = () => {
 
   if (error || !student) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">{error || "Student not found"}</div>
+      <div
+        className={`min-h-screen flex items-center justify-center p-6 ${
+          theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+        }`}
+      >
+        <div
+          className={`p-4 rounded-2xl border flex items-center gap-3 ${
+            theme === "dark"
+              ? "bg-red-500/10 border-red-500/20 text-red-400"
+              : "bg-red-50 border-red-200 text-red-700"
+          }`}
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0" />
+          <span className="text-sm font-medium">{error || "Student not found"}</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen p-6 transition-colors duration-300 ${
-      theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
-    }`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+    <div
+      className={`min-h-screen p-4 sm:p-6 transition-colors duration-500 ${
+        theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+      } font-sans`}
+    >
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div>
           <Link to={isMentorView ? "/mentor-dashboard/students" : "/admin/students"}>
-            <Button variant="outline" className={`${
-              theme === "dark"
-                ? "border-slate-700 hover:bg-slate-800 text-slate-300"
-                : "border-slate-300 hover:bg-slate-100 text-slate-700"
-            }`}>
+            <Button
+              variant="outline"
+              className={`h-10 px-4 rounded-xl border ${
+                theme === "dark"
+                  ? "border-slate-700 hover:bg-slate-800 text-slate-200"
+                  : "border-slate-200 hover:bg-white text-slate-700"
+              }`}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Students
             </Button>
           </Link>
         </div>
 
-        {/* Student Profile Section */}
-        <Card className={`mb-6 transition-colors duration-300 ${
-          theme === "dark"
-            ? "bg-slate-900 border-slate-700"
-            : "bg-white border-slate-200 shadow-sm"
-        }`}>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${
-                  theme === "dark" ? "bg-blue-500/10" : "bg-blue-50"
-                }`}>
-                  <User className={`h-6 w-6 ${
-                    theme === "dark" ? "text-blue-400" : "text-blue-600"
-                  }`} />
+        {/* Student Profile */}
+        <Card
+          className={`rounded-2xl border shadow-sm ${
+            theme === "dark"
+              ? "bg-slate-900/50 border-slate-800"
+              : "bg-white border-slate-100"
+          }`}
+        >
+          <CardContent className="p-5 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+              <div className="flex items-start sm:items-center gap-4 min-w-0">
+                <div
+                  className={`h-14 w-14 rounded-full flex items-center justify-center text-lg font-bold shrink-0 ring-4 ${
+                    theme === "dark"
+                      ? "bg-blue-500/20 text-blue-300 ring-blue-500/10"
+                      : "bg-blue-50 text-blue-600 ring-blue-50"
+                  }`}
+                >
+                  {getInitials(student.name)}
                 </div>
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h2 className={`text-2xl font-bold ${
-                      theme === "dark" ? "text-slate-100" : "text-slate-900"
-                    }`}>{student?.name}</h2>
-                    <Badge variant={student?.status === 'active' ? 'default' : 'destructive'} className="px-3 py-1">
-                      {student?.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <h1 className="text-2xl sm:text-[1.75rem] font-bold tracking-tight truncate">
+                      {student.name}
+                    </h1>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        student.status === "active"
+                          ? theme === "dark"
+                            ? "bg-emerald-500/15 text-emerald-300"
+                            : "bg-emerald-50 text-emerald-700"
+                          : theme === "dark"
+                            ? "bg-red-500/15 text-red-300"
+                            : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      {student.status === "active" ? "Active" : "Inactive"}
+                    </span>
                   </div>
-                  <div className={`flex items-center gap-2 text-sm mt-1 ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>
-                    <Mail className="h-4 w-4" />
-                    {student?.email}
+                  <div
+                    className={`flex items-center gap-2 text-sm mt-1 truncate ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    <Mail className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{student.email}</span>
                   </div>
-                  <div className={`flex items-center gap-4 text-xs mt-2 ${
-                    theme === "dark" ? "text-slate-500" : "text-slate-500"
-                  }`}>
-                    <div className="flex items-center gap-1">
+                  <div
+                    className={`flex flex-wrap items-center gap-x-4 gap-y-1 text-xs mt-2 ${
+                      theme === "dark" ? "text-slate-500" : "text-slate-500"
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Joined: {student ? new Date(student.joinedAt).toLocaleDateString() : ''}
-                    </div>
-                    <div className="flex items-center gap-1">
+                      Joined {new Date(student.joinedAt).toLocaleDateString()}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      Last Active: {student ? new Date(student.lastActive).toLocaleDateString() : ''}
-                    </div>
+                      Last active {new Date(student.lastActive).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>
+
               {!isMentorView && (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleStudentAction(student?.status === 'active' ? 'suspend' : 'activate')}
-                  disabled={actionLoading}
-                  className={`${
-                    theme === "dark"
-                      ? "border-slate-700 hover:bg-slate-800 text-slate-300"
-                      : "border-slate-300 hover:bg-slate-100 text-slate-700"
-                  }`}
-                >
-                  {student?.status === 'active' ? <UserX className="h-4 w-4 mr-1" /> : <UserCheck className="h-4 w-4 mr-1" />}
-                  {student?.status === 'active' ? 'Suspend' : 'Activate'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleStudentAction('reset-password')}
-                  disabled={actionLoading}
-                  className={`${
-                    theme === "dark"
-                      ? "border-slate-700 hover:bg-slate-800 text-slate-300"
-                      : "border-slate-300 hover:bg-slate-100 text-slate-700"
-                  }`}
-                >
-                  <RotateCcw className="h-4 w-4 mr-1" />
-                  Reset Password
-                </Button>
-              </div>
+                <div className="flex items-center gap-2.5 w-full lg:w-auto">
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      handleStudentAction(
+                        student.status === "active" ? "suspend" : "activate"
+                      )
+                    }
+                    disabled={actionLoading}
+                    className={`flex-1 lg:flex-none h-10 px-4 rounded-xl border ${
+                      theme === "dark"
+                        ? "border-slate-700 hover:bg-slate-800 text-slate-200"
+                        : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    {student.status === "active" ? (
+                      <UserX className="h-4 w-4 mr-1.5" />
+                    ) : (
+                      <UserCheck className="h-4 w-4 mr-1.5" />
+                    )}
+                    {student.status === "active" ? "Suspend" : "Activate"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleStudentAction("reset-password")}
+                    disabled={actionLoading}
+                    className={`flex-1 lg:flex-none h-10 px-4 rounded-xl border ${
+                      theme === "dark"
+                        ? "border-slate-700 hover:bg-slate-800 text-slate-200"
+                        : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1.5" />
+                    Reset Password
+                  </Button>
+                </div>
               )}
-            </CardTitle>
-          </CardHeader>
+            </div>
+          </CardContent>
         </Card>
 
-        {/* Overall Performance Summary */}
+        {/* Performance Summary */}
         {performanceSummary && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`text-lg font-semibold ${
-                theme === "dark" ? "text-slate-200" : "text-slate-900"
-              }`}>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h2
+                className={`text-lg font-semibold tracking-tight ${
+                  theme === "dark" ? "text-slate-100" : "text-slate-900"
+                }`}
+              >
                 Performance Summary
                 {timeFilter !== "all" && (
-                  <span className={`ml-2 text-sm font-normal ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>
-                    ({timeFilter === "today" ? "Today" :
-                      timeFilter === "week" ? "This Week" :
-                      timeFilter === "month" ? "This Month" : "All Time"})
+                  <span
+                    className={`ml-2 text-sm font-normal ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    ({timeFilterLabel})
                   </span>
                 )}
-              </h3>
+              </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card className={`transition-colors duration-300 ${
-              theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <CardContent className="pt-6">
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>Total Evaluations</div>
-                <div className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-slate-100" : "text-slate-900"
-                }`}>{performanceSummary.totalEvaluations}</div>
-              </CardContent>
-            </Card>
-            <Card className={`transition-colors duration-300 ${
-              theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <CardContent className="pt-6">
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>Average Score</div>
-                <div className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-slate-100" : "text-slate-900"
-                }`}>{performanceSummary.averageScore.toFixed(1)}%</div>
-              </CardContent>
-            </Card>
-            <Card className={`transition-colors duration-300 ${
-              theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <CardContent className="pt-6">
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>Highest Score</div>
-                <div className={`text-2xl font-bold text-green-500`}>
-                  {performanceSummary.highestScore}%
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={`transition-colors duration-300 ${
-              theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <CardContent className="pt-6">
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>Lowest Score</div>
-                <div className={`text-2xl font-bold text-orange-500`}>
-                  {performanceSummary.lowestScore}%
-                </div>
-              </CardContent>
-            </Card>
-            <Card className={`transition-colors duration-300 ${
-              theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <CardContent className="pt-6">
-                <div className={`text-sm flex items-center gap-1 ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>
-                  {performanceSummary.improvementPercentage >= 0 ? <TrendingUp className="h-4 w-4 text-green-500" /> : <TrendingDown className="h-4 w-4 text-red-500" />}
-                  Improvement
-                </div>
-                <div className={`text-2xl font-bold ${performanceSummary.improvementPercentage >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {performanceSummary.improvementPercentage > 0 ? '+' : ''}{performanceSummary.improvementPercentage}%
-                </div>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {summaryStats.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <Card
+                    key={stat.label}
+                    className={`rounded-2xl border shadow-sm transition-shadow hover:shadow-md ${
+                      theme === "dark"
+                        ? "bg-slate-900/50 border-slate-800"
+                        : "bg-white border-slate-100"
+                    }`}
+                  >
+                    <CardContent className="p-4 sm:p-5 flex items-center gap-3.5">
+                      <div
+                        className={`h-11 w-11 rounded-full flex items-center justify-center shrink-0 ${stat.iconBg}`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500 truncate">
+                          {stat.label}
+                        </p>
+                        <p
+                          className={`text-xl sm:text-2xl font-bold tracking-tight mt-0.5 ${stat.valueClass}`}
+                        >
+                          {stat.value}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         )}
 
-        {/* Time Filter */}
-        <div className={`flex flex-wrap items-center gap-3 mb-6 p-3 rounded-xl border ${
-          theme === "dark"
-            ? "bg-slate-800/30 border-slate-700"
-            : "bg-slate-100/50 border-slate-200"
-        }`}>
-          <span className={`text-sm font-medium ${
-            theme === "dark" ? "text-slate-300" : "text-slate-700"
-          }`}>Time Period:</span>
-          <Badge variant="outline" className={`px-3 py-1 ${
+        {/* Time Filter — single control, no duplicate badge */}
+        <div
+          className={`flex flex-col sm:flex-row sm:items-center gap-3 p-2 sm:p-1.5 rounded-2xl border ${
             theme === "dark"
-              ? "border-blue-500/50 text-blue-300 bg-blue-500/10"
-              : "border-blue-300 text-blue-700 bg-blue-50"
-          }`}>
-            {timeFilter === "today" && "📅 Today"}
-            {timeFilter === "week" && "📊 This Week"}
-            {timeFilter === "month" && "📈 This Month"}
-            {timeFilter === "all" && "🔄 All Time"}
-          </Badge>
-          <div className="flex flex-wrap gap-1">
-            <Button
-              variant={timeFilter === "today" ? "default" : "ghost"}
-              onClick={() => setTimeFilter("today")}
-              className={`px-3 py-2 text-sm ${
-                timeFilter === "today"
-                  ? theme === "dark"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-600 text-white shadow-sm"
-                  : theme === "dark"
-                    ? "text-slate-300 hover:bg-slate-700"
-                    : "text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              <CalendarDays className="h-4 w-4 mr-1" />
-              Today
-            </Button>
-            <Button
-              variant={timeFilter === "week" ? "default" : "ghost"}
-              onClick={() => setTimeFilter("week")}
-              className={`px-3 py-2 text-sm ${
-                timeFilter === "week"
-                  ? theme === "dark"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-600 text-white shadow-sm"
-                  : theme === "dark"
-                    ? "text-slate-300 hover:bg-slate-700"
-                    : "text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              <Calendar className="h-4 w-4 mr-1" />
-              This Week
-            </Button>
-            <Button
-              variant={timeFilter === "month" ? "default" : "ghost"}
-              onClick={() => setTimeFilter("month")}
-              className={`px-3 py-2 text-sm ${
-                timeFilter === "month"
-                  ? theme === "dark"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-600 text-white shadow-sm"
-                  : theme === "dark"
-                    ? "text-slate-300 hover:bg-slate-700"
-                    : "text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              <CalendarRange className="h-4 w-4 mr-1" />
-              This Month
-            </Button>
-            <Button
-              variant={timeFilter === "all" ? "default" : "ghost"}
-              onClick={() => setTimeFilter("all")}
-              className={`px-3 py-2 text-sm ${
-                timeFilter === "all"
-                  ? theme === "dark"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-600 text-white shadow-sm"
-                  : theme === "dark"
-                    ? "text-slate-300 hover:bg-slate-700"
-                    : "text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              <Activity className="h-4 w-4 mr-1" />
-              All Time
-            </Button>
+              ? "bg-slate-900/50 border-slate-800"
+              : "bg-white border-slate-200 shadow-sm"
+          }`}
+        >
+          <span
+            className={`text-xs font-semibold uppercase tracking-wider px-3 ${
+              theme === "dark" ? "text-slate-400" : "text-slate-500"
+            }`}
+          >
+            Time Period
+          </span>
+          <div className="flex flex-wrap gap-1 p-0.5">
+            {periodFilters.map(({ key, label, icon: Icon }) => {
+              const active = timeFilter === key;
+              return (
+                <Button
+                  key={key}
+                  type="button"
+                  variant={active ? "default" : "ghost"}
+                  onClick={() => setTimeFilter(key)}
+                  className={`h-9 px-3 rounded-xl text-sm font-medium ${
+                    active
+                      ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                      : theme === "dark"
+                        ? "text-slate-300 hover:bg-slate-800"
+                        : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5 mr-1.5" />
+                  {label}
+                </Button>
+              );
+            })}
           </div>
         </div>
 
         {/* Quick Stats for Selected Period */}
-        {(timeFilter !== "all") && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className={`p-4 rounded-xl border ${
-              theme === "dark"
-                ? "bg-blue-500/10 border-blue-500/20"
-                : "bg-blue-50 border-blue-200"
-            }`}>
-              <div className={`text-2xl font-bold ${
-                theme === "dark" ? "text-blue-400" : "text-blue-600"
-              }`}>
-                {prelimsData?.tests.length || 0}
+        {timeFilter !== "all" && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              {
+                label: "Prelims Tests",
+                value: String(prelimsData?.tests.length || 0),
+                className:
+                  theme === "dark"
+                    ? "bg-blue-500/10 border-blue-500/20 text-blue-300"
+                    : "bg-blue-50 border-blue-100 text-blue-700",
+                valueClass: theme === "dark" ? "text-blue-400" : "text-blue-600",
+              },
+              {
+                label: "Mains Evaluations",
+                value: String(mainsData?.evaluations.length || 0),
+                className:
+                  theme === "dark"
+                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+                    : "bg-emerald-50 border-emerald-100 text-emerald-700",
+                valueClass: theme === "dark" ? "text-emerald-400" : "text-emerald-600",
+              },
+              {
+                label: "Total Activities",
+                value: String(activityData?.totalActivities || 0),
+                className:
+                  theme === "dark"
+                    ? "bg-sky-500/10 border-sky-500/20 text-sky-300"
+                    : "bg-sky-50 border-sky-100 text-sky-700",
+                valueClass: theme === "dark" ? "text-sky-400" : "text-sky-600",
+              },
+              {
+                label: "Avg Accuracy",
+                value: `${prelimsData?.statistics.averageAccuracy?.toFixed(1) || "0.0"}%`,
+                className:
+                  theme === "dark"
+                    ? "bg-amber-500/10 border-amber-500/20 text-amber-300"
+                    : "bg-amber-50 border-amber-100 text-amber-700",
+                valueClass: theme === "dark" ? "text-amber-400" : "text-amber-600",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className={`p-4 rounded-2xl border ${item.className}`}
+              >
+                <div className={`text-2xl font-bold tracking-tight ${item.valueClass}`}>
+                  {item.value}
+                </div>
+                <div className="text-xs font-semibold uppercase tracking-wider mt-1 opacity-80">
+                  {item.label}
+                </div>
               </div>
-              <div className={`text-sm ${
-                theme === "dark" ? "text-blue-300" : "text-blue-700"
-              }`}>
-                Prelims Tests
-              </div>
-            </div>
-            <div className={`p-4 rounded-xl border ${
-              theme === "dark"
-                ? "bg-green-500/10 border-green-500/20"
-                : "bg-green-50 border-green-200"
-            }`}>
-              <div className={`text-2xl font-bold ${
-                theme === "dark" ? "text-green-400" : "text-green-600"
-              }`}>
-                {mainsData?.evaluations.length || 0}
-              </div>
-              <div className={`text-sm ${
-                theme === "dark" ? "text-green-300" : "text-green-700"
-              }`}>
-                Mains Evaluations
-              </div>
-            </div>
-            <div className={`p-4 rounded-xl border ${
-              theme === "dark"
-                ? "bg-blue-500/10 border-blue-500/20"
-                : "bg-blue-50 border-blue-200"
-            }`}>
-              <div className={`text-2xl font-bold ${
-                theme === "dark" ? "text-blue-400" : "text-blue-600"
-              }`}>
-                {activityData?.totalActivities || 0}
-              </div>
-              <div className={`text-sm ${
-                theme === "dark" ? "text-blue-300" : "text-blue-700"
-              }`}>
-                Total Activities
-              </div>
-            </div>
-            <div className={`p-4 rounded-xl border ${
-              theme === "dark"
-                ? "bg-orange-500/10 border-orange-500/20"
-                : "bg-orange-50 border-orange-200"
-            }`}>
-              <div className={`text-2xl font-bold ${
-                theme === "dark" ? "text-orange-400" : "text-orange-600"
-              }`}>
-                {prelimsData?.statistics.averageAccuracy?.toFixed(1) || "0.0"}%
-              </div>
-              <div className={`text-sm ${
-                theme === "dark" ? "text-orange-300" : "text-orange-700"
-              }`}>
-                Avg Accuracy
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
         {/* Tabs */}
-        <div className={`flex gap-2 mb-6 flex-wrap p-1 rounded-xl ${
-          theme === "dark" ? "bg-slate-800/50" : "bg-slate-100/50"
-        }`}>
-          <Button
-            variant={activeTab === "overview" ? "default" : "ghost"}
-            onClick={() => setActiveTab("overview")}
-            className={`${
-              activeTab === "overview"
-                ? theme === "dark"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-blue-600 text-white shadow-sm"
-                : theme === "dark"
-                  ? "text-slate-300 hover:bg-slate-700"
-                  : "text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Overview
-          </Button>
-          <Button
-            variant={activeTab === "prelims" ? "default" : "ghost"}
-            onClick={() => setActiveTab("prelims")}
-            className={`${
-              activeTab === "prelims"
-                ? theme === "dark"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-blue-600 text-white shadow-sm"
-                : theme === "dark"
-                  ? "text-slate-300 hover:bg-slate-700"
-                  : "text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Prelims ({prelimsData?.statistics.totalTests || 0})
-          </Button>
-          <Button
-            variant={activeTab === "mains" ? "default" : "ghost"}
-            onClick={() => setActiveTab("mains")}
-            className={`${
-              activeTab === "mains"
-                ? theme === "dark"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-blue-600 text-white shadow-sm"
-                : theme === "dark"
-                  ? "text-slate-300 hover:bg-slate-700"
-                  : "text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <ClipboardCheck className="h-4 w-4 mr-2" />
-            Mains ({mainsData?.statistics.totalEvaluations || 0})
-          </Button>
-          <Button
-            variant={activeTab === "activity" ? "default" : "ghost"}
-            onClick={() => setActiveTab("activity")}
-            className={`${
-              activeTab === "activity"
-                ? theme === "dark"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-blue-600 text-white shadow-sm"
-                : theme === "dark"
-                  ? "text-slate-300 hover:bg-slate-700"
-                  : "text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <Activity className="h-4 w-4 mr-2" />
-            Activity ({activityData?.totalActivities || 0})
-          </Button>
-          <Button
-            variant={activeTab === "analytics" ? "default" : "ghost"}
-            onClick={() => setActiveTab("analytics")}
-            className={`${
-              activeTab === "analytics"
-                ? theme === "dark"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-blue-600 text-white shadow-sm"
-                : theme === "dark"
-                  ? "text-slate-300 hover:bg-slate-700"
-                  : "text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <PieChart className="h-4 w-4 mr-2" />
-            Analytics (DART)
-          </Button>
+        <div
+          className={`flex gap-1 flex-wrap p-1.5 rounded-2xl border ${
+            theme === "dark"
+              ? "bg-slate-900/50 border-slate-800"
+              : "bg-white border-slate-200 shadow-sm"
+          }`}
+        >
+          {tabs.map(({ key, label, icon: Icon, count }) => {
+            const active = activeTab === key;
+            return (
+              <Button
+                key={key}
+                type="button"
+                variant={active ? "default" : "ghost"}
+                onClick={() => setActiveTab(key)}
+                className={`h-10 px-3.5 rounded-xl text-sm font-medium ${
+                  active
+                    ? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                    : theme === "dark"
+                      ? "text-slate-300 hover:bg-slate-800"
+                      : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <Icon className="h-4 w-4 mr-1.5" />
+                {label}
+                {count !== undefined && (
+                  <span
+                    className={`ml-1.5 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-[11px] font-semibold ${
+                      active
+                        ? "bg-white/20 text-white"
+                        : theme === "dark"
+                          ? "bg-slate-800 text-slate-400"
+                          : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </Button>
+            );
+          })}
         </div>
 
         {/* Overview Tab */}
@@ -1120,70 +1257,70 @@ export const StudentDetailPage = () => {
         {activeTab === "prelims" && (
           <div className="space-y-6">
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className={`transition-colors duration-300 ${
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                <CardContent className="p-4 sm:p-5">
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${
+                    theme === "dark" ? "text-slate-500" : "text-slate-500"
                   }`}>Total Tests</div>
-                  <div className={`text-2xl font-bold ${
+                  <div className={`text-2xl font-bold tracking-tight mt-0.5 ${
                     theme === "dark" ? "text-slate-100" : "text-slate-900"
-                  }`}>{prelimsData?.statistics.totalTests || 0}</div>
+                  }`}>{prelimsData?.statistics?.totalTests || 0}</div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                <CardContent className="p-4 sm:p-5">
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${
+                    theme === "dark" ? "text-slate-500" : "text-slate-500"
                   }`}>Average Score</div>
-                  <div className={`text-2xl font-bold ${
+                  <div className={`text-2xl font-bold tracking-tight mt-0.5 ${
                     theme === "dark" ? "text-slate-100" : "text-slate-900"
-                  }`}>{prelimsData?.statistics.averageScore.toFixed(1) || "0.0"}</div>
+                  }`}>{prelimsData?.statistics?.averageScore?.toFixed(1) ?? "0.0"}</div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                <CardContent className="p-4 sm:p-5">
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${
+                    theme === "dark" ? "text-slate-500" : "text-slate-500"
                   }`}>Average Accuracy</div>
-                  <div className={`text-2xl font-bold ${
+                  <div className={`text-2xl font-bold tracking-tight mt-0.5 ${
                     theme === "dark" ? "text-slate-100" : "text-slate-900"
-                  }`}>{prelimsData?.statistics.averageAccuracy.toFixed(1) || "0.0"}%</div>
+                  }`}>{prelimsData?.statistics?.averageAccuracy?.toFixed(1) ?? "0.0"}%</div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
+                <CardContent className="p-4 sm:p-5">
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${
+                    theme === "dark" ? "text-slate-500" : "text-slate-500"
                   }`}>Highest Score</div>
-                  <div className={`text-2xl font-bold text-green-500`}>
-                    {prelimsData?.statistics.highestScore || 0}
+                  <div className="text-2xl font-bold tracking-tight mt-0.5 text-emerald-500">
+                    {prelimsData?.statistics?.highestScore || 0}
                   </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Test History */}
-            <Card className={`transition-colors duration-300 ${
+            <Card className={`rounded-2xl border shadow-sm ${
               theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
+                ? "bg-slate-900/50 border-slate-800"
+                : "bg-white border-slate-100"
             }`}>
               <CardHeader>
                 <CardTitle className={`${
@@ -1202,109 +1339,137 @@ export const StudentDetailPage = () => {
                     <p className="text-sm mt-1">Tests will appear here once the student starts taking them</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {prelimsData?.tests.map((test) => (
-                      <div
-                        key={test.id}
-                        className={`p-5 rounded-xl border transition-colors duration-200 cursor-pointer ${
-                          theme === "dark"
-                            ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
-                            : "bg-slate-50 border-slate-200 hover:bg-slate-100/80"
-                        }`}
-                        onClick={() =>
-                          navigate(
-                            isMentorView
-                              ? `/result/${test.id}?fromMentor=1&studentId=${id}`
-                              : `/result/${test.id}?fromAdmin=1&studentId=${id}`
-                          )
-                        }
-                      >
-                        <div className="flex justify-between items-start gap-4">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3
-                                className={`font-semibold text-lg truncate ${
-                                  theme === "dark" ? "text-slate-100" : "text-slate-900"
-                                }`}
-                              >
-                                {test.subject} - {test.topic}
-                              </h3>
-                              {test.isPrelimsMock && (
-                                <span
-                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                    theme === "dark" ? "bg-amber-500/20 text-amber-400" : "bg-amber-100 text-amber-800"
-                                  }`}
-                                >
-                                  Prelims Mock
-                                </span>
-                              )}
-                            </div>
-                            <p
-                              className={`text-sm mt-1 ${
-                                theme === "dark" ? "text-slate-400" : "text-slate-600"
-                              }`}
-                            >
-                              {test.difficulty} • {test.totalQuestions} questions
-                            </p>
-                            <p
-                              className={`text-xs mt-2 ${
-                                theme === "dark" ? "text-slate-500" : "text-slate-500"
-                              }`}
-                            >
-                              {new Date(test.attemptedAt).toLocaleString()}
-                            </p>
-                          </div>
-                          <div className="text-right ml-4 flex flex-col items-end gap-2">
-                            <div>
-                              <div
-                                className={`text-xl font-bold ${
-                                  theme === "dark" ? "text-slate-100" : "text-slate-900"
-                                }`}
-                              >
-                                Score: {test.score.toFixed(2)}
-                              </div>
-                              <div
-                                className={`text-sm ${
-                                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                                }`}
-                              >
-                                Accuracy: {test.accuracy.toFixed(1)}%
-                              </div>
-                              <div
-                                className={`text-xs mt-1 px-2 py-1 rounded-full inline-block ${
-                                  theme === "dark"
-                                    ? "bg-slate-700 text-slate-300"
-                                    : "bg-slate-100 text-slate-700"
-                                }`}
-                              >
-                                {test.correctAnswers} correct, {test.wrongAnswers} wrong
-                              </div>
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className={`mt-1 flex items-center gap-1 ${
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {paginatedPrelims.items.map((test) => (
+                        <div
+                          key={test.id}
+                          className={`group flex flex-col rounded-2xl border p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:border-blue-400/50 ${
+                            theme === "dark"
+                              ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
+                              : "bg-white border-slate-200 shadow-sm hover:bg-slate-50/80"
+                          }`}
+                          onClick={() =>
+                            navigate(
+                              isMentorView
+                                ? `/result/${test.id}?fromMentor=1&studentId=${id}`
+                                : `/result/${test.id}?fromAdmin=1&studentId=${id}`
+                            )
+                          }
+                        >
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div
+                              className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
                                 theme === "dark"
-                                  ? "border-slate-600 text-slate-200 hover:bg-slate-800"
-                                  : "border-slate-300 text-slate-700 hover:bg-slate-100"
+                                  ? "bg-blue-500/15 text-blue-300"
+                                  : "bg-blue-50 text-blue-600"
                               }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(
-                                  isMentorView
-                                    ? `/result/${test.id}?fromMentor=1&studentId=${id}`
-                                    : `/result/${test.id}?fromAdmin=1&studentId=${id}`
-                                );
-                              }}
                             >
-                              <Eye className="h-3.5 w-3.5" />
-                              <span className="text-xs font-semibold">View Details</span>
-                            </Button>
+                              <FileText className="h-5 w-5" />
+                            </div>
+                            {test.isPrelimsMock && (
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
+                                  theme === "dark"
+                                    ? "bg-amber-500/20 text-amber-400"
+                                    : "bg-amber-100 text-amber-800"
+                                }`}
+                              >
+                                Mock
+                              </span>
+                            )}
                           </div>
+
+                          <h3
+                            className={`font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] ${
+                              theme === "dark" ? "text-slate-100" : "text-slate-900"
+                            }`}
+                            title={`${test.subject} - ${test.topic}`}
+                          >
+                            {test.subject} - {test.topic}
+                          </h3>
+
+                          <p
+                            className={`text-xs mt-1.5 ${
+                              theme === "dark" ? "text-slate-400" : "text-slate-500"
+                            }`}
+                          >
+                            {test.difficulty} • {test.totalQuestions} questions
+                          </p>
+                          <p
+                            className={`text-[11px] mt-1 ${
+                              theme === "dark" ? "text-slate-500" : "text-slate-400"
+                            }`}
+                          >
+                            {new Date(test.attemptedAt).toLocaleString()}
+                          </p>
+
+                          <div
+                            className={`grid grid-cols-2 gap-2 mt-4 rounded-xl overflow-hidden ${
+                              theme === "dark"
+                                ? "bg-slate-900/60"
+                                : "bg-slate-50"
+                            }`}
+                          >
+                            <div className="px-3 py-2.5 text-center">
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                Score
+                              </p>
+                              <p
+                                className={`text-lg font-bold leading-none mt-1 ${
+                                  theme === "dark" ? "text-slate-100" : "text-slate-900"
+                                }`}
+                              >
+                                {Number(test.score || 0).toFixed(1)}
+                              </p>
+                            </div>
+                            <div
+                              className={`px-3 py-2.5 text-center border-l ${
+                                theme === "dark" ? "border-slate-700" : "border-slate-200"
+                              }`}
+                            >
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                Accuracy
+                              </p>
+                              <p className="text-lg font-bold leading-none mt-1 text-emerald-500">
+                                {Number(test.accuracy || 0).toFixed(1)}%
+                              </p>
+                            </div>
+                          </div>
+
+                          <p
+                            className={`text-[11px] mt-2.5 text-center ${
+                              theme === "dark" ? "text-slate-500" : "text-slate-500"
+                            }`}
+                          >
+                            {test.correctAnswers} correct · {test.wrongAnswers} wrong
+                          </p>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`mt-3 w-full h-9 rounded-xl flex items-center justify-center gap-1.5 ${
+                              theme === "dark"
+                                ? "border-slate-600 text-slate-200 hover:bg-slate-700"
+                                : "border-slate-200 text-slate-700 hover:bg-white"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                isMentorView
+                                  ? `/result/${test.id}?fromMentor=1&studentId=${id}`
+                                  : `/result/${test.id}?fromAdmin=1&studentId=${id}`
+                              );
+                            }}
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                            <span className="text-xs font-semibold">View Details</span>
+                          </Button>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                    {renderListPagination(paginatedPrelims, setPrelimsPage)}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -1315,70 +1480,62 @@ export const StudentDetailPage = () => {
         {activeTab === "mains" && (
           <div className="space-y-6">
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className={`transition-colors duration-300 ${
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>Total Evaluations</div>
-                  <div className={`text-2xl font-bold ${
+                <CardContent className="p-4 sm:p-5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Evaluations</div>
+                  <div className={`text-2xl font-bold tracking-tight mt-0.5 ${
                     theme === "dark" ? "text-slate-100" : "text-slate-900"
-                  }`}>{mainsData?.statistics.totalEvaluations || 0}</div>
+                  }`}>{mainsData?.statistics?.totalEvaluations || 0}</div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>Average Score</div>
-                  <div className={`text-2xl font-bold ${
+                <CardContent className="p-4 sm:p-5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Average Score</div>
+                  <div className={`text-2xl font-bold tracking-tight mt-0.5 ${
                     theme === "dark" ? "text-slate-100" : "text-slate-900"
-                  }`}>{mainsData?.statistics.averageScore.toFixed(1) || "0.0"}%</div>
+                  }`}>{mainsData?.statistics?.averageScore?.toFixed(1) ?? "0.0"}%</div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>Highest Score</div>
-                  <div className={`text-2xl font-bold text-green-500`}>
-                    {mainsData?.statistics.highestScore.toFixed(1) || "0.0"}%
+                <CardContent className="p-4 sm:p-5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Highest Score</div>
+                  <div className="text-2xl font-bold tracking-tight mt-0.5 text-emerald-500">
+                    {mainsData?.statistics?.highestScore?.toFixed(1) ?? "0.0"}%
                   </div>
                 </CardContent>
               </Card>
-              <Card className={`transition-colors duration-300 ${
+              <Card className={`rounded-2xl border shadow-sm ${
                 theme === "dark"
-                  ? "bg-slate-900 border-slate-700"
-                  : "bg-white border-slate-200 shadow-sm"
+                  ? "bg-slate-900/50 border-slate-800"
+                  : "bg-white border-slate-100"
               }`}>
-                <CardContent className="pt-6">
-                  <div className={`text-sm ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>Lowest Score</div>
-                  <div className={`text-2xl font-bold text-orange-500`}>
-                    {mainsData?.statistics.lowestScore.toFixed(1) || "0.0"}%
+                <CardContent className="p-4 sm:p-5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Lowest Score</div>
+                  <div className="text-2xl font-bold tracking-tight mt-0.5 text-amber-500">
+                    {mainsData?.statistics?.lowestScore?.toFixed(1) ?? "0.0"}%
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Evaluation History Table */}
-            <Card className={`transition-colors duration-300 ${
+            {/* Evaluation History */}
+            <Card className={`rounded-2xl border shadow-sm ${
               theme === "dark"
-                ? "bg-slate-900 border-slate-700"
-                : "bg-white border-slate-200 shadow-sm"
+                ? "bg-slate-900/50 border-slate-800"
+                : "bg-white border-slate-100"
             }`}>
               <CardHeader>
                 <CardTitle className={`${
@@ -1397,82 +1554,142 @@ export const StudentDetailPage = () => {
                     <p className="text-sm mt-1">Evaluations will appear here once the student submits answers</p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className={`border-b ${
-                          theme === "dark" ? "border-slate-700" : "border-slate-200"
-                        }`}>
-                          <th className={`text-left p-4 font-medium ${
-                            theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`}>Date</th>
-                          <th className={`text-left p-4 font-medium ${
-                            theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`}>Subject</th>
-                          <th className={`text-left p-4 font-medium ${
-                            theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`}>Score</th>
-                          <th className={`text-left p-4 font-medium ${
-                            theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`}>Word Count</th>
-                          <th className={`text-left p-4 font-medium ${
-                            theme === "dark" ? "text-slate-400" : "text-slate-600"
-                          }`}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {mainsData?.evaluations.map((evaluation) => (
-                          <tr key={evaluation.id} className={`border-b transition-colors ${
-                            theme === "dark"
-                              ? "border-slate-800 hover:bg-slate-800/50"
-                              : "border-slate-100 hover:bg-slate-50/50"
-                          }`}>
-                            <td className={`p-4 ${
-                              theme === "dark" ? "text-slate-300" : "text-slate-700"
-                            }`}>{new Date(evaluation.evaluatedAt).toLocaleDateString()}</td>
-                            <td className={`p-4 font-medium ${
-                              theme === "dark" ? "text-slate-200" : "text-slate-800"
-                            }`}>{evaluation.subject}</td>
-                            <td className="p-4">
-                              {evaluation.overallScore ? (
-                                <span className={`font-semibold px-2 py-1 rounded-full ${
-                                  evaluation.overallScore.percentage >= 70
-                                    ? theme === "dark" ? "bg-green-500/10 text-green-400" : "bg-green-50 text-green-700"
-                                    : evaluation.overallScore.percentage >= 50
-                                      ? theme === "dark" ? "bg-yellow-500/10 text-yellow-400" : "bg-yellow-50 text-yellow-700"
-                                      : theme === "dark" ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-700"
-                                }`}>
-                                  {evaluation.overallScore.percentage.toFixed(1)}%
-                                </span>
-                              ) : (
-                                <span className={`${
-                                  theme === "dark" ? "text-slate-500" : "text-slate-400"
-                                }`}>No score</span>
-                              )}
-                            </td>
-                            <td className={`p-4 ${
-                              theme === "dark" ? "text-slate-300" : "text-slate-700"
-                            }`}>{evaluation.wordCount || 0}</td>
-                            <td className="p-4">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => viewEvaluationDetails(evaluation.id)}
-                                className={`${
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {paginatedMains.items.map((evaluation) => {
+                        const scorePct = evaluation.overallScore?.percentage;
+                        const scoreColor =
+                          scorePct == null
+                            ? theme === "dark"
+                              ? "text-slate-400"
+                              : "text-slate-500"
+                            : scorePct >= 70
+                              ? "text-emerald-500"
+                              : scorePct >= 50
+                                ? "text-amber-500"
+                                : "text-red-500";
+
+                        return (
+                          <div
+                            key={evaluation.id}
+                            className={`group flex flex-col rounded-2xl border p-4 transition-all duration-200 cursor-pointer hover:shadow-md hover:border-blue-400/50 ${
+                              theme === "dark"
+                                ? "bg-slate-800/50 border-slate-700 hover:bg-slate-800/80"
+                                : "bg-white border-slate-200 shadow-sm hover:bg-slate-50/80"
+                            }`}
+                            onClick={() => viewEvaluationDetails(evaluation.id)}
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-3">
+                              <div
+                                className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
                                   theme === "dark"
-                                    ? "border-slate-700 hover:bg-slate-800 text-slate-300"
-                                    : "border-slate-300 hover:bg-slate-100 text-slate-700"
+                                    ? "bg-emerald-500/15 text-emerald-300"
+                                    : "bg-emerald-50 text-emerald-600"
                                 }`}
                               >
-                                <Eye className="h-4 w-4 mr-1" />
-                                View Answer
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                                <ClipboardCheck className="h-5 w-5" />
+                              </div>
+                              {evaluation.paper && (
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
+                                    theme === "dark"
+                                      ? "bg-slate-700 text-slate-300"
+                                      : "bg-slate-100 text-slate-600"
+                                  }`}
+                                >
+                                  {evaluation.paper}
+                                </span>
+                              )}
+                            </div>
+
+                            <h3
+                              className={`font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] ${
+                                theme === "dark" ? "text-slate-100" : "text-slate-900"
+                              }`}
+                              title={evaluation.subject}
+                            >
+                              {evaluation.subject}
+                            </h3>
+
+                            <p
+                              className={`text-xs mt-1.5 ${
+                                theme === "dark" ? "text-slate-400" : "text-slate-500"
+                              }`}
+                            >
+                              {evaluation.year ? `${evaluation.year} · ` : ""}
+                              {evaluation.totalQuestions || 0} questions
+                            </p>
+                            <p
+                              className={`text-[11px] mt-1 ${
+                                theme === "dark" ? "text-slate-500" : "text-slate-400"
+                              }`}
+                            >
+                              {new Date(evaluation.evaluatedAt).toLocaleString()}
+                            </p>
+
+                            <div
+                              className={`grid grid-cols-2 gap-2 mt-4 rounded-xl overflow-hidden ${
+                                theme === "dark" ? "bg-slate-900/60" : "bg-slate-50"
+                              }`}
+                            >
+                              <div className="px-3 py-2.5 text-center">
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                  Score
+                                </p>
+                                <p className={`text-lg font-bold leading-none mt-1 ${scoreColor}`}>
+                                  {scorePct != null ? `${scorePct.toFixed(1)}%` : "N/A"}
+                                </p>
+                              </div>
+                              <div
+                                className={`px-3 py-2.5 text-center border-l ${
+                                  theme === "dark" ? "border-slate-700" : "border-slate-200"
+                                }`}
+                              >
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                                  Words
+                                </p>
+                                <p
+                                  className={`text-lg font-bold leading-none mt-1 ${
+                                    theme === "dark" ? "text-slate-100" : "text-slate-900"
+                                  }`}
+                                >
+                                  {evaluation.wordCount || 0}
+                                </p>
+                              </div>
+                            </div>
+
+                            {evaluation.overallScore && (
+                              <p
+                                className={`text-[11px] mt-2.5 text-center ${
+                                  theme === "dark" ? "text-slate-500" : "text-slate-500"
+                                }`}
+                              >
+                                {evaluation.overallScore.obtained}/{evaluation.overallScore.maximum} marks
+                              </p>
+                            )}
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={`mt-3 w-full h-9 rounded-xl flex items-center justify-center gap-1.5 ${
+                                theme === "dark"
+                                  ? "border-slate-600 text-slate-200 hover:bg-slate-700"
+                                  : "border-slate-200 text-slate-700 hover:bg-white"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                viewEvaluationDetails(evaluation.id);
+                              }}
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                              <span className="text-xs font-semibold">View Answer</span>
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {renderListPagination(paginatedMains, setMainsPage)}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -1884,7 +2101,7 @@ export const StudentDetailPage = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {activityData?.activities.map((activity, index) => (
+                  {paginatedActivity.items.map((activity, index) => (
                     <div key={activity.id} className="flex gap-6">
                       <div className="flex flex-col items-center">
                         <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
@@ -1894,7 +2111,7 @@ export const StudentDetailPage = () => {
                         }`}>
                           <div className={`w-2 h-2 rounded-full bg-white`} />
                         </div>
-                        {index < (activityData?.activities.length || 0) - 1 && (
+                        {index < paginatedActivity.items.length - 1 && (
                           <div className={`w-px h-20 mt-4 ${
                             theme === "dark" ? "bg-slate-700" : "bg-slate-300"
                           }`} />
@@ -1930,6 +2147,7 @@ export const StudentDetailPage = () => {
                       </div>
                     </div>
                   ))}
+                  {renderListPagination(paginatedActivity, setActivityPage)}
                 </div>
               )}
             </CardContent>

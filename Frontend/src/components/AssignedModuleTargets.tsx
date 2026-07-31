@@ -160,7 +160,13 @@ export function AssignedModuleTargets() {
   const [filter, setFilter] = useState<FilterMode>("active");
   /** Subject key filter ("" = all subjects). Handy for Done list. */
   const [subjectFilter, setSubjectFilter] = useState("");
+  /** true = collapsed. Missing key = use default (only first subject open). */
   const [collapsedSubjects, setCollapsedSubjects] = useState<Record<string, boolean>>({});
+  /** Modules whose chapter list is expanded. Locked modules stay collapsed by default. */
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
+  const [modulePage, setModulePage] = useState(1);
+
+  const MODULES_PER_PAGE = 5;
 
   const load = useCallback(async () => {
     try {
@@ -168,9 +174,24 @@ export function AssignedModuleTargets() {
       setError(null);
       const res = await syllabusTargetsAPI.listMine({ includeCompleted: true });
       if (res.data.success) {
-        setTargets(sortTargets(res.data.data.targets || []));
+        const sorted = sortTargets(res.data.data.targets || []);
+        setTargets(sorted);
         setActiveCount(res.data.data.activeCount || 0);
         setCompletedCount(res.data.data.completedCount || 0);
+
+        // Focus first unlocked active module (page + chapters + subject)
+        const firstOpen = sorted.find(
+          (t) => !t.completed && !isModuleLocked(t, sorted)
+        );
+        if (firstOpen) {
+          setExpandedModules({ [firstOpen._id]: true });
+          setCollapsedSubjects({ [firstOpen.subjectKey || "other"]: false });
+          const activeOnly = sorted.filter((t) => !t.completed);
+          const idx = activeOnly.findIndex((t) => t._id === firstOpen._id);
+          if (idx >= 0) {
+            setModulePage(Math.floor(idx / MODULES_PER_PAGE) + 1);
+          }
+        }
       }
     } catch {
       setError("Could not load your assigned modules");
@@ -342,30 +363,53 @@ export function AssignedModuleTargets() {
     });
   }, [targets, filter, subjectFilter]);
 
-  const subjectGroups = useMemo(() => groupBySubject(visible), [visible]);
+  const totalModulePages = Math.max(1, Math.ceil(visible.length / MODULES_PER_PAGE));
 
-  const toggleSubject = (subjectKey: string) => {
-    setCollapsedSubjects((prev) => ({
-      ...prev,
-      [subjectKey]: !prev[subjectKey],
-    }));
+  useEffect(() => {
+    setModulePage(1);
+  }, [filter, subjectFilter]);
+
+  useEffect(() => {
+    if (modulePage > totalModulePages) setModulePage(totalModulePages);
+  }, [modulePage, totalModulePages]);
+
+  const pageModules = useMemo(() => {
+    const start = (modulePage - 1) * MODULES_PER_PAGE;
+    return visible.slice(start, start + MODULES_PER_PAGE);
+  }, [visible, modulePage]);
+
+  const subjectGroups = useMemo(() => groupBySubject(pageModules), [pageModules]);
+
+  const isSubjectCollapsed = (subjectKey: string, index: number) => {
+    if (Object.prototype.hasOwnProperty.call(collapsedSubjects, subjectKey)) {
+      return Boolean(collapsedSubjects[subjectKey]);
+    }
+    // Default: only first subject on this page is open
+    return index !== 0;
   };
 
-  if (loading) {
-    return (
-      <div className="sd-card sd-assigned-targets">
-        <div className="sd-card-hd">
-          <div>
-            <h3>Your Module Targets</h3>
-            <p className="sd-syll-deck">Loading assigned modules…</p>
-          </div>
-        </div>
-        <div className="sd-assigned-loading">
-          <Loader2 className="sd-assigned-spin" />
-        </div>
-      </div>
-    );
-  }
+  const toggleSubject = (subjectKey: string, index: number) => {
+    setCollapsedSubjects((prev) => {
+      const currentlyCollapsed = Object.prototype.hasOwnProperty.call(prev, subjectKey)
+        ? Boolean(prev[subjectKey])
+        : index !== 0;
+      return { ...prev, [subjectKey]: !currentlyCollapsed };
+    });
+  };
+
+  const isModuleExpanded = (t: StudentSyllabusTarget) => {
+    if (Object.prototype.hasOwnProperty.call(expandedModules, t._id)) {
+      return Boolean(expandedModules[t._id]);
+    }
+    return false;
+  };
+
+  const toggleModuleChapters = (moduleId: string) => {
+    setExpandedModules((prev) => ({
+      ...prev,
+      [moduleId]: !prev[moduleId],
+    }));
+  };
 
   if (!loading && targets.length === 0) {
     return null;
@@ -405,6 +449,7 @@ export function AssignedModuleTargets() {
         : needsModuleFinal
           ? "Final pending"
           : "In progress";
+    const isCurrentModule = !t.completed && !moduleLocked;
 
     return (
       <li
@@ -413,6 +458,7 @@ export function AssignedModuleTargets() {
           t.completed ? "done" : "",
           moduleLocked ? "module-locked" : "",
           needsModuleFinal ? "final-ready" : "",
+          isCurrentModule ? "is-current" : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -439,8 +485,8 @@ export function AssignedModuleTargets() {
           <strong>{t.moduleName}</strong>
           {moduleLocked && prevModule ? (
             <p className="sd-assigned-module-lock-hint">
-              Complete <b>{prevModule.moduleId}</b> {prevModule.moduleName} (incl. Module Final) to
-              unlock
+              Unlock by completing <b>{prevModule.moduleId}</b> — {prevModule.moduleName}
+              (including Module Final)
             </p>
           ) : null}
           {needsModuleFinal ? (
@@ -502,6 +548,30 @@ export function AssignedModuleTargets() {
           )}
           {t.note ? <p className="sd-assigned-note">{t.note}</p> : null}
           {topics.length > 0 && (
+            <>
+              <button
+                type="button"
+                className="sd-assigned-chapters-toggle"
+                onClick={() => toggleModuleChapters(t._id)}
+                aria-expanded={isModuleExpanded(t)}
+              >
+                <span>
+                  {isModuleExpanded(t)
+                    ? "Hide chapters"
+                    : moduleLocked
+                      ? `Chapters locked · ${topics.length}`
+                      : `Open chapters · ${topics.length}`}
+                </span>
+                <ChevronDown
+                  className={
+                    isModuleExpanded(t)
+                      ? "sd-assigned-subject-chevron"
+                      : "sd-assigned-subject-chevron is-collapsed"
+                  }
+                  aria-hidden
+                />
+              </button>
+              {isModuleExpanded(t) && (
             <ul className="sd-assigned-chapter-list">
               {topics.map((line, idx) => {
                 const chapterDone = doneChapters.has(line) || t.completed;
@@ -654,6 +724,8 @@ export function AssignedModuleTargets() {
                 );
               })}
             </ul>
+              )}
+            </>
           )}
         </div>
       </li>
@@ -666,8 +738,14 @@ export function AssignedModuleTargets() {
         <div>
           <h3>Your Module Targets</h3>
           <p className="sd-syll-deck">
-            Subject-wise · Chapters → Module Final → next unlock · {activeCount} active
-            {completedCount > 0 ? ` · ${completedCount} done` : ""}
+            Finish chapters → Module Final → unlock next ·{" "}
+            <span className="sd-assigned-stat-pill">{activeCount} active</span>
+            {completedCount > 0 ? (
+              <>
+                {" "}
+                <span className="sd-assigned-stat-pill is-done">{completedCount} done</span>
+              </>
+            ) : null}
           </p>
         </div>
         <div className="sd-assigned-hd-actions">
@@ -680,7 +758,9 @@ export function AssignedModuleTargets() {
             <History className="sd-assigned-history-icon" />
             View History
           </button>
-          <Target className="sd-assigned-hd-icon" aria-hidden />
+          <span className="sd-assigned-hd-icon-wrap" aria-hidden>
+            <Target className="sd-assigned-hd-icon" />
+          </span>
         </div>
       </div>
 
@@ -754,7 +834,12 @@ export function AssignedModuleTargets() {
         </label>
       </div>
 
-      {subjectGroups.length === 0 ? (
+      {loading ? (
+        <div className="sd-assigned-loading">
+          <Loader2 className="sd-assigned-spin" />
+          <span>Loading modules…</span>
+        </div>
+      ) : subjectGroups.length === 0 ? (
         <p className="sd-assigned-empty">
           {filter === "active"
             ? subjectFilter
@@ -769,43 +854,74 @@ export function AssignedModuleTargets() {
                 : "No modules to show."}
         </p>
       ) : (
-        <div className="sd-assigned-subjects">
-          {subjectGroups.map((group) => {
-            const collapsed = Boolean(collapsedSubjects[group.subjectKey]);
-            const countLabel =
-              filter === "active"
-                ? `${group.activeCount} remaining`
-                : filter === "done"
-                  ? `${group.doneCount} done`
-                  : `${group.activeCount} active · ${group.doneCount} done`;
-            return (
-              <section key={group.subjectKey} className="sd-assigned-subject-group">
-                <button
-                  type="button"
-                  className="sd-assigned-subject-hd"
-                  onClick={() => toggleSubject(group.subjectKey)}
-                  aria-expanded={!collapsed}
-                >
-                  <span className="sd-assigned-subject-hd-main">
-                    <span className="sd-assigned-subject-name">{group.subjectName}</span>
-                    <span className="sd-assigned-subject-count">{countLabel}</span>
-                  </span>
-                  <ChevronDown
-                    className={
-                      collapsed
-                        ? "sd-assigned-subject-chevron is-collapsed"
-                        : "sd-assigned-subject-chevron"
-                    }
-                    aria-hidden
-                  />
-                </button>
-                {!collapsed && (
-                  <ul className="sd-assigned-list">{group.modules.map(renderModule)}</ul>
-                )}
-              </section>
-            );
-          })}
-        </div>
+        <>
+          <div className="sd-assigned-subjects">
+            {subjectGroups.map((group, groupIndex) => {
+              const collapsed = isSubjectCollapsed(group.subjectKey, groupIndex);
+              const countLabel =
+                filter === "active"
+                  ? `${group.activeCount} remaining`
+                  : filter === "done"
+                    ? `${group.doneCount} done`
+                    : `${group.activeCount} active · ${group.doneCount} done`;
+              return (
+                <section key={group.subjectKey} className="sd-assigned-subject-group">
+                  <button
+                    type="button"
+                    className="sd-assigned-subject-hd"
+                    onClick={() => toggleSubject(group.subjectKey, groupIndex)}
+                    aria-expanded={!collapsed}
+                  >
+                    <span className="sd-assigned-subject-hd-main">
+                      <span className="sd-assigned-subject-name">{group.subjectName}</span>
+                      <span className="sd-assigned-subject-count">{countLabel}</span>
+                    </span>
+                    <ChevronDown
+                      className={
+                        collapsed
+                          ? "sd-assigned-subject-chevron is-collapsed"
+                          : "sd-assigned-subject-chevron"
+                      }
+                      aria-hidden
+                    />
+                  </button>
+                  {!collapsed && (
+                    <ul className="sd-assigned-list">{group.modules.map(renderModule)}</ul>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+
+          {visible.length > MODULES_PER_PAGE && (
+            <div className="sd-assigned-pagination">
+              <button
+                type="button"
+                className="sd-assigned-page-btn"
+                disabled={modulePage <= 1}
+                onClick={() => setModulePage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </button>
+              <span className="sd-assigned-page-info">
+                Page {modulePage} of {totalModulePages}
+                <span className="sd-assigned-page-meta">
+                  {" "}
+                  · showing {(modulePage - 1) * MODULES_PER_PAGE + 1}–
+                  {Math.min(modulePage * MODULES_PER_PAGE, visible.length)} of {visible.length}
+                </span>
+              </span>
+              <button
+                type="button"
+                className="sd-assigned-page-btn"
+                disabled={modulePage >= totalModulePages}
+                onClick={() => setModulePage((p) => Math.min(totalModulePages, p + 1))}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

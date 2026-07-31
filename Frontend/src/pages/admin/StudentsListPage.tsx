@@ -16,6 +16,7 @@ interface Student {
   name: string;
   email: string;
   createdAt: string;
+  targetYear?: string;
   totalEvaluations: number;
   latestScore: number | null;
   lastEvaluationDate: string | null;
@@ -148,138 +149,199 @@ export const StudentsListPage = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
-  return (
-    <div className={`min-h-screen p-6 transition-colors duration-500 ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
-      } font-sans`}>
-      <div className="max-w-7xl mx-auto space-y-8">
+  const pageActivity = students.reduce(
+    (acc, s) => acc + s.totalEvaluations + (s.totalPrelimsTests || 0),
+    0
+  );
 
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-2">
+  const stats = [
+    {
+      label: "Total Enrollment",
+      value: String(pagination?.total || 0),
+      icon: GraduationCap,
+      iconBg: "bg-blue-500/10 text-blue-500",
+    },
+    {
+      label: "Active This Month",
+      value: "--",
+      icon: UserCheck,
+      iconBg: "bg-emerald-500/10 text-emerald-500",
+    },
+    {
+      label: "Total Activity",
+      value: `${pageActivity}+`,
+      icon: BookOpen,
+      iconBg: "bg-sky-500/10 text-sky-500",
+    },
+    {
+      label: "Avg Achievement",
+      value: "74%",
+      icon: TrendingUp,
+      iconBg: "bg-amber-500/10 text-amber-500",
+    },
+  ];
+
+  return (
+    <div className={`min-h-screen p-4 sm:p-6 transition-colors duration-500 ${theme === "dark" ? "bg-[#020012] text-slate-50" : "bg-slate-50 text-slate-900"
+      } font-sans`}>
+      <div className="max-w-7xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent">
-              Student Management
-            </h1>
-            <p className={`mt-2 text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-3xl sm:text-[2rem] font-bold tracking-tight text-blue-500">
+                MD Student
+              </h1>
+              {pagination?.total != null && (
+                <span
+                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                    theme === "dark"
+                      ? "bg-blue-500/15 text-blue-300"
+                      : "bg-blue-50 text-blue-600"
+                  }`}
+                >
+                  {pagination.total}
+                </span>
+              )}
+            </div>
+            <p className={`mt-1 text-sm ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
               Manage your cohort, track performance, and oversee registrations.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <Button
               onClick={() => {
                 setShowCreateModal(true);
                 setCreatedStudent(null);
                 setNewStudentData({ name: "", email: "" });
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-6 h-auto rounded-2xl shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] flex items-center gap-2 group"
+              className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white h-11 px-5 rounded-xl shadow-sm shadow-blue-500/20 flex items-center justify-center gap-2"
             >
-              <UserPlus className="h-5 w-5 transition-transform group-hover:scale-110" />
-              <span className="font-semibold">Add New Student</span>
+              <UserPlus className="h-4 w-4" />
+              <span className="font-semibold text-sm">Add New Student</span>
             </Button>
-            <Link to="/admin/dashboard">
-              <Button variant="outline" className={`h-auto py-3 px-6 rounded-2xl border-2 ${theme === "dark" ? "border-slate-800 hover:bg-slate-800" : "border-slate-200 hover:bg-slate-100"
-                }`}>
+            <Link to="/admin/dashboard" className="shrink-0">
+              <Button
+                variant="outline"
+                className={`h-11 px-5 rounded-xl border ${
+                  theme === "dark"
+                    ? "border-slate-700 hover:bg-slate-800 text-slate-200"
+                    : "border-slate-200 hover:bg-white text-slate-700"
+                }`}
+              >
                 Dashboard
               </Button>
             </Link>
           </div>
         </div>
 
-        {/* Stats Summary Rows */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className={`${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-md" : "bg-white border-slate-100"} rounded-3xl overflow-hidden border-2`}>
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500">
-                <GraduationCap className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Enrollment</p>
-                <p className="text-2xl font-black">{pagination?.total || 0}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={`${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-md" : "bg-white border-slate-100"} rounded-3xl overflow-hidden border-2`}>
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-500">
-                <UserCheck className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Active This Month</p>
-                <p className="text-2xl font-black">--</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={`${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-md" : "bg-white border-slate-100"} rounded-3xl overflow-hidden border-2`}>
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500">
-                <BookOpen className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Activity</p>
-                <p className="text-2xl font-black">
-                  {students.reduce(
-                    (acc, s) => acc + s.totalEvaluations + (s.totalPrelimsTests || 0),
-                    0
-                  )}+
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={`${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-md" : "bg-white border-slate-100"} rounded-3xl overflow-hidden border-2`}>
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Avg Achievement</p>
-                <p className="text-2xl font-black">74%</p>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card
+                key={stat.label}
+                className={`rounded-2xl border shadow-sm transition-shadow hover:shadow-md ${
+                  theme === "dark"
+                    ? "bg-slate-900/50 border-slate-800"
+                    : "bg-white border-slate-100"
+                }`}
+              >
+                <CardContent className="p-4 sm:p-5 flex items-center gap-3.5">
+                  <div className={`h-11 w-11 rounded-full flex items-center justify-center shrink-0 ${stat.iconBg}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500 truncate">
+                      {stat.label}
+                    </p>
+                    <p className="text-xl sm:text-2xl font-bold tracking-tight mt-0.5">
+                      {stat.value}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Card className={`flex-1 transition-all duration-300 ${theme === "dark" ? "bg-slate-900/40 border-slate-800 backdrop-blur-xl" : "bg-white border-slate-200 shadow-sm"
-            } rounded-[2.5rem] overflow-hidden border-2`}>
-            <CardContent className="p-2 px-4 flex items-center gap-2">
-              <Search className={`h-5 w-5 ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`} />
-              <form onSubmit={handleSearch} className="flex-1">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Find a student by name or email..."
-                  className={`w-full py-3 bg-transparent border-none focus:outline-none focus:ring-0 ${theme === "dark" ? "text-slate-100 placeholder:text-slate-600" : "text-slate-900 placeholder:text-slate-400"
-                    }`}
-                />
-              </form>
-              <Button type="submit" onClick={handleSearch} className="rounded-2xl px-6 bg-slate-800 hover:bg-slate-700 text-white">Search</Button>
-            </CardContent>
-          </Card>
+        {/* Search */}
+        <div className="flex flex-col sm:flex-row gap-2.5">
+          <form
+            onSubmit={handleSearch}
+            className={`flex-1 flex items-center gap-2 rounded-2xl border px-3.5 h-12 shadow-sm ${
+              theme === "dark"
+                ? "bg-slate-900/50 border-slate-800"
+                : "bg-white border-slate-200"
+            }`}
+          >
+            <Search className={`h-4 w-4 shrink-0 ${theme === "dark" ? "text-slate-500" : "text-slate-400"}`} />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Find a student by name or email..."
+              className={`flex-1 min-w-0 bg-transparent border-none outline-none text-sm ${
+                theme === "dark"
+                  ? "text-slate-100 placeholder:text-slate-600"
+                  : "text-slate-900 placeholder:text-slate-400"
+              }`}
+            />
+            <Button
+              type="submit"
+              className="h-8 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shrink-0"
+            >
+              Search
+            </Button>
+          </form>
 
-          <Button variant="outline" className={`rounded-[2rem] px-6 h-auto border-2 ${theme === "dark" ? "border-slate-800 bg-slate-900/40" : "border-slate-200"
-            }`}>
+          <Button
+            type="button"
+            variant="outline"
+            className={`h-12 px-4 rounded-2xl border shrink-0 ${
+              theme === "dark"
+                ? "border-slate-800 bg-slate-900/50 hover:bg-slate-800"
+                : "border-slate-200 bg-white hover:bg-slate-50"
+            }`}
+          >
             <Filter className="h-4 w-4 mr-2" />
             Filters
           </Button>
         </div>
 
         {error && (
-          <div className={`p-5 rounded-3xl border flex items-center gap-4 ${theme === "dark" ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-200 text-red-700"
+          <div className={`p-4 rounded-2xl border flex items-center gap-3 ${theme === "dark" ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-200 text-red-700"
             }`}>
-            <ShieldAlert className="h-6 w-6" />
-            <span className="font-medium">{error}</span>
+            <ShieldAlert className="h-5 w-5 shrink-0" />
+            <span className="text-sm font-medium">{error}</span>
           </div>
         )}
 
-        {/* Students List */}
+        {/* Students Grid — 4 profile boxes per row */}
+        {!loading && students.length > 0 && (
+          <div className="flex items-center justify-between pt-1">
+            <p className={`text-sm font-medium ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+              Showing{" "}
+              <span className={theme === "dark" ? "text-slate-200" : "text-slate-800"}>
+                {students.length}
+              </span>
+              {pagination?.total != null && pagination.total !== students.length && (
+                <> of {pagination.total}</>
+              )}{" "}
+              students
+            </p>
+          </div>
+        )}
+
         {loading && students.length === 0 ? (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
               <div
                 key={i}
-                className={`h-20 rounded-2xl animate-pulse ${
+                className={`h-64 rounded-2xl animate-pulse ${
                   theme === "dark" ? "bg-slate-900/50" : "bg-slate-200/50"
                 }`}
               ></div>
@@ -297,118 +359,133 @@ export const StudentsListPage = () => {
             </p>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {students.map((student) => (
-              <Card
-                key={student._id}
-                className={`group relative overflow-hidden rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/40 ${
-                  theme === "dark"
-                    ? "bg-slate-900/60 border-slate-800"
-                    : "bg-white border-slate-100"
-                }`}
-              >
-                <div
-                  className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
-                ></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {students.map((student) => {
+              const success =
+                student.latestScore ??
+                (student.prelimsAverageScore !== undefined
+                  ? student.prelimsAverageScore
+                  : null);
+              const totalActivity =
+                student.totalEvaluations + (student.totalPrelimsTests || 0);
 
-                <CardContent className="px-5 py-4">
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Left: avatar + name/email */}
-                    <div className="flex items-center gap-4">
+              return (
+                <Card
+                  key={student._id}
+                  className={`group relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-md hover:border-blue-400/50 ${
+                    theme === "dark"
+                      ? "bg-slate-900/60 border-slate-800"
+                      : "bg-white border-slate-200 shadow-sm"
+                  }`}
+                >
+                  {/* Always-visible delete */}
+                  <button
+                    type="button"
+                    title="Delete student"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setStudentToDelete(student);
+                      setShowDeleteConfirm(true);
+                      setDeleteError("");
+                    }}
+                    className={`absolute top-3 right-3 z-10 h-8 w-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all ${
+                      theme === "dark"
+                        ? "text-slate-500 hover:text-red-400 hover:bg-red-500/15"
+                        : "text-slate-400 hover:text-red-500 hover:bg-red-50"
+                    }`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+
+                  <CardContent className="p-5 pt-6 flex flex-col items-center text-center h-full">
+                    <div
+                      className={`h-14 w-14 rounded-full flex items-center justify-center text-lg font-bold mb-3 ring-4 ${
+                        theme === "dark"
+                          ? "bg-blue-500/20 text-blue-300 ring-blue-500/10"
+                          : "bg-blue-50 text-blue-600 ring-blue-50"
+                      }`}
+                    >
+                      {getInitials(student.name)}
+                    </div>
+
+                    <h3 className="text-[15px] font-semibold truncate w-full px-6 leading-tight">
+                      {student.name}
+                    </h3>
+                    <p
+                      className={`text-xs truncate w-full mt-1 ${
+                        theme === "dark" ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
+                      {student.email}
+                    </p>
+
+                    <div
+                      className={`grid grid-cols-2 divide-x w-full mt-4 rounded-xl overflow-hidden ${
+                        theme === "dark"
+                          ? "bg-slate-800/50 divide-slate-700/80"
+                          : "bg-slate-50 divide-slate-200"
+                      }`}
+                    >
+                      <div className="px-2 py-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+                          Activity
+                        </p>
+                        <p className="text-lg font-bold leading-none">{totalActivity}</p>
+                        <p className="text-[10px] text-slate-500 mt-1">
+                          {student.totalEvaluations}M · {student.totalPrelimsTests || 0}P
+                        </p>
+                      </div>
+                      <div className="px-2 py-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
+                          Success
+                        </p>
+                        <p className="text-lg font-bold leading-none text-emerald-500">
+                          {success !== null ? `${Math.round(success)}%` : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`mt-auto pt-4 w-full flex items-center justify-between gap-2 border-t ${
+                        theme === "dark" ? "border-slate-800" : "border-slate-100"
+                      }`}
+                    >
                       <div
-                        className={`h-12 w-12 rounded-xl flex items-center justify-center text-lg font-black transition-transform group-hover:scale-110 duration-300 ${
-                          theme === "dark"
-                            ? "bg-blue-500/20 text-blue-300"
-                            : "bg-blue-100 text-blue-700"
-                        }`}
+                        className="flex items-center gap-1.5"
+                        title={
+                          student.targetYear
+                            ? `Target Year: ${student.targetYear}`
+                            : "Target year not set"
+                        }
                       >
-                        {getInitials(student.name)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold truncate leading-tight group-hover:text-blue-400 transition-colors">
-                          {student.name}
-                        </h3>
-                        <p className={`text-xs truncate mt-0.5 opacity-60`}>
-                          {student.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Right top: delete button */}
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setStudentToDelete(student);
-                          setShowDeleteConfirm(true);
-                          setDeleteError("");
-                        }}
-                        className="h-12 w-12 p-0 rounded-2xl hover:bg-red-500/20 hover:text-red-400 text-slate-400 transition-all duration-300 flex items-center justify-center shrink-0"
-                      >
-                        <Trash2 className="h-6 w-6" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Row content */}
-                  <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    {/* Middle: activity + success */}
-                    <div className="flex flex-1 gap-4 md:gap-8">
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
-                          Total Activity
-                        </p>
-                        <p className="text-base font-semibold">
-                          {student.totalEvaluations + (student.totalPrelimsTests || 0)}
-                        </p>
-                        <p className="mt-0.5 text-[11px] text-slate-500">
-                          {student.totalEvaluations} mains • {student.totalPrelimsTests || 0} prelims
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">
-                          Success Rate
-                        </p>
-                        <p className="text-base font-semibold text-emerald-500">
-                          {(() => {
-                            const success =
-                              student.latestScore ??
-                              (student.prelimsAverageScore !== undefined
-                                ? student.prelimsAverageScore
-                                : null);
-                            return success !== null ? `${Math.round(success)}%` : "N/A";
-                          })()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Right: joined + profile button */}
-                    <div className="flex items-center justify-between md:justify-end gap-3 md:min-w-[220px]">
-                      <div className="flex items-center gap-2 text-[11px] font-semibold opacity-50">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span>
-                          {new Date(student.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            year: "numeric",
-                          })}
+                        <Calendar className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                        <span
+                          className={`text-sm font-bold tracking-tight ${
+                            student.targetYear
+                              ? "text-red-600 dark:text-red-400"
+                              : theme === "dark"
+                                ? "text-slate-500"
+                                : "text-slate-400"
+                          }`}
+                        >
+                          {student.targetYear
+                            ? `Target ${student.targetYear}`
+                            : "Target —"}
                         </span>
                       </div>
-                      <Link to={`/admin/students/${student._id}`}>
-                        <Button
-                          variant="ghost"
-                          className="rounded-xl h-8 px-3 hover:bg-blue-500/10 hover:text-blue-400 flex items-center gap-1.5 group/btn text-xs font-semibold"
-                        >
-                          Profile
-                          <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-1" />
-                        </Button>
+                      <Link
+                        to={`/admin/students/${student._id}`}
+                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 group/btn"
+                      >
+                        Profile
+                        <ArrowRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
                       </Link>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 

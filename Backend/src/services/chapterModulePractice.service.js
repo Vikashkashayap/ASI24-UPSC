@@ -383,6 +383,32 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
  * student reuses those questions (new Test doc per student, 0 LLM calls).
  * Retake prefers that student's own prior paper, else the shared bank.
  */
+function mapSavedChapterTestForClient(test, extra = {}) {
+  return {
+    _id: test._id,
+    subject: test.subject,
+    examType: test.examType,
+    topic: test.topic,
+    difficulty: test.difficulty,
+    totalQuestions: test.totalQuestions,
+    durationMinutes: test.durationMinutes,
+    questions: (test.questions || []).map((q) =>
+      mapBilingualQuestionForClient(q, { includeAnswers: false })
+    ),
+    createdAt: test.createdAt,
+    isSubmitted: Boolean(test.isSubmitted),
+    ...extra,
+  };
+}
+
+/** Same scope filters used for chapter practice (exclude prelims / assigned practice). */
+function chapterPracticeScopeFilters() {
+  return [
+    { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+    { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+  ];
+}
+
 export async function createChapterPracticeTest({
   userId,
   kbSubject,
@@ -415,6 +441,45 @@ export async function createChapterPracticeTest({
     `^${topicNormalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
     "i"
   );
+
+  // Resume unfinished attempt for this student + topic (Stop creating duplicate "In progress" rows)
+  if (userId) {
+    const openAttempts = await Test.find({
+      userId,
+      topic: topicRegex,
+      examType: "GS",
+      isSubmitted: false,
+      $and: chapterPracticeScopeFilters(),
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    if (openAttempts.length > 0) {
+      const [latest, ...stale] = openAttempts;
+      if (stale.length > 0) {
+        await Test.deleteMany({ _id: { $in: stale.map((t) => t._id) } });
+        console.log(
+          `[chapterPractice] cleaned ${stale.length} stale unsubmitted duplicate(s) for "${topicNormalized}"`
+        );
+      }
+      console.log(
+        `[chapterPractice] RESUME unsubmitted test ${latest._id} (topic="${topicNormalized}") — no new doc`
+      );
+      return {
+        test: mapSavedChapterTestForClient(latest, {
+          fromCache: true,
+          resumed: true,
+          chapterLabel: chapterLabel || topicNormalized,
+          kbSubject,
+          shownCount: latest.totalQuestions,
+          source: "resume",
+        }),
+        fromCache: true,
+        resumed: true,
+      };
+    }
+  }
+
   const baseCacheQuery = {
     subject: testSubject,
     topic: topicRegex,
@@ -422,10 +487,7 @@ export async function createChapterPracticeTest({
     examType: "GS",
     totalQuestions: { $gte: SHOW_COUNT },
     questions: { $exists: true, $not: { $size: 0 } },
-    $and: [
-      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
-      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
-    ],
+    $and: chapterPracticeScopeFilters(),
   };
 
   /**
@@ -570,18 +632,7 @@ export async function createChapterPracticeTest({
   await test.save();
 
   return {
-    test: {
-      _id: test._id,
-      subject: test.subject,
-      examType: test.examType,
-      topic: test.topic,
-      difficulty: test.difficulty,
-      totalQuestions: test.totalQuestions,
-      durationMinutes: test.durationMinutes,
-      questions: test.questions.map((q) =>
-        mapBilingualQuestionForClient(q, { includeAnswers: false })
-      ),
-      createdAt: test.createdAt,
+    test: mapSavedChapterTestForClient(test, {
       fromCache,
       cacheMeta,
       chapterLabel: chapterLabel || topicNormalized,
@@ -589,8 +640,10 @@ export async function createChapterPracticeTest({
       generatedCount: GENERATE_COUNT,
       shownCount: questions.length,
       source: fromCache ? "cache" : generationSource,
-    },
+      resumed: false,
+    }),
     fromCache,
+    resumed: false,
   };
 }
 
@@ -922,14 +975,11 @@ export async function listMyModuleTargetsPracticeHistory({
     topic: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
   }));
 
-  return Test.find({
+  const rows = await Test.find({
     userId,
     examType: "GS",
     $or: topicOr,
-    $and: [
-      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
-      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
-    ],
+    $and: chapterPracticeScopeFilters(),
   })
     .sort({ createdAt: -1 })
     .limit(Math.min(200, Math.max(1, Number(limit) || 100)))
@@ -937,4 +987,32 @@ export async function listMyModuleTargetsPracticeHistory({
       "_id subject topic difficulty totalQuestions score accuracy isSubmitted createdAt correctAnswers wrongAnswers"
     )
     .lean();
+
+  // Keep every submitted attempt; only the latest unsubmitted per topic (no duplicate In progress cards)
+  const seenOpenTopic = new Set();
+  const staleOpenIds = [];
+  const deduped = [];
+  for (const row of rows) {
+    const key = String(row.topic || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+    if (!row.isSubmitted) {
+      if (seenOpenTopic.has(key)) {
+        staleOpenIds.push(row._id);
+        continue;
+      }
+      seenOpenTopic.add(key);
+    }
+    deduped.push(row);
+  }
+
+  // Drop older unfinished duplicates left from pre-fix "Start Test" clicks
+  if (staleOpenIds.length > 0) {
+    void Test.deleteMany({ _id: { $in: staleOpenIds }, userId, isSubmitted: false }).catch((err) =>
+      console.warn("[chapterHistory] stale cleanup:", err.message)
+    );
+  }
+
+  return deduped;
 }

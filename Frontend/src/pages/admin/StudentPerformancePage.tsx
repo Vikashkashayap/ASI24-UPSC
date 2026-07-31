@@ -84,8 +84,14 @@ export const StudentPerformancePage: React.FC = () => {
   const [data, setData] = useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [historyPage, setHistoryPage] = useState(1);
+  const HISTORY_PAGE_SIZE = 10;
 
   const isDark = theme === "dark";
+
+  useEffect(() => {
+    setHistoryPage(1);
+  }, [studentId]);
 
   useEffect(() => {
     if (!studentId) return;
@@ -180,6 +186,12 @@ export const StudentPerformancePage: React.FC = () => {
     if (accuracy > 70) return isDark ? "#4ade80" : "#16a34a";
     return isDark ? "#fbbf24" : "#ca8a04";
   };
+
+  const historyTotal = data?.tests?.length || 0;
+  const historyTotalPages = Math.max(1, Math.ceil(historyTotal / HISTORY_PAGE_SIZE));
+  const historyCurrentPage = Math.min(Math.max(1, historyPage), historyTotalPages);
+  const historyStart = (historyCurrentPage - 1) * HISTORY_PAGE_SIZE;
+  const pagedTests = (data?.tests || []).slice(historyStart, historyStart + HISTORY_PAGE_SIZE);
 
   if (!studentId) {
     return (
@@ -409,7 +421,7 @@ export const StudentPerformancePage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                data.tests.map((t) => (
+                pagedTests.map((t) => (
                   <tr
                     key={t.testId}
                     className={`border-t ${isDark ? "border-slate-700 hover:bg-slate-800/50" : "hover:bg-slate-50"}`}
@@ -431,6 +443,78 @@ export const StudentPerformancePage: React.FC = () => {
             </tbody>
           </table>
         </div>
+        {historyTotal > HISTORY_PAGE_SIZE && (
+          <div
+            className={`flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t ${
+              isDark ? "border-slate-700" : "border-slate-200"
+            }`}
+          >
+            <p className={`text-xs sm:text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              Showing{" "}
+              <span className={isDark ? "text-slate-200" : "text-slate-800"}>
+                {historyStart + 1}–{Math.min(historyStart + HISTORY_PAGE_SIZE, historyTotal)}
+              </span>{" "}
+              of {historyTotal}
+            </p>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={historyCurrentPage <= 1}
+                onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                className="h-9 px-3 rounded-xl"
+              >
+                Prev
+              </Button>
+              {Array.from({ length: historyTotalPages }, (_, i) => i + 1)
+                .filter((page) => {
+                  if (historyTotalPages <= 7) return true;
+                  return (
+                    page === 1 ||
+                    page === historyTotalPages ||
+                    Math.abs(page - historyCurrentPage) <= 1
+                  );
+                })
+                .map((page, idx, arr) => {
+                  const prev = arr[idx - 1];
+                  const showEllipsis = prev != null && page - prev > 1;
+                  return (
+                    <span key={page} className="flex items-center">
+                      {showEllipsis && (
+                        <span className={`px-1 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                          …
+                        </span>
+                      )}
+                      <Button
+                        type="button"
+                        variant={historyCurrentPage === page ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setHistoryPage(page)}
+                        className={`h-9 w-9 p-0 rounded-xl font-semibold ${
+                          historyCurrentPage === page
+                            ? "bg-amber-600 hover:bg-amber-500 text-white"
+                            : ""
+                        }`}
+                      >
+                        {page}
+                      </Button>
+                    </span>
+                  );
+                })}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={historyCurrentPage >= historyTotalPages}
+                onClick={() => setHistoryPage((p) => Math.min(historyTotalPages, p + 1))}
+                className="h-9 px-3 rounded-xl"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
