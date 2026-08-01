@@ -37,6 +37,7 @@ const subscriptionCheck = async (req, res, next) => {
         subscriptionPlanId: null,
         subscriptionStartDate: null,
         subscriptionEndDate: null,
+        ...(user.accountType === "paid-user" ? { isPremiumStudent: false } : {}),
       });
     } catch (err) {
       console.error("Subscription expiry update failed:", err);

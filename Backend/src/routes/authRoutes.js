@@ -8,8 +8,11 @@ import {
   registerSendOtp,
   verifyRegisterOtp,
   resendRegisterOtp,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/authController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { forgotPasswordRateLimiter } from "../middleware/rateLimiter.js";
 import { googleAuth, googleAuthCallback } from "../config/passport.js";
 
 const router = express.Router();
@@ -22,6 +25,8 @@ router.post("/register/resend-otp", resendRegisterOtp);
 router.post("/login", login);
 router.get("/google", googleAuth);
 router.get("/google/callback", googleAuthCallback);
+router.post("/forgot-password", forgotPasswordRateLimiter, forgotPassword);
+router.post("/reset-password", resetPassword);
 router.post("/change-password", authMiddleware, changePassword);
 router.get("/me", authMiddleware, me);
 router.patch("/profile", authMiddleware, updateProfile);

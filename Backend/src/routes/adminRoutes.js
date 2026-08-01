@@ -94,6 +94,27 @@ import {
   updateOffer,
   deleteOffer,
 } from "../controllers/offerController.js";
+import {
+  adminListCategories,
+  adminCreateCategory,
+  adminUpdateCategory,
+  adminDeleteCategory,
+  adminListNotes,
+  adminGetNote,
+  adminCreateNote,
+  adminUpdateNote,
+  adminDeleteNote,
+  adminListPermissions,
+  adminGrantPermission,
+  adminRevokePermission,
+  adminListOrders,
+  adminListNotesStudents,
+} from "../controllers/notesWebsiteController.js";
+import {
+  adminGetOrders,
+  adminGetSubscriptions,
+  adminOrdersStats,
+} from "../controllers/order.controller.js";
 import { requireAdminOrMentorTools } from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
@@ -132,6 +153,11 @@ router.use(requireAdminOrMentorTools);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);
+
+// Notes Website orders / subscriptions (canonical APIs)
+router.get("/orders/stats", adminOrdersStats);
+router.get("/orders", adminGetOrders);
+router.get("/subscriptions", adminGetSubscriptions);
 
 // Prelims Import: upload question paper PDF (parsed English questions)
 router.post("/upload-test", pdfUpload, uploadTest);
@@ -219,6 +245,25 @@ router.get("/offers", listOffers);
 router.post("/offers", createOffer);
 router.put("/offers/:id", updateOffer);
 router.delete("/offers/:id", deleteOffer);
+
+// Website Notes CMS (admin only — path must NOT start with /notes so mentors stay on sync tools only)
+router.get("/website-notes/categories", adminListCategories);
+router.post("/website-notes/categories", adminCreateCategory);
+router.put("/website-notes/categories/:id", adminUpdateCategory);
+router.delete("/website-notes/categories/:id", adminDeleteCategory);
+
+router.get("/website-notes", adminListNotes);
+router.get("/website-notes/:id", adminGetNote);
+router.post("/website-notes", adminCreateNote);
+router.put("/website-notes/:id", adminUpdateNote);
+router.delete("/website-notes/:id", adminDeleteNote);
+
+router.get("/website-notes-permissions", adminListPermissions);
+router.post("/website-notes-permissions", adminGrantPermission);
+router.delete("/website-notes-permissions/:id", adminRevokePermission);
+
+router.get("/website-notes-orders", adminListOrders);
+router.get("/website-notes-students", adminListNotesStudents);
 
 // User search
 router.get("/search", searchUsers);

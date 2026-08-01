@@ -111,3 +111,46 @@ export const sendPaymentReceiptEmail = async (user, plan) => {
     html,
   });
 };
+
+/**
+ * Password reset email for Notes Website / Student Portal.
+ * @param {{ toEmail: string, resetUrl: string, ttlMinutes?: number, name?: string }} params
+ */
+export const sendPasswordResetEmail = async ({
+  toEmail,
+  resetUrl,
+  ttlMinutes = 15,
+  name = "",
+}) => {
+  const mailer = getTransporter();
+  const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
+  const fromName = process.env.SMTP_FROM_NAME || "MentorsDaily";
+  const supportEmail = process.env.SUPPORT_EMAIL || fromEmail || "support@mentorsdaily.com";
+  const greeting = name ? `Hi ${name},` : "Hi,";
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;background:#060b24;color:#e2e8f0;padding:24px;">
+      <div style="max-width:560px;margin:0 auto;background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:24px;">
+        <h2 style="margin:0 0 10px;color:#60a5fa;">Reset your MentorsDaily password</h2>
+        <p style="margin:0 0 16px;color:#cbd5e1;">${greeting} we received a request to reset your password.</p>
+        <p style="margin:0 0 20px;">
+          <a href="${resetUrl}" style="display:inline-block;background:#f97316;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:8px;">
+            Reset password
+          </a>
+        </p>
+        <p style="margin:0 0 8px;color:#94a3b8;font-size:13px;">Or copy and paste this link into your browser:</p>
+        <p style="margin:0 0 16px;color:#60a5fa;font-size:12px;word-break:break-all;">${resetUrl}</p>
+        <p style="margin:0;color:#94a3b8;">This link expires in ${ttlMinutes} minutes.</p>
+        <p style="margin:8px 0 0;color:#64748b;font-size:12px;">If you did not request a password reset, you can ignore this email.</p>
+        <p style="margin:14px 0 0;color:#64748b;font-size:12px;">Need help? Write to ${supportEmail}</p>
+      </div>
+    </div>
+  `;
+
+  await mailer.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    to: toEmail,
+    subject: "Reset your MentorsDaily password",
+    html,
+  });
+};

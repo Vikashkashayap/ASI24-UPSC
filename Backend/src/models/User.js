@@ -78,6 +78,43 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    /**
+     * Registration origin for the shared users collection.
+     * - "portal": Student Portal (default)
+     * - "notes": Public Notes Website
+     */
+    source: {
+      type: String,
+      enum: ["portal", "notes"],
+      default: "portal",
+      index: true,
+    },
+    /**
+     * When true, user can open all premium notes on the Notes Website without purchase.
+     * Set for MD / admin-created students and active portal subscribers.
+     * Notes Website self-registrations stay false and must purchase premium notes.
+     */
+    isPremiumStudent: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    /** Last successful login via Notes Website APIs (/api/notes/auth/*) */
+    notesLastLoginAt: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    /** SHA-256 hash of password-reset token (plain token is never stored) */
+    passwordResetToken: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    passwordResetExpires: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

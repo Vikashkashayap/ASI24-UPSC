@@ -119,6 +119,26 @@ const AdminOfferManagerPage = lazyPage(
   () => import("./pages/admin/AdminOfferManagerPage"),
   "AdminOfferManagerPage"
 );
+const AdminNotesManagerPage = lazyPage(
+  () => import("./pages/admin/AdminNotesManagerPage"),
+  "AdminNotesManagerPage"
+);
+const AdminNotesAnalyticsPage = lazyPage(
+  () => import("./pages/admin/AdminNotesAnalyticsPage"),
+  "AdminNotesAnalyticsPage"
+);
+const AdminNotesPricingPlansPage = lazyPage(
+  () => import("./pages/admin/AdminNotesPricingPlansPage"),
+  "AdminNotesPricingPlansPage"
+);
+const AdminNotesOrdersPage = lazyPage(
+  () => import("./pages/admin/AdminNotesOrdersPage"),
+  "AdminNotesOrdersPage"
+);
+const AdminNotesPaymentsPage = lazyPage(
+  () => import("./pages/admin/AdminNotesPaymentsPage"),
+  "AdminNotesPaymentsPage"
+);
 const StudentsListPage = lazyPage(() => import("./pages/admin/StudentsListPage"), "StudentsListPage");
 const StudentDetailPage = lazyPage(() => import("./pages/admin/StudentDetailPage"), "StudentDetailPage");
 const AdminMentorsPage = lazyPage(() => import("./pages/admin/AdminMentorsPage"), "AdminMentorsPage");
@@ -216,6 +236,11 @@ function App() {
               <Route path="student-performance/:studentId" element={<StudentPerformancePage />} />
               <Route path="pricing" element={<AdminPricingPage />} />
               <Route path="offer-manager" element={<AdminOfferManagerPage />} />
+              <Route path="notes-analytics" element={<AdminNotesAnalyticsPage />} />
+              <Route path="notes-pricing-plans" element={<AdminNotesPricingPlansPage />} />
+              <Route path="notes-orders" element={<AdminNotesOrdersPage />} />
+              <Route path="notes-payments" element={<AdminNotesPaymentsPage />} />
+              <Route path="notes-manager" element={<AdminNotesManagerPage />} />
               <Route path="students" element={<StudentsListPage />} />
               <Route path="students/:id" element={<StudentDetailPage />} />
               <Route path="mentors" element={<AdminMentorsPage />} />

@@ -30,6 +30,7 @@ async function promoteLegacyUnpaidProToMdStudents(adminUserId) {
         subscriptionPlanId: null,
         subscriptionStartDate: new Date(),
         subscriptionEndDate: null,
+        isPremiumStudent: true,
         ...(adminUserId ? { createdBy: adminUserId } : {}),
       },
     },
@@ -362,6 +363,7 @@ export const moveProStudentToAdmin = async (req, res) => {
     student.subscriptionPlanId = null;
     student.subscriptionStartDate = new Date();
     student.subscriptionEndDate = null;
+    student.isPremiumStudent = true;
     if (req.user?._id) {
       student.createdBy = req.user._id;
     }
@@ -403,6 +405,7 @@ export const moveAllProStudentsToAdmin = async (req, res) => {
           subscriptionPlanId: null,
           subscriptionStartDate: new Date(),
           subscriptionEndDate: null,
+          isPremiumStudent: true,
           ...(req.user?._id ? { createdBy: req.user._id } : {}),
         },
       },
@@ -1423,6 +1426,8 @@ export const createStudent = async (req, res) => {
       subscriptionPlanId: null,
       subscriptionStartDate: new Date(),
       subscriptionEndDate: null,
+      source: "portal",
+      isPremiumStudent: true,
     });
 
     res.status(201).json({
