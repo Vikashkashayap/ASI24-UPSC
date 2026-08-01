@@ -21,6 +21,7 @@ import {
   adminListOrders,
   adminListPayments,
   adminListNotesUsers,
+  adminDeleteNotesUser,
   adminNotesAnalytics,
 } from "../controllers/notesCmsAdminController.js";
 import {
@@ -69,5 +70,6 @@ router.get("/subscriptions", adminGetSubscriptions);
 
 /* Registered Notes users (source=notes only) */
 router.get("/users", adminListNotesUsers);
+router.delete("/users/:id", adminDeleteNotesUser);
 
 export default router;

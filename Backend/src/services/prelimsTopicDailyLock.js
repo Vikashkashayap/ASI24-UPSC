@@ -3,7 +3,7 @@ import Test from "../models/Test.js";
 const TZ = "Asia/Kolkata";
 
 /** Max practice tests a student may generate per IST calendar day. */
-export const PRELIMS_DAILY_TEST_LIMIT = 2;
+export const PRELIMS_DAILY_TEST_LIMIT = 4;
 
 /**
  * Calendar day bounds in Asia/Kolkata (IST).

@@ -1584,6 +1584,8 @@ export const notesPortalAdminAPI = {
         pagination: { page: number; limit: number; total: number; totalPages: number };
       };
     }>(`${NP}/users`, { params }),
+  deleteUser: (id: string) =>
+    api.delete<{ success: boolean; message?: string }>(`${NP}/users/${id}`),
 };
 
 /** Public Notes Website catalog (subjects / chapters / subscribe) */
@@ -1713,3 +1715,76 @@ export const currentAffairsAdminAPI = {
   runNow: () => api.post<{ success: boolean; data: { created: number; skipped: number }; message: string }>("/api/admin/current-affairs/run-now"),
   toggle: (id: string) => api.patch<{ success: boolean; data: { _id: string; isActive: boolean } }>(`/api/current-affairs/${id}`),
 };
+
+// ─── Mains Materials (Mains 360) ─────────────────────────────────────────────
+export interface MainsMaterialFileMeta {
+  originalName: string;
+  fileSize: number;
+  hasFile: boolean;
+}
+
+export interface MainsMaterialSession {
+  _id: string;
+  sessionNumber: number;
+  title: string;
+  description: string;
+  videoUrl: string;
+  status: "published" | "draft";
+  ppt: MainsMaterialFileMeta | null;
+  workbook: MainsMaterialFileMeta | null;
+  referenceCards: MainsMaterialFileMeta | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type MainsMaterialFileType = "ppt" | "workbook" | "referenceCards";
+
+export const mainsMaterialsAPI = {
+  /** Student: published sessions only */
+  listPublished: () =>
+    api.get<{ success: boolean; data: MainsMaterialSession[] }>("/api/mains-materials"),
+
+  /** Admin: all sessions */
+  listAdmin: () =>
+    api.get<{ success: boolean; data: MainsMaterialSession[] }>("/api/admin/mains-materials"),
+
+  getAdmin: (id: string) =>
+    api.get<{ success: boolean; data: MainsMaterialSession }>(`/api/admin/mains-materials/${id}`),
+
+  create: (formData: FormData) =>
+    api.post<{ success: boolean; data: MainsMaterialSession }>("/api/admin/mains-materials", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 600000,
+    }),
+
+  update: (id: string, formData: FormData) =>
+    api.put<{ success: boolean; data: MainsMaterialSession }>(`/api/admin/mains-materials/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 600000,
+    }),
+
+  delete: (id: string) =>
+    api.delete<{ success: boolean; message?: string }>(`/api/admin/mains-materials/${id}`),
+
+  /** Authenticated PDF stream (student published / admin any) */
+  downloadFile: (id: string, type: MainsMaterialFileType, asAdmin = false) =>
+    api.get(
+      asAdmin
+        ? `/api/admin/mains-materials/${id}/file/${type}`
+        : `/api/mains-materials/${id}/file/${type}`,
+      { responseType: "blob", timeout: 120000 }
+    ),
+};
+
+/** Open a Mains Materials PDF in a new tab (auth via axios). */
+export async function openMainsMaterialPdf(
+  id: string,
+  type: MainsMaterialFileType,
+  asAdmin = false
+): Promise<void> {
+  const res = await mainsMaterialsAPI.downloadFile(id, type, asAdmin);
+  const blob = new Blob([res.data], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank", "noopener,noreferrer");
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}

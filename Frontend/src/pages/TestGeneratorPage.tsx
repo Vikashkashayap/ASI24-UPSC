@@ -102,7 +102,7 @@ const TestGeneratorPage: React.FC = () => {
   const [currentAffairsYear, setCurrentAffairsYear] = useState<string>("");
 
   const isDailyLocked = Boolean(dailyStatus?.locked);
-  const dailyLimit = dailyStatus?.limit ?? 2;
+  const dailyLimit = dailyStatus?.limit ?? 4;
   const usedCount = dailyStatus?.usedCount ?? 0;
   const remaining = dailyStatus?.remaining ?? dailyLimit;
   const formDisabled = isGenerating || isDailyLocked;

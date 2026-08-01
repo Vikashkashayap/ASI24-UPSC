@@ -2,7 +2,7 @@ import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award, ShoppingBag, CreditCard } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award, CreditCard, Library } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -124,6 +124,7 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/practice-test/history': { title: 'Modular Test History', icon: <History className="w-5 h-5" /> },
     '/prelims-mock': { title: 'Prelims Test Series', icon: <Award className="w-5 h-5" /> },
     '/current-affairs': { title: 'Daily Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
+    '/mains-360': { title: 'Mains 360', icon: <Library className="w-5 h-5" /> },
     '/module-chapter-history': { title: 'Chapter Test History', icon: <History className="w-5 h-5" /> },
     // '/test-history': { title: 'Test History', icon: <History className="w-5 h-5" /> },
     '/meeting': { title: 'Live Meeting', icon: <Video className="w-5 h-5" /> },
@@ -153,10 +154,10 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
+    '/admin/mains-materials': { title: 'Mains Materials', icon: <Library className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
     '/admin/notes-analytics': { title: 'Notes Analytics', icon: <BarChart3 className="w-5 h-5" /> },
     '/admin/notes-pricing-plans': { title: 'Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
-    '/admin/notes-orders': { title: 'Orders', icon: <ShoppingBag className="w-5 h-5" /> },
     '/admin/notes-payments': { title: 'Payments', icon: <CreditCard className="w-5 h-5" /> },
     '/admin/notes-manager': { title: 'Registered Notes Users', icon: <Users className="w-5 h-5" /> },
     '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
@@ -517,6 +518,10 @@ export const DashboardLayout = () => {
                   <IndianRupee className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Pricing Plans</span>}
                 </NavLink>
+                <NavLink to="/admin/mains-materials" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Mains Materials">
+                  <Library className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Mains Materials</span>}
+                </NavLink>
                 <NavLink to="/admin/offer-manager" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Offer Manager">
                   <Tag className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Offer Manager</span>}
@@ -534,10 +539,6 @@ export const DashboardLayout = () => {
                 <NavLink to="/admin/notes-pricing-plans" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Notes Pricing Plans">
                   <IndianRupee className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Pricing Plans</span>}
-                </NavLink>
-                <NavLink to="/admin/notes-orders" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Orders">
-                  <ShoppingBag className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Orders</span>}
                 </NavLink>
                 <NavLink to="/admin/notes-payments" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Payments">
                   <CreditCard className="w-4 h-4 flex-shrink-0" />
@@ -672,6 +673,16 @@ export const DashboardLayout = () => {
                   collapsed={sidebarCollapsed}
                   pathname={location.pathname}
                   end
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
+                <SidebarNavItem
+                  to="/mains-360"
+                  title="Mains 360"
+                  icon={Library}
+                  label="Mains 360"
+                  theme={theme}
+                  collapsed={sidebarCollapsed}
+                  pathname={location.pathname}
                   onNavigate={() => setMobileMenuOpen(false)}
                 />
                 <SidebarNavItem

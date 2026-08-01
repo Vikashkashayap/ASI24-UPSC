@@ -12,14 +12,40 @@ import { getDartAnalytics, getDart15DayReport, build15DayReportPdf } from "../se
 /**
  * Legacy unpaid pro accounts (never completed payment) → MD Students with free access.
  * Only touches accounts created before this cutoff so new self-registrants still must pay.
+ * Notes Website users are never promoted — they stay on /admin/notes-manager.
  */
 const LEGACY_PRO_TO_MD_CUTOFF = new Date("2026-08-01T00:00:00.000Z");
 
+/** Undo Notes users incorrectly marked as MD (admin-created) by legacy promotion. */
+async function demoteNotesUsersFromMdStudents() {
+  return User.updateMany(
+    {
+      role: "student",
+      source: "notes",
+      accountType: "admin-created",
+    },
+    {
+      $set: {
+        accountType: "paid-user",
+        subscriptionStatus: "inactive",
+        isPremiumStudent: false,
+        subscriptionPlanId: null,
+        subscriptionEndDate: null,
+      },
+      $unset: { createdBy: "" },
+    },
+  );
+}
+
 async function promoteLegacyUnpaidProToMdStudents(adminUserId) {
+  // Ensure Notes self-registrants never linger in MD Students
+  await demoteNotesUsersFromMdStudents();
+
   const result = await User.updateMany(
     {
       role: "student",
       accountType: "paid-user",
+      source: { $ne: "notes" },
       subscriptionStatus: { $ne: "active" },
       createdAt: { $lt: LEGACY_PRO_TO_MD_CUTOFF },
     },
@@ -63,12 +89,18 @@ export const getAllStudents = async (req, res) => {
         };
       }
     } else {
-      query = { role: "student", accountType: { $ne: "paid-user" } };
+      // MD Students = admin-created portal users only (exclude Notes Website registrants)
+      query = {
+        role: "student",
+        accountType: "admin-created",
+        source: { $ne: "notes" },
+      };
       if (search && search.trim().length >= 2) {
         const searchRegex = new RegExp(search.trim(), "i");
         query = {
           role: "student",
-          accountType: { $ne: "paid-user" },
+          accountType: "admin-created",
+          source: { $ne: "notes" },
           $or: [{ name: searchRegex }, { email: searchRegex }],
         };
       }
@@ -198,9 +230,11 @@ export const getProStudents = async (req, res) => {
     // Keep legacy unpaid accounts from getting stuck only on this list
     await promoteLegacyUnpaidProToMdStudents(req.user?._id);
 
+    // Portal pro students only — Notes Website users belong in Notes Manager
     let query = {
       role: 'student',
       accountType: 'paid-user',
+      source: { $ne: 'notes' },
     };
 
     if (search && search.trim().length >= 2) {
@@ -305,6 +339,7 @@ export const getProStudents = async (req, res) => {
     const activeProStudents = await User.countDocuments({
       role: 'student',
       accountType: 'paid-user',
+      source: { $ne: 'notes' },
       subscriptionStatus: 'active',
     });
 
@@ -358,7 +393,15 @@ export const moveProStudentToAdmin = async (req, res) => {
       });
     }
 
+    if (student.source === 'notes') {
+      return res.status(400).json({
+        success: false,
+        message: 'Notes Website users cannot be moved to MD Students. Manage them under Notes Manager.',
+      });
+    }
+
     student.accountType = 'admin-created';
+    student.source = 'portal';
     student.subscriptionStatus = 'active';
     student.subscriptionPlanId = null;
     student.subscriptionStartDate = new Date();
@@ -397,10 +440,11 @@ export const moveAllProStudentsToAdmin = async (req, res) => {
     await promoteLegacyUnpaidProToMdStudents(req.user?._id);
 
     const result = await User.updateMany(
-      { role: 'student', accountType: 'paid-user' },
+      { role: 'student', accountType: 'paid-user', source: { $ne: 'notes' } },
       {
         $set: {
           accountType: 'admin-created',
+          source: 'portal',
           subscriptionStatus: 'active',
           subscriptionPlanId: null,
           subscriptionStartDate: new Date(),
@@ -942,10 +986,11 @@ export const getDashboardStats = async (req, res) => {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    // MD Students only (excludes paid-user / Pro Students — same as /admin/students list)
+    // MD Students only (admin-created portal — excludes Pro + Notes Website users)
     const totalStudents = await User.countDocuments({
       role: 'student',
-      accountType: { $ne: 'paid-user' },
+      accountType: 'admin-created',
+      source: { $ne: 'notes' },
     });
     const totalEvaluations = await CopyEvaluation.countDocuments({ status: 'completed' });
     const pendingEvaluations = await CopyEvaluation.countDocuments({ status: { $in: ['pending', 'processing'] } });
@@ -954,7 +999,8 @@ export const getDashboardStats = async (req, res) => {
     // Recent registrations (last 7 days) — MD Students only
     const recentRegistrations = await User.countDocuments({
       role: 'student',
-      accountType: { $ne: 'paid-user' },
+      accountType: 'admin-created',
+      source: { $ne: 'notes' },
       createdAt: { $gte: sevenDaysAgo }
     });
 

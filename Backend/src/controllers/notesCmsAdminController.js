@@ -540,7 +540,7 @@ export const adminListNotesUsers = async (req, res) => {
       };
     });
 
-    console.log("Notes Users", items.length);
+    const totalPages = Math.ceil(total / limitNum) || 1;
 
     return res.json({
       success: true,
@@ -550,12 +550,50 @@ export const adminListNotesUsers = async (req, res) => {
           page: pageNum,
           limit: limitNum,
           total,
-          totalPages: Math.ceil(total / limitNum) || 1,
+          totalPages,
+          hasNext: pageNum < totalPages,
+          hasPrev: pageNum > 1,
         },
       },
     });
   } catch (err) {
     console.error("adminListNotesUsers:", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+export const adminDeleteNotesUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid user id" });
+    }
+
+    const user = await User.findById(id);
+    if (!user || user.role !== "student") {
+      return res.status(404).json({ success: false, message: "Notes user not found" });
+    }
+    if (user.source !== "notes") {
+      return res.status(403).json({
+        success: false,
+        message: "Only Notes Website registrations can be deleted from here",
+      });
+    }
+
+    await Promise.all([
+      NotesSubscription.deleteMany({ user: id }),
+      NotesStoreOrder.deleteMany({ user: id }),
+      NotesPayment.deleteMany({ user: id }),
+    ]);
+
+    await User.findByIdAndDelete(id);
+
+    return res.json({
+      success: true,
+      message: "Notes user deleted successfully",
+    });
+  } catch (err) {
+    console.error("adminDeleteNotesUser:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

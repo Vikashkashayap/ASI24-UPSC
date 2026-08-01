@@ -31,6 +31,10 @@ import paymentsRoutes from "./routes/payments.routes.js";
 import currentAffairsRoutes, {
   currentAffairsAdminRouter,
 } from "./routes/currentAffairsRoutes.js";
+import {
+  mainsMaterialStudentRouter,
+  mainsMaterialAdminRouter,
+} from "./routes/mainsMaterialRoutes.js";
 import syllabusTargetRoutes from "./routes/syllabusTargetRoutes.js";
 import ragRoutes from "./rag/routes/ragRoutes.js";
 import { uploadPdf as ragUploadPdf } from "./rag/controllers/ragController.js";
@@ -62,9 +66,11 @@ app.set("trust proxy", 1);
 /* -------------------- CORS -------------------- */
 
 const allowedOrigins = [
+  process.env.STUDENT_PORTAL_URL,
   process.env.CLIENT_ORIGIN,
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
+  process.env.NOTES_FRONTEND_URL,
   process.env.NOTES_CLIENT_ORIGIN,
   process.env.NOTES_CLIENT_URL,
   "https://studentportal.mentorsdaily.com",
@@ -199,10 +205,12 @@ app.use("/api/study-plan", authMiddleware, studyPlanRoutes);
 app.use("/api/study-planner", authMiddleware, advancedStudyPlannerRoutes);
 app.use("/api/syllabus-targets", syllabusTargetRoutes);
 
-// Must be before /api/admin so /api/admin/current-affairs/* and notes-portal are not swallowed
+// Must be before /api/admin so /api/admin/current-affairs/*, notes-portal, mains-materials are not swallowed
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin/notes-portal", notesCmsAdminRoutes);
+app.use("/api/admin/mains-materials", mainsMaterialAdminRouter);
 app.use("/api/admin", adminRoutes);
+app.use("/api/mains-materials", mainsMaterialStudentRouter);
 
 // Enterprise Knowledge Base (upload + taxonomy)
 app.use("/api/knowledge", knowledgeRoutes);

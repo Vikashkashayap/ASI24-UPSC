@@ -131,10 +131,6 @@ const AdminNotesPricingPlansPage = lazyPage(
   () => import("./pages/admin/AdminNotesPricingPlansPage"),
   "AdminNotesPricingPlansPage"
 );
-const AdminNotesOrdersPage = lazyPage(
-  () => import("./pages/admin/AdminNotesOrdersPage"),
-  "AdminNotesOrdersPage"
-);
 const AdminNotesPaymentsPage = lazyPage(
   () => import("./pages/admin/AdminNotesPaymentsPage"),
   "AdminNotesPaymentsPage"
@@ -143,6 +139,11 @@ const StudentsListPage = lazyPage(() => import("./pages/admin/StudentsListPage")
 const StudentDetailPage = lazyPage(() => import("./pages/admin/StudentDetailPage"), "StudentDetailPage");
 const AdminMentorsPage = lazyPage(() => import("./pages/admin/AdminMentorsPage"), "AdminMentorsPage");
 const AdminCurrentAffairsPage = lazyPage(() => import("./pages/admin/AdminCurrentAffairsPage"));
+const AdminMainsMaterialsPage = lazyPage(
+  () => import("./pages/admin/AdminMainsMaterialsPage"),
+  "AdminMainsMaterialsPage"
+);
+const Mains360Page = lazyPage(() => import("./pages/Mains360Page"), "Mains360Page");
 
 function App() {
   return (
@@ -201,6 +202,7 @@ function App() {
               <Route path="student-profiler" element={<StudentProfilerPage />} />
               <Route path="current-affairs" element={<CurrentAffairsPage />} />
               <Route path="current-affairs/:slug" element={<CurrentAffairDetailPage />} />
+              <Route path="mains-360" element={<Mains360Page />} />
               <Route
                 path="mentor-dashboard"
                 element={
@@ -238,13 +240,13 @@ function App() {
               <Route path="offer-manager" element={<AdminOfferManagerPage />} />
               <Route path="notes-analytics" element={<AdminNotesAnalyticsPage />} />
               <Route path="notes-pricing-plans" element={<AdminNotesPricingPlansPage />} />
-              <Route path="notes-orders" element={<AdminNotesOrdersPage />} />
               <Route path="notes-payments" element={<AdminNotesPaymentsPage />} />
               <Route path="notes-manager" element={<AdminNotesManagerPage />} />
               <Route path="students" element={<StudentsListPage />} />
               <Route path="students/:id" element={<StudentDetailPage />} />
               <Route path="mentors" element={<AdminMentorsPage />} />
               <Route path="current-affairs" element={<AdminCurrentAffairsPage />} />
+              <Route path="mains-materials" element={<AdminMainsMaterialsPage />} />
             </Route>
             <Route path="*" element={<DefaultCaughtRoute />} />
           </Routes>
