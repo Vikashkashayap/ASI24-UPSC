@@ -2,7 +2,7 @@ import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award, ShoppingBag, CreditCard } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -154,6 +154,11 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
     '/admin/offer-manager': { title: 'Offer Manager', icon: <Tag className="w-5 h-5" /> },
+    '/admin/notes-analytics': { title: 'Notes Analytics', icon: <BarChart3 className="w-5 h-5" /> },
+    '/admin/notes-pricing-plans': { title: 'Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
+    '/admin/notes-orders': { title: 'Orders', icon: <ShoppingBag className="w-5 h-5" /> },
+    '/admin/notes-payments': { title: 'Payments', icon: <CreditCard className="w-5 h-5" /> },
+    '/admin/notes-manager': { title: 'Registered Notes Users', icon: <Users className="w-5 h-5" /> },
     '/admin/current-affairs': { title: 'Current Affairs', icon: <Newspaper className="w-5 h-5" /> },
     '/profile': { title: 'Profile', icon: <User className="w-5 h-5" /> },
     '/help-support': { title: 'Help & Support', icon: <HelpCircle className="w-5 h-5" /> },
@@ -516,6 +521,33 @@ export const DashboardLayout = () => {
                   <Tag className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Offer Manager</span>}
                 </NavLink>
+
+                {!sidebarCollapsed && (
+                  <div className="pt-3 md:pt-4 pb-1 md:pb-2">
+                    <div className={sidebarSectionLabelClass(theme)}>Notes Website</div>
+                  </div>
+                )}
+                <NavLink to="/admin/notes-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Notes Analytics">
+                  <BarChart3 className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Analytics</span>}
+                </NavLink>
+                <NavLink to="/admin/notes-pricing-plans" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Notes Pricing Plans">
+                  <IndianRupee className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Pricing Plans</span>}
+                </NavLink>
+                <NavLink to="/admin/notes-orders" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Orders">
+                  <ShoppingBag className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Orders</span>}
+                </NavLink>
+                <NavLink to="/admin/notes-payments" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Payments">
+                  <CreditCard className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Payments</span>}
+                </NavLink>
+                <NavLink to="/admin/notes-manager" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Registered Notes Users">
+                  <Users className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>Registered Notes Users</span>}
+                </NavLink>
+
                 <NavLink to="/admin/current-affairs" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Current Affairs">
                   <Newspaper className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Current Affairs</span>}

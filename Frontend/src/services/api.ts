@@ -1270,6 +1270,398 @@ export const offersAPI = {
   delete: (id: string) => api.delete<{ success: boolean }>(`/api/admin/offers/${id}`),
 };
 
+/* -------------------- Website Notes CMS (Admin) + Public Notes Website APIs -------------------- */
+
+export interface WebsiteNoteCategoryType {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  subject?: string;
+  icon?: string;
+  sortOrder?: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WebsiteNoteType {
+  _id: string;
+  title: string;
+  slug: string;
+  summary?: string;
+  content?: string | null;
+  contentHtml?: string | null;
+  category: string | { _id: string; name: string; slug?: string };
+  subject?: string;
+  tags?: string[];
+  coverImage?: string;
+  isPremium: boolean;
+  price: number;
+  currency?: string;
+  isPublished: boolean;
+  isFeatured: boolean;
+  sortOrder?: number;
+  estimatedReadMinutes?: number;
+  hasAccess?: boolean;
+  locked?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface WebsiteNoteOrderType {
+  _id: string;
+  user: string | { _id: string; name?: string; email?: string; source?: string };
+  note: string | { _id: string; title?: string; slug?: string; price?: number };
+  amount: number;
+  currency?: string;
+  status: string;
+  razorpayOrderId?: string;
+  paidAt?: string;
+  createdAt?: string;
+}
+
+export interface WebsiteNotePermissionType {
+  _id: string;
+  user: string | { _id: string; name?: string; email?: string; source?: string; isPremiumStudent?: boolean };
+  note: string | { _id: string; title?: string; slug?: string };
+  source: string;
+  isActive: boolean;
+  expiresAt?: string | null;
+  createdAt?: string;
+}
+
+export interface WebsiteNotesStudentType {
+  _id: string;
+  name: string;
+  email: string;
+  source?: string;
+  isPremiumStudent?: boolean;
+  accountType?: string;
+  subscriptionStatus?: string;
+  isActive?: boolean;
+  status?: string;
+  notesLastLoginAt?: string | null;
+  phone?: string;
+  city?: string;
+  createdAt?: string;
+}
+
+/** Admin-only Notes Website CMS (Student Portal Admin Panel). */
+export const websiteNotesAdminAPI = {
+  listCategories: () =>
+    api.get<{ success: boolean; data: WebsiteNoteCategoryType[] }>(
+      "/api/admin/website-notes/categories"
+    ),
+  createCategory: (data: Partial<WebsiteNoteCategoryType>) =>
+    api.post<{ success: boolean; data: WebsiteNoteCategoryType }>(
+      "/api/admin/website-notes/categories",
+      data
+    ),
+  updateCategory: (id: string, data: Partial<WebsiteNoteCategoryType>) =>
+    api.put<{ success: boolean; data: WebsiteNoteCategoryType }>(
+      `/api/admin/website-notes/categories/${id}`,
+      data
+    ),
+  deleteCategory: (id: string) =>
+    api.delete<{ success: boolean }>(`/api/admin/website-notes/categories/${id}`),
+
+  listNotes: (params?: {
+    category?: string;
+    search?: string;
+    published?: string;
+    premium?: string;
+    page?: number;
+    limit?: number;
+  }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: WebsiteNoteType[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>("/api/admin/website-notes", { params }),
+  getNote: (id: string) =>
+    api.get<{ success: boolean; data: WebsiteNoteType }>(`/api/admin/website-notes/${id}`),
+  createNote: (data: Record<string, unknown>) =>
+    api.post<{ success: boolean; data: WebsiteNoteType }>("/api/admin/website-notes", data),
+  updateNote: (id: string, data: Record<string, unknown>) =>
+    api.put<{ success: boolean; data: WebsiteNoteType }>(`/api/admin/website-notes/${id}`, data),
+  deleteNote: (id: string) =>
+    api.delete<{ success: boolean }>(`/api/admin/website-notes/${id}`),
+
+  listPermissions: (params?: { userId?: string; noteId?: string; page?: number; limit?: number }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: WebsiteNotePermissionType[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>("/api/admin/website-notes-permissions", { params }),
+  grantPermission: (data: { userId: string; noteId: string; expiresAt?: string }) =>
+    api.post<{ success: boolean; data: WebsiteNotePermissionType }>(
+      "/api/admin/website-notes-permissions",
+      data
+    ),
+  revokePermission: (id: string) =>
+    api.delete<{ success: boolean }>(`/api/admin/website-notes-permissions/${id}`),
+
+  listOrders: (params?: { status?: string; page?: number; limit?: number }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: WebsiteNoteOrderType[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>("/api/admin/website-notes-orders", { params }),
+
+  listStudents: (params?: { search?: string; page?: number; limit?: number }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: WebsiteNotesStudentType[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>("/api/admin/website-notes-students", { params }),
+};
+
+/* -------------------- Notes Portal CMS (subjects / chapters / notes / plans) -------------------- */
+
+export interface NotesPortalSubject {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  thumbnail?: string;
+  sortOrder?: number;
+  status: "active" | "inactive";
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+export interface NotesPortalChapter {
+  _id: string;
+  subject: string | { _id: string; name: string; slug?: string };
+  title: string;
+  slug: string;
+  description?: string;
+  thumbnail?: string;
+  sortOrder?: number;
+  status: "published" | "draft";
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+export interface NotesPortalNote {
+  _id: string;
+  subject: string | { _id: string; name: string; slug?: string };
+  chapter: string | { _id: string; title: string; slug?: string };
+  title: string;
+  slug: string;
+  summary?: string;
+  content?: string;
+  contentHtml?: string;
+  thumbnail?: string;
+  price?: number;
+  status: "published" | "draft";
+  sortOrder?: number;
+  metaTitle?: string;
+  metaDescription?: string;
+  tags?: string[];
+  updatedAt?: string;
+}
+
+export interface NotesPortalPlan {
+  _id: string;
+  title: string;
+  description?: string;
+  price: number;
+  duration: string;
+  durationDays?: number | null;
+  features: string[];
+  status: "active" | "inactive";
+  sortOrder?: number;
+}
+
+export interface NotesPortalAnalytics {
+  totalNotesUsers: number;
+  premiumSubscribers: number;
+  revenue: number;
+  plansSold: number;
+  totalNotes: number;
+  publishedNotes: number;
+  totalSubjects: number;
+  totalChapters: number;
+  latestRegistrations: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    createdAt?: string;
+  }>;
+  latestPayments: Array<{
+    _id: string;
+    amount: number;
+    paidAt?: string;
+    user?: { name?: string; email?: string };
+    plan?: { title?: string; price?: number };
+  }>;
+}
+
+export interface NotesPortalUserRow {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  source?: string;
+  isPremiumStudent?: boolean;
+  isActive?: boolean;
+  status?: string;
+  notesLastLoginAt?: string | null;
+  createdAt?: string;
+  subscription?: {
+    status: string;
+    planTitle?: string;
+    endDate?: string | null;
+  };
+}
+
+const NP = "/api/admin/notes-portal";
+
+export const notesPortalAdminAPI = {
+  analytics: () => api.get<{ success: boolean; data: NotesPortalAnalytics }>(`${NP}/analytics`),
+
+  listSubjects: () => api.get<{ success: boolean; data: NotesPortalSubject[] }>(`${NP}/subjects`),
+  createSubject: (data: Partial<NotesPortalSubject>) =>
+    api.post<{ success: boolean; data: NotesPortalSubject }>(`${NP}/subjects`, data),
+  updateSubject: (id: string, data: Partial<NotesPortalSubject>) =>
+    api.put<{ success: boolean; data: NotesPortalSubject }>(`${NP}/subjects/${id}`, data),
+  deleteSubject: (id: string) => api.delete<{ success: boolean }>(`${NP}/subjects/${id}`),
+
+  listChapters: (params?: { subject?: string }) =>
+    api.get<{ success: boolean; data: NotesPortalChapter[] }>(`${NP}/chapters`, { params }),
+  createChapter: (data: Record<string, unknown>) =>
+    api.post<{ success: boolean; data: NotesPortalChapter }>(`${NP}/chapters`, data),
+  updateChapter: (id: string, data: Record<string, unknown>) =>
+    api.put<{ success: boolean; data: NotesPortalChapter }>(`${NP}/chapters/${id}`, data),
+  deleteChapter: (id: string) => api.delete<{ success: boolean }>(`${NP}/chapters/${id}`),
+
+  listNotes: (params?: Record<string, string | number | undefined>) =>
+    api.get<{
+      success: boolean;
+      data: { items: NotesPortalNote[]; pagination: { total: number } };
+    }>(`${NP}/notes`, { params }),
+  getNote: (id: string) =>
+    api.get<{ success: boolean; data: NotesPortalNote }>(`${NP}/notes/${id}`),
+  createNote: (data: Record<string, unknown>) =>
+    api.post<{ success: boolean; data: NotesPortalNote }>(`${NP}/notes`, data),
+  updateNote: (id: string, data: Record<string, unknown>) =>
+    api.put<{ success: boolean; data: NotesPortalNote }>(`${NP}/notes/${id}`, data),
+  deleteNote: (id: string) => api.delete<{ success: boolean }>(`${NP}/notes/${id}`),
+
+  listPlans: () => api.get<{ success: boolean; data: NotesPortalPlan[] }>(`${NP}/plans`),
+  createPlan: (data: Record<string, unknown>) =>
+    api.post<{ success: boolean; data: NotesPortalPlan }>(`${NP}/plans`, data),
+  updatePlan: (id: string, data: Record<string, unknown>) =>
+    api.put<{ success: boolean; data: NotesPortalPlan }>(`${NP}/plans/${id}`, data),
+  deletePlan: (id: string) => api.delete<{ success: boolean }>(`${NP}/plans/${id}`),
+
+  listOrders: (params?: { status?: string; page?: number; limit?: number }) =>
+    api.get<{ success: boolean; data: { items: unknown[]; pagination: { total: number } } }>(
+      `${NP}/orders`,
+      { params }
+    ),
+  listPayments: (params?: { status?: string; page?: number; limit?: number }) =>
+    api.get<{ success: boolean; data: { items: unknown[]; pagination: { total: number } } }>(
+      `${NP}/payments`,
+      { params }
+    ),
+  listUsers: (params?: { search?: string; page?: number; limit?: number }) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: NotesPortalUserRow[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>(`${NP}/users`, { params }),
+};
+
+/** Public Notes Website catalog (subjects / chapters / subscribe) */
+export const notesPortalPublicAPI = {
+  listSubjects: () => api.get(`/api/notes-portal/subjects`),
+  listChapters: (params?: { subjectId?: string; subjectSlug?: string }) =>
+    api.get(`/api/notes-portal/chapters`, { params }),
+  listNotesInChapter: (chapterId: string) =>
+    api.get(`/api/notes-portal/chapters/${chapterId}/notes`),
+  getContent: (slugOrId: string) => api.get(`/api/notes-portal/content/${slugOrId}`),
+  accessMe: () => api.get(`/api/notes-portal/access/me`),
+  listPlans: () => api.get(`/api/notes-portal/plans`),
+  createSubscribeOrder: (planId: string) =>
+    api.post(`/api/notes-portal/subscribe/create-order`, { planId }),
+  verifySubscribeOrder: (payload: Record<string, string>) =>
+    api.post(`/api/notes-portal/subscribe/verify`, payload),
+};
+
+/**
+ * Public Notes Website client (for notes.mentorsdaily.com).
+ * Reuses the same JWT / users collection as the Student Portal.
+ */
+export const notesWebsiteAPI = {
+  register: (data: { name: string; email: string; password: string }) =>
+    api.post<{
+      success: boolean;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        source: string;
+        isPremiumStudent: boolean;
+      };
+      token: string;
+    }>("/api/notes/auth/register", data),
+  login: (data: { email: string; password: string }) =>
+    api.post<{
+      success: boolean;
+      user: {
+        id: string;
+        name: string;
+        email: string;
+        source: string;
+        isPremiumStudent: boolean;
+      };
+      token: string;
+    }>("/api/notes/auth/login", data),
+  me: () => api.get<{ success: boolean; data: Record<string, unknown> }>("/api/notes/auth/me"),
+  listCategories: () =>
+    api.get<{ success: boolean; data: WebsiteNoteCategoryType[] }>("/api/notes/categories"),
+  listNotes: (params?: Record<string, string | number | boolean | undefined>) =>
+    api.get<{
+      success: boolean;
+      data: {
+        items: WebsiteNoteType[];
+        pagination: { page: number; limit: number; total: number; totalPages: number };
+      };
+    }>("/api/notes", { params }),
+  getNote: (slugOrId: string) =>
+    api.get<{ success: boolean; data: WebsiteNoteType }>(`/api/notes/${slugOrId}`),
+  myPermissions: () =>
+    api.get<{ success: boolean; data: Record<string, unknown> }>("/api/notes/permissions/me"),
+  checkPermission: (noteId: string) =>
+    api.get<{ success: boolean; data: { hasAccess: boolean; isPremium: boolean } }>(
+      `/api/notes/permissions/${noteId}`
+    ),
+  createOrder: (noteId: string) =>
+    api.post<{ success: boolean; data: Record<string, unknown> }>("/api/notes/orders", { noteId }),
+  verifyOrder: (payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    noteId: string;
+  }) => api.post<{ success: boolean; data: Record<string, unknown> }>("/api/notes/orders/verify", payload),
+  myOrders: () =>
+    api.get<{ success: boolean; data: WebsiteNoteOrderType[] }>("/api/notes/orders/my"),
+};
+
 // Payments – Razorpay integration
 export const paymentAPI = {
   createOrder: (planId: string) =>

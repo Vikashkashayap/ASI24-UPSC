@@ -1,7 +1,17 @@
-import { registerUser, loginUser, changeUserPassword } from "../services/authService.js";
+import {
+  registerUser,
+  loginUser,
+  changeUserPassword,
+  requestPasswordReset,
+  resetPasswordWithToken,
+} from "../services/authService.js";
 import { PricingPlan } from "../models/PricingPlan.js";
 import { User } from "../models/User.js";
 import { sendOtpEmail } from "../utils/sendEmail.js";
+import {
+  isNotesWebsiteRequest,
+  resolveRegistrationSource,
+} from "../utils/notesClient.js";
 
 const OTP_LENGTH = Number(process.env.OTP_LENGTH || 6);
 const OTP_TTL_MINUTES = Number(process.env.OTP_TTL_MINUTES || 10);
@@ -14,34 +24,53 @@ const generateOtp = () => {
   return String(Math.floor(min + Math.random() * (max - min + 1)));
 };
 
-const serializeUser = (user, subscriptionPlan) => ({
-  id: user._id,
-  createdAt: user.createdAt,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  mustChangePassword: user.mustChangePassword,
-  accountType: user.accountType,
-  subscriptionStatus: user.subscriptionStatus,
-  subscriptionPlanId: user.subscriptionPlanId,
-  subscriptionStartDate: user.subscriptionStartDate,
-  subscriptionEndDate: user.subscriptionEndDate,
-  subscriptionPlan: subscriptionPlan || undefined,
-  phone: user.phone || "",
-  city: user.city || "",
-  gender: user.gender || "",
-  attempt: user.attempt || "",
-  targetYear: user.targetYear || "",
-  prepStartDate: user.prepStartDate || "",
-  dailyStudyHours: user.dailyStudyHours || "",
-  educationBackground: user.educationBackground || "",
-  isEmailVerified: Boolean(user.isEmailVerified),
-});
+const serializeUser = (user, subscriptionPlan) => {
+  const source = user.source === "notes" ? "notes" : user.source || "portal";
+  return {
+    id: user._id,
+    createdAt: user.createdAt,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    mustChangePassword: user.mustChangePassword,
+    accountType: user.accountType,
+    subscriptionStatus: user.subscriptionStatus,
+    subscriptionPlanId: user.subscriptionPlanId,
+    subscriptionStartDate: user.subscriptionStartDate,
+    subscriptionEndDate: user.subscriptionEndDate,
+    subscriptionPlan: subscriptionPlan || undefined,
+    source,
+    // Notes-origin accounts are never portal "Premium Student"
+    isPremiumStudent: source === "notes" ? false : Boolean(user.isPremiumStudent),
+    phone: user.phone || "",
+    mobile: user.phone || "",
+    city: user.city || "",
+    gender: user.gender || "",
+    attempt: user.attempt || "",
+    targetYear: user.targetYear || "",
+    prepStartDate: user.prepStartDate || "",
+    dailyStudyHours: user.dailyStudyHours || "",
+    educationBackground: user.educationBackground || "",
+    isEmailVerified: Boolean(user.isEmailVerified),
+    notesLastLoginAt: user.notesLastLoginAt || null,
+  };
+};
 
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const { user, token } = await registerUser({ name, email, password });
+    // Never trust body.source — force from Notes Website Origin/Referer
+    const source = resolveRegistrationSource(req);
+    const phone = req.body.phone || req.body.mobile || "";
+
+    const { user, token } = await registerUser({
+      name,
+      email,
+      password,
+      phone,
+      source,
+    });
+
     res.status(201).json({ user: serializeUser(user), token });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -71,6 +100,8 @@ export const registerSendOtp = async (req, res) => {
     const now = new Date();
     const otp = generateOtp();
     const otpExpiresAt = new Date(now.getTime() + (OTP_TTL_MINUTES * 60 * 1000));
+    const source = resolveRegistrationSource(req);
+    const mobile = phone || req.body.mobile || "";
 
     let user = await User.findOne({ email: normalizedEmail });
 
@@ -93,7 +124,7 @@ export const registerSendOtp = async (req, res) => {
         name,
         email: normalizedEmail,
         password,
-        phone: phone || "",
+        phone: mobile,
         city: city || "",
         attempt: attempt || "",
         targetYear: targetYear || "",
@@ -103,21 +134,41 @@ export const registerSendOtp = async (req, res) => {
         accountType: "paid-user",
         subscriptionStatus: "inactive",
         isEmailVerified: false,
+        source,
+        isPremiumStudent: false,
+        notesLastLoginAt: source === "notes" ? now : null,
         otpCode: otp,
         otpExpiresAt,
         otpLastSentAt: now,
         otpVerifyAttempts: 0,
       });
+      if (source === "notes") {
+        console.log("New Notes User", {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          source: user.source,
+          isPremiumStudent: user.isPremiumStudent,
+          role: user.role,
+        });
+      }
     } else {
       user.name = name;
       user.password = password;
-      user.phone = phone || "";
+      user.phone = mobile;
       user.city = city || "";
       user.attempt = attempt || "";
       user.targetYear = targetYear || "";
       user.prepStartDate = prepStartDate || "";
       user.dailyStudyHours = dailyStudyHours || "";
       user.educationBackground = educationBackground || "";
+      // Force source from request origin (never trust body)
+      user.source = source;
+      if (source === "notes") {
+        user.isPremiumStudent = false;
+        user.notesLastLoginAt = user.notesLastLoginAt || now;
+      }
       user.otpCode = otp;
       user.otpExpiresAt = otpExpiresAt;
       user.otpLastSentAt = now;
@@ -239,6 +290,23 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const { user, token } = await loginUser({ email, password });
+
+    // Notes Website login: stamp last login for notes-registered users only
+    // Do NOT convert portal users to source=notes
+    if (
+      user &&
+      user._id !== "000000000000000000000000" &&
+      isNotesWebsiteRequest(req) &&
+      user.source === "notes"
+    ) {
+      try {
+        await User.findByIdAndUpdate(user._id, { notesLastLoginAt: new Date() });
+        user.notesLastLoginAt = new Date();
+      } catch (e) {
+        console.error("notesLastLoginAt update failed:", e?.message || e);
+      }
+    }
+
     let subscriptionPlan = null;
     if (user.subscriptionPlanId) {
       const plan = await PricingPlan.findById(user.subscriptionPlanId)
@@ -265,12 +333,57 @@ export const changePassword = async (req, res) => {
   }
 };
 
+/** POST /api/auth/forgot-password */
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const result = await requestPasswordReset({ email });
+    return res.status(200).json(result);
+  } catch (error) {
+    const status = error.statusCode || 400;
+    return res.status(status).json({
+      success: false,
+      message: error.message || "Failed to process password reset request",
+    });
+  }
+};
+
+/** POST /api/auth/reset-password */
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password, confirmPassword } = req.body || {};
+    const result = await resetPasswordWithToken({
+      token,
+      password,
+      confirmPassword,
+    });
+    return res.status(200).json(result);
+  } catch (error) {
+    const status = error.statusCode || 400;
+    return res.status(status).json({
+      success: false,
+      message: error.message || "Failed to reset password",
+    });
+  }
+};
+
 export const me = async (req, res) => {
   const user = req.user;
   // Virtual admin user has no subscription
   if (user._id === "000000000000000000000000") {
     return res.json({ user: { ...user, id: user._id } });
   }
+
+  // Self-heal: notes-origin accounts must never keep portal premium flag
+  if (user.source === "notes" && user.isPremiumStudent) {
+    user.isPremiumStudent = false;
+    try {
+      await user.save();
+    } catch (e) {
+      console.error("me: clear isPremiumStudent failed:", e?.message || e);
+    }
+  }
+
   let subscriptionPlan = null;
   if (user.subscriptionPlanId) {
     const plan = await PricingPlan.findById(user.subscriptionPlanId)
@@ -278,24 +391,8 @@ export const me = async (req, res) => {
       .lean();
     if (plan) subscriptionPlan = plan;
   }
-  const userObj = user.toObject ? user.toObject() : { ...user };
-  res.json({
-    user: {
-      ...userObj,
-      id: userObj._id || userObj.id,
-      createdAt: userObj.createdAt,
-      subscriptionPlan: subscriptionPlan || undefined,
-      phone: userObj.phone || "",
-      city: userObj.city || "",
-      gender: userObj.gender || "",
-      attempt: userObj.attempt || "",
-      targetYear: userObj.targetYear || "",
-      prepStartDate: userObj.prepStartDate || "",
-      dailyStudyHours: userObj.dailyStudyHours || "",
-      educationBackground: userObj.educationBackground || "",
-      isEmailVerified: Boolean(userObj.isEmailVerified),
-    },
-  });
+
+  return res.json({ user: serializeUser(user, subscriptionPlan) });
 };
 
 const ALLOWED_GENDERS = new Set(["", "Male", "Female", "Other"]);

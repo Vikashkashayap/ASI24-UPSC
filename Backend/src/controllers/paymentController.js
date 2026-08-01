@@ -182,6 +182,8 @@ export const verifyPayment = async (req, res) => {
     if (!user.accountType || user.accountType === "paid-user") {
       user.accountType = "paid-user";
     }
+    // Portal subscribers unlock all premium notes on the Notes Website
+    user.isPremiumStudent = true;
 
     await user.save();
 

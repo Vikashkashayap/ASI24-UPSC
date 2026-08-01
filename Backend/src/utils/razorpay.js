@@ -55,6 +55,68 @@ export const createOrderForPlan = async (plan, userId) => {
   return order;
 };
 
+/** Razorpay order for a single premium note purchase (Notes Website). */
+export const createOrderForNote = async (note, userId) => {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new Error("Razorpay keys are not configured on the server");
+  }
+
+  const amountInPaise = Math.round(Number(note.price) * 100);
+  if (!amountInPaise || amountInPaise <= 0) {
+    throw new Error("Invalid note amount");
+  }
+
+  const shortNoteId = String(note._id).slice(-8);
+  const shortUserId = String(userId).slice(-8);
+  const shortTs = Date.now().toString(36).slice(-6);
+  const receipt = `nte_${shortNoteId}_${shortUserId}_${shortTs}`.slice(0, 40);
+
+  const options = {
+    amount: amountInPaise,
+    currency: note.currency || "INR",
+    receipt,
+    notes: {
+      type: "note_purchase",
+      noteId: String(note._id),
+      userId: String(userId),
+      noteTitle: String(note.title || "").slice(0, 100),
+    },
+  };
+
+  return getRazorpayClient().orders.create(options);
+};
+
+/** Razorpay order for Notes Website subscription plan purchase. */
+export const createOrderForNotesPlan = async (plan, userId) => {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new Error("Razorpay keys are not configured on the server");
+  }
+
+  const amountInPaise = Math.round(Number(plan.price) * 100);
+  if (!amountInPaise || amountInPaise <= 0) {
+    throw new Error("Invalid plan amount");
+  }
+
+  const shortPlanId = String(plan._id).slice(-8);
+  const shortUserId = String(userId).slice(-8);
+  const shortTs = Date.now().toString(36).slice(-6);
+  const receipt = `nsp_${shortPlanId}_${shortUserId}_${shortTs}`.slice(0, 40);
+
+  const options = {
+    amount: amountInPaise,
+    currency: "INR",
+    receipt,
+    notes: {
+      type: "notes_subscription",
+      planId: String(plan._id),
+      userId: String(userId),
+      planTitle: String(plan.title || "").slice(0, 100),
+    },
+  };
+
+  return getRazorpayClient().orders.create(options);
+};
+
 export const verifyRazorpaySignature = ({
   razorpay_order_id,
   razorpay_payment_id,
