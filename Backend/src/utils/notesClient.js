@@ -116,19 +116,49 @@ export function getPortalFrontendOrigin() {
 
 /**
  * Resolve which product owns this password-reset email.
- * Prefer stored user.source; fall back to request Origin/Referer; default notes
- * because the live forgot-password email flow is Notes Website.
+ * Prefer where the user clicked "Forgot password" (Origin/Referer) over
+ * stored user.source — a portal-sourced account resetting from Notes must
+ * still land on notes.mentorsdaily.com/reset-password.
  *
  * @param {import('express').Request | null | undefined} req
  * @param {{ source?: string } | null | undefined} user
  * @returns {"notes"|"portal"}
  */
 export function resolvePasswordResetSource(req, user) {
+  // 1) Request came from Notes Website → always Notes reset page
+  if (req && isNotesWebsiteRequest(req)) return "notes";
+
+  // 2) Request came from Student Portal origin → portal (if that flow exists)
+  if (req && isPortalWebsiteRequest(req)) return "portal";
+
+  // 3) Fall back to account source
   const stored = String(user?.source || "").trim().toLowerCase();
   if (stored === "notes" || stored === "portal") return stored;
-  if (req && isNotesWebsiteRequest(req)) return "notes";
-  // Default to notes: portal UI currently does not send reset emails.
+
+  // 4) Default Notes — portal UI does not email token reset links today
   return "notes";
+}
+
+function isPortalWebsiteRequest(req) {
+  const portalOrigin = normalizeOrigin(getPortalFrontendOrigin());
+  const candidates = [req.headers?.origin, req.headers?.referer].filter(Boolean);
+  for (const raw of candidates) {
+    const origin = normalizeOrigin(raw);
+    if (!origin) continue;
+    if (portalOrigin && origin === portalOrigin) return true;
+    try {
+      const host = new URL(origin).hostname.toLowerCase();
+      if (
+        host === "studentportal.mentorsdaily.com" ||
+        host.endsWith(".studentportal.mentorsdaily.com")
+      ) {
+        return true;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return false;
 }
 
 const NOTES_PROD_RESET_BASE = "https://notes.mentorsdaily.com/reset-password";
@@ -140,14 +170,12 @@ function isLocalhostHost(value) {
 /**
  * Full password-reset URL embedded in the email.
  *
- * Notes:
- *   RESET_PASSWORD_URL  (preferred)  e.g. https://notes.mentorsdaily.com/reset-password
+ * Notes (forgot-password from notes.mentorsdaily.com):
+ *   RESET_PASSWORD_URL  (preferred)
  *   else {NOTES_FRONTEND_URL|NOTES_CLIENT_*}/reset-password
- *   Never emails localhost when request/user is Notes (or NODE_ENV=production).
  *
- * Portal:
- *   PORTAL_RESET_PASSWORD_URL (preferred)
- *   else {STUDENT_PORTAL_URL|CLIENT_*}/reset-password
+ * Portal (only when request Origin is the Student Portal):
+ *   PORTAL_RESET_PASSWORD_URL or {CLIENT_*}/reset-password
  *
  * @param {import('express').Request | null | undefined} req
  * @param {string} rawToken
@@ -167,17 +195,10 @@ export function buildPasswordResetUrl(req, rawToken, user) {
     firstConfigured(process.env.RESET_PASSWORD_URL) ||
     `${getNotesFrontendOrigin()}/reset-password`;
 
-  // Safety net: live Notes users must never receive localhost links,
-  // even if NOTES_* / RESET_PASSWORD_URL are mis-set on the server.
-  const forceProdNotes =
-    isLocalhostHost(base) &&
-    (process.env.NODE_ENV === "production" ||
-      (req && isNotesWebsiteRequest(req)) ||
-      String(user?.source || "").toLowerCase() === "notes");
-
-  if (forceProdNotes) {
+  // Never email localhost / studentportal for Notes reset flow
+  if (isLocalhostHost(base) || /studentportal\.mentorsdaily\.com/i.test(base)) {
     console.warn(
-      "[password-reset] blocked localhost reset base; using notes.mentorsdaily.com"
+      "[password-reset] correcting non-Notes reset base → notes.mentorsdaily.com"
     );
     base = NOTES_PROD_RESET_BASE;
   }
