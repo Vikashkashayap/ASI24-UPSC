@@ -348,7 +348,7 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-/** POST /api/auth/reset-password */
+/** POST /api/auth/reset-password — body: { token, password, confirmPassword? } */
 export const resetPassword = async (req, res) => {
   try {
     const { token, password, confirmPassword } = req.body || {};

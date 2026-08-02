@@ -229,20 +229,27 @@ export const requestPasswordReset = async ({ email, req }) => {
 
 /**
  * Reset password using a one-time token from the email link.
- * @param {{ token: string, password: string, confirmPassword: string }} params
+ * Notes Website sends { token, password } only (confirm is client-side).
+ * confirmPassword is optional — if present, must match password.
+ * @param {{ token: string, password: string, confirmPassword?: string }} params
  */
 export const resetPasswordWithToken = async ({
   token,
   password,
   confirmPassword,
 }) => {
-  if (!token || !password || !confirmPassword) {
-    const err = new Error("Token, password and confirmPassword are required");
+  if (!token || !password) {
+    const err = new Error("Token and password are required");
     err.statusCode = 400;
     throw err;
   }
 
-  if (String(password) !== String(confirmPassword)) {
+  if (
+    confirmPassword !== undefined &&
+    confirmPassword !== null &&
+    String(confirmPassword) !== "" &&
+    String(password) !== String(confirmPassword)
+  ) {
     const err = new Error("Password and confirmPassword do not match");
     err.statusCode = 400;
     throw err;
