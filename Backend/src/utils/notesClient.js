@@ -3,6 +3,20 @@
  * Never trust req.body.source from the client.
  */
 
+function stripTrailingSlash(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\/$/, "");
+}
+
+function firstConfigured(...values) {
+  for (const value of values) {
+    const cleaned = stripTrailingSlash(value);
+    if (cleaned) return cleaned;
+  }
+  return "";
+}
+
 function normalizeOrigin(value) {
   if (!value) return null;
   try {
@@ -15,6 +29,7 @@ function normalizeOrigin(value) {
 
 function notesAllowedOrigins() {
   const fromEnv = [
+    process.env.NOTES_FRONTEND_URL,
     process.env.NOTES_CLIENT_ORIGIN,
     process.env.NOTES_CLIENT_URL,
   ]
@@ -67,33 +82,105 @@ export function resolveRegistrationSource(req) {
 }
 
 /**
- * Base URL for Notes Website password-reset links.
- * Dev → http://localhost:3000 | Prod → https://notes.mentorsdaily.com
+ * Base URL for Notes Website (OAuth redirect, CORS, reset-link fallback).
+ * Honors env in every NODE_ENV — never ignore a configured production URL
+ * just because the process is not marked production.
  */
 export function getNotesFrontendOrigin() {
-  if (process.env.NODE_ENV !== "production") {
-    const localOverride = (
-      process.env.NOTES_CLIENT_URL ||
-      process.env.NOTES_CLIENT_ORIGIN ||
-      ""
-    )
-      .trim()
-      .replace(/\/$/, "");
+  const fromEnv = firstConfigured(
+    process.env.NOTES_FRONTEND_URL,
+    process.env.NOTES_CLIENT_URL,
+    process.env.NOTES_CLIENT_ORIGIN
+  );
+  if (fromEnv) return fromEnv;
+  return process.env.NODE_ENV === "production"
+    ? "https://notes.mentorsdaily.com"
+    : "http://localhost:3000";
+}
 
-    // Prefer explicit local Notes URL; otherwise default to Notes Website port
-    if (localOverride && /localhost|127\.0\.0\.1/.test(localOverride)) {
-      return localOverride;
-    }
-    return "http://localhost:3000";
+/**
+ * Student Portal frontend origin (does not affect Notes reset links).
+ */
+export function getPortalFrontendOrigin() {
+  const fromEnv = firstConfigured(
+    process.env.STUDENT_PORTAL_URL,
+    process.env.CLIENT_ORIGIN,
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL
+  );
+  if (fromEnv) return fromEnv;
+  return process.env.NODE_ENV === "production"
+    ? "https://studentportal.mentorsdaily.com"
+    : "http://localhost:5173";
+}
+
+/**
+ * Resolve which product owns this password-reset email.
+ * Prefer stored user.source; fall back to request Origin/Referer; default notes
+ * because the live forgot-password email flow is Notes Website.
+ *
+ * @param {import('express').Request | null | undefined} req
+ * @param {{ source?: string } | null | undefined} user
+ * @returns {"notes"|"portal"}
+ */
+export function resolvePasswordResetSource(req, user) {
+  const stored = String(user?.source || "").trim().toLowerCase();
+  if (stored === "notes" || stored === "portal") return stored;
+  if (req && isNotesWebsiteRequest(req)) return "notes";
+  // Default to notes: portal UI currently does not send reset emails.
+  return "notes";
+}
+
+const NOTES_PROD_RESET_BASE = "https://notes.mentorsdaily.com/reset-password";
+
+function isLocalhostHost(value) {
+  return /localhost|127\.0\.0\.1/i.test(String(value || ""));
+}
+
+/**
+ * Full password-reset URL embedded in the email.
+ *
+ * Notes:
+ *   RESET_PASSWORD_URL  (preferred)  e.g. https://notes.mentorsdaily.com/reset-password
+ *   else {NOTES_FRONTEND_URL|NOTES_CLIENT_*}/reset-password
+ *   Never emails localhost when request/user is Notes (or NODE_ENV=production).
+ *
+ * Portal:
+ *   PORTAL_RESET_PASSWORD_URL (preferred)
+ *   else {STUDENT_PORTAL_URL|CLIENT_*}/reset-password
+ *
+ * @param {import('express').Request | null | undefined} req
+ * @param {string} rawToken
+ * @param {{ source?: string } | null | undefined} user
+ */
+export function buildPasswordResetUrl(req, rawToken, user) {
+  const token = encodeURIComponent(String(rawToken || ""));
+  const source = resolvePasswordResetSource(req, user);
+
+  if (source === "portal") {
+    const dedicated = firstConfigured(process.env.PORTAL_RESET_PASSWORD_URL);
+    const base = dedicated || `${getPortalFrontendOrigin()}/reset-password`;
+    return `${base}?token=${token}`;
   }
 
-  const fromEnv = (
-    process.env.NOTES_CLIENT_URL ||
-    process.env.NOTES_CLIENT_ORIGIN ||
-    ""
-  )
-    .trim()
-    .replace(/\/$/, "");
+  let base =
+    firstConfigured(process.env.RESET_PASSWORD_URL) ||
+    `${getNotesFrontendOrigin()}/reset-password`;
 
-  return fromEnv || "https://notes.mentorsdaily.com";
+  // Safety net: live Notes users must never receive localhost links,
+  // even if NOTES_* / RESET_PASSWORD_URL are mis-set on the server.
+  const forceProdNotes =
+    isLocalhostHost(base) &&
+    (process.env.NODE_ENV === "production" ||
+      (req && isNotesWebsiteRequest(req)) ||
+      String(user?.source || "").toLowerCase() === "notes");
+
+  if (forceProdNotes) {
+    console.warn(
+      "[password-reset] blocked localhost reset base; using notes.mentorsdaily.com"
+    );
+    base = NOTES_PROD_RESET_BASE;
+  }
+
+  return `${base}?token=${token}`;
 }

@@ -337,7 +337,7 @@ export const changePassword = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body || {};
-    const result = await requestPasswordReset({ email });
+    const result = await requestPasswordReset({ email, req });
     return res.status(200).json(result);
   } catch (error) {
     const status = error.statusCode || 400;

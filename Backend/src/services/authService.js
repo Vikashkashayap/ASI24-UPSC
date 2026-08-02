@@ -2,7 +2,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 import { sendPasswordResetEmail } from "../utils/sendEmail.js";
-import { getNotesFrontendOrigin } from "../utils/notesClient.js";
+import { buildPasswordResetUrl } from "../utils/notesClient.js";
 
 const PASSWORD_RESET_TTL_MINUTES = 15;
 const GENERIC_FORGOT_MESSAGE =
@@ -179,9 +179,9 @@ export const loginGoogleUser = async (profile) => {
 
 /**
  * Request a password reset email. Never reveals whether the email exists.
- * @param {{ email: string }} params
+ * @param {{ email: string, req?: import('express').Request }} params
  */
-export const requestPasswordReset = async ({ email }) => {
+export const requestPasswordReset = async ({ email, req }) => {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   if (!normalizedEmail) {
     const err = new Error("Email is required");
@@ -207,7 +207,15 @@ export const requestPasswordReset = async ({ email }) => {
   user.passwordResetExpires = expiresAt;
   await user.save();
 
-  const resetUrl = `${getNotesFrontendOrigin()}/reset-password?token=${rawToken}`;
+  const resetUrl = buildPasswordResetUrl(req, rawToken, user);
+  // Log host only — never the token
+  try {
+    console.log(
+      `[password-reset] email link host=${new URL(resetUrl).origin}${new URL(resetUrl).pathname}`
+    );
+  } catch {
+    console.log("[password-reset] email link built");
+  }
 
   await sendPasswordResetEmail({
     toEmail: user.email,
