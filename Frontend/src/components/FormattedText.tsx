@@ -8,78 +8,100 @@ interface FormattedTextProps {
 
 export const FormattedText: React.FC<FormattedTextProps> = ({ text, className = '' }) => {
   const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  // Parse and format the text with basic markdown support
   const formatText = (inputText: string) => {
     const lines = inputText.split('\n');
     const formattedElements: React.ReactNode[] = [];
     let currentListItems: string[] = [];
     let listType: 'bullet' | 'numbered' | null = null;
 
-    const flushList = () => {
-      if (currentListItems.length > 0) {
-        const listElement = listType === 'bullet' ? (
-          <ul className="ml-4 space-y-1 my-2" key={`list-${formattedElements.length}`}>
-            {currentListItems.map((item, idx) => (
-              <li key={idx} className="flex items-start">
-                <span className="mr-2 mt-1.5 text-xs">•</span>
-                <span className="flex-1">{formatInlineText(item)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <ol className="ml-4 space-y-1 my-2" key={`list-${formattedElements.length}`}>
-            {currentListItems.map((item, idx) => (
-              <li key={idx} className="flex items-start">
-                <span className="mr-2 mt-1.5 text-xs font-medium">{idx + 1}.</span>
-                <span className="flex-1">{formatInlineText(item)}</span>
-              </li>
-            ))}
-          </ol>
-        );
-        formattedElements.push(listElement);
-        currentListItems = [];
-        listType = null;
-      }
-    };
-
-    const formatInlineText = (text: string) => {
-      // Handle bold text (**text** or __text__)
-      let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    const formatInlineText = (raw: string) => {
+      let formatted = raw.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       formatted = formatted.replace(/__(.*?)__/g, '<strong>$1</strong>');
-
-      // Handle italic text (*text* or _text_)
       formatted = formatted.replace(/(?<!\*)\*(?!\*)([^*]+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
       formatted = formatted.replace(/(?<!_)_(?!_)([^_]+?)(?<!_)_(?!_)/g, '<em>$1</em>');
 
-      // Convert HTML to React elements
       const parts = formatted.split(/(<strong>.*?<\/strong>|<em>.*?<\/em>)/g);
       return parts.map((part, idx) => {
         if (part.startsWith('<strong>')) {
           const content = part.replace(/<\/?strong>/g, '');
-          return <strong key={idx} className="font-semibold">{content}</strong>;
-        } else if (part.startsWith('<em>')) {
-          const content = part.replace(/<\/?em>/g, '');
-          return <em key={idx} className="italic">{content}</em>;
+          return (
+            <strong
+              key={idx}
+              className={`font-semibold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}
+            >
+              {content}
+            </strong>
+          );
         }
-        return part;
+        if (part.startsWith('<em>')) {
+          const content = part.replace(/<\/?em>/g, '');
+          return (
+            <em key={idx} className="italic">
+              {content}
+            </em>
+          );
+        }
+        return <React.Fragment key={idx}>{part}</React.Fragment>;
       });
+    };
+
+    const flushList = () => {
+      if (currentListItems.length === 0) return;
+      const listElement =
+        listType === 'bullet' ? (
+          <ul
+            className="my-3 ml-1 space-y-2 list-none"
+            key={`list-${formattedElements.length}`}
+          >
+            {currentListItems.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2.5">
+                <span
+                  className={`mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    isDark ? 'bg-blue-400' : 'bg-blue-600'
+                  }`}
+                />
+                <span className="flex-1 leading-relaxed">{formatInlineText(item)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ol
+            className="my-3 ml-1 space-y-2 list-none"
+            key={`list-${formattedElements.length}`}
+          >
+            {currentListItems.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2.5">
+                <span
+                  className={`text-xs font-bold tabular-nums mt-0.5 w-5 flex-shrink-0 ${
+                    isDark ? 'text-blue-400' : 'text-blue-600'
+                  }`}
+                >
+                  {idx + 1}.
+                </span>
+                <span className="flex-1 leading-relaxed">{formatInlineText(item)}</span>
+              </li>
+            ))}
+          </ol>
+        );
+      formattedElements.push(listElement);
+      currentListItems = [];
+      listType = null;
     };
 
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
 
-      // Check for bullet points
-      if (trimmedLine.match(/^[-*]\s+/)) {
+      if (trimmedLine.match(/^[-*•]\s+/)) {
         if (listType !== 'bullet') {
           flushList();
           listType = 'bullet';
         }
-        currentListItems.push(trimmedLine.replace(/^[-*]\s+/, ''));
+        currentListItems.push(trimmedLine.replace(/^[-*•]\s+/, ''));
         return;
       }
 
-      // Check for numbered lists
       if (trimmedLine.match(/^\d+\.\s+/)) {
         if (listType !== 'numbered') {
           flushList();
@@ -89,47 +111,66 @@ export const FormattedText: React.FC<FormattedTextProps> = ({ text, className = 
         return;
       }
 
-      // If we have a list going and this line doesn't continue it, flush the list
       if (listType && trimmedLine !== '') {
         flushList();
       }
 
-      // Handle headers
       if (trimmedLine.match(/^#{1,3}\s+/)) {
         const level = trimmedLine.match(/^#+/)?.[0].length || 1;
         const headerText = trimmedLine.replace(/^#+\s+/, '');
-        const headerSize = level === 1 ? 'text-sm font-bold' : level === 2 ? 'text-xs font-semibold' : 'text-xs font-medium';
+        const size =
+          level === 1
+            ? 'text-base font-bold'
+            : level === 2
+              ? 'text-[15px] font-bold'
+              : 'text-sm font-semibold';
         formattedElements.push(
-          <div key={index} className={`${headerSize} my-2 ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
+          <div
+            key={index}
+            className={`${size} mt-4 mb-2 first:mt-0 ${
+              isDark ? 'text-slate-50' : 'text-slate-900'
+            }`}
+          >
             {formatInlineText(headerText)}
           </div>
         );
         return;
       }
 
-      // Handle empty lines
-      if (trimmedLine === '') {
-        formattedElements.push(<br key={index} />);
+      // Bold-only line as section heading: **Title:** or **Title**
+      if (trimmedLine.match(/^\*\*[^*]+\*\*:?\s*$/)) {
+        const headerText = trimmedLine
+          .replace(/^\*\*/, '')
+          .replace(/\*\*:?\s*$/, '')
+          .replace(/:$/, '');
+        formattedElements.push(
+          <div
+            key={index}
+            className={`text-[15px] font-bold mt-4 mb-2 first:mt-0 tracking-tight ${
+              isDark ? 'text-slate-50' : 'text-slate-900'
+            }`}
+          >
+            {headerText}
+          </div>
+        );
         return;
       }
 
-      // Regular paragraph text
+      if (trimmedLine === '') {
+        formattedElements.push(<div key={index} className="h-2" />);
+        return;
+      }
+
       formattedElements.push(
-        <div key={index} className="my-1 leading-relaxed">
+        <p key={index} className="my-1.5 leading-relaxed">
           {formatInlineText(trimmedLine)}
-        </div>
+        </p>
       );
     });
 
-    // Flush any remaining list items
     flushList();
-
     return formattedElements;
   };
 
-  return (
-    <div className={`text-xs md:text-sm leading-relaxed ${className}`}>
-      {formatText(text)}
-    </div>
-  );
+  return <div className={`leading-relaxed ${className}`}>{formatText(text)}</div>;
 };

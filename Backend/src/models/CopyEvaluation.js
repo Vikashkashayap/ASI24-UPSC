@@ -152,11 +152,13 @@ const questionDemandSchema = new mongoose.Schema({
 
 const knowledgeMetaSchema = new mongoose.Schema({
   used: { type: Boolean, default: false },
+  role: { type: String, default: 'support_only' },
   chunkCount: { type: Number, default: 0 },
   source: { type: String, default: '' },
   kbSubject: { type: String, default: null },
   query: { type: String, default: '' },
   extractedQuestion: { type: String, default: '' },
+  ocrConfidence: { type: Number },
 }, { _id: false });
 
 const visionEvaluationResultSchema = new mongoose.Schema({
@@ -202,6 +204,57 @@ const visionEvaluationResultSchema = new mongoose.Schema({
   suggestions: [{ type: String }],
   improvedConclusion: { type: String, default: '' },
   examinerFeedback: { type: String, default: '' },
+  // Premium structured evaluation fields
+  overall_score: { type: Number },
+  grade: { type: String, default: '' },
+  confidence: { type: Number },
+  percentile: { type: Number },
+  evaluationTimeSec: { type: Number },
+  expectedWordCount: { type: Number },
+  section_scores: { type: mongoose.Schema.Types.Mixed, default: null },
+  keywords: {
+    expected: [{ type: String }],
+    covered: [{ type: String }],
+    missing: [{ type: String }],
+    extra: [{ type: String }],
+  },
+  improved_answer: { type: String, default: '' },
+  model_answer: { type: String, default: '' },
+  next_practice: [{
+    type: { type: String, default: 'practice' },
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+  }],
+  paragraph_feedback: [{
+    paragraphIndex: { type: Number },
+    text: { type: String, default: '' },
+    positives: [{ type: String }],
+    mistakes: [{ type: String }],
+    suggestions: [{ type: String }],
+  }],
+  missing_points: [{ type: String }],
+  coveredPoints: [{ type: String }],
+  questionMeta: {
+    paper: { type: String, default: '' },
+    paperType: { type: String, default: '' },
+    questionNumber: { type: String, default: '' },
+    wordLimit: { type: Number, default: null },
+    marks: { type: Number, default: null },
+    topic: { type: String, default: '' },
+    confidence: { type: Number },
+    needsConfirmation: { type: Boolean, default: false },
+  },
+  rawOcrText: { type: String, default: '' },
+  ocrMeta: {
+    confidence: { type: Number },
+    wordCountEstimate: { type: Number },
+    illegibleRegions: [{ type: String }],
+    language: { type: String, default: '' },
+  },
+  answerLanguage: { type: String, default: '' },
+  feedbackLanguage: { type: String, default: '' },
+  modelAnswerShared: { type: Boolean, default: false },
+  questionFingerprint: { type: String, default: '' },
 }, { _id: false });
 
 const finalSummarySchema = new mongoose.Schema({
@@ -307,7 +360,41 @@ const copyEvaluationSchema = new mongoose.Schema({
   confidenceScore: {
     type: Number,
     default: 1.0
-  }
+  },
+  // Question matching / confirmation
+  questionMeta: {
+    paper: { type: String, default: '' },
+    paperType: { type: String, default: '' },
+    questionNumber: { type: String, default: '' },
+    wordLimit: { type: Number, default: null },
+    marks: { type: Number, default: null },
+    topic: { type: String, default: '' },
+    confidence: { type: Number },
+    needsConfirmation: { type: Boolean, default: false },
+  },
+  // Structured AI JSON snapshot (same as visionResult premium fields)
+  evaluationResultJson: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null,
+  },
+  // Job pipeline metadata
+  evaluationJob: {
+    stages: [{
+      name: { type: String },
+      status: { type: String, enum: ['pending', 'running', 'done', 'failed', 'skipped'], default: 'pending' },
+      startedAt: { type: Date },
+      finishedAt: { type: Date },
+    }],
+    startedAt: { type: Date },
+    finishedAt: { type: Date },
+    durationSec: { type: Number },
+  },
+  // Same-question fingerprint → reuse shared model_answer across students (token saver)
+  questionFingerprint: {
+    type: String,
+    default: null,
+    index: true,
+  },
 }, {
   timestamps: true
 });
@@ -316,6 +403,7 @@ const copyEvaluationSchema = new mongoose.Schema({
 copyEvaluationSchema.index({ userId: 1, createdAt: -1 });
 copyEvaluationSchema.index({ subject: 1, createdAt: -1 });
 copyEvaluationSchema.index({ status: 1 });
+copyEvaluationSchema.index({ questionFingerprint: 1, status: 1, createdAt: -1 });
 
 // Virtual for overall score
 copyEvaluationSchema.virtual('overallScore').get(function() {

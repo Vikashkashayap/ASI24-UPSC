@@ -19,6 +19,27 @@ if (stripped === "" && raw === "/api") {
 }
 export const apiBaseURL = baseURL;
 
+/** Live AI evaluation timeline (Socket / SSE / poll) */
+export type EvaluationTimelineStep = {
+  id: string;
+  label: string;
+  description: string;
+  status: "pending" | "running" | "done" | "failed" | "skipped";
+  message?: string | null;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+};
+
+export type EvaluationTimeline = {
+  evaluationId: string;
+  currentStep: string;
+  complete: boolean;
+  failed: boolean;
+  progressPct: number;
+  steps: EvaluationTimelineStep[];
+  updatedAt?: string;
+};
+
 export const api = axios.create({
   baseURL,
 });
@@ -57,30 +78,63 @@ api.interceptors.response.use(
   }
 );
 
-// Copy Evaluation API (vision-based — PDF or image upload)
+// Copy Evaluation API — upload creates a job; OCR/AI run separately when enabled
 export const copyEvaluationAPI = {
   uploadAndEvaluate: async (
     file: File,
-    metadata: { subject?: string; paper?: string; year?: number; maxMarks?: number }
+    metadata: {
+      subject?: string;
+      paper?: string;
+      year?: number;
+      language?: string;
+      questionId?: string;
+      maxMarks?: number;
+    }
   ) => {
     const formData = new FormData();
     formData.append('file', file);
     if (metadata.subject) formData.append('subject', metadata.subject);
     if (metadata.paper) formData.append('paper', metadata.paper);
     if (metadata.year) formData.append('year', metadata.year.toString());
+    if (metadata.language) formData.append('language', metadata.language);
+    if (metadata.questionId) formData.append('questionId', metadata.questionId);
     if (metadata.maxMarks) formData.append('maxMarks', metadata.maxMarks.toString());
 
     return api.post('/api/copy-evaluation/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 300000,
+      timeout: 120000,
     });
   },
 
   getEvaluationById: (id: string, includeRawText?: boolean) => {
     const params = includeRawText ? { includeRawText: 'true' } : {};
     return api.get(`/api/copy-evaluation/${id}`, { params });
+  },
+
+  getStatus: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/status`);
+  },
+
+  getTimeline: (id: string) => {
+    return api.get<{
+      success: boolean;
+      data: EvaluationTimeline;
+      stepsCatalog?: Array<{ id: string; label: string; description: string }>;
+    }>(`/api/copy-evaluation/${id}/timeline`);
+  },
+
+  getOcr: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/ocr`);
+  },
+
+  updateOcr: (id: string, payload: { text?: string; confirm?: boolean }) => {
+    return api.put(`/api/copy-evaluation/${id}/ocr`, payload);
+  },
+
+  retryOcr: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/ocr/retry`);
   },
 
   getHistory: (page = 1, limit = 10) => {
@@ -103,6 +157,86 @@ export const copyEvaluationAPI = {
 
   processEvaluation: (id: string) => {
     return api.post(`/api/copy-evaluation/${id}/process`);
+  },
+
+  getMarks: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/marks`);
+  },
+
+  calculateMarks: (id: string, body?: { maximumMarks?: number }) => {
+    return api.post(`/api/copy-evaluation/${id}/marks`, body || {});
+  },
+
+  getFeedback: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/feedback`);
+  },
+
+  generateFeedback: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/feedback`);
+  },
+
+  getMentorMessage: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/mentor-message`);
+  },
+
+  generateMentorMessage: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/mentor-message`);
+  },
+
+  getTopperComparison: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/topper-comparison`);
+  },
+
+  generateTopperComparison: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/topper-comparison`);
+  },
+
+  getModelAnswer: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/model-answer`);
+  },
+
+  generateModelAnswer: (id: string, body?: { wordLimit?: number }) => {
+    return api.post(`/api/copy-evaluation/${id}/model-answer`, body || {});
+  },
+
+  getFlowchart: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/flowchart`);
+  },
+
+  generateFlowchart: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/flowchart`);
+  },
+
+  getDiagramRecommendation: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/diagram-recommendation`);
+  },
+
+  generateDiagramRecommendation: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/diagram-recommendation`);
+  },
+
+  getValueAddition: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/value-addition`);
+  },
+
+  generateValueAddition: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/value-addition`);
+  },
+
+  getScoreImprovement: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/score-improvement`);
+  },
+
+  generateScoreImprovement: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/score-improvement`);
+  },
+
+  getTopperRoadmap: (id: string) => {
+    return api.get(`/api/copy-evaluation/${id}/topper-roadmap`);
+  },
+
+  generateTopperRoadmap: (id: string) => {
+    return api.post(`/api/copy-evaluation/${id}/topper-roadmap`);
   },
 };
 
@@ -1788,3 +1922,102 @@ export async function openMainsMaterialPdf(
   window.open(url, "_blank", "noopener,noreferrer");
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
+
+/** AI Orchestrator — cost / token analytics (admin) */
+export type AiCostAnalytics = {
+  success: boolean;
+  summary: {
+    requests: number;
+    success: number;
+    failed: number;
+    estimatedTokens: number;
+    actualTokens: number;
+    estimatedCost: number;
+    actualCost: number;
+    avgSavingsPct: number;
+    avgLatencyMs: number;
+  };
+  byTask: Array<{
+    task: string;
+    requests: number;
+    estimatedTokens: number;
+    actualTokens: number;
+    estimatedCost: number;
+    actualCost: number;
+    avgSavingsPct: number;
+  }>;
+  byDay: Array<{
+    date: string;
+    requests: number;
+    actualTokens: number;
+    estimatedCost: number;
+    actualCost: number;
+  }>;
+  recent: Array<{
+    requestId: string;
+    task: string;
+    model: string;
+    status: string;
+    estimatedTokens: number;
+    actualTokens: number;
+    estimatedCost: number;
+    actualCost: number;
+    savingsPct: number;
+    latency: number;
+    createdAt: string;
+  }>;
+  live?: {
+    promptSavingsPct: number;
+    targetMet: boolean;
+    targetSavingsPct: number;
+  };
+};
+
+export const aiOrchestratorAPI = {
+  analytics: (params?: { from?: string; to?: string; limit?: number }) =>
+    api.get<AiCostAnalytics>("/api/ai/analytics", { params }),
+  health: (params?: { windowMinutes?: number }) =>
+    api.get<AiHealthMonitor>("/api/ai/health", { params }),
+  monitor: (params?: { windowMinutes?: number }) =>
+    api.get<AiHealthMonitor>("/api/ai/monitor", { params }),
+};
+
+export type AiHealthMonitor = {
+  success: boolean;
+  updatedAt?: string;
+  windowMinutes?: number;
+  status?: {
+    level: "healthy" | "degraded" | "critical" | "idle" | "unknown";
+    label: string;
+    detail?: string;
+  };
+  metrics?: {
+    averageResponseTimeMs: number;
+    successRate: number;
+    failureRate: number;
+    retryCount: number;
+    averageRetries: number;
+    averageTokens: number;
+    averageCost: number;
+    totalTokens: number;
+    totalCost: number;
+    requestCount: number;
+    successCount: number;
+    failureCount: number;
+    retryingCount: number;
+  };
+  queue?: {
+    size: number;
+    queued: number;
+    active: number;
+    maxConcurrency: number;
+  };
+  currentModel?: {
+    active: string | null;
+    lite: string | null;
+    flash: string | null;
+    lastTask: string | null;
+    lastUsedAt: string | null;
+    recent: Array<{ model: string; count: number; lastUsed: string }>;
+  };
+};

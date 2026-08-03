@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Upload,
-  FileText,
   History,
   Download,
 } from 'lucide-react';
@@ -14,6 +13,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CopyEvaluationLoading } from '../components/copy-evaluation/CopyEvaluationLoading';
 import { CopyEvaluationResultView } from '../components/copy-evaluation/CopyEvaluationResultView';
 import { CopyEvaluationUploadModal } from '../components/copy-evaluation/CopyEvaluationUploadModal';
+import { CopyEvaluationEmptyState } from '../components/copy-evaluation/CopyEvaluationEmptyState';
 import { QuestionEvaluationView } from '../components/QuestionEvaluationView';
 import { VisionEvaluationResult } from '../types/copyEvaluation';
 
@@ -47,6 +47,7 @@ const CopyEvaluationPage: React.FC = () => {
   const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   useEffect(() => {
     const evaluationId = searchParams.get('id');
@@ -82,7 +83,7 @@ const CopyEvaluationPage: React.FC = () => {
 
   const handleUpload = async (
     file: File,
-    meta: { subject: string; paper: string; year: number }
+    meta: { subject: string; paper: string; year: number; language?: string }
   ) => {
     setIsUploading(true);
     setUploadProgress(10);
@@ -91,6 +92,7 @@ const CopyEvaluationPage: React.FC = () => {
     setVisionResult(null);
     setFullEvaluation(null);
     setShowUploadModal(false);
+    setPendingFile(null);
 
     const progressTimer = setInterval(() => {
       setUploadProgress((p) => Math.min(p + 4, 90));
@@ -152,6 +154,12 @@ const CopyEvaluationPage: React.FC = () => {
     }
   };
 
+  /** Quick upload from empty-state dropzone — opens modal with file preselected via pending */
+  const handleFileFromEmptyState = (file: File) => {
+    setPendingFile(file);
+    setShowUploadModal(true);
+  };
+
   const hasResult = Boolean(visionResult || (fullEvaluation?.evaluations?.length ?? 0) > 0);
   const isLegacyResult =
     fullEvaluation?.evaluations &&
@@ -174,7 +182,7 @@ const CopyEvaluationPage: React.FC = () => {
               theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
             }`}
           >
-            UPSC Mains answer copy check — examiner marks & line-wise feedback
+            AI-powered UPSC Mains examiner — marks, feedback & model answers
           </p>
         </div>
         {!hasResult && !isUploading && (
@@ -193,45 +201,10 @@ const CopyEvaluationPage: React.FC = () => {
         {isUploading ? (
           <CopyEvaluationLoading fileName={uploadFileName} progress={uploadProgress} />
         ) : !hasResult ? (
-          <Card
-            className={`h-full min-h-[400px] ${
-              theme === 'dark'
-                ? 'bg-slate-900/80 border-slate-700'
-                : 'bg-white border-slate-200'
-            }`}
-          >
-            <CardContent className="p-8 text-center flex items-center justify-center h-full min-h-[400px]">
-              <div className="max-w-md">
-                <FileText
-                  className={`w-12 h-12 mx-auto mb-4 ${
-                    theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
-                  }`}
-                />
-                <h2
-                  className={`text-lg font-bold mb-2 ${
-                    theme === 'dark' ? 'text-slate-200' : 'text-slate-800'
-                  }`}
-                >
-                  No copy evaluated yet
-                </h2>
-                <p
-                  className={`text-sm mb-6 ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
-                  }`}
-                >
-                  Upload your handwritten UPSC Mains answer (PDF or image) for
-                  examiner-style checking.
-                </p>
-                <Button
-                  onClick={() => setShowUploadModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload Answer Copy
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <CopyEvaluationEmptyState
+            onFileReady={handleFileFromEmptyState}
+            onOpenModal={() => setShowUploadModal(true)}
+          />
         ) : (
           <div className="space-y-3">
             <div className="flex items-center justify-end flex-wrap gap-2">
@@ -272,6 +245,10 @@ const CopyEvaluationPage: React.FC = () => {
               </Button>
             </div>
 
+            {error && (
+              <p className="text-sm text-red-500 font-medium">{error}</p>
+            )}
+
             {visionResult ? (
               <CopyEvaluationResultView
                 result={visionResult}
@@ -284,6 +261,7 @@ const CopyEvaluationPage: React.FC = () => {
                 fileName={
                   fullEvaluation?.fileName || fullEvaluation?.pdfFileName
                 }
+                createdAt={fullEvaluation?.createdAt}
               />
             ) : isLegacyResult && fullEvaluation?.evaluations ? (
               <Card
@@ -319,12 +297,14 @@ const CopyEvaluationPage: React.FC = () => {
           if (!isUploading) {
             setShowUploadModal(false);
             setError(null);
+            setPendingFile(null);
           }
         }}
         onUpload={handleUpload}
         isUploading={isUploading}
         uploadProgress={uploadProgress}
         error={error}
+        initialFile={pendingFile}
       />
     </div>
   );

@@ -23,18 +23,9 @@ import dartRoutes from "./routes/dartRoutes.js";
 import pricingRoutes from "./routes/pricingRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import offersRoutes from "./routes/offersRoutes.js";
-import notesPublicRoutes from "./routes/notesPublicRoutes.js";
-import notesCmsPublicRoutes from "./routes/notesCmsPublicRoutes.js";
-import notesCmsAdminRoutes from "./routes/notesCmsAdminRoutes.js";
-import orderRoutes from "./routes/order.routes.js";
-import paymentsRoutes from "./routes/payments.routes.js";
 import currentAffairsRoutes, {
   currentAffairsAdminRouter,
 } from "./routes/currentAffairsRoutes.js";
-import {
-  mainsMaterialStudentRouter,
-  mainsMaterialAdminRouter,
-} from "./routes/mainsMaterialRoutes.js";
 import syllabusTargetRoutes from "./routes/syllabusTargetRoutes.js";
 import ragRoutes from "./rag/routes/ragRoutes.js";
 import { uploadPdf as ragUploadPdf } from "./rag/controllers/ragController.js";
@@ -47,6 +38,7 @@ import { startProcessingEngine } from "./processing/index.js";
 import intelligenceRoutes from "./intelligence/routes/intelligence.routes.js";
 import searchAliasRoutes from "./intelligence/routes/search.routes.js";
 import { startIntelligenceEngine } from "./intelligence/index.js";
+import aiRoutes from "./ai/routes/ai.routes.js";
 import qiRoutes from "./questionIntelligence/routes/qi.routes.js";
 import testBuilderRoutes from "./testBuilder/routes/testBuilder.routes.js";
 
@@ -66,26 +58,16 @@ app.set("trust proxy", 1);
 /* -------------------- CORS -------------------- */
 
 const allowedOrigins = [
-  process.env.STUDENT_PORTAL_URL,
   process.env.CLIENT_ORIGIN,
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
-  process.env.NOTES_FRONTEND_URL,
-  process.env.NOTES_CLIENT_ORIGIN,
-  process.env.NOTES_CLIENT_URL,
   "https://studentportal.mentorsdaily.com",
-  "https://notes.mentorsdaily.com",
 ]
   .filter(Boolean)
   .map((origin) => origin.replace(/\/$/, ""));
 
 if (process.env.NODE_ENV !== "production") {
-  allowedOrigins.push(
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:3000",
-    "http://localhost:3001"
-  );
+  allowedOrigins.push("http://localhost:5173", "http://localhost:5174");
 }
 
 app.use(
@@ -96,18 +78,6 @@ app.use(
 );
 
 app.use(express.json());
-
-/* -------------------- JSON body / error handling -------------------- */
-
-app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && "body" in err) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid JSON body",
-    });
-  }
-  return next(err);
-});
 
 /* -------------------- DB -------------------- */
 
@@ -205,12 +175,9 @@ app.use("/api/study-plan", authMiddleware, studyPlanRoutes);
 app.use("/api/study-planner", authMiddleware, advancedStudyPlannerRoutes);
 app.use("/api/syllabus-targets", syllabusTargetRoutes);
 
-// Must be before /api/admin so /api/admin/current-affairs/*, notes-portal, mains-materials are not swallowed
+// Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
-app.use("/api/admin/notes-portal", notesCmsAdminRoutes);
-app.use("/api/admin/mains-materials", mainsMaterialAdminRouter);
 app.use("/api/admin", adminRoutes);
-app.use("/api/mains-materials", mainsMaterialStudentRouter);
 
 // Enterprise Knowledge Base (upload + taxonomy)
 app.use("/api/knowledge", knowledgeRoutes);
@@ -222,6 +189,9 @@ app.use("/api/processing", processingRoutes);
 app.use("/api/intelligence", intelligenceRoutes);
 // Spec alias paths: POST /api/search, /api/search/topic, …
 app.use("/api/search", searchAliasRoutes);
+
+// AI Orchestrator — cost analytics + health monitor (admin)
+app.use("/api/ai", aiRoutes);
 
 // Question Intelligence Engine (select bank + generate only if required)
 app.use("/api/question-intelligence", qiRoutes);
@@ -235,26 +205,13 @@ app.use("/api/rag", ragRoutes);
 app.post("/api/admin/upload-pdf", requireAdmin, ragPdfUpload, ragUploadPdf);
 
 app.use("/api/offers", offersRoutes);
-app.use("/api/notes", notesPublicRoutes);
-app.use("/api/notes-portal", notesCmsPublicRoutes);
 app.use("/api/current-affairs", currentAffairsRoutes);
 
 app.use("/api/pricing", pricingRoutes);
 app.use("/api/payment", paymentRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payments", paymentsRoutes);
 
 app.use("/api/prelims-mock", authMiddleware, prelimsMockRoutes);
 app.use("/api/dart", authMiddleware, dartRoutes);
-
-/* -------------------- API JSON 404 (never return HTML for /api/*) -------------------- */
-
-app.use("/api", (req, res) => {
-  return res.status(404).json({
-    success: false,
-    message: `Cannot ${req.method} ${req.originalUrl}`,
-  });
-});
 
 /* -------------------- CRON -------------------- */
 

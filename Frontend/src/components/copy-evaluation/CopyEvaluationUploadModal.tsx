@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Upload, FileText, Image as ImageIcon, X, Sparkles } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { Button } from '../ui/button';
@@ -12,15 +12,19 @@ const ACCEPTED_TYPES = [
   'image/webp',
 ];
 
-const MAX_SIZE = 15 * 1024 * 1024;
+const MAX_SIZE = 20 * 1024 * 1024;
 
 interface CopyEvaluationUploadModalProps {
   open: boolean;
   onClose: () => void;
-  onUpload: (file: File, meta: { subject: string; paper: string; year: number }) => void;
+  onUpload: (
+    file: File,
+    meta: { subject: string; paper: string; year: number; language: string }
+  ) => void;
   isUploading: boolean;
   uploadProgress?: number;
   error: string | null;
+  initialFile?: File | null;
 }
 
 export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps> = ({
@@ -30,6 +34,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
   isUploading,
   uploadProgress = 0,
   error,
+  initialFile = null,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -37,41 +42,55 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
   const [subject, setSubject] = useState('Polity');
   const [paper, setPaper] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
+  const [language, setLanguage] = useState('auto');
   const [dragOver, setDragOver] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateAndSetFile = (file: File) => {
+  const validateAndSetFile = useCallback((file: File) => {
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setLocalError('Please select a PDF or image (JPEG, PNG, WebP)');
       return;
     }
     if (file.size > MAX_SIZE) {
-      setLocalError('File size must be less than 15MB');
+      setLocalError('File size must be less than 20MB');
       return;
     }
     setSelectedFile(file);
     setLocalError(null);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (open && initialFile) {
+      validateAndSetFile(initialFile);
+    }
+    if (!open) {
+      setSelectedFile(null);
+      setLocalError(null);
+    }
+  }, [open, initialFile, validateAndSetFile]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) validateAndSetFile(file);
   };
 
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) validateAndSetFile(file);
-  }, []);
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) validateAndSetFile(file);
+    },
+    [validateAndSetFile]
+  );
 
   const handleSubmit = () => {
     if (!selectedFile) {
       setLocalError('Please select a file first');
       return;
     }
-    onUpload(selectedFile, { subject, paper, year });
+    onUpload(selectedFile, { subject, paper, year, language });
   };
 
   const clearFile = () => {
@@ -174,7 +193,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                       Drag & drop or click to upload
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      PDF or photo · Multi-page PDF supported · Max 15MB
+                      PDF · JPG · PNG · Multi-page PDF supported · Max 20 MB
                     </p>
                   </label>
                 </div>
@@ -196,7 +215,7 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block font-medium mb-2 text-sm">Subject</label>
                 <select
@@ -222,6 +241,21 @@ export const CopyEvaluationUploadModal: React.FC<CopyEvaluationUploadModalProps>
                   <option>Essay</option>
                   <option>General Studies</option>
                   <option>Optional Subject</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-medium mb-2 text-sm">Answer medium</label>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  disabled={isUploading}
+                  className={`w-full px-4 py-2 rounded-lg border ${
+                    isDark ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white border-slate-300'
+                  }`}
+                >
+                  <option value="auto">Auto-detect (English / Hindi)</option>
+                  <option value="en">English medium</option>
+                  <option value="hi">Hindi medium</option>
                 </select>
               </div>
               <div>

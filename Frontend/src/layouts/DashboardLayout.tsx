@@ -2,7 +2,7 @@ import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award, CreditCard, Library } from "lucide-react";
+import { LineChart, CalendarClock, MessageCircle, FileText, Video, Menu, X, ClipboardList, User, Users, History, Home, Settings, HelpCircle, LogOut, PanelLeftClose, PanelLeftOpen, BarChart3, Lightbulb, Target, ClipboardEdit, IndianRupee, AlertTriangle, Tag, Newspaper, ChevronDown, Crown, BookOpen, ExternalLink, Database, Layers, Sparkles, Activity, Brain, Award, CreditCard, Library, Coins } from "lucide-react";
 import { lazyNamed } from "../utils/lazyRoute";
 import logoImg from "../LOGO/mentorsdaily.png";
 import { AnimatePresence, motion } from "framer-motion";
@@ -151,6 +151,8 @@ const getPageTitle = (pathname: string, userRole?: string): { title: string; ico
     '/admin/knowledge-base': { title: 'Knowledge Base', icon: <Database className="w-5 h-5" /> },
     '/admin/processing': { title: 'Processing Engine', icon: <Activity className="w-5 h-5" /> },
     '/admin/intelligence': { title: 'Knowledge Intelligence', icon: <Brain className="w-5 h-5" /> },
+    '/admin/ai-analytics': { title: 'AI Cost Analytics', icon: <Coins className="w-5 h-5" /> },
+    '/admin/ai-health': { title: 'AI Health Monitor', icon: <Activity className="w-5 h-5" /> },
     '/admin/topic-practice': { title: 'Topic Practice', icon: <ClipboardList className="w-5 h-5" /> },
     '/admin/syllabus-targets': { title: 'Syllabus Targets', icon: <BookOpen className="w-5 h-5" /> },
     '/admin/pricing': { title: 'Manage Pricing Plans', icon: <IndianRupee className="w-5 h-5" /> },
@@ -505,6 +507,14 @@ export const DashboardLayout = () => {
                 <NavLink to="/admin/intelligence" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Intelligence — embeddings & hybrid search">
                   <Brain className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Intelligence</span>}
+                </NavLink>
+                <NavLink to="/admin/ai-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Cost Analytics — estimated vs actual tokens">
+                  <Coins className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>AI Cost Analytics</span>}
+                </NavLink>
+                <NavLink to="/admin/ai-health" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Health Monitor — latency, success, queue">
+                  <Activity className="w-4 h-4 flex-shrink-0" />
+                  {!sidebarCollapsed && <span>AI Health Monitor</span>}
                 </NavLink>
                 <NavLink to="/admin/topic-practice" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Topic Practice - Assign tests to students">
                   <ClipboardList className="w-4 h-4 flex-shrink-0" />

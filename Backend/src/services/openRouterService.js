@@ -159,44 +159,139 @@ export const callOpenRouterAPI = async ({
 };
 
 /**
- * Parse JSON from AI response text
- * Extracts JSON object from response even if wrapped in markdown or other text
+ * Parse JSON from AI response text.
+ * Handles markdown fences, trailing garbage, truncated objects, and common AI JSON glitches.
  * @param {string} content - Raw content from AI response
  * @returns {Object|null} - Parsed JSON object or null if parsing fails
  */
 export const parseJSONFromResponse = (content) => {
+  if (content == null) return null;
+  let text = String(content).trim();
+  if (!text) return null;
+
   try {
-    // First, try to find JSON object in the response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    if (text.startsWith("```")) {
+      text = text
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
+    }
+
+    const first = text.indexOf("{");
+    if (first < 0) {
       console.error("No JSON object found in response");
       return null;
     }
+    const last = text.lastIndexOf("}");
+    let jsonString = last > first ? text.slice(first, last + 1) : text.slice(first);
 
-    let jsonString = jsonMatch[0];
+    const tryParse = (s) => {
+      let cleaned = s.replace(/("(?:[^"\\]|\\.)*")/g, (match) =>
+        match.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, " ")
+      );
+      cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+      cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
+      return JSON.parse(cleaned);
+    };
 
-    // Clean control characters that might break JSON parsing
-    // Remove unescaped control characters from within string literals
-    jsonString = jsonString.replace(/("(?:[^"\\]|\\.)*")/g, (match) => {
-      // For each string literal, remove control characters except \n, \t, \r
-      return match.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-    });
+    try {
+      return tryParse(jsonString);
+    } catch (firstErr) {
+      const repaired = repairTruncatedJson(jsonString);
+      if (repaired) {
+        try {
+          return tryParse(repaired);
+        } catch {
+          /* continue */
+        }
+      }
+      const progressive = tryProgressiveParse(jsonString, tryParse);
+      if (progressive) return progressive;
 
-    // Also clean any remaining control characters outside strings (though this shouldn't happen in valid JSON)
-    jsonString = jsonString.replace(/[\x00-\x1F\x7F]/g, '');
-
-    // Try to parse the cleaned JSON
-    return JSON.parse(jsonString);
+      console.error("Failed to parse JSON from response:", firstErr);
+      console.error("Raw content length:", text.length);
+      const pos = Number(String(firstErr.message).match(/position (\d+)/)?.[1]) || 0;
+      console.error(
+        "Content around error position:",
+        text.substring(Math.max(0, pos - 80), Math.min(text.length, pos + 80))
+      );
+      return null;
+    }
   } catch (error) {
     console.error("Failed to parse JSON from response:", error);
-    console.error("Raw content length:", content.length);
-    // Log a portion of the problematic content for debugging
-    const startPos = Math.max(0, 2300);
-    const endPos = Math.min(content.length, 2400);
-    console.error("Content around error position:", content.substring(startPos, endPos));
+    console.error("Raw content length:", String(content).length);
     return null;
   }
 };
+
+/** Close open strings / braces when model hits max tokens mid-JSON. */
+function repairTruncatedJson(input) {
+  if (!input || typeof input !== "string") return input;
+  let s = input.trim();
+
+  let inString = false;
+  let escape = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\" && inString) {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') inString = !inString;
+  }
+  if (inString) {
+    if (s.endsWith("\\")) s = s.slice(0, -1);
+    s += '"';
+  }
+
+  s = s.replace(/,\s*"[^"]*"\s*:\s*$/g, "");
+  s = s.replace(/,\s*"[^"]*"\s*$/g, "");
+  s = s.replace(/,\s*$/g, "");
+
+  const stack = [];
+  inString = false;
+  escape = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\" && inString) {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === "{" || ch === "[") stack.push(ch);
+    else if (ch === "}" || ch === "]") stack.pop();
+  }
+  while (stack.length) {
+    s += stack.pop() === "{" ? "}" : "]";
+  }
+  return s;
+}
+
+function tryProgressiveParse(jsonString, tryParse) {
+  for (let i = jsonString.length - 1; i >= 0; i--) {
+    if (jsonString[i] !== "}") continue;
+    const candidate = repairTruncatedJson(jsonString.slice(0, i + 1));
+    try {
+      const parsed = tryParse(candidate);
+      if (parsed && typeof parsed === "object") return parsed;
+    } catch {
+      /* continue */
+    }
+  }
+  return null;
+}
 
 /**
  * Evaluate UPSC answer using OpenRouter API

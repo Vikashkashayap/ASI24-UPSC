@@ -13,7 +13,14 @@ import {
 import fs from "fs";
 
 const VISION_MODEL =
-  process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
+  process.env.OPENROUTER_VISION_MODEL ||
+  process.env.OPENROUTER_MODEL ||
+  "google/gemini-2.5-flash-lite";
+
+const TEXT_MODEL =
+  process.env.OPENROUTER_COPY_EVAL_MODEL ||
+  process.env.OPENROUTER_MODEL ||
+  "google/gemini-2.5-flash-lite";
 
 /**
  * Upload answer copy (PDF/image) and evaluate via vision AI
@@ -37,6 +44,7 @@ export const uploadAndEvaluateCopy = async (req, res) => {
       paper = "",
       year = new Date().getFullYear(),
       maxMarks = 15,
+      language = "auto",
     } = req.body;
 
     const userId = req.user._id;
@@ -82,12 +90,25 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     await evaluation.save();
 
     const parsedMaxMarks = parseInt(maxMarks, 10) || 15;
+    const preferredLanguage = String(language || "auto").toLowerCase().trim();
 
     const visionResult = await evaluateCopyWithVision({
       pages: imageData.pages,
-      metadata: { subject, paper, year },
+      metadata: {
+        subject,
+        paper,
+        year,
+        language:
+          preferredLanguage === "en" ||
+          preferredLanguage === "english" ||
+          preferredLanguage === "hi" ||
+          preferredLanguage === "hindi"
+            ? preferredLanguage
+            : "auto",
+      },
       apiKey,
       model: VISION_MODEL,
+      textModel: TEXT_MODEL,
       maxMarks: parsedMaxMarks,
     });
 
@@ -110,9 +131,40 @@ export const uploadAndEvaluateCopy = async (req, res) => {
       result.marks = result.overallMarks;
     }
     result.overallMarks = result.marks;
+    result.overall_score = result.marks;
 
     evaluation.visionResult = result;
     evaluation.aiModel = visionResult.model || VISION_MODEL;
+    evaluation.questionFingerprint =
+      result.questionFingerprint ||
+      result.tokenCache?.questionFp ||
+      null;
+    // Store OCR transcript (Pass A) as source of truth
+    evaluation.rawText =
+      result.rawOcrText ||
+      visionResult.ocr?.fullTranscript ||
+      result.extractedAnswerText ||
+      "";
+    evaluation.confidenceScore =
+      (result.ocrMeta?.confidence ??
+        result.confidence ??
+        result.questionMeta?.confidence ??
+        100) / 100;
+    evaluation.questionMeta = result.questionMeta || {};
+    evaluation.evaluationResultJson = result;
+    evaluation.evaluationJob = {
+      stages: [
+        { name: "upload", status: "done" },
+        { name: "ocr", status: "done" },
+        { name: "question_match", status: "done" },
+        { name: "kb_support", status: knowledgeMetaRole(result) },
+        { name: "ai_evaluation", status: "done" },
+        { name: "report", status: "done" },
+      ],
+      startedAt: evaluation.createdAt,
+      finishedAt: new Date(),
+      durationSec: result.evaluationTimeSec || null,
+    };
 
     try {
       evaluation.storedPages = await saveEvaluationPageImages(
@@ -130,7 +182,7 @@ export const uploadAndEvaluateCopy = async (req, res) => {
         obtained,
         maximum: result.maxMarks,
         percentage: Math.round((obtained / result.maxMarks) * 100),
-        grade: getGrade(obtained, result.maxMarks),
+        grade: result.grade || getGrade(obtained, result.maxMarks),
       },
       strengths: result.strengths,
       weaknesses: result.weaknesses,
@@ -271,7 +323,7 @@ export const getUserEvaluationHistory = async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit, 10))
       .select(
-        "subject paper year pdfFileName fileName fileType status evaluationMode visionResult finalSummary createdAt"
+        "subject paper year pdfFileName fileName fileType status evaluationMode visionResult finalSummary questionMeta createdAt"
       );
 
     const total = await CopyEvaluation.countDocuments({ userId });
@@ -282,9 +334,12 @@ export const getUserEvaluationHistory = async (req, res) => {
       paper: e.paper,
       year: e.year,
       fileName: e.fileName || e.pdfFileName,
+      pdfFileName: e.pdfFileName,
       status: e.status,
       evaluationMode: e.evaluationMode,
       createdAt: e.createdAt,
+      questionText: e.visionResult?.questionText || e.questionMeta?.topic || "",
+      grade: e.visionResult?.grade || e.finalSummary?.overallScore?.grade,
       overallMarks:
         e.visionResult?.marks ??
         e.visionResult?.overallMarks ??
@@ -292,6 +347,7 @@ export const getUserEvaluationHistory = async (req, res) => {
       maxMarks:
         e.visionResult?.maxMarks ?? e.finalSummary?.overallScore?.maximum,
       percentage: e.finalSummary?.overallScore?.percentage,
+      finalSummary: e.finalSummary,
     }));
 
     res.status(200).json({
@@ -464,6 +520,10 @@ function getUpscRange(obtained, maximum) {
   if (pct >= 55) return "Above Average";
   if (pct >= 40) return "Average";
   return "Below Average";
+}
+
+function knowledgeMetaRole(result) {
+  return result?.knowledgeMeta?.used ? "done" : "skipped";
 }
 
 export default {

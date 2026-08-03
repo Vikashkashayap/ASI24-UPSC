@@ -1,11 +1,24 @@
-import React from 'react';
-import { AlertTriangle, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { CopyEvaluationAnswerPanel } from './CopyEvaluationAnswerPanel';
 import { EvaluationScoreHero } from './EvaluationScoreHero';
-import { VisionEvaluationResult } from '../../types/copyEvaluation';
-import { SuperKalamSectionBlock } from './superkalam/SuperKalamSectionBlock';
-import { SuperKalamMarksFooter } from './superkalam/SuperKalamMarksFooter';
+import { EvaluationInsightGrid } from './EvaluationInsightGrid';
+import {
+  QuestionAnalysisPanel,
+  MissingContentChecklist,
+} from './QuestionAnalysisPanel';
+import { ParagraphFeedbackPanel } from './ParagraphFeedbackPanel';
+import { ImprovedModelAnswerPanel } from './ImprovedModelAnswerPanel';
+import { NextPracticePanel } from './NextPracticePanel';
+import {
+  VisionEvaluationResult,
+  getKeywords,
+  getImprovedAnswer,
+  getModelAnswer,
+  getNextPractice,
+  getMissingPoints,
+} from '../../types/copyEvaluation';
 
 export type { VisionEvaluationResult } from '../../types/copyEvaluation';
 
@@ -21,6 +34,7 @@ interface CopyEvaluationResultViewProps {
   subject?: string;
   paper?: string;
   fileName?: string;
+  createdAt?: string;
 }
 
 export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> = ({
@@ -30,19 +44,42 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
   subject,
   paper,
   fileName,
+  createdAt,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [showCopy, setShowCopy] = useState(false);
 
-  const expectedPoints = result.questionDemand?.expectedPoints || [];
-  const missingAreas =
-    result.questionDemand?.missingAreas || result.missingDimensions || [];
-  const hasDemand = expectedPoints.length > 0 || missingAreas.length > 0;
-  const criticalMistakes = result.criticalMistakes?.filter(Boolean) || [];
+  const missingAreas = getMissingPoints(result);
+  const keywords = getKeywords(result);
+  const covered =
+    result.coveredPoints?.length
+      ? result.coveredPoints
+      : keywords.covered || [];
+  const suggestions =
+    result.improvementPriority?.length
+      ? result.improvementPriority
+      : result.suggestions || [];
 
-  const shellClass = isDark
-    ? 'rounded-xl border border-slate-700/50 bg-slate-900/50'
-    : 'rounded-xl border border-slate-200 bg-white shadow-sm';
+  // Avoid repeating the same points in Weaknesses + Critical Mistakes
+  const weaknessSet = new Set(
+    (result.weaknesses || []).map((w) => w.trim().toLowerCase())
+  );
+  const uniqueCritical = (result.criticalMistakes || []).filter(
+    (m) => m && !weaknessSet.has(m.trim().toLowerCase())
+  );
+  const weaknesses = [
+    ...(result.weaknesses || []),
+    ...uniqueCritical,
+  ];
+
+  const hasCopy =
+    Boolean(evaluationId) &&
+    Boolean(
+      storedPages?.length ||
+        result.extractedAnswerText ||
+        result.questionText
+    );
 
   return (
     <div className="space-y-4">
@@ -51,175 +88,103 @@ export const CopyEvaluationResultView: React.FC<CopyEvaluationResultViewProps> =
         subject={subject}
         paper={paper}
         fileName={fileName}
+        createdAt={createdAt}
       />
 
-      <div className={shellClass}>
-        {evaluationId &&
-          (storedPages?.length ||
-            result.extractedAnswerText ||
-            result.questionText) && (
+      <EvaluationInsightGrid
+        strengths={result.strengths}
+        weaknesses={weaknesses}
+        suggestions={suggestions}
+      />
+
+      <QuestionAnalysisPanel
+        keywords={keywords}
+        questionText={result.questionText}
+        wordCount={result.wordCount}
+        expectedWordCount={
+          result.expectedWordCount ?? result.questionMeta?.wordLimit ?? undefined
+        }
+      />
+
+      <MissingContentChecklist covered={covered} missing={missingAreas} />
+
+      <ParagraphFeedbackPanel result={result} />
+
+      {result.presentationNotes?.trim() && (
+        <div
+          className={`rounded-xl border p-4 ${
+            isDark
+              ? 'bg-slate-900/50 border-slate-700/50'
+              : 'bg-white border-slate-200 shadow-sm'
+          }`}
+        >
+          <p className="text-xs font-bold tracking-[0.14em] uppercase mb-2 text-slate-500">
+            Presentation
+          </p>
+          <p
+            className={`text-sm leading-relaxed ${
+              isDark ? 'text-slate-400' : 'text-slate-600'
+            }`}
+          >
+            {result.presentationNotes}
+          </p>
+        </div>
+      )}
+
+      <ImprovedModelAnswerPanel
+        improvedAnswer={getImprovedAnswer(result)}
+        modelAnswer={getModelAnswer(result)}
+        modelSuggestions={result.modelAnswerSuggestions}
+        modelAnswerShared={Boolean(result.modelAnswerShared || result.tokenCache?.modelAnswerCached)}
+      />
+
+      <NextPracticePanel items={getNextPractice(result)} />
+
+      {hasCopy && evaluationId && (
+        <div
+          className={`rounded-xl border overflow-hidden ${
+            isDark
+              ? 'bg-slate-900/50 border-slate-700/50'
+              : 'bg-white border-slate-200 shadow-sm'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => setShowCopy((v) => !v)}
+            className={`w-full flex items-center justify-between px-4 xs:px-5 py-3.5 text-left ${
+              isDark ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <FileText
+                className={`w-4 h-4 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}
+              />
+              <span
+                className={`text-sm font-bold ${
+                  isDark ? 'text-slate-100' : 'text-slate-900'
+                }`}
+              >
+                Your Answer Copy
+              </span>
+              <span className="text-xs text-slate-500 font-normal">
+                Transcript & uploaded pages
+              </span>
+            </span>
+            {showCopy ? (
+              <ChevronUp className="w-4 h-4 text-slate-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-slate-500" />
+            )}
+          </button>
+          {showCopy && (
             <CopyEvaluationAnswerPanel
               evaluationId={evaluationId}
               result={result}
               storedPages={storedPages}
             />
           )}
-
-        <div className="px-4 xs:px-5 py-1">
-          {criticalMistakes.length > 0 && (
-            <div
-              className={`my-5 rounded-lg border p-4 ${
-                isDark
-                  ? 'bg-red-950/20 border-red-500/25'
-                  : 'bg-red-50/80 border-red-200'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-red-500" />
-                <h3
-                  className={`text-sm font-bold ${
-                    isDark ? 'text-slate-100' : 'text-slate-900'
-                  }`}
-                >
-                  Critical Mistakes
-                </h3>
-              </div>
-              <ul
-                className={`space-y-2 ${
-                  isDark ? 'text-slate-300' : 'text-slate-700'
-                }`}
-              >
-                {criticalMistakes.map((m, i) => (
-                  <li key={`cm-${i}`} className="text-sm leading-relaxed flex gap-2.5">
-                    <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-red-500" />
-                    <span>{m}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {hasDemand && (
-            <div
-              className={`my-5 rounded-lg border p-4 ${
-                isDark
-                  ? 'bg-slate-800/40 border-slate-700/50'
-                  : 'bg-slate-50 border-slate-200'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-4 h-4 text-rose-500" />
-                <h3
-                  className={`text-sm font-bold ${
-                    isDark ? 'text-slate-100' : 'text-slate-900'
-                  }`}
-                >
-                  Question Demand
-                </h3>
-              </div>
-              {expectedPoints.length > 0 && (
-                <div className="mb-3">
-                  <p
-                    className={`text-xs font-semibold mb-2 ${
-                      isDark ? 'text-slate-400' : 'text-slate-500'
-                    }`}
-                  >
-                    Examiner expects
-                  </p>
-                  <ul
-                    className={`space-y-1.5 ${
-                      isDark ? 'text-slate-300' : 'text-slate-700'
-                    }`}
-                  >
-                    {expectedPoints.map((p, i) => (
-                      <li key={`e-${i}`} className="text-sm leading-relaxed flex gap-2.5">
-                        <span
-                          className={`mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                            isDark ? 'bg-blue-400' : 'bg-blue-500'
-                          }`}
-                        />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {missingAreas.length > 0 && (
-                <div>
-                  <p
-                    className={`text-xs font-semibold mb-2 ${
-                      isDark ? 'text-orange-400/90' : 'text-orange-700'
-                    }`}
-                  >
-                    Missing in your answer
-                  </p>
-                  <ul
-                    className={`space-y-1.5 ${
-                      isDark ? 'text-slate-300' : 'text-slate-700'
-                    }`}
-                  >
-                    {missingAreas.map((p, i) => (
-                      <li key={`m-${i}`} className="text-sm leading-relaxed flex gap-2.5">
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-orange-500" />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          )}
-
-          {result.introduction && (
-            <SuperKalamSectionBlock
-              label="Introduction"
-              section={result.introduction}
-            />
-          )}
-
-          {result.body?.map((sec, i) => (
-            <SuperKalamSectionBlock
-              key={i}
-              label={sec.sectionTitle || `Body ${i + 1}`}
-              section={sec}
-            />
-          ))}
-
-          {result.conclusion && (
-            <SuperKalamSectionBlock
-              label="Conclusion"
-              section={result.conclusion}
-            />
-          )}
-
-          {result.presentationNotes?.trim() && (
-            <div
-              className={`py-4 border-b ${
-                isDark ? 'border-slate-700/40' : 'border-slate-100'
-              }`}
-            >
-              <p
-                className={`text-xs font-bold tracking-[0.14em] uppercase mb-2 ${
-                  isDark ? 'text-slate-500' : 'text-slate-500'
-                }`}
-              >
-                Presentation
-              </p>
-              <p
-                className={`text-sm leading-relaxed ${
-                  isDark ? 'text-slate-400' : 'text-slate-600'
-                }`}
-              >
-                {result.presentationNotes}
-              </p>
-            </div>
-          )}
-
-          <div className="py-5">
-            <SuperKalamMarksFooter result={result} />
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

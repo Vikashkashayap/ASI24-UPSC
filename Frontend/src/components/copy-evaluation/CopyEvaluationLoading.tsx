@@ -1,24 +1,35 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Sparkles,
   Upload,
   FileSearch,
-  Brain,
   PenLine,
-  ClipboardCheck,
-  Target,
-  BookOpen,
+  HelpCircle,
+  BookOpenCheck,
+  MessageSquareText,
+  Calculator,
+  FileCheck2,
+  Check,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 
 const LOADING_STEPS = [
-  { icon: Upload, text: 'Uploading answer copy...' },
-  { icon: FileSearch, text: 'Analyzing handwriting...' },
-  { icon: Target, text: 'Understanding question demand...' },
-  { icon: BookOpen, text: 'Evaluating introduction...' },
-  { icon: Brain, text: 'Checking answer structure...' },
-  { icon: PenLine, text: 'Reviewing body & conclusion...' },
-  { icon: ClipboardCheck, text: 'Generating examiner feedback...' },
+  { icon: Upload, text: 'Uploading PDF', detail: 'Securely transferring your answer copy' },
+  { icon: FileSearch, text: 'Extracting Text', detail: 'Reading pages and layout' },
+  { icon: PenLine, text: 'Reading Handwriting', detail: 'Transcribing your written answer' },
+  { icon: HelpCircle, text: 'Understanding Question', detail: 'Detecting paper, demand & marks' },
+  {
+    icon: BookOpenCheck,
+    text: 'Comparing with UPSC Model Answer',
+    detail: 'Matching expected dimensions & keywords',
+  },
+  {
+    icon: MessageSquareText,
+    text: 'Generating Feedback',
+    detail: 'Line-by-line examiner remarks',
+  },
+  { icon: Calculator, text: 'Calculating Marks', detail: 'Applying UPSC-style rubric' },
+  { icon: FileCheck2, text: 'Preparing Report', detail: 'Building your evaluation dashboard' },
 ];
 
 interface CopyEvaluationLoadingProps {
@@ -31,114 +42,214 @@ export const CopyEvaluationLoading: React.FC<CopyEvaluationLoadingProps> = ({
   progress,
 }) => {
   const { theme } = useTheme();
-  const [stepIndex, setStepIndex] = useState(0);
   const isDark = theme === 'dark';
+  const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStepIndex((i) => (i + 1) % LOADING_STEPS.length);
-    }, 2400);
+      setStepIndex((i) => {
+        if (i >= LOADING_STEPS.length - 1) return i;
+        return i + 1;
+      });
+    }, 2800);
     return () => clearInterval(interval);
   }, []);
 
-  const StepIcon = LOADING_STEPS[stepIndex].icon;
-  const displayProgress = progress ?? Math.min(95, 15 + stepIndex * 12);
+  // Sync step loosely with progress when provided
+  useEffect(() => {
+    if (progress == null) return;
+    const mapped = Math.min(
+      LOADING_STEPS.length - 1,
+      Math.floor((progress / 100) * LOADING_STEPS.length)
+    );
+    setStepIndex((prev) => Math.max(prev, mapped));
+  }, [progress]);
+
+  const displayProgress =
+    progress ?? Math.min(94, 8 + stepIndex * Math.floor(86 / LOADING_STEPS.length));
+  const CurrentIcon = LOADING_STEPS[stepIndex].icon;
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border-2 p-8 xs:p-10 text-center ${
+      className={`relative overflow-hidden rounded-2xl border p-6 xs:p-8 sm:p-10 ${
         isDark
-          ? 'bg-gradient-to-br from-slate-900 via-blue-950/40 to-slate-900 border-blue-500/30'
-          : 'bg-gradient-to-br from-white via-blue-50/50 to-white border-blue-200/60'
+          ? 'bg-slate-900/90 border-slate-700/60'
+          : 'bg-white border-slate-200 shadow-[0_8px_40px_-12px_rgba(15,23,42,0.1)]'
       }`}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className={`absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl ${
-            isDark ? 'bg-blue-500/20' : 'bg-blue-300/30'
-          } animate-pulse`}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{ opacity: [0.3, 0.55, 0.3], scale: [1, 1.08, 1] }}
+          transition={{ repeat: Infinity, duration: 4 }}
+          className={`absolute -top-24 -right-20 w-72 h-72 rounded-full blur-3xl ${
+            isDark ? 'bg-blue-600/20' : 'bg-blue-400/25'
+          }`}
         />
-        <div
-          className={`absolute -bottom-16 -left-16 w-48 h-48 rounded-full blur-3xl ${
-            isDark ? 'bg-emerald-500/15' : 'bg-emerald-300/25'
-          } animate-pulse`}
-          style={{ animationDelay: '1s' }}
+        <motion.div
+          animate={{ opacity: [0.2, 0.4, 0.2] }}
+          transition={{ repeat: Infinity, duration: 5, delay: 1 }}
+          className={`absolute -bottom-20 -left-16 w-56 h-56 rounded-full blur-3xl ${
+            isDark ? 'bg-emerald-500/15' : 'bg-emerald-300/30'
+          }`}
         />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        <div className="relative">
-          <div
-            className={`w-20 h-20 rounded-2xl flex items-center justify-center ${
-              isDark ? 'bg-blue-500/20' : 'bg-blue-100'
-            }`}
+      <div className="relative z-10 max-w-lg mx-auto">
+        <div className="text-center mb-8">
+          <motion.div
+            key={stepIndex}
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative inline-flex mb-5"
           >
-            <Sparkles
-              className={`w-10 h-10 animate-pulse ${
-                isDark ? 'text-indigo-400' : 'text-blue-600'
+            <div
+              className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                isDark ? 'bg-blue-500/20' : 'bg-blue-100'
               }`}
+            >
+              <CurrentIcon
+                className={`w-8 h-8 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}
+              />
+            </div>
+            <motion.span
+              className="absolute -inset-2 rounded-3xl border-2 border-blue-500/30"
+              animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ repeat: Infinity, duration: 2 }}
             />
-          </div>
-          <div className="absolute -inset-2 rounded-3xl border-2 border-indigo-500/30 animate-ping opacity-40" />
-        </div>
+          </motion.div>
 
-        <div>
           <h3
-            className={`text-lg xs:text-xl font-bold mb-1 ${
-              isDark ? 'text-slate-100' : 'text-slate-800'
+            className={`text-lg xs:text-xl font-bold tracking-tight ${
+              isDark ? 'text-slate-100' : 'text-slate-900'
             }`}
           >
-            Premium Examiner Evaluation
+            AI Examiner at Work
           </h3>
           {fileName && (
-            <p className={`text-xs truncate max-w-xs mx-auto ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
+            <p className="text-xs mt-1 truncate max-w-xs mx-auto text-slate-500">
               {fileName}
             </p>
           )}
         </div>
 
-        <div
-          className={`flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-500 min-w-[280px] ${
-            isDark ? 'bg-slate-800/80 border border-slate-700/50' : 'bg-white border border-slate-200 shadow-sm'
-          }`}
-        >
-          <StepIcon
-            className={`w-5 h-5 flex-shrink-0 ${isDark ? 'text-indigo-400' : 'text-blue-600'}`}
-          />
-          <p className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-            {LOADING_STEPS[stepIndex].text}
-          </p>
-        </div>
+        {/* Active step callout */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={LOADING_STEPS[stepIndex].text}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
+            className={`mb-6 px-4 py-3.5 rounded-xl text-center ${
+              isDark
+                ? 'bg-slate-800/80 border border-slate-700/50'
+                : 'bg-slate-50 border border-slate-200'
+            }`}
+          >
+            <p
+              className={`text-sm font-semibold ${
+                isDark ? 'text-slate-100' : 'text-slate-800'
+              }`}
+            >
+              {LOADING_STEPS[stepIndex].text}
+            </p>
+            <p className="text-xs mt-0.5 text-slate-500">
+              {LOADING_STEPS[stepIndex].detail}
+            </p>
+          </motion.div>
+        </AnimatePresence>
 
-        <div className="w-full max-w-sm">
+        {/* Vertical step list */}
+        <ol className="space-y-0 mb-8">
+          {LOADING_STEPS.map((step, i) => {
+            const done = i < stepIndex;
+            const active = i === stepIndex;
+            const Icon = step.icon;
+            return (
+              <li key={step.text} className="flex gap-3">
+                <div className="flex flex-col items-center">
+                  <motion.div
+                    animate={
+                      active
+                        ? { scale: [1, 1.08, 1] }
+                        : { scale: 1 }
+                    }
+                    transition={
+                      active
+                        ? { repeat: Infinity, duration: 1.6 }
+                        : undefined
+                    }
+                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border ${
+                      done
+                        ? 'bg-emerald-500 border-emerald-500 text-white'
+                        : active
+                          ? isDark
+                            ? 'bg-blue-500/25 border-blue-400 text-blue-300'
+                            : 'bg-blue-100 border-blue-500 text-blue-600'
+                          : isDark
+                            ? 'bg-slate-800 border-slate-700 text-slate-600'
+                            : 'bg-slate-100 border-slate-200 text-slate-400'
+                    }`}
+                  >
+                    {done ? (
+                      <Check className="w-4 h-4" strokeWidth={3} />
+                    ) : (
+                      <Icon className="w-3.5 h-3.5" />
+                    )}
+                  </motion.div>
+                  {i < LOADING_STEPS.length - 1 && (
+                    <div
+                      className={`w-0.5 flex-1 min-h-[18px] my-0.5 ${
+                        done
+                          ? 'bg-emerald-500'
+                          : isDark
+                            ? 'bg-slate-700'
+                            : 'bg-slate-200'
+                      }`}
+                    />
+                  )}
+                </div>
+                <div className={`pb-3 pt-1.5 ${i === LOADING_STEPS.length - 1 ? 'pb-0' : ''}`}>
+                  <p
+                    className={`text-sm font-medium leading-tight ${
+                      done || active
+                        ? isDark
+                          ? 'text-slate-200'
+                          : 'text-slate-800'
+                        : isDark
+                          ? 'text-slate-600'
+                          : 'text-slate-400'
+                    }`}
+                  >
+                    {step.text}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/* Progress bar */}
+        <div>
           <div className="flex justify-between text-xs mb-1.5">
             <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Progress</span>
             <span className="font-semibold tabular-nums">{displayProgress}%</span>
           </div>
-          <div className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700 ease-out"
-              style={{ width: `${displayProgress}%` }}
+          <div
+            className={`h-2 rounded-full overflow-hidden ${
+              isDark ? 'bg-slate-800' : 'bg-slate-200'
+            }`}
+          >
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-emerald-400"
+              initial={{ width: 0 }}
+              animate={{ width: `${displayProgress}%` }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
             />
           </div>
-          <p className={`text-[10px] mt-2 ${isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-            Vision AI reads your handwriting directly — typically 1–3 minutes
+          <p className="text-[11px] mt-2.5 text-center text-slate-500">
+            Typically 1–3 minutes · Please keep this tab open
           </p>
-        </div>
-
-        <div className="flex gap-1.5 flex-wrap justify-center max-w-xs">
-          {LOADING_STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === stepIndex
-                  ? 'bg-indigo-500 scale-125'
-                  : isDark
-                    ? 'bg-slate-600'
-                    : 'bg-slate-300'
-              }`}
-            />
-          ))}
         </div>
       </div>
     </div>

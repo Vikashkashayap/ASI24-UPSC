@@ -20,7 +20,7 @@ const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
-  limits: { fileSize: 15 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (isAllowedUploadMime(file.mimetype)) {
       cb(null, true);
@@ -70,7 +70,7 @@ router.use((err, req, res, next) => {
       return res.status(400).json({
         success: false,
         message: "File too large",
-        error: "Maximum file size is 15MB",
+        error: "Maximum file size is 20MB",
       });
     }
     return res.status(400).json({

@@ -1,4 +1,4 @@
-import { VisionEvaluationResult, getMarks, LineFeedback } from '../types/copyEvaluation';
+import { VisionEvaluationResult, getMarks } from '../types/copyEvaluation';
 
 interface DownloadParams {
   result: VisionEvaluationResult;
@@ -20,39 +20,18 @@ const listHtml = (items: string[]) =>
     ? `<ul>${items.map((i) => `<li>${escapeHtml(i)}</li>`).join('')}</ul>`
     : '<p>—</p>';
 
-const lineFeedbackHtml = (items: LineFeedback[] = []) => {
-  if (!items.length) return '';
-  return items
-    .map(
-      (row, i) => `
-  <div class="line-card">
-    <p><strong>Line ${i + 1}</strong>${row.verdict ? ` · <em>${escapeHtml(row.verdict.replace(/_/g, ' '))}</em>` : ''}</p>
-    <div class="box quote">${escapeHtml(row.studentLine)}</div>
-    <p><strong>Research &amp; Analysis:</strong> ${escapeHtml(row.examinerAnalysis)}</p>
-    <p><strong>How to improve:</strong> ${escapeHtml(row.howToImprove)}</p>
-  </div>`
-    )
-    .join('');
-};
-
 const sectionHtml = (title: string, section: {
   studentText?: string;
-  lineFeedback?: LineFeedback[];
   strengths?: string[];
   weaknesses?: string[];
   suggestions?: string[];
   analysis?: string[];
 }) => {
   if (!section) return '';
-  const lines = section.lineFeedback?.length
-    ? `<h3>Research &amp; Analysis (line-by-line)</h3>${lineFeedbackHtml(section.lineFeedback)}`
-    : section.studentText
-      ? `<div class="box">${escapeHtml(section.studentText)}</div>`
-      : '';
   return `
   <h2>${escapeHtml(title)}</h2>
-  ${lines}
-  ${section.analysis?.length ? `<p><strong>Section summary — analysis:</strong></p>${listHtml(section.analysis)}` : ''}
+  ${section.studentText ? `<div class="box">${escapeHtml(section.studentText)}</div>` : ''}
+  ${section.analysis?.length ? `<p><strong>Section analysis:</strong></p>${listHtml(section.analysis)}` : ''}
   <h3>Strengths</h3>${listHtml(section.strengths || [])}
   <h3>Weaknesses</h3>${listHtml(section.weaknesses || [])}
   <h3>Suggestions</h3>${listHtml(section.suggestions || [])}`;
@@ -79,15 +58,15 @@ export function downloadCopyEvaluationReport({
   <meta charset="UTF-8" />
   <title>${escapeHtml(title)} — Premium Evaluation Report</title>
   <style>
-    body { font-family: Georgia, serif; max-width: 800px; margin: 2rem auto; padding: 0 1.5rem; color: #1e293b; line-height: 1.6; }
-    h1 { color: #6b21a8; border-bottom: 2px solid #c4b5fd; padding-bottom: 0.5rem; }
-    h2 { color: #5b21b6; margin-top: 1.5rem; font-size: 1.1rem; }
-    h3 { color: #7c3aed; font-size: 0.95rem; margin-top: 0.75rem; }
-    .score { font-size: 1.5rem; font-weight: bold; color: #7c3aed; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1.5rem; color: #1e293b; line-height: 1.6; }
+    h1 { color: #1d4ed8; border-bottom: 2px solid #bfdbfe; padding-bottom: 0.5rem; }
+    h2 { color: #1e40af; margin-top: 1.5rem; font-size: 1.1rem; }
+    h3 { color: #2563eb; font-size: 0.95rem; margin-top: 0.75rem; }
+    .score { font-size: 1.5rem; font-weight: bold; color: #1d4ed8; }
     .meta { color: #64748b; font-size: 0.9rem; }
     .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin: 1rem 0; white-space: pre-wrap; }
     .line-card { margin: 1rem 0; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; }
-    .quote { font-style: italic; border-left: 3px solid #c4b5fd; }
+    .quote { font-style: italic; border-left: 3px solid #93c5fd; }
     ul { margin: 0.5rem 0; padding-left: 1.25rem; }
     .footer { margin-top: 2rem; font-size: 0.8rem; color: #94a3b8; }
   </style>
@@ -96,10 +75,10 @@ export function downloadCopyEvaluationReport({
   <h1>UPSC Mains — Premium Copy Evaluation</h1>
   <p class="meta">${escapeHtml([subject, paper, createdAt ? new Date(createdAt).toLocaleString() : ''].filter(Boolean).join(' · '))}</p>
   <p class="meta">File: ${escapeHtml(fileName || 'Answer copy')}</p>
-  <p class="score">Score: ${marks} / ${result.maxMarks} (${pct}%) · Words: ~${result.wordCount || '—'} · Limit: ${result.wordLimitStatus || 'GOOD'}${result.onTrackVerdict ? ` · ${escapeHtml(result.onTrackVerdict.replace(/_/g, ' '))}` : ''}${result.knowledgeContextUsed ? ' · KB + AI' : ''}</p>
+  <p class="score">Score: ${marks} / ${result.maxMarks} (${pct}%)${result.grade ? ` · Grade ${escapeHtml(result.grade)}` : ''} · Words: ~${result.wordCount || '—'} · Limit: ${result.wordLimitStatus || 'GOOD'}${result.onTrackVerdict ? ` · ${escapeHtml(result.onTrackVerdict.replace(/_/g, ' '))}` : ''}${result.knowledgeContextUsed ? ' · KB + AI' : ''}</p>
 
   ${result.questionText ? `<h2>Question</h2><div class="box">${escapeHtml(result.questionText)}</div>` : ''}
-  ${result.extractedAnswerText ? `<h2>Transcribed Answer</h2><div class="box">${escapeHtml(result.extractedAnswerText)}</div>` : ''}
+  ${result.extractedAnswerText ? `<h2>Student Copy (Transcribed)</h2><div class="box">${escapeHtml(result.extractedAnswerText)}</div>` : ''}
 
   ${result.onTrackExplanation ? `<h2>On-Track Assessment</h2><p>${escapeHtml(result.onTrackExplanation)}</p>` : ''}
   ${result.criticalMistakes?.length ? `<h2>Critical Mistakes</h2>${listHtml(result.criticalMistakes)}` : ''}
@@ -108,8 +87,12 @@ export function downloadCopyEvaluationReport({
   ${result.questionDemand ? `
   <h2>Question Demand</h2>
   <h3>Expected Points</h3>${listHtml(result.questionDemand.expectedPoints || [])}
-  <h3>Missing Areas</h3>${listHtml(result.questionDemand.missingAreas || [])}
+  <h3>Missing Areas</h3>${listHtml(result.questionDemand.missingAreas || result.missing_points || [])}
   ` : ''}
+
+  <h2>Strengths</h2>${listHtml(result.strengths || [])}
+  <h2>Weaknesses</h2>${listHtml(result.weaknesses || [])}
+  <h2>Suggestions</h2>${listHtml(result.improvementPriority || result.suggestions || [])}
 
   ${result.introduction ? sectionHtml('Introduction', result.introduction) : ''}
   ${bodySections}
@@ -117,12 +100,13 @@ export function downloadCopyEvaluationReport({
 
   <h2>Overall Feedback</h2><p>${escapeHtml(result.overallFeedback || result.summary || '')}</p>
 
-  <h2>Improvement Priority</h2>${listHtml(result.improvementPriority || result.suggestions || [])}
   <h2>Model Answer Framework</h2>${listHtml(result.modelAnswerSuggestions || [])}
+  ${(result.improved_answer || result.improvedAnswer) ? `<h2>AI Improved Answer</h2><div class="box">${escapeHtml(result.improved_answer || result.improvedAnswer || '')}</div>` : ''}
+  ${(result.model_answer || result.modelAnswer) ? `<h2>Ideal Model Answer</h2><div class="box">${escapeHtml(result.model_answer || result.modelAnswer || '')}</div>` : ''}
 
   <h2>Examiner Remark</h2><div class="box">${escapeHtml(result.examinerRemark || result.examinerFeedback || '')}</div>
 
-  <p class="footer">Generated by Mentors Daily — Premium Copy Evaluation</p>
+  <p class="footer">Generated by Mentors Daily — AI UPSC Mains Copy Evaluation</p>
 </body>
 </html>`;
 
