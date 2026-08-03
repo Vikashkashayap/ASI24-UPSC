@@ -143,6 +143,21 @@ export const copyEvaluationAPI = {
     });
   },
 
+  getDailyStatus: () => {
+    return api.get<{
+      success: boolean;
+      data: {
+        limit: number;
+        used: number;
+        remaining: number;
+        locked: boolean;
+        resetsAt: string;
+        unlimited?: boolean;
+      };
+      message?: string;
+    }>('/api/copy-evaluation/daily-status');
+  },
+
   getAnalytics: () => {
     return api.get('/api/copy-evaluation/analytics/summary');
   },

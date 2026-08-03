@@ -10,6 +10,7 @@ import {
   getPageImagePath,
   deleteEvaluationFiles,
 } from "../services/copyEvaluationStorageService.js";
+import { getCopyEvalDailyStatus } from "../middleware/copyEvalRateLimit.js";
 import fs from "fs";
 
 const VISION_MODEL =
@@ -505,6 +506,30 @@ export const getEvaluationStats = async (req, res) => {
   }
 };
 
+/**
+ * GET /api/copy-evaluation/daily-status
+ * How many copy evals the student has left today (IST).
+ */
+export const getDailyStatus = async (req, res) => {
+  try {
+    const userId = req.user?._id ?? req.user?.id;
+    const status = await getCopyEvalDailyStatus(userId, req.user?.role);
+    return res.json({
+      success: true,
+      data: status,
+      message: status.locked
+        ? `Daily limit reached (${status.limit}/day). Resets at midnight IST.`
+        : undefined,
+    });
+  } catch (error) {
+    console.error("Error in getDailyStatus:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to load daily status",
+    });
+  }
+};
+
 function getGrade(obtained, maximum) {
   const pct = (obtained / maximum) * 100;
   if (pct >= 80) return "A";
@@ -535,4 +560,5 @@ export default {
   getUserAnalytics,
   deleteEvaluation,
   getEvaluationStats,
+  getDailyStatus,
 };

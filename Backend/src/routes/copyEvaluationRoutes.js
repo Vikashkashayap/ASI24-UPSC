@@ -9,6 +9,7 @@ import {
   deleteEvaluation,
   getEvaluationStats,
   getEvaluationPageImage,
+  getDailyStatus,
 } from "../controllers/copyEvaluationController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { copyEvalRateLimit } from "../middleware/copyEvalRateLimit.js";
@@ -48,6 +49,8 @@ const uploadMiddleware = (req, res, next) => {
 };
 
 router.use(authMiddleware);
+
+router.get("/daily-status", getDailyStatus);
 
 router.post("/upload", copyEvalRateLimit, uploadMiddleware, uploadAndEvaluateCopy);
 

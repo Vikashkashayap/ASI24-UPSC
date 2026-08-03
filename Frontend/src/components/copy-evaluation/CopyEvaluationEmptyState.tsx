@@ -52,11 +52,19 @@ interface RecentItem {
 interface CopyEvaluationEmptyStateProps {
   onFileReady: (file: File) => void;
   onOpenModal?: () => void;
+  dailyQuota?: {
+    limit: number;
+    used: number;
+    remaining: number;
+    locked: boolean;
+    unlimited?: boolean;
+  } | null;
 }
 
 export const CopyEvaluationEmptyState: React.FC<CopyEvaluationEmptyStateProps> = ({
   onFileReady,
   onOpenModal,
+  dailyQuota = null,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -87,6 +95,12 @@ export const CopyEvaluationEmptyState: React.FC<CopyEvaluationEmptyStateProps> =
   }, []);
 
   const validateAndAccept = (file: File) => {
+    if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+      setLocalError(
+        `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). You can evaluate ${dailyQuota.limit} copies per day — try again tomorrow.`
+      );
+      return;
+    }
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setLocalError('Please upload a PDF or image (JPG, PNG)');
       return;
@@ -179,6 +193,23 @@ export const CopyEvaluationEmptyState: React.FC<CopyEvaluationEmptyStateProps> =
             Powered by AI Examiner
           </div>
 
+          {dailyQuota && !dailyQuota.unlimited && (
+            <div
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium mb-3 ml-2 border ${
+                dailyQuota.locked
+                  ? isDark
+                    ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                  : isDark
+                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              }`}
+            >
+              Today: {dailyQuota.used}/{dailyQuota.limit} evaluations
+              {dailyQuota.locked ? ' · limit reached' : ` · ${dailyQuota.remaining} left`}
+            </div>
+          )}
+
           <h2
             className={`text-2xl xs:text-3xl font-bold tracking-tight mb-3 ${
               isDark ? 'text-slate-50' : 'text-slate-900'
@@ -226,19 +257,42 @@ export const CopyEvaluationEmptyState: React.FC<CopyEvaluationEmptyStateProps> =
           <div
             onDragOver={(e) => {
               e.preventDefault();
+              if (dailyQuota?.locked && !dailyQuota?.unlimited) return;
               setDragOver(true);
             }}
             onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`relative cursor-pointer rounded-2xl border-2 border-dashed p-8 sm:p-12 transition-all duration-300 ${
-              dragOver
+            onDrop={(e) => {
+              if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+                e.preventDefault();
+                setLocalError(
+                  `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). Try again tomorrow.`
+                );
+                return;
+              }
+              onDrop(e);
+            }}
+            onClick={() => {
+              if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+                setLocalError(
+                  `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). Try again tomorrow.`
+                );
+                return;
+              }
+              if (onOpenModal) onOpenModal();
+              else fileInputRef.current?.click();
+            }}
+            className={`relative rounded-2xl border-2 border-dashed p-8 sm:p-12 transition-all duration-300 ${
+              dailyQuota?.locked && !dailyQuota?.unlimited
                 ? isDark
-                  ? 'border-blue-400 bg-blue-500/15 scale-[1.01]'
-                  : 'border-blue-500 bg-blue-50 scale-[1.01]'
-                : isDark
-                  ? 'border-slate-600 bg-slate-800/40 hover:border-blue-500/50 hover:bg-slate-800/70'
-                  : 'border-slate-300 bg-slate-50/80 hover:border-blue-400 hover:bg-blue-50/40'
+                  ? 'border-slate-700 bg-slate-800/30 cursor-not-allowed opacity-70'
+                  : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-70'
+                : dragOver
+                  ? isDark
+                    ? 'cursor-pointer border-blue-400 bg-blue-500/15 scale-[1.01]'
+                    : 'cursor-pointer border-blue-500 bg-blue-50 scale-[1.01]'
+                  : isDark
+                    ? 'cursor-pointer border-slate-600 bg-slate-800/40 hover:border-blue-500/50 hover:bg-slate-800/70'
+                    : 'cursor-pointer border-slate-300 bg-slate-50/80 hover:border-blue-400 hover:bg-blue-50/50'
             }`}
           >
             <input
@@ -247,6 +301,7 @@ export const CopyEvaluationEmptyState: React.FC<CopyEvaluationEmptyStateProps> =
               accept="application/pdf,image/jpeg,image/jpg,image/png,image/webp"
               className="hidden"
               onChange={onFileChange}
+              disabled={Boolean(dailyQuota?.locked && !dailyQuota?.unlimited)}
             />
             <div className="flex flex-col items-center gap-3">
               <div

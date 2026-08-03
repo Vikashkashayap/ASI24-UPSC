@@ -48,6 +48,26 @@ const CopyEvaluationPage: React.FC = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [dailyQuota, setDailyQuota] = useState<{
+    limit: number;
+    used: number;
+    remaining: number;
+    locked: boolean;
+    unlimited?: boolean;
+  } | null>(null);
+
+  const refreshDailyQuota = async () => {
+    try {
+      const res = await copyEvaluationAPI.getDailyStatus();
+      if (res.data.success) setDailyQuota(res.data.data);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    refreshDailyQuota();
+  }, []);
 
   useEffect(() => {
     const evaluationId = searchParams.get('id');
@@ -85,6 +105,14 @@ const CopyEvaluationPage: React.FC = () => {
     file: File,
     meta: { subject: string; paper: string; year: number; language?: string }
   ) => {
+    if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+      setError(
+        `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). Try again tomorrow.`
+      );
+      setShowUploadModal(true);
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(10);
     setUploadFileName(file.name);
@@ -131,14 +159,18 @@ const CopyEvaluationPage: React.FC = () => {
         });
         navigate(`/copy-evaluation?id=${evaluationId}`, { replace: true });
         window.dispatchEvent(new Event('evaluation-complete'));
+        refreshDailyQuota();
       } else {
         throw new Error('No evaluation result returned from server');
       }
     } catch (err: unknown) {
       const axiosErr = err as {
-        response?: { data?: { message?: string; error?: string } };
+        response?: { data?: { message?: string; error?: string; code?: string } };
         message?: string;
       };
+      if (axiosErr.response?.data?.code === 'COPY_EVAL_DAILY_LIMIT') {
+        refreshDailyQuota();
+      }
       setError(
         axiosErr.response?.data?.error ||
           axiosErr.response?.data?.message ||
@@ -183,17 +215,37 @@ const CopyEvaluationPage: React.FC = () => {
             }`}
           >
             AI-powered UPSC Mains examiner — marks, feedback & model answers
+            {dailyQuota && !dailyQuota.unlimited
+              ? ` · Today ${dailyQuota.used}/${dailyQuota.limit}`
+              : ''}
           </p>
         </div>
         {!hasResult && !isUploading && (
-          <Button
-            onClick={() => navigate('/evaluation-history')}
-            variant="outline"
-            size="sm"
-          >
-            <History className="w-4 h-4 mr-2" />
-            History
-          </Button>
+          <div className="flex items-center gap-2">
+            {dailyQuota && !dailyQuota.unlimited && (
+              <span
+                className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
+                  dailyQuota.locked
+                    ? theme === 'dark'
+                      ? 'border-amber-500/40 text-amber-300'
+                      : 'border-amber-300 text-amber-800 bg-amber-50'
+                    : theme === 'dark'
+                      ? 'border-emerald-500/40 text-emerald-300'
+                      : 'border-emerald-300 text-emerald-800 bg-emerald-50'
+                }`}
+              >
+                {dailyQuota.remaining} / {dailyQuota.limit} left today
+              </span>
+            )}
+            <Button
+              onClick={() => navigate('/evaluation-history')}
+              variant="outline"
+              size="sm"
+            >
+              <History className="w-4 h-4 mr-2" />
+              History
+            </Button>
+          </div>
         )}
       </div>
 
@@ -203,7 +255,16 @@ const CopyEvaluationPage: React.FC = () => {
         ) : !hasResult ? (
           <CopyEvaluationEmptyState
             onFileReady={handleFileFromEmptyState}
-            onOpenModal={() => setShowUploadModal(true)}
+            onOpenModal={() => {
+              if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+                setError(
+                  `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). Try again tomorrow.`
+                );
+                return;
+              }
+              setShowUploadModal(true);
+            }}
+            dailyQuota={dailyQuota}
           />
         ) : (
           <div className="space-y-3">
@@ -236,12 +297,24 @@ const CopyEvaluationPage: React.FC = () => {
                 </Button>
               )}
               <Button
-                onClick={() => setShowUploadModal(true)}
+                onClick={() => {
+                  if (dailyQuota?.locked && !dailyQuota?.unlimited) {
+                    setError(
+                      `Daily limit reached (${dailyQuota.used}/${dailyQuota.limit}). Try again tomorrow.`
+                    );
+                    return;
+                  }
+                  setShowUploadModal(true);
+                }}
                 variant="outline"
                 size="sm"
+                disabled={Boolean(dailyQuota?.locked && !dailyQuota?.unlimited)}
               >
                 <Upload className="w-4 h-4 mr-1.5" />
                 New Upload
+                {dailyQuota && !dailyQuota.unlimited
+                  ? ` (${dailyQuota.remaining}/${dailyQuota.limit})`
+                  : ''}
               </Button>
             </div>
 
