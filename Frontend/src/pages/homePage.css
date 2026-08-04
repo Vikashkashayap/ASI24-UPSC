@@ -806,6 +806,12 @@
   box-shadow: 0 2px 8px color-mix(in srgb, var(--sd-blue) 18%, transparent);
 }
 
+.sd-assigned-view-history:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .sd-assigned-top-history {
   margin: 0 0 12px;
   padding: 10px 12px;
@@ -1183,6 +1189,58 @@
   cursor: pointer;
   text-align: left;
   transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.sd-assigned-subject-hd-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.sd-assigned-subject-hd-row .sd-assigned-subject-hd {
+  flex: 1;
+  min-width: 0;
+}
+
+.sd-assigned-subject-pdf-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 52px;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--sd-blue) 28%, #dbeafe);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f8fbff 100%);
+  color: var(--sd-blue);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.sd-assigned-subject-pdf-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sd-blue) 10%, #fff);
+  border-color: var(--sd-blue);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--sd-blue) 18%, transparent);
+}
+
+.sd-assigned-subject-pdf-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.sd-assigned-subject-pdf-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.sd-assigned-subject-pdf-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
 
 .sd-assigned-subject-hd:hover {

@@ -1010,6 +1010,12 @@ export const syllabusTargetsAPI = {
         completedCount: number;
       };
     }>("/api/syllabus-targets/mine", { params }),
+  /** Offline Module Targets planner PDF — one subject at a time */
+  downloadMyPlannerPdf: (params: { subjectKey: string }) =>
+    api.get("/api/syllabus-targets/mine/pdf", {
+      params,
+      responseType: "blob",
+    }),
   /** Chapter-wise (+ module final) attempts for home View History */
   listMyChapterHistory: () =>
     api.get<{

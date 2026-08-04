@@ -77,14 +77,16 @@ export const getAllStudents = async (req, res) => {
 
     // Build query based on search parameter.
     // Default: MD Students (admin-created / free cohort — excludes paid-user).
-    // mentorPicker: all registered students (any accountType) for mentor assignment UI.
+    // mentorPicker: portal students (any accountType) for Syllabus Targets / Topic Practice / mentor assign.
+    // Notes Website registrants (source=notes) stay only on /admin/notes-manager.
     let query;
     if (mentorPicker) {
-      query = { role: "student" };
+      query = { role: "student", source: { $ne: "notes" } };
       if (search && search.trim().length >= 2) {
         const searchRegex = new RegExp(search.trim(), "i");
         query = {
           role: "student",
+          source: { $ne: "notes" },
           $or: [{ name: searchRegex }, { email: searchRegex }],
         };
       }

@@ -24,6 +24,7 @@ import {
   validateStudentIdsForActor,
   getMentorRosterIdSet,
 } from "../utils/mentorRosterAccess.js";
+import { buildSyllabusPlannerPdf } from "../services/syllabusPlannerPdf.js";
 
 async function validateStudentIds(studentIds) {
   return validateStudentIdsForActor({ role: "admin" }, studentIds);
@@ -508,6 +509,54 @@ function sortStudentTargets(targets) {
   return [...targets].sort((a, b) => compareTargetsBySyllabusOrder(a, b, subjectRank));
 }
 
+async function loadMySyllabusTargetsMapped(userId) {
+  const records = await SyllabusModuleTarget.find({
+    status: "active",
+    assignedStudentIds: userId,
+  }).lean();
+
+  const mapped = records.map((r) => {
+    const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
+    const chapterEntry = (r.chapterCompletions || []).find(
+      (c) => String(c.studentId) === String(userId)
+    );
+    const topicsPreview = r.topicsPreview || [];
+    return {
+      _id: r._id,
+      subjectKey: r.subjectKey,
+      subjectName: r.subjectName,
+      moduleId: r.moduleId,
+      moduleName: r.moduleName,
+      medium: r.medium === "hi" ? "hi" : "en",
+      estimatedDays: r.estimatedDays,
+      estimatedHours: r.estimatedHours,
+      chapterRange: r.chapterRange || "",
+      durationLabel: r.durationLabel || "",
+      topicCount: r.topicCount,
+      topicsPreview,
+      completedChapters: chapterEntry?.chapters || [],
+      chaptersComplete:
+        topicsPreview.length > 0 &&
+        topicsPreview.every((line) => (chapterEntry?.chapters || []).includes(line)),
+      note: r.note || "",
+      dueDate: r.dueDate || null,
+      completed,
+      createdAt: r.createdAt,
+    };
+  });
+
+  const sorted = sortStudentTargets(mapped);
+  const active = sorted.filter((t) => !t.completed);
+  const completed = sorted.filter((t) => t.completed);
+  return {
+    targets: sorted,
+    active,
+    completed,
+    activeCount: active.length,
+    completedCount: completed.length,
+  };
+}
+
 /**
  * GET /api/syllabus-targets/mine — student home
  */
@@ -515,57 +564,91 @@ export const listMySyllabusTargets = async (req, res) => {
   try {
     const userId = req.user._id;
     const includeCompleted = String(req.query.includeCompleted || "true") === "true";
-
-    const records = await SyllabusModuleTarget.find({
-      status: "active",
-      assignedStudentIds: userId,
-    }).lean();
-
-    const mapped = records.map((r) => {
-      const completed = (r.completedStudentIds || []).some((id) => String(id) === String(userId));
-      const chapterEntry = (r.chapterCompletions || []).find(
-        (c) => String(c.studentId) === String(userId)
-      );
-      const topicsPreview = r.topicsPreview || [];
-      return {
-        _id: r._id,
-        subjectKey: r.subjectKey,
-        subjectName: r.subjectName,
-        moduleId: r.moduleId,
-        moduleName: r.moduleName,
-        medium: r.medium === "hi" ? "hi" : "en",
-        estimatedDays: r.estimatedDays,
-        estimatedHours: r.estimatedHours,
-        chapterRange: r.chapterRange || "",
-        durationLabel: r.durationLabel || "",
-        topicCount: r.topicCount,
-        topicsPreview,
-        completedChapters: chapterEntry?.chapters || [],
-        chaptersComplete:
-          topicsPreview.length > 0 &&
-          topicsPreview.every((line) => (chapterEntry?.chapters || []).includes(line)),
-        note: r.note || "",
-        dueDate: r.dueDate || null,
-        completed,
-        createdAt: r.createdAt,
-      };
-    });
-
-    const sorted = sortStudentTargets(mapped);
-    const active = sorted.filter((t) => !t.completed);
-    const completed = sorted.filter((t) => t.completed);
+    const data = await loadMySyllabusTargetsMapped(userId);
 
     return res.json({
       success: true,
       data: {
-        targets: includeCompleted ? sorted : active,
-        activeCount: active.length,
-        completedCount: completed.length,
+        targets: includeCompleted ? data.targets : data.active,
+        activeCount: data.activeCount,
+        completedCount: data.completedCount,
       },
     });
   } catch (error) {
     console.error("listMySyllabusTargets:", error);
     return res.status(500).json({ success: false, message: error.message || "Failed to load targets" });
+  }
+};
+
+/**
+ * GET /api/syllabus-targets/mine/pdf — download offline planner PDF (one subject)
+ * Query: subjectKey=polity (required)
+ */
+export const downloadMySyllabusPlannerPdf = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const subjectKey = String(req.query.subjectKey || "").trim();
+    if (!subjectKey) {
+      return res.status(400).json({
+        success: false,
+        message: "Select a subject to download the planner PDF",
+      });
+    }
+
+    const data = await loadMySyllabusTargetsMapped(userId);
+    const subjectTargets = data.targets.filter(
+      (t) => String(t.subjectKey || "") === subjectKey
+    );
+    if (!subjectTargets.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No module targets found for this subject",
+      });
+    }
+
+    const subjectName = subjectTargets[0]?.subjectName || subjectKey;
+    const activeCount = subjectTargets.filter((t) => !t.completed).length;
+    const completedCount = subjectTargets.filter((t) => t.completed).length;
+    const studentName =
+      req.user?.name ||
+      req.user?.fullName ||
+      req.user?.enrollmentName ||
+      req.user?.email ||
+      "Student";
+
+    const pdfBuffer = await buildSyllabusPlannerPdf({
+      studentName,
+      targets: subjectTargets,
+      activeCount,
+      completedCount,
+      subjectName,
+      title: `${subjectName} — Module Targets Planner`,
+    });
+
+    const safeStudent = String(studentName)
+      .replace(/[^\w\- ]+/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 30) || "Student";
+    const safeSubject = String(subjectName)
+      .replace(/[^\w\- ]+/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 30) || subjectKey;
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${safeSubject}-Planner-${safeStudent}-${stamp}.pdf"`
+    );
+    return res.send(pdfBuffer);
+  } catch (error) {
+    console.error("downloadMySyllabusPlannerPdf:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to generate planner PDF",
+    });
   }
 };
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, ChevronDown, History, Loader2, Lock, Target } from "lucide-react";
+import { Check, ChevronDown, Download, History, Loader2, Lock, Target } from "lucide-react";
 import {
   syllabusTargetsAPI,
   type StudentSyllabusTarget,
@@ -165,6 +165,8 @@ export function AssignedModuleTargets() {
   /** Modules whose chapter list is expanded. Locked modules stay collapsed by default. */
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
   const [modulePage, setModulePage] = useState(1);
+  /** subjectKey currently downloading planner PDF (null = idle) */
+  const [downloadingSubjectKey, setDownloadingSubjectKey] = useState<string | null>(null);
 
   const MODULES_PER_PAGE = 5;
 
@@ -203,6 +205,37 @@ export function AssignedModuleTargets() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const downloadPlannerPdf = async (subjectKey: string, subjectName?: string) => {
+    if (!subjectKey || downloadingSubjectKey) return;
+    const hasSubject = targets.some((t) => (t.subjectKey || "other") === subjectKey);
+    if (!hasSubject) {
+      setError("No modules in this subject to download.");
+      return;
+    }
+    setDownloadingSubjectKey(subjectKey);
+    setError(null);
+    try {
+      const res = await syllabusTargetsAPI.downloadMyPlannerPdf({ subjectKey });
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const stamp = new Date().toISOString().slice(0, 10);
+      const safeSubject = String(subjectName || subjectKey)
+        .replace(/[^\w\- ]+/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
+        .slice(0, 40) || subjectKey;
+      a.download = `${safeSubject}-Planner-${stamp}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError("Could not download this subject's planner PDF. Please try again.");
+    } finally {
+      setDownloadingSubjectKey(null);
+    }
+  };
 
   const recount = (next: StudentSyllabusTarget[]) => {
     const done = next.filter((t) => t.completed).length;
@@ -764,6 +797,34 @@ export function AssignedModuleTargets() {
           <button
             type="button"
             className="sd-assigned-view-history"
+            onClick={() => {
+              if (!subjectFilter) {
+                setError("Select a subject first (dropdown below), or use Download on each subject row.");
+                return;
+              }
+              const name =
+                subjectOptions.find((s) => s.key === subjectFilter)?.name || subjectFilter;
+              void downloadPlannerPdf(subjectFilter, name);
+            }}
+            disabled={Boolean(downloadingSubjectKey) || loading || targets.length === 0}
+            title={
+              subjectFilter
+                ? "Download planner PDF for the selected subject"
+                : "Select a subject in the filter, or download from a subject row"
+            }
+          >
+            {downloadingSubjectKey && downloadingSubjectKey === subjectFilter ? (
+              <Loader2 className="sd-assigned-history-icon sd-assigned-spin" />
+            ) : (
+              <Download className="sd-assigned-history-icon" />
+            )}
+            {downloadingSubjectKey && downloadingSubjectKey === subjectFilter
+              ? "Preparing…"
+              : "Download PDF"}
+          </button>
+          <button
+            type="button"
+            className="sd-assigned-view-history"
             onClick={() => navigate("/module-chapter-history")}
             title="View chapter-wise test history"
           >
@@ -878,25 +939,45 @@ export function AssignedModuleTargets() {
                     : `${group.activeCount} active · ${group.doneCount} done`;
               return (
                 <section key={group.subjectKey} className="sd-assigned-subject-group">
-                  <button
-                    type="button"
-                    className="sd-assigned-subject-hd"
-                    onClick={() => toggleSubject(group.subjectKey, groupIndex)}
-                    aria-expanded={!collapsed}
-                  >
-                    <span className="sd-assigned-subject-hd-main">
-                      <span className="sd-assigned-subject-name">{group.subjectName}</span>
-                      <span className="sd-assigned-subject-count">{countLabel}</span>
-                    </span>
-                    <ChevronDown
-                      className={
-                        collapsed
-                          ? "sd-assigned-subject-chevron is-collapsed"
-                          : "sd-assigned-subject-chevron"
-                      }
-                      aria-hidden
-                    />
-                  </button>
+                  <div className="sd-assigned-subject-hd-row">
+                    <button
+                      type="button"
+                      className="sd-assigned-subject-hd"
+                      onClick={() => toggleSubject(group.subjectKey, groupIndex)}
+                      aria-expanded={!collapsed}
+                    >
+                      <span className="sd-assigned-subject-hd-main">
+                        <span className="sd-assigned-subject-name">{group.subjectName}</span>
+                        <span className="sd-assigned-subject-count">{countLabel}</span>
+                      </span>
+                      <ChevronDown
+                        className={
+                          collapsed
+                            ? "sd-assigned-subject-chevron is-collapsed"
+                            : "sd-assigned-subject-chevron"
+                        }
+                        aria-hidden
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      className="sd-assigned-subject-pdf-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void downloadPlannerPdf(group.subjectKey, group.subjectName);
+                      }}
+                      disabled={Boolean(downloadingSubjectKey)}
+                      title={`Download ${group.subjectName} planner PDF`}
+                      aria-label={`Download ${group.subjectName} planner PDF`}
+                    >
+                      {downloadingSubjectKey === group.subjectKey ? (
+                        <Loader2 className="sd-assigned-subject-pdf-icon sd-assigned-spin" />
+                      ) : (
+                        <Download className="sd-assigned-subject-pdf-icon" />
+                      )}
+                      <span className="sd-assigned-subject-pdf-label">PDF</span>
+                    </button>
+                  </div>
                   {!collapsed && (
                     <ul className="sd-assigned-list">{group.modules.map(renderModule)}</ul>
                   )}
