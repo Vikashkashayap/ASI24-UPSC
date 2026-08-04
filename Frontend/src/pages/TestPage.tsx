@@ -164,12 +164,35 @@ const TestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const moduleHandoff = (location.state || {}) as {
+
+  const HANDOFF_KEY = id ? `moduleHandoff:${id}` : "";
+  const stateHandoff = (location.state || {}) as {
     fromModuleTarget?: boolean;
     fromModuleFinal?: boolean;
     targetId?: string;
     chapter?: string;
     nextChapter?: string | null;
+    moduleId?: string;
+  };
+  // Persist handoff so refresh / result navigation still unlocks module
+  if (HANDOFF_KEY && (stateHandoff.fromModuleFinal || stateHandoff.fromModuleTarget)) {
+    try {
+      sessionStorage.setItem(HANDOFF_KEY, JSON.stringify(stateHandoff));
+    } catch {
+      /* ignore */
+    }
+  }
+  let storedHandoff: typeof stateHandoff = {};
+  if (HANDOFF_KEY) {
+    try {
+      storedHandoff = JSON.parse(sessionStorage.getItem(HANDOFF_KEY) || "{}") || {};
+    } catch {
+      storedHandoff = {};
+    }
+  }
+  const moduleHandoff = {
+    ...storedHandoff,
+    ...stateHandoff,
   };
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [test, setTest] = useState<TestData | null>(null);
@@ -346,6 +369,13 @@ const TestPage: React.FC = () => {
             await syllabusTargetsAPI.toggleComplete(moduleHandoff.targetId, true);
           } catch (unlockErr) {
             console.warn("[ModuleTargets] module unlock after final failed", unlockErr);
+          }
+        }
+        if (HANDOFF_KEY) {
+          try {
+            sessionStorage.removeItem(HANDOFF_KEY);
+          } catch {
+            /* ignore */
           }
         }
         navigate(`/result/${id}`);

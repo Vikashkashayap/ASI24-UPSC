@@ -41,6 +41,10 @@ import { startIntelligenceEngine } from "./intelligence/index.js";
 import aiRoutes from "./ai/routes/ai.routes.js";
 import qiRoutes from "./questionIntelligence/routes/qi.routes.js";
 import testBuilderRoutes from "./testBuilder/routes/testBuilder.routes.js";
+import {
+  mainsMaterialStudentRouter,
+  mainsMaterialAdminRouter,
+} from "./routes/mainsMaterialRoutes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
@@ -177,6 +181,7 @@ app.use("/api/syllabus-targets", syllabusTargetRoutes);
 
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
+app.use("/api/admin/mains-materials", mainsMaterialAdminRouter);
 app.use("/api/admin", adminRoutes);
 
 // Enterprise Knowledge Base (upload + taxonomy)
@@ -203,6 +208,9 @@ app.use("/api/test-builder", testBuilderRoutes);
 app.use("/api/rag", ragRoutes);
 // Prompt alias: POST /api/admin/upload-pdf → same pipeline as Knowledge Base PDF ingest
 app.post("/api/admin/upload-pdf", requireAdmin, ragPdfUpload, ragUploadPdf);
+
+// Mains 360 materials (student published list + file download)
+app.use("/api/mains-materials", mainsMaterialStudentRouter);
 
 app.use("/api/offers", offersRoutes);
 app.use("/api/current-affairs", currentAffairsRoutes);

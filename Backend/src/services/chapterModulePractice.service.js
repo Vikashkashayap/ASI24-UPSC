@@ -732,8 +732,10 @@ async function generateModuleFinalTopUp({
 }
 
 /**
- * Module Final (50Q): reuse chapter-bank when teaching-quality, fill shortfall from
- * Admin KB/RAG (LLM fallback if topic missing), polish all explanations (50–100 words, all options).
+ * Module Final (50Q):
+ * 1) Resume this student's unsubmitted attempt
+ * 2) Reuse shared Module Final paper (any student) — 0 LLM / same questions
+ * 3) Else build from chapter bank + RAG top-up (first generation only)
  */
 export async function createModuleFinalTestFromChapterBank({
   userId,
@@ -742,8 +744,135 @@ export async function createModuleFinalTestFromChapterBank({
   moduleName,
   chapterLabels = [],
   showCount = 50,
+  syllabusModuleTargetId = null,
 }) {
   const testSubject = resolveTestSubject(kbSubject);
+  const finalTopic = `${moduleId} Module Final — ${moduleName}`.trim();
+  const topicRegex = new RegExp(
+    `^${String(moduleId || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+Module Final`,
+    "i"
+  );
+
+  const saveClone = async (questions, extra = {}) => {
+    const cleaned = questions.slice(0, showCount).map((q) => {
+      const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
+      return pickBilingualQuestionFields({
+        ...plain,
+        userAnswer: null,
+        timeSpent: 0,
+      });
+    });
+    const test = new Test({
+      userId,
+      subject: testSubject,
+      examType: "GS",
+      topic: finalTopic,
+      difficulty: "Hard",
+      questions: cleaned,
+      totalQuestions: cleaned.length,
+      durationMinutes: Math.max(15, Math.round((cleaned.length * 60) / 50)),
+      ...(syllabusModuleTargetId
+        ? { syllabusModuleTargetId }
+        : {}),
+    });
+    await test.save();
+    return {
+      test: mapSavedChapterTestForClient(test, {
+        fromChapterBank: Boolean(extra.fromChapterBank),
+        fromGeneration: Boolean(extra.fromGeneration),
+        fromCache: Boolean(extra.fromCache),
+        resumed: Boolean(extra.resumed),
+        bankCount: extra.bankCount ?? 0,
+        generatedCount: extra.generatedCount ?? 0,
+        moduleId,
+        moduleName,
+        poolSize: cleaned.length,
+        source: extra.source || "module_final",
+        sourceTestId: extra.sourceTestId || null,
+      }),
+      fromCache: Boolean(extra.fromCache || extra.resumed),
+      resumed: Boolean(extra.resumed),
+    };
+  };
+
+  // 1) Resume unfinished Module Final for this student
+  if (userId) {
+    const openAttempts = await Test.find({
+      userId,
+      topic: topicRegex,
+      examType: "GS",
+      isSubmitted: false,
+      $and: chapterPracticeScopeFilters(),
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    if (openAttempts.length > 0) {
+      const [latest, ...stale] = openAttempts;
+      if (stale.length > 0) {
+        await Test.deleteMany({ _id: { $in: stale.map((t) => t._id) } });
+      }
+      if (
+        syllabusModuleTargetId &&
+        !latest.syllabusModuleTargetId
+      ) {
+        latest.syllabusModuleTargetId = syllabusModuleTargetId;
+        await latest.save();
+      }
+      console.log(
+        `[moduleFinal] RESUME unsubmitted ${latest._id} (module=${moduleId}) — 0 LLM`
+      );
+      return {
+        test: mapSavedChapterTestForClient(latest, {
+          fromCache: true,
+          resumed: true,
+          moduleId,
+          moduleName,
+          source: "resume",
+        }),
+        fromCache: true,
+        resumed: true,
+      };
+    }
+  }
+
+  // 2) Shared Module Final cache — same questions for every student
+  const cachedDocs = await Test.find({
+    topic: topicRegex,
+    examType: "GS",
+    difficulty: "Hard",
+    totalQuestions: { $gte: showCount },
+    questions: { $exists: true, $not: { $size: 0 } },
+    $and: chapterPracticeScopeFilters(),
+  })
+    .sort({ createdAt: 1 }) // oldest canonical paper first (stable shared set)
+    .limit(20)
+    .lean();
+
+  for (const doc of cachedDocs) {
+    const raw = (doc.questions || []).map((value) => {
+      const plain = typeof value.toObject === "function" ? value.toObject() : { ...value };
+      return pickBilingualQuestionFields({ ...plain, userAnswer: null, timeSpent: 0 });
+    });
+    const ready = filterStudentReadyQuestions(dedupeQuestionsByStem(dedupeQuestions(raw)));
+    if (ready.length < showCount) continue;
+
+    // Exact shared set (no reshuffle) so every student sees the same Module Final
+    const picked = ready.slice(0, showCount);
+    console.log(
+      `[moduleFinal] SHARED CACHE HIT → ${picked.length}Q from test ${doc._id} (module=${moduleId}) — 0 LLM`
+    );
+    return saveClone(picked, {
+      fromCache: true,
+      fromChapterBank: true,
+      bankCount: picked.length,
+      generatedCount: 0,
+      source: "shared_module_final_cache",
+      sourceTestId: String(doc._id),
+    });
+  }
+
+  // 3) Cache miss — build from chapter bank + RAG (first student only)
   const topicNames = (chapterLabels || [])
     .map((line) => parseChapterPreviewLine(line).topicName)
     .map((t) => String(t || "").trim())
@@ -764,10 +893,7 @@ export async function createModuleFinalTestFromChapterBank({
     difficulty: "Hard",
     questions: { $exists: true, $not: { $size: 0 } },
     $or: topicOr,
-    $and: [
-      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
-      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
-    ],
+    $and: chapterPracticeScopeFilters(),
   })
     .sort({ createdAt: -1 })
     .limit(60)
@@ -800,10 +926,9 @@ export async function createModuleFinalTestFromChapterBank({
   }
 
   console.log(
-    `[moduleFinal] ${moduleId}: topics=${topicNames.length}, pool=${pool.length}, bank=${bankUnique.length} (teaching=${bankTeaching.length}), need=${showCount}`
+    `[moduleFinal] CACHE MISS ${moduleId}: topics=${topicNames.length}, pool=${pool.length}, bank=${bankUnique.length} (teaching=${bankTeaching.length}), need=${showCount}`
   );
 
-  // If no chapter bank yet, still build entirely from Admin KB RAG across module topics
   let combined = filterStudentReadyQuestions([...bankUnique]);
   let generatedCount = 0;
   let fromGeneration = false;
@@ -862,6 +987,7 @@ export async function createModuleFinalTestFromChapterBank({
     throw err;
   }
 
+  // First generation: shuffle once to build the canonical shared paper
   let picked = [...combined]
     .map((value) => ({ value, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
@@ -872,53 +998,24 @@ export async function createModuleFinalTestFromChapterBank({
   if (apiKey) {
     try {
       picked = await ensurePrelimsExplanationsPracticeStyle(apiKey, picked);
-      console.log(`[moduleFinal] polished ${picked.length} explanations (all-option teaching)`);
+      console.log(`[moduleFinal] polished ${picked.length} explanations (canonical paper)`);
     } catch (err) {
       console.warn("[moduleFinal] explanation polish failed:", err?.message || err);
     }
   }
 
-  const finalTopic = `${moduleId} Module Final — ${moduleName}`.trim();
-  const test = new Test({
-    userId,
-    subject: testSubject,
-    examType: "GS",
-    topic: finalTopic,
-    difficulty: "Hard",
-    questions: picked,
-    totalQuestions: picked.length,
-    // Module Final 50Q → 1 hour; other counts scale (60 min per 50Q)
-    durationMinutes: Math.max(15, Math.round((picked.length * 60) / 50)),
-  });
-  await test.save();
-
   console.log(
-    `[moduleFinal] created ${picked.length}Q in ${test.durationMinutes}min (bank=${bankUnique.length}, RAG=${generatedCount}, fromGeneration=${fromGeneration})`
+    `[moduleFinal] created CANONICAL ${picked.length}Q (bank=${bankUnique.length}, RAG=${generatedCount}, fromGeneration=${fromGeneration})`
   );
 
-  return {
-    test: {
-      _id: test._id,
-      subject: test.subject,
-      examType: test.examType,
-      topic: test.topic,
-      difficulty: test.difficulty,
-      totalQuestions: test.totalQuestions,
-      durationMinutes: test.durationMinutes,
-      questions: test.questions.map((q) =>
-        mapBilingualQuestionForClient(q, { includeAnswers: false })
-      ),
-      createdAt: test.createdAt,
-      fromChapterBank: bankUnique.length > 0,
-      fromGeneration,
-      bankCount: bankUnique.length,
-      generatedCount,
-      moduleId,
-      moduleName,
-      poolSize: combined.length,
-      source: "knowledge_base_rag",
-    },
-  };
+  return saveClone(picked, {
+    fromCache: false,
+    fromChapterBank: bankUnique.length > 0,
+    fromGeneration,
+    bankCount: bankUnique.length,
+    generatedCount,
+    source: fromGeneration ? "knowledge_base_rag" : "chapter_bank",
+  });
 }
 
 /**

@@ -1,5 +1,6 @@
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
+import SyllabusModuleTarget from "../models/SyllabusModuleTarget.js";
 import { generateTestQuestions, generateFullMockTestQuestions, isPrelimsRagEnabled } from "../services/testGenerationService.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
@@ -26,6 +27,68 @@ function mapQuestionForClient(q, { includeAnswers = false, includeMeta = false }
     };
   }
   return mapped;
+}
+
+/**
+ * After Module Final submit: mark syllabus module complete so next module unlocks.
+ * Works even if frontend lost React Router handoff state.
+ */
+async function unlockSyllabusModuleAfterFinal(userId, test) {
+  const topic = String(test?.topic || "");
+  const isModuleFinal = /module\s*final/i.test(topic);
+  if (!isModuleFinal || !userId) return null;
+
+  try {
+    let record = null;
+    if (test.syllabusModuleTargetId) {
+      record = await SyllabusModuleTarget.findById(test.syllabusModuleTargetId);
+    }
+    if (!record) {
+      const m = topic.match(/^(.+?)\s+Module Final\b/i);
+      if (!m) return null;
+      record = await SyllabusModuleTarget.findOne({
+        moduleId: m[1].trim(),
+        status: "active",
+        assignedStudentIds: userId,
+      });
+    }
+    if (!record) return null;
+
+    const assigned = (record.assignedStudentIds || []).some(
+      (id) => String(id) === String(userId)
+    );
+    if (!assigned) return null;
+
+    const already = (record.completedStudentIds || []).some(
+      (id) => String(id) === String(userId)
+    );
+    if (!already) {
+      record.completedStudentIds = [...(record.completedStudentIds || []), userId];
+      const topics = record.topicsPreview || [];
+      if (topics.length > 0) {
+        const idx = (record.chapterCompletions || []).findIndex(
+          (c) => String(c.studentId) === String(userId)
+        );
+        if (idx >= 0) {
+          record.chapterCompletions[idx].chapters = [...topics];
+        } else {
+          record.chapterCompletions = [
+            ...(record.chapterCompletions || []),
+            { studentId: userId, chapters: [...topics] },
+          ];
+        }
+        record.markModified("chapterCompletions");
+      }
+      await record.save();
+      console.log(
+        `[moduleFinal] SERVER unlock → module ${record.moduleId} (${record._id}) for user ${userId}`
+      );
+    }
+    return { targetId: String(record._id), moduleId: record.moduleId };
+  } catch (err) {
+    console.warn("[moduleFinal] server unlock failed:", err?.message || err);
+    return null;
+  }
 }
 
 function mapQuestionForStart(q) {
@@ -491,6 +554,8 @@ export const submitTest = async (req, res) => {
 
     await test.save();
 
+    const moduleUnlock = await unlockSyllabusModuleAfterFinal(userId, test);
+
     // Return results with explanations
     res.json({
       success: true,
@@ -509,6 +574,8 @@ export const submitTest = async (req, res) => {
         questions: test.questions.map((q) => mapQuestionForClient(q, { includeAnswers: true })),
         createdAt: test.createdAt,
         submittedAt: test.updatedAt,
+        moduleUnlocked: Boolean(moduleUnlock),
+        unlockedModuleTargetId: moduleUnlock?.targetId || null,
       },
     });
   } catch (error) {

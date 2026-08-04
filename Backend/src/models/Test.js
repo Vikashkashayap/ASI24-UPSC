@@ -35,6 +35,13 @@ const testSchema = new mongoose.Schema(
       ref: "AssignedPracticeTest",
       required: false,
     },
+    /** Set on Module Final papers so submit can unlock the next module server-side */
+    syllabusModuleTargetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SyllabusModuleTarget",
+      required: false,
+      index: true,
+    },
     difficulty: {
       type: String,
       required: false,

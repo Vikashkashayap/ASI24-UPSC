@@ -1041,14 +1041,17 @@ export const startModuleFinal = async (req, res) => {
       moduleName: record.moduleName,
       chapterLabels: topics,
       showCount: 50,
+      syllabusModuleTargetId: record._id,
     });
 
     const bankPart = test.bankCount != null ? test.bankCount : null;
     const genPart = test.generatedCount || 0;
-    const detail =
-      genPart > 0
+    const fromCache = Boolean(test.fromCache || test.resumed);
+    const detail = fromCache
+      ? `${test.totalQuestions}Q from shared Module Final cache (0 new tokens)`
+      : genPart > 0
         ? `${test.totalQuestions}Q ready (${Math.min(bankPart ?? test.totalQuestions, 50)} from chapter bank + ${genPart} newly generated)`
-        : `${test.totalQuestions} questions shuffled from chapter bank`;
+        : `${test.totalQuestions} questions from chapter bank (canonical paper saved for other students)`;
 
     return res.status(201).json({
       success: true,

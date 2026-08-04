@@ -299,6 +299,18 @@ export function AssignedModuleTargets() {
           moduleId: target.moduleId,
         },
       });
+      try {
+        sessionStorage.setItem(
+          `moduleHandoff:${data.testId}`,
+          JSON.stringify({
+            fromModuleFinal: true,
+            targetId: target._id,
+            moduleId: target.moduleId,
+          })
+        );
+      } catch {
+        /* ignore */
+      }
     } catch (err) {
       setError(axiosMessage(err));
     } finally {
