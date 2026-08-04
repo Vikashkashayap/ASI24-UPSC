@@ -11,6 +11,10 @@ import {
   PRELIMS_DAILY_LIMIT_MESSAGE,
 } from "../services/prelimsTopicDailyLock.js";
 import { filterQuestionsByTopic } from "../services/qg/utils/topicRelevance.js";
+import {
+  OPENROUTER_APP_TITLES,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 
 const ALLOWED_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs", "CSAT"];
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
@@ -187,7 +191,7 @@ export const generateFullMockTest = async (req, res) => {
 };
 
 /**
- * Daily lock status for Prelims / Practice test generator (2 per IST day).
+ * Daily lock status for Prelims / Practice test generator (4 per IST day).
  * GET /api/tests/prelims-daily-status
  */
 export const getPrelimsDailyStatus = async (req, res) => {
@@ -218,7 +222,7 @@ export const generateTest = async (req, res) => {
     const { subjects, topic, examType, questionCount, difficulty, csatCategories, currentAffairsPeriod } = req.body;
     const count = questionCount != null ? parseInt(questionCount, 10) : null;
 
-    // 2 practice tests per calendar day (IST) — enforced before cache / AI
+    // 4 practice tests per calendar day (IST) — enforced before cache / AI
     const dailyLock = await getPrelimsDailyLockStatus(
       req.user?._id ?? req.user?.id,
       req.user?.role
@@ -334,6 +338,7 @@ export const generateTest = async (req, res) => {
               return pickBilingualQuestionFields({ ...plain, userAnswer: null });
             }),
             totalQuestions: count,
+            isPracticeGenerator: true,
           });
 
           await newTest.save();
@@ -371,15 +376,19 @@ export const generateTest = async (req, res) => {
         isPrelimsRagEnabled(examType) ? " [Knowledge Base RAG]" : ""
       }...`
     );
-    const generationResult = await generateTestQuestions({
-      subjects,
-      topic: topicNormalized,
-      examType,
-      questionCount: count,
-      difficulty: difficultyKey,
-      csatCategories: examType === "CSAT" ? csatCategories : undefined,
-      currentAffairsPeriod: currentAffairsPeriod || undefined,
-    });
+    const generationResult = await runWithOpenRouterAppTitle(
+      OPENROUTER_APP_TITLES.PRACTICE,
+      () =>
+        generateTestQuestions({
+          subjects,
+          topic: topicNormalized,
+          examType,
+          questionCount: count,
+          difficulty: difficultyKey,
+          csatCategories: examType === "CSAT" ? csatCategories : undefined,
+          currentAffairsPeriod: currentAffairsPeriod || undefined,
+        })
+    );
 
     if (!generationResult.success) {
       let errorMessage = generationResult.error || "Failed to generate questions";
@@ -428,6 +437,7 @@ export const generateTest = async (req, res) => {
       ...(examType === "GS" && difficultyKey && { difficulty: difficultyKey }),
       questions: generationResult.questions.map((q) => pickBilingualQuestionFields(q)),
       totalQuestions: generationResult.questions.length,
+      isPracticeGenerator: true,
     });
 
     await test.save();

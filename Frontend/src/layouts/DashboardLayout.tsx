@@ -374,10 +374,23 @@ export const DashboardLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [dartModalOpen, setDartModalOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);  const location = useLocation();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [kbRagOpen, setKbRagOpen] = useState(false);
+  const location = useLocation();
   const isCopyEvaluationPage = location.pathname === '/copy-evaluation';
   const isLiveTestPage = /^\/test\/[^/]+$/.test(location.pathname);
   const pageInfo = getPageTitle(location.pathname, user?.role);
+  const isKbRagRoute = [
+    "/admin/knowledge-base",
+    "/admin/processing",
+    "/admin/intelligence",
+    "/admin/ai-analytics",
+    "/admin/ai-health",
+  ].some((p) => location.pathname === p || location.pathname.startsWith(`${p}/`));
+
+  useEffect(() => {
+    if (isKbRagRoute) setKbRagOpen(true);
+  }, [isKbRagRoute]);
   const isStudent = user?.role !== "admin" && user?.role !== "mentor";
   const hasActiveSubscription =
     user?.role === "admin" ||
@@ -496,26 +509,79 @@ export const DashboardLayout = () => {
                   <Award className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Prelims Mock</span>}
                 </NavLink>
-                <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Base — upload notes, PDFs & PYQs">
-                  <Database className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Knowledge Base</span>}
-                </NavLink>
-                <NavLink to="/admin/processing" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Processing Engine — queues, OCR, parse, chunks">
-                  <Activity className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Processing</span>}
-                </NavLink>
-                <NavLink to="/admin/intelligence" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Knowledge Intelligence — embeddings & hybrid search">
-                  <Brain className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>Intelligence</span>}
-                </NavLink>
-                <NavLink to="/admin/ai-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Cost Analytics — estimated vs actual tokens">
-                  <Coins className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>AI Cost Analytics</span>}
-                </NavLink>
-                <NavLink to="/admin/ai-health" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="AI Health Monitor — latency, success, queue">
-                  <Activity className="w-4 h-4 flex-shrink-0" />
-                  {!sidebarCollapsed && <span>AI Health Monitor</span>}
-                </NavLink>
+
+                {/* KB+RAG collapsible group */}
+                {!sidebarCollapsed ? (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setKbRagOpen((v) => !v);
+                      }}
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-[13px] font-semibold min-h-[42px] touch-manipulation transition-colors ${
+                        theme === "dark"
+                          ? `hover:bg-white/[0.06] ${isKbRagRoute || kbRagOpen ? "text-slate-100" : "text-slate-300"}`
+                          : `hover:bg-slate-100/90 ${isKbRagRoute || kbRagOpen ? "text-slate-900" : "text-slate-600"}`
+                      }`}
+                      aria-expanded={kbRagOpen}
+                      title="KB+RAG"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Database className={`w-4 h-4 flex-shrink-0 ${isKbRagRoute ? (theme === "dark" ? "text-blue-300" : "text-blue-600") : ""}`} />
+                        <span className="truncate">KB+RAG</span>
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${kbRagOpen ? "rotate-180" : ""} ${
+                          theme === "dark" ? "text-slate-400" : "text-slate-500"
+                        }`}
+                      />
+                    </button>
+                    {kbRagOpen && (
+                      <div className={`mt-0.5 ml-2 pl-2 space-y-0.5 border-l ${theme === "dark" ? "border-slate-700" : "border-slate-200"}`}>
+                        <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: false })} title="Knowledge Base — upload notes, PDFs & PYQs">
+                          <Database className="w-4 h-4 flex-shrink-0" />
+                          <span>Knowledge Base</span>
+                        </NavLink>
+                        <NavLink to="/admin/processing" className={(props) => navLinkClass({ ...props, theme, collapsed: false })} title="AI Processing Engine — queues, OCR, parse, chunks">
+                          <Activity className="w-4 h-4 flex-shrink-0" />
+                          <span>Processing</span>
+                        </NavLink>
+                        <NavLink to="/admin/intelligence" className={(props) => navLinkClass({ ...props, theme, collapsed: false })} title="Knowledge Intelligence — embeddings & hybrid search">
+                          <Brain className="w-4 h-4 flex-shrink-0" />
+                          <span>Intelligence</span>
+                        </NavLink>
+                        <NavLink to="/admin/ai-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: false })} title="AI Cost Analytics — estimated vs actual tokens">
+                          <Coins className="w-4 h-4 flex-shrink-0" />
+                          <span>AI Cost Analytics</span>
+                        </NavLink>
+                        <NavLink to="/admin/ai-health" className={(props) => navLinkClass({ ...props, theme, collapsed: false })} title="AI Health Monitor — latency, success, queue">
+                          <Activity className="w-4 h-4 flex-shrink-0" />
+                          <span>AI Health Monitor</span>
+                        </NavLink>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <NavLink to="/admin/knowledge-base" className={(props) => navLinkClass({ ...props, theme, collapsed: true })} title="Knowledge Base">
+                      <Database className="w-4 h-4 flex-shrink-0" />
+                    </NavLink>
+                    <NavLink to="/admin/processing" className={(props) => navLinkClass({ ...props, theme, collapsed: true })} title="Processing">
+                      <Activity className="w-4 h-4 flex-shrink-0" />
+                    </NavLink>
+                    <NavLink to="/admin/intelligence" className={(props) => navLinkClass({ ...props, theme, collapsed: true })} title="Intelligence">
+                      <Brain className="w-4 h-4 flex-shrink-0" />
+                    </NavLink>
+                    <NavLink to="/admin/ai-analytics" className={(props) => navLinkClass({ ...props, theme, collapsed: true })} title="AI Cost Analytics">
+                      <Coins className="w-4 h-4 flex-shrink-0" />
+                    </NavLink>
+                    <NavLink to="/admin/ai-health" className={(props) => navLinkClass({ ...props, theme, collapsed: true })} title="AI Health Monitor">
+                      <Activity className="w-4 h-4 flex-shrink-0" />
+                    </NavLink>
+                  </>
+                )}
+
                 <NavLink to="/admin/topic-practice" className={(props) => navLinkClass({ ...props, theme, collapsed: sidebarCollapsed })} title="Topic Practice - Assign tests to students">
                   <ClipboardList className="w-4 h-4 flex-shrink-0" />
                   {!sidebarCollapsed && <span>Topic Practice</span>}

@@ -35,6 +35,15 @@ const testSchema = new mongoose.Schema(
       ref: "AssignedPracticeTest",
       required: false,
     },
+    /**
+     * True only for tests created via POST /api/tests/generate (Practice Test page).
+     * Used for the daily practice limit so chapter/module/mock tests are not counted.
+     */
+    isPracticeGenerator: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
     /** Set on Module Final papers so submit can unlock the next module server-side */
     syllabusModuleTargetId: {
       type: mongoose.Schema.Types.ObjectId,

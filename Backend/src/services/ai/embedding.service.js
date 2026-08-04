@@ -1,4 +1,6 @@
 import fetch from "node-fetch";
+import { getFrontendOrigin } from "../../config/urlConfig.js";
+import { getOpenRouterAppTitle } from "../../config/openRouterAppTitle.js";
 
 const DEFAULT_JINA_URL = "https://api.jina.ai/v1/embeddings";
 const DEFAULT_OPENAI_URL = "https://api.openai.com/v1";
@@ -261,6 +263,11 @@ class EmbeddingService {
       "Content-Type": "application/json",
       Authorization: `Bearer ${this.apiKey}`,
     };
+    // OpenRouter Observability App column
+    if (/openrouter\.ai/i.test(this.baseUrl || this.embedUrl || "")) {
+      headers["HTTP-Referer"] = getFrontendOrigin();
+      headers["X-Title"] = getOpenRouterAppTitle("UPSC Mentor");
+    }
 
     const body = {
       model: this.model,

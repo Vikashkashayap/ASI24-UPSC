@@ -23,6 +23,10 @@ import {
 import { pickBilingualQuestionFields, filterStudentReadyQuestions } from "../services/questionTranslationService.js";
 import { searchKnowledgeBase } from "../rag/services/search.service.js";
 import { generateQuestionsFromRag } from "../rag/services/questionGen.service.js";
+import {
+  OPENROUTER_APP_TITLES,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
 import { ALL_PATTERN_IDS } from "../config/questionPatterns.js";
 
@@ -273,7 +277,13 @@ export async function cacheRelatedTopicsForChapter({
  * Warm RAG question cache for a chapter (fire-and-forget friendly).
  * Skips entirely when a shared Test paper already exists — avoids duplicate LLM spend.
  */
-export async function warmChapterQuestionCache({ kbSubject, topicName }) {
+export async function warmChapterQuestionCache(params) {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+    warmChapterQuestionCacheInner(params)
+  );
+}
+
+async function warmChapterQuestionCacheInner({ kbSubject, topicName }) {
   try {
     const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
     if (!topicNormalized || !kbSubject) return;
@@ -320,7 +330,13 @@ export async function warmChapterQuestionCache({ kbSubject, topicName }) {
 /**
  * Prefetch next chapter: related topics + optional question cache warm.
  */
-export async function prefetchNextChapter({
+export async function prefetchNextChapter(params) {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+    prefetchNextChapterInner(params)
+  );
+}
+
+async function prefetchNextChapterInner({
   subjectKey,
   kbSubject,
   currentLabel,
@@ -409,7 +425,13 @@ function chapterPracticeScopeFilters() {
   ];
 }
 
-export async function createChapterPracticeTest({
+export async function createChapterPracticeTest(params) {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+    createChapterPracticeTestInner(params)
+  );
+}
+
+async function createChapterPracticeTestInner({
   userId,
   kbSubject,
   topicName,
@@ -737,7 +759,13 @@ async function generateModuleFinalTopUp({
  * 2) Reuse shared Module Final paper (any student) — 0 LLM / same questions
  * 3) Else build from chapter bank + RAG top-up (first generation only)
  */
-export async function createModuleFinalTestFromChapterBank({
+export async function createModuleFinalTestFromChapterBank(params) {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+    createModuleFinalTestFromChapterBankInner(params)
+  );
+}
+
+async function createModuleFinalTestFromChapterBankInner({
   userId,
   kbSubject,
   moduleId,

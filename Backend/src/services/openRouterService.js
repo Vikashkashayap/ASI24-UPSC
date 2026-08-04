@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { getFrontendOrigin } from "../config/urlConfig.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
+import { getOpenRouterAppTitle } from "../config/openRouterAppTitle.js";
 
 /**
  * OpenRouter API Service
@@ -18,6 +19,7 @@ const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
  * @param {string} params.userPrompt - User prompt/question
  * @param {number} params.temperature - Temperature for response (default: 0.3)
  * @param {number} params.maxTokens - Maximum tokens in response (default: 2000)
+ * @param {string} [params.xTitle] - OpenRouter App label (overrides ALS context)
  * @returns {Promise<Object>} - API response with content
  */
 export const callOpenRouterAPI = async ({
@@ -27,6 +29,7 @@ export const callOpenRouterAPI = async ({
   userPrompt,
   temperature = 0.3,
   maxTokens = 2000,
+  xTitle,
 }) => {
   try {
     assertOpenRouterAllowed("callOpenRouterAPI");
@@ -45,19 +48,20 @@ export const callOpenRouterAPI = async ({
     console.log("🤖 Using model:", model);
     console.log("🌐 Base URL:", OPENROUTER_BASE_URL);
 
-    // OpenRouter requires HTTP-Referer and X-Title headers (exact values as per requirements)
+    const appTitle = xTitle || getOpenRouterAppTitle("UPSC Mentor");
+    // OpenRouter uses X-Title for the App column in logs
     const frontendOrigin = getFrontendOrigin();
     const headers = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
       "HTTP-Referer": frontendOrigin,
-      "X-Title": "UPSC Mentor - Prelims Test Generator",
+      "X-Title": appTitle,
     };
 
     console.log("📤 Request headers:");
     console.log("   Authorization:", `Bearer ${apiKey.substring(0, 15)}...`);
     console.log("   HTTP-Referer:", frontendOrigin);
-    console.log("   X-Title:", "UPSC Mentor - Prelims Test Generator");
+    console.log("   X-Title:", appTitle);
 
     const requestBody = {
       model,
@@ -319,6 +323,7 @@ export const callOpenRouterVisionAPI = async ({
   images = [],
   temperature = 0.2,
   maxTokens = 4096,
+  xTitle,
 }) => {
   try {
     assertOpenRouterAllowed("callOpenRouterVisionAPI");
@@ -334,12 +339,14 @@ export const callOpenRouterVisionAPI = async ({
       throw new Error("At least one image is required for vision evaluation");
     }
 
+    const appTitle =
+      xTitle || getOpenRouterAppTitle("copy evaluation");
     const frontendOrigin = getFrontendOrigin();
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": frontendOrigin,
-      "X-Title": "UPSC Mentor - Copy Evaluation",
+      "X-Title": appTitle,
     };
 
     const userContent = [

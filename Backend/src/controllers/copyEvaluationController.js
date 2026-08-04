@@ -11,6 +11,10 @@ import {
   deleteEvaluationFiles,
 } from "../services/copyEvaluationStorageService.js";
 import { getCopyEvalDailyStatus } from "../middleware/copyEvalRateLimit.js";
+import {
+  OPENROUTER_APP_TITLES,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 import fs from "fs";
 
 const VISION_MODEL =
@@ -93,25 +97,29 @@ export const uploadAndEvaluateCopy = async (req, res) => {
     const parsedMaxMarks = parseInt(maxMarks, 10) || 15;
     const preferredLanguage = String(language || "auto").toLowerCase().trim();
 
-    const visionResult = await evaluateCopyWithVision({
-      pages: imageData.pages,
-      metadata: {
-        subject,
-        paper,
-        year,
-        language:
-          preferredLanguage === "en" ||
-          preferredLanguage === "english" ||
-          preferredLanguage === "hi" ||
-          preferredLanguage === "hindi"
-            ? preferredLanguage
-            : "auto",
-      },
-      apiKey,
-      model: VISION_MODEL,
-      textModel: TEXT_MODEL,
-      maxMarks: parsedMaxMarks,
-    });
+    const visionResult = await runWithOpenRouterAppTitle(
+      OPENROUTER_APP_TITLES.COPY_EVALUATION,
+      () =>
+        evaluateCopyWithVision({
+          pages: imageData.pages,
+          metadata: {
+            subject,
+            paper,
+            year,
+            language:
+              preferredLanguage === "en" ||
+              preferredLanguage === "english" ||
+              preferredLanguage === "hi" ||
+              preferredLanguage === "hindi"
+                ? preferredLanguage
+                : "auto",
+          },
+          apiKey,
+          model: VISION_MODEL,
+          textModel: TEXT_MODEL,
+          maxMarks: parsedMaxMarks,
+        })
+    );
 
     if (!visionResult.success) {
       evaluation.status = "failed";

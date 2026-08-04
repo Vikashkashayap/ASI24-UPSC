@@ -45,6 +45,8 @@ import {
   mainsMaterialStudentRouter,
   mainsMaterialAdminRouter,
 } from "./routes/mainsMaterialRoutes.js";
+import notesCmsAdminRoutes from "./routes/notesCmsAdminRoutes.js";
+import notesCmsPublicRoutes from "./routes/notesCmsPublicRoutes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
@@ -182,7 +184,11 @@ app.use("/api/syllabus-targets", syllabusTargetRoutes);
 // Must be before /api/admin so /api/admin/current-affairs/* is not swallowed by admin router
 app.use("/api/admin/current-affairs", currentAffairsAdminRouter);
 app.use("/api/admin/mains-materials", mainsMaterialAdminRouter);
+app.use("/api/admin/notes-portal", notesCmsAdminRoutes);
 app.use("/api/admin", adminRoutes);
+
+// Notes Website public catalog + subscribe (CMS admin is /api/admin/notes-portal)
+app.use("/api/notes-portal", notesCmsPublicRoutes);
 
 // Enterprise Knowledge Base (upload + taxonomy)
 app.use("/api/knowledge", knowledgeRoutes);

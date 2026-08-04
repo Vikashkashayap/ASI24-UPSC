@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { getFrontendOrigin } from "../config/urlConfig.js";
+import { getOpenRouterAppTitle } from "../config/openRouterAppTitle.js";
 import { buildMatchQuestionTextForTranslation, parseMatchFollowingFromText, buildMatchColumnsPayload } from "../utils/matchQuestionFormat.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 import {
@@ -658,7 +659,7 @@ HARD RULES:
         userPrompt: `Write compact 50–80 word explanations. Match answer letter+text:\n${JSON.stringify(chunk)}`,
         // ~120 tokens out per Q → keep ceiling low
         maxTokens: Math.min(2200, 160 * chunk.length + 200),
-        apiTitle: "UPSC Mentor - Prelims Explanation Polish",
+        apiTitle: getOpenRouterAppTitle("UPSC Mentor - Prelims Explanation Polish"),
       });
 
       let parsed = null;
@@ -2832,16 +2833,17 @@ async function callOpenRouterTestGeneration({
   systemPrompt,
   userPrompt,
   maxTokens,
-  apiTitle = "UPSC Mentor - Prelims Test Generator",
+  apiTitle,
 }) {
   assertOpenRouterAllowed("callOpenRouterTestGeneration");
+  const title = apiTitle || getOpenRouterAppTitle("UPSC Mentor");
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": apiTitle,
+      "X-Title": title,
     },
     body: JSON.stringify({
       model,
@@ -3252,7 +3254,7 @@ Same count/order. No markdown. Complete Hindi only — never half/truncated list
         systemPrompt,
         userPrompt,
         maxTokens,
-        apiTitle: "UPSC Mentor - Topic Practice Hindi",
+        apiTitle: getOpenRouterAppTitle("UPSC Mentor - Topic Practice Hindi"),
       });
 
       if (!aiContent || !String(aiContent).trim()) {
@@ -3604,7 +3606,7 @@ async function generateTopicPracticeBatch(
     systemPrompt,
     userPrompt,
     maxTokens,
-    apiTitle: "UPSC Mentor - Topic Practice",
+    apiTitle: getOpenRouterAppTitle("UPSC Mentor - Topic Practice"),
   });
 
   if (finishReason === "length") {

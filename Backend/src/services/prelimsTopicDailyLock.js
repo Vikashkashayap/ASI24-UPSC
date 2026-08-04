@@ -28,16 +28,47 @@ export function getNextIstMidnightIso(now = new Date()) {
   return end.toISOString();
 }
 
+const notMockOrAssigned = [
+  { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+  { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+  { $or: [{ syllabusModuleTargetId: null }, { syllabusModuleTargetId: { $exists: false } }] },
+];
+
 /**
- * Practice / Prelims generator tests only (not mocks, not admin-assigned practice).
+ * Count only Practice Test generator attempts (POST /api/tests/generate).
+ * Excludes chapter practice, module finals, assigned practice, and prelims mocks.
+ *
+ * New docs are tagged with isPracticeGenerator: true.
+ * Legacy docs (before the flag) are matched by shape: 5/10/20Q, no timer,
+ * no mock/assigned/module linkage, and not a Module Final / Full Mock topic.
  */
 function practiceTestFilter(userId, start, end) {
   return {
     userId,
     createdAt: { $gte: start, $lt: end },
-    $and: [
-      { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
-      { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+    $or: [
+      // Explicitly tagged Practice Test page generations
+      { isPracticeGenerator: true },
+      // Legacy practice-generator docs (created before isPracticeGenerator existed)
+      {
+        $and: [
+          {
+            $or: [
+              { isPracticeGenerator: { $exists: false } },
+              { isPracticeGenerator: false },
+            ],
+          },
+          { totalQuestions: { $in: [5, 10, 20] } },
+          {
+            $or: [
+              { durationMinutes: null },
+              { durationMinutes: { $exists: false } },
+            ],
+          },
+          { topic: { $not: /module\s*final|full\s*mock/i } },
+          ...notMockOrAssigned,
+        ],
+      },
     ],
   };
 }
