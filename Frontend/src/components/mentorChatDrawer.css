@@ -46,6 +46,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
   border-bottom: 1px solid var(--sd-drawer-border);
   background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
 }
@@ -65,10 +66,10 @@
 
 .sd-mentor-drawer-close {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--sd-drawer-border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
   color: var(--sd-drawer-muted);
   cursor: pointer;
@@ -117,5 +118,6 @@
 @media (max-width: 640px) {
   .sd-mentor-drawer {
     width: 100vw;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

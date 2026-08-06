@@ -129,28 +129,30 @@ export const RegisterPage = () => {
   };
 
   const inputClass =
-    "w-full rounded-lg border border-blue-200/30 bg-[#0a1838] px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/70 focus:border-[#3b82f6] autofill:shadow-[inset_0_0_0px_1000px_#0a1838] autofill:[-webkit-text-fill-color:#f1f5f9]";
+    "w-full rounded-lg border border-blue-300/25 bg-[#0a2048] px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/70 focus:border-[#3b82f6] autofill:shadow-[inset_0_0_0px_1000px_#0a2048] autofill:[-webkit-text-fill-color:#f1f5f9]";
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-50">
-      <LandingNavbar />
-      <div className="mx-auto max-w-6xl px-4 py-24">
-        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-blue-400/20 bg-[#07142e] shadow-2xl lg:grid-cols-[1.05fr_1.35fr]">
-          <div className="hidden border-r border-blue-400/20 bg-gradient-to-b from-[#0b1f45] to-[#081631] p-8 lg:block">
+    <div className="min-h-[100dvh] min-h-screen overflow-x-hidden bg-[#0b1f45] text-slate-50">
+      <div className="sticky top-0 z-50">
+        <LandingNavbar />
+      </div>
+      <div className="mx-auto max-w-6xl px-3 pb-10 pt-6 sm:px-4 sm:pt-8 md:py-12 lg:py-16">
+        <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-blue-400/25 bg-[#0b1f45] shadow-2xl lg:grid-cols-[1.05fr_1.35fr]">
+          <div className="hidden border-r border-blue-400/25 bg-[#0b1f45] p-8 lg:block">
             <h2 className="mb-4 text-4xl font-extrabold leading-tight">Start Your UPSC Journey The Right Way</h2>
             <p className="mb-8 text-sm text-slate-300">
               Join MentorsDaily and build a smart preparation workflow with AI + structured planning.
             </p>
-            <ul className="space-y-3 text-sm text-slate-200">
-              <li>• Personalized Study Plan</li>
-              <li>• Full Performance Analytics</li>
-              <li>• Dedicated Mentor</li>
-              <li>• 30,000+ Practice Questions</li>
+            <ul className="list-disc space-y-3 pl-5 text-sm text-slate-200 marker:text-blue-400">
+              <li>Personalized Study Plan</li>
+              <li>Full Performance Analytics</li>
+              <li>Dedicated Mentor</li>
+              <li>30,000+ Practice Questions</li>
             </ul>
           </div>
 
-          <div className="p-5 sm:p-8">
-            <h1 className="text-2xl font-bold">Create Your Account</h1>
+          <div className="bg-[#0b1f45] p-4 sm:p-6 md:p-8">
+            <h1 className="text-xl font-bold sm:text-2xl">Create Your Account</h1>
             <p className="mt-1 text-sm text-slate-300">
               Already registered?{" "}
               <Link to="/login" className="font-semibold text-blue-400 hover:underline">
@@ -164,7 +166,7 @@ export const RegisterPage = () => {
                 const active = step >= current;
                 return (
                   <div key={n} className="flex items-center gap-2">
-                    <div className={`h-7 w-7 rounded-full text-xs font-semibold flex items-center justify-center ${active ? "bg-blue-500 text-white" : "bg-slate-700 text-slate-200"}`}>
+                    <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${active ? "bg-blue-500 text-white" : "bg-[#0a2048] text-slate-200 border border-blue-400/30"}`}>
                       {n}
                     </div>
                     <div className="hidden text-xs text-slate-300 sm:block">{stepLabel[current]}</div>
@@ -173,10 +175,10 @@ export const RegisterPage = () => {
               })}
             </div>
 
-            <div className="mt-6 rounded-xl border border-blue-400/20 bg-[#0b1a3b] p-4 sm:p-5">
+            <div className="mt-6 rounded-xl border border-blue-400/25 bg-[#0d2550] p-4 sm:p-5">
               {/* <a
                 href={`${apiBaseURL}/api/auth/google?from=register`}
-                className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-white/25 bg-[#111827] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#1f2937]"
+                className="relative mb-4 inline-flex w-full items-center justify-center rounded-full border border-blue-300/30 bg-[#0a2048] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#122a5c]"
               >
                 <span className="absolute left-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow">
                   <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">

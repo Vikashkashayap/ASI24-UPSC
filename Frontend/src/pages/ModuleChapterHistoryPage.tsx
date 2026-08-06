@@ -239,7 +239,7 @@ const ModuleChapterHistoryPage: React.FC = () => {
           </div>
           <Button
             variant="outline"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/daily-targets")}
             className="shrink-0 min-h-[40px]"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -314,11 +314,11 @@ const ModuleChapterHistoryPage: React.FC = () => {
             >
               {hasActiveFilters
                 ? "Try adjusting your search or subject filter"
-                : "Take a chapter Test from Module Targets on Home to see it here"}
+                : "Take a chapter Test from Module Targets on Daily Targets to see it here"}
             </p>
             {!hasActiveFilters && (
               <Button
-                onClick={() => navigate("/home")}
+                onClick={() => navigate("/daily-targets")}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               >
                 <Target className="mr-2 h-4 w-4" />

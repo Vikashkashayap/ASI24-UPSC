@@ -2,7 +2,6 @@ import { FormEvent, useState, useEffect, useRef } from "react";
 import { mentorAPI } from "../services/api";
 import { Button } from "../components/ui/button";
 import { useTheme } from "../hooks/useTheme";
-import { FormattedText } from "../components/FormattedText";
 import {
   MessageCircle,
   Send,
@@ -15,7 +14,14 @@ import {
   Trash2,
   PanelLeftClose,
   PanelLeftOpen,
+  BookOpen,
+  ClipboardList,
+  FileText,
+  CalendarDays,
+  Brain,
+  Newspaper,
 } from "lucide-react";
+import { ChatBubble, TypingIndicator, PromptCard, SUGGESTED_PROMPTS } from "../components/aiExperience";
 
 export interface ChatItem {
   sessionId: string;
@@ -151,11 +157,9 @@ export const MentorChatPage = ({ embedded = false }: MentorChatPageProps) => {
   };
 
   // Send message
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || loading) return;
-
-    const text = message.trim();
+  const sendText = async (textRaw: string) => {
+    if (!textRaw.trim() || loading) return;
+    const text = textRaw.trim();
     setMessage("");
     setMessages((prev) => [...prev, { role: "user", text }]);
     setLoading(true);
@@ -186,6 +190,15 @@ export const MentorChatPage = ({ embedded = false }: MentorChatPageProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await sendText(message);
+  };
+
+  const applyPrompt = (prompt: string) => {
+    void sendText(prompt);
   };
 
   // Delete chat
@@ -442,117 +455,110 @@ export const MentorChatPage = ({ embedded = false }: MentorChatPageProps) => {
               <Loader2 className={`w-8 h-8 animate-spin ${isDark ? "text-blue-400" : "text-blue-600"}`} />
             </div>
           ) : !currentSessionId && messages.length === 0 ? (
-            /* Empty state - responsive spacing and copy */
-            <div className={`flex flex-col items-center justify-center min-h-[240px] sm:min-h-[280px] px-4 sm:px-6 py-8 sm:py-12 text-center ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 ${isDark ? "bg-blue-500/10" : "bg-blue-100"}`}>
-                <MessageCircle className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+            <div className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-8 sm:px-6 sm:py-10">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[20px] bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/25">
+                <Sparkles className="h-7 w-7" />
               </div>
-              <h2 className={`text-lg sm:text-xl md:text-2xl font-bold mb-1.5 sm:mb-2 px-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                Where should we begin?
+              <h2 className="text-center text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">
+                Your UPSC AI Mentor
               </h2>
-              <p className="text-sm sm:text-base max-w-md mb-4 sm:mb-6 px-1">
-                Ask doubts, next steps, or strategy questions like you would with a senior mentor.
+              <p className="mt-1 max-w-md text-center text-sm font-medium text-slate-500">
+                Ask doubts, strategy, notes, MCQs, or revision plans — like ChatGPT, built for UPSC.
               </p>
-              <p className="text-xs sm:text-sm max-w-sm px-1">
-                Open the menu to create a project or pick a chat. Or type below to begin.
-              </p>
+              <div className="mt-6 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                {SUGGESTED_PROMPTS.map((p, i) => {
+                  const icons = [
+                    BookOpen,
+                    FileText,
+                    ClipboardList,
+                    Brain,
+                    FileText,
+                    CalendarDays,
+                    Newspaper,
+                    BookOpen,
+                    ClipboardList,
+                  ];
+                  const Icon = icons[i % icons.length];
+                  const tones = [
+                    "bg-blue-50 text-blue-600",
+                    "bg-violet-50 text-violet-600",
+                    "bg-emerald-50 text-emerald-600",
+                    "bg-amber-50 text-amber-600",
+                    "bg-sky-50 text-sky-600",
+                    "bg-rose-50 text-rose-600",
+                    "bg-cyan-50 text-cyan-600",
+                    "bg-indigo-50 text-indigo-600",
+                    "bg-teal-50 text-teal-600",
+                  ];
+                  return (
+                    <PromptCard
+                      key={p.title}
+                      title={p.title}
+                      description={p.description}
+                      icon={Icon}
+                      tone={tones[i % tones.length]}
+                      onClick={() => applyPrompt(p.prompt)}
+                    />
+                  );
+                })}
+              </div>
             </div>
           ) : (
-            /* Message list - scrollable, responsive padding */
-            <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4 pb-4">
+            <div className="space-y-3 px-3 py-3 pb-4 sm:space-y-4 sm:px-4 sm:py-4 md:px-6">
               {messages.map((m, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-start gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}
-                >
-                  <div
-                    className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      m.role === "user"
-                        ? "bg-blue-500/20 text-blue-400"
-                        : isDark
-                        ? "bg-blue-500/20 text-blue-300"
-                        : "bg-blue-100 text-blue-600"
-                    }`}
-                  >
-                    {m.role === "user" ? (
-                      <MessageCircle className="w-4 h-4" />
-                    ) : (
-                      <Sparkles className="w-4 h-4" />
-                    )}
-                  </div>
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                      m.role === "user"
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-md"
-                        : isDark
-                        ? "bg-slate-800/80 text-slate-100 border border-slate-700 rounded-tl-md"
-                        : "bg-white border border-slate-200 text-slate-900 rounded-tl-md"
-                    }`}
-                  >
-                    {m.role === "user" ? (
-                      <p className="text-sm md:text-base whitespace-pre-wrap">{m.text}</p>
-                    ) : (
-                      <FormattedText text={m.text} />
-                    )}
-                  </div>
-                </div>
+                <ChatBubble key={idx} role={m.role} text={m.text} />
               ))}
-              {loading && (
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div className={`rounded-2xl rounded-tl-md px-4 py-3 ${isDark ? "bg-slate-800/80 border border-slate-700" : "bg-white border border-slate-200"}`}>
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className={isDark ? "text-slate-400" : "text-slate-500"}>Thinking...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {loading ? <TypingIndicator /> : null}
               <div ref={messagesEndRef} />
             </div>
           )}
         </div>
 
-        {/* Input area - fixed at bottom, responsive padding */}
-        <div className={`flex-shrink-0 p-3 sm:p-4 md:p-6 border-t ${isDark ? "border-slate-800 bg-slate-950" : "border-slate-200 bg-slate-50"}`}>
-            <form ref={formRef} onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-              <div
-                className={`flex gap-2 rounded-2xl border-2 overflow-hidden transition-colors ${
-                  isDark
-                    ? "bg-slate-900/80 border-slate-700 focus-within:border-blue-500/50"
-                    : "bg-white border-slate-200 focus-within:border-blue-400"
+        {/* Composer — ChatGPT-style, safe-area for Android keyboard */}
+        <div
+          className={`flex-shrink-0 border-t px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-4 sm:pt-4 md:px-6 ${
+            isDark ? "border-slate-800 bg-slate-950/95 backdrop-blur-md" : "border-slate-200/80 bg-white/90 backdrop-blur-md"
+          }`}
+        >
+          <form ref={formRef} onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+            <div
+              className={`flex items-end gap-1 rounded-[20px] border shadow-soft transition-colors focus-within:ring-2 focus-within:ring-blue-500/20 ${
+                isDark
+                  ? "border-slate-700 bg-slate-900/90 focus-within:border-blue-500/50"
+                  : "border-slate-200 bg-white focus-within:border-blue-400"
+              }`}
+            >
+              <textarea
+                ref={textareaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Message your AI Mentor…"
+                disabled={loading}
+                rows={1}
+                aria-label="Message your AI Mentor"
+                className={`max-h-[160px] min-h-[52px] flex-1 resize-none bg-transparent px-4 py-3.5 text-sm focus:outline-none md:text-base ${
+                  isDark ? "text-slate-100 placeholder-slate-500" : "text-slate-900 placeholder-slate-400"
                 }`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    formRef.current?.requestSubmit();
+                  }
+                }}
+              />
+              <Button
+                type="submit"
+                disabled={loading || !message.trim()}
+                aria-label="Send message"
+                className="m-2 h-11 w-11 shrink-0 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 p-0 text-white hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40"
               >
-                <textarea
-                  ref={textareaRef}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ask anything..."
-                  disabled={loading}
-                  rows={1}
-                  className={`flex-1 min-h-[52px] max-h-[160px] px-4 py-3 bg-transparent resize-none text-sm md:text-base focus:outline-none ${isDark ? "text-slate-100 placeholder-slate-500" : "text-slate-900 placeholder-slate-400"}`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      formRef.current?.requestSubmit();
-                    }
-                  }}
-                />
-                <Button
-                  type="submit"
-                  disabled={loading || !message.trim()}
-                  className={`self-end m-2 rounded-xl px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shrink-0`}
-                >
-                  {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </Button>
-              </div>
-            </form>
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+              </Button>
+            </div>
+            <p className="mt-2 text-center text-[10px] font-medium text-slate-400">
+              Enter to send · Shift+Enter for new line
+            </p>
+          </form>
         </div>
       </main>
     </div>

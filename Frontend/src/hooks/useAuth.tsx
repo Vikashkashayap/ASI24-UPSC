@@ -86,6 +86,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate("/login", { replace: true });
   };
 
+  // Soft logout when API reports expired / invalid token
+  useEffect(() => {
+    const onExpired = () => {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem(STORAGE_KEY);
+      if (!window.location.pathname.startsWith("/login")) {
+        navigate("/login", { replace: true });
+      }
+    };
+    window.addEventListener("md:session-expired", onExpired);
+    return () => window.removeEventListener("md:session-expired", onExpired);
+  }, [navigate]);
+
   const refreshUser = async () => {
     const t = token ?? (() => {
       try {

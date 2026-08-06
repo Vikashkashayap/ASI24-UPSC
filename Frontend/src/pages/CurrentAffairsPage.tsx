@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useTheme } from "../hooks/useTheme";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
-import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { currentAffairsAPI, type CurrentAffairType } from "../services/api";
-import {
-  Newspaper,
-  Search,
-  Filter,
-  ExternalLink,
-  BookOpen,
-  FileText,
-  Sparkles,
-  ChevronRight,
-} from "lucide-react";
+import { CurrentAffairCard } from "../components/aiExperience";
+import { Newspaper, Search, Sparkles } from "lucide-react";
 
 const GS_OPTIONS = ["GS1", "GS2", "GS3", "GS4"];
 const DIFFICULTY_OPTIONS = ["Easy", "Moderate", "Hard"];
@@ -49,9 +39,10 @@ export default function CurrentAffairsPage() {
         setPage(res.data.data.page || 1);
       }
     } catch (e: unknown) {
-      const msg = e && typeof e === "object" && "response" in e
-        ? (e as { response?: { data?: { message?: string } } }).response?.data?.message
-        : undefined;
+      const msg =
+        e && typeof e === "object" && "response" in e
+          ? (e as { response?: { data?: { message?: string } } }).response?.data?.message
+          : undefined;
       setError(typeof msg === "string" && msg.trim() ? msg : "Failed to load current affairs");
       setItems([]);
     } finally {
@@ -79,260 +70,156 @@ export default function CurrentAffairsPage() {
   const isDark = theme === "dark";
 
   return (
-    <section
-      className={`min-h-[60vh] border-b py-12 md:py-20 transition-colors ${
-        theme === "dark" ? "border-slate-800/50 bg-[#030712]" : "border-slate-200 bg-slate-50"
-      }`}
-    >
-      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 px-3 md:px-4 overflow-x-hidden pb-4">
-      {/* Header */}
-      <div
-        className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-6 border-2 transition-all duration-300 ${
-          isDark
-            ? "bg-slate-800/90 border-[#2563eb]/20"
-            : "bg-white border-slate-200/80"
-        }`}
-      >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[#2563eb]/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col gap-2 md:gap-3">
-          <div className="flex items-center gap-2 md:gap-3">
-            <div
-              className={`p-2 md:p-2.5 rounded-lg shrink-0 ${
-                isDark ? "bg-[#2563eb]/20" : "bg-[#2563eb]/10"
-              }`}
-            >
-              <Newspaper
-                className={`w-5 h-5 md:w-6 md:h-6 ${
-                  isDark ? "text-blue-400" : "text-[#2563eb]"
-                }`}
-              />
+    <section className="min-h-[60vh] border-b border-slate-200 bg-gradient-to-b from-slate-50 via-white to-slate-50 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:py-10">
+      <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden px-3 pb-4 md:space-y-6 md:px-4">
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-[20px] border border-slate-200/80 bg-white p-4 shadow-soft md:p-6"
+        >
+          <div className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+          <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/20">
+                <Newspaper className="h-6 w-6" />
+              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-extrabold tracking-tight text-slate-900 md:text-2xl">
+                    Current Affairs
+                  </h1>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
+                    <Sparkles className="h-3 w-3" /> AI curated
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-slate-500">
+                  Prelims & Mains ready news — filter by GS paper or difficulty.
+                </p>
+              </div>
             </div>
-            <h1
-              className={`text-xl md:text-3xl font-bold tracking-tight ${
-                isDark
-                  ? "text-slate-50"
-                  : "text-slate-900"
-              }`}
-            >
-              Daily UPSC Current Affairs
-            </h1>
           </div>
-          <p
-            className={`text-xs md:text-base ml-0 md:ml-12 ${
-              isDark ? "text-slate-300" : "text-slate-600"
-            }`}
-          >
-            AI-curated news analysis for Prelims & Mains. Filter by GS Paper or difficulty.
-          </p>
-        </div>
-      </div>
 
-      {/* Filters + Search */}
-      {/* <Card
-        className={
-          isDark
-            ? "border-slate-800 bg-slate-950/60"
-            : "border-slate-200 bg-white"
-        }
-      >
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            Filters & Search
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+          {/* Search + filters */}
+          <form onSubmit={handleSearchSubmit} className="relative mt-4 flex gap-2">
             <div className="relative flex-1">
-              <Search
-                className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                  isDark ? "text-slate-400" : "text-slate-500"
-                }`}
-              />
-              <Input
-                type="text"
-                placeholder="Search by keyword..."
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                placeholder="Search headlines, keywords…"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className={`pl-9 ${
-                  isDark
-                    ? "bg-slate-800 border-slate-600 text-slate-200"
-                    : "bg-white border-slate-300 text-slate-900"
-                }`}
+                aria-label="Search current affairs"
+                className="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/15"
               />
             </div>
-            <Button type="submit" variant="primary">
+            <Button type="submit" className="h-11 rounded-2xl bg-blue-600 px-4 text-white hover:bg-blue-500">
               Search
             </Button>
           </form>
-          <div className="flex flex-wrap gap-2">
-            <span className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              GS Paper:
-            </span>
+
+          <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="GS paper filters">
             {GS_OPTIONS.map((g) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => setGsPaper(gsPaper === g ? "" : g)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`app-chrome-btn min-h-[36px] rounded-2xl px-3 text-xs font-bold transition-colors ${
                   gsPaper === g
                     ? "bg-blue-600 text-white"
-                    : isDark
-                    ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 {g}
               </button>
             ))}
-            <span className={`text-xs font-medium ml-2 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              Difficulty:
-            </span>
+            <span className="mx-1 hidden h-8 w-px bg-slate-200 sm:inline-block" aria-hidden />
             {DIFFICULTY_OPTIONS.map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setDifficulty(difficulty === d ? "" : d)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                className={`app-chrome-btn min-h-[36px] rounded-2xl px-3 text-xs font-bold transition-colors ${
                   difficulty === d
-                    ? "bg-[#2563eb] text-white"
-                    : isDark
-                    ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    ? "bg-indigo-600 text-white"
+                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 {d}
               </button>
             ))}
           </div>
-        </CardContent>
-      </Card> */}
+        </motion.div>
 
-      {error && (
-        <div
-          className={`p-4 rounded-xl border ${
-            isDark ? "bg-red-500/10 border-red-500/30 text-red-300" : "bg-red-50 border-red-200 text-red-700"
-          }`}
-        >
-          {error}
-        </div>
-      )}
+        {error ? (
+          <div className="rounded-[20px] border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        ) : null}
 
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2563eb]" />
-        </div>
-      ) : items.length === 0 ? (
-        <Card className={isDark ? "border-slate-800 bg-slate-950/60" : "border-slate-200 bg-white"}>
-          <CardContent className="py-12 text-center">
-            <Newspaper className={`w-12 h-12 mx-auto mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`} />
-            <p className={isDark ? "text-slate-400" : "text-slate-600"}>
-              No current affairs for today. Check back after the daily 6 AM update or try different filters.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div ref={listRef} className="space-y-4">
-          <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-            {total} article{total !== 1 ? "s" : ""} found
-            {totalPages > 1 && ` · Showing ${(page - 1) * 12 + 1}–${Math.min(page * 12, total)} of ${total}`}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {items.map((item) => (
-              <Card
-                key={item._id}
-                className={`relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-2 ${
-                  isDark
-                    ? "bg-slate-800/90 border-slate-700/60"
-                    : "bg-white border-slate-200"
-                }`}
-              >
-                <Link to={item.slug} className="block" relative="path">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#2563eb]/10 to-transparent rounded-full blur-2xl group-hover:blur-3xl transition-all" />
-                  <CardHeader className="relative z-10 pb-2">
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
-                          isDark ? "bg-blue-500/20 text-blue-300" : "bg-blue-100 text-blue-700"
-                        }`}
-                      >
-                        {item.gsPaper}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
-                          item.difficulty === "Easy"
-                            ? isDark
-                              ? "bg-green-500/20 text-green-300"
-                              : "bg-green-100 text-green-700"
-                            : item.difficulty === "Hard"
-                            ? isDark
-                              ? "bg-amber-500/20 text-amber-300"
-                              : "bg-amber-100 text-amber-700"
-                            : isDark
-                            ? "bg-slate-500/20 text-slate-300"
-                            : "bg-slate-100 text-slate-700"
-                        }`}
-                      >
-                        {item.difficulty}
-                      </span>
-                    </div>
-                    <CardTitle className="text-base font-bold line-clamp-2 mb-1">
-                      {item.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs line-clamp-2">
-                      {item.summary}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="relative z-10 pt-0">
-                    <div className="flex flex-wrap gap-1">
-                      {(item.keywords || []).slice(0, 4).map((kw, i) => (
-                        <span
-                          key={i}
-                          className={`px-1.5 py-0.5 rounded text-[10px] ${
-                            isDark ? "bg-slate-700/50 text-slate-300" : "bg-slate-100 text-slate-600"
-                          }`}
-                        >
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 flex items-center gap-1 text-xs font-medium text-[#2563eb]">
-                      <span>Read more</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </div>
-                  </CardContent>
-                </Link>
-              </Card>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-44 animate-pulse rounded-[20px] bg-slate-200/60" />
             ))}
           </div>
-
-          <nav className="flex flex-wrap items-center justify-center gap-2 pt-6 pb-2" aria-label="Pagination">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(page - 1)}
-              disabled={page <= 1}
-              aria-label="Previous page"
-            >
-              Previous
-            </Button>
-            <span className={`flex items-center px-3 text-sm ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-              Page {page} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => goToPage(page + 1)}
-              disabled={page >= totalPages}
-              aria-label="Next page"
-            >
-              Next
-            </Button>
-          </nav>
+        ) : items.length === 0 ? (
+          <div className="rounded-[20px] border border-dashed border-slate-200 bg-white py-14 text-center shadow-soft">
+            <Newspaper className="mx-auto mb-3 h-12 w-12 text-slate-300" />
+            <p className="text-sm font-semibold text-slate-600">
+              No current affairs for today. Check back after the daily update or try different filters.
+            </p>
           </div>
-        </>
-      )}
+        ) : (
+          <div ref={listRef} className="space-y-4">
+            <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              {total} article{total !== 1 ? "s" : ""}
+              {totalPages > 1
+                ? ` · ${(page - 1) * 12 + 1}–${Math.min(page * 12, total)} of ${total}`
+                : null}
+            </p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {items.map((item) => (
+                <CurrentAffairCard
+                  key={item._id}
+                  to={item.slug}
+                  title={item.title}
+                  summary={item.summary}
+                  gsPaper={item.gsPaper}
+                  difficulty={item.difficulty}
+                  keywords={item.keywords || []}
+                  readTime="3 min"
+                />
+              ))}
+            </div>
+
+            <nav className="flex flex-wrap items-center justify-center gap-2 pt-4" aria-label="Pagination">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToPage(page - 1)}
+                disabled={page <= 1}
+                aria-label="Previous page"
+                className="min-h-[44px] rounded-2xl"
+              >
+                Previous
+              </Button>
+              <span className="px-3 text-sm font-medium text-slate-600">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => goToPage(page + 1)}
+                disabled={page >= totalPages}
+                aria-label="Next page"
+                className="min-h-[44px] rounded-2xl"
+              >
+                Next
+              </Button>
+            </nav>
+          </div>
+        )}
       </div>
     </section>
   );

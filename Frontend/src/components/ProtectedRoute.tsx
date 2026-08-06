@@ -43,7 +43,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   const isActiveSubscription = user.subscriptionStatus === "active";
   // Routes that a new (unpaid) student can still see – they will see banners/CTAs,
   // but premium actions are blocked by the backend.
-  const allowedWithoutSubscription = ["/home", "/student-profiler", "/help-support", "/profile"];
+  const allowedWithoutSubscription = ["/home", "/daily-targets", "/student-profiler", "/help-support", "/profile"];
 
   if (
     isStudent &&

@@ -3,6 +3,8 @@ import {
   Upload,
   History,
   Download,
+  PenLine,
+  Sparkles,
 } from 'lucide-react';
 import { downloadCopyEvaluationReport } from '../utils/downloadCopyEvaluation';
 import { copyEvaluationAPI } from '../services/api';
@@ -16,6 +18,7 @@ import { CopyEvaluationUploadModal } from '../components/copy-evaluation/CopyEva
 import { CopyEvaluationEmptyState } from '../components/copy-evaluation/CopyEvaluationEmptyState';
 import { QuestionEvaluationView } from '../components/QuestionEvaluationView';
 import { VisionEvaluationResult } from '../types/copyEvaluation';
+import { PerformanceCard } from '../components/analytics';
 
 interface FullEvaluation {
   _id: string;
@@ -199,39 +202,32 @@ const CopyEvaluationPage: React.FC = () => {
     !visionResult;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4 pb-8 px-2 xs:px-3 sm:px-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1
-            className={`text-xl xs:text-2xl font-bold tracking-tight ${
-              theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
-            }`}
-          >
-            Copy Evaluation
-          </h1>
-          <p
-            className={`text-sm mt-0.5 ${
-              theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
-            }`}
-          >
-            AI-powered UPSC Mains examiner — marks, feedback & model answers
-            {dailyQuota && !dailyQuota.unlimited
-              ? ` · Today ${dailyQuota.used}/${dailyQuota.limit}`
-              : ''}
-          </p>
+    <div className="mx-auto max-w-7xl space-y-4 px-2 pb-[max(2rem,env(safe-area-inset-bottom))] xs:px-3 sm:px-4">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-white via-violet-50/40 to-white p-4 shadow-soft sm:p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-600">
+            <PenLine className="h-6 w-6" />
+          </span>
+          <div>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 xs:text-2xl">
+              Copy Evaluation
+            </h1>
+            <p className="mt-0.5 text-sm font-medium text-slate-600">
+              AI-powered UPSC Mains examiner — marks, feedback & model answers
+              {dailyQuota && !dailyQuota.unlimited
+                ? ` · Today ${dailyQuota.used}/${dailyQuota.limit}`
+                : ''}
+            </p>
+          </div>
         </div>
         {!hasResult && !isUploading && (
           <div className="flex items-center gap-2">
             {dailyQuota && !dailyQuota.unlimited && (
               <span
-                className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
+                className={`rounded-full border px-2.5 py-1 text-xs font-bold ${
                   dailyQuota.locked
-                    ? theme === 'dark'
-                      ? 'border-amber-500/40 text-amber-300'
-                      : 'border-amber-300 text-amber-800 bg-amber-50'
-                    : theme === 'dark'
-                      ? 'border-emerald-500/40 text-emerald-300'
-                      : 'border-emerald-300 text-emerald-800 bg-emerald-50'
+                    ? 'border-amber-300 bg-amber-50 text-amber-800'
+                    : 'border-emerald-300 bg-emerald-50 text-emerald-800'
                 }`}
               >
                 {dailyQuota.remaining} / {dailyQuota.limit} left today
@@ -241,13 +237,38 @@ const CopyEvaluationPage: React.FC = () => {
               onClick={() => navigate('/evaluation-history')}
               variant="outline"
               size="sm"
+              className="min-h-[44px] rounded-2xl"
             >
-              <History className="w-4 h-4 mr-2" />
+              <History className="mr-2 h-4 w-4" />
               History
             </Button>
           </div>
         )}
-      </div>
+      </header>
+
+      {!hasResult && !isUploading && dailyQuota ? (
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+          <PerformanceCard
+            label="Today used"
+            value={`${dailyQuota.used}/${dailyQuota.unlimited ? '∞' : dailyQuota.limit}`}
+            icon={Sparkles}
+            tone="violet"
+          />
+          <PerformanceCard
+            label="Remaining"
+            value={dailyQuota.unlimited ? '∞' : String(dailyQuota.remaining)}
+            icon={Upload}
+            tone="emerald"
+          />
+          <PerformanceCard
+            label="Studio"
+            value="Open"
+            hint="Upload answer copy"
+            icon={PenLine}
+            tone="blue"
+          />
+        </div>
+      ) : null}
 
       <div className="min-h-[calc(100vh-14rem)]">
         {isUploading ? (

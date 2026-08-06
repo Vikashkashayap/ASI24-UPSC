@@ -2,12 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0f1e3d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="MD Student Portal" />
+    <meta name="apple-mobile-web-app-title" content="MD Student Portal" />
+    <link rel="manifest" href="/manifest.webmanifest" />
 
-    <!-- Favicon (MD monogram, transparent, 32x32) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=5" />
-    <link rel="apple-touch-icon" sizes="32x32" href="/favicon.png?v=5" />
+    <!-- Favicon / PWA icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=6" />
+    <link rel="apple-touch-icon" href="/brand/app-icon.png" />
+    <style>
+      /* Prevent white flash before React / Capacitor splash */
+      html, body, #root {
+        background-color: #0f1e3d;
+        min-height: 100%;
+      }
+      body:not(.capacitor-native) {
+        background-color: #f0f9ff;
+      }
+    </style>
 
     <!-- Readable exam & bilingual UI fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

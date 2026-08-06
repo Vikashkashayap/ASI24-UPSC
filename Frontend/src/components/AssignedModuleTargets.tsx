@@ -5,6 +5,7 @@ import {
   syllabusTargetsAPI,
   type StudentSyllabusTarget,
 } from "../services/api";
+import { FilterChips, StudySkeleton } from "./study";
 
 type FilterMode = "all" | "active" | "done";
 
@@ -591,7 +592,6 @@ export function AssignedModuleTargets() {
               <span style={{ width: `${chapterProgress}%` }} />
             </div>
           )}
-          {t.note ? <p className="sd-assigned-note">{t.note}</p> : null}
           {topics.length > 0 && (
             <>
               <button
@@ -846,35 +846,15 @@ export function AssignedModuleTargets() {
       )}
 
       <div className="sd-assigned-filter-row">
-        <div className="sd-assigned-filter" role="tablist" aria-label="Filter modules">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === "active"}
-            className={filter === "active" ? "active" : ""}
-            onClick={() => setFilter("active")}
-          >
-            Active ({activeCount})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === "done"}
-            className={filter === "done" ? "active" : ""}
-            onClick={() => setFilter("done")}
-          >
-            Done ({completedCount})
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={filter === "all"}
-            className={filter === "all" ? "active" : ""}
-            onClick={() => setFilter("all")}
-          >
-            All ({targets.length})
-          </button>
-        </div>
+        <FilterChips
+          chips={[
+            { id: "active", label: `Active (${activeCount})` },
+            { id: "done", label: `Done (${completedCount})` },
+            { id: "all", label: `All (${targets.length})` },
+          ]}
+          activeId={filter}
+          onChange={(id) => setFilter(id as FilterMode)}
+        />
 
         <label className="sd-assigned-subject-filter">
           <span className="sd-assigned-subject-filter-label">Subject</span>
@@ -908,10 +888,7 @@ export function AssignedModuleTargets() {
       </div>
 
       {loading ? (
-        <div className="sd-assigned-loading">
-          <Loader2 className="sd-assigned-spin" />
-          <span>Loading modules…</span>
-        </div>
+        <StudySkeleton rows={4} />
       ) : subjectGroups.length === 0 ? (
         <p className="sd-assigned-empty">
           {filter === "active"

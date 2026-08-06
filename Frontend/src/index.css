@@ -2,13 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MentorsDaily brand — matches home dashboard (blue + indigo) */
+/* MentorsDaily / MD Student Portal design tokens */
 :root {
   --md-navy: #0f1e3d;
   --md-navy-soft: #1a3366;
   --md-blue: #2563eb;
   --md-blue-dark: #1d4ed8;
   --md-blue-light: #3b82f6;
+  --md-sky: #38bdf8;
+  --md-gold: #f59e0b;
   --md-indigo: #6366f1;
   --md-border: #e2e8f0;
   --md-text: #0f172a;
@@ -18,6 +20,57 @@
   --md-gradient: linear-gradient(135deg, #2563eb, #6366f1);
   --md-gradient-hover: linear-gradient(135deg, #1d4ed8, #4f46e5);
   --md-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.04);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --touch-min: 44px;
+}
+
+.dark {
+  --md-border: #1e293b;
+  --md-text: #f1f5f9;
+  --md-muted: #94a3b8;
+  --md-card: #111827;
+  --md-page-bg: #0b1220;
+  --md-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Capacitor native shell — no white flash, safe areas */
+html.capacitor-native,
+html.capacitor-native body {
+  background-color: var(--md-navy);
+  overscroll-behavior: none;
+}
+
+html.capacitor-native body {
+  background-color: var(--md-page-bg);
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+html.capacitor-native .app-shell {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+/* Native-feeling page transitions (respect reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  html.capacitor-native .page-transition-enter {
+    animation: md-page-in 220ms ease-out both;
+  }
+}
+
+@keyframes md-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @layer components {
@@ -129,6 +182,12 @@ input[type="reset"],
 select {
   min-height: 44px; /* iOS/Android minimum touch target */
   touch-action: manipulation; /* Disable double-tap zoom */
+}
+
+/* Compact icon buttons in native app chrome (header / bottom nav) */
+button.app-chrome-btn {
+  min-height: 0;
+  min-width: 0;
 }
 
 /* Ensure inputs are thumb-friendly on mobile */
