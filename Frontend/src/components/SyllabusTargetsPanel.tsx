@@ -1,5 +1,10 @@
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SearchBar } from "./study/SearchBar";
+import { FilterChips } from "./study/FilterChips";
+import { BottomSheet } from "./study/BottomSheet";
+import { TopicCard } from "./study/TopicCard";
+import { Bookmark } from "lucide-react";
 import syllabusData from "../data/upsc_syllabus.json";
 import polityData from "../data/upsc_polity_syllabus.json";
 import ancientHistoryData from "../data/upsc_history_ancient.json";
@@ -794,24 +799,112 @@ function daysUntil(date: Date) {
   return Math.max(0, Math.ceil(diff / 86400000));
 }
 
+type SyllabusTopicFilter = "all" | "pending" | "revision" | "bookmarks";
+
+const SyllabusUiContext = createContext<{ topicFilter: SyllabusTopicFilter }>({
+  topicFilter: "all",
+});
+
 function TaskRow(props: { title: string; subtitle: string; showActions?: boolean }) {
   const navigate = useNavigate();
+  const { topicFilter } = useContext(SyllabusUiContext);
   const { title, subtitle, showActions = true } = props;
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const bookmarkKey = `syllabus-bm:${title}`;
+  const [bookmarked, setBookmarked] = useState(() => {
+    try {
+      return localStorage.getItem(bookmarkKey) === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  if (topicFilter === "bookmarks" && !bookmarked) return null;
+
+  const toggleBookmark = () => {
+    setBookmarked((prev) => {
+      const next = !prev;
+      try {
+        if (next) localStorage.setItem(bookmarkKey, "1");
+        else localStorage.removeItem(bookmarkKey);
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
   return (
-    <div className="sd-task">
-      <h4>{title}</h4>
-      <p>{subtitle}</p>
-      {showActions ? (
-        <div className="sd-btns">
-          <button type="button" onClick={() => navigate("/prelims-test")}>
-            Prelims MCQ
-          </button>
-          <button type="button" onClick={() => navigate("/copy-evaluation")}>
-            Mains Answer
-          </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setSheetOpen(true)}
+        className="w-full rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 text-left transition active:scale-[0.99] md:cursor-default"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h4 className="text-[13px] font-bold leading-snug text-slate-900">{title}</h4>
+            <p className="mt-0.5 text-[11px] font-medium text-slate-500">{subtitle}</p>
+          </div>
+          <span
+            role="presentation"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBookmark();
+            }}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400"
+          >
+            <Bookmark className={`h-4 w-4 ${bookmarked ? "fill-amber-400 text-amber-500" : ""}`} />
+          </span>
         </div>
-      ) : null}
-    </div>
+        {showActions ? (
+          <div className="mt-3 hidden grid-cols-2 gap-2 md:grid">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/prelims-test");
+              }}
+              className="app-chrome-btn h-10 rounded-xl bg-blue-600 text-[11px] font-bold text-white active:scale-95"
+            >
+              Prelims MCQ
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/copy-evaluation");
+              }}
+              className="app-chrome-btn h-10 rounded-xl border border-slate-200 bg-white text-[11px] font-bold text-slate-700 active:scale-95"
+            >
+              Mains Answer
+            </button>
+          </div>
+        ) : null}
+        <p className="mt-2 text-[10px] font-semibold text-blue-600 md:hidden">Tap for details</p>
+      </button>
+
+      <BottomSheet open={sheetOpen} title={title} onClose={() => setSheetOpen(false)}>
+        <TopicCard
+          title={title}
+          difficulty="Standard"
+          weightage={subtitle}
+          completion={0}
+          revision={topicFilter === "revision"}
+          bookmarked={bookmarked}
+          onBookmark={toggleBookmark}
+          onPractice={() => {
+            setSheetOpen(false);
+            navigate("/prelims-test");
+          }}
+          onNotes={() => {
+            setSheetOpen(false);
+            navigate("/copy-evaluation");
+          }}
+        />
+        <p className="mt-3 text-[12px] font-medium text-slate-500">{subtitle}</p>
+      </BottomSheet>
+    </>
   );
 }
 
@@ -1290,6 +1383,8 @@ export function SyllabusTargetsPanel({
   const [geographyPart, setGeographyPart] = useState<GeographyPart>(() =>
     defaultGeographyPartForProfile(studentProfile?.educationBackground),
   );
+  const [topicQuery, setTopicQuery] = useState("");
+  const [topicFilter, setTopicFilter] = useState<SyllabusTopicFilter>("all");
   const meta = syllabusData.meta as { description?: string; last_updated?: string; version?: string };
   const polityMeta = polityData.meta as { version?: string };
   const ancientMeta = ancientHistoryData.meta as { version?: string };
@@ -1423,17 +1518,20 @@ export function SyllabusTargetsPanel({
   }, [dailyTargetsCount, dailyHours, preparationMode]);
 
   return (
-    <>
-      <div className="sd-card-hd sd-syll-hd">
-        <div>
-          <h3>{title}</h3>
-          <p className="sd-syll-deck">{subtitle}</p>
-          <p className="sd-syll-deck sd-syll-plan">{planHint}</p>
+    <SyllabusUiContext.Provider value={{ topicFilter }}>
+    <div className="space-y-4 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-lg font-extrabold tracking-tight text-slate-900">{title}</h3>
+          <p className="mt-0.5 text-[13px] font-medium text-slate-500">{subtitle}</p>
+          <p className="mt-1 text-[11px] font-semibold text-blue-600">{planHint}</p>
         </div>
-        <span className="sd-syll-today-chip">{todayLabel}</span>
+        <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-bold text-emerald-700">
+          {todayLabel}
+        </span>
       </div>
 
-      <div className="sd-syll-meta-bar">
+      <div className="flex flex-wrap gap-2 rounded-2xl bg-slate-50 px-3 py-2 text-[11px] font-medium text-slate-500">
         <span>
           {!segment
             ? "Choose any subject from the list below"
@@ -1486,13 +1584,30 @@ export function SyllabusTargetsPanel({
                                     : `Syllabus v${meta.version ?? "1.x"}${meta.last_updated ? ` · ${meta.last_updated}` : ""}`}
         </span>
         <span>
-          {" "}• UPSC Prelims {studentProfile?.targetYear || new Date().getFullYear() + 1}:{" "}
+          · UPSC Prelims {studentProfile?.targetYear || new Date().getFullYear() + 1}:{" "}
           {prelimsDate.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
-          {" "}({daysLeft} days left)
+          ({daysLeft} days left)
         </span>
       </div>
 
-      <div className="sd-syll-tabs" role="tablist" aria-label="Syllabus section">
+      <SearchBar
+        value={topicQuery}
+        onChange={setTopicQuery}
+        placeholder="Search subjects & topics…"
+      />
+
+      <FilterChips
+        chips={[
+          { id: "all", label: "All" },
+          { id: "pending", label: "Pending" },
+          { id: "revision", label: "Revision" },
+          { id: "bookmarks", label: "Bookmarks" },
+        ]}
+        activeId={topicFilter}
+        onChange={(id) => setTopicFilter(id as SyllabusTopicFilter)}
+      />
+
+      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Syllabus section">
         {(
           [
             ["prelims", "Prelims"],
@@ -1515,13 +1630,23 @@ export function SyllabusTargetsPanel({
             ["disaster_management", "Disaster Mgmt"],
             ["art_culture", "Art & Culture"],
           ] as const
-        ).map(([id, label]) => (
+        )
+          .filter(([id, label]) => {
+            if (!topicQuery.trim()) return true;
+            const q = topicQuery.toLowerCase();
+            return id.includes(q) || label.toLowerCase().includes(q);
+          })
+          .map(([id, label]) => (
           <button
             key={id}
             type="button"
             role="tab"
             aria-selected={segment === id}
-            className={segment === id ? "active" : ""}
+            className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold transition-colors ${
+              segment === id
+                ? "bg-blue-600 text-white shadow-md shadow-blue-600/25"
+                : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
+            }`}
             onClick={() => setSegment((prev) => (prev === id ? null : id))}
           >
             {label}
@@ -1530,21 +1655,21 @@ export function SyllabusTargetsPanel({
       </div>
 
       {!segment ? (
-        <div className="sd-syll-empty-pick">
-          <p className="sd-syll-empty-pick-title">No subject selected</p>
-          <p className="sd-syll-empty-pick-copy">
+        <div className="rounded-[20px] border border-dashed border-slate-200 bg-slate-50 px-4 py-10 text-center">
+          <p className="text-sm font-bold text-slate-800">No subject selected</p>
+          <p className="mt-1 text-[12px] text-slate-500">
             Select Polity, History, Economy, or any other subject from the tabs above to view its modules.
           </p>
         </div>
       ) : null}
 
       {segment === "history" ? (
-        <div className="sd-syll-history-group">
-          <div className="sd-syll-history-label" id="history-period-label">
-            History — pick a period (all four below)
-          </div>
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400" id="history-period-label">
+            History — pick a period
+          </p>
           <div
-            className="sd-syll-history-pills"
+            className="scrollbar-hide flex gap-2 overflow-x-auto pb-1"
             role="tablist"
             aria-labelledby="history-period-label"
             aria-label="History period"
@@ -1555,7 +1680,11 @@ export function SyllabusTargetsPanel({
                 type="button"
                 role="tab"
                 aria-selected={historyPart === id}
-                className={historyPart === id ? "active" : ""}
+                className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold ${
+                  historyPart === id
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "border border-slate-200 bg-white text-slate-600"
+                }`}
                 onClick={() => setHistoryPart(id)}
               >
                 {label}
@@ -1566,12 +1695,12 @@ export function SyllabusTargetsPanel({
       ) : null}
 
       {segment === "geography" || (segment === "prelims" && prelimsSubject === "geography") ? (
-        <div className="sd-syll-history-group">
-          <div className="sd-syll-history-label" id="geography-scope-label">
-            Geography — choose scope (all three below)
-          </div>
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400" id="geography-scope-label">
+            Geography — choose scope
+          </p>
           <div
-            className="sd-syll-history-pills"
+            className="scrollbar-hide flex gap-2 overflow-x-auto pb-1"
             role="tablist"
             aria-labelledby="geography-scope-label"
             aria-label="Geography scope"
@@ -1582,7 +1711,11 @@ export function SyllabusTargetsPanel({
                 type="button"
                 role="tab"
                 aria-selected={geographyPart === id}
-                className={geographyPart === id ? "active" : ""}
+                className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold ${
+                  geographyPart === id
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "border border-slate-200 bg-white text-slate-600"
+                }`}
                 onClick={() => setGeographyPart(id)}
               >
                 {label}
@@ -1593,12 +1726,12 @@ export function SyllabusTargetsPanel({
       ) : null}
 
       {segment === "prelims" ? (
-        <div className="sd-syll-history-group">
-          <div className="sd-syll-history-label" id="prelims-subject-label">
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400" id="prelims-subject-label">
             Prelims GS — pick a subject
-          </div>
+          </p>
           <div
-            className="sd-syll-history-pills"
+            className="scrollbar-hide flex gap-2 overflow-x-auto pb-1"
             role="tablist"
             aria-labelledby="prelims-subject-label"
             aria-label="Prelims subject"
@@ -1609,7 +1742,11 @@ export function SyllabusTargetsPanel({
                 type="button"
                 role="tab"
                 aria-selected={prelimsSubject === id}
-                className={prelimsSubject === id ? "active" : ""}
+                className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold ${
+                  prelimsSubject === id
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "border border-slate-200 bg-white text-slate-600"
+                }`}
                 onClick={() => {
                   setPrelimsSubject(id);
                   if (id === "history" && historyPart === "world_history") {
@@ -1625,12 +1762,12 @@ export function SyllabusTargetsPanel({
       ) : null}
 
       {segment === "prelims" && prelimsSubject === "history" ? (
-        <div className="sd-syll-history-group">
-          <div className="sd-syll-history-label" id="prelims-history-period-label">
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400" id="prelims-history-period-label">
             History — Ancient, Medieval & Modern (Prelims)
-          </div>
+          </p>
           <div
-            className="sd-syll-history-pills"
+            className="scrollbar-hide flex gap-2 overflow-x-auto pb-1"
             role="tablist"
             aria-labelledby="prelims-history-period-label"
             aria-label="Prelims history period"
@@ -1641,7 +1778,11 @@ export function SyllabusTargetsPanel({
                 type="button"
                 role="tab"
                 aria-selected={historyPart === id}
-                className={historyPart === id ? "active" : ""}
+                className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold ${
+                  historyPart === id
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "border border-slate-200 bg-white text-slate-600"
+                }`}
                 onClick={() => setHistoryPart(id)}
               >
                 {label}
@@ -1677,6 +1818,7 @@ export function SyllabusTargetsPanel({
       {segment === "post_independence" ? <PostIndependenceSection /> : null}
       {segment === "disaster_management" ? <DisasterManagementSection /> : null}
       {segment === "art_culture" ? <ArtCultureSection /> : null}
-    </>
+    </div>
+    </SyllabusUiContext.Provider>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Loader2, BookOpen, Target, TrendingUp, History, Lock } from "lucide-react";
+import { Loader2, BookOpen, Target, TrendingUp, History, Lock, Sparkles } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { SubjectToggle } from "../components/SubjectToggle";
@@ -13,6 +13,11 @@ import {
   type ExamType,
 } from "../constants/testGenerator";
 import { sanitizePlannerTopic } from "../components/advancedStudyPlanner/plannerUtils";
+import {
+  TestPageHeader,
+  TestStatCard,
+  AISummaryCard,
+} from "../components/tests";
 
 function matchSubjectFromUrl(raw: string): string {
   const decoded = decodeURIComponent(raw).trim();
@@ -201,43 +206,72 @@ const TestGeneratorPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 md:space-y-8 pb-6 md:pb-8 px-3 md:px-4 min-h-0">
-      {/* Enhanced Header - compact on mobile for full mobile view */}
-      <div className={`relative overflow-hidden rounded-xl md:rounded-2xl p-4 md:p-8 border-2 transition-all duration-300 ${theme === "dark"
-        ? "bg-gradient-to-br from-slate-800/90 via-amber-900/20 to-slate-900/90 border-amber-500/20 shadow-xl shadow-amber-500/10"
-        : "bg-gradient-to-br from-white via-amber-50/30 to-white border-amber-200/50 shadow-xl shadow-amber-100/30"
-        }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-6">
-          <div className="flex items-center gap-2 md:gap-4 min-w-0">
-            <div className={`p-2 md:p-3 rounded-lg md:rounded-xl shrink-0 ${theme === "dark" ? "bg-amber-500/20" : "bg-amber-100"
-              }`}>
-              <BookOpen className={`w-5 h-5 md:w-6 md:h-6 ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`} />
-            </div>
-            <div className="flex flex-col gap-0.5 md:gap-2 min-w-0">
-              <h1 className={`text-lg md:text-3xl font-bold tracking-tight bg-gradient-to-r truncate ${theme === "dark"
-                ? "from-amber-200 via-amber-300 to-amber-400 bg-clip-text text-transparent"
-                : "from-amber-600 via-amber-700 to-amber-800 bg-clip-text text-transparent"
-                }`}>
-                UPSC Prelims Test Generator
-              </h1>
-              <p className={`text-xs md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"} hidden sm:block`}>
-                Generate UPSC Prelims MCQs from your Knowledge Base for the topic you choose
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={() => navigate('/test-history')}
-            className={`flex items-center justify-center gap-2 shadow-lg transition-all duration-300 shrink-0 w-full sm:w-auto min-h-[44px] touch-manipulation ${theme === "dark"
-              ? "bg-amber-600 hover:bg-amber-500 text-white border border-amber-500"
-              : "bg-amber-500 hover:bg-amber-600 text-white border border-amber-600"
-              }`}
+    <div className="mx-auto max-w-4xl space-y-4 px-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:space-y-8 md:px-4 md:pb-8">
+      <TestPageHeader
+        title="Practice Test"
+        subtitle="Generate UPSC Prelims MCQs from your Knowledge Base"
+        icon={BookOpen}
+        accent="amber"
+        action={
+          <button
+            type="button"
+            onClick={() => navigate("/test-history")}
+            className="app-chrome-btn inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-amber-600 px-4 text-[13px] font-bold text-white shadow-md shadow-amber-600/20 active:scale-95 sm:w-auto"
           >
-            <History className="w-4 h-4" />
+            <History className="h-4 w-4" />
             View History
-          </Button>
-        </div>
+          </button>
+        }
+      />
+
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        <TestStatCard
+          label="Used today"
+          value={dailyStatusLoading ? "…" : `${usedCount}/${dailyLimit}`}
+          icon={Target}
+          tone="bg-amber-50 text-amber-600"
+        />
+        <TestStatCard
+          label="Remaining"
+          value={dailyStatusLoading ? "…" : String(remaining)}
+          icon={Sparkles}
+          tone="bg-blue-50 text-blue-600"
+        />
+        <TestStatCard label="Mode" value={examType} icon={BookOpen} tone="bg-violet-50 text-violet-600" />
+        <TestStatCard
+          label="Questions"
+          value={String(questionCount)}
+          icon={TrendingUp}
+          tone="bg-emerald-50 text-emerald-600"
+        />
       </div>
+
+      <AISummaryCard
+        message={
+          isDailyLocked
+            ? `Daily practice limit reached (${usedCount}/${dailyLimit}). Review today's paper or continue an unfinished attempt.`
+            : fromPlanner && topic
+              ? `Planner handoff ready — practice ${subjects[0] || "this subject"}: ${topic}.`
+              : `Pick a subject & topic, then generate. You have ${remaining} practice run${remaining === 1 ? "" : "s"} left today.`
+        }
+        cta={
+          isDailyLocked && dailyStatus?.todayTest?._id
+            ? dailyStatus.todayTest.isSubmitted
+              ? "View Result"
+              : "Continue Test"
+            : undefined
+        }
+        onAction={
+          isDailyLocked && dailyStatus?.todayTest?._id
+            ? () =>
+                navigate(
+                  dailyStatus.todayTest?.isSubmitted
+                    ? `/result/${dailyStatus.todayTest!._id}`
+                    : `/test/${dailyStatus.todayTest!._id}`
+                )
+            : undefined
+        }
+      />
 
       {fromPlanner && topic && !isDailyLocked && (
         <div

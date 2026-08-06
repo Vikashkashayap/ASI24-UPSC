@@ -1,19 +1,40 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  CalendarClock,
-  CalendarDays,
-  FileText,
+  ClipboardList,
   MessageCircle,
-  Sparkles,
+  Newspaper,
+  CalendarClock,
+  FileText,
+  BarChart3,
+  BookOpen,
+  Library,
+  AlertCircle,
+  Bell,
+  Target,
 } from "lucide-react";
 import { MentorChatDrawer } from "../components/MentorChatDrawer";
-import { PageLoader } from "../components/PageLoader";
 import { useAuth } from "../hooks/useAuth";
-
-const AssignedModuleTargets = lazy(() =>
-  import("../components/AssignedModuleTargets").then((m) => ({ default: m.AssignedModuleTargets }))
-);
+import { currentAffairsAPI, advancedStudyPlannerAPI, api } from "../services/api";
+import {
+  GreetingCard,
+  DailyProgressCard,
+  QuickActionCard,
+  ContinueLearningCard,
+  PerformanceCard,
+  UpcomingCard,
+  AIMentorCard,
+  CurrentAffairCard,
+  MotivationCard,
+  type UpcomingItem,
+  type CurrentAffairItem,
+} from "../components/home";
+import { DailyTargetsHub } from "../components/study";
 import "./homePage.css";
 
 function getGreetingByHour(hour: number) {
@@ -40,37 +61,58 @@ function getPreparationPhase(daysLeft: number) {
   return "foundation";
 }
 
-const phaseLabels: Record<string, { label: string; tone: string }> = {
-  revision: { label: "Revision Phase", tone: "sd-phase-revision" },
-  balanced: { label: "Balanced Phase", tone: "sd-phase-balanced" },
-  foundation: { label: "Foundation Phase", tone: "sd-phase-foundation" },
-};
-
 export const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [countdown, setCountdown] = useState({ days: "000", hours: "00", mins: "00", secs: "00", progress: 0 });
+
+  const [countdown, setCountdown] = useState({
+    days: "000",
+    hours: "00",
+    mins: "00",
+    secs: "00",
+    progress: 0,
+  });
   const [showMentorDrawer, setShowMentorDrawer] = useState(false);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
+  const [streak, setStreak] = useState(1);
+  const [questionsSolved, setQuestionsSolved] = useState(0);
+  const [perf, setPerf] = useState<{
+    accuracy: number | null;
+    averageScore: number | null;
+    completion: number | null;
+    weeklyGrowth: number | null;
+    monthlyGrowth: number | null;
+  }>({
+    accuracy: null,
+    averageScore: null,
+    completion: null,
+    weeklyGrowth: null,
+    monthlyGrowth: null,
+  });
+  const [caItems, setCaItems] = useState<CurrentAffairItem[]>([]);
+  const [continueMeta, setContinueMeta] = useState<{
+    subject: string;
+    title: string;
+    progress: number;
+    eta?: string;
+  } | null>(null);
 
   const targetYear = Number(user?.targetYear) || new Date().getFullYear() + 1;
   const examDate = useMemo(() => new Date(`${targetYear}-05-25T09:00:00`), [targetYear]);
   const joinDate = useMemo(
     () => (user?.createdAt ? new Date(user.createdAt) : new Date()),
-    [user?.createdAt],
+    [user?.createdAt]
   );
-  const todayLabel = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
-    day: "numeric",
-    month: "short",
-  });
   const studentName = user?.name || "Student";
   const firstName = studentName.split(" ")[0];
-  const daysSinceJoin = Math.max(1, Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const daysSinceJoin = Math.max(
+    1,
+    Math.floor((Date.now() - joinDate.getTime()) / (1000 * 60 * 60 * 24))
+  );
   const dailyHours = parseDailyHours(user?.dailyStudyHours);
   const daysLeftForPrelims = Number(countdown.days) || 0;
   const preparationPhase = getPreparationPhase(daysLeftForPrelims);
-  const phaseMeta = phaseLabels[preparationPhase];
+  const greeting = getGreetingByHour(currentHour);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -87,7 +129,8 @@ export const HomePage = () => {
       const hours = Math.floor((left % 86400000) / 3600000);
       const mins = Math.floor((left % 3600000) / 60000);
       const secs = Math.floor((left % 60000) / 1000);
-      const progress = total > 0 ? Math.min(100, Number((((total - left) / total) * 100).toFixed(1))) : 0;
+      const progress =
+        total > 0 ? Math.min(100, Number((((total - left) / total) * 100).toFixed(1))) : 0;
 
       setCountdown({
         days: String(days).padStart(3, "0"),
@@ -108,7 +151,114 @@ export const HomePage = () => {
     return () => window.clearInterval(timer);
   }, []);
 
-  const greeting = getGreetingByHour(currentHour);
+  // Existing APIs only — soft-fail so Home always renders
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const ca = await currentAffairsAPI.list({ page: 1, limit: 5 });
+        if (cancelled) return;
+        const items = ca.data?.data?.items ?? [];
+        setCaItems(
+          items.map((it) => ({
+            id: it._id,
+            title: it.title,
+            category: it.gsPaper || "Current Affairs",
+            date: it.date
+              ? new Date(it.date).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                })
+              : undefined,
+            slug: it.slug,
+          }))
+        );
+      } catch {
+        /* ignore */
+      }
+
+      try {
+        const dash = await advancedStudyPlannerAPI.getDashboard();
+        if (cancelled) return;
+        const d = dash.data as {
+          streak?: number;
+          progress?: { daily?: { completed?: number; total?: number }; streak?: number };
+          dailyTasks?: Array<{
+            subject?: string;
+            topic?: string;
+            completed?: boolean;
+            duration?: number;
+          }>;
+          plan?: { motivationalLine?: string } | null;
+        };
+        const s = Number(d?.streak ?? d?.progress?.streak ?? 0);
+        if (s > 0) setStreak(s);
+
+        const tasks = Array.isArray(d?.dailyTasks) ? d.dailyTasks : [];
+        const next = tasks.find((t) => !t.completed) || tasks[0];
+        if (next) {
+          const done = tasks.filter((t) => t.completed).length;
+          const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+          setContinueMeta({
+            subject: next.subject || "Study Plan",
+            title: next.topic || "Today's study session",
+            progress: pct,
+            eta: next.duration ? `~${next.duration} mins left` : undefined,
+          });
+        }
+      } catch {
+        /* ignore */
+      }
+
+      try {
+        const [copyRes, prelimsRes] = await Promise.allSettled([
+          api.get("/api/performance"),
+          api.get("/api/tests/prelims-performance"),
+        ]);
+        if (cancelled) return;
+
+        let averageScore: number | null = null;
+        let accuracy: number | null = null;
+        let completion: number | null = null;
+        let weeklyGrowth: number | null = null;
+        let monthlyGrowth: number | null = null;
+        let solved = 0;
+
+        if (copyRes.status === "fulfilled") {
+          const data = copyRes.value.data?.data ?? copyRes.value.data;
+          if (data?.averageScore != null) averageScore = Number(data.averageScore);
+          if (Array.isArray(data?.history)) solved += data.history.length;
+          if (data?.improvementTrend != null) weeklyGrowth = Number(data.improvementTrend);
+        }
+        if (prelimsRes.status === "fulfilled") {
+          const data = prelimsRes.value.data?.data ?? prelimsRes.value.data;
+          if (data?.averageScore != null && averageScore == null) {
+            averageScore = Number(data.averageScore);
+          }
+          if (data?.totalTests != null) solved += Number(data.totalTests) || 0;
+          const hist = Array.isArray(data?.history) ? data.history : [];
+          if (hist.length) {
+            const last = hist[hist.length - 1];
+            if (last?.accuracy != null) accuracy = Number(last.accuracy);
+            else if (last?.percentage != null) accuracy = Number(last.percentage);
+          }
+          if (data?.preLimsReadiness != null) completion = Number(data.preLimsReadiness);
+          if (data?.improvementTrend != null) monthlyGrowth = Number(data.improvementTrend);
+        }
+
+        setQuestionsSolved(solved);
+        setPerf({ accuracy, averageScore, completion, weeklyGrowth, monthlyGrowth });
+      } catch {
+        /* ignore */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const upcomingSession = useMemo(() => {
     const background = (user?.educationBackground || "General Studies").trim();
     const subjectLabel = background === "Arts" ? "History" : background;
@@ -126,7 +276,11 @@ export const HomePage = () => {
     sessionDate.setHours(isFastTrack ? 6 : 19, 0, 0, 0);
 
     const dayText = new Intl.DateTimeFormat("en-IN", { weekday: "long" }).format(sessionDate);
-    const timeText = new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true }).format(sessionDate);
+    const timeText = new Intl.DateTimeFormat("en-IN", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(sessionDate);
 
     return {
       title: phaseTopicMap[preparationPhase],
@@ -134,120 +288,229 @@ export const HomePage = () => {
     };
   }, [dailyHours, preparationPhase, user?.educationBackground]);
 
+  const openDailyTargets = useCallback(() => {
+    navigate("/daily-targets");
+  }, [navigate]);
+
+  const quickActions = useMemo(
+    () => [
+      {
+        id: "targets",
+        label: "Daily Targets",
+        description: "Module goals",
+        icon: Target,
+        gradient: "bg-gradient-to-br from-blue-500 to-cyan-600",
+        to: "/daily-targets",
+      },
+      {
+        id: "practice",
+        label: "Practice Test",
+        description: "MCQ drills",
+        icon: ClipboardList,
+        gradient: "bg-gradient-to-br from-blue-600 to-indigo-600",
+        to: "/prelims-test",
+      },
+      {
+        id: "mentor",
+        label: "AI Mentor",
+        description: "Ask doubts",
+        icon: MessageCircle,
+        gradient: "bg-gradient-to-br from-violet-600 to-fuchsia-600",
+        action: () => setShowMentorDrawer(true),
+      },
+      {
+        id: "ca",
+        label: "Current Affairs",
+        description: "Daily briefs",
+        icon: Newspaper,
+        gradient: "bg-gradient-to-br from-emerald-600 to-teal-600",
+        to: "/current-affairs",
+      },
+      {
+        id: "planner",
+        label: "Study Planner",
+        description: "Daily plan",
+        icon: CalendarClock,
+        gradient: "bg-gradient-to-br from-sky-600 to-blue-600",
+        to: "/planner",
+      },
+      {
+        id: "eval",
+        label: "Copy Evaluation",
+        description: "Mains answers",
+        icon: FileText,
+        gradient: "bg-gradient-to-br from-amber-500 to-orange-600",
+        to: "/copy-evaluation",
+      },
+      {
+        id: "perf",
+        label: "Performance",
+        description: "Your stats",
+        icon: BarChart3,
+        gradient: "bg-gradient-to-br from-rose-500 to-pink-600",
+        to: "/performance",
+      },
+      {
+        id: "syllabus",
+        label: "Syllabus",
+        description: "Coverage map",
+        icon: BookOpen,
+        gradient: "bg-gradient-to-br from-slate-700 to-slate-900",
+        to: "/syllabus",
+      },
+      {
+        id: "mains",
+        label: "Mains 360",
+        description: "Materials",
+        icon: Library,
+        gradient: "bg-gradient-to-br from-indigo-500 to-blue-700",
+        to: "/mains-360",
+      },
+    ],
+    []
+  );
+
+  const upcomingItems: UpcomingItem[] = useMemo(
+    () => [
+      {
+        id: "session",
+        title: upcomingSession.title,
+        meta: upcomingSession.meta,
+        icon: CalendarClock,
+        tone: "bg-blue-50 text-blue-600",
+        onClick: () => navigate("/planner"),
+      },
+      {
+        id: "test",
+        title: "Practice Test ready",
+        meta: "Resume prelims practice anytime",
+        icon: ClipboardList,
+        tone: "bg-indigo-50 text-indigo-600",
+        onClick: () => navigate("/prelims-test"),
+      },
+      {
+        id: "eval",
+        title: "Pending Evaluation",
+        meta: "Check copy evaluation status",
+        icon: AlertCircle,
+        tone: "bg-amber-50 text-amber-600",
+        onClick: () => navigate("/copy-evaluation"),
+      },
+      {
+        id: "reminder",
+        title: "Study Reminder",
+        meta: `Day ${daysSinceJoin} · Target CSE ${targetYear}`,
+        icon: Bell,
+        tone: "bg-emerald-50 text-emerald-600",
+        onClick: openDailyTargets,
+      },
+    ],
+    [upcomingSession, navigate, daysSinceJoin, targetYear, openDailyTargets]
+  );
+
+  const continueCard = continueMeta || {
+    subject: "Module Targets",
+    title: "Resume your assigned modules",
+    progress: Math.min(100, Math.round(countdown.progress)),
+    eta: `${Number(countdown.days)} days to Prelims`,
+  };
+
   return (
-    <div className="student-dashboard-page">
-      <div className="sd-layout">
-        <div className="sd-main">
-          <section className="sd-hero">
-            <div className="sd-hero-top">
-              <div className="sd-hero-copy">
-                <h1>
-                  {greeting},{" "}
-                  <span className="sd-name-highlight">{firstName}</span>
-                </h1>
-                <p>
-                  Day {daysSinceJoin} of your journey · Target UPSC CSE {targetYear}
-                </p>
-              </div>
-              <div className="sd-hero-date">
-                <CalendarDays className="sd-hero-date-icon" aria-hidden />
-                <span>Today · {todayLabel}</span>
-              </div>
-            </div>
-          </section>
+    <div className="w-full min-w-0 max-w-full space-y-4 sm:space-y-5 pb-4 md:pb-2 animate-[sd-page-in_0.35s_ease-out]">
+      <GreetingCard
+        greeting={greeting}
+        firstName={firstName}
+        gender={user?.gender}
+      />
 
-          <Suspense fallback={<PageLoader />}>
-            <AssignedModuleTargets />
-          </Suspense>
+      <DailyProgressCard
+        progress={countdown.progress}
+        daysLeft={daysLeftForPrelims}
+        daysLabel={countdown.days}
+        hoursLabel={countdown.hours}
+        minsLabel={countdown.mins}
+        secsLabel={countdown.secs}
+        examLabel={`UPSC Prelims ${targetYear}`}
+        examDateLabel={`25 May ${targetYear}`}
+        studyHours={dailyHours}
+        streak={Math.max(1, streak)}
+        questionsSolved={questionsSolved}
+      />
+
+      <section aria-label="Quick actions">
+        <h2 className="mb-3 px-0.5 text-base font-bold text-slate-900">Quick Actions</h2>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+          {quickActions.map((a) => (
+            <QuickActionCard
+              key={a.id}
+              label={a.label}
+              description={a.description}
+              icon={a.icon}
+              gradient={a.gradient}
+              onClick={() => {
+                if (a.action) a.action();
+                else if (a.to) navigate(a.to);
+              }}
+            />
+          ))}
         </div>
+      </section>
 
-        <aside className="sd-sidebar">
-          <div className="sd-countdown-card">
-            <div className="sd-countdown-top">
-              <div>
-                <div className="sd-eyebrow">Exam Countdown</div>
-                <div className="sd-exam-label">UPSC Prelims {targetYear}</div>
-                <div className="sd-exam-date">25 May {targetYear}</div>
-              </div>
-              <div className="sd-countdown-ring" style={{ "--sd-progress": countdown.progress } as React.CSSProperties}>
-                <span>{Math.round(countdown.progress)}%</span>
-              </div>
-            </div>
-            <div className="sd-countdown-grid">
-              <div><strong>{countdown.days}</strong><span>Days</span></div>
-              <div><strong>{countdown.hours}</strong><span>Hrs</span></div>
-              <div><strong>{countdown.mins}</strong><span>Mins</span></div>
-              <div><strong>{countdown.secs}</strong><span>Secs</span></div>
-            </div>
-            <div className="sd-progress">
-              <div style={{ width: `${countdown.progress}%` }} />
-            </div>
-            <p>{Math.round(countdown.progress)}% elapsed · {Number(countdown.days)} days left</p>
-          </div>
+      <ContinueLearningCard
+        subject={continueCard.subject}
+        title={continueCard.title}
+        progress={continueCard.progress}
+        eta={continueCard.eta}
+        onContinue={() => {
+          if (continueMeta) navigate("/planner");
+          else openDailyTargets();
+        }}
+      />
 
-          <div className="sd-card sd-mentor-card">
-            <div className="sd-card-hd">
-              <div className="sd-card-title-wrap">
-                <span className="sd-card-icon sd-card-icon-ai"><Sparkles className="sd-card-svg" /></span>
-                <div>
-                  <h3>AI Mentor</h3>
-                  <small>Ask doubts anytime</small>
-                </div>
-              </div>
-              <span className="sd-live-badge">Live</span>
-            </div>
-            <div className="sd-chat">
-              <div className="ai">
-                <MessageCircle className="sd-chat-icon" />
-                <span>Want a quick revision on Repo vs Reverse Repo?</span>
-              </div>
-              <div className="me">
-                <span>Yes, explain inflation impact.</span>
-              </div>
-            </div>
-            <button type="button" className="full sd-mentor-btn" onClick={() => setShowMentorDrawer(true)}>
-              Open Mentor Chat
-            </button>
-          </div>
+      <DailyTargetsHub
+        progress={countdown.progress}
+        completedPct={countdown.progress}
+        timeStudiedLabel={`${dailyHours}h`}
+        questionsSolved={questionsSolved}
+        remainingTasks={Math.max(1, 6 - Math.min(5, Math.round(countdown.progress / 20)))}
+        streak={Math.max(1, streak)}
+        weeklyStreak={Math.max(1, streak)}
+        studyHours={dailyHours}
+        accuracy={perf.accuracy}
+        onResume={openDailyTargets}
+        onQuickRevision={() => navigate("/syllabus")}
+        onPractice={() => navigate("/prelims-test")}
+        onAskAI={() => setShowMentorDrawer(true)}
+        aiMessage={
+          daysLeftForPrelims > 0
+            ? `You have ${daysLeftForPrelims} days to Prelims ${targetYear}. Open Daily Targets and keep your ${Math.max(1, streak)}-day streak alive.`
+            : "Prelims window is here — revise weakly areas and attempt a short practice set."
+        }
+      />
 
-          <div className="sd-card sd-eval-card">
-            <div className="sd-card-hd">
-              <div className="sd-card-title-wrap">
-                <span className="sd-card-icon sd-card-icon-eval"><FileText className="sd-card-svg" /></span>
-                <div>
-                  <h3>Mains Evaluation</h3>
-                  <small>Recent submissions</small>
-                </div>
-              </div>
-            </div>
-            <ul className="sd-eval-list">
-              <li>
-                <div>
-                  <strong>Ethics Case Study</strong>
-                  <span>Evaluated</span>
-                </div>
-                <b>12.5 / 25</b>
-              </li>
-              <li>
-                <div>
-                  <strong>IR Indo-Pacific</strong>
-                  <span className="pending">In Review</span>
-                </div>
-              </li>
-            </ul>
-            <button type="button" className="full sd-outline-btn" onClick={() => navigate("/evaluation-history")}>
-              View All
-            </button>
-          </div>
+      <PerformanceCard
+        accuracy={perf.accuracy}
+        averageScore={perf.averageScore}
+        completion={perf.completion ?? Math.round(countdown.progress)}
+        weeklyGrowth={perf.weeklyGrowth}
+        monthlyGrowth={perf.monthlyGrowth}
+        onViewAll={() => navigate("/performance")}
+      />
 
-          <div className="sd-card session">
-            <div className="sd-session-icon"><CalendarClock className="sd-card-svg" /></div>
-            <span className="sd-session-label">Upcoming Session</span>
-            <h3>{upcomingSession.title}</h3>
-            <p>{upcomingSession.meta}</p>
-          </div>
-        </aside>
-      </div>
+      <UpcomingCard items={upcomingItems} />
+
+      <AIMentorCard onAsk={() => setShowMentorDrawer(true)} />
+
+      <CurrentAffairCard
+        items={caItems}
+        onViewAll={() => navigate("/current-affairs")}
+        onRead={(item) => {
+          if (item.slug) navigate(`/current-affairs/${item.slug}`);
+          else navigate("/current-affairs");
+        }}
+      />
+
+      <MotivationCard seed={daysSinceJoin} />
 
       <MentorChatDrawer open={showMentorDrawer} onClose={() => setShowMentorDrawer(false)} />
     </div>

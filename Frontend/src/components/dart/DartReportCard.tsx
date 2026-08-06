@@ -108,35 +108,35 @@ export const DartReportCard: React.FC<DartReportCardProps> = ({
   return (
     <div
       className={cn(
-        "rounded-xl border p-3 flex flex-col gap-2.5",
+        "flex flex-col gap-2.5 rounded-[20px] border p-3.5 shadow-soft",
         isDark
-          ? "bg-amber-950/20 border-amber-500/25"
-          : "bg-gradient-to-br from-amber-50/90 to-orange-50/50 border-amber-200/80",
+          ? "border-amber-500/25 bg-amber-950/20"
+          : "border-amber-200/80 bg-gradient-to-br from-amber-50/90 to-orange-50/50",
         className
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
           <span
             className={cn(
-              "shrink-0 p-1.5 rounded-md",
+              "shrink-0 rounded-xl p-2",
               isDark ? "bg-amber-500/20" : "bg-amber-200/70"
             )}
           >
-            <FileBarChart className="w-3.5 h-3.5 text-amber-600" />
+            <FileBarChart className="h-4 w-4 text-amber-600" />
           </span>
           <div className="min-w-0">
-            <p className={cn("text-xs font-semibold truncate", isDark ? "text-amber-100" : "text-amber-950")}>
+            <p className={cn("truncate text-xs font-bold", isDark ? "text-amber-100" : "text-amber-950")}>
               DART Reports
             </p>
-            <p className={cn("text-[10px] truncate", isDark ? "text-slate-500" : "text-amber-800/55")}>
-              PDF with charts
+            <p className={cn("truncate text-[10px]", isDark ? "text-slate-500" : "text-amber-800/55")}>
+              Weekly · Monthly · AI PDF summary
             </p>
           </div>
         </div>
         <div
           className={cn(
-            "flex p-0.5 rounded-lg shrink-0",
+            "flex shrink-0 rounded-xl p-0.5",
             isDark ? "bg-slate-800/80" : "bg-amber-100/80"
           )}
         >
@@ -146,7 +146,7 @@ export const DartReportCard: React.FC<DartReportCardProps> = ({
               type="button"
               onClick={() => setRange(p.id)}
               className={cn(
-                "px-2 py-1 text-[10px] font-bold rounded-md transition-all",
+                "app-chrome-btn rounded-lg px-2 py-1 text-[10px] font-bold transition-all",
                 range === p.id
                   ? "bg-amber-500 text-white shadow-sm"
                   : isDark
@@ -213,9 +213,9 @@ export const DartReportCard: React.FC<DartReportCardProps> = ({
         onClick={handleDownload}
         disabled={downloading || !canDownload}
         className={cn(
-          "w-full flex items-center justify-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg transition-all",
+          "app-chrome-btn flex h-11 w-full items-center justify-center gap-1.5 rounded-2xl px-3 text-xs font-bold transition-all",
           canDownload && !downloading
-            ? "bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+            ? "bg-amber-500 text-white shadow-sm hover:bg-amber-600"
             : isDark
             ? "bg-slate-800/80 text-slate-500 cursor-not-allowed"
             : "bg-amber-100 text-amber-400 cursor-not-allowed"

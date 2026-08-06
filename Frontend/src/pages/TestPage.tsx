@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
-  Clock,
   AlertCircle,
   Flag,
   ChevronRight,
   ChevronLeft,
   Maximize2,
   Minimize2,
-  Send,
+  LayoutGrid,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { ConfirmationDialog } from "../components/ui/dialog";
@@ -18,6 +17,12 @@ import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
 import { useClientSideHindiQuestions } from "../hooks/useClientSideHindiQuestions";
 import { testAPI, syllabusTargetsAPI } from "../services/api";
+import {
+  ExamTimer,
+  QuestionPalette,
+  BottomSheetPalette,
+  type PaletteStatus,
+} from "../components/tests";
 
 interface Question {
   _id: string;
@@ -48,18 +53,6 @@ interface TestData {
   isSubmitted: boolean;
 }
 
-type PaletteStatus = "not-visited" | "answered" | "marked" | "answered-marked" | "current";
-
-function formatCountdown(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  if (h > 0) {
-    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  }
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 /** 50Q → 60 min; 20Q → 24 min (proportional). */
 function resolveExamDurationMinutes(test: { durationMinutes?: number; totalQuestions?: number } | null): number {
   if (!test) return 60;
@@ -68,96 +61,6 @@ function resolveExamDurationMinutes(test: { durationMinutes?: number; totalQuest
   }
   const n = Number(test.totalQuestions) || 20;
   return Math.max(15, Math.round((n * 60) / 50));
-}
-
-function PalettePanel({
-  paletteStats,
-  paletteCols,
-  paletteBtnH,
-  test,
-  getPaletteStatus,
-  paletteBtnClass,
-  goToQuestion,
-  onSubmit,
-  isSubmitting,
-  compact = false,
-}: {
-  paletteStats: { done: number; marked: number; left: number };
-  paletteCols: number;
-  paletteBtnH: string;
-  test: TestData;
-  getPaletteStatus: (i: number) => PaletteStatus;
-  paletteBtnClass: (s: PaletteStatus) => string;
-  goToQuestion: (i: number) => void;
-  onSubmit: () => void;
-  isSubmitting: boolean;
-  compact?: boolean;
-}) {
-  return (
-    <>
-      {!compact && (
-        <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100">
-          <h2 className="font-bold text-slate-800 text-xs">Question Palette</h2>
-          <div className="flex gap-2 mt-1 text-[10px] font-medium">
-            <span className="text-emerald-600">{paletteStats.done} done</span>
-            <span className="text-amber-500">{paletteStats.marked} marked</span>
-            <span className="text-slate-400">{paletteStats.left} left</span>
-          </div>
-        </div>
-      )}
-      {compact && (
-        <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100">
-          <div className="flex gap-3 text-[11px] font-medium">
-            <span className="text-emerald-600">{paletteStats.done} done</span>
-            <span className="text-amber-500">{paletteStats.marked} marked</span>
-            <span className="text-slate-400">{paletteStats.left} left</span>
-          </div>
-        </div>
-      )}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-slate-100 grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] sm:text-[10px] text-slate-500">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded border border-slate-300 bg-white shrink-0" /> Not visited
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-emerald-500 shrink-0" /> Answered
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-amber-400 shrink-0" /> Marked
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-violet-600 shrink-0" /> Ans+Marked
-        </div>
-      </div>
-      <div className="flex-1 min-h-0 px-2 sm:px-3 py-2 overflow-y-auto">
-        <div
-          className="w-full grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${paletteCols}, minmax(0, 1fr))` }}
-        >
-          {test.questions.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => goToQuestion(index)}
-              className={`${paletteBtnH} rounded text-[10px] sm:text-[11px] font-semibold border transition-colors ${paletteBtnClass(getPaletteStatus(index))}`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="flex-shrink-0 p-2 sm:p-3 border-t border-slate-100">
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={isSubmitting}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs sm:text-sm transition-colors"
-        >
-          <Send className="w-4 h-4" />
-          Submit Test
-        </button>
-      </div>
-    </>
-  );
 }
 
 const TestPage: React.FC = () => {
@@ -197,7 +100,7 @@ const TestPage: React.FC = () => {
   const { lang: examLang, setLang: setExamLang } = useExamLanguage();
   const [test, setTest] = useState<TestData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { questions: displayQuestions, translating: translatingHi } = useClientSideHindiQuestions(
+  const { questions: displayQuestions } = useClientSideHindiQuestions(
     test?.questions || [],
     examLang,
     currentIndex
@@ -423,21 +326,6 @@ const TestPage: React.FC = () => {
     return visitedIndices.has(index) ? "not-visited" : "not-visited";
   };
 
-  const paletteBtnClass = (status: PaletteStatus) => {
-    switch (status) {
-      case "current":
-        return "border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold";
-      case "answered":
-        return "bg-emerald-500 text-white border-emerald-500";
-      case "marked":
-        return "bg-amber-400 text-white border-amber-400";
-      case "answered-marked":
-        return "bg-violet-600 text-white border-violet-600";
-      default:
-        return "bg-white text-slate-600 border-slate-200 hover:border-slate-300";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[50vh] bg-slate-100">
@@ -473,47 +361,34 @@ const TestPage: React.FC = () => {
 
   return (
     <div className="h-[100dvh] flex flex-col bg-slate-100 text-slate-900 overflow-hidden">
-      {/* Top exam bar */}
-      <header className="flex-shrink-0 bg-white border-b border-slate-200 px-2 sm:px-4 py-2 shadow-sm safe-area-inset-top">
-        <div className="flex items-start sm:items-center justify-between gap-2 max-w-[1600px] mx-auto w-full">
+      {/* ── Exam App Bar ── */}
+      <header className="flex-shrink-0 bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-sm pt-[env(safe-area-inset-top,0px)]">
+        {/* Row 1: progress · timer · actions */}
+        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 h-12 sm:h-14 max-w-[1600px] mx-auto w-full">
           <div className="min-w-0 flex-1">
-            <h1 className="text-[11px] sm:text-sm font-bold text-slate-900 truncate leading-tight">
+            <p className="text-[10px] sm:text-xs font-semibold text-slate-500 truncate leading-none mb-0.5 hidden sm:block">
               {test.topic}
-            </h1>
-            <p className="text-[9px] sm:text-[11px] text-slate-500 leading-tight mt-0.5 flex flex-wrap gap-x-1.5 gap-y-0">
-              <span>Q {currentIndex + 1}/{test.totalQuestions}</span>
-              <span className="text-slate-300 hidden sm:inline">·</span>
-              <span className="text-emerald-600 font-medium">+2 marks</span>
-              <span className="text-slate-300 hidden sm:inline">·</span>
-              <span className="text-red-500 font-medium">-0.66 wrong</span>
-              {test.difficulty ? (
-                <>
-                  <span className="text-slate-300 hidden sm:inline">·</span>
-                  <span className="font-medium text-slate-600">{test.difficulty}</span>
-                </>
-              ) : null}
             </p>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact />
-            {translatingHi ? (
-              <span className="text-[9px] text-slate-400 hidden sm:inline">हिंदी…</span>
-            ) : null}
-            <span className="text-[9px] sm:text-[11px] font-semibold text-slate-500 tabular-nums">
-              {attemptedCount}/{test.totalQuestions}
-            </span>
-            <div
-              className={`flex items-center gap-1 px-2 py-1 rounded-md font-mono text-[11px] sm:text-xs font-bold ${
-                timeRemaining < 300 ? "bg-red-50 text-red-600" : "bg-slate-100 text-slate-700"
-              }`}
-            >
-              <Clock className="w-3.5 h-3.5 shrink-0" />
-              {formatCountdown(timeRemaining)}
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-sm sm:text-base font-extrabold text-slate-900 tabular-nums tracking-tight">
+                Q {currentIndex + 1}
+              </span>
+              <span className="text-xs font-medium text-slate-400 tabular-nums">
+                / {test.totalQuestions}
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400 tabular-nums ml-1">
+                · {attemptedCount} done
+              </span>
             </div>
+          </div>
+
+          <ExamTimer remainingSeconds={timeRemaining} className="shrink-0" />
+
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="hidden md:flex p-1.5 rounded-md hover:bg-slate-100 text-slate-500"
+              className="app-chrome-btn hidden md:flex h-9 w-9 items-center justify-center rounded-xl hover:bg-slate-100 text-slate-500"
               title="Fullscreen"
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -521,26 +396,54 @@ const TestPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowSubmitDialog(true)}
-              className="hidden sm:inline-flex px-2.5 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white text-[10px] sm:text-xs font-bold"
+              className="app-chrome-btn hidden sm:inline-flex h-9 px-3 items-center justify-center rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-bold"
             >
               Submit
             </button>
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="xl:hidden inline-flex px-2 py-1 rounded-md bg-slate-100 text-[10px] font-semibold text-slate-700"
+              className="app-chrome-btn xl:hidden inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-700 active:bg-slate-200"
+              aria-label="Question palette"
+              title="Palette"
             >
-              Palette
+              <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* Row 2: marking scheme + language */}
+        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 pb-2.5 max-w-[1600px] mx-auto w-full">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-x-auto scrollbar-hide">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold whitespace-nowrap">
+              +2
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-600 text-[10px] font-bold whitespace-nowrap">
+              −0.66
+            </span>
+            {test.difficulty ? (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold whitespace-nowrap">
+                {test.difficulty}
+              </span>
+            ) : null}
+          </div>
+          <ExamLanguageToggle lang={examLang} onChange={setExamLang} compact className="shrink-0" />
+        </div>
+
+        {/* Progress strip */}
+        <div className="h-1 w-full bg-slate-100">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-[width] duration-300 ease-out"
+            style={{ width: `${((currentIndex + 1) / test.totalQuestions) * 100}%` }}
+          />
         </div>
       </header>
 
       {/* Main + palette */}
       <div className="flex-1 min-h-0 flex overflow-hidden max-w-[1600px] mx-auto w-full">
         {/* Question area */}
-        <div className="flex-1 min-w-0 flex flex-col overflow-hidden p-1.5 sm:p-2 md:p-3">
-          <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-2 sm:px-3 md:px-4 pt-2 sm:pt-3 pb-2">
             <UpscExamPaperShell>
               <div className="px-3 sm:px-5 py-3 sm:py-4">
                 <ExamQuestionBody question={currentQuestion} compact lang={examLang} />
@@ -564,46 +467,45 @@ const TestPage: React.FC = () => {
             </UpscExamPaperShell>
           </div>
 
-          {/* Bottom nav */}
-          <div className="flex-shrink-0 pt-1.5 sm:pt-2">
-            <div className="grid grid-cols-3 gap-1 sm:gap-2">
+          {/* Fixed bottom action bar */}
+          <div className="flex-shrink-0 border-t border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-[0_-8px_24px_rgba(15,23,42,0.06)] px-2 sm:px-3 pt-2 pb-[max(env(safe-area-inset-bottom),8px)]">
+            <div className="grid grid-cols-[1fr_auto_1.4fr] gap-2 max-w-[1600px] mx-auto">
               <button
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentIndex === 0}
-                className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg border border-slate-300 bg-white text-[10px] sm:text-xs font-medium text-slate-600 disabled:opacity-40 min-h-[40px]"
+                className="app-chrome-btn inline-flex items-center justify-center gap-1 h-11 rounded-2xl border border-slate-200 bg-white text-xs font-semibold text-slate-600 disabled:opacity-35 active:scale-[0.98] transition-transform"
               >
-                <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
-                <span className="hidden min-[400px]:inline">Previous</span>
-                <span className="min-[400px]:hidden">Prev</span>
+                <ChevronLeft className="w-4 h-4 shrink-0" />
+                <span className="hidden min-[380px]:inline">Prev</span>
               </button>
               <button
                 type="button"
                 onClick={toggleMarkReview}
-                className={`inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-2 rounded-lg border text-[10px] sm:text-xs font-medium min-h-[40px] ${
+                className={`app-chrome-btn inline-flex items-center justify-center gap-1.5 h-11 px-3 sm:px-4 rounded-2xl border text-xs font-semibold active:scale-[0.98] transition-transform ${
                   isMarked
-                    ? "border-amber-400 bg-amber-50 text-amber-700"
-                    : "border-slate-300 bg-white text-slate-600"
+                    ? "border-amber-300 bg-amber-50 text-amber-700"
+                    : "border-slate-200 bg-white text-slate-600"
                 }`}
               >
-                <Flag className={`w-3 h-3 shrink-0 ${isMarked ? "fill-amber-500 text-amber-500" : ""}`} />
-                <span className="truncate">Mark</span>
+                <Flag className={`w-3.5 h-3.5 shrink-0 ${isMarked ? "fill-amber-500 text-amber-500" : ""}`} />
+                <span>Mark</span>
               </button>
               {currentIndex < test.questions.length - 1 ? (
                 <button
                   type="button"
                   onClick={handleSaveAndNext}
-                  className="inline-flex items-center justify-center gap-0.5 sm:gap-1 px-1 sm:px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs font-semibold min-h-[40px]"
+                  className="app-chrome-btn inline-flex items-center justify-center gap-1 h-11 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/25 active:scale-[0.98] transition-transform"
                 >
-                  <span className="truncate">Save &amp; Next</span>
-                  <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                  <span>Next</span>
+                  <ChevronRight className="w-4 h-4 shrink-0" />
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => setShowSubmitDialog(true)}
                   disabled={isSubmitting}
-                  className="inline-flex items-center justify-center gap-1 px-2 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs font-semibold min-h-[40px]"
+                  className="app-chrome-btn inline-flex items-center justify-center gap-1 h-11 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/25 active:scale-[0.98] transition-transform"
                 >
                   Submit
                 </button>
@@ -613,60 +515,42 @@ const TestPage: React.FC = () => {
         </div>
 
         {/* Question palette — desktop sidebar */}
-        <aside className="hidden xl:flex flex-shrink-0 w-[260px] 2xl:w-[280px] bg-white border-l border-slate-200 flex-col overflow-hidden">
-          <PalettePanel
-            paletteStats={paletteStats}
-            paletteCols={paletteColsDesktop}
-            paletteBtnH={paletteBtnH}
-            test={test}
-            getPaletteStatus={getPaletteStatus}
-            paletteBtnClass={paletteBtnClass}
-            goToQuestion={goToQuestion}
+        <aside className="hidden xl:flex w-[260px] 2xl:w-[280px] flex-shrink-0 flex-col overflow-hidden border-l border-slate-200 bg-white">
+          <QuestionPalette
+            total={test.totalQuestions}
+            cols={paletteColsDesktop}
+            btnH={paletteBtnH}
+            getStatus={getPaletteStatus}
+            onSelect={goToQuestion}
+            stats={paletteStats}
             onSubmit={() => setShowSubmitDialog(true)}
-            isSubmitting={isSubmitting}
+            submitting={isSubmitting}
           />
         </aside>
 
-        {/* Mobile / tablet palette drawer */}
-        {paletteOpen && (
-          <>
-            <button
-              type="button"
-              className="xl:hidden fixed inset-0 bg-black/40 z-40"
-              onClick={() => setPaletteOpen(false)}
-              aria-label="Close palette"
-            />
-            <aside className="xl:hidden fixed inset-y-0 right-0 z-50 w-[min(280px,88vw)] bg-white shadow-2xl flex flex-col">
-              <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100">
-                <span className="font-bold text-sm text-slate-800">Question Palette</span>
-                <button
-                  type="button"
-                  onClick={() => setPaletteOpen(false)}
-                  className="text-xs font-medium text-slate-500 px-2 py-1 rounded hover:bg-slate-100"
-                >
-                  Close
-                </button>
-              </div>
-              <PalettePanel
-                paletteStats={paletteStats}
-                paletteCols={paletteColsMobile}
-                paletteBtnH={paletteBtnH}
-                test={test}
-                getPaletteStatus={getPaletteStatus}
-                paletteBtnClass={paletteBtnClass}
-                goToQuestion={goToQuestion}
-                onSubmit={() => setShowSubmitDialog(true)}
-                isSubmitting={isSubmitting}
-                compact
-              />
-            </aside>
-          </>
-        )}
+        <BottomSheetPalette
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          title="Question Palette"
+          subtitle={`${paletteStats.done} done · ${paletteStats.marked} marked · ${paletteStats.left} left`}
+        >
+          <QuestionPalette
+            total={test.totalQuestions}
+            cols={paletteColsMobile}
+            btnH={paletteBtnH}
+            getStatus={getPaletteStatus}
+            onSelect={goToQuestion}
+            stats={paletteStats}
+            onSubmit={() => setShowSubmitDialog(true)}
+            submitting={isSubmitting}
+            compact
+          />
+        </BottomSheetPalette>
       </div>
 
       {error && (
-        <div className="flex-shrink-0 mx-4 mb-2 px-4 py-2 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="mx-3 mb-2 flex flex-shrink-0 items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>
       )}
@@ -676,11 +560,11 @@ const TestPage: React.FC = () => {
         title="Submit Test"
         message={
           attemptedCount === 0
-            ? "You haven't answered any questions. Are you sure you want to submit?"
-            : `You have attempted ${attemptedCount} of ${test.totalQuestions} questions. Once submitted, you cannot change your answers.`
+            ? `No answers yet · ${paletteStats.marked} marked · ${Math.floor(timeRemaining / 60)}m left. Submit anyway?`
+            : `Answered ${attemptedCount}/${test.totalQuestions} · Marked ${paletteStats.marked} · ${Math.floor(timeRemaining / 60)}m remaining. You cannot change answers after submit.`
         }
         confirmText="Submit Test"
-        cancelText="Cancel"
+        cancelText="Resume"
         confirmButtonClass="bg-red-600 hover:bg-red-700 text-white"
         onConfirm={handleConfirmSubmit}
         onCancel={() => setShowSubmitDialog(false)}

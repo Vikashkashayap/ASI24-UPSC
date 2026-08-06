@@ -1,0 +1,24 @@
+{
+  "name": "MD Student Portal",
+  "short_name": "MD Portal",
+  "description": "MentorsDaily student dashboard for UPSC preparation",
+  "start_url": "/home",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f1e3d",
+  "theme_color": "#0f1e3d",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "/brand/app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

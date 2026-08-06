@@ -36,6 +36,7 @@ const ContactUsPage = lazyPage(() => import("./pages/ContactUs"), "ContactUsPage
 
 // Student dashboard
 const HomePage = lazyPage(() => import("./pages/HomePage"), "HomePage");
+const DailyTargetsPage = lazyPage(() => import("./pages/DailyTargetsPage"));
 const SyllabusPage = lazyPage(() => import("./pages/SyllabusPage"), "SyllabusPage");
 const PerformanceDashboardPage = lazyPage(
   () => import("./pages/PerformanceDashboardPage"),
@@ -189,6 +190,7 @@ function App() {
               }
             >
               <Route path="home" element={<HomePage />} />
+              <Route path="daily-targets" element={<DailyTargetsPage />} />
               <Route path="syllabus" element={<SyllabusPage />} />
               <Route path="performance" element={<PerformanceDashboardPage />} />
               <Route path="planner" element={<PlannerPage />} />

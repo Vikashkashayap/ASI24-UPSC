@@ -41,6 +41,7 @@ import { PlanSyllabusTimeline } from "../components/advancedStudyPlanner/PlanSyl
 import { toDateString } from "../components/advancedStudyPlanner/plannerUtils";
 import { cn } from "../utils/cn";
 import { Bell, Target } from "lucide-react";
+import { GamificationStrip, InsightCard } from "../components/aiExperience";
 
 export const PlannerPage = () => {
   const { user } = useAuth();
@@ -195,25 +196,20 @@ export const PlannerPage = () => {
 
   if (!plan) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 px-1">
+      <div className="mx-auto max-w-3xl space-y-6 px-1 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "rounded-3xl p-8 text-center border-2",
-            theme === "dark"
-              ? "bg-gradient-to-br from-blue-950/50 to-indigo-950/30 border-blue-500/20"
-              : "bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200"
-          )}
+          className="rounded-[20px] border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-8 text-center shadow-soft"
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-3xl font-extrabold text-transparent">
             AI Study Planner
           </h1>
-          <p className="mt-2 text-sm opacity-80 max-w-md mx-auto">
-            Your personal UPSC/MPPSC preparation coach — analyzes weak areas, builds adaptive plans, and tracks readiness.
+          <p className="mx-auto mt-2 max-w-md text-sm font-medium text-slate-600">
+            Your personal UPSC/MPPSC coach — adaptive daily plans, revision, and readiness tracking.
           </p>
         </motion.div>
-        {error && <p className="text-rose-500 text-sm text-center">{error}</p>}
+        {error && <p className="text-center text-sm text-rose-500">{error}</p>}
         <SmartSetupForm onSubmit={handleGenerate} isLoading={setupLoading} />
       </div>
     );
@@ -250,6 +246,21 @@ export const PlannerPage = () => {
           onRefreshMotivation={handleRefreshMotivation}
           regenerating={setupLoading}
         />
+
+        <GamificationStrip
+          streak={progress?.streak ?? plan.currentStreak ?? 0}
+          longest={progress?.longestStreak ?? plan.longestStreak ?? 0}
+          xp={plan.xpPoints ?? 0}
+        />
+
+        {insights[0] ? (
+          <InsightCard
+            title={insights[0].title || "AI planner insight"}
+            body={insights[0].message || "Stay consistent with today’s plan."}
+            cta="Refresh insights"
+            onAction={() => void handleRefreshInsights()}
+          />
+        ) : null}
 
         {/* Exam alert */}
         {daysRemaining != null && daysRemaining <= 30 && (

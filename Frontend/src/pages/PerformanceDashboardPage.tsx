@@ -45,6 +45,14 @@ import {
   Smile
 } from "lucide-react";
 import { DartReportCard } from "../components/dart/DartReportCard";
+import {
+  PerformanceCard,
+  AIInsightsPanel,
+  SubjectAnalyticsCard,
+  BadgeCard,
+  ACHIEVEMENT_PRESETS,
+  ProgressRing,
+} from "../components/analytics";
 
 const COLORS = [
   "#2563eb", // purple
@@ -199,6 +207,72 @@ export const PerformanceDashboardPage = () => {
 
   const combinedMetrics = getCombinedMetrics();
 
+  const aiInsights = useMemo(() => {
+    const items: { id: string; text: string }[] = [];
+    const readiness = prelimsPerformanceData?.preLimsReadiness;
+    const strengths: string[] = readiness?.strengths || [];
+    const weaknesses: string[] = readiness?.weaknesses || [];
+    const subjects: { subject?: string; name?: string; averageScore?: number; accuracy?: number }[] =
+      prelimsPerformanceData?.subjectBreakdown || copyPerformanceData?.subjectBreakdown || [];
+
+    if (weaknesses[0]) {
+      items.push({ id: "w1", text: `You lose most marks around ${weaknesses[0]}. Schedule a focused revision block this week.` });
+    }
+    if (strengths[0]) {
+      items.push({ id: "s1", text: `Your strongest signal is ${strengths[0]}. Protect it with short weekly revision quizzes.` });
+    }
+
+    const sorted = [...subjects].sort(
+      (a, b) => (b.averageScore ?? b.accuracy ?? 0) - (a.averageScore ?? a.accuracy ?? 0)
+    );
+    const top = sorted[0];
+    const bottom = sorted[sorted.length - 1];
+    if (top && (top.subject || top.name)) {
+      items.push({
+        id: "top",
+        text: `Strongest subject: ${top.subject || top.name}. Average ${Math.round(top.averageScore ?? top.accuracy ?? 0)}%.`,
+      });
+    }
+    if (bottom && sorted.length > 1 && (bottom.subject || bottom.name)) {
+      items.push({
+        id: "bottom",
+        text: `${bottom.subject || bottom.name} needs more practice — accuracy/score is lagging vs peers of your attempt mix.`,
+      });
+    }
+
+    if (dartAnalytics?.consistencyIndex != null && dartAnalytics.consistencyIndex < 50) {
+      items.push({
+        id: "cons",
+        text: "Consistency is below 50%. Aim for 6+ study hours on at least 4 days this week.",
+      });
+    } else if ((dartAnalytics?.performanceScore ?? 0) >= 70) {
+      items.push({
+        id: "perf",
+        text: "UPSC readiness is trending well. Keep DART logging and convert weak topics into daily targets.",
+      });
+    }
+
+    if (items.length === 0) {
+      items.push({
+        id: "start",
+        text: "Recommended today: take one Modular Test and submit one Copy Evaluation to unlock deeper AI analytics.",
+      });
+    }
+
+    return items.slice(0, 4);
+  }, [prelimsPerformanceData, copyPerformanceData, dartAnalytics]);
+
+  const subjectCards = useMemo(() => {
+    const rows: { name: string; score: number }[] =
+      (prelimsPerformanceData?.subjectBreakdown || copyPerformanceData?.subjectBreakdown || []).map(
+        (s: { subject?: string; name?: string; averageScore?: number; accuracy?: number }) => ({
+          name: String(s.subject || s.name || "Subject"),
+          score: Number(s.averageScore ?? s.accuracy ?? 0),
+        })
+      );
+    return rows.slice(0, 8);
+  }, [prelimsPerformanceData, copyPerformanceData]);
+
   const chartTooltipStyle = {
     backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
     border: theme === "dark" ? "1px solid #334155" : "1px solid #e2e8f0",
@@ -230,75 +304,120 @@ export const PerformanceDashboardPage = () => {
 
   const renderOverviewTab = () => (
     <div className="space-y-6">
+      <AIInsightsPanel
+        insights={aiInsights}
+        cta="Open Modular Test"
+        onAction={() => navigate("/practice-test")}
+      />
+
       {/* Metric strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-        {[
-          {
-            label: "Overall average",
-            value: loading ? "…" : `${combinedMetrics.overallAverage}%`,
-            sub: "Copy + Prelims",
-            icon: Target,
-            tone: "blue",
-          },
-          {
-            label: "Total activities",
-            value: loading ? "…" : String(combinedMetrics.totalActivities),
-            sub: "Tests & evaluations",
-            icon: Activity,
-            tone: "cyan",
-          },
-          {
-            label: "Copy evaluations",
-            value: loading ? "…" : String(combinedMetrics.copyEvaluations),
-            sub: "Mains answers",
-            icon: FileText,
-            tone: "indigo",
-          },
-          {
-            label: "Prelims tests",
-            value: loading ? "…" : String(combinedMetrics.prelimsTests),
-            sub: "MCQ attempts",
-            icon: ClipboardList,
-            tone: "amber",
-          },
-        ].map((m) => {
-          const Icon = m.icon;
-          const tones: Record<string, string> = {
-            blue: theme === "dark" ? "border-blue-500/25 bg-blue-500/10" : "border-blue-100 bg-blue-50/70",
-            cyan: theme === "dark" ? "border-cyan-500/25 bg-cyan-500/10" : "border-cyan-100 bg-cyan-50/70",
-            indigo: theme === "dark" ? "border-indigo-500/25 bg-indigo-500/10" : "border-indigo-100 bg-indigo-50/70",
-            amber: theme === "dark" ? "border-amber-500/25 bg-amber-500/10" : "border-amber-100 bg-amber-50/70",
-          };
-          const iconTone: Record<string, string> = {
-            blue: "text-blue-500",
-            cyan: "text-cyan-500",
-            indigo: "text-indigo-500",
-            amber: "text-amber-500",
-          };
-          return (
-            <div
-              key={m.label}
-              className={`rounded-2xl border p-4 ${tones[m.tone]} ${
-                theme === "dark" ? "" : "shadow-sm"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2 mb-2">
-                <p className={`text-[11px] font-bold uppercase tracking-wide ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
-                  {m.label}
-                </p>
-                <Icon className={`w-4 h-4 ${iconTone[m.tone]}`} />
-              </div>
-              <p className={`text-2xl md:text-3xl font-bold ${theme === "dark" ? "text-slate-50" : "text-slate-900"}`}>
-                {m.value}
-              </p>
-              <p className={`text-xs mt-1 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>{m.sub}</p>
-            </div>
-          );
-        })}
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
+        <PerformanceCard
+          label="Overall average"
+          value={loading ? "…" : `${combinedMetrics.overallAverage}%`}
+          hint="Copy + Prelims"
+          icon={Target}
+          tone="blue"
+          trend={combinedMetrics.combinedTrend || undefined}
+        />
+        <PerformanceCard
+          label="Total activities"
+          value={loading ? "…" : String(combinedMetrics.totalActivities)}
+          hint="Tests & evaluations"
+          icon={Activity}
+          tone="cyan"
+        />
+        <PerformanceCard
+          label="Copy evaluations"
+          value={loading ? "…" : String(combinedMetrics.copyEvaluations)}
+          hint="Mains answers"
+          icon={FileText}
+          tone="violet"
+        />
+        <PerformanceCard
+          label="Prelims tests"
+          value={loading ? "…" : String(combinedMetrics.prelimsTests)}
+          hint="MCQ attempts"
+          icon={ClipboardList}
+          tone="amber"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <PerformanceCard
+          label="AI / Perf score"
+          value={String(dartAnalytics?.performanceScore ?? 0)}
+          hint={dartAnalytics?.performanceScoreLevel ?? "UPSC readiness"}
+          icon={Sparkles}
+          tone="emerald"
+        />
+        <PerformanceCard
+          label="Consistency"
+          value={`${dartAnalytics?.consistencyIndex ?? 0}%`}
+          hint="6+ hr study days"
+          icon={Zap}
+          tone="cyan"
+        />
+        <PerformanceCard
+          label="Study entries"
+          value={String(dartAnalytics?.entriesCountLast7 ?? dartAnalytics?.entriesCount ?? 0)}
+          hint="Last 7 days DART"
+          icon={Clock}
+          tone="blue"
+        />
+        <PerformanceCard
+          label="Answer writing"
+          value={String(dartAnalytics?.answerWritingWeeklyCount ?? 0)}
+          hint="This week"
+          icon={Award}
+          tone="rose"
+        />
+      </div>
+
+      {subjectCards.length > 0 ? (
+        <div>
+          <h3 className="mb-3 text-base font-bold text-slate-900">Subject analytics</h3>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {subjectCards.map((s) => (
+              <SubjectAnalyticsCard
+                key={s.name}
+                title={s.name}
+                progress={Math.min(100, s.score)}
+                accuracy={s.score}
+                averageScore={s.score}
+                strongTopics={s.score >= 70 ? ["Solid base"] : []}
+                weakTopics={s.score < 50 ? ["Needs revision"] : []}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div>
+        <h3 className="mb-3 text-base font-bold text-slate-900">Achievements</h3>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {ACHIEVEMENT_PRESETS.map((b) => (
+            <BadgeCard
+              key={b.key}
+              title={b.title}
+              description={b.description}
+              icon={b.icon}
+              unlocked={
+                b.key === "streak"
+                  ? (dartAnalytics?.consistencyIndex ?? 0) >= 40
+                  : b.key === "tests"
+                    ? combinedMetrics.totalActivities >= 10
+                    : b.key === "fast"
+                      ? (combinedMetrics.combinedTrend || 0) > 0
+                      : combinedMetrics.overallAverage >= 70
+              }
+            />
+          ))}
+        </div>
       </div>
 
       {/* Main graphs */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-2">
         <Card className={`border ${theme === "dark" ? "bg-slate-800/80 border-slate-700" : "bg-white border-slate-200 shadow-sm"}`}>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Score trend</CardTitle>
@@ -1239,46 +1358,42 @@ export const PerformanceDashboardPage = () => {
   const enrollmentName = dartAnalytics?.enrollmentName || user?.name || "Student";
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-6 lg:space-y-8 overflow-x-hidden">
+    <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden px-3 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8 lg:space-y-8">
       {/* Welcome + compact metric strip */}
-      <div className={`rounded-xl p-3 md:p-4 border ${
-        theme === "dark" ? "bg-slate-800/80 border-slate-700/60" : "bg-white border-slate-200/80 shadow-sm"
-      }`}>
-        <h2 className={`text-sm md:text-base font-semibold mb-3 flex items-center gap-1.5 ${
-          theme === "dark" ? "text-slate-100" : "text-slate-900"
-        }`}>
-          <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
-          Welcome, {enrollmentName}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+      <div className="rounded-[20px] border border-slate-200/80 bg-white p-4 shadow-soft sm:p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600">Performance Home</p>
+            <h2 className="mt-0.5 flex items-center gap-2 text-lg font-extrabold text-slate-900 sm:text-xl">
+              <Sparkles className="h-5 w-5 text-blue-500" />
+              Welcome, {enrollmentName}
+            </h2>
+          </div>
+          <ProgressRing value={dartAnalytics?.consistencyIndex ?? combinedMetrics.overallAverage} size={72} label="Ready" />
+        </div>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {/* Performance Score */}
-          <div className={`rounded-xl border p-3 flex items-center gap-3 ${
-            theme === "dark"
-              ? "bg-slate-900/60 border-blue-500/20"
-              : "bg-blue-50/40 border-blue-100"
-          }`}>
-            <div className={`shrink-0 p-2 rounded-lg ${
-              theme === "dark" ? "bg-blue-500/15" : "bg-blue-100"
-            }`}>
-              <Target className="w-4 h-4 text-blue-500" />
+          <div className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-3">
+            <div className="shrink-0 rounded-xl bg-blue-100 p-2">
+              <Target className="h-4 w-4 text-blue-600" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className={`text-[10px] font-medium uppercase tracking-wide ${
-                theme === "dark" ? "text-slate-500" : "text-slate-500"
-              }`}>
-                Performance Score
-              </p>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className={`text-xl font-bold leading-none ${
-                  (dartAnalytics?.performanceScore ?? 0) >= 80 ? "text-green-500" :
-                  (dartAnalytics?.performanceScore ?? 0) >= 60 ? "text-blue-500" :
-                  (dartAnalytics?.performanceScore ?? 0) >= 40 ? "text-amber-500" : "text-slate-500"
-                }`}>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Performance Score</p>
+              <div className="mt-0.5 flex items-baseline gap-2">
+                <span
+                  className={`text-xl font-extrabold leading-none ${
+                    (dartAnalytics?.performanceScore ?? 0) >= 80
+                      ? "text-emerald-600"
+                      : (dartAnalytics?.performanceScore ?? 0) >= 60
+                        ? "text-blue-600"
+                        : (dartAnalytics?.performanceScore ?? 0) >= 40
+                          ? "text-amber-600"
+                          : "text-slate-500"
+                  }`}
+                >
                   {dartAnalytics?.performanceScore ?? 0}
                 </span>
-                <span className={`text-[11px] truncate ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-500"
-                }`}>
+                <span className="truncate text-[11px] text-slate-500">
                   {dartAnalytics?.performanceScoreLevel ?? "Needs Improvement"}
                 </span>
               </div>
@@ -1286,45 +1401,11 @@ export const PerformanceDashboardPage = () => {
           </div>
 
           {/* Consistency Index */}
-          <div className={`rounded-xl border p-3 flex items-center gap-3 ${
-            theme === "dark"
-              ? "bg-slate-900/60 border-cyan-500/20"
-              : "bg-cyan-50/40 border-cyan-100"
-          }`}>
-            <div className="relative w-11 h-11 shrink-0">
-              <svg className="w-11 h-11 -rotate-90" viewBox="0 0 36 36">
-                <path
-                  className="text-cyan-500/20 stroke-[3]"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeDasharray="100"
-                  d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
-                />
-                <path
-                  className="text-cyan-500 stroke-[3] transition-all duration-500"
-                  stroke="currentColor"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray="100"
-                  strokeDashoffset={100 - (dartAnalytics?.consistencyIndex ?? 0)}
-                  d="M18 2.5 a 15.5 15.5 0 0 1 0 31 a 15.5 15.5 0 0 1 0 -31"
-                />
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-cyan-500">
-                {dartAnalytics?.consistencyIndex ?? 0}%
-              </span>
-            </div>
+          <div className="flex items-center gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/40 p-3">
+            <ProgressRing value={dartAnalytics?.consistencyIndex ?? 0} size={64} label="" />
             <div className="min-w-0 flex-1">
-              <p className={`text-[10px] font-medium uppercase tracking-wide ${
-                theme === "dark" ? "text-slate-500" : "text-slate-500"
-              }`}>
-                Consistency
-              </p>
-              <p className={`text-[11px] mt-0.5 leading-snug ${
-                theme === "dark" ? "text-slate-400" : "text-slate-600"
-              }`}>
-                Days with 6+ hrs study
-              </p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Consistency</p>
+              <p className="mt-0.5 text-[11px] leading-snug text-slate-600">Days with 6+ hrs study</p>
             </div>
           </div>
 
@@ -1337,46 +1418,38 @@ export const PerformanceDashboardPage = () => {
       </div>
 
       {/* Header + timeframe + tabs */}
-      <div className={`rounded-2xl border p-4 md:p-5 ${
-        theme === "dark"
-          ? "bg-slate-800/80 border-slate-700"
-          : "bg-white border-slate-200 shadow-sm"
-      }`}>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+      <div className="rounded-[20px] border border-slate-200/80 bg-white p-4 shadow-soft md:p-5">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2.5">
-              <div className={`p-2 rounded-xl shrink-0 ${theme === "dark" ? "bg-blue-500/20" : "bg-blue-50"}`}>
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+              <div className="shrink-0 rounded-2xl bg-blue-50 p-2">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
               </div>
               <div className="min-w-0">
-                <h1 className={`text-lg md:text-2xl font-bold tracking-tight truncate ${
-                  theme === "dark" ? "text-slate-50" : "text-slate-900"
-                }`}>
+                <h1 className="truncate text-lg font-extrabold tracking-tight text-slate-900 md:text-2xl">
                   Performance Dashboard
                 </h1>
-                <p className={`text-xs md:text-sm mt-0.5 ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+                <p className="mt-0.5 text-xs text-slate-500 md:text-sm">
                   Graphs for Copy, Prelims & DART study habits
                 </p>
               </div>
             </div>
           </div>
-          <div className={`flex items-center gap-1 p-1 rounded-xl self-start sm:self-auto ${
-            theme === "dark" ? "bg-slate-900/70" : "bg-slate-100"
-          }`}>
-            {([
-              { id: "week" as const, label: "Week" },
-              { id: "month" as const, label: "Month" },
-              { id: "all" as const, label: "All Time" },
-            ]).map((tf) => (
+          <div className="flex items-center gap-1 self-start rounded-2xl bg-slate-100 p-1 sm:self-auto">
+            {(
+              [
+                { id: "week" as const, label: "Week" },
+                { id: "month" as const, label: "Month" },
+                { id: "all" as const, label: "All Time" },
+              ]
+            ).map((tf) => (
               <button
                 key={tf.id}
                 type="button"
                 onClick={() => setSelectedTimeframe(tf.id)}
-                className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold min-h-[40px] transition ${
+                className={`app-chrome-btn min-h-[40px] rounded-xl px-3 py-2 text-xs font-bold sm:text-sm ${
                   selectedTimeframe === tf.id
                     ? "bg-blue-600 text-white shadow-sm"
-                    : theme === "dark"
-                    ? "text-slate-400 hover:text-slate-200"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -1386,14 +1459,14 @@ export const PerformanceDashboardPage = () => {
           </div>
         </div>
 
-        <div className={`flex gap-1 p-1 rounded-xl ${
-          theme === "dark" ? "bg-slate-900/60" : "bg-slate-50"
-        }`}>
-            {([
-            { id: "overview" as const, label: "Overview", Icon: BarChart3 },
-            { id: "copy-evaluation" as const, label: "Copy Eval", Icon: FileText },
-            { id: "prelims" as const, label: "Prelims", Icon: ClipboardList },
-          ]).map((tab) => {
+        <div className="flex gap-1 rounded-2xl bg-slate-50 p-1">
+          {(
+            [
+              { id: "overview" as const, label: "Overview", Icon: BarChart3 },
+              { id: "copy-evaluation" as const, label: "Copy Eval", Icon: FileText },
+              { id: "prelims" as const, label: "Prelims", Icon: ClipboardList },
+            ]
+          ).map((tab) => {
             const Icon = tab.Icon;
             const active = activeTab === tab.id;
             return (
@@ -1401,15 +1474,13 @@ export const PerformanceDashboardPage = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2.5 rounded-lg text-xs sm:text-sm font-semibold min-h-[44px] transition ${
+                className={`app-chrome-btn flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-xs font-bold sm:px-3 sm:text-sm ${
                   active
                     ? "bg-blue-600 text-white shadow-sm"
-                    : theme === "dark"
-                    ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white"
+                    : "text-slate-600 hover:bg-white hover:text-slate-900"
                 }`}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className="h-4 w-4 shrink-0" />
                 <span>{tab.label}</span>
               </button>
             );
@@ -1418,7 +1489,7 @@ export const PerformanceDashboardPage = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6 min-w-0">
+      <div className="mt-2 min-w-0">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeTab}
@@ -1428,9 +1499,9 @@ export const PerformanceDashboardPage = () => {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="min-w-0"
           >
-            {activeTab === 'overview' && renderOverviewTab()}
-            {activeTab === 'copy-evaluation' && renderCopyEvaluationTab()}
-            {activeTab === 'prelims' && renderPrelimsTab()}
+            {activeTab === "overview" && renderOverviewTab()}
+            {activeTab === "copy-evaluation" && renderCopyEvaluationTab()}
+            {activeTab === "prelims" && renderPrelimsTab()}
           </motion.div>
         </AnimatePresence>
       </div>

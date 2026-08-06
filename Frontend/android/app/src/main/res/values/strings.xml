@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MD Student Portal</string>
+    <string name="title_activity_main">MD Student Portal</string>
+    <string name="package_name">com.mentorsdaily.studentportal</string>
+    <string name="custom_url_scheme">com.mentorsdaily.studentportal</string>
+</resources>

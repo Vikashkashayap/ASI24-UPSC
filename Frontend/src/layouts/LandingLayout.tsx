@@ -27,7 +27,7 @@ export const LandingLayout = () => {
   return (
     <>
       <SEO {...seo} />
-    <div className={`min-h-screen overflow-y-auto scroll-smooth scrollbar-hide transition-colors ${
+    <div className={`min-h-[100dvh] min-h-screen overflow-x-hidden overflow-y-auto scroll-smooth scrollbar-hide transition-colors ${
       theme === "dark" ? "page-dots-bg-dark text-slate-50" : "page-dots-bg-light text-slate-900"
     }`}>
       {/* Fixed header: offer strip on top, navbar below – padding follows height so no gap when banner is dismissed */}
@@ -35,7 +35,10 @@ export const LandingLayout = () => {
         <OfferBanner />
         <LandingNavbar />
       </header>
-      <main style={headerHeight > 0 ? { paddingTop: `${headerHeight}px` } : undefined} className={`transition-[padding] duration-200 ${headerHeight > 0 ? "" : "pt-24 md:pt-28"}`}>
+      <main
+        style={headerHeight > 0 ? { paddingTop: `${headerHeight}px` } : undefined}
+        className={`min-w-0 max-w-full transition-[padding] duration-200 ${headerHeight > 0 ? "" : "pt-20 md:pt-28"}`}
+      >
         <TopBanner />
         <Outlet />
       </main>

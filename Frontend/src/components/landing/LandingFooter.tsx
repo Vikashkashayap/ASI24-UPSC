@@ -17,11 +17,12 @@ export const LandingFooter = () => {
         {/* LEFT SECTION - logo aligned same as navbar */}
         <div className="space-y-4 md:max-w-xs">
 
-          <Link to="/" className="flex items-center shrink-0 select-none" aria-label="Home">
+          <Link to="/" className="flex shrink-0 select-none items-center" aria-label="Home">
             <img
               src={logoImg}
               alt="MentorsDaily"
-              className="h-9 md:h-10 w-auto object-contain object-left"
+              className="h-8 w-auto max-w-[160px] object-contain object-left sm:h-9 md:h-10 md:max-w-none"
+              decoding="async"
             />
           </Link>
 

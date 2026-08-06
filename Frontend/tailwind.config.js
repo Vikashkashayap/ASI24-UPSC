@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -16,10 +17,18 @@ export default {
           navy: "#0f1e3d",
           "navy-soft": "#1a3366",
           indigo: "#6366f1",
+          sky: "#38bdf8",
+          gold: "#f59e0b",
         },
         "royal-blue": "#2563eb",
         "royal-blue-dark": "#1d4ed8",
         "hero-bg": "#f0f9ff",
+      },
+      spacing: {
+        "safe-top": "var(--safe-top)",
+        "safe-bottom": "var(--safe-bottom)",
+        "safe-left": "var(--safe-left)",
+        "safe-right": "var(--safe-right)",
       },
       boxShadow: {
         soft: "0 10px 30px rgba(15, 23, 42, 0.08)",

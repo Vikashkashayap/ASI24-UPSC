@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
@@ -21,6 +22,13 @@ import { UpscExamPaperShell } from "../components/exam/UpscExamPaperShell";
 import { useExamLanguage } from "../hooks/useExamLanguage";
 import { useClientSideHindiQuestions } from "../hooks/useClientSideHindiQuestions";
 import { testAPI } from "../services/api";
+import {
+  ResultCard,
+  AISummaryCard,
+  AnalyticsChart,
+  BottomSheetPalette,
+  SubjectCard,
+} from "../components/tests";
 
 interface QuestionResult {
   _id: string;
@@ -164,6 +172,7 @@ const TestResultPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [analysisOpen, setAnalysisOpen] = useState(true);
 
   useEffect(() => {
     if (id) loadResult();
@@ -256,6 +265,11 @@ const TestResultPage: React.FC = () => {
   const currentQuestion = displayQuestions[currentIndex] || result.questions[currentIndex];
   const optionKeys = getQuestionOptionKeys(currentQuestion);
   const totalMarks = result.totalMarks ?? result.totalQuestions * 2;
+  const skipped = result.totalQuestions - result.correctAnswers - result.wrongAnswers;
+  const aiMessage =
+    result.accuracy >= 70
+      ? `Strong attempt on ${result.subject}. Accuracy ${Math.round(result.accuracy)}%. Review wrong answers and revise related ${result.topic} notes.`
+      : `Accuracy ${Math.round(result.accuracy)}% on ${result.subject}. Focus revision on ${result.topic}, then re-attempt a short practice set.`;
   const paletteColsDesktop = examPaletteCols(result.totalQuestions, false);
   const paletteColsMobile = examPaletteCols(result.totalQuestions, true);
   const paletteBtnH =
@@ -302,6 +316,15 @@ const TestResultPage: React.FC = () => {
                 {formatTimeSpent(currentQuestion.timeSpent)}
               </div>
             )}
+            <button
+              type="button"
+              onClick={() => setAnalysisOpen(true)}
+              className="app-chrome-btn inline-flex h-8 items-center gap-1 rounded-xl bg-indigo-50 px-2 text-[10px] font-bold text-indigo-700"
+              aria-label="Open analysis"
+            >
+              <BarChart3 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Analysis</span>
+            </button>
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
@@ -393,13 +416,13 @@ const TestResultPage: React.FC = () => {
               onClick={() => setPaletteOpen(false)}
               aria-label="Close review palette"
             />
-            <aside className="xl:hidden fixed inset-y-0 right-0 z-50 w-[min(280px,88vw)] bg-white shadow-2xl flex flex-col">
+            <aside className="xl:hidden fixed inset-y-0 right-0 z-50 w-[min(280px,88vw)] bg-white shadow-2xl flex flex-col pb-[env(safe-area-inset-bottom)]">
               <div className="flex items-center justify-between px-3 py-2 border-b border-slate-100">
                 <span className="font-bold text-sm text-slate-800">Question Review</span>
                 <button
                   type="button"
                   onClick={() => setPaletteOpen(false)}
-                  className="text-xs font-medium text-slate-500 px-2 py-1 rounded hover:bg-slate-100"
+                  className="app-chrome-btn h-9 rounded-xl bg-slate-100 px-3 text-xs font-semibold text-slate-600"
                 >
                   Close
                 </button>
@@ -418,6 +441,46 @@ const TestResultPage: React.FC = () => {
           </>
         )}
       </div>
+
+      <BottomSheetPalette
+        open={analysisOpen}
+        onClose={() => setAnalysisOpen(false)}
+        title="Result Analytics"
+        subtitle={`${result.subject} · ${result.topic}`}
+        mobileOnly={false}
+      >
+        <div className="space-y-3 px-4 pb-5 pt-1">
+          <ResultCard
+            score={result.score}
+            totalMarks={totalMarks}
+            accuracy={result.accuracy}
+            correct={result.correctAnswers}
+            incorrect={result.wrongAnswers}
+            skipped={skipped}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <SubjectCard
+              title={result.subject}
+              accuracy={result.accuracy}
+              tone={result.accuracy >= 60 ? "strong" : "weak"}
+            />
+            <SubjectCard
+              title={result.topic}
+              accuracy={result.accuracy}
+              tone={result.accuracy >= 70 ? "strong" : "weak"}
+            />
+          </div>
+          <AnalyticsChart
+            title="Attempt mix"
+            items={[
+              { label: "Correct", value: result.correctAnswers, tone: "bg-emerald-500" },
+              { label: "Incorrect", value: result.wrongAnswers, tone: "bg-red-500" },
+              { label: "Skipped", value: skipped, tone: "bg-slate-400" },
+            ]}
+          />
+          <AISummaryCard message={aiMessage} cta="Continue review" onAction={() => setAnalysisOpen(false)} />
+        </div>
+      </BottomSheetPalette>
     </div>
   );
 };

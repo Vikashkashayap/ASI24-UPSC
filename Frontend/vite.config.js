@@ -31,6 +31,8 @@ function manualChunks(id) {
 }
 
 export default defineConfig({
+  // Relative base required for Capacitor Android/iOS WebView (file / https asset paths)
+  base: "./",
   plugins: [react()],
   resolve: {
     dedupe: ["react", "react-dom"],

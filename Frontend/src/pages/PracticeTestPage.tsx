@@ -1,22 +1,26 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Loader2,
   Target,
-  Play,
-  BookOpen,
   History,
-  Search,
-  Calendar,
-  FileText,
-  Clock,
-  TrendingUp,
+  Trophy,
+  Crosshair,
+  Clock3,
+  CheckCircle2,
+  Play,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
 import { Pagination } from "../components/ui/pagination";
-import { useTheme } from "../hooks/useTheme";
 import { assignedPracticeAPI } from "../services/api";
+import {
+  TestCard,
+  TestPageHeader,
+  TestFilterBar,
+  TestEmptyState,
+  TestSkeleton,
+  TestStatCard,
+  AISummaryCard,
+  type TestCardStatus,
+} from "../components/tests";
 
 interface AssignedPracticeItem {
   _id: string;
@@ -44,10 +48,14 @@ function formatAssignedDate(iso: string): string {
   });
 }
 
+function cardStatus(t: AssignedPracticeItem): TestCardStatus {
+  if (t.attempted && t.attempt?.isSubmitted) return "done";
+  if (t.attempted && t.attempt && !t.attempt.isSubmitted) return "in_progress";
+  return "not_started";
+}
+
 export const PracticeTestPage: React.FC = () => {
-  const { theme } = useTheme();
   const navigate = useNavigate();
-  const isDark = theme === "dark";
 
   const [assignedTests, setAssignedTests] = useState<AssignedPracticeItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +63,8 @@ export const PracticeTestPage: React.FC = () => {
   const [startingId, setStartingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
+  const [statusChip, setStatusChip] = useState("all");
+  const [sortChip, setSortChip] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -82,11 +92,35 @@ export const PracticeTestPage: React.FC = () => {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [assignedTests]);
 
+  const stats = useMemo(() => {
+    const done = assignedTests.filter((t) => t.attempted && t.attempt?.isSubmitted);
+    const inProgress = assignedTests.filter(
+      (t) => t.attempted && t.attempt && !t.attempt.isSubmitted
+    );
+    const scored = done.filter((t) => t.attempt?.score != null);
+    const avg =
+      scored.length > 0
+        ? scored.reduce((s, t) => s + (t.attempt?.score || 0), 0) / scored.length
+        : null;
+    const mins = assignedTests.reduce((s, t) => s + (t.durationMinutes || 0), 0);
+    return {
+      upcoming: assignedTests.length - done.length - inProgress.length,
+      resume: inProgress.length,
+      completed: done.length,
+      avgScore: avg,
+      timeSpentLabel: mins > 0 ? `${mins}m` : "—",
+    };
+  }, [assignedTests]);
+
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     const subject = subjectFilter.trim().toLowerCase();
-    return assignedTests.filter((t) => {
+    let list = assignedTests.filter((t) => {
       if (subject && t.subject.toLowerCase() !== subject) return false;
+      const st = cardStatus(t);
+      if (statusChip === "attempted" && st !== "done" && st !== "in_progress") return false;
+      if (statusChip === "not_attempted" && st !== "not_started") return false;
+      if (statusChip === "in_progress" && st !== "in_progress") return false;
       if (!q) return true;
       return (
         (t.title || "").toLowerCase().includes(q) ||
@@ -95,13 +129,19 @@ export const PracticeTestPage: React.FC = () => {
         (t.difficulty && t.difficulty.toLowerCase().includes(q))
       );
     });
-  }, [assignedTests, searchQuery, subjectFilter]);
+    list = [...list].sort((a, b) => {
+      const da = new Date(a.createdAt).getTime();
+      const db = new Date(b.createdAt).getTime();
+      return sortChip === "oldest" ? da - db : db - da;
+    });
+    return list;
+  }, [assignedTests, searchQuery, subjectFilter, statusChip, sortChip]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, subjectFilter]);
+  }, [searchQuery, subjectFilter, statusChip, sortChip]);
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages);
@@ -130,300 +170,167 @@ export const PracticeTestPage: React.FC = () => {
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case "easy":
-        return "text-green-600 bg-green-100";
-      case "moderate":
-        return "text-yellow-600 bg-yellow-100";
-      case "hard":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
+  const resumeItem = assignedTests.find(
+    (t) => t.attempted && t.attempt && !t.attempt.isSubmitted && t.attempt.testId
+  );
 
-  const statusLabel = (t: AssignedPracticeItem) => {
-    if (t.attempted && t.attempt?.isSubmitted) return "Done";
-    if (t.attempted && t.attempt && !t.attempt.isSubmitted) return "In progress";
-    return "Not started";
-  };
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() || subjectFilter.trim() || statusChip !== "all"
+  );
 
-  const hasActiveFilters = Boolean(searchQuery.trim() || subjectFilter.trim());
+  const aiMessage =
+    stats.resume > 0
+      ? `You have ${stats.resume} modular test${stats.resume === 1 ? "" : "s"} in progress. Resume now to protect your attempt streak.`
+      : stats.completed > 0
+        ? `You've completed ${stats.completed} modular test${stats.completed === 1 ? "" : "s"}. Keep practicing weak topics from your results.`
+        : "Start your first assigned modular test. Focus on accuracy before speed.";
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 md:space-y-6 pb-8 px-3 md:px-4">
-      <div
-        className={`relative overflow-hidden rounded-2xl p-5 md:p-6 border-2 ${
-          isDark
-            ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10"
-            : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
-        }`}
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3 md:gap-4 min-w-0">
-            <div
-              className={`p-2.5 md:p-3 rounded-xl shrink-0 ${
-                isDark ? "bg-blue-500/20" : "bg-blue-100"
-              }`}
-            >
-              <Target className={`w-6 h-6 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
-            </div>
-            <div className="min-w-0">
-              <h1
-                className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-                  isDark
-                    ? "from-blue-200 via-blue-300 to-sky-300 bg-clip-text text-transparent"
-                    : "from-blue-700 via-blue-800 to-slate-800 bg-clip-text text-transparent"
-                }`}
-              >
-                Practice Test
-              </h1>
-              <p className={`text-sm mt-0.5 ${isDark ? "text-slate-300" : "text-slate-600"}`}>
-                Tests assigned to you by your admin — topic-based practice
-              </p>
-            </div>
-          </div>
-          <Button
+    <div className="mx-auto max-w-7xl space-y-5 pb-[max(2rem,env(safe-area-inset-bottom))] px-3 md:space-y-6 md:px-4">
+      <TestPageHeader
+        title="Modular Test"
+        subtitle="Admin-assigned topic practice — start, resume, and review"
+        icon={Target}
+        accent="blue"
+        action={
+          <button
             type="button"
             onClick={() => navigate("/practice-test/history")}
-            className="flex items-center gap-2 shrink-0 bg-blue-600 hover:bg-blue-700 text-white"
+            className="app-chrome-btn inline-flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-4 text-[13px] font-bold text-white shadow-md shadow-blue-600/20 active:scale-95"
           >
-            <History className="w-4 h-4" />
+            <History className="h-4 w-4" />
             View History
-          </Button>
-        </div>
+          </button>
+        }
+      />
+
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+        <TestStatCard label="Upcoming" value={String(stats.upcoming)} icon={Play} tone="bg-sky-50 text-sky-600" />
+        <TestStatCard label="Resume" value={String(stats.resume)} icon={Clock3} tone="bg-amber-50 text-amber-600" />
+        <TestStatCard label="Completed" value={String(stats.completed)} icon={CheckCircle2} tone="bg-emerald-50 text-emerald-600" />
+        <TestStatCard
+          label="Avg Score"
+          value={stats.avgScore == null ? "—" : stats.avgScore.toFixed(1)}
+          icon={Trophy}
+          tone="bg-violet-50 text-violet-600"
+        />
+        <TestStatCard
+          label="Scheduled"
+          value={stats.timeSpentLabel}
+          hint="Total duration"
+          icon={Crosshair}
+          tone="bg-blue-50 text-blue-600"
+        />
       </div>
 
+      <AISummaryCard
+        message={aiMessage}
+        cta={resumeItem ? "Resume Test" : undefined}
+        onAction={
+          resumeItem?.attempt?.testId
+            ? () => navigate(`/test/${resumeItem.attempt!.testId}`)
+            : undefined
+        }
+      />
+
       {error && (
-        <div
-          className={`rounded-xl border px-4 py-3 text-sm text-center ${
-            isDark
-              ? "bg-red-950/30 border-red-800 text-red-300"
-              : "bg-red-50 border-red-200 text-red-800"
-          }`}
-        >
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-800">
           {error}
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Search by title, topic, or difficulty..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-10 pr-4 py-3 rounded-xl border-2 focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 outline-none ${
-              isDark
-                ? "bg-slate-800/80 border-slate-700 text-slate-200 placeholder:text-slate-500"
-                : "bg-white border-slate-200 text-slate-800 placeholder:text-slate-400 shadow-sm"
+      <TestFilterBar
+        search={searchQuery}
+        onSearch={setSearchQuery}
+        placeholder="Search by title, topic, or difficulty…"
+        subject={subjectFilter}
+        subjects={subjects}
+        onSubject={setSubjectFilter}
+        chips={[
+          { id: "all", label: "All" },
+          { id: "not_attempted", label: "Not attempted" },
+          { id: "in_progress", label: "In progress" },
+          { id: "attempted", label: "Attempted" },
+        ]}
+        activeChip={statusChip}
+        onChipChange={setStatusChip}
+      />
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" role="tablist" aria-label="Sort">
+        {(
+          [
+            ["newest", "Newest"],
+            ["oldest", "Oldest"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={sortChip === id}
+            onClick={() => setSortChip(id)}
+            className={`app-chrome-btn h-10 shrink-0 rounded-full px-4 text-[12px] font-bold ${
+              sortChip === id
+                ? "bg-blue-600 text-white shadow-md shadow-blue-600/25"
+                : "border border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700"
             }`}
-          />
-        </div>
-        <select
-          value={subjectFilter}
-          onChange={(e) => setSubjectFilter(e.target.value)}
-          aria-label="Filter by subject"
-          className={`sm:w-52 shrink-0 px-3 py-3 rounded-xl border-2 focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 outline-none ${
-            isDark
-              ? "bg-slate-800/80 border-slate-700 text-slate-200"
-              : "bg-white border-slate-200 text-slate-800 shadow-sm"
-          }`}
-        >
-          <option value="">All subjects</option>
-          {subjects.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
-          <Loader2 className="w-5 h-5 animate-spin" /> Loading practice tests…
-        </div>
+        <TestSkeleton />
       ) : filtered.length === 0 ? (
-        <Card>
-          <CardContent className="pt-12 pb-12 text-center">
-            <Target
-              className={`w-16 h-16 mx-auto mb-4 ${isDark ? "text-slate-600" : "text-slate-400"}`}
-            />
-            <h3
-              className={`text-lg font-medium mb-2 ${
-                isDark ? "text-slate-300" : "text-slate-700"
-              }`}
-            >
-              {hasActiveFilters ? "No tests found" : "No practice tests assigned yet"}
-            </h3>
-            <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-              {hasActiveFilters
-                ? "Try adjusting your search or subject filter"
-                : "When your admin assigns a topic practice test, it will appear here."}
-            </p>
-          </CardContent>
-        </Card>
+        <TestEmptyState
+          icon={Target}
+          title={hasActiveFilters ? "No tests found" : "No practice tests assigned yet"}
+          description={
+            hasActiveFilters
+              ? "Try adjusting your search or filters"
+              : "When your admin assigns a topic practice test, it will appear here."
+          }
+        />
       ) : (
         <>
-          <div className="flex items-center justify-between gap-2 px-0.5">
-            <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              {filtered.length} test{filtered.length === 1 ? "" : "s"}
-              {hasActiveFilters ? " found" : ""}
-            </p>
-          </div>
+          <p className="px-0.5 text-sm font-medium text-slate-500">
+            {filtered.length} test{filtered.length === 1 ? "" : "s"}
+            {hasActiveFilters ? " found" : ""}
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 md:gap-4">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {pageItems.map((t) => {
-              const status = statusLabel(t);
+              const status = cardStatus(t);
               return (
-                <Card
+                <TestCard
                   key={t._id}
-                  className={`group relative flex flex-col overflow-hidden border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
-                    isDark
-                      ? "bg-slate-800/70 border-slate-700/80 hover:border-blue-500/40"
-                      : "bg-white border-slate-200/90 hover:border-blue-300 shadow-sm"
-                  }`}
-                >
-                  <CardContent className="flex flex-col flex-1 p-4 pt-4">
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div
-                        className={`p-2 rounded-lg shrink-0 ${
-                          isDark ? "bg-blue-900/40" : "bg-blue-50"
-                        }`}
-                      >
-                        <BookOpen
-                          className={`w-[18px] h-[18px] ${
-                            isDark ? "text-blue-400" : "text-blue-600"
-                          }`}
-                        />
-                      </div>
-                      <span
-                        className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full shrink-0 ${
-                          status === "Done"
-                            ? isDark
-                              ? "bg-emerald-900/40 text-emerald-400"
-                              : "bg-emerald-50 text-emerald-700"
-                            : status === "In progress"
-                              ? isDark
-                                ? "bg-amber-900/40 text-amber-400"
-                                : "bg-amber-50 text-amber-700"
-                              : isDark
-                                ? "bg-slate-700 text-slate-300"
-                                : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {status}
-                      </span>
-                    </div>
-
-                    <h3
-                      className={`font-semibold text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] ${
-                        isDark ? "text-slate-100" : "text-slate-900"
-                      }`}
-                      title={t.title || `${t.subject} — ${t.topic}`}
-                    >
-                      {t.title || `${t.subject} — ${t.topic}`}
-                    </h3>
-
-                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      <span
-                        className={`text-xs font-medium truncate max-w-[55%] ${
-                          isDark ? "text-slate-300" : "text-slate-600"
-                        }`}
-                        title={t.subject}
-                      >
-                        {t.subject}
-                      </span>
-                      {t.difficulty ? (
-                        <span
-                          className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold capitalize ${getDifficultyColor(
-                            t.difficulty
-                          )}`}
-                        >
-                          {t.difficulty}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <div
-                      className={`mt-3 space-y-1.5 text-xs ${
-                        isDark ? "text-slate-400" : "text-slate-500"
-                      }`}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 shrink-0" />
-                        <span>
-                          {t.totalQuestions} Q · {t.durationMinutes} min
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">
-                          Assigned {formatAssignedDate(t.createdAt)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {t.attempted && t.attempt?.isSubmitted && t.attempt.score != null ? (
-                      <div
-                        className={`mt-3 flex items-center gap-1.5 rounded-lg px-2.5 py-2 ${
-                          isDark ? "bg-emerald-900/25" : "bg-emerald-50"
-                        }`}
-                      >
-                        <TrendingUp className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span className="text-sm font-semibold text-emerald-600">
-                          Score: {t.attempt.score}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="mt-3 h-[38px]" aria-hidden />
-                    )}
-
-                    <div className="mt-auto pt-3">
-                      {t.attempted && t.attempt ? (
-                        t.attempt.isSubmitted ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => navigate(`/result/${t.attempt!.testId}`)}
-                          >
-                            View Result
-                          </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                            onClick={() => navigate(`/test/${t.attempt!.testId}`)}
-                          >
-                            <Play className="mr-1.5 h-3.5 w-3.5" />
-                            Continue
-                          </Button>
-                        )
-                      ) : (
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                          onClick={() => void handleStart(t._id)}
-                          disabled={startingId === t._id}
-                        >
-                          {startingId === t._id ? (
-                            <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-                          ) : (
-                            <Play className="mr-1.5 h-3.5 w-3.5" />
-                          )}
-                          Start Test
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                  title={t.title || `${t.subject} — ${t.topic}`}
+                  subject={t.subject}
+                  difficulty={t.difficulty}
+                  questions={t.totalQuestions}
+                  durationMinutes={t.durationMinutes}
+                  marks={t.totalMarks}
+                  meta={`Assigned ${formatAssignedDate(t.createdAt)}`}
+                  status={status}
+                  accent="blue"
+                  scoreLabel={
+                    status === "done" && t.attempt?.score != null
+                      ? `Score: ${t.attempt.score}`
+                      : undefined
+                  }
+                  starting={startingId === t._id}
+                  onStart={status === "not_started" ? () => void handleStart(t._id) : undefined}
+                  onResume={
+                    status === "in_progress" && t.attempt?.testId
+                      ? () => navigate(`/test/${t.attempt!.testId}`)
+                      : undefined
+                  }
+                  onReview={
+                    status === "done" && t.attempt?.testId
+                      ? () => navigate(`/result/${t.attempt!.testId}`)
+                      : undefined
+                  }
+                />
               );
             })}
           </div>

@@ -29,7 +29,7 @@ export const LandingHero = () => {
         theme === "dark" ? "hero-dots-bg-dark" : "hero-dots-bg-light"
       }`}
     >
-      <div className="mx-auto max-w-4xl px-4 pb-12 pt-14 md:pb-16 md:pt-20 text-center">
+      <div className="mx-auto max-w-4xl px-3 pb-10 pt-8 text-center sm:px-4 sm:pt-10 md:pb-16 md:pt-16">
         {/* Top tagline */}
         <p
           className={`text-sm md:text-base ${
@@ -59,12 +59,12 @@ export const LandingHero = () => {
         </p>
 
         {/* CTAs - all open WhatsApp to +91 87662 33193 */}
-        <div className="mt-6 flex flex-col xs:flex-row flex-wrap items-center justify-center gap-3">
+        <div className="mt-6 flex flex-col flex-wrap items-center justify-center gap-3 xs:flex-row">
           <a
             href={`https://wa.me/918766233193?text=${encodeURIComponent("Hi! I'm interested in MentorsDaily. I'd like to explore courses.")}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-11 w-full xs:w-auto rounded-lg bg-[#2563eb] px-6 text-sm font-semibold text-white shadow-md hover:bg-[#1d4ed8] md:px-8 transition-colors min-h-[44px]"
+            className="inline-flex h-11 min-h-[44px] w-full items-center justify-center rounded-lg bg-[#2563eb] px-6 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[#1d4ed8] xs:w-auto md:px-8"
           >
             Explore Courses →
           </a>
@@ -72,7 +72,9 @@ export const LandingHero = () => {
             href={`https://wa.me/918766233193?text=${encodeURIComponent("Hi! I'd like to enquire about MentorsDaily.")}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-11 w-full xs:w-auto rounded-lg border-2 border-[#2563eb] bg-white px-5 text-sm font-medium text-[#2563eb] hover:bg-blue-50 md:px-6 transition-colors min-h-[44px]"
+            className={`inline-flex h-11 min-h-[44px] w-full items-center justify-center rounded-lg border-2 border-[#2563eb] px-5 text-sm font-medium text-[#2563eb] transition-colors xs:w-auto md:px-6 ${
+              theme === "dark" ? "bg-slate-900/60 hover:bg-slate-800" : "bg-white hover:bg-blue-50"
+            }`}
           >
             Enquire Now
           </a>
@@ -80,7 +82,9 @@ export const LandingHero = () => {
             href={`https://wa.me/918766233193?text=${encodeURIComponent("Hi! I'd like to book a free consultation for MentorsDaily.")}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center h-11 w-full xs:w-auto rounded-lg border-2 border-[#2563eb] bg-white px-5 text-sm font-medium text-[#2563eb] hover:bg-blue-50 md:px-6 transition-colors min-h-[44px]"
+            className={`inline-flex h-11 min-h-[44px] w-full items-center justify-center rounded-lg border-2 border-[#2563eb] px-5 text-sm font-medium text-[#2563eb] transition-colors xs:w-auto md:px-6 ${
+              theme === "dark" ? "bg-slate-900/60 hover:bg-slate-800" : "bg-white hover:bg-blue-50"
+            }`}
           >
             Book Free Consultation
           </a>

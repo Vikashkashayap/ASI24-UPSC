@@ -62,7 +62,20 @@ api.interceptors.response.use(
   (err) => {
     const status = err?.response?.status;
     const redirectTo = err?.response?.data?.redirectTo;
+    const message = err?.response?.data?.message || "";
     const currentPath = window.location.pathname;
+
+    // Session expiry — clear local auth shell (no API / auth contract change)
+    if (
+      status === 401 &&
+      (message === "Token failed" ||
+        message === "Token expired" ||
+        message === "Invalid token" ||
+        message === "Not authorized" ||
+        message === "Unauthorized")
+    ) {
+      window.dispatchEvent(new CustomEvent("md:session-expired"));
+    }
 
     // For most pages, send user to pricing when subscription is required/expired.
     // On the home dashboard, we handle the "locked" state in the UI instead.

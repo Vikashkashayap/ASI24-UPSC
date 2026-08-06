@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Trash2, Upload, Search, Calendar } from 'lucide-react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
+import { FileText, Upload, Search, CheckCircle2, Trophy, TrendingUp } from 'lucide-react';
 import { copyEvaluationAPI } from '../services/api';
-import { useTheme } from '../hooks/useTheme';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConfirmationDialog } from '../components/ui/dialog';
 import { Pagination } from '../components/ui/pagination';
+import { CopyCard, PerformanceCard, AnalyticsSkeleton } from '../components/analytics';
 
 interface EvaluationHistory {
   _id: string;
@@ -62,7 +60,6 @@ interface EvaluationHistoryResponse {
 }
 
 const EvaluationHistoryPage: React.FC = () => {
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const [history, setHistory] = useState<EvaluationHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -175,322 +172,131 @@ const EvaluationHistoryPage: React.FC = () => {
     navigate('/copy-evaluation');
   };
 
+  const summary = useMemo(() => {
+    const completed = history.filter((e) => getEvaluationScore(e));
+    const avg =
+      completed.length > 0
+        ? Math.round(
+            completed.reduce((sum, e) => sum + (getEvaluationScore(e)?.percentage || 0), 0) /
+              completed.length
+          )
+        : 0;
+    const top = completed.reduce((max, e) => Math.max(max, getEvaluationScore(e)?.percentage || 0), 0);
+    return {
+      total: history.length,
+      completed: completed.length,
+      pending: history.length - completed.length,
+      avg,
+      top,
+      above70: completed.filter((e) => (getEvaluationScore(e)?.percentage || 0) >= 70).length,
+    };
+  }, [history]);
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6 md:space-y-8 pb-8 px-3 md:px-4">
-      {/* Enhanced Header */}
-      <div className={`relative overflow-hidden rounded-2xl p-6 md:p-8 border-2 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 via-blue-900/20 to-slate-900/90 border-blue-500/20 shadow-xl shadow-blue-500/10" 
-          : "bg-gradient-to-br from-white via-blue-50/30 to-white border-blue-200/50 shadow-xl shadow-blue-100/30"
-      }`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
-          <div className="flex items-center gap-3 md:gap-4">
-            <div className={`p-2.5 md:p-3 rounded-xl ${
-              theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"
-            }`}>
-              <FileText className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
-            </div>
-            <div className="flex flex-col gap-1 md:gap-2">
-              <h1 className={`text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r ${
-                theme === "dark" 
-                  ? "from-blue-200 via-blue-300 to-blue-400 bg-clip-text text-transparent" 
-                  : "from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent"
-              }`}>
-                Evaluation History
-              </h1>
-              <p className={`text-sm md:text-base ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}>
-                View and manage all your answer copy evaluations
-              </p>
-            </div>
+    <div className="mx-auto max-w-7xl space-y-5 px-3 pb-[max(2rem,env(safe-area-inset-bottom))] md:space-y-6 md:px-4">
+      <header className="flex flex-col gap-4 rounded-[20px] border border-slate-200/80 bg-gradient-to-br from-white via-blue-50/40 to-white p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex items-center gap-3">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+            <FileText className="h-6 w-6" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+              Evaluation History
+            </h1>
+            <p className="mt-0.5 text-sm font-medium text-slate-600">
+              Submitted copies Â· pending Â· evaluated Â· AI feedback
+            </p>
           </div>
-          <Button
-            onClick={startNewEvaluation}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/30"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            New Evaluation
-          </Button>
         </div>
+        <button
+          type="button"
+          onClick={startNewEvaluation}
+          className="app-chrome-btn inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4 text-[13px] font-bold text-white shadow-md shadow-blue-600/20 active:scale-95"
+        >
+          <Upload className="h-4 w-4" />
+          New Evaluation
+        </button>
+      </header>
+
+      {history.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <PerformanceCard label="Submitted" value={String(summary.total)} icon={FileText} tone="blue" />
+          <PerformanceCard label="Evaluated" value={String(summary.completed)} icon={CheckCircle2} tone="emerald" />
+          <PerformanceCard label="Average" value={`${summary.avg}%`} icon={TrendingUp} tone="violet" />
+          <PerformanceCard label="Top score" value={`${summary.top}%`} icon={Trophy} tone="amber" />
+        </div>
+      ) : null}
+
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          type="search"
+          placeholder="Search by file name, subject, paper, or yearâ€¦"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="h-12 w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-4 text-[14px] font-medium text-slate-900 shadow-soft outline-none placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+          aria-label="Search evaluations"
+        />
       </div>
 
-      {/* Search Bar */}
-      <Card className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-xl ${
-        theme === "dark" 
-          ? "bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-blue-500/20 shadow-lg" 
-          : "bg-gradient-to-br from-white to-blue-50/20 border-blue-200/50 shadow-lg"
-      }`}>
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <CardContent className="p-4 md:p-6 relative z-10">
-          <div className="relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-              theme === "dark" ? "text-slate-400" : "text-slate-500"
-            }`} />
-            <input
-              type="text"
-              placeholder="Search by file name, subject, paper, or year..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                theme === "dark"
-                  ? "bg-slate-800 border-slate-700 text-slate-200 placeholder-slate-500"
-                  : "bg-white border-slate-300 text-slate-900 placeholder-slate-400"
-              } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* History List */}
       {loadingHistory ? (
-        <Card className={theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}>
-          <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className={`mt-4 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>Loading evaluations...</p>
-          </CardContent>
-        </Card>
+        <AnalyticsSkeleton />
       ) : filteredHistory.length === 0 ? (
-        <Card className={theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}>
-          <CardContent className="p-8 text-center">
-            <FileText className={`w-16 h-16 mx-auto mb-4 ${
-              theme === "dark" ? "text-slate-600" : "text-slate-400"
-            }`} />
-            <h3 className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}>
-              {searchQuery ? 'No evaluations found' : 'No evaluations yet'}
-            </h3>
-            <p className={`mb-6 ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-              {searchQuery 
-                ? 'Try adjusting your search query'
-                : 'Upload your first answer copy to get started with AI-powered evaluation'
-              }
-            </p>
-            {!searchQuery && (
-              <Button
-                onClick={startNewEvaluation}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload First Evaluation
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredHistory.map((evaluation) => (
-            <Card
-              key={evaluation._id}
-              onClick={() => handleEvaluationClick(evaluation._id)}
-              className={`cursor-pointer transition-all hover:shadow-lg ${
-                theme === "dark"
-                  ? "bg-slate-900 border-slate-700 hover:border-blue-500/50"
-                  : "bg-white border-slate-200 hover:border-blue-300"
-              }`}
+        <div className="flex flex-col items-center justify-center rounded-[20px] border border-dashed border-slate-200 bg-white px-4 py-16 text-center shadow-soft">
+          <FileText className="mb-3 h-14 w-14 text-slate-300" />
+          <h3 className="text-base font-bold text-slate-800">
+            {searchQuery ? "No evaluations found" : "No evaluations yet"}
+          </h3>
+          <p className="mt-1 max-w-sm text-sm font-medium text-slate-500">
+            {searchQuery
+              ? "Try adjusting your search query"
+              : "Upload your first answer copy to get AI-powered evaluation"}
+          </p>
+          {!searchQuery ? (
+            <button
+              type="button"
+              onClick={startNewEvaluation}
+              className="app-chrome-btn mt-4 inline-flex h-11 items-center gap-2 rounded-2xl bg-blue-600 px-4 text-[13px] font-bold text-white"
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <div className={`p-2 rounded-lg ${
-                      theme === "dark" ? "bg-slate-800" : "bg-blue-50"
-                    }`}>
-                      <FileText className={`w-5 h-5 ${
-                        theme === "dark" ? "text-blue-400" : "text-blue-600"
-                      }`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className={`text-sm font-semibold mb-1 truncate ${
-                        theme === "dark" ? "text-white" : "text-slate-900"
-                      }`}>
-                        {evaluation.fileName || evaluation.pdfFileName}
-                      </CardTitle>
-                      <div className={`flex items-center gap-2 text-xs ${
-                        theme === "dark" ? "text-slate-400" : "text-slate-600"
-                      }`}>
-                        <Calendar className="w-3 h-3" />
-                        <span>{formatDate(evaluation.createdAt)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => deleteEvaluation(evaluation._id, e)}
-                    className={`p-1.5 rounded hover:bg-red-500/10 transition-colors ${
-                      theme === "dark" ? "text-red-400 hover:text-red-300" : "text-red-500 hover:text-red-600"
-                    }`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-2">
-                  <div className={`flex items-center gap-2 text-xs ${
-                    theme === "dark" ? "text-slate-400" : "text-slate-600"
-                  }`}>
-                    <span className="font-medium">Subject:</span>
-                    <span>{evaluation.subject}</span>
-                    {evaluation.paper ? <span>· {evaluation.paper}</span> : null}
-                  </div>
-                  {evaluation.questionText && (
-                    <p className={`text-xs line-clamp-2 leading-relaxed ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-600"
-                    }`}>
-                      <span className="font-medium">Q: </span>
-                      {evaluation.questionText}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border ${
-                      evaluation.status === 'completed'
-                        ? theme === 'dark'
-                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        : evaluation.status === 'failed'
-                          ? theme === 'dark'
-                            ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                            : 'bg-rose-50 text-rose-700 border-rose-200'
-                          : theme === 'dark'
-                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                            : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }`}>
-                      {evaluation.status}
-                    </span>
-                    {(evaluation.grade || evaluation.finalSummary?.overallScore?.grade) && (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                        theme === 'dark' ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'
-                      }`}>
-                        Grade {evaluation.grade || evaluation.finalSummary?.overallScore?.grade}
-                      </span>
-                    )}
-                  </div>
-                  {getEvaluationScore(evaluation) && (() => {
-                    const score = getEvaluationScore(evaluation)!;
-                    return (
-                    <div className={`mt-3 pt-3 border-t ${
-                      theme === "dark" ? "border-slate-700" : "border-slate-200"
-                    }`}>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-medium ${
-                          theme === "dark" ? "text-slate-400" : "text-slate-600"
-                        }`}>
-                          Marks
-                        </span>
-                        <span className={`text-lg font-bold tabular-nums ${
-                          score.percentage >= 70 ? 'text-green-500' :
-                          score.percentage >= 50 ? 'text-orange-500' : 'text-red-500'
-                        }`}>
-                          {score.obtained}/{score.maximum}
-                        </span>
-                      </div>
-                      <div className="mt-2 flex items-center justify-between gap-2">
-                        <span className={`text-xs ${
-                          theme === "dark" ? "text-slate-500" : "text-slate-500"
-                        }`}>
-                          {score.percentage}% · Open evaluation
-                        </span>
-                        <span className={`text-[10px] font-medium ${
-                          theme === "dark" ? "text-blue-400" : "text-blue-600"
-                        }`}>
-                          Compare →
-                        </span>
-                      </div>
-                    </div>
-                    );
-                  })()}
-                  {!getEvaluationScore(evaluation) && (
-                    <div className={`mt-3 pt-3 border-t ${
-                      theme === "dark" ? "border-slate-700" : "border-slate-200"
-                    }`}>
-                      <span className={`text-xs ${
-                        theme === "dark" ? "text-slate-500" : "text-slate-500"
-                      }`}>
-                        {evaluation.status === 'processing' ? 'Processing...' : 'Pending evaluation'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+              <Upload className="h-4 w-4" /> Upload First Evaluation
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+          {filteredHistory.map((evaluation) => {
+            const score = getEvaluationScore(evaluation);
+            return (
+              <CopyCard
+                key={evaluation._id}
+                title={evaluation.fileName || evaluation.pdfFileName}
+                question={evaluation.questionText}
+                subject={evaluation.subject}
+                paper={evaluation.paper}
+                year={evaluation.year}
+                status={evaluation.status}
+                grade={evaluation.grade || evaluation.finalSummary?.overallScore?.grade}
+                submittedAt={formatDate(evaluation.createdAt)}
+                marksLabel={score ? `${score.obtained}/${score.maximum} Â· ${score.percentage}%` : undefined}
+                evaluator="AI Examiner"
+                onOpen={() => handleEvaluationClick(evaluation._id)}
+                onDelete={(e) => deleteEvaluation(evaluation._id, e)}
+                onAiReview={() => handleEvaluationClick(evaluation._id)}
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Stats Summary */}
-      {history.length > 0 && (
-        <Card className={theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white"}>
-          <CardHeader>
-            <CardTitle className={theme === "dark" ? "text-white" : "text-slate-900"}>
-              Summary
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <div className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-slate-900"
-                }`}>
-                  {history.length}
-                </div>
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>
-                  Total Evaluations
-                </div>
-              </div>
-              <div>
-                <div className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-slate-900"
-                }`}>
-                  {history.filter(e => getEvaluationScore(e)).length}
-                </div>
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>
-                  Completed
-                </div>
-              </div>
-              <div>
-                <div className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-slate-900"
-                }`}>
-                  {history.filter(e => { const s = getEvaluationScore(e); return s && s.percentage >= 70; }).length}
-                </div>
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>
-                  Above 70%
-                </div>
-              </div>
-              <div>
-                <div className={`text-2xl font-bold ${
-                  history.length > 0 && history.filter(e => getEvaluationScore(e)).length > 0
-                    ? (() => {
-                        const completed = history.filter(e => getEvaluationScore(e));
-                        const avg = completed.reduce((sum, e) => sum + (getEvaluationScore(e)?.percentage || 0), 0) / completed.length;
-                        return avg >= 70 ? 'text-green-500' : avg >= 50 ? 'text-orange-500' : 'text-red-500';
-                      })()
-                    : theme === "dark" ? "text-white" : "text-slate-900"
-                }`}>
-                  {history.length > 0 && history.filter(e => getEvaluationScore(e)).length > 0
-                    ? Math.round(
-                        history
-                          .filter(e => getEvaluationScore(e))
-                          .reduce((sum, e) => sum + (getEvaluationScore(e)?.percentage || 0), 0) /
-                        history.filter(e => getEvaluationScore(e)).length
-                      )
-                    : 0}%
-                </div>
-                <div className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-600"
-                }`}>
-                  Average Score
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {history.length > 0 ? (
+        <div className="rounded-[20px] border border-slate-200/80 bg-white p-4 shadow-soft">
+          <p className="text-sm font-bold text-slate-900">Recent feedback snapshot</p>
+          <p className="mt-1 text-[12px] font-medium text-slate-500">
+            {summary.pending} pending Â· {summary.above70} copies above 70% Â· open any card for full AI review
+          </p>
+        </div>
+      ) : null}
 
-      {/* Pagination */}
       {pagination && pagination.pages > 1 && (
         <Pagination
           currentPage={pagination.page}
@@ -501,7 +307,6 @@ const EvaluationHistoryPage: React.FC = () => {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={showDeleteDialog}
         title="Delete Evaluation"
@@ -516,4 +321,3 @@ const EvaluationHistoryPage: React.FC = () => {
 };
 
 export default EvaluationHistoryPage;
-
