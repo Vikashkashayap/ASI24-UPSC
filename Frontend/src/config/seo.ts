@@ -1,5 +1,5 @@
 /** Base URL for canonical and OG URLs. Use your production domain. */
-export const SITE_URL = "http://studentportal.mentorsdaily.com";
+export const SITE_URL = "https://studentportal.mentorsdaily.com";
 
 /** Default OG image (absolute URL for social crawlers). */
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon.png`;
@@ -97,6 +97,15 @@ export const LANDING_SEO: Record<string, PageSEO> = {
       "Privacy policy for MentorsDaily at studentportal.mentorsdaily.com. How we collect and protect your data.",
     path: "/privacy",
     keywords: "MentorsDaily privacy policy, student data",
+  },
+  "/download": {
+    title: "Download MentorsDaily Android App (APK) | Student Portal",
+    description:
+      "Download the official MentorsDaily Student Portal Android APK. UPSC Answer Lab, prelims practice, analytics, AI mentor — install on Android 8+.",
+    path: "/download",
+    keywords:
+      "MentorsDaily APK, download MentorsDaily app, UPSC Android app, student portal APK, MentorsDaily Student Portal",
+    image: "/brand/app-icon.png",
   },
 };
 

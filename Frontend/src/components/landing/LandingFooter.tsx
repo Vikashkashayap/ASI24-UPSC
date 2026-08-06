@@ -76,6 +76,11 @@ export const LandingFooter = () => {
                   Testimonials
                 </Link>
               </li>
+              <li>
+                <Link to="/download" className="hover:text-[#2563eb] transition">
+                  Download App
+                </Link>
+              </li>
             </ul>
           </div>
 

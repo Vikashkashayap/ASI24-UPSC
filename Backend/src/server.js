@@ -47,6 +47,7 @@ import {
 } from "./routes/mainsMaterialRoutes.js";
 import notesCmsAdminRoutes from "./routes/notesCmsAdminRoutes.js";
 import notesCmsPublicRoutes from "./routes/notesCmsPublicRoutes.js";
+import downloadRoutes from "./routes/downloadRoutes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
@@ -219,6 +220,7 @@ app.post("/api/admin/upload-pdf", requireAdmin, ragPdfUpload, ragUploadPdf);
 app.use("/api/mains-materials", mainsMaterialStudentRouter);
 
 app.use("/api/offers", offersRoutes);
+app.use("/api/download", downloadRoutes);
 app.use("/api/current-affairs", currentAffairsRoutes);
 
 app.use("/api/pricing", pricingRoutes);

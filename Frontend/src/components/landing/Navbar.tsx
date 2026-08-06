@@ -12,6 +12,7 @@ const navItems: { label: string; to: string; external?: boolean }[] = [
   { label: "Compare", to: "/compare" },
   { label: "Current Affairs", to: "/daily-current-affairs" },
   { label: "Testimonials", to: "/testimonials" },
+  { label: "Download App", to: "/download" },
   { label: "About", to: "/about" },
 ];
 
