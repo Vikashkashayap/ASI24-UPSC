@@ -14,8 +14,10 @@
     "cap:open": "npx cap open android",
     "cap:assets": "npx capacitor-assets generate --android --assetPath resources",
     "build:cap": "cross-env VITE_BASE=./ VITE_API_URL=https://studentportal.mentorsdaily.com/api VITE_LOW_MEM=1 node --max-old-space-size=1536 ./node_modules/vite/bin/vite.js build",
-    "android:build": "npm run build:cap && npx cap sync android",
-    "android:release": "npm run build:cap && npx cap sync android && cd android && .\\gradlew.bat bundleRelease"
+    "android:sync": "npm run build:cap && npx cap sync android",
+    "android:build": "npm run android:sync",
+    "android:live": "cross-env CAP_SERVER_URL=https://studentportal.mentorsdaily.com npm run android:sync",
+    "android:release": "npm run android:live && cd android && .\\gradlew.bat bundleRelease"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

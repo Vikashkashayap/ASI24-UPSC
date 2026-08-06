@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Production network policy. Certificate pinning can be added under <domain-config> pin-set. -->
+<!-- Production: HTTPS only. Debug APKs may use LAN Vite (cleartext) via overrides. -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
@@ -10,4 +10,11 @@
         <domain includeSubdomains="true">mentorsdaily.com</domain>
         <domain includeSubdomains="true">studentportal.mentorsdaily.com</domain>
     </domain-config>
+    <debug-overrides>
+        <base-config cleartextTrafficPermitted="true">
+            <trust-anchors>
+                <certificates src="system" />
+            </trust-anchors>
+        </base-config>
+    </debug-overrides>
 </network-security-config>
