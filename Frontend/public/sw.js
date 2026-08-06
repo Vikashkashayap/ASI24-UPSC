@@ -1,6 +1,6 @@
 /* Minimal service worker — static asset cache + network-first for navigations.
    Background Sync ready: listen for 'sync' when online queue flushes. */
-const CACHE = "md-student-portal-v1";
+const CACHE = "md-student-portal-v2";
 const PRECACHE = ["/", "/manifest.webmanifest", "/brand/app-icon.png", "/brand/mentorsdaily-logo.png", "/favicon.png"];
 
 self.addEventListener("install", (event) => {
@@ -26,6 +26,15 @@ self.addEventListener("fetch", (event) => {
 
   // API: network only (offline queue handles mutations in app layer)
   if (url.pathname.startsWith("/api")) return;
+
+  // APK / download assets: always network (never cache large binaries)
+  if (
+    url.pathname.startsWith("/downloads/") ||
+    url.pathname.endsWith(".apk") ||
+    url.pathname.endsWith("version.json")
+  ) {
+    return;
+  }
 
   // Static assets: cache-first
   if (url.pathname.startsWith("/assets/") || url.pathname.match(/\.(js|css|png|jpg|jpeg|webp|svg|woff2?)$/)) {

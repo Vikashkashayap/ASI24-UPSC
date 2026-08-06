@@ -33,6 +33,7 @@ const TermsConditionsPage = lazyPage(() => import("./pages/TermsConditions"), "T
 const RefundPolicyPage = lazyPage(() => import("./pages/RefundPolicy"), "RefundPolicyPage");
 const DisclaimerPage = lazyPage(() => import("./pages/Disclaimer"), "DisclaimerPage");
 const ContactUsPage = lazyPage(() => import("./pages/ContactUs"), "ContactUsPage");
+const DownloadPage = lazyPage(() => import("./pages/landing/DownloadPage"), "DownloadPage");
 
 // Student dashboard
 const HomePage = lazyPage(() => import("./pages/HomePage"), "HomePage");
@@ -175,6 +176,7 @@ function App() {
               <Route path="refund-policy" element={<RefundPolicyPage />} />
               <Route path="disclaimer" element={<DisclaimerPage />} />
               <Route path="contact-us" element={<ContactUsPage />} />
+              <Route path="download" element={<DownloadPage />} />
             </Route>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
