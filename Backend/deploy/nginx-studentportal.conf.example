@@ -20,6 +20,18 @@ server {
     root /var/www/studentportal/frontend/dist;
     index index.html;
 
+    # PWA manifest (avoid application/octet-stream)
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        add_header Cache-Control "public, max-age=3600";
+    }
+
+    # Hashed JS/CSS — never fall back to index.html
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
     # API + Google OAuth → Node (required for /api/auth/google)
     location /api/ {
         proxy_pass http://127.0.0.1:5000;

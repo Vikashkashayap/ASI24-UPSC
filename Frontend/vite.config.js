@@ -30,9 +30,12 @@ function manualChunks(id) {
   return "vendor";
 }
 
+// Web (nginx SPA): base must be "/" so /login, /home etc. still load /assets/*.js
+// Capacitor WebView: use relative base via VITE_BASE=./ (see android:* scripts)
+const base = process.env.VITE_BASE || "/";
+
 export default defineConfig({
-  // Relative base required for Capacitor Android/iOS WebView (file / https asset paths)
-  base: "./",
+  base,
   plugins: [react()],
   resolve: {
     dedupe: ["react", "react-dom"],
