@@ -35,48 +35,30 @@ export const LandingNavbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Lock the landing scroll root (not just body — layout uses overflow-y-auto on an inner div)
+  // Lock landing scroll root while menu is open.
+  // Do NOT set touch-action:none on the scroll root — that breaks single-finger
+  // scroll after close on Android/WebView (two-finger still works).
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
-    const scrollRoot =
-      (document.querySelector("[data-landing-scroll]") as HTMLElement | null) ||
-      document.documentElement;
-    const isDocRoot =
-      scrollRoot === document.documentElement || scrollRoot === document.body;
-    const scrollY = isDocRoot ? window.scrollY : scrollRoot.scrollTop;
+    const scrollRoot = document.querySelector(
+      "[data-landing-scroll]"
+    ) as HTMLElement | null;
 
     const prev = {
       htmlOverflow: document.documentElement.style.overflow,
       bodyOverflow: document.body.style.overflow,
-      bodyPosition: document.body.style.position,
-      bodyTop: document.body.style.top,
-      bodyWidth: document.body.style.width,
-      rootOverflow: scrollRoot.style.overflow,
-      rootTouchAction: scrollRoot.style.touchAction,
+      rootOverflow: scrollRoot?.style.overflow ?? "",
     };
 
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    scrollRoot.style.overflow = "hidden";
-    scrollRoot.style.touchAction = "none";
+    if (scrollRoot) scrollRoot.style.overflow = "hidden";
 
     return () => {
       document.documentElement.style.overflow = prev.htmlOverflow;
       document.body.style.overflow = prev.bodyOverflow;
-      document.body.style.position = prev.bodyPosition;
-      document.body.style.top = prev.bodyTop;
-      document.body.style.width = prev.bodyWidth;
-      scrollRoot.style.overflow = prev.rootOverflow;
-      scrollRoot.style.touchAction = prev.rootTouchAction;
-      if (isDocRoot) {
-        window.scrollTo(0, scrollY);
-      } else {
-        scrollRoot.scrollTop = scrollY;
-      }
+      if (scrollRoot) scrollRoot.style.overflow = prev.rootOverflow;
     };
   }, [mobileMenuOpen]);
 

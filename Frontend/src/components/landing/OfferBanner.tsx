@@ -119,19 +119,19 @@ export const OfferBanner = () => {
       <div className="banner-strip bg-gradient-to-r from-blue-600 via-blue-700 to-blue-700 text-white flex items-center overflow-hidden">
         {/* Scrolling marquee – moves right */}
         <div className="flex-1 min-w-0 overflow-hidden flex items-center">
-          <div className="flex items-center animate-marquee-right whitespace-nowrap w-max h-full">
+          <div className="pointer-events-none flex items-center animate-marquee-right whitespace-nowrap w-max h-full">
             {[1, 2, 3].map((i) => (
               <MarqueeSegment key={i} />
             ))}
           </div>
         </div>
         {/* Fixed CTA + close on the right */}
-        <div className="flex items-center gap-2 shrink-0 pl-4 pr-2 h-full bg-gradient-to-l from-blue-700/80 to-transparent">
+        <div className="flex items-center gap-1.5 shrink-0 pl-2 pr-1.5 h-full bg-gradient-to-l from-blue-700/80 to-transparent sm:gap-2 sm:pl-4 sm:pr-2">
           {offer.redirectUrl && (
             <button
               type="button"
               onClick={handleCta}
-              className="rounded-md bg-[#2563eb] text-white font-semibold text-xs md:text-sm px-3 py-1.5 hover:bg-[#1d4ed8] transition-colors whitespace-nowrap"
+              className="rounded-md bg-[#2563eb] text-white font-semibold text-[11px] sm:text-xs md:text-sm px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#1d4ed8] transition-colors whitespace-nowrap"
             >
               {offer.ctaText || "Claim Offer"}
             </button>

@@ -47,14 +47,14 @@ export function DownloadButton({
       type="button"
       onClick={handleClick}
       disabled={busy}
-      className={`group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-900/40 transition hover:from-[#3b82f6] hover:to-[#2563eb] hover:shadow-blue-600/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1e3d] disabled:opacity-70 ${className}`}
+      className={`group inline-flex max-w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-900/40 transition hover:from-[#3b82f6] hover:to-[#2563eb] hover:shadow-blue-600/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1e3d] disabled:opacity-70 sm:px-8 sm:py-4 sm:text-base ${className}`}
     >
       {busy ? (
-        <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+        <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden />
       ) : (
-        <Download className="h-5 w-5 transition group-hover:-translate-y-0.5" aria-hidden />
+        <Download className="h-5 w-5 shrink-0 transition group-hover:-translate-y-0.5" aria-hidden />
       )}
-      <span>
+      <span className="min-w-0 truncate">
         Download APK
         {sizeLabel ? (
           <span className="ml-1 font-normal opacity-90">({sizeLabel})</span>

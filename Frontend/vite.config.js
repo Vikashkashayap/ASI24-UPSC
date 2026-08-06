@@ -89,6 +89,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: true, // 0.0.0.0 — phone same WiFi pe http://<PC-IP>:5173 se open kar sake
     port: 5173,
     proxy: {
       "/api": {

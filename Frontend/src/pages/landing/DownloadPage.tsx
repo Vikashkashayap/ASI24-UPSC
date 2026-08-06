@@ -32,7 +32,7 @@ export const DownloadPage = () => {
   return (
     <>
       {/* Hero — navy glass composition */}
-      <section className="relative overflow-hidden border-b border-white/10 bg-[#0f1e3d]">
+      <section className="relative w-full max-w-full overflow-x-hidden border-b border-white/10 bg-[#0f1e3d]">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
@@ -49,46 +49,47 @@ export const DownloadPage = () => {
           }}
         />
 
-        <div className="relative mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-20">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
-            <div>
-              <div className="mb-6 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 px-4 py-2.5 backdrop-blur-md">
+        <div className="relative mx-auto w-full max-w-6xl min-w-0 px-3 py-10 sm:px-4 sm:py-14 md:px-6 md:py-20">
+          <div className="grid min-w-0 items-center gap-8 sm:gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="min-w-0 max-w-full">
+              <div className="mb-5 inline-flex max-w-full items-center gap-2.5 rounded-2xl border border-white/15 bg-white/10 px-3 py-2 backdrop-blur-md sm:mb-6 sm:gap-3 sm:px-4 sm:py-2.5">
                 <img
                   src="/brand/app-icon.png"
                   alt="MentorsDaily"
-                  className="h-10 w-10 rounded-xl object-cover shadow-md"
+                  className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-md sm:h-10 sm:w-10"
                   width={40}
                   height={40}
                 />
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300/90">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-300/90 sm:text-[11px] sm:tracking-[0.18em]">
                     Official Android App
                   </p>
-                  <p className="text-sm font-medium text-white">MentorsDaily</p>
+                  <p className="truncate text-sm font-medium text-white">MentorsDaily</p>
                 </div>
               </div>
 
-              <h1 className="text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-[2.75rem] lg:leading-tight">
+              <h1 className="break-words text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.75rem] lg:leading-tight">
                 {info.appName}
               </h1>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-300 md:text-base">
+              <p className="mt-3 max-w-xl break-words text-sm leading-relaxed text-slate-300 sm:mt-4 md:text-base">
                 Prepare for UPSC on the go — Answer Lab, prelims practice, analytics,
                 planner and AI mentor in one native Android experience.
               </p>
 
-              <div className="mt-8">
+              <div className="mt-6 sm:mt-8">
                 <DownloadMeta info={info} />
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex w-full min-w-0 flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <DownloadButton
                   apkUrl={info.apk}
                   version={info.version}
                   sizeLabel={info.size}
+                  className="w-full sm:w-auto"
                 />
                 <Link
                   to="/features"
-                  className="text-sm font-medium text-slate-300 underline-offset-4 hover:text-white hover:underline"
+                  className="text-center text-sm font-medium text-slate-300 underline-offset-4 hover:text-white hover:underline sm:text-left"
                 >
                   Explore features
                 </Link>
@@ -99,15 +100,15 @@ export const DownloadPage = () => {
               ) : null}
             </div>
 
-            <div className="flex justify-center lg:justify-end">
-              <div className="w-full max-w-sm rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl md:p-8">
-                <ApkQrCode apkUrl={info.apk} size={176} />
-                <p className="mt-4 text-center text-xs leading-relaxed text-slate-300">
+            <div className="flex min-w-0 justify-center lg:justify-end">
+              <div className="w-full max-w-[280px] rounded-2xl border border-white/15 bg-white/10 p-4 shadow-2xl backdrop-blur-xl sm:max-w-sm sm:rounded-3xl sm:p-5 md:p-8">
+                <ApkQrCode apkUrl={info.apk} size={148} />
+                <p className="mt-3 text-center text-xs leading-relaxed text-slate-300 sm:mt-4">
                   Point your phone camera at the QR code to download the APK directly.
                 </p>
                 <a
                   href={info.apk}
-                  className="mt-4 block truncate text-center text-[11px] text-blue-300/90 underline-offset-2 hover:underline"
+                  className="mt-3 block truncate text-center text-[11px] text-blue-300/90 underline-offset-2 hover:underline sm:mt-4"
                   download="MD-Student-Portal.apk"
                 >
                   {info.apk.replace(/^https?:\/\//, "")}
@@ -119,12 +120,12 @@ export const DownloadPage = () => {
       </section>
 
       {/* Features */}
-      <section className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white py-14 md:py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <section className="w-full max-w-full overflow-x-hidden border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white py-12 sm:py-14 md:py-16">
+        <div className="mx-auto w-full min-w-0 max-w-6xl px-3 sm:px-4 md:px-6">
           <h2 className="text-center text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
             What&apos;s inside the app
           </h2>
-          <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-slate-600">
+          <p className="mx-auto mt-2 max-w-2xl break-words text-center text-sm text-slate-600">
             Everything from the MentorsDaily student portal, optimized for Android.
           </p>
           <div className="mt-8">
@@ -149,12 +150,12 @@ export const DownloadPage = () => {
       </section>
 
       {/* Install guide */}
-      <section className="border-b border-slate-200 bg-[#0f1e3d] py-14 md:py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <section className="w-full max-w-full overflow-x-hidden border-b border-slate-200 bg-[#0f1e3d] py-12 sm:py-14 md:py-16">
+        <div className="mx-auto w-full min-w-0 max-w-6xl px-3 sm:px-4 md:px-6">
           <h2 className="text-center text-xl font-bold tracking-tight text-white md:text-2xl">
             Installation guide
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-center text-sm text-slate-300">
+          <p className="mx-auto mt-2 max-w-xl break-words text-center text-sm text-slate-300">
             Four quick steps to get MentorsDaily on your Android phone.
           </p>
           <div className="mt-8">
@@ -164,8 +165,8 @@ export const DownloadPage = () => {
       </section>
 
       {/* FAQ + legal */}
-      <section className="bg-slate-50 py-14 md:py-16">
-        <div className="mx-auto max-w-3xl px-4 md:px-6">
+      <section className="w-full max-w-full overflow-x-hidden bg-slate-50 py-12 sm:py-14 md:py-16">
+        <div className="mx-auto w-full min-w-0 max-w-3xl px-3 sm:px-4 md:px-6">
           <h2 className="text-center text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
             Frequently asked questions
           </h2>
