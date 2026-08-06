@@ -1,22 +1,11 @@
 import axios from "axios";
+import { resolveApiOrigin } from "../config/apiOrigin";
 
-// VITE_API_URL can be:
-//   - "http://localhost:5000" (local) → base = localhost backend
-//   - "/api" (production same-origin) → base = "" so /api/auth/login goes to same host
-//   - "https://studentportal.mentorsdaily.com/api" (production explicit) → base = https://studentportal.mentorsdaily.com
-const defaultApiUrl =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.MODE === "development" ? "http://localhost:5000" : "/api");
-const raw = defaultApiUrl.replace(/\/$/, "");
-const stripped = raw.replace(/\/api$/i, "").trim();
-let baseURL: string;
-if (stripped === "" && raw === "/api") {
-  baseURL = ""; // VITE_API_URL=/api → same-origin, paths are /api/...
-} else if (stripped === "") {
-  baseURL = "http://localhost:5000";
-} else {
-  baseURL = stripped;
-}
+// VITE_API_URL / Capacitor-aware origin:
+//   - Dev web → http://localhost:5000
+//   - Prod web (nginx) → "" (same-origin /api/*)
+//   - Capacitor APK → https://studentportal.mentorsdaily.com (relative /api would hit https://localhost)
+const baseURL = resolveApiOrigin();
 export const apiBaseURL = baseURL;
 
 /** Live AI evaluation timeline (Socket / SSE / poll) */

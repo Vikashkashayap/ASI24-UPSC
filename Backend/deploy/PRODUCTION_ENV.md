@@ -15,6 +15,9 @@ CLIENT_URL=https://studentportal.mentorsdaily.com
 BASE_URL=https://studentportal.mentorsdaily.com
 BACKEND_URL=https://studentportal.mentorsdaily.com
 
+# Capacitor Android/iOS WebView CORS is already allowlisted in server.js
+# (https://localhost, capacitor://localhost) — no extra env needed.
+
 # Notes Website — password-reset emails use RESET_PASSWORD_URL first
 NOTES_FRONTEND_URL=https://notes.mentorsdaily.com
 NOTES_CLIENT_ORIGIN=https://notes.mentorsdaily.com

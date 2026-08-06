@@ -27,7 +27,9 @@ export const LandingLayout = () => {
   return (
     <>
       <SEO {...seo} />
-    <div className={`min-h-[100dvh] min-h-screen overflow-x-hidden overflow-y-auto scroll-smooth scrollbar-hide transition-colors ${
+    <div
+      data-landing-scroll
+      className={`min-h-[100dvh] min-h-screen overflow-x-hidden overflow-y-auto overscroll-y-contain scroll-smooth scrollbar-hide transition-colors ${
       theme === "dark" ? "page-dots-bg-dark text-slate-50" : "page-dots-bg-light text-slate-900"
     }`}>
       {/* Fixed header: offer strip on top, navbar below – padding follows height so no gap when banner is dismissed */}

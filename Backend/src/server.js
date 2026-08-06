@@ -69,6 +69,11 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
   "https://studentportal.mentorsdaily.com",
+  // Capacitor Android/iOS WebView origins (androidScheme: https → https://localhost)
+  "https://localhost",
+  "http://localhost",
+  "capacitor://localhost",
+  "ionic://localhost",
 ]
   .filter(Boolean)
   .map((origin) => origin.replace(/\/$/, ""));

@@ -35,12 +35,48 @@ export const LandingNavbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Lock the landing scroll root (not just body — layout uses overflow-y-auto on an inner div)
   useEffect(() => {
     if (!mobileMenuOpen) return;
-    const prev = document.body.style.overflow;
+
+    const scrollRoot =
+      (document.querySelector("[data-landing-scroll]") as HTMLElement | null) ||
+      document.documentElement;
+    const isDocRoot =
+      scrollRoot === document.documentElement || scrollRoot === document.body;
+    const scrollY = isDocRoot ? window.scrollY : scrollRoot.scrollTop;
+
+    const prev = {
+      htmlOverflow: document.documentElement.style.overflow,
+      bodyOverflow: document.body.style.overflow,
+      bodyPosition: document.body.style.position,
+      bodyTop: document.body.style.top,
+      bodyWidth: document.body.style.width,
+      rootOverflow: scrollRoot.style.overflow,
+      rootTouchAction: scrollRoot.style.touchAction,
+    };
+
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    scrollRoot.style.overflow = "hidden";
+    scrollRoot.style.touchAction = "none";
+
     return () => {
-      document.body.style.overflow = prev;
+      document.documentElement.style.overflow = prev.htmlOverflow;
+      document.body.style.overflow = prev.bodyOverflow;
+      document.body.style.position = prev.bodyPosition;
+      document.body.style.top = prev.bodyTop;
+      document.body.style.width = prev.bodyWidth;
+      scrollRoot.style.overflow = prev.rootOverflow;
+      scrollRoot.style.touchAction = prev.rootTouchAction;
+      if (isDocRoot) {
+        window.scrollTo(0, scrollY);
+      } else {
+        scrollRoot.scrollTop = scrollY;
+      }
     };
   }, [mobileMenuOpen]);
 
@@ -136,15 +172,16 @@ export const LandingNavbar = () => {
       {mobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 touch-none overscroll-none bg-black/60 backdrop-blur-sm md:hidden"
             onClick={() => setMobileMenuOpen(false)}
+            onTouchMove={(e) => e.preventDefault()}
             aria-hidden="true"
           />
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className={`fixed inset-y-0 right-0 z-50 flex h-[100dvh] w-[min(18rem,85vw)] flex-col border-l shadow-2xl md:hidden ${
+            className={`fixed inset-y-0 right-0 z-50 flex h-[100dvh] w-[min(18rem,85vw)] flex-col overscroll-contain border-l shadow-2xl md:hidden ${
               darkChrome ? "border-blue-400/20 bg-[#0b1f45]" : "border-slate-200 bg-white"
             }`}
           >

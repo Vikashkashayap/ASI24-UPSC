@@ -10,7 +10,14 @@ import { getFrontendOrigin } from "../config/urlConfig.js";
  */
 export const initializeSocketIO = (server) => {
   const defaultOrigin = getFrontendOrigin();
-  const allowedOrigins = [defaultOrigin, "https://studentportal.mentorsdaily.com"]
+  const allowedOrigins = [
+    defaultOrigin,
+    "https://studentportal.mentorsdaily.com",
+    "https://localhost",
+    "http://localhost",
+    "capacitor://localhost",
+    "ionic://localhost",
+  ]
     .filter(Boolean)
     .map((origin) => origin.replace(/\/$/, ""));
 
