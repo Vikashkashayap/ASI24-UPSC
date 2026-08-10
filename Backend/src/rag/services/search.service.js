@@ -9,6 +9,8 @@ import { MongoRetriever } from "../../services/ai/retrievers/mongoRetriever.js";
 import { RAG_CONFIG } from "../config/rag.config.js";
 import { ragLogger } from "../utils/logger.js";
 import { withRetry } from "../utils/retry.js";
+import { isNonContentChunk, chunkTextOf } from "../../services/content/frontMatterFilter.js";
+import { filterChunksByTopic } from "../../services/qg/utils/topicRelevance.js";
 
 const mongoRetriever = new MongoRetriever();
 
@@ -159,6 +161,30 @@ export async function searchKnowledgeBase({ query, topK, filters = {} } = {}) {
   if (filters.language) {
     const lang = String(filters.language).toLowerCase();
     hits = hits.filter((h) => !h.language || String(h.language).toLowerCase() === lang);
+  }
+
+  hits = hits.filter(
+    (h) =>
+      !isNonContentChunk({
+        text: chunkTextOf(h),
+        heading: h.heading || h.topic,
+        topic: h.topic,
+        subTopic: h.subtopic,
+        page: h.page,
+      })
+  );
+
+  const topicFilter = String(filters.topic || "").trim();
+  if (topicFilter) {
+    const tf = filterChunksByTopic(
+      hits.map((h) => ({
+        ...h,
+        text: h.text || chunkTextOf(h),
+        heading: h.heading || h.topic || "",
+      })),
+      topicFilter
+    );
+    hits = tf.chunks.length ? tf.chunks : [];
   }
 
   const durationMs = timer.end({

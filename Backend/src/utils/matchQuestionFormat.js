@@ -1,5 +1,5 @@
 const MATCH_INTRO_RE =
-  /match\s+(?:the\s+)?following|consider the following pairs|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*(?:मिलान|युग्म)|सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२]|सूची[- ]?i.*(?:मिला|से)/i;
+  /match\s+(?:the\s+)?following|consider the following pairs|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*(?:मिलान|युग्म)|(?:सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२])/i;
 const MATCH_PROMPT_RE =
   /select the correct|code given below|नीचे दिए गए|सही उत्तर|सही जोड़ी|कूट/i;
 const MATCH_SECTION_SKIP =

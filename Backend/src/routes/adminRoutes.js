@@ -58,6 +58,7 @@ import {
   createSyllabusTargets,
   listAdminSyllabusTargets,
   updateSyllabusTargetAssignment,
+  removeStudentsFromSyllabusTarget,
   deleteSyllabusTarget,
   archiveSyllabusTarget,
 } from "../controllers/syllabusTargetController.js";
@@ -195,6 +196,7 @@ router.get("/syllabus-targets/catalog/:subjectKey", getSyllabusSubjectModules);
 router.get("/syllabus-targets", listAdminSyllabusTargets);
 router.post("/syllabus-targets", createSyllabusTargets);
 router.patch("/syllabus-targets/:id/assign", updateSyllabusTargetAssignment);
+router.patch("/syllabus-targets/:id/remove-students", removeStudentsFromSyllabusTarget);
 router.patch("/syllabus-targets/:id/archive", archiveSyllabusTarget);
 router.delete("/syllabus-targets/:id", deleteSyllabusTarget);
 

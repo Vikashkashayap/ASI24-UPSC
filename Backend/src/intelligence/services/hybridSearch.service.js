@@ -10,6 +10,7 @@ import { expandSynonyms } from "../data/synonyms.js";
 import { relatedConcepts } from "../data/concepts.js";
 import { cacheGet, cacheSet, cacheKey } from "./searchCache.service.js";
 import { aiReranker } from "../providers/placeholders.js";
+import { isNonContentChunk, chunkTextOf } from "../../services/content/frontMatterFilter.js";
 
 /** Include notes.mentorsdaily.com (ContentChunk / notes Qdrant) in hybrid search. */
 const INCLUDE_WEBSITE_NOTES =
@@ -262,6 +263,19 @@ function escapeRegex(s) {
   return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function filterSearchResults(results) {
+  return (results || []).filter(
+    (r) =>
+      !isNonContentChunk({
+        text: chunkTextOf(r),
+        heading: r.topic || r.chapter,
+        topic: r.topic,
+        chapter: r.chapter,
+        page: r.page,
+      })
+  );
+}
+
 /**
  * Hybrid = keyword + semantic + RRF fusion + rerank placeholder.
  */
@@ -277,17 +291,18 @@ export async function hybridSearch({
   const key = cacheKey(["search", searchType, query, JSON.stringify(f), topK]);
   const cached = await cacheGet(key);
   if (cached) {
+    const filteredCached = filterSearchResults(cached);
     await searchLogRepo.create({
       userId,
       query,
       searchType,
       filters: f,
-      resultCount: cached.length,
-      topScore: cached[0]?.score ?? null,
+      resultCount: filteredCached.length,
+      topScore: filteredCached[0]?.score ?? null,
       latencyMs: Date.now() - started,
       cached: true,
     });
-    return { results: cached, cached: true, concepts: relatedConcepts(query) };
+    return { results: filteredCached, cached: true, concepts: relatedConcepts(query) };
   }
 
   let semanticHits = [];
@@ -334,7 +349,7 @@ export async function hybridSearch({
   fused = await aiReranker.rerank(query, fused);
   fused = fused.slice(0, topK);
 
-  const results = await hydrateResults(fused);
+  const results = filterSearchResults(await hydrateResults(fused));
   await cacheSet(key, results);
 
   await searchLogRepo.create({

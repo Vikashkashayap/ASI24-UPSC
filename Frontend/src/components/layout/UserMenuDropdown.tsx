@@ -50,6 +50,8 @@ export const UserMenuDropdown = memo(function UserMenuDropdown({
   return (
     <div
       ref={menuRef}
+      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
       className={`absolute right-0 top-[calc(100%+8px)] w-64 rounded-xl border shadow-xl z-50 overflow-hidden ${
         theme === "dark"
           ? "bg-[#0f172a] border-slate-700/80 shadow-black/40"

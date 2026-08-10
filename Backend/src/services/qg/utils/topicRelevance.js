@@ -4,6 +4,8 @@
  * killing valid on-topic Qs (NITI, Five Year Plan, LPG reforms, etc.).
  */
 
+import { isMetadataQuestion } from "../../content/frontMatterFilter.js";
+
 /** Pure filler — never strip subject words like economy/indian from the student topic */
 const FILLER_STOP = new Set([
   "the",
@@ -423,6 +425,8 @@ function questionBlob(question) {
  * @param {{ soft?: boolean }} [opts] soft=true → only drop clear cross-topic leaks
  */
 export function isQuestionOnTopic(question, topic, opts = {}) {
+  if (isMetadataQuestion(question)) return false;
+
   // Abstract chapter titles rarely appear verbatim in stems — always soft-check
   const soft = Boolean(opts.soft) || isAbstractChapterTopic(topic);
   const tokens = tokenizeTopic(topic);

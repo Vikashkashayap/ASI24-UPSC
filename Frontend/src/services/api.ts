@@ -1000,6 +1000,8 @@ export const syllabusTargetsAPI = {
     id: string,
     body: { studentIds: string[]; dueDate?: string | null; note?: string }
   ) => api.patch(`/api/admin/syllabus-targets/${id}/assign`, body),
+  removeStudents: (id: string, studentIds: string[]) =>
+    api.patch(`/api/admin/syllabus-targets/${id}/remove-students`, { studentIds }),
   archive: (id: string) => api.patch(`/api/admin/syllabus-targets/${id}/archive`),
   delete: (id: string) => api.delete(`/api/admin/syllabus-targets/${id}`),
   // Student

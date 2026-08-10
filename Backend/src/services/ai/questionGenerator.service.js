@@ -23,6 +23,8 @@ import {
   estimateTokens,
 } from "./tokenEstimator.service.js";
 import { prepareContextForBatch, ABORT_CONTEXT_TOKENS } from "./contextReducer.service.js";
+import { filterQuestionsByTopic } from "../qg/utils/topicRelevance.js";
+import { isMetadataQuestion } from "../content/frontMatterFilter.js";
 import { MAX_PROMPT_TOKENS, MAX_CONTEXT_TOKENS } from "./retriever.service.js";
 import { lockPlainExplanationToAnswer } from "../qg/utils/consistency.js";
 import {
@@ -748,7 +750,7 @@ export async function generateQuestionsFromContextBatch({
         retrievalSource: ragOptimized ? "rag" : "provided",
       });
 
-      const questions = (result.questions || []).map((q) => {
+      let questions = (result.questions || []).map((q) => {
         const explanationText = String(q.explanation || q.explanation_en || "").trim();
         // Prefer 50–100 word teaching body for UI (correct + wrong options)
         const detail =
@@ -793,6 +795,10 @@ export async function generateQuestionsFromContextBatch({
           modelUsed: q.modelUsed,
         });
       });
+
+      questions = questions.filter((q) => !isMetadataQuestion(q));
+      const onTopic = filterQuestionsByTopic(questions, topic, { soft: false });
+      if (onTopic.questions.length) questions = onTopic.questions;
 
       return {
         success: questions.length > 0,

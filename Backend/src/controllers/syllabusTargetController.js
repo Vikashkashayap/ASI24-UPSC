@@ -472,6 +472,84 @@ export const deleteSyllabusTarget = async (req, res) => {
 };
 
 /**
+ * PATCH /api/admin/syllabus-targets/:id/remove-students
+ * Body: { studentIds: string[] } — remove specific students from this target
+ */
+export const removeStudentsFromSyllabusTarget = async (req, res) => {
+  try {
+    const record = await SyllabusModuleTarget.findById(req.params.id);
+    if (!record) {
+      return res.status(404).json({ success: false, message: "Target not found" });
+    }
+
+    const toRemove = [...new Set((req.body?.studentIds || []).map(String).filter(Boolean))];
+    if (toRemove.length === 0) {
+      return res.status(400).json({ success: false, message: "Select at least one student to remove" });
+    }
+
+    if (req.user?.role === "mentor") {
+      const rosterSet = await getMentorRosterIdSet(req.user._id);
+      const outsideRoster = toRemove.filter((id) => !rosterSet.has(id));
+      if (outsideRoster.length > 0) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only remove students from your roster",
+        });
+      }
+    }
+
+    const removeSet = new Set(toRemove);
+    const currentAssigned = new Set((record.assignedStudentIds || []).map(String));
+    const actuallyRemoving = toRemove.filter((id) => currentAssigned.has(id));
+    if (actuallyRemoving.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected students are not assigned to this target",
+      });
+    }
+
+    record.assignedStudentIds = (record.assignedStudentIds || []).filter(
+      (id) => !removeSet.has(String(id))
+    );
+    record.completedStudentIds = (record.completedStudentIds || []).filter(
+      (id) => !removeSet.has(String(id))
+    );
+    record.chapterCompletions = (record.chapterCompletions || []).filter(
+      (cc) => !removeSet.has(String(cc.studentId))
+    );
+
+    if (record.assignedStudentIds.length === 0) {
+      await SyllabusModuleTarget.findByIdAndDelete(req.params.id);
+      return res.json({
+        success: true,
+        message: "Target removed — no students remain assigned",
+        deleted: true,
+      });
+    }
+
+    await record.save();
+
+    const remainingIds = (record.assignedStudentIds || []).map(String);
+    const students = remainingIds.length
+      ? await User.find({ _id: { $in: remainingIds } }).select("_id name email").lean()
+      : [];
+    const studentMap = new Map(students.map((s) => [String(s._id), s]));
+
+    return res.json({
+      success: true,
+      message: `Removed ${actuallyRemoving.length} student(s) from this target`,
+      data: serializeTarget(record, studentMap),
+    });
+  } catch (error) {
+    console.error("removeStudentsFromSyllabusTarget:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to remove students",
+    });
+  }
+};
+
+/**
  * PATCH /api/admin/syllabus-targets/:id/archive
  */
 export const archiveSyllabusTarget = async (req, res) => {

@@ -10,6 +10,7 @@ import { QG_CONFIG } from "../config/qg.config.js";
 import { hybridRetrieve } from "./hybridRetrieval.service.js";
 import { rerankChunks } from "./rerank.service.js";
 import { buildMergedContext } from "./contextBuilder.service.js";
+import { filterChunksByTopic } from "../utils/topicRelevance.js";
 import { generateQuestionsStage } from "./questionGen.service.js";
 import { verifyAnswerStage } from "./answerVerifier.service.js";
 import { generateExplanationStage } from "./explanationGen.service.js";
@@ -93,14 +94,22 @@ export async function retrieveAndBuildContext(params = {}) {
     topN: QG_CONFIG.hybrid.finalTopK,
   });
 
-  const merged = buildMergedContext(reranked.chunks, {
+  let contextChunks = reranked.chunks;
+  const topicLabel = String(params.topic || "").trim();
+  if (topicLabel) {
+    const tf = filterChunksByTopic(contextChunks, topicLabel);
+    if (tf.chunks.length) contextChunks = tf.chunks;
+    else if (tf.dropped > 0) contextChunks = [];
+  }
+
+  const merged = buildMergedContext(contextChunks, {
     maxTokens: params.maxTokens || QG_CONFIG.context.maxTokens,
   });
 
   return {
     query,
     contextText: merged.contextText,
-    chunks: reranked.chunks,
+    chunks: contextChunks,
     chunkIds: merged.chunkIds,
     tokens: merged.tokens,
     retrieval,

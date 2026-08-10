@@ -4,6 +4,8 @@
  * Target: 500–800 words · overlap: 100 words (env overrides via PRACTICE_CHUNK_*).
  */
 
+import { isNonContentHeading, isNonContentChunk } from "../content/frontMatterFilter.js";
+
 const DEFAULT_MIN_WORDS = parseInt(process.env.PRACTICE_CHUNK_MIN_WORDS, 10) || 500;
 const DEFAULT_MAX_WORDS = parseInt(process.env.PRACTICE_CHUNK_MAX_WORDS, 10) || 800;
 const DEFAULT_OVERLAP_WORDS = parseInt(process.env.PRACTICE_CHUNK_OVERLAP_WORDS, 10) || 100;
@@ -178,6 +180,7 @@ export function detectTopicsFromBlocks(blocks, opts = {}) {
   const fallback = String(opts.fallbackTitle || "Chapter Content").trim() || "Chapter Content";
   const topics = [];
   let current = null;
+  let inNonContent = false;
 
   const startTopic = (name) => {
     current = {
@@ -192,9 +195,16 @@ export function detectTopicsFromBlocks(blocks, opts = {}) {
 
   for (const block of blocks) {
     if (block.type === "heading") {
+      if (isNonContentHeading(block.text)) {
+        inNonContent = true;
+        current = null;
+        continue;
+      }
+      inNonContent = false;
       startTopic(block.text);
       continue;
     }
+    if (inNonContent) continue;
     if (!current) startTopic(fallback);
     current.blocks.push(block);
   }
@@ -204,10 +214,14 @@ export function detectTopicsFromBlocks(blocks, opts = {}) {
     topics[0].blocks = [...blocks];
   }
 
-  // Drop empty topics (heading-only with no body) except if it's the only topic
-  const withBody = topics.filter((t) => t.blocks.some((b) => countWords(b.text) > 0));
+  // Drop empty topics (heading-only with no body) and non-content sections (preface/index/TOC)
+  const withBody = topics.filter(
+    (t) =>
+      !isNonContentHeading(t.name) &&
+      t.blocks.some((b) => countWords(b.text) > 0)
+  );
   if (withBody.length) return withBody;
-  return topics;
+  return topics.filter((t) => !isNonContentHeading(t.name));
 }
 
 /**
@@ -322,6 +336,12 @@ export function packBlocksIntoChunks(blocks, opts = {}) {
   }
 
   flush(true);
+
+  const filtered = chunks.filter(
+    (c) => !isNonContentChunk({ text: c.text, heading: baseHeading || c.heading, topic: currentSubTopic })
+  );
+  chunks.length = 0;
+  chunks.push(...filtered);
 
   // Merge tiny trailing chunk into previous when possible
   if (chunks.length >= 2) {

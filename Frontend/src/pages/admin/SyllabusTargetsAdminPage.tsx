@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, ConfirmationDialog } from "../../components/ui/dialog";
 import { useTheme } from "../../hooks/useTheme";
 import {
   adminAPI,
@@ -92,6 +93,13 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [removeTarget, setRemoveTarget] = useState<SyllabusModuleTargetItem | null>(null);
+  const [removeSelectedIds, setRemoveSelectedIds] = useState<Set<string>>(new Set());
+  const [removingStudents, setRemovingStudents] = useState(false);
+  const [bulkSelectedTargetIds, setBulkSelectedTargetIds] = useState<Set<string>>(new Set());
+  const [bulkRemoving, setBulkRemoving] = useState(false);
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [selectingAllBulk, setSelectingAllBulk] = useState(false);
 
   const surface = isDark ? "bg-slate-900/60 border-slate-800" : "bg-white border-slate-200";
   const muted = isDark ? "text-slate-400" : "text-slate-500";
@@ -169,6 +177,10 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
   useEffect(() => {
     loadList();
   }, [loadList]);
+
+  useEffect(() => {
+    setBulkSelectedTargetIds(new Set());
+  }, [listStudentIdFilter, listSubjectFilter, listPage]);
 
   useEffect(() => {
     if (!subjectKey) {
@@ -348,25 +360,126 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (
-      !window.confirm(
-        isMentor
-          ? "Remove this plan from your students? Other mentors' students on this module stay assigned."
-          : "Delete this syllabus target for all assigned students?"
-      )
-    ) {
+  const openRemoveDialog = (item: SyllabusModuleTargetItem) => {
+    setRemoveTarget(item);
+    setRemoveSelectedIds(new Set());
+    setError(null);
+    setSuccess(null);
+  };
+
+  const closeRemoveDialog = () => {
+    if (removingStudents) return;
+    setRemoveTarget(null);
+    setRemoveSelectedIds(new Set());
+  };
+
+  const toggleRemoveStudent = (studentId: string) => {
+    setRemoveSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(studentId)) next.delete(studentId);
+      else next.add(studentId);
+      return next;
+    });
+  };
+
+  const selectAllRemoveStudents = () => {
+    if (!removeTarget) return;
+    setRemoveSelectedIds(new Set(removeTarget.assignedStudents.map((s) => s._id)));
+  };
+
+  const handleRemoveStudents = async () => {
+    if (!removeTarget || removeSelectedIds.size === 0) {
+      setError("Select at least one student to remove");
+      return;
+    }
+
+    try {
+      setRemovingStudents(true);
+      setDeletingId(removeTarget._id);
+      const res = await syllabusTargetsAPI.removeStudents(removeTarget._id, [...removeSelectedIds]);
+      setSuccess(res.data.message || "Student(s) removed from target");
+      closeRemoveDialog();
+      await loadList();
+    } catch (e: unknown) {
+      const msg =
+        e && typeof e === "object" && "response" in e
+          ? (e as { response?: { data?: { message?: string } } }).response?.data?.message
+          : "Failed to remove student(s)";
+      setError(String(msg));
+    } finally {
+      setRemovingStudents(false);
+      setDeletingId(null);
+    }
+  };
+
+  const selectedListStudent = students.find((s) => s._id === listStudentIdFilter);
+
+  const studentBulkMode = !!listStudentIdFilter && !!selectedListStudent;
+
+  const toggleBulkTarget = (targetId: string) => {
+    setBulkSelectedTargetIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(targetId)) next.delete(targetId);
+      else next.add(targetId);
+      return next;
+    });
+  };
+
+  const selectAllBulkOnPage = () => {
+    setBulkSelectedTargetIds(new Set(list.map((item) => item._id)));
+  };
+
+  const selectAllBulkTargets = async () => {
+    if (!listStudentIdFilter) return;
+    const total = listPagination?.total || list.length;
+    if (total <= list.length) {
+      setBulkSelectedTargetIds(new Set(list.map((item) => item._id)));
       return;
     }
     try {
-      setDeletingId(id);
-      await syllabusTargetsAPI.delete(id);
-      setSuccess(isMentor ? "Plan removed from your students" : "Target removed");
-      await loadList();
+      setSelectingAllBulk(true);
+      const res = await syllabusTargetsAPI.listAdmin({
+        page: 1,
+        limit: Math.min(total, 500),
+        filter: "active",
+        ...(listSubjectFilter ? { subjectKey: listSubjectFilter } : {}),
+        studentId: listStudentIdFilter,
+      });
+      if (res.data.success) {
+        setBulkSelectedTargetIds(new Set((res.data.data.targets || []).map((item) => item._id)));
+      }
     } catch {
-      setError("Failed to delete target");
+      setError("Failed to select all targets");
     } finally {
-      setDeletingId(null);
+      setSelectingAllBulk(false);
+    }
+  };
+
+  const handleBulkRemoveStudent = async () => {
+    if (!listStudentIdFilter || !selectedListStudent || bulkSelectedTargetIds.size === 0) return;
+
+    try {
+      setBulkRemoving(true);
+      const targetIds = [...bulkSelectedTargetIds];
+      let removed = 0;
+      for (const targetId of targetIds) {
+        await syllabusTargetsAPI.removeStudents(targetId, [listStudentIdFilter]);
+        removed += 1;
+      }
+      setSuccess(
+        `Removed ${selectedListStudent.name} from ${removed} target${removed === 1 ? "" : "s"}`
+      );
+      setBulkSelectedTargetIds(new Set());
+      setBulkConfirmOpen(false);
+      await loadList();
+    } catch (e: unknown) {
+      const msg =
+        e && typeof e === "object" && "response" in e
+          ? (e as { response?: { data?: { message?: string } } }).response?.data?.message
+          : "Failed to remove student from selected targets";
+      setError(String(msg));
+    } finally {
+      setBulkRemoving(false);
     }
   };
 
@@ -386,8 +499,6 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
       )
       .slice(0, 200);
   }, [students, listStudentSearch]);
-
-  const selectedListStudent = students.find((s) => s._id === listStudentIdFilter);
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 px-3 md:px-6 pb-8">
@@ -957,6 +1068,76 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
           </div>
         </CardHeader>
         <CardContent>
+          {studentBulkMode && list.length > 0 && (
+            <div
+              className={`mb-4 rounded-xl border px-3 py-3 flex flex-col sm:flex-row sm:items-center gap-3 ${
+                isDark ? "border-indigo-900/50 bg-indigo-950/20" : "border-indigo-200 bg-indigo-50/60"
+              }`}
+            >
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-semibold ${text}`}>
+                  Remove {selectedListStudent?.name} from targets
+                </p>
+                <p className={`text-xs mt-0.5 ${muted}`}>
+                  Select targets below, then remove this student from all selected plans.
+                  {listPagination ? ` · ${listPagination.total} target${listPagination.total === 1 ? "" : "s"} assigned` : ""}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                {listPagination && listPagination.total > list.length ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={selectingAllBulk || bulkRemoving}
+                      onClick={selectAllBulkOnPage}
+                    >
+                      Select page
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={selectingAllBulk || bulkRemoving}
+                      onClick={selectAllBulkTargets}
+                    >
+                      {selectingAllBulk ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        `Select all ${listPagination.total}`
+                      )}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={selectingAllBulk || bulkRemoving}
+                    onClick={selectAllBulkOnPage}
+                  >
+                    Select all
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  size="sm"
+                  className="gap-1.5 bg-red-600 hover:bg-red-700 text-white"
+                  disabled={bulkSelectedTargetIds.size === 0 || bulkRemoving}
+                  onClick={() => setBulkConfirmOpen(true)}
+                >
+                  {bulkRemoving ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
+                  Remove from {bulkSelectedTargetIds.size || "selected"}
+                </Button>
+              </div>
+            </div>
+          )}
+
           {listLoading ? (
             <div className={`flex items-center justify-center gap-2 py-10 text-sm ${muted}`}>
               <Loader2 className="w-4 h-4 animate-spin" /> Loading…
@@ -969,13 +1150,26 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
             </p>
           ) : (
             <div className="space-y-2">
-              {list.map((item) => (
+              {list.map((item) => {
+                const bulkChecked = bulkSelectedTargetIds.has(item._id);
+                return (
                 <div
                   key={item._id}
                   className={`rounded-xl border px-3 py-3 flex flex-col sm:flex-row sm:items-center gap-3 ${
                     isDark ? "border-slate-800" : "border-slate-200"
-                  }`}
+                  } ${studentBulkMode && bulkChecked ? (isDark ? "border-indigo-800 bg-indigo-950/20" : "border-indigo-200 bg-indigo-50/40") : ""}`}
                 >
+                  {studentBulkMode && (
+                    <label className="flex items-center shrink-0 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={bulkChecked}
+                        onChange={() => toggleBulkTarget(item._id)}
+                        className="rounded border-slate-300"
+                        aria-label={`Select ${item.moduleName} for bulk remove`}
+                      />
+                    </label>
+                  )}
                   <div className="min-w-0 flex-1">
                     <div className={`text-sm font-semibold ${text}`}>
                       <span className={`mr-1.5 text-xs font-bold ${muted}`}>{item.moduleId}</span>
@@ -1002,7 +1196,7 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
                     </div>
                     {item.note ? <div className={`text-xs mt-1 ${muted}`}>Note: {item.note}</div> : null}
                     {item.assignedStudents?.length > 0 && (
-                      <div className={`text-xs mt-1 truncate ${muted}`}>
+                      <div className={`text-xs mt-1 ${muted}`}>
                         {item.assignedStudents
                           .slice(0, 4)
                           .map((s) => s.name)
@@ -1018,18 +1212,19 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
                     variant="outline"
                     size="sm"
                     className="gap-1.5 shrink-0 text-red-600 border-red-200 hover:bg-red-50"
-                    disabled={deletingId === item._id}
-                    onClick={() => handleDelete(item._id)}
+                    disabled={deletingId === item._id || !item.assignedStudents?.length}
+                    onClick={() => openRemoveDialog(item)}
                   >
                     {deletingId === item._id ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
                       <Trash2 className="w-3.5 h-3.5" />
                     )}
-                    Remove
+                    Remove students
                   </Button>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
 
@@ -1060,6 +1255,123 @@ export function SyllabusTargetsAdminPage({ mode = "admin" }: SyllabusTargetsAdmi
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!removeTarget}>
+        <DialogContent className="max-w-md w-full">
+          <DialogHeader>
+            <DialogTitle>Remove students from target</DialogTitle>
+            <button
+              type="button"
+              onClick={closeRemoveDialog}
+              disabled={removingStudents}
+              className={`p-1 rounded ${isDark ? "hover:bg-slate-800" : "hover:bg-slate-100"}`}
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </DialogHeader>
+          {removeTarget && (
+            <div className="px-6 pb-6 space-y-4">
+              <div>
+                <p className={`text-sm font-medium ${text}`}>
+                  {removeTarget.moduleId} {removeTarget.subjectName} — {removeTarget.moduleName}
+                </p>
+                <p className={`text-xs mt-1 ${muted}`}>
+                  Select which student(s) to remove from this target plan.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <span className={`text-xs font-semibold uppercase tracking-wide ${muted}`}>
+                  {removeSelectedIds.size} of {removeTarget.assignedStudents.length} selected
+                </span>
+                <button
+                  type="button"
+                  onClick={selectAllRemoveStudents}
+                  className={`text-xs font-medium underline-offset-2 hover:underline ${
+                    isDark ? "text-indigo-400" : "text-indigo-600"
+                  }`}
+                >
+                  Select all
+                </button>
+              </div>
+
+              <div
+                className={`max-h-56 overflow-y-auto rounded-lg border divide-y ${
+                  isDark ? "border-slate-700 divide-slate-800" : "border-slate-200 divide-slate-100"
+                }`}
+              >
+                {removeTarget.assignedStudents.map((student) => {
+                  const checked = removeSelectedIds.has(student._id);
+                  return (
+                    <label
+                      key={student._id}
+                      className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer ${
+                        isDark ? "hover:bg-slate-800/60" : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleRemoveStudent(student._id)}
+                        className="rounded border-slate-300"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className={`text-sm font-medium ${text}`}>{student.name}</div>
+                        {student.email ? (
+                          <div className={`text-xs truncate ${muted}`}>{student.email}</div>
+                        ) : null}
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-2 justify-end pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={closeRemoveDialog}
+                  disabled={removingStudents}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  className="gap-1.5 bg-red-600 hover:bg-red-700 text-white"
+                  disabled={removingStudents || removeSelectedIds.size === 0}
+                  onClick={handleRemoveStudents}
+                >
+                  {removingStudents ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                  Remove selected
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmationDialog
+        isOpen={bulkConfirmOpen}
+        title="Remove student from targets?"
+        message={
+          selectedListStudent
+            ? `Remove ${selectedListStudent.name} from ${bulkSelectedTargetIds.size} selected target${
+                bulkSelectedTargetIds.size === 1 ? "" : "s"
+              }? This cannot be undone.`
+            : "Remove this student from selected targets?"
+        }
+        confirmText="Remove"
+        cancelText="Cancel"
+        confirmButtonClass="bg-red-600 hover:bg-red-700 text-white"
+        onConfirm={handleBulkRemoveStudent}
+        onCancel={() => !bulkRemoving && setBulkConfirmOpen(false)}
+        loading={bulkRemoving}
+      />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import ContentChunk from "../../../models/ContentChunk.js";
 import { QG_CONFIG } from "../config/qg.config.js";
 import { retrievalCache, embeddingCache, cacheKey } from "./cache.service.js";
 import { withRetry } from "../utils/retry.js";
+import { isNonContentChunk } from "../../content/frontMatterFilter.js";
 
 const mongoRetriever = new MongoRetriever();
 
@@ -316,6 +317,17 @@ export async function hybridRetrieve(params = {}) {
   if (exclude.size) {
     merged = merged.filter((c) => !exclude.has(chunkIdOf(c)));
   }
+
+  merged = merged.filter(
+    (c) =>
+      !isNonContentChunk({
+        text: c.text,
+        heading: c.heading || c.subTopic,
+        topic: c.subTopic || c.heading,
+        chapter: c.chapter || c.book,
+        page: c.page,
+      })
+  );
 
   for (const c of merged) {
     c.hybridScore = computeHybridScore(c);

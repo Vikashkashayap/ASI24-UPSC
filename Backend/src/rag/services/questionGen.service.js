@@ -11,6 +11,8 @@ import { RAG_CONFIG } from "../config/rag.config.js";
 import { ragLogger } from "../utils/logger.js";
 import { withRetry } from "../utils/retry.js";
 import { lockPlainExplanationToAnswer } from "../../services/qg/utils/consistency.js";
+import { filterQuestionsByTopic } from "../../services/qg/utils/topicRelevance.js";
+import { isMetadataQuestion } from "../../services/content/frontMatterFilter.js";
 
 function normalizeDifficulty(d) {
   const v = String(d || "Medium").trim().toLowerCase();
@@ -27,6 +29,7 @@ Generate MCQs STRICTLY from the provided CONTEXT only.
 SOURCE RULES:
 - Never invent facts, dates, articles, or figures not present in CONTEXT.
 - If CONTEXT is insufficient for a question, omit that question.
+- NEVER generate questions from preface, foreword, publisher/edition info, table of contents, index listings, bibliography, or other book metadata. Test substantive subject matter only.
 - If CONTEXT cannot support ANY question, respond exactly: {"insufficient":true,"message":"Insufficient context."}
 - Return ONLY valid JSON (no markdown).
 
@@ -169,6 +172,7 @@ export async function generateQuestionsFromRag(params = {}) {
     topK: Math.max(RAG_CONFIG.generateTopK, 8),
     filters: {
       subject: subject || undefined,
+      topic,
       ...(params.filters || {}),
     },
   });
@@ -281,9 +285,15 @@ export async function generateQuestionsFromRag(params = {}) {
   const questions = (parsed?.questions || [])
     .map((q) => normalizeQuestion(q, meta))
     .filter(Boolean)
+    .filter((q) => !isMetadataQuestion(q))
     .slice(0, count);
 
-  if (!questions.length) {
+  const onTopic = filterQuestionsByTopic(questions, topic, { soft: false });
+  const finalQuestions = onTopic.questions.length
+    ? onTopic.questions
+    : questions.filter((q) => !isMetadataQuestion(q));
+
+  if (!finalQuestions.length) {
     return {
       cached: false,
       insufficient: true,
@@ -307,8 +317,8 @@ export async function generateQuestionsFromRag(params = {}) {
         subject: subject || "",
         topic,
         difficulty,
-        count: questions.length,
-        questions,
+        count: finalQuestions.length,
+        questions: finalQuestions,
         retrievalSource: retrieval.source,
         matchedChunks: retrieval.count,
         avgSimilarity,
@@ -323,7 +333,7 @@ export async function generateQuestionsFromRag(params = {}) {
   ragLogger.info("rag.generate.saved", {
     topic,
     subject,
-    generated: questions.length,
+    generated: finalQuestions.length,
     matchedChunks: retrieval.count,
     llmMs,
   });
@@ -333,11 +343,11 @@ export async function generateQuestionsFromRag(params = {}) {
     subject,
     topic,
     difficulty,
-    count: questions.length,
+    count: finalQuestions.length,
     matchedChunks: retrieval.count,
     retrievalSource: retrieval.source,
     avgSimilarity,
-    questions,
+    questions: finalQuestions,
     llmMs,
   };
 }

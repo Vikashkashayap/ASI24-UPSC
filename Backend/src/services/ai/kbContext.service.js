@@ -7,6 +7,8 @@ import { hybridSearch } from "../../intelligence/services/hybridSearch.service.j
 import { relatedConcepts } from "../../intelligence/data/concepts.js";
 import { KbSubject } from "../../knowledge/models/KbSubject.js";
 import { estimateTokens } from "./tokenEstimator.service.js";
+import { isNonContentChunk, chunkTextOf } from "../content/frontMatterFilter.js";
+import { filterChunksByTopic } from "../qg/utils/topicRelevance.js";
 
 const QUERY_ANGLES = [
   (topic, subject) => `${subject} ${topic}`,
@@ -179,8 +181,29 @@ export async function getContextForPractice({
 
   let rows = (result.results || []).filter((r) => {
     const id = String(r.chunkId || "");
-    return id && !exclude.has(id);
+    if (!id || exclude.has(id)) return false;
+    return !isNonContentChunk({
+      text: chunkTextOf(r),
+      heading: r.topic || r.chapter,
+      topic: r.topic,
+      chapter: r.chapter,
+      page: r.page,
+    });
   });
+
+  const applyTopicFilter = (list) => {
+    const mapped = (list || []).map((r) => ({
+      ...r,
+      text: chunkTextOf(r),
+      heading: r.topic || r.chapter || "",
+    }));
+    const tf = filterChunksByTopic(mapped, topicQuery);
+    if (tf.chunks.length) return tf.chunks;
+    if (tf.dropped > 0) return [];
+    return mapped;
+  };
+
+  rows = applyTopicFilter(rows);
 
   // If subject filter was too strict, retry unfiltered (semantic still keyed on topic query)
   if (!rows.length && kbSubject) {
@@ -192,12 +215,23 @@ export async function getContextForPractice({
     });
     rows = (result.results || []).filter((r) => {
       const id = String(r.chunkId || "");
-      return id && !exclude.has(id);
+      if (!id || exclude.has(id)) return false;
+      return !isNonContentChunk({
+        text: chunkTextOf(r),
+        heading: r.topic || r.chapter,
+        topic: r.topic,
+        chapter: r.chapter,
+        page: r.page,
+      });
     });
+    rows = applyTopicFilter(rows);
   }
 
   rows = rows.slice(0, fetchK);
-  const contextText = buildContextFromResults(rows, tokenBudget);
+  const contextText = buildContextFromResults(
+    rows.map((r) => ({ ...r, chunk: chunkTextOf(r) })),
+    tokenBudget
+  );
   const tokens = estimateTokens(contextText);
   const chunkIds = rows.map((r) => String(r.chunkId)).filter(Boolean);
 
@@ -215,7 +249,7 @@ export async function getContextForPractice({
     contextText,
     chunks: rows.map((r) => ({
       _id: r.chunkId,
-      text: r.chunk,
+      text: chunkTextOf(r),
       subject: r.subject,
       topic: r.topic,
       heading: r.document?.title || r.topic || "",

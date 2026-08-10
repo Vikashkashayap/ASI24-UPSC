@@ -1,5 +1,6 @@
 import { sha256, wordCount, jaccardSimilarity } from "../utils/helpers.js";
 import { chunkRepo } from "../repositories/index.js";
+import { isNonContentHeading, isNonContentChunk } from "../../services/content/frontMatterFilter.js";
 
 const MAX_CHUNK_WORDS = Number(process.env.PROCESSING_MAX_CHUNK_WORDS || 220);
 const MIN_CHUNK_WORDS = Number(process.env.PROCESSING_MIN_CHUNK_WORDS || 40);
@@ -15,6 +16,7 @@ export function generateChunks(sections, { subject, chapter } = {}) {
   let buffer = [];
   let page = 1;
   let sectionType = "paragraph";
+  let inNonContent = false;
 
   const flush = () => {
     const text = buffer.join("\n\n").trim();
@@ -32,7 +34,17 @@ export function generateChunks(sections, { subject, chapter } = {}) {
         const pw = wordCount(p);
         if (partWords + pw > MAX_CHUNK_WORDS && part.length) {
           const chunkText = part.join("\n\n");
-          chunks.push(makeChunk({ chunkText, page, subject, chapter, currentTopic, sectionType, order: order++ }));
+          if (
+            !isNonContentChunk({
+              chunkText,
+              heading: currentTopic,
+              topic: currentTopic,
+              sectionType,
+              page,
+            })
+          ) {
+            chunks.push(makeChunk({ chunkText, page, subject, chapter, currentTopic, sectionType, order: order++ }));
+          }
           part = [];
           partWords = 0;
         }
@@ -41,16 +53,44 @@ export function generateChunks(sections, { subject, chapter } = {}) {
       }
       if (part.length) {
         const chunkText = part.join("\n\n");
-        chunks.push(makeChunk({ chunkText, page, subject, chapter, currentTopic, sectionType, order: order++ }));
+        if (
+          !isNonContentChunk({
+            chunkText,
+            heading: currentTopic,
+            topic: currentTopic,
+            sectionType,
+            page,
+          })
+        ) {
+          chunks.push(makeChunk({ chunkText, page, subject, chapter, currentTopic, sectionType, order: order++ }));
+        }
       }
       return;
     }
 
+    if (
+      isNonContentChunk({
+        chunkText: text,
+        heading: currentTopic,
+        topic: currentTopic,
+        sectionType,
+        page,
+      })
+    ) {
+      return;
+    }
     chunks.push(makeChunk({ chunkText: text, page, subject, chapter, currentTopic, sectionType, order: order++ }));
   };
 
   for (const sec of sections || []) {
     if (["title", "heading", "subheading"].includes(sec.sectionType)) {
+      if (isNonContentHeading(sec.text)) {
+        inNonContent = true;
+        buffer = [];
+        currentTopic = "";
+        continue;
+      }
+      inNonContent = false;
       // new semantic boundary
       if (wordCount(buffer.join(" ")) >= MIN_CHUNK_WORDS) flush();
       else if (buffer.length) {
@@ -63,6 +103,7 @@ export function generateChunks(sections, { subject, chapter } = {}) {
       flush();
       continue;
     }
+    if (inNonContent) continue;
     if (["question", "options", "answer", "explanation"].includes(sec.sectionType)) {
       // questions are stored separately — skip from notes chunks
       continue;

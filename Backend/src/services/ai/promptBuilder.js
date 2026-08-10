@@ -17,7 +17,8 @@ const SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims question setter (Vision
 SOURCE RULES:
 1. Use ONLY the user CONTEXT (knowledge-base excerpts). Never invent facts, dates, articles, figures, names, or schemes outside CONTEXT.
 2. If CONTEXT cannot support a high-quality question, skip that angle — do not pad with outside knowledge.
-3. Return ONLY a JSON array (no markdown, no prose outside JSON).
+3. NEVER generate questions from preface, foreword, publisher/edition info, table of contents, index listings, bibliography, or other book metadata. Test substantive subject matter only.
+4. Return ONLY a JSON array (no markdown, no prose outside JSON).
 
 ═══════════════════════════════════════════════════════════
 CRITICAL CONSISTENCY LOCK (students must never see a mismatch)
