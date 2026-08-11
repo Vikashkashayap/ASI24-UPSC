@@ -146,7 +146,19 @@ class KnowledgeQdrantService {
     if (!client || !Array.isArray(vector) || !vector.length) return [];
 
     const must = [];
-    if (filters.subject) must.push({ key: "subject", match: { value: String(filters.subject) } });
+    // Accept alias family (Ancient History ↔ History) so syllabus labels still hit generic KB uploads
+    const subjectAliases = [
+      ...(Array.isArray(filters.subjectAliases) ? filters.subjectAliases : []),
+      ...(filters.subject ? [filters.subject] : []),
+    ]
+      .map((s) => String(s || "").trim())
+      .filter(Boolean);
+    const uniqueSubjects = [...new Set(subjectAliases)];
+    if (uniqueSubjects.length > 1) {
+      must.push({ key: "subject", match: { any: uniqueSubjects } });
+    } else if (uniqueSubjects.length === 1) {
+      must.push({ key: "subject", match: { value: uniqueSubjects[0] } });
+    }
     if (filters.chapter) must.push({ key: "chapter", match: { value: String(filters.chapter) } });
     if (filters.topic) must.push({ key: "topic", match: { value: String(filters.topic) } });
     if (filters.language) must.push({ key: "language", match: { value: String(filters.language) } });

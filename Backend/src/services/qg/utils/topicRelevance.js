@@ -227,6 +227,45 @@ const TOPIC_PHRASE_HINTS = {
     "soil of india",
     "natural vegetation",
   ],
+  "the importance of ancient indian history": [
+    "ancient indian history",
+    "ancient india",
+    "importance of history",
+    "historical sources",
+    "historiography",
+    "periodisation",
+    "periodization",
+    "why study history",
+    "reconstruction of history",
+  ],
+  "the construction of ancient indian history": [
+    "sources of ancient",
+    "literary sources",
+    "archaeological sources",
+    "inscriptions",
+    "coins",
+    "numismatic",
+    "foreign accounts",
+    "puranas",
+    "vedic literature",
+    "buddhist literature",
+    "jaina literature",
+    "historiography",
+  ],
+  "the stone age": [
+    "stone age",
+    "palaeolithic",
+    "paleolithic",
+    "mesolithic",
+    "neolithic",
+    "microlith",
+    "hunter gatherer",
+    "hunters and gatherers",
+    "bhimbetka",
+    "soan",
+    "acheulian",
+    "chalcolithic",
+  ],
 };
 
 /** If question hits these AND misses topic tokens, treat as clear off-topic (soft mode). */
@@ -469,6 +508,96 @@ export function filterQuestionsByTopic(questions, topic, opts = {}) {
   };
 }
 
+function normalizePatternIdLoose(questionType) {
+  const t = String(questionType || "").toLowerCase().replace(/[\s-]+/g, "_");
+  if (t.includes("not_correct") || t.includes("incorrect")) return "statement_not_correct";
+  if (t.includes("elimin")) return "multi_statement_elimination";
+  if (t.includes("pair") || t.includes("match")) return "pair_matching";
+  if (t.includes("assert")) return "assertion_reason";
+  if (t.includes("chron")) return "chronology";
+  if (t.includes("sequence") || t.includes("arrang")) return "sequence_arrangement";
+  if (t.includes("map") || t.includes("location")) return "map_location";
+  if (t.includes("odd")) return "odd_one_out";
+  if (t.includes("statement")) return "statement_based";
+  if (t.includes("direct") || t.includes("concept")) return "direct_conceptual";
+  return t || "direct_conceptual";
+}
+
+/**
+ * Keep only UPSC Prelims Hard / PYQ-style stems.
+ * Drops easy one-liners, trivia Who/What recalls, and empty multi-statement shells.
+ */
+export function isPyqHardEnough(question) {
+  if (!question || typeof question !== "object") return false;
+  if (String(question.difficulty || "").toLowerCase() === "easy") return false;
+
+  const stem = String(
+    question.question_en || question.question || question.question_hi || ""
+  ).trim();
+  if (stem.length < 60) return false;
+
+  const type = normalizePatternIdLoose(question.questionType || question.type);
+  const hasNumbered =
+    /(?:^|\n)\s*(?:\(?\d+\)?[.)]|[1-9]\s*[.)])/m.test(stem) ||
+    (Array.isArray(question.statements) &&
+      question.statements.filter((s) => String(s || "").trim().length >= 12).length >= 2);
+  const hasAR =
+    /assertion\s*\(|reason\s*\(|अभिकथन|कारण/i.test(stem) ||
+    Boolean(question.assertionReason?.assertion && question.assertionReason?.reason);
+  const hasMatch =
+    /list[\s-]*i|match the following|सुमेलित/i.test(stem) ||
+    (Array.isArray(question.matchColumns?.columnA) &&
+      question.matchColumns.columnA.filter((x) => String(x || "").trim()).length >= 2);
+  const hasChrono =
+    /chronolog|arrange|sequence|सही क्रम/i.test(stem) ||
+    (Array.isArray(question.chronologyItems) &&
+      question.chronologyItems.filter((x) => String(x || "").trim()).length >= 2);
+
+  const pyqPatterns = new Set([
+    "statement_based",
+    "statement_not_correct",
+    "multi_statement_elimination",
+    "assertion_reason",
+    "pair_matching",
+    "chronology",
+    "sequence_arrangement",
+  ]);
+
+  if (pyqPatterns.has(type)) {
+    if (type === "assertion_reason") return hasAR || stem.length >= 140;
+    if (type === "pair_matching") return hasMatch || stem.length >= 140;
+    if (type === "chronology" || type === "sequence_arrangement") {
+      return hasChrono || hasNumbered || stem.length >= 140;
+    }
+    return hasNumbered || stem.length >= 160;
+  }
+
+  // direct_conceptual / others — reject trivia one-liners
+  if (/^(who|what|when|where|which\s+year)\b/i.test(stem) && stem.length < 140) {
+    return false;
+  }
+  if (stem.length < 110) return false;
+  // Prefer conceptual framing
+  if (
+    /with reference to|consider the following|which of the following|in the context of|correctly explained|not correct/i.test(
+      stem
+    )
+  ) {
+    return true;
+  }
+  return stem.length >= 140;
+}
+
+/**
+ * @param {object[]} questions
+ * @returns {{ questions: object[], dropped: number }}
+ */
+export function filterQuestionsByPyqHardness(questions) {
+  const list = Array.isArray(questions) ? questions : [];
+  const kept = list.filter((q) => isPyqHardEnough(q));
+  return { questions: kept, dropped: list.length - kept.length };
+}
+
 export default {
   tokenizeTopic,
   topicOverlapScore,
@@ -476,4 +605,6 @@ export default {
   isQuestionOnTopic,
   filterQuestionsByTopic,
   isAbstractChapterTopic,
+  isPyqHardEnough,
+  filterQuestionsByPyqHardness,
 };

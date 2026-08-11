@@ -21,43 +21,103 @@ const QUERY_ANGLES = [
   (topic) => `${topic} comparison difference articles`,
 ];
 
+/**
+ * Map syllabus / student labels → Admin KB subject names that actually exist on uploads.
+ * Order matters: parent bucket ("History") first so Ancient/Medieval/World all hit the same PDFs.
+ */
 const SUBJECT_ALIASES = {
   polity: ["Polity", "Indian Polity"],
-  history: ["History", "Ancient History", "Medieval History", "Modern History"],
+  "indian polity": ["Polity", "Indian Polity"],
+  history: ["History", "Ancient History", "Medieval History", "Modern History", "World History"],
+  "ancient history": ["History", "Ancient History"],
+  "medieval history": ["History", "Medieval History"],
+  "modern history": ["History", "Modern History"],
+  "world history": ["History", "World History"],
   geography: ["Geography", "Indian Geography", "World Geography"],
+  "indian geography": ["Geography", "Indian Geography"],
+  "world geography": ["Geography", "World Geography"],
   economy: ["Economy", "Indian Economy"],
+  "indian economy": ["Economy", "Indian Economy"],
+  economics: ["Economy", "Indian Economy"],
   environment: ["Environment", "Ecology", "Environment & Ecology"],
+  ecology: ["Environment", "Ecology", "Environment & Ecology"],
   "science & tech": ["Science & Tech", "Science and Technology", "Science & Technology"],
+  "science and technology": ["Science & Tech", "Science and Technology", "Science & Technology"],
   "art & culture": ["Art & Culture", "Art and Culture"],
+  "art and culture": ["Art & Culture", "Art and Culture"],
   "current affairs": ["Current Affairs"],
+  "international relations": ["International Relations"],
+  "internal security": ["Internal Security"],
+  governance: ["Governance"],
+  ethics: ["Ethics"],
+  society: ["Society"],
 };
 
 function escapeRegex(s) {
   return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function aliasListForSubject(subject) {
+  const raw = String(subject || "").trim();
+  if (!raw) return [];
+  const lower = raw.toLowerCase();
+
+  if (SUBJECT_ALIASES[lower]) return [...SUBJECT_ALIASES[lower]];
+
+  // Longest alias key contained in label (e.g. "Ancient History" → "ancient history")
+  let bestKey = "";
+  for (const key of Object.keys(SUBJECT_ALIASES)) {
+    if (lower.includes(key) && key.length > bestKey.length) bestKey = key;
+  }
+  if (bestKey) return [...SUBJECT_ALIASES[bestKey]];
+
+  return [raw];
+}
+
 /**
- * Map student subject label → best matching KbSubject.name (if present).
+ * Map student / syllabus subject label → best matching KbSubject.name (if present).
+ * "Ancient History" → "History" when only generic History PDFs exist in KB.
  */
 async function resolveKbSubjectName(subject) {
   const raw = String(subject || "").trim();
   if (!raw) return "";
 
-  const aliases = SUBJECT_ALIASES[raw.toLowerCase()] || [raw];
-  const or = aliases.flatMap((a) => [
-    { name: new RegExp(`^${escapeRegex(a)}$`, "i") },
-    { slug: new RegExp(`^${escapeRegex(a).replace(/\s+/g, "-")}$`, "i") },
-  ]);
+  const aliases = aliasListForSubject(raw);
+  if (!aliases.some((a) => a.toLowerCase() === raw.toLowerCase())) {
+    aliases.push(raw);
+  }
 
   try {
-    const hit = await KbSubject.findOne({
+    // Prefer parent bucket first (History before Ancient History)
+    for (const a of aliases) {
+      const hit = await KbSubject.findOne({
+        isDeleted: { $ne: true },
+        isActive: { $ne: false },
+        $or: [
+          { name: new RegExp(`^${escapeRegex(a)}$`, "i") },
+          { slug: new RegExp(`^${escapeRegex(a).replace(/\s+/g, "-")}$`, "i") },
+        ],
+      })
+        .select("name")
+        .lean();
+      if (hit?.name) return hit.name;
+    }
+
+    // Loose: KbSubject name contained in label (History ⊂ "Ancient History")
+    const candidates = await KbSubject.find({
       isDeleted: { $ne: true },
       isActive: { $ne: false },
-      $or: or,
     })
       .select("name")
       .lean();
-    if (hit?.name) return hit.name;
+    const lower = raw.toLowerCase();
+    const reverse = (candidates || [])
+      .filter((s) => {
+        const n = String(s.name || "").toLowerCase();
+        return n.length >= 4 && (lower.includes(n) || n.includes(lower));
+      })
+      .sort((a, b) => String(b.name).length - String(a.name).length);
+    if (reverse[0]?.name) return reverse[0].name;
 
     // Loose contains (e.g. "Polity" ↔ "Indian Polity")
     const loose = await KbSubject.findOne({
@@ -72,7 +132,8 @@ async function resolveKbSubjectName(subject) {
     console.warn("[kbContext] KbSubject resolve failed:", err.message);
   }
 
-  return raw;
+  // Fall back to parent alias even if KbSubject row missing (chunk.subject may still be "History")
+  return aliases[0] || raw;
 }
 
 function truncateToTokenBudget(text, maxTokens) {
@@ -150,8 +211,16 @@ export async function getContextForPractice({
   }
 
   const kbSubject = await resolveKbSubjectName(subjectRaw);
+  const subjectAliases = aliasListForSubject(kbSubject || subjectRaw);
+  // Keep syllabus label in the query (Ancient History) even when KB filter is generic (History)
+  const querySubject =
+    subjectRaw &&
+    kbSubject &&
+    subjectRaw.toLowerCase() !== kbSubject.toLowerCase()
+      ? `${kbSubject} ${subjectRaw}`
+      : kbSubject || subjectRaw;
   const angleFn = QUERY_ANGLES[Math.abs(batchIndex) % QUERY_ANGLES.length];
-  const angledQuery = angleFn(topicQuery, kbSubject || subjectRaw);
+  const angledQuery = angleFn(topicQuery, querySubject);
   const concepts = relatedConcepts(angledQuery);
   const expanded = [angledQuery, ...concepts.slice(0, 3)].join(" ");
 
@@ -168,12 +237,18 @@ export async function getContextForPractice({
     Number(process.env.PRELIMS_KB_CONTEXT_TOKENS || 2400) ||
     2400;
 
-  // Free-text student topic → query only (not exact payload topic filter).
-  // Subject filter uses resolved KbSubject name; hybridSearch already soft-retries.
+  // Free-text chapter topic → semantic query.
+  // Subject filter accepts History family aliases so Ancient History targets
+  // still retrieve PDFs tagged only as "History".
   let result = await hybridSearch({
     query: expanded,
     filters: {
-      ...(kbSubject ? { subject: kbSubject } : {}),
+      ...(kbSubject
+        ? {
+            subject: kbSubject,
+            subjectAliases: subjectAliases.length ? subjectAliases : [kbSubject],
+          }
+        : {}),
     },
     topK: requestK,
     searchType: "hybrid",

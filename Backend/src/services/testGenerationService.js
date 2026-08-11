@@ -26,7 +26,7 @@ import {
   coerceListItemText,
   filterStudentReadyQuestions,
 } from "./questionTranslationService.js";
-import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
+import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS, resolveNotesPatterns } from "../config/questionPatterns.js";
 import { generateQuestionsFromContextBatch } from "./ai/questionGenerator.service.js";
 import { questionPatternEngine } from "./ai/questionPatternEngine.js";
 import {
@@ -43,7 +43,10 @@ import {
   extractClaimedCorrectLetter,
   lockPlainExplanationToAnswer,
 } from "./qg/utils/consistency.js";
-import { filterQuestionsByTopic } from "./qg/utils/topicRelevance.js";
+import {
+  filterQuestionsByTopic,
+  filterQuestionsByPyqHardness,
+} from "./qg/utils/topicRelevance.js";
 import {
   getHindiTranslateProvider,
   mtTranslateManyToHindi,
@@ -107,10 +110,21 @@ async function generateTestQuestionsFromKnowledgeBase({
   }
 
   // Admin KB + Intelligence hybrid (same stack as QI / Test Builder)
+  // Chapter Targets (kbOnly): pull deeper RAG context for UPSC-Hard grounded stems
+  const ragTopK = forceKbOnly
+    ? Number(process.env.CHAPTER_KB_TOP_K || process.env.PRELIMS_KB_TOP_K || 20) || 20
+    : undefined;
+  const ragMaxTokens = forceKbOnly
+    ? Number(process.env.CHAPTER_KB_CONTEXT_TOKENS || process.env.PRELIMS_KB_CONTEXT_TOKENS || 3600) ||
+      3600
+    : undefined;
+
   const probe = await getContextForPractice({
     subject: primarySubject,
     topic: topicQuery,
     batchIndex: 0,
+    ...(ragTopK ? { topK: ragTopK } : {}),
+    ...(ragMaxTokens ? { maxTokens: ragMaxTokens } : {}),
   });
   const probeHasOnTopicKb = Boolean(probe.contextText && probe.contextText.length >= 80);
   // Keyword/mongo-only retrieval is often weakly related — prefer LLM sooner
@@ -142,12 +156,21 @@ async function generateTestQuestionsFromKnowledgeBase({
   let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
   let openKnowledgeUsed = preferOpenKnowledge;
 
-  // Always all UPSC Prelims patterns in equal ratio (KB + LLM) — none missing
-  const selectedPatterns = resolveNotesPatterns(ALL_PATTERN_IDS);
+  // Hard + KB-only (Module Targets): real UPSC Prelims / PYQ pattern mix
+  const pyqHardMode = forceKbOnly && difficultyKey === "hard";
+  const selectedPatterns = resolveNotesPatterns(
+    pyqHardMode ? PYQ_HARD_PATTERN_IDS : ALL_PATTERN_IDS
+  );
   const planState = questionPatternEngine.createPlan({
     questionCount: count + Math.min(5, count),
     patternsToInclude: selectedPatterns,
+    difficultyProfile: pyqHardMode ? "pyq_hard" : "balanced",
   });
+  if (pyqHardMode) {
+    console.log(
+      `🎯 PYQ-Hard mode ON for "${topicQuery}" — patterns=${selectedPatterns.join(",")} | easy≈0 moderate≈15% hard≈85%`
+    );
+  }
 
   const forcedBatch =
     batchSizeOverride != null && Number.isFinite(Number(batchSizeOverride))
@@ -193,7 +216,7 @@ async function generateTestQuestionsFromKnowledgeBase({
         batchSize: askCount,
       }),
       subject: primarySubject,
-      chapter: "",
+      chapter: topicQuery,
       ragOptimized: !openKnowledge,
       openKnowledge,
     });
@@ -240,8 +263,24 @@ async function generateTestQuestionsFromKnowledgeBase({
         `⚠️ Prelims batch ${round + 1}: dropped ${onTopic.dropped} off-topic question(s) for "${topicQuery}" (${openKnowledge ? "LLM-soft" : "KB"})`
       );
     }
-    // Keep all on-topic (may be > need) so progress fills faster across rounds
-    return onTopic.questions;
+
+    let kept = onTopic.questions;
+    if (pyqHardMode && kept.length) {
+      const hardPass = filterQuestionsByPyqHardness(kept);
+      if (hardPass.dropped > 0) {
+        console.warn(
+          `⚠️ Prelims batch ${round + 1}: dropped ${hardPass.dropped} easy/one-liner Q(s) (PYQ-Hard filter)`
+        );
+      }
+      // If filter wiped the batch, keep softest survivors only when nothing else remains
+      if (hardPass.questions.length) kept = hardPass.questions;
+      else if (kept.length) {
+        console.warn(
+          `⚠️ Prelims batch ${round + 1}: PYQ-Hard filter emptied batch — keeping ${kept.length} for refill`
+        );
+      }
+    }
+    return kept;
   };
 
   for (let round = 0; validatedQuestions.length < count && round < maxBatchRounds; round += 1) {
@@ -258,6 +297,8 @@ async function generateTestQuestionsFromKnowledgeBase({
         topic: topicQuery,
         batchIndex: round,
         excludeChunkIds: [...usedChunkIds],
+        ...(ragTopK ? { topK: ragTopK } : {}),
+        ...(ragMaxTokens ? { maxTokens: ragMaxTokens } : {}),
       });
       for (const id of rag.chunkIds || []) usedChunkIds.add(id);
 

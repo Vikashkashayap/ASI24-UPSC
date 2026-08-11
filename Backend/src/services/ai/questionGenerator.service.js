@@ -455,12 +455,19 @@ async function callNotesBatchOnce({
 
   const maxTokens = getMaxTokensForPracticeGeneration(requestCount);
   const startedAt = Date.now();
+  const diffNorm = String(difficulty || "").toLowerCase();
+  const baseTemp =
+    typeof temperature === "number"
+      ? temperature
+      : diffNorm === "hard"
+        ? 0.15
+        : 0.2;
   const result = await callOpenRouterAPI({
     apiKey,
     model,
     systemPrompt,
     userPrompt,
-    temperature,
+    temperature: baseTemp,
     maxTokens,
   });
 
@@ -642,7 +649,15 @@ async function generateNotesBatch({
       generationPlan,
       subject,
       chapter,
-      temperature: fill === 0 ? 0.2 : Math.min(0.55, 0.3 + fill * 0.05),
+      temperature:
+        fill === 0
+          ? String(difficulty || "").toLowerCase() === "hard"
+            ? 0.15
+            : 0.2
+          : Math.min(
+              0.5,
+              (String(difficulty || "").toLowerCase() === "hard" ? 0.22 : 0.3) + fill * 0.05
+            ),
       openKnowledge,
     });
 

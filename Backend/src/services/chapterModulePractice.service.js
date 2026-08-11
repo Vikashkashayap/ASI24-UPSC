@@ -1,10 +1,10 @@
 /**
  * Student Module Targets → chapter practice:
- * - Prefer Admin KB / RAG for 30 Hard MCQs; if topic missing/short → LLM open-syllabus (no hard fail)
+ * - Admin KB / RAG only for Hard MCQs (no open-syllabus inventing)
  * - Always bilingual (EN + HI) for chapter practice
  * - Show 20 unique questions (teaching explanations: correct + all wrong options)
  * - Prefetch related UPSC topics for the *next* chapter into cache
- * Module Final (50Q): chapter bank + RAG/LLM top-up, polished explanations
+ * Module Final (50Q): chapter bank + RAG top-up, polished explanations
  */
 
 import Test from "../models/Test.js";
@@ -28,28 +28,33 @@ import {
   runWithOpenRouterAppTitle,
 } from "../config/openRouterAppTitle.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
-import { ALL_PATTERN_IDS } from "../config/questionPatterns.js";
+import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS } from "../config/questionPatterns.js";
+import {
+  resolveKbSubjectLabel,
+  SYLLABUS_KEY_TO_KB_SUBJECT as SHARED_SYLLABUS_KEY_TO_KB,
+} from "./ai/kbSubjectResolve.js";
+import { filterQuestionsByPyqHardness } from "./qg/utils/topicRelevance.js";
 
-const SYLLABUS_KEY_TO_KB_SUBJECT = {
-  polity: "Polity",
-  ancient: "History",
-  medieval: "History",
-  modern: "History",
-  postind: "History",
-  worldhist: "History",
-  artculture: "Art & Culture",
-  indgeo: "Geography",
-  worldgeo: "Geography",
-  economy: "Economy",
-  environment: "Environment",
-  ir: "International Relations",
-  intsec: "Internal Security",
-  society: "Society",
-  governance: "Governance",
-  socialjustice: "Governance",
-  ethics: "Ethics",
-  scitech: "Science & Tech",
-};
+export const SYLLABUS_KEY_TO_KB_SUBJECT = SHARED_SYLLABUS_KEY_TO_KB;
+
+/**
+ * Syllabus display names (Ancient History, World Geography, …) → Admin KB subject bucket.
+ * KB uploads are often generic ("History") while Daily Targets use fine-grained labels.
+ */
+const SYLLABUS_NAME_TO_KB_SUBJECT = [
+  { re: /\b(ancient|medieval|modern|world)\s*hist|post[-\s]?independ|\bhistory\b/i, subject: "History" },
+  { re: /\b(indian\s+)?polity\b|\bconstitution\b/i, subject: "Polity" },
+  { re: /\b(indian\s+|world\s+)?geography\b|\bgeograph/i, subject: "Geography" },
+  { re: /\beconom(y|ics)\b/i, subject: "Economy" },
+  { re: /\benvironment\b|\becology\b/i, subject: "Environment" },
+  { re: /\bart\s*(and|&)\s*culture\b/i, subject: "Art & Culture" },
+  { re: /\bscience\s*(and|&)\s*tech/i, subject: "Science & Tech" },
+  { re: /\binternational\s+relations\b|\b\bir\b/i, subject: "International Relations" },
+  { re: /\binternal\s+security\b/i, subject: "Internal Security" },
+  { re: /\bsocial\s+justice\b|\bgovernance\b/i, subject: "Governance" },
+  { re: /\bethics\b/i, subject: "Ethics" },
+  { re: /\bsociety\b/i, subject: "Society" },
+];
 
 /** Prelims test UI subjects — fall back when KB subject is not a GS toggle subject. */
 const KB_TO_TEST_SUBJECT = {
@@ -77,15 +82,18 @@ export function parseChapterPreviewLine(line) {
   return { chapterNum: "", topicName: raw, label: raw };
 }
 
+/** Ancient History / Medieval / … → History (where NCERT PDFs are tagged). */
 export function resolveKbSubject(subjectKey, subjectName) {
+  const fromShared = resolveKbSubjectLabel(subjectKey, subjectName);
+  if (fromShared && fromShared !== String(subjectName || "").trim()) return fromShared;
   const key = String(subjectKey || "").trim().toLowerCase();
   if (SYLLABUS_KEY_TO_KB_SUBJECT[key]) return SYLLABUS_KEY_TO_KB_SUBJECT[key];
   const name = String(subjectName || "").trim();
-  if (!name) return "Polity";
-  const mapped = Object.values(SYLLABUS_KEY_TO_KB_SUBJECT).find(
-    (s) => s.toLowerCase() === name.toLowerCase()
-  );
-  return mapped || name;
+  if (!name) return fromShared || "Polity";
+  for (const { re, subject } of SYLLABUS_NAME_TO_KB_SUBJECT) {
+    if (re.test(name)) return subject;
+  }
+  return fromShared || name;
 }
 
 export function resolveTestSubject(kbSubject) {
@@ -120,7 +128,13 @@ function pickBalancedPatternSet(pool, showCount) {
   const unique = dedupeQuestionsByStem(dedupeQuestions(pool || []));
   if (unique.length <= showCount) return unique;
 
-  const buckets = new Map(ALL_PATTERN_IDS.map((id) => [id, []]));
+  // Prefer real UPSC Prelims Hard patterns when selecting the shown paper
+  const patternOrder = [
+    ...PYQ_HARD_PATTERN_IDS,
+    ...ALL_PATTERN_IDS.filter((id) => !PYQ_HARD_PATTERN_IDS.includes(id)),
+  ];
+
+  const buckets = new Map(patternOrder.map((id) => [id, []]));
   const leftovers = [];
   for (const q of unique) {
     const id = normalizePatternId(q.questionType || q.type);
@@ -143,10 +157,10 @@ function pickBalancedPatternSet(pool, showCount) {
   const picked = [];
   const used = new Set();
   let guard = 0;
-  while (picked.length < showCount && guard < showCount * ALL_PATTERN_IDS.length + 20) {
+  while (picked.length < showCount && guard < showCount * patternOrder.length + 20) {
     guard += 1;
     let added = false;
-    for (const id of ALL_PATTERN_IDS) {
+    for (const id of patternOrder) {
       if (picked.length >= showCount) break;
       const list = buckets.get(id) || [];
       while (list.length) {
@@ -391,7 +405,7 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 
 /**
  * Create (or reuse-from-cache) a chapter practice test.
- * Prefer Admin KB/RAG for 30 Hard MCQs; if topic missing/short → LLM fallback.
+ * Admin KB/RAG only for 30 Hard MCQs (no open-syllabus inventing).
  * English at generate time; Hindi via free client Google translate (0 OpenRouter tokens).
  * Show 20 unique questions with teaching explanations.
  *
@@ -590,8 +604,8 @@ async function createChapterPracticeTestInner({
     );
   } else {
     console.log(
-      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG` +
-        ` (LLM fallback if missing) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
+      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG only` +
+        ` (no open-syllabus) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
     );
   }
 
@@ -604,8 +618,9 @@ async function createChapterPracticeTestInner({
       difficulty,
       batchSize: BATCH_SIZE,
       minAcceptable: MIN_ACCEPTABLE,
-      kbOnly: false,
-      allowLlmFallback: true,
+      // Module Targets: questions MUST come from Admin KB/RAG only (UPSC Hard)
+      kbOnly: true,
+      allowLlmFallback: false,
       ensureHindi: true,
     });
 
@@ -619,7 +634,15 @@ async function createChapterPracticeTestInner({
     }
 
     const rawPool = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
-    const pool = filterStudentReadyQuestions(uniquePool(rawPool));
+    const hardness = filterQuestionsByPyqHardness(rawPool);
+    if (hardness.dropped > 0) {
+      console.log(
+        `[chapterPractice] PYQ-Hard filter: kept ${hardness.questions.length}/${rawPool.length} (dropped ${hardness.dropped} easy/one-liners)`
+      );
+    }
+    const pool = filterStudentReadyQuestions(
+      uniquePool(hardness.questions.length ? hardness.questions : rawPool)
+    );
 
     const hardFloor = Math.min(MIN_ACCEPTABLE, 18);
     if (pool.length < hardFloor) {
@@ -704,8 +727,8 @@ async function generateModuleFinalTopUp({
       difficulty: "Hard",
       batchSize: Math.min(5, want),
       minAcceptable: 1,
-      kbOnly: false,
-      allowLlmFallback: true,
+      kbOnly: true,
+      allowLlmFallback: false,
       ensureHindi: true,
     });
 
@@ -740,8 +763,8 @@ async function generateModuleFinalTopUp({
         difficulty: "Hard",
         batchSize: 5,
         minAcceptable: 1,
-        kbOnly: false,
-        allowLlmFallback: true,
+        kbOnly: true,
+        allowLlmFallback: false,
         ensureHindi: true,
       });
       if (!generationResult.success || !generationResult.questions?.length) continue;

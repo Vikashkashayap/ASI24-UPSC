@@ -81,9 +81,15 @@ export const keywordRepo = {
   insertMany: (docs) => (docs.length ? KeywordIndex.insertMany(docs, { ordered: false }).catch((e) => {
     if (e?.code !== 11000) throw e;
   }) : Promise.resolve()),
-  searchTerms: async (terms, { subject, limit = 40 } = {}) => {
+  searchTerms: async (terms, { subject, subjects, limit = 40 } = {}) => {
     const filter = { term: { $in: terms.map((t) => t.toLowerCase()) } };
-    if (subject) filter.subject = subject;
+    const list = Array.isArray(subjects) && subjects.length
+      ? subjects.map((s) => String(s || "").trim()).filter(Boolean)
+      : subject
+        ? [String(subject).trim()].filter(Boolean)
+        : [];
+    if (list.length > 1) filter.subject = { $in: list };
+    else if (list.length === 1) filter.subject = list[0];
     const rows = await KeywordIndex.find(filter).limit(500).lean();
     const byChunk = new Map();
     for (const row of rows) {

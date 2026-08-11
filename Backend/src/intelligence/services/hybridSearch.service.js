@@ -33,6 +33,18 @@ function normalizeFilters(filters = {}) {
       out[key] = filters[key];
     }
   }
+  if (Array.isArray(filters.subjectAliases) && filters.subjectAliases.length) {
+    out.subjectAliases = [
+      ...new Set(
+        filters.subjectAliases
+          .map((s) => String(s || "").trim())
+          .filter(Boolean)
+      ),
+    ];
+  } else if (out.subject) {
+    // Always allow exact subject through as a single-element alias list for MatchAny callers
+    out.subjectAliases = [String(out.subject)];
+  }
   return out;
 }
 
@@ -147,7 +159,15 @@ async function semanticSearch(query, filters, topK) {
   if (!embeddingService.isConfigured() || !knowledgeQdrant.isConfigured()) return [];
   const vector = await embedQuery(query);
   if (!vector) return [];
-  const hits = await knowledgeQdrant.search({ vector, filters, topK });
+  let hits = await knowledgeQdrant.search({ vector, filters, topK });
+  // Syllabus "Ancient History" vs KB uploads tagged "History" — retry unfiltered
+  if (
+    !hits.length &&
+    (filters.subject || (filters.subjectAliases && filters.subjectAliases.length))
+  ) {
+    const { subject: _s, subjectAliases: _a, chapter: _c, topic: _t, ...rest } = filters;
+    hits = await knowledgeQdrant.search({ vector, filters: rest, topK });
+  }
   return hits.map((h) => ({
     chunkId: h.payload?.chunkId,
     documentId: h.payload?.documentId,
@@ -203,10 +223,21 @@ async function notesWebsiteSemanticSearch(query, filters, topK) {
 
 async function keywordSearch(query, filters, topK) {
   const terms = expandSynonyms(query);
-  const hits = await keywordRepo.searchTerms(terms, {
-    subject: filters.subject,
+  const subjects =
+    Array.isArray(filters.subjectAliases) && filters.subjectAliases.length
+      ? filters.subjectAliases
+      : filters.subject
+        ? [filters.subject]
+        : [];
+  let hits = await keywordRepo.searchTerms(terms, {
+    subject: subjects[0],
+    subjects,
     limit: topK,
   });
+  // Same subject-label mismatch as semantic (Ancient History vs History)
+  if (!hits.length && subjects.length) {
+    hits = await keywordRepo.searchTerms(terms, { limit: topK });
+  }
   return hits.map((h) => ({
     chunkId: h.chunkId,
     documentId: h.documentId,
@@ -229,7 +260,21 @@ async function mongoTextSearch(query, filters, topK) {
     .slice(0, 8);
 
   const and = [{ isDuplicate: { $ne: true } }];
-  if (filters.subject) and.push({ subject: new RegExp(escapeRegex(filters.subject), "i") });
+  const subjectList =
+    Array.isArray(filters.subjectAliases) && filters.subjectAliases.length
+      ? filters.subjectAliases
+      : filters.subject
+        ? [filters.subject]
+        : [];
+  if (subjectList.length > 1) {
+    and.push({
+      $or: subjectList.map((s) => ({
+        subject: new RegExp(`^${escapeRegex(s)}$`, "i"),
+      })),
+    });
+  } else if (subjectList.length === 1) {
+    and.push({ subject: new RegExp(escapeRegex(subjectList[0]), "i") });
+  }
   if (filters.chapter) and.push({ chapter: new RegExp(escapeRegex(filters.chapter), "i") });
   if (filters.topic) and.push({ topic: new RegExp(escapeRegex(filters.topic), "i") });
   if (filters.documentId) and.push({ documentId: filters.documentId });

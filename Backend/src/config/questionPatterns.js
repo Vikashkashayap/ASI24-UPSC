@@ -15,6 +15,21 @@ export const PATTERN_LABELS = {
 
 export const ALL_PATTERN_IDS = Object.keys(PATTERN_LABELS);
 
+/**
+ * Real UPSC CSE Prelims (PYQ) Hard mix — heavy on elimination / statements / A-R.
+ * Direct conceptual kept low (~1/8). Soft patterns (odd one out) excluded.
+ */
+export const PYQ_HARD_PATTERN_IDS = [
+  "statement_based",
+  "statement_not_correct",
+  "multi_statement_elimination",
+  "assertion_reason",
+  "pair_matching",
+  "chronology",
+  "sequence_arrangement",
+  "direct_conceptual",
+];
+
 const VALID_PATTERN_IDS = new Set(ALL_PATTERN_IDS);
 
 export function resolveNotesPatterns(patternsToInclude = []) {

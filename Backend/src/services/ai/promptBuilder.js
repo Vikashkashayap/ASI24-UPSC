@@ -76,13 +76,16 @@ STEM COMPLETENESS (mandatory — students must see the full question):
 - NEVER use placeholder dashes for missing content — if CONTEXT is thin, skip that question.
 
 QUALITY BAR (UPSC aspirant / Hard Prelims — accuracy first):
-- Prefer hard, elimination-based, multi-statement questions over easy recall.
-- Close distractors from the SAME topic; no trivial giveaways.
+- Match official UPSC CSE Prelims toughness (recent PYQs / Vision IAS / Insights standard).
+- Prefer hard, elimination-based, multi-statement, assertion-reason, and matching questions over easy recall.
+- Close distractors from the SAME topic; no trivial giveaways or textbook one-liners.
 - Statements must be precise enough for serious CSE Prelims practice.
 - Facts (years, articles, schemes, bodies, places) MUST match CONTEXT exactly — never approximate.
 - Prefer PYQ-style framing: "With reference to…", "Consider the following statements…", "Which of the following…".
 - One clear concept per question; no compound trivia that confuses aspirants.
 - Wrong options = near-miss UPSC traps (wrong year/article, partial truth, swapped cause/effect) — never absurd.
+- When Difficulty is hard / PYQ-Hard: ≥80% multi-statement / assertion-reason / elimination / matching / chronology. Cap direct one-fact recall. Ban "Who was… / What is…" trivia unless embedded in a deeper stem.
+- Every Hard stem must force elimination thinking — a serious aspirant should need 30–60 seconds, not 5.
 
 questionType one of: statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
 Cover Mix evenly — no pattern missing, no duplicate stems.
@@ -178,8 +181,8 @@ JSON array only.`;
   }
 
   return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
-Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
-Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (knowledge base).
+Difficulty: ${difficulty}${difficulty === "hard" ? " (official UPSC CSE Prelims / recent PYQ toughness)" : ""}. Count: ${count}. Mix: ${mix}.
+Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (Admin Knowledge Base / RAG excerpts).
 
 HARD RULES (student safety):
 1. Decide correct OPTION TEXT from CONTEXT first, then set answer = that letter.
@@ -191,6 +194,18 @@ HARD RULES (student safety):
 7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
 8. ${patternRules}
 9. Explanation MUST teach: why the correct option is right + why EACH of the other three options is wrong (aspirant-level elimination). Include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
+10. SOURCE LOCK: Use ONLY CONTEXT. Do not invent facts outside CONTEXT. Better fewer grounded questions than padded outside knowledge.
+${
+  difficulty === "hard"
+    ? `11. HARD / PYQ MODE (mandatory):
+- Write like recent UPSC CSE Prelims + Vision IAS / Insights sectional tests.
+- ≥80% of this batch = statement_based / statement_not_correct / multi_statement_elimination / assertion_reason / pair_matching / chronology / sequence_arrangement.
+- ≤20% direct_conceptual, and those must be conceptual (not "Who founded…").
+- Ban short trivia stems. Each stem should need careful reading / elimination.
+- Distractors = near-miss from CONTEXT (wrong year, partial truth, swapped cause/effect, closely related concept).
+- Prefer frames: "With reference to…", "Consider the following statements:", "Which of the following pairs is/are correctly matched?".`
+    : ""
+}
 
 JSON array only.
 
