@@ -92,6 +92,7 @@ QUALITY BAR (UPSC aspirant / Hard Prelims — accuracy first):
 - Wrong options = near-miss UPSC traps (wrong year/article, partial truth, swapped cause/effect) — never absurd.
 - When Difficulty is hard / PYQ-Hard: ≥80% multi-statement / assertion-reason / elimination / matching / chronology. Cap direct one-fact recall. Ban "Who was… / What is…" trivia unless embedded in a deeper stem.
 - Every Hard stem must force elimination thinking — a serious aspirant should need 30–60 seconds, not 5.
+- Cover EVERY pattern id listed in Mix with the exact counts — never skip pair_matching, chronology, sequence_arrangement, or assertion_reason when Mix asks for them.
 
 questionType one of: statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
 Cover Mix evenly — no pattern missing, no duplicate stems.
@@ -182,10 +183,13 @@ export function buildNotesQuestionUserPrompt(params) {
       : `TOPIC LOCK: Every question MUST be directly about "${topic}". Ignore CONTEXT about a different chapter/sub-topic.`;
 
   const patternRules = `PATTERN RULES (mandatory — equal mix, none missing from Mix):
-- Follow Mix exactly: ${mix}
-- Every item MUST set "questionType" to the pattern id you wrote (from the Mix list).
+- Follow Mix EXACTLY by count: ${mix}
+- If Mix says Nxpair_matching, write exactly N pair_matching items (do NOT substitute statement_based).
+- Same for assertion_reason, chronology, sequence_arrangement, statement_not_correct, multi_statement_elimination.
+- Every item MUST set "questionType" to the exact pattern id from Mix.
 - COMPLETE stems only (no empty statements / blank match lists).
-- No repeated or near-duplicate questions.`;
+- No repeated or near-duplicate questions.
+- Cap direct_conceptual to at most what Mix asks — never flood the batch with recall MCQs.`;
 
   if (openKnowledge) {
     return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
@@ -219,13 +223,15 @@ HARD RULES (student safety):
 11. BOOK APPARATUS BAN: Never ask about Index, TOC, glossary, Example/Exercise boxes, practice lists, preface, or page numbers. If CONTEXT is only that junk, return [].
 ${
   difficulty === "hard"
-    ? `12. HARD / PYQ MODE (mandatory):
-- Write like recent UPSC CSE Prelims + Vision IAS / Insights sectional tests.
-- ≥80% of this batch = statement_based / statement_not_correct / multi_statement_elimination / assertion_reason / pair_matching / chronology / sequence_arrangement.
+    ? `12. HARD / PYQ MODE (mandatory — official UPSC CSE Prelims level):
+- Write like recent UPSC CSE Prelims + Vision IAS / Insights sectional tests (NOT textbook MCQs).
+- Follow Mix counts EXACTLY — all listed patterns must appear in this batch.
+- ≥80% = statement_based / statement_not_correct / multi_statement_elimination / assertion_reason / pair_matching / chronology / sequence_arrangement.
 - ≤20% direct_conceptual, and those must be conceptual (not "Who founded…").
-- Ban short trivia stems. Each stem should need careful reading / elimination.
+- Ban short trivia stems. Each stem should need careful reading / elimination (30–60 sec).
 - Distractors = near-miss from CONTEXT (wrong year, partial truth, swapped cause/effect, closely related concept).
-- Prefer frames: "With reference to…", "Consider the following statements:", "Which of the following pairs is/are correctly matched?".`
+- Prefer frames: "With reference to…", "Consider the following statements:", "Which of the following pairs is/are correctly matched?", "Which of the statements given above is/are not correct?".
+- difficulty field on every item MUST be "hard".`
     : ""
 }
 

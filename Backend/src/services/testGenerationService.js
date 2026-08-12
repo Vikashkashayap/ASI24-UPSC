@@ -962,7 +962,72 @@ function looseStemKey(q) {
   let stem = normalizeTextForFingerprint(getQuestionText(q));
   stem = stem.replace(UPSC_STEM_PREFIX_RE, "");
   stem = stem.replace(/\b[1234]\.\s/g, " ");
-  return stem.trim().slice(0, 80);
+  return stem.trim().slice(0, 120);
+}
+
+/** Content used for near-dupe similarity (stem + AR + statements, no UPSC filler). */
+function nearDupeContent(q) {
+  if (!q || typeof q !== "object") return "";
+  let stem = normalizeTextForFingerprint(getQuestionText(q));
+  stem = stem.replace(UPSC_STEM_PREFIX_RE, "");
+  stem = stem.replace(/\b([1-5])\.\s+/g, " ");
+  const ar = q.assertionReason;
+  if (ar && typeof ar === "object") {
+    stem += ` ${normalizeTextForFingerprint(ar.assertion)} ${normalizeTextForFingerprint(ar.reason)}`;
+  }
+  return stem.trim().replace(/\s+/g, " ");
+}
+
+function tokenSetForSim(text) {
+  return new Set(
+    String(text || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0900-\u097f]+/g, " ")
+      .split(/\s+/)
+      .filter((t) => t.length > 2)
+  );
+}
+
+function jaccardSim(a, b) {
+  if (!a?.size || !b?.size) return 0;
+  let inter = 0;
+  for (const t of a) if (b.has(t)) inter += 1;
+  return inter / (a.size + b.size - inter);
+}
+
+function optionTokenSet(q) {
+  const opts = getQuestionOptions(q);
+  const joined = ["A", "B", "C", "D"]
+    .map((k) => normalizeTextForFingerprint(opts[k] ?? ""))
+    .join(" ");
+  return tokenSetForSim(joined);
+}
+
+/** Within-paper near-dupe: stem overlap and/or near-identical options. */
+const WITHIN_PAPER_STEM_SIM = 0.72;
+const WITHIN_PAPER_OPT_SIM = 0.9;
+const WITHIN_PAPER_STEM_WITH_OPTS = 0.55;
+
+function isNearDuplicateOf(q, kept) {
+  const content = nearDupeContent(q);
+  if (!content || content.length < 24) return false;
+  const qTokens = tokenSetForSim(content);
+  const qOpts = optionTokenSet(q);
+  const qLoose = looseStemKey(q);
+
+  for (const other of kept) {
+    const otherLoose = looseStemKey(other);
+    if (qLoose && otherLoose && qLoose === otherLoose) return true;
+
+    const stemSim = jaccardSim(qTokens, tokenSetForSim(nearDupeContent(other)));
+    if (stemSim >= WITHIN_PAPER_STEM_SIM) return true;
+
+    const optSim = jaccardSim(qOpts, optionTokenSet(other));
+    if (optSim >= WITHIN_PAPER_OPT_SIM && stemSim >= WITHIN_PAPER_STEM_WITH_OPTS) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -1014,6 +1079,16 @@ export function isQuestionRepeatOfPrior(q, priorFingerprints) {
   if (fk && priorFingerprints.fullKeys?.has(fk)) return true;
   if (sk && priorFingerprints.stemKeys?.has(sk)) return true;
   if (lk && priorFingerprints.looseKeys?.has(lk)) return true;
+
+  // Near-paraphrase vs prior snippets (same chapter bank / prior papers)
+  const snippets = priorFingerprints.snippets || [];
+  if (snippets.length) {
+    const qTokens = tokenSetForSim(nearDupeContent(q));
+    for (const snip of snippets) {
+      const sim = jaccardSim(qTokens, tokenSetForSim(normalizeTextForFingerprint(snip)));
+      if (sim >= WITHIN_PAPER_STEM_SIM) return true;
+    }
+  }
   return false;
 }
 
@@ -1023,18 +1098,30 @@ export function filterOutPriorRepeats(questions, priorFingerprints) {
 }
 
 /**
- * Remove repeated stems in one paper (strictly one variant of same question idea).
+ * Remove repeated / near-duplicate stems in one paper.
+ * Exact match + loose stem key + Jaccard near-paraphrase (why we generate 30 to show 20).
  */
 export function dedupeQuestionsByStem(questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
-  const seen = new Set();
-  return questions.filter((q) => {
-    const key = canonicalStemKey(q);
-    if (!key) return false;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  const seenExact = new Set();
+  const seenLoose = new Set();
+  const kept = [];
+
+  for (const q of questions) {
+    const exact = canonicalStemKey(q);
+    if (!exact) continue;
+    if (seenExact.has(exact)) continue;
+
+    const loose = looseStemKey(q);
+    if (loose && seenLoose.has(loose)) continue;
+
+    if (isNearDuplicateOf(q, kept)) continue;
+
+    seenExact.add(exact);
+    if (loose) seenLoose.add(loose);
+    kept.push(q);
+  }
+  return kept;
 }
 
 /**

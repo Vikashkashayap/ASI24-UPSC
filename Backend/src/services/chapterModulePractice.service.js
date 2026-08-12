@@ -28,7 +28,7 @@ import {
   runWithOpenRouterAppTitle,
 } from "../config/openRouterAppTitle.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
-import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS } from "../config/questionPatterns.js";
+import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS, buildEqualPatternQuota, retagQuestionsToPyqPatterns } from "../config/questionPatterns.js";
 import {
   resolveKbSubjectLabel,
   SYLLABUS_KEY_TO_KB_SUBJECT as SHARED_SYLLABUS_KEY_TO_KB,
@@ -121,18 +121,30 @@ function normalizePatternId(questionType) {
 }
 
 /**
- * Pick `showCount` unique questions with equal-as-possible coverage of all UPSC patterns.
- * No repeats (caller should already dedupe; we still guard by stem).
+ * Pick `showCount` unique UPSC-Hard questions with equal quota across all PYQ patterns.
+ * Guarantees every pattern appears when the pool has it (e.g. 20Q → 3/3/3/3/2/2/2/2).
  */
 function pickBalancedPatternSet(pool, showCount) {
-  const unique = dedupeQuestionsByStem(dedupeQuestions(pool || []));
-  if (unique.length <= showCount) return unique;
+  const unique = retagQuestionsToPyqPatterns(
+    dedupeQuestionsByStem(dedupeQuestions(pool || [])),
+    { forceHard: true }
+  );
+  if (unique.length <= showCount) {
+    const coverage = {};
+    for (const q of unique) {
+      const id = normalizePatternId(q.questionType || q.type);
+      coverage[id] = (coverage[id] || 0) + 1;
+    }
+    console.log(`[chapterPractice] pattern coverage in shown ${unique.length}Q:`, coverage);
+    return unique;
+  }
 
-  // Prefer real UPSC Prelims Hard patterns when selecting the shown paper
+  // Core UPSC Prelims Hard patterns — must appear in every paper when available
   const patternOrder = [
     ...PYQ_HARD_PATTERN_IDS,
     ...ALL_PATTERN_IDS.filter((id) => !PYQ_HARD_PATTERN_IDS.includes(id)),
   ];
+  const quota = buildEqualPatternQuota(showCount, PYQ_HARD_PATTERN_IDS);
 
   const buckets = new Map(patternOrder.map((id) => [id, []]));
   const leftovers = [];
@@ -142,7 +154,6 @@ function pickBalancedPatternSet(pool, showCount) {
     else leftovers.push(q);
   }
 
-  // Shuffle inside each bucket for variety
   for (const [, list] of buckets) {
     for (let i = list.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -154,23 +165,60 @@ function pickBalancedPatternSet(pool, showCount) {
     [leftovers[i], leftovers[j]] = [leftovers[j], leftovers[i]];
   }
 
+  const stemGuardKey = (q) => {
+    const text = String(q.question_en || q.question || "")
+      .toLowerCase()
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return text.slice(0, 180) || String(q._id || q.questionId || Math.random());
+  };
+
   const picked = [];
   const used = new Set();
+  const taken = new Map(patternOrder.map((id) => [id, 0]));
+
+  const tryTake = (q, patternId) => {
+    const key = stemGuardKey(q);
+    if (used.has(key)) return false;
+    used.add(key);
+    picked.push(q);
+    if (patternId) taken.set(patternId, (taken.get(patternId) || 0) + 1);
+    return true;
+  };
+
+  // Pass 1 — fill each PYQ pattern up to its equal quota
+  for (const id of PYQ_HARD_PATTERN_IDS) {
+    const need = quota.get(id) || 0;
+    const list = buckets.get(id) || [];
+    while ((taken.get(id) || 0) < need && list.length && picked.length < showCount) {
+      tryTake(list.shift(), id);
+    }
+  }
+
+  // Pass 2 — cover any still-empty PYQ pattern with at least 1 if available
+  for (const id of PYQ_HARD_PATTERN_IDS) {
+    if (picked.length >= showCount) break;
+    if ((taken.get(id) || 0) > 0) continue;
+    const list = buckets.get(id) || [];
+    while (list.length && picked.length < showCount) {
+      if (tryTake(list.shift(), id)) break;
+    }
+  }
+
+  // Pass 3 — fill remaining seats round-robin (prefer under-quota / hard patterns)
   let guard = 0;
-  while (picked.length < showCount && guard < showCount * patternOrder.length + 20) {
+  while (picked.length < showCount && guard < showCount * patternOrder.length + 40) {
     guard += 1;
     let added = false;
     for (const id of patternOrder) {
       if (picked.length >= showCount) break;
       const list = buckets.get(id) || [];
       while (list.length) {
-        const q = list.shift();
-        const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
-        if (used.has(key)) continue;
-        used.add(key);
-        picked.push(q);
-        added = true;
-        break;
+        if (tryTake(list.shift(), id)) {
+          added = true;
+          break;
+        }
       }
     }
     if (!added) break;
@@ -178,21 +226,13 @@ function pickBalancedPatternSet(pool, showCount) {
 
   while (picked.length < showCount && leftovers.length) {
     const q = leftovers.shift();
-    const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
-    if (used.has(key)) continue;
-    used.add(key);
-    picked.push(q);
+    tryTake(q, normalizePatternId(q?.questionType || q?.type));
   }
 
-  // If still short, take any remaining from buckets
   if (picked.length < showCount) {
     for (const list of buckets.values()) {
       while (list.length && picked.length < showCount) {
-        const q = list.shift();
-        const key = String(q._id || q.question_en || q.question || "").slice(0, 160);
-        if (used.has(key)) continue;
-        used.add(key);
-        picked.push(q);
+        tryTake(list.shift(), null);
       }
     }
   }
@@ -202,7 +242,17 @@ function pickBalancedPatternSet(pool, showCount) {
     const id = normalizePatternId(q.questionType || q.type);
     coverage[id] = (coverage[id] || 0) + 1;
   }
+  const missing = PYQ_HARD_PATTERN_IDS.filter((id) => !coverage[id]);
+  if (missing.length) {
+    console.warn(
+      `[chapterPractice] pattern gaps in shown paper (pool thin): missing=${missing.join(",")}`
+    );
+  }
   console.log(`[chapterPractice] pattern coverage in shown ${picked.length}Q:`, coverage);
+  console.log(
+    `[chapterPractice] UPSC-Hard quota target:`,
+    Object.fromEntries(quota)
+  );
 
   return picked.slice(0, showCount);
 }
@@ -458,19 +508,21 @@ async function createChapterPracticeTestInner({
   const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
   const testSubject = resolveTestSubject(kbSubject);
   const difficulty = "Hard";
-  const GENERATE_COUNT = 30; // 10 × 3 batches
-  const SHOW_COUNT = 20; // student sees 20
-  const MIN_ACCEPTABLE = 20; // need a full paper; 30 pool absorbs drops/dupes
+  const GENERATE_COUNT = 30; // 10 × 3 batches — buffer so near-dupes can be dropped
+  const SHOW_COUNT = 20; // student sees 20 unique only
+  const MIN_ACCEPTABLE = 20; // full paper floor after filters
+  /** Keep generating past 20 so post-filter near-dupe drops still leave ≥20 unique. */
+  const MIN_KEEP_GENERATE = Math.min(GENERATE_COUNT, SHOW_COUNT + 8); // 28
   const BATCH_SIZE = 10;
 
-  /** Drop exact + near-duplicate stems; keep unique pool for the paper. */
+  /** Drop exact + near-duplicate / paraphrased stems; keep unique pool for the paper. */
   const uniquePool = (list) => {
     const before = list.length;
     const unique = dedupeQuestionsByStem(dedupeQuestions(list));
     const dropped = before - unique.length;
     if (dropped > 0) {
       console.log(
-        `[chapterPractice] dedupe: ${before} → ${unique.length} unique (dropped ${dropped} duplicates)`
+        `[chapterPractice] dedupe: ${before} → ${unique.length} unique (dropped ${dropped} repeated/near-dupes)`
       );
     }
     return unique;
@@ -643,7 +695,8 @@ async function createChapterPracticeTestInner({
       questionCount: GENERATE_COUNT,
       difficulty,
       batchSize: BATCH_SIZE,
-      minAcceptable: MIN_ACCEPTABLE,
+      // Aim ~28 unique before early-stop so near-dupe + hardness drops still leave 20 to show
+      minAcceptable: MIN_KEEP_GENERATE,
       // Module Targets: questions MUST come from Admin KB/RAG only (UPSC Hard)
       kbOnly: true,
       allowLlmFallback: false,
@@ -672,20 +725,24 @@ async function createChapterPracticeTestInner({
       );
     }
     const topicPool = onTopic.questions.length ? onTopic.questions : rawPool;
-    const hardness = filterQuestionsByPyqHardness(topicPool);
+    // Retag mislabeled patterns first (keep original difficulty for PYQ-Hard gate)
+    const retagged = retagQuestionsToPyqPatterns(topicPool, { forceHard: false });
+    const hardness = filterQuestionsByPyqHardness(retagged);
     if (hardness.dropped > 0) {
       console.log(
-        `[chapterPractice] PYQ-Hard filter: kept ${hardness.questions.length}/${rawPool.length} (dropped ${hardness.dropped} easy/one-liners)`
+        `[chapterPractice] PYQ-Hard filter: kept ${hardness.questions.length}/${retagged.length} (dropped ${hardness.dropped} easy/one-liners)`
       );
     }
-    const pool = filterStudentReadyQuestions(
-      uniquePool(hardness.questions.length ? hardness.questions : topicPool)
+    const hardPool = retagQuestionsToPyqPatterns(
+      hardness.questions.length ? hardness.questions : retagged,
+      { forceHard: true }
     );
+    const pool = filterStudentReadyQuestions(uniquePool(hardPool));
 
-    const hardFloor = Math.min(MIN_ACCEPTABLE, 18);
+    const hardFloor = MIN_ACCEPTABLE;
     if (pool.length < hardFloor) {
       const err = new Error(
-        `Only ${pool.length} usable questions for "${topicNormalized}" (need ${hardFloor}+). Please try again.`
+        `Only ${pool.length} unique usable questions for "${topicNormalized}" (need ${hardFloor}+ after removing repeats). Please try again.`
       );
       err.status = 400;
       throw err;
@@ -695,7 +752,7 @@ async function createChapterPracticeTestInner({
     generationSource = generationResult.source || "kb_or_llm";
 
     console.log(
-      `[chapterPractice] ${generationSource}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} — saved for shared reuse`
+      `[chapterPractice] ${generationSource}: raw ${rawPool.length} → unique ${pool.length} → showing ${questions.length} (no repeats) — saved for shared reuse`
     );
   }
 
