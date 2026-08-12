@@ -55,6 +55,8 @@ export function stemHasBlankNumberedItems(text: string): boolean {
 
 const PROMPT_PATTERNS = [
   /which of the (?:statements|following statements)(?: given above)?(?: is\/are| are)?[^.]*\??/i,
+  /which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.]*\??/i,
+  /in the context of the above,?\s*which of the following[^.]*\??/i,
   /how many of the (?:above )?statements?(?: given above)?(?: is\/are| are)?[^.]*\??/i,
   /which of the above(?: statements)?(?: is\/are| are)?[^.]*\??/i,
   /select the correct answer using the codes? given below[^.]*\??/i,
@@ -62,6 +64,18 @@ const PROMPT_PATTERNS = [
   /उपर्युक्त(?: में से)?(?: कौन(?:-सा|-से)?\/कौन-से)?[^.]*\??/,
   /ऊपर(?: दिए गए)?(?: कथनों| कथन)?(?: में से)?[^.]*\??/,
 ];
+
+/** Trailing MCQ prompts that must never stay inside Assertion/Reason body text. */
+const AR_TRAILING_PROMPT_RE =
+  /(?:[.!?]?\s*)(?:In the context of the above,?\s*)?(?:Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??|Select the correct answer[^.?]*\??|उपर्युक्त के संदर्भ में[^.?]*\??|निम्नलिखित में से कौन[^.?]*\??)\s*$/i;
+
+/** Strip leaked "Which of the following is correct?" (etc.) from A/R body. */
+export function stripAssertionReasonTrailingPrompt(text: string): string {
+  return String(text || "")
+    .replace(AR_TRAILING_PROMPT_RE, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 const INTRO_PATTERNS = [
   /consider the following/i,
@@ -142,7 +156,7 @@ function parseAssertionReasonStem(text: string): UpscStemPart[] | null {
   const rSplit = afterA.split(/(?:Reason|कारण)\s*\(R\)\s*:?\s*/i);
   if (rSplit.length < 2) return null;
 
-  let assertion = rSplit[0].trim();
+  let assertion = stripAssertionReasonTrailingPrompt(rSplit[0]);
   let reasonAndRest = rSplit[1].trim();
 
   // Strip leaked option banks / code prompts from reason body
@@ -150,12 +164,14 @@ function parseAssertionReasonStem(text: string): UpscStemPart[] | null {
     .replace(/\n?\s*नीचे दिए गए कूट[\s\S]*$/i, "")
     .replace(/\n?\s*Select the correct answer using the code[\s\S]*$/i, "")
     .replace(/\n?\s*In the context of the above[\s\S]*$/i, "")
+    .replace(/\n?\s*Which of the following(?:\s+is|\s+are|\s+options)?[^.]*\??\s*$/i, "")
     .replace(/\n?\s*उपर्युक्त के संदर्भ में[\s\S]*$/i, "")
     .replace(/\n?\s*\(\s*A\s*\)\s*(?:दोनों|Both)[\s\S]*$/i, "")
     .replace(/\n?\s*A\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i, "")
     .trim();
 
-  const { body: reason, prompt } = extractTrailingPrompt(reasonAndRest);
+  const { body: reasonRaw, prompt } = extractTrailingPrompt(reasonAndRest);
+  const reason = stripAssertionReasonTrailingPrompt(reasonRaw);
 
   // Incomplete A-R (empty assertion or reason) — fall back to plain text
   if (assertion.length < 10 || reason.length < 10) return null;
@@ -633,7 +649,9 @@ export function buildAssertionReasonStem(ar: {
   reason: string;
   prompt?: string;
 }): string {
-  const isHi = /[\u0900-\u097F]/.test(`${ar.assertion}${ar.reason}`);
+  const assertion = stripAssertionReasonTrailingPrompt(ar.assertion);
+  const reason = stripAssertionReasonTrailingPrompt(ar.reason);
+  const isHi = /[\u0900-\u097F]/.test(`${assertion}${reason}`);
   const aLabel = isHi ? "अभिकथन (A)" : "Assertion (A)";
   const rLabel = isHi ? "कारण (R)" : "Reason (R)";
   const prompt =
@@ -641,5 +659,5 @@ export function buildAssertionReasonStem(ar: {
     (isHi
       ? "उपर्युक्त के संदर्भ में निम्नलिखित में से कौन-सा सही है?"
       : "In the context of the above, which of the following is correct?");
-  return `${aLabel}: ${ar.assertion}\n${rLabel}: ${ar.reason}\n${prompt}`;
+  return `${aLabel}: ${assertion}\n${rLabel}: ${reason}\n${prompt}`;
 }

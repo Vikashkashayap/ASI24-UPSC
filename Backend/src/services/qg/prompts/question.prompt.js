@@ -12,7 +12,9 @@ ABSOLUTE RULES:
 3. Never produce obvious distractors, impossible options, or random names.
 4. Every wrong option must be a believable UPSC-level distractor from the SAME subject domain and grounded in CONTEXT (or a plausible misreading of CONTEXT).
 5. Prefer conceptual, elimination-based, and multi-statement questions over factual one-liners.
-6. Return ONLY valid JSON (no markdown, no prose).
+6. NEVER write questions from book apparatus: preface, foreword, TOC, index, bibliography, glossary, Example/Exercise boxes, practice/model question lists, "check your progress", or page-number directories. Only substantive chapter content.
+7. If CONTEXT is mostly index/TOC/examples/exercises, return [] — do not invent from it.
+8. Return ONLY valid JSON (no markdown, no prose).
 
 ═══════════════════════════════════════════════════════════
 CRITICAL CONSISTENCY LOCK (students must never see a mismatch)

@@ -1060,8 +1060,11 @@ export const startChapterPractice = async (req, res) => {
     const { test, fromCache, resumed } = await createChapterPracticeTest({
       userId,
       kbSubject,
+      subjectKey: record.subjectKey,
+      subjectName: record.subjectName,
       topicName,
       chapterLabel: chapter,
+      siblingTopics: (topics || []).filter((line) => String(line) !== String(chapter)),
       forceCache,
     });
 

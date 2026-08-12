@@ -160,12 +160,13 @@ async function semanticSearch(query, filters, topK) {
   const vector = await embedQuery(query);
   if (!vector) return [];
   let hits = await knowledgeQdrant.search({ vector, filters, topK });
-  // Syllabus "Ancient History" vs KB uploads tagged "History" — retry unfiltered
+  // Retry without topic/chapter filter — keep subject family (never fully unfiltered)
   if (
     !hits.length &&
-    (filters.subject || (filters.subjectAliases && filters.subjectAliases.length))
+    (filters.subject || (filters.subjectAliases && filters.subjectAliases.length)) &&
+    (filters.topic || filters.chapter)
   ) {
-    const { subject: _s, subjectAliases: _a, chapter: _c, topic: _t, ...rest } = filters;
+    const { topic: _t, chapter: _c, ...rest } = filters;
     hits = await knowledgeQdrant.search({ vector, filters: rest, topK });
   }
   return hits.map((h) => ({
@@ -198,9 +199,9 @@ async function notesWebsiteSemanticSearch(query, filters, topK) {
     topK,
   });
 
-  // Subject labels may differ (KB "Indian Polity" vs notes "Polity") — retry unfiltered
+  // Subject labels may differ (KB "Indian Polity" vs notes "Polity") — keep subject on retry
   if (!hits.length && filters.subject) {
-    hits = await qdrantService.searchChunks({ vector, topK });
+    hits = await qdrantService.searchChunks({ vector, subject: filters.subject, topK });
   }
 
   return hits.map((h) => {
@@ -234,9 +235,9 @@ async function keywordSearch(query, filters, topK) {
     subjects,
     limit: topK,
   });
-  // Same subject-label mismatch as semantic (Ancient History vs History)
-  if (!hits.length && subjects.length) {
-    hits = await keywordRepo.searchTerms(terms, { limit: topK });
+  // Same subject-label mismatch as semantic — retry with all alias subjects, not unfiltered
+  if (!hits.length && subjects.length > 1) {
+    hits = await keywordRepo.searchTerms(terms, { subjects, limit: topK });
   }
   return hits.map((h) => ({
     chunkId: h.chunkId,
@@ -380,9 +381,10 @@ export async function hybridSearch({
   // When vector/keyword indexes are empty (e.g. embedding provider down), use Mongo chunks
   if (!fused.length) {
     let mongoHits = await mongoTextSearch(query, f, topK * 2);
-    // Retry without subject/topic filters if too strict (chunks may lack taxonomy labels)
-    if (!mongoHits.length && (f.subject || f.topic || f.chapter)) {
-      mongoHits = await mongoTextSearch(query, {}, topK * 2);
+    // Retry without topic/chapter filter — keep subject constraints
+    if (!mongoHits.length && (f.topic || f.chapter) && (f.subject || f.subjectAliases?.length)) {
+      const { topic: _t, chapter: _c, ...rest } = f;
+      mongoHits = await mongoTextSearch(query, rest, topK * 2);
     }
     fused = mongoHits.map((h) => ({
       ...h,

@@ -5,6 +5,7 @@
  */
 
 import { isMetadataQuestion } from "../../content/frontMatterFilter.js";
+import { getEraExclusionMarkers } from "../../ai/kbSubjectResolve.js";
 
 /** Pure filler — never strip subject words like economy/indian from the student topic */
 const FILLER_STOP = new Set([
@@ -377,8 +378,12 @@ function textHasToken(haystack, token) {
  * True when the chapter title is mostly filler ("Introduction", "The Geographical Setting").
  * Strict keyword filters kill valid MCQs for these — soft mode is safer.
  * Uses raw topic words only (aliases must not make a vague title look distinctive).
+ * Topics with dedicated phrase hints (e.g. "The Stone Age") are NEVER abstract.
  */
 export function isAbstractChapterTopic(topic) {
+  const key = normalizeTopicKey(topic);
+  if (key && TOPIC_PHRASE_HINTS[key]?.length >= 3) return false;
+  // Short distinctive titles like "Stone Age" / "Cabinet" are concrete
   const raw = String(topic || "")
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
@@ -386,7 +391,124 @@ export function isAbstractChapterTopic(topic) {
     .filter((t) => t.length >= 3 && !FILLER_STOP.has(t));
   if (!raw.length) return true;
   const distinctive = raw.filter((t) => !WEAK_TOPIC_TOKENS.has(t) && t.length >= 5);
+  // One strong domain word (stone, vedic, harappan) is enough to be concrete
+  if (distinctive.some((t) => t.length >= 6)) return false;
   return distinctive.length <= 1;
+}
+
+/**
+ * Words shared across an entire subject — never use as sibling-chapter bans
+ * (e.g. "ancient"/"history" appear in every Ancient History chapter).
+ */
+const SHARED_SUBJECT_STOP = new Set([
+  "ancient",
+  "medieval",
+  "modern",
+  "indian",
+  "india",
+  "history",
+  "historical",
+  "geography",
+  "geographical",
+  "economy",
+  "economic",
+  "polity",
+  "political",
+  "culture",
+  "cultural",
+  "society",
+  "social",
+  "environment",
+  "ecology",
+  "science",
+  "technology",
+  "world",
+  "period",
+  "age",
+  "ages",
+]);
+
+/**
+ * Build exclusion phrases from OTHER chapters in the same module.
+ * e.g. generating "The Stone Age" → ban "construction", "sources", "geographical setting".
+ * Dynamic from syllabus topicsPreview — no hardcoded chapter lists required.
+ *
+ * @param {string} currentTopic
+ * @param {string[]} siblingTopics — other chapter topic names (or "Ch N: Name" lines)
+ * @returns {string[]}
+ */
+export function buildSiblingExclusionMarkers(currentTopic, siblingTopics = []) {
+  const curKey = normalizeTopicKey(currentTopic);
+  const curTokens = new Set(tokenizeTopic(currentTopic));
+  const markers = new Set();
+
+  for (const raw of siblingTopics || []) {
+    let line = String(raw || "").trim();
+    if (!line) continue;
+    // Strip "Ch 2: " prefix if present
+    const m = line.match(/^(?:Ch\.?\s*|अध्\.?\s*)\d+\s*[:.\-–—]\s*(.+)$/i);
+    if (m) line = m[1].trim();
+    const key = normalizeTopicKey(line);
+    if (!key || key === curKey) continue;
+    // Full sibling title as phrase (minus leading "the ")
+    const titlePhrase = key.replace(/^the\s+/, "");
+    if (titlePhrase.length >= 10) markers.add(titlePhrase);
+    // Distinctive multi-word fragments from sibling title
+    const words = key
+      .split(" ")
+      .filter(
+        (w) =>
+          w.length >= 4 &&
+          !FILLER_STOP.has(w) &&
+          !WEAK_TOPIC_TOKENS.has(w) &&
+          !SHARED_SUBJECT_STOP.has(w)
+      );
+    for (let i = 0; i < words.length; i += 1) {
+      const w = words[i];
+      if (curTokens.has(w)) continue;
+      if (w.length >= 6) markers.add(w);
+      if (i + 1 < words.length) {
+        const bigram = `${w} ${words[i + 1]}`;
+        if (bigram.length >= 10) markers.add(bigram);
+      }
+    }
+    // Sibling phrase hints — ban Ch2 sources phrases on Ch4, etc.
+    const hints = TOPIC_PHRASE_HINTS[key] || [];
+    for (const h of hints) {
+      const hk = normalizeTopicKey(h);
+      const first = hk.split(" ")[0];
+      if (hk.length >= 6 && !curTokens.has(first) && !SHARED_SUBJECT_STOP.has(first)) {
+        markers.add(hk);
+      }
+    }
+  }
+
+  return [...markers];
+}
+
+/**
+ * Drop chunks that clearly belong to a sibling chapter in the same module.
+ */
+export function filterChunksBySiblingChapters(chunks, currentTopic, siblingTopics = []) {
+  const markers = buildSiblingExclusionMarkers(currentTopic, siblingTopics);
+  if (!markers.length) return { chunks: chunks || [], dropped: 0, markers };
+
+  const kept = [];
+  let dropped = 0;
+  for (const c of chunks || []) {
+    const hay = chunkBlob(c);
+    // Prefer keeping if chunk clearly matches current topic phrases
+    const phrases = phraseHintsForTopic(currentTopic);
+    const onCurrent = phrases.some((p) => hay.includes(p));
+    if (onCurrent) {
+      kept.push(c);
+      continue;
+    }
+    const isSibling = markers.some((m) => hay.includes(String(m).toLowerCase()));
+    if (isSibling) dropped += 1;
+    else kept.push(c);
+  }
+  return { chunks: kept, dropped, markers };
 }
 
 /**
@@ -406,30 +528,69 @@ export function topicOverlapScore(text, tokens) {
   return hits / list.length;
 }
 
+function chunkBlob(c) {
+  return [c.heading, c.subTopic, c.chapter, c.topic, c.book, c.text, c.chunk]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+/**
+ * Drop chunks from wrong history era / geography sub-bucket.
+ * e.g. Medieval Mughal text must not feed Ancient History chapter tests.
+ * @param {object[]} chunks
+ * @param {{ subjectKey?: string, subjectName?: string }} scope
+ */
+export function filterChunksBySubjectEra(chunks, scope = {}) {
+  const markers = getEraExclusionMarkers(scope.subjectKey, scope.subjectName);
+  if (!markers.length) return { chunks: chunks || [], dropped: 0 };
+
+  const kept = [];
+  let dropped = 0;
+  for (const c of chunks || []) {
+    const hay = chunkBlob(c);
+    const isWrongEra = markers.some((m) => hay.includes(String(m).toLowerCase()));
+    if (isWrongEra) {
+      dropped += 1;
+    } else {
+      kept.push(c);
+    }
+  }
+  return { chunks: kept, dropped };
+}
+
 /**
  * Keep chunks that actually mention the requested topic.
  * @param {object[]} chunks
  * @param {string} topic
- * @param {{ minHits?: number }} [opts]
+ * @param {{ minHits?: number, strict?: boolean }} [opts]
  */
 export function filterChunksByTopic(chunks, topic, opts = {}) {
   const tokens = tokenizeTopic(topic);
   const phrases = phraseHintsForTopic(topic);
   if (!tokens.length && !phrases.length) return { chunks: chunks || [], tokens, dropped: 0 };
 
-  const minHits = Math.max(1, opts.minHits ?? 1);
+  const strict = Boolean(opts.strict);
+  const minHits = Math.max(1, opts.minHits ?? (strict ? 1 : 1));
   const kept = [];
   let dropped = 0;
   for (const c of chunks || []) {
-    const blob = [c.heading, c.subTopic, c.chapter, c.book, c.text].filter(Boolean).join(" ");
+    const blob = [c.heading, c.subTopic, c.chapter, c.book, c.text, c.chunk].filter(Boolean).join(" ");
     const hay = blob.toLowerCase();
     const score = tokens.length ? topicOverlapScore(hay, tokens) : 0;
     const hitCount = tokens.length ? Math.round(score * tokens.length) : 0;
     const phraseHit = phrases.some((p) => hay.includes(p));
     if (hitCount >= minHits || phraseHit) {
       kept.push({ ...c, topicOverlap: Math.max(score, phraseHit ? 0.5 : 0) });
-    } else {
+    } else if (strict) {
       dropped += 1;
+    } else if (!isAbstractChapterTopic(topic)) {
+      dropped += 1;
+    } else {
+      // Abstract chapter title — keep only if no clear cross-chapter leak
+      const clearLeak = CLEAR_OFFTOPIC_MARKERS.some((m) => hay.includes(m));
+      if (clearLeak) dropped += 1;
+      else kept.push({ ...c, topicOverlap: 0.25 });
     }
   }
   return { chunks: kept, tokens, dropped };
@@ -461,28 +622,43 @@ function questionBlob(question) {
  * True if question content is about the topic (not just same subject).
  * @param {object} question
  * @param {string} topic
- * @param {{ soft?: boolean }} [opts] soft=true → only drop clear cross-topic leaks
+ * @param {{ soft?: boolean, subjectKey?: string, subjectName?: string, siblingTopics?: string[] }} [opts]
  */
 export function isQuestionOnTopic(question, topic, opts = {}) {
   if (isMetadataQuestion(question)) return false;
 
-  // Abstract chapter titles rarely appear verbatim in stems — always soft-check
-  const soft = Boolean(opts.soft) || isAbstractChapterTopic(topic);
-  const tokens = tokenizeTopic(topic);
-  const phrases = phraseHintsForTopic(topic);
-  if (!tokens.length && !phrases.length) return true;
-
   const hay = questionBlob(question);
   if (!hay.trim()) return false;
 
-  if (phrases.some((p) => hay.includes(p))) return true;
+  // Block wrong history era / geography sub-bucket in question text
+  const eraMarkers = getEraExclusionMarkers(opts.subjectKey, opts.subjectName);
+  if (eraMarkers.some((m) => hay.includes(String(m).toLowerCase()))) return false;
 
+  const tokens = tokenizeTopic(topic);
+  const phrases = phraseHintsForTopic(topic);
+  const phraseHit = phrases.some((p) => hay.includes(p));
   const score = tokens.length ? topicOverlapScore(hay, tokens) : 0;
   const hitCount = tokens.length ? Math.round(score * tokens.length) : 0;
-  if (hitCount >= 1) return true;
+  const onCurrent = phraseHit || hitCount >= 1;
+
+  // Sibling chapter leak: Ch 2 sources content must not appear in Ch 4 Stone Age
+  const siblingMarkers = buildSiblingExclusionMarkers(topic, opts.siblingTopics || []);
+  if (siblingMarkers.length && !onCurrent) {
+    if (siblingMarkers.some((m) => hay.includes(String(m).toLowerCase()))) return false;
+  }
+  // Even if weakly on-topic, hard-ban clear sibling phrase hits when current topic has strong hints
+  if (siblingMarkers.length && phrases.length >= 3 && !phraseHit) {
+    if (siblingMarkers.some((m) => hay.includes(String(m).toLowerCase()))) return false;
+  }
+
+  // Soft only for truly abstract titles without sibling list
+  const soft = Boolean(opts.soft) || (isAbstractChapterTopic(topic) && !opts.siblingTopics?.length);
+
+  if (!tokens.length && !phrases.length) return true;
+
+  if (onCurrent) return true;
 
   if (soft) {
-    // Trust prompt TOPIC LOCK / KB grounding unless clearly another chapter
     const clearLeak = CLEAR_OFFTOPIC_MARKERS.some((m) => hay.includes(m));
     return !clearLeak;
   }
@@ -494,11 +670,13 @@ export function isQuestionOnTopic(question, topic, opts = {}) {
  * Filter an array of questions down to on-topic ones.
  * @param {object[]} questions
  * @param {string} topic
- * @param {{ soft?: boolean }} [opts]
+ * @param {{ soft?: boolean, subjectKey?: string, subjectName?: string, siblingTopics?: string[] }} [opts]
  */
 export function filterQuestionsByTopic(questions, topic, opts = {}) {
   const list = Array.isArray(questions) ? questions : [];
-  const soft = Boolean(opts.soft) || isAbstractChapterTopic(topic);
+  const soft =
+    Boolean(opts.soft) ||
+    (isAbstractChapterTopic(topic) && !(opts.siblingTopics || []).length);
   const kept = list.filter((q) => isQuestionOnTopic(q, topic, { ...opts, soft }));
   return {
     questions: kept,
@@ -602,6 +780,9 @@ export default {
   tokenizeTopic,
   topicOverlapScore,
   filterChunksByTopic,
+  filterChunksBySubjectEra,
+  filterChunksBySiblingChapters,
+  buildSiblingExclusionMarkers,
   isQuestionOnTopic,
   filterQuestionsByTopic,
   isAbstractChapterTopic,

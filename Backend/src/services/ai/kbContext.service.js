@@ -8,7 +8,13 @@ import { relatedConcepts } from "../../intelligence/data/concepts.js";
 import { KbSubject } from "../../knowledge/models/KbSubject.js";
 import { estimateTokens } from "./tokenEstimator.service.js";
 import { isNonContentChunk, chunkTextOf } from "../content/frontMatterFilter.js";
-import { filterChunksByTopic } from "../qg/utils/topicRelevance.js";
+import { filterChunksByTopic, filterChunksBySubjectEra, filterChunksBySiblingChapters } from "../qg/utils/topicRelevance.js";
+import {
+  narrowKbSubjectAliases,
+  resolveSubjectEra,
+  HISTORY_ERA_CONFIG,
+  GEOGRAPHY_ERA_CONFIG,
+} from "./kbSubjectResolve.js";
 
 const QUERY_ANGLES = [
   (topic, subject) => `${subject} ${topic}`,
@@ -189,35 +195,50 @@ function buildContextFromResults(results, maxTokens) {
  *
  * @param {{
  *   subject: string,
+ *   subjectKey?: string,
+ *   subjectName?: string,
  *   topic: string,
+ *   siblingTopics?: string[],
  *   batchIndex?: number,
  *   excludeChunkIds?: string[],
  *   maxTokens?: number,
  *   topK?: number,
+ *   strictTopic?: boolean,
  * }} params
  */
 export async function getContextForPractice({
   subject,
+  subjectKey,
+  subjectName,
   topic,
+  siblingTopics = [],
   batchIndex = 0,
   excludeChunkIds = [],
   maxTokens,
   topK,
+  strictTopic = true,
 } = {}) {
   const subjectRaw = String(subject || "").trim();
+  const syllabusLabel = String(subjectName || subjectRaw).trim();
   const topicQuery = String(topic || "").trim();
   if (!subjectRaw || !topicQuery) {
     return { contextText: "", chunks: [], source: "empty", tokens: 0, chunkIds: [], query: "" };
   }
 
   const kbSubject = await resolveKbSubjectName(subjectRaw);
-  const subjectAliases = aliasListForSubject(kbSubject || subjectRaw);
-  // Keep syllabus label in the query (Ancient History) even when KB filter is generic (History)
+  // Era-narrow aliases: Ancient History → ["History","Ancient History"] NOT full History family
+  const subjectAliases = narrowKbSubjectAliases(subjectKey, syllabusLabel);
+  const era = resolveSubjectEra(subjectKey, syllabusLabel);
+  const eraLabel =
+    (era && HISTORY_ERA_CONFIG[era]?.label) ||
+    (era && GEOGRAPHY_ERA_CONFIG[era]?.label) ||
+    syllabusLabel;
+  const scope = { subjectKey, subjectName: syllabusLabel };
+
+  // Keep syllabus era in the query even when KB filter is generic (History)
   const querySubject =
-    subjectRaw &&
-    kbSubject &&
-    subjectRaw.toLowerCase() !== kbSubject.toLowerCase()
-      ? `${kbSubject} ${subjectRaw}`
+    eraLabel && kbSubject && eraLabel.toLowerCase() !== kbSubject.toLowerCase()
+      ? `${kbSubject} ${eraLabel}`
       : kbSubject || subjectRaw;
   const angleFn = QUERY_ANGLES[Math.abs(batchIndex) % QUERY_ANGLES.length];
   const angledQuery = angleFn(topicQuery, querySubject);
@@ -237,9 +258,31 @@ export async function getContextForPractice({
     Number(process.env.PRELIMS_KB_CONTEXT_TOKENS || 2400) ||
     2400;
 
-  // Free-text chapter topic → semantic query.
-  // Subject filter accepts History family aliases so Ancient History targets
-  // still retrieve PDFs tagged only as "History".
+  const applyTopicFilter = (list, { strict = strictTopic } = {}) => {
+    const mapped = (list || []).map((r) => ({
+      ...r,
+      text: chunkTextOf(r),
+      heading: r.topic || r.chapter || "",
+    }));
+    const eraFiltered = filterChunksBySubjectEra(mapped, scope);
+    const sibFiltered = filterChunksBySiblingChapters(
+      eraFiltered.chunks,
+      topicQuery,
+      siblingTopics
+    );
+    if (sibFiltered.dropped > 0) {
+      console.log(
+        `[kbContext] sibling-chapter filter: dropped ${sibFiltered.dropped} chunk(s) for "${topicQuery}"`
+      );
+    }
+    const afterSib = sibFiltered.chunks;
+    const tf = filterChunksByTopic(afterSib, topicQuery, { strict });
+    if (tf.chunks.length) return tf.chunks;
+    if (tf.dropped > 0 || eraFiltered.dropped > 0 || sibFiltered.dropped > 0) return [];
+    return afterSib;
+  };
+
+  // Pass era-narrow subject aliases; topic is handled via semantic query + post-filter
   let result = await hybridSearch({
     query: expanded,
     filters: {
@@ -266,25 +309,16 @@ export async function getContextForPractice({
     });
   });
 
-  const applyTopicFilter = (list) => {
-    const mapped = (list || []).map((r) => ({
-      ...r,
-      text: chunkTextOf(r),
-      heading: r.topic || r.chapter || "",
-    }));
-    const tf = filterChunksByTopic(mapped, topicQuery);
-    if (tf.chunks.length) return tf.chunks;
-    if (tf.dropped > 0) return [];
-    return mapped;
-  };
+  rows = applyTopicFilter(rows, { strict: true });
 
-  rows = applyTopicFilter(rows);
-
-  // If subject filter was too strict, retry unfiltered (semantic still keyed on topic query)
+  // Retry without topic Qdrant filter — still subject + era bounded (never fully unfiltered)
   if (!rows.length && kbSubject) {
     result = await hybridSearch({
       query: expanded,
-      filters: {},
+      filters: {
+        subject: kbSubject,
+        subjectAliases: subjectAliases.length ? subjectAliases : [kbSubject],
+      },
       topK: requestK,
       searchType: "hybrid",
     });
@@ -299,7 +333,7 @@ export async function getContextForPractice({
         page: r.page,
       });
     });
-    rows = applyTopicFilter(rows);
+    rows = applyTopicFilter(rows, { strict: false });
   }
 
   rows = rows.slice(0, fetchK);
@@ -335,8 +369,11 @@ export async function getContextForPractice({
     tokens,
     chunkIds,
     query: angledQuery,
-    scope: "subject",
+    scope: era || "subject",
     subject: kbSubject || subjectRaw,
+    subjectKey: subjectKey || "",
+    subjectName: syllabusLabel,
+    era: era || null,
     hybrid: true,
     concepts: result.concepts || concepts,
   };

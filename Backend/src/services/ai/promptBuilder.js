@@ -17,8 +17,14 @@ const SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims question setter (Vision
 SOURCE RULES:
 1. Use ONLY the user CONTEXT (knowledge-base excerpts). Never invent facts, dates, articles, figures, names, or schemes outside CONTEXT.
 2. If CONTEXT cannot support a high-quality question, skip that angle — do not pad with outside knowledge.
-3. NEVER generate questions from preface, foreword, publisher/edition info, table of contents, index listings, bibliography, or other book metadata. Test substantive subject matter only.
-4. Return ONLY a JSON array (no markdown, no prose outside JSON).
+3. NEVER generate questions from book apparatus or metadata:
+   - preface, foreword, publisher/edition/ISBN/copyright pages
+   - table of contents, index listings, bibliography, glossary, further reading
+   - Example/Exercise boxes, practice/model/sample question lists, "check your progress", "points to remember"
+   - page-number directories or chapter listing lines
+   Test ONLY substantive chapter subject matter (concepts, facts, chronology, institutions, places, provisions).
+4. If CONTEXT is mostly index/TOC/examples/exercises, return [] — do not invent questions from it.
+5. Return ONLY a JSON array (no markdown, no prose outside JSON).
 
 ═══════════════════════════════════════════════════════════
 CRITICAL CONSISTENCY LOCK (students must never see a mismatch)
@@ -159,6 +165,21 @@ export function buildNotesQuestionUserPrompt(params) {
   const subject = String(params.subject || "").trim();
   const openKnowledge = Boolean(params.openKnowledge);
   const context = compressContext(params.context);
+  const excludeTopics = (Array.isArray(params.siblingTopics) ? params.siblingTopics : [])
+    .map((t) => {
+      let line = String(t || "").trim();
+      const m = line.match(/^(?:Ch\.?\s*|अध्\.?\s*)\d+\s*[:.\-–—]\s*(.+)$/i);
+      if (m) line = m[1].trim();
+      return line;
+    })
+    .filter((t) => t && t.toLowerCase() !== topic.toLowerCase())
+    .slice(0, 12);
+  const chapterLock =
+    excludeTopics.length > 0
+      ? `CHAPTER LOCK: Questions MUST be ONLY about "${topic}". Do NOT ask about sibling chapters: ${excludeTopics
+          .map((t) => `"${t}"`)
+          .join(", ")}. If CONTEXT mixes those topics, ignore off-chapter passages.`
+      : `TOPIC LOCK: Every question MUST be directly about "${topic}". Ignore CONTEXT about a different chapter/sub-topic.`;
 
   const patternRules = `PATTERN RULES (mandatory — equal mix, none missing from Mix):
 - Follow Mix exactly: ${mix}
@@ -172,7 +193,7 @@ Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
 Knowledge base had no on-topic chunks for this Topic. Generate EXACTLY ${count} complete UPSC Prelims MCQs from standard syllabus knowledge.
 
 HARD RULES:
-1. TOPIC LOCK: every question MUST be about "${topic}" only — no off-topic drift within the same subject.
+1. ${chapterLock}
 2. ${patternRules}
 3. Decide correct OPTION TEXT first, then set answer = that letter.
 4. explanation MUST start with: Option {answer} ("{that option text}") is correct. Then justify why correct AND why each wrong option fails (50–100 words).
@@ -190,14 +211,15 @@ HARD RULES (student safety):
 3. explanation = 50–100 words; MUST start with: Option {answer} ("{that option text}") is correct.
 4. explanation must NEVER say a different letter is correct.
 5. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME. If wrong, fix answer.
-6. TOPIC LOCK: Every question MUST be directly about "${topic}". If CONTEXT is about a different sub-topic (e.g. Preamble when Topic is Cabinet), IGNORE that CONTEXT and return [] — do NOT invent off-topic MCQs.
+6. ${chapterLock}
 7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
 8. ${patternRules}
 9. Explanation MUST teach: why the correct option is right + why EACH of the other three options is wrong (aspirant-level elimination). Include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
 10. SOURCE LOCK: Use ONLY CONTEXT. Do not invent facts outside CONTEXT. Better fewer grounded questions than padded outside knowledge.
+11. BOOK APPARATUS BAN: Never ask about Index, TOC, glossary, Example/Exercise boxes, practice lists, preface, or page numbers. If CONTEXT is only that junk, return [].
 ${
   difficulty === "hard"
-    ? `11. HARD / PYQ MODE (mandatory):
+    ? `12. HARD / PYQ MODE (mandatory):
 - Write like recent UPSC CSE Prelims + Vision IAS / Insights sectional tests.
 - ≥80% of this batch = statement_based / statement_not_correct / multi_statement_elimination / assertion_reason / pair_matching / chronology / sequence_arrangement.
 - ≤20% direct_conceptual, and those must be conceptual (not "Who founded…").

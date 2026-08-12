@@ -33,7 +33,7 @@ import {
   resolveKbSubjectLabel,
   SYLLABUS_KEY_TO_KB_SUBJECT as SHARED_SYLLABUS_KEY_TO_KB,
 } from "./ai/kbSubjectResolve.js";
-import { filterQuestionsByPyqHardness } from "./qg/utils/topicRelevance.js";
+import { filterQuestionsByPyqHardness, filterQuestionsByTopic } from "./qg/utils/topicRelevance.js";
 
 export const SYLLABUS_KEY_TO_KB_SUBJECT = SHARED_SYLLABUS_KEY_TO_KB;
 
@@ -448,8 +448,11 @@ export async function createChapterPracticeTest(params) {
 async function createChapterPracticeTestInner({
   userId,
   kbSubject,
+  subjectKey,
+  subjectName,
   topicName,
   chapterLabel,
+  siblingTopics = [],
   forceCache = false,
 }) {
   const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
@@ -560,18 +563,38 @@ async function createChapterPracticeTestInner({
       const cached = filterStudentReadyQuestions(uniquePool(raw));
       if (cached.length < SHOW_COUNT) continue;
 
-      const teachingCount = cached.filter((q) => hasTeachingExplanation(q)).length;
+      const onTopic = filterQuestionsByTopic(cached, topicNormalized, {
+        soft: false,
+        subjectKey: subjectKey || "",
+        subjectName: subjectName || kbSubject,
+        siblingTopics,
+      });
+      // If sibling filter dropped a lot, this bank is contaminated — skip it
+      if (
+        onTopic.dropped > 0 &&
+        onTopic.questions.length < SHOW_COUNT &&
+        onTopic.dropped >= Math.ceil(cached.length * 0.25)
+      ) {
+        console.warn(
+          `[chapterPractice] cache skip — ${onTopic.dropped}/${cached.length} off-chapter Qs for "${topicNormalized}"`
+        );
+        continue;
+      }
+      const topicSafe = onTopic.questions.length >= SHOW_COUNT ? onTopic.questions : null;
+      if (!topicSafe || topicSafe.length < SHOW_COUNT) continue;
+
+      const teachingCount = topicSafe.filter((q) => hasTeachingExplanation(q)).length;
       const isOwn = userId && String(doc.userId || "") === String(userId);
       // Own retake paper wins; else prefer richer teaching explanations, then size
       const score =
         (isOwn && forceCache ? 1_000_000 : 0) +
         teachingCount * 100 +
-        cached.length +
+        topicSafe.length +
         (isOwn ? 50 : 0);
 
       if (score > bestScore) {
         bestScore = score;
-        best = { doc, cached, teachingCount, isOwn };
+        best = { doc, cached: topicSafe, teachingCount, isOwn };
       }
     }
 
@@ -612,6 +635,9 @@ async function createChapterPracticeTestInner({
   if (!fromCache) {
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
+      subjectKey: subjectKey || "",
+      subjectName: subjectName || kbSubject,
+      siblingTopics,
       topic: topicNormalized,
       examType: "GS",
       questionCount: GENERATE_COUNT,
@@ -634,14 +660,26 @@ async function createChapterPracticeTestInner({
     }
 
     const rawPool = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
-    const hardness = filterQuestionsByPyqHardness(rawPool);
+    const onTopic = filterQuestionsByTopic(rawPool, topicNormalized, {
+      soft: false,
+      subjectKey: subjectKey || "",
+      subjectName: subjectName || kbSubject,
+      siblingTopics,
+    });
+    if (onTopic.dropped > 0) {
+      console.log(
+        `[chapterPractice] topic/era filter: kept ${onTopic.questions.length}/${rawPool.length} (dropped ${onTopic.dropped} off-topic)`
+      );
+    }
+    const topicPool = onTopic.questions.length ? onTopic.questions : rawPool;
+    const hardness = filterQuestionsByPyqHardness(topicPool);
     if (hardness.dropped > 0) {
       console.log(
         `[chapterPractice] PYQ-Hard filter: kept ${hardness.questions.length}/${rawPool.length} (dropped ${hardness.dropped} easy/one-liners)`
       );
     }
     const pool = filterStudentReadyQuestions(
-      uniquePool(hardness.questions.length ? hardness.questions : rawPool)
+      uniquePool(hardness.questions.length ? hardness.questions : topicPool)
     );
 
     const hardFloor = Math.min(MIN_ACCEPTABLE, 18);

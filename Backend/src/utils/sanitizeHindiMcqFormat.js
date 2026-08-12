@@ -33,7 +33,9 @@ export function stripLeakedOptionsFromArBody(text) {
     /\n?\s*नीचे दिए गए कूट[\s\S]*$/i,
     /\n?\s*Select the correct answer using the code[\s\S]*$/i,
     /\n?\s*In the context of the above[\s\S]*$/i,
+    /(?:[.!?]?\s*)Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??\s*$/i,
     /\n?\s*उपर्युक्त के संदर्भ में[\s\S]*$/i,
+    /(?:[.!?]?\s*)निम्नलिखित में से कौन[^.?]*\??\s*$/i,
     /\n?\s*\(\s*A\s*\)\s*(?:दोनों|Both)[\s\S]*$/i,
     /\n?\s*A\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i,
   ];

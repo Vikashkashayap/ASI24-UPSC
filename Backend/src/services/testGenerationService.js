@@ -73,6 +73,9 @@ function normalizePrelimsDifficulty(difficulty) {
  */
 async function generateTestQuestionsFromKnowledgeBase({
   subjects,
+  subjectKey,
+  subjectName,
+  siblingTopics = [],
   topic,
   questionCount,
   difficulty = "Moderate",
@@ -96,6 +99,7 @@ async function generateTestQuestionsFromKnowledgeBase({
   );
   const subjectsList = Array.isArray(subjects) ? subjects : [subjects];
   const primarySubject = String(subjectsList[0] || "").trim();
+  const syllabusLabel = String(subjectName || primarySubject).trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
   // Prefer KB/RAG; LLM open-syllabus when topic missing/short (unless strict kbOnly without allowLlmFallback).
@@ -121,8 +125,12 @@ async function generateTestQuestionsFromKnowledgeBase({
 
   const probe = await getContextForPractice({
     subject: primarySubject,
+    subjectKey,
+    subjectName: syllabusLabel,
     topic: topicQuery,
+    siblingTopics,
     batchIndex: 0,
+    strictTopic: forceKbOnly,
     ...(ragTopK ? { topK: ragTopK } : {}),
     ...(ragMaxTokens ? { maxTokens: ragMaxTokens } : {}),
   });
@@ -217,6 +225,7 @@ async function generateTestQuestionsFromKnowledgeBase({
       }),
       subject: primarySubject,
       chapter: topicQuery,
+      siblingTopics,
       ragOptimized: !openKnowledge,
       openKnowledge,
     });
@@ -242,15 +251,24 @@ async function generateTestQuestionsFromKnowledgeBase({
     // Abstract chapter titles (e.g. "The Geographical Setting") also use soft via isQuestionOnTopic
     let onTopic = filterQuestionsByTopic(mapped, topicQuery, {
       soft: Boolean(openKnowledge),
+      subjectKey,
+      subjectName: syllabusLabel,
+      siblingTopics,
     });
-    // KB strict filter too aggressive for this topic — soft re-check before discarding the batch
+    // KB strict filter — do not relax to soft for chapter practice (kbOnly)
     if (
       !openKnowledge &&
+      !forceKbOnly &&
       mapped.length > 0 &&
       onTopic.dropped > 0 &&
       onTopic.questions.length < Math.ceil(mapped.length * 0.5)
     ) {
-      const softPass = filterQuestionsByTopic(mapped, topicQuery, { soft: true });
+      const softPass = filterQuestionsByTopic(mapped, topicQuery, {
+        soft: true,
+        subjectKey,
+        subjectName: syllabusLabel,
+        siblingTopics,
+      });
       if (softPass.questions.length > onTopic.questions.length) {
         console.warn(
           `⚠️ Prelims batch ${round + 1}: relaxed topic filter ${onTopic.questions.length}→${softPass.questions.length} for "${topicQuery}" (KB soft)`
@@ -294,9 +312,13 @@ async function generateTestQuestionsFromKnowledgeBase({
     if (!openKnowledge) {
       const rag = await getContextForPractice({
         subject: primarySubject,
+        subjectKey,
+        subjectName: syllabusLabel,
         topic: topicQuery,
+        siblingTopics,
         batchIndex: round,
         excludeChunkIds: [...usedChunkIds],
+        strictTopic: forceKbOnly,
         ...(ragTopK ? { topK: ragTopK } : {}),
         ...(ragMaxTokens ? { maxTokens: ragMaxTokens } : {}),
       });
@@ -3830,6 +3852,9 @@ function getTestGenMaxBatchRounds(count, batchSize) {
  */
 export const generateTestQuestions = async ({
   subjects,
+  subjectKey,
+  subjectName,
+  siblingTopics = [],
   topic,
   examType,
   questionCount,
@@ -3849,6 +3874,9 @@ export const generateTestQuestions = async ({
     if (isPrelimsRagEnabled(examType)) {
       return await generateTestQuestionsFromKnowledgeBase({
         subjects,
+        subjectKey,
+        subjectName,
+        siblingTopics,
         topic,
         questionCount,
         difficulty,

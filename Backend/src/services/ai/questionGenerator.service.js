@@ -168,10 +168,20 @@ function normalizeMatchColumns(raw) {
   return { columnA, columnB };
 }
 
+function stripArTrailingPrompt(text) {
+  return String(text || "")
+    .replace(
+      /(?:[.!?]?\s*)(?:In the context of the above,?\s*)?(?:Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??|Select the correct answer[^.?]*\??|उपर्युक्त के संदर्भ में[^.?]*\??|निम्नलिखित में से कौन[^.?]*\??)\s*$/i,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function normalizeAssertionReason(raw) {
   if (!raw || typeof raw !== "object") return null;
-  const assertion = String(raw.assertion || raw.A || "").trim();
-  const reason = String(raw.reason || raw.R || "").trim();
+  const assertion = stripArTrailingPrompt(raw.assertion || raw.A || "");
+  const reason = stripArTrailingPrompt(raw.reason || raw.R || "");
   if (assertion.length < 15 || reason.length < 15) return null;
   return { assertion, reason };
 }
@@ -217,8 +227,8 @@ function formatChronologyStem(intro, items) {
 
 function formatAssertionStem(ar) {
   return [
-    `Assertion (A): ${ar.assertion}`,
-    `Reason (R): ${ar.reason}`,
+    `Assertion (A): ${stripArTrailingPrompt(ar.assertion)}`,
+    `Reason (R): ${stripArTrailingPrompt(ar.reason)}`,
     "In the context of the above, which of the following is correct?",
   ].join("\n");
 }
@@ -429,6 +439,7 @@ async function callNotesBatchOnce({
   generationPlan,
   subject,
   chapter,
+  siblingTopics = [],
   temperature = 0.2,
   openKnowledge = false,
 }) {
@@ -443,6 +454,7 @@ async function callNotesBatchOnce({
     patternsToInclude,
     batchIndex,
     generationPlan,
+    siblingTopics,
     openKnowledge,
   });
 
@@ -506,6 +518,7 @@ async function generateNotesBatch({
   generationPlan = null,
   subject = "",
   chapter = "",
+  siblingTopics = [],
   ragOptimized = false,
   openKnowledge = false,
 }) {
@@ -585,6 +598,7 @@ async function generateNotesBatch({
       patternsToInclude,
       batchIndex,
       generationPlan,
+      siblingTopics,
       openKnowledge: false,
     });
     const probe = estimateRequestTokens({
@@ -649,6 +663,7 @@ async function generateNotesBatch({
       generationPlan,
       subject,
       chapter,
+      siblingTopics,
       temperature:
         fill === 0
           ? String(difficulty || "").toLowerCase() === "hard"
@@ -732,6 +747,7 @@ export async function generateQuestionsFromContextBatch({
   generationPlan = null,
   subject = "",
   chapter = "",
+  siblingTopics = [],
   ragOptimized = false,
   openKnowledge = false,
 }) {
@@ -812,7 +828,10 @@ export async function generateQuestionsFromContextBatch({
       });
 
       questions = questions.filter((q) => !isMetadataQuestion(q));
-      const onTopic = filterQuestionsByTopic(questions, topic, { soft: false });
+      const onTopic = filterQuestionsByTopic(questions, topic, {
+        soft: false,
+        siblingTopics,
+      });
       if (onTopic.questions.length) questions = onTopic.questions;
 
       return {
@@ -850,6 +869,7 @@ export async function generateQuestionsFromContextBatch({
     generationPlan,
     subject,
     chapter,
+    siblingTopics,
     ragOptimized,
     openKnowledge,
   });

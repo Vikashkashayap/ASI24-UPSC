@@ -225,4 +225,222 @@ export async function resolveKbSubjectNameFromDb(subject, deps = {}) {
   }
 }
 
+/**
+ * History syllabus eras — used to block cross-era chunk/question leaks
+ * (e.g. Medieval Mughal content in Ancient History chapter tests).
+ */
+export const HISTORY_ERA_CONFIG = {
+  ancient: {
+    label: "Ancient History",
+    aliases: ["History", "Ancient History"],
+    excludeMarkers: [
+      "medieval",
+      "mughal",
+      "sultanate",
+      "delhi sultanate",
+      "bahmani",
+      "vijayanagara",
+      "vijayanagar",
+      "bhakti movement",
+      "sufi movement",
+      "maratha",
+      "british",
+      "colonial",
+      "freedom struggle",
+      "1857",
+      "revolt of 1857",
+      "independence",
+      "partition",
+      "gandhi",
+      "nehru",
+      "subhash",
+      "world war",
+      "industrial revolution",
+      "renaissance",
+      "french revolution",
+      "russian revolution",
+      "cold war",
+      "united nations",
+    ],
+  },
+  medieval: {
+    label: "Medieval History",
+    aliases: ["History", "Medieval History"],
+    excludeMarkers: [
+      "stone age",
+      "palaeolithic",
+      "paleolithic",
+      "mesolithic",
+      "neolithic",
+      "microlith",
+      "bhimbetka",
+      "harappan",
+      "indus valley",
+      "indus civilization",
+      "vedic period",
+      "rig veda",
+      "maurya",
+      "mauryan",
+      "ashoka",
+      "gupta",
+      "guptas",
+      "kushan",
+      "satavahana",
+      "british",
+      "colonial",
+      "freedom struggle",
+      "1857",
+      "independence",
+      "partition",
+      "gandhi",
+      "world war",
+      "industrial revolution",
+    ],
+  },
+  modern: {
+    label: "Modern History",
+    aliases: ["History", "Modern History"],
+    excludeMarkers: [
+      "stone age",
+      "palaeolithic",
+      "paleolithic",
+      "mesolithic",
+      "neolithic",
+      "harappan",
+      "indus valley",
+      "vedic period",
+      "maurya",
+      "gupta",
+      "mughal",
+      "sultanate",
+      "delhi sultanate",
+      "vijayanagara",
+      "world war i",
+      "world war ii",
+      "cold war",
+      "united nations",
+      "french revolution",
+      "russian revolution",
+    ],
+  },
+  world: {
+    label: "World History",
+    aliases: ["History", "World History"],
+    excludeMarkers: [
+      "stone age",
+      "harappan",
+      "indus valley",
+      "vedic",
+      "maurya",
+      "gupta",
+      "mughal",
+      "sultanate",
+      "1857",
+      "freedom struggle",
+      "gandhi",
+      "nehru",
+    ],
+  },
+  postind: {
+    label: "Post-Independence India",
+    aliases: ["History", "Modern History"],
+    excludeMarkers: [
+      "stone age",
+      "harappan",
+      "indus valley",
+      "vedic",
+      "maurya",
+      "gupta",
+      "mughal",
+      "sultanate",
+      "delhi sultanate",
+      "vijayanagara",
+    ],
+  },
+};
+
+/** Geography sub-buckets — Indian vs World */
+export const GEOGRAPHY_ERA_CONFIG = {
+  indgeo: {
+    label: "Indian Geography",
+    aliases: ["Geography", "Indian Geography"],
+    excludeMarkers: [
+      "europe",
+      "africa",
+      "north america",
+      "south america",
+      "australia",
+      "antarctica",
+      "arctic",
+      "sahara",
+      "amazon",
+      "mississippi",
+      "rockies",
+      "alps",
+      "andes",
+    ],
+  },
+  worldgeo: {
+    label: "World Geography",
+    aliases: ["Geography", "World Geography"],
+    excludeMarkers: [
+      "indo-gangetic",
+      "indo gangetic",
+      "deccan plateau",
+      "western ghats",
+      "eastern ghats",
+      "thar desert",
+      "tropic of cancer india",
+      "standard meridian of india",
+    ],
+  },
+};
+
+/**
+ * Resolve syllabus subjectKey / display name → history era key (or null).
+ * @returns {'ancient'|'medieval'|'modern'|'world'|'postind'|'indgeo'|'worldgeo'|null}
+ */
+export function resolveSubjectEra(subjectKey, subjectName) {
+  const key = String(subjectKey || "").trim().toLowerCase();
+  if (HISTORY_ERA_CONFIG[key]) return key;
+  if (GEOGRAPHY_ERA_CONFIG[key]) return key;
+
+  const name = String(subjectName || "").toLowerCase();
+  if (/\bancient\b.*\bhistory\b|\bhistory\b.*\bancient\b/.test(name)) return "ancient";
+  if (/\bmedieval\b.*\bhistory\b|\bhistory\b.*\bmedieval\b/.test(name)) return "medieval";
+  if (/\bworld\b.*\bhistory\b|\bhistory\b.*\bworld\b/.test(name)) return "world";
+  if (/post[-\s]?independ/.test(name)) return "postind";
+  if (/\bmodern\b.*\bhistory\b|\bhistory\b.*\bmodern\b/.test(name)) return "modern";
+  if (/\bindian\b.*\bgeograph/.test(name)) return "indgeo";
+  if (/\bworld\b.*\bgeograph/.test(name)) return "worldgeo";
+  return null;
+}
+
+/**
+ * Narrow KB subject aliases for retrieval — era-specific, not full History family.
+ * Ancient History → ["History", "Ancient History"] (NOT Medieval/Modern/World).
+ */
+export function narrowKbSubjectAliases(subjectKey, subjectName) {
+  const era = resolveSubjectEra(subjectKey, subjectName);
+  if (era && HISTORY_ERA_CONFIG[era]) {
+    return [...HISTORY_ERA_CONFIG[era].aliases];
+  }
+  if (era && GEOGRAPHY_ERA_CONFIG[era]) {
+    return [...GEOGRAPHY_ERA_CONFIG[era].aliases];
+  }
+  const label = String(subjectName || subjectKey || "").trim();
+  return expandKbSubjectAliases(label);
+}
+
+/**
+ * Get exclusion markers for a syllabus era (cross-subject leak prevention).
+ * @returns {string[]}
+ */
+export function getEraExclusionMarkers(subjectKey, subjectName) {
+  const era = resolveSubjectEra(subjectKey, subjectName);
+  if (era && HISTORY_ERA_CONFIG[era]) return HISTORY_ERA_CONFIG[era].excludeMarkers;
+  if (era && GEOGRAPHY_ERA_CONFIG[era]) return GEOGRAPHY_ERA_CONFIG[era].excludeMarkers;
+  return [];
+}
+
 export { escapeRegex, normalizeLabel };
