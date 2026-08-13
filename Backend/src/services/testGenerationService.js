@@ -69,7 +69,8 @@ function normalizePrelimsDifficulty(difficulty) {
 
 /**
  * GS Prelims: prefer Admin Knowledge Base (Intelligence hybrid RAG) for the selected
- * subject + topic; if topic missing from KB, fall back to LLM (unless kbOnly / PRELIMS_FORCE_KB_ONLY).
+ * subject + topic. If RAG is empty/short, LLM fills the remainder when allowLlmFallback
+ * is true (kbOnly still uses strict topic RAG + PYQ-Hard patterns).
  */
 async function generateTestQuestionsFromKnowledgeBase({
   subjects,
@@ -102,11 +103,10 @@ async function generateTestQuestionsFromKnowledgeBase({
   const syllabusLabel = String(subjectName || primarySubject).trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
-  // Prefer KB/RAG; LLM open-syllabus when topic missing/short (unless strict kbOnly without allowLlmFallback).
+  // kbOnly / PRELIMS_FORCE_KB_ONLY = strict RAG + PYQ-Hard. LLM fill is a separate switch.
   const forceKbOnly =
-    !allowLlmFallback &&
-    (Boolean(kbOnly) ||
-      String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true");
+    Boolean(kbOnly) ||
+    String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
   const allowOpenKnowledge = !forceKbOnly || Boolean(allowLlmFallback);
 
   if (!primarySubject || !topicQuery) {
@@ -199,10 +199,10 @@ async function generateTestQuestionsFromKnowledgeBase({
   let validatedQuestions = [];
   let stallRounds = 0;
 
-  if (forceKbOnly) {
+  if (forceKbOnly && !allowOpenKnowledge) {
     console.warn("⚠️ PRELIMS_FORCE_KB_ONLY / kbOnly — LLM fallback disabled (KB-only)");
   } else if (allowLlmFallback) {
-    console.log("ℹ️ LLM fallback enabled — if KB/RAG miss or shortfall, open-syllabus will fill");
+    console.log("ℹ️ LLM fallback enabled — RAG first, then open-syllabus fills any shortfall");
   }
 
   console.log(
@@ -391,13 +391,17 @@ async function generateTestQuestionsFromKnowledgeBase({
       `📈 Prelims progress: ${validatedQuestions.length}/${count} on-topic (batch ${round + 1}/${maxBatchRounds})`
     );
 
-    // Prefer filling toward count, but stop once caller has enough (chapter: 20 of 30)
-  if (validatedQuestions.length >= minKeep && minKeep < count) {
-    console.log(
-      `✅ Early stop at ${validatedQuestions.length}/${count} (minKeep=${minKeep}) — enough for paper`
-    );
-    break;
-  }
+    // Prefer filling toward count. Do not early-stop on a tiny minKeep (e.g. 1 of 8).
+    if (
+      validatedQuestions.length >= minKeep &&
+      minKeep < count &&
+      minKeep >= Math.ceil(count * 0.8)
+    ) {
+      console.log(
+        `✅ Early stop at ${validatedQuestions.length}/${count} (minKeep=${minKeep}) — enough for paper`
+      );
+      break;
+    }
 
     if (validatedQuestions.length === beforeLen) {
       stallRounds += 1;
@@ -406,16 +410,17 @@ async function generateTestQuestionsFromKnowledgeBase({
     }
   }
 
-  // KB/RAG shortfall → LLM open-syllabus top-up so practice never fails empty
-  if (validatedQuestions.length < minKeep && allowOpenKnowledge) {
-    const shortfall = minKeep - validatedQuestions.length;
-    const topUpRounds = Math.min(6, Math.ceil(shortfall / Math.max(1, batchSize)) + 2);
+  // KB/RAG shortfall → LLM open-syllabus top-up (deduped against already-kept stems)
+  const fillTarget = allowLlmFallback ? count : minKeep;
+  if (validatedQuestions.length < fillTarget && allowOpenKnowledge) {
+    const shortfall = fillTarget - validatedQuestions.length;
+    const topUpRounds = Math.min(8, Math.ceil(shortfall / Math.max(1, batchSize)) + 3);
     console.warn(
-      `⚠️ Prelims short ${validatedQuestions.length}/${minKeep} for "${topicQuery}" — LLM top-up (${topUpRounds} rounds)`
+      `⚠️ Prelims short ${validatedQuestions.length}/${fillTarget} for "${topicQuery}" — LLM top-up (${topUpRounds} rounds, no repeats)`
     );
     preferOpenKnowledge = true;
     openKnowledgeUsed = true;
-    for (let i = 0; i < topUpRounds && validatedQuestions.length < minKeep; i += 1) {
+    for (let i = 0; i < topUpRounds && validatedQuestions.length < fillTarget; i += 1) {
       const need = Math.min(batchSize, count - validatedQuestions.length);
       const kept = await runBatch({
         need,
@@ -429,7 +434,7 @@ async function generateTestQuestionsFromKnowledgeBase({
         csat: false,
       }).slice(0, count);
       console.log(
-        `📈 Prelims LLM top-up: ${validatedQuestions.length}/${count} (round ${i + 1}/${topUpRounds})`
+        `📈 Prelims LLM top-up: ${validatedQuestions.length}/${count} unique (round ${i + 1}/${topUpRounds})`
       );
     }
   }
@@ -441,9 +446,15 @@ async function generateTestQuestionsFromKnowledgeBase({
   }
 
   if (validatedQuestions.length < minKeep) {
-    throw new Error(
-      `Only ${validatedQuestions.length} of ${count} on-topic questions could be generated for "${topicQuery}". Please try again.`
-    );
+    if (allowLlmFallback) {
+      console.warn(
+        `⚠️ Prelims gen: ${validatedQuestions.length}/${minKeep} after RAG+LLM for "${topicQuery}" — returning unique set for caller top-up`
+      );
+    } else {
+      throw new Error(
+        `Only ${validatedQuestions.length} of ${count} on-topic questions could be generated for "${topicQuery}". Please try again.`
+      );
+    }
   }
 
   if (validatedQuestions.length < count) {
@@ -3950,9 +3961,9 @@ export const generateTestQuestions = async ({
   currentAffairsPeriod,
   batchSize: batchSizeParam,
   minAcceptable,
-  /** When true: Admin KB / RAG only — no open-syllabus LLM (unless allowLlmFallback). */
+  /** When true: strict topic RAG + PYQ-Hard. Pair with allowLlmFallback to fill shortfalls. */
   kbOnly = false,
-  /** Prefer KB first; if topic missing/short in RAG/KB, generate via LLM instead of failing. */
+  /** RAG first; if topic missing/short, LLM generates remaining unique questions. */
   allowLlmFallback = false,
   /** Force Hindi bilingual fields for practice (even if PRACTICE_GEN_BATCH_HINDI=false). */
   ensureHindi = false,

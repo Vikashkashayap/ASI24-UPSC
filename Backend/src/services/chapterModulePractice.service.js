@@ -1,10 +1,10 @@
 /**
  * Student Module Targets → chapter practice:
- * - Admin KB / RAG only for Hard MCQs (no open-syllabus inventing)
+ * - Admin KB / RAG first for Hard MCQs; LLM fills any shortfall (no repeated stems)
  * - Always bilingual (EN + HI) for chapter practice
  * - Show 20 unique questions (teaching explanations: correct + all wrong options)
  * - Prefetch related UPSC topics for the *next* chapter into cache
- * Module Final (50Q): chapter bank + RAG top-up, polished explanations
+ * Module Final (50Q): chapter bank + RAG top-up, then LLM fill if still short
  */
 
 import Test from "../models/Test.js";
@@ -455,7 +455,7 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 
 /**
  * Create (or reuse-from-cache) a chapter practice test.
- * Admin KB/RAG only for 30 Hard MCQs (no open-syllabus inventing).
+ * RAG first for 30 Hard MCQs; LLM fills remaining unique stems if KB is thin.
  * English at generate time; Hindi via free client Google translate (0 OpenRouter tokens).
  * Show 20 unique questions with teaching explanations.
  *
@@ -679,8 +679,8 @@ async function createChapterPracticeTestInner({
     );
   } else {
     console.log(
-      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG only` +
-        ` (no open-syllabus) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
+      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG` +
+        ` (LLM fills shortfall, no repeats) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
     );
   }
 
@@ -697,9 +697,8 @@ async function createChapterPracticeTestInner({
       batchSize: BATCH_SIZE,
       // Aim ~28 unique before early-stop so near-dupe + hardness drops still leave 20 to show
       minAcceptable: MIN_KEEP_GENERATE,
-      // Module Targets: questions MUST come from Admin KB/RAG only (UPSC Hard)
       kbOnly: true,
-      allowLlmFallback: false,
+      allowLlmFallback: true,
       ensureHindi: true,
     });
 
@@ -737,9 +736,51 @@ async function createChapterPracticeTestInner({
       hardness.questions.length ? hardness.questions : retagged,
       { forceHard: true }
     );
-    const pool = filterStudentReadyQuestions(uniquePool(hardPool));
+    let pool = filterStudentReadyQuestions(uniquePool(hardPool));
 
     const hardFloor = MIN_ACCEPTABLE;
+    if (pool.length < hardFloor) {
+      const stillNeed = hardFloor - pool.length + 8;
+      console.warn(
+        `[chapterPractice] ${pool.length}/${hardFloor} unique after RAG filters — LLM fill ${stillNeed} for "${topicNormalized}"`
+      );
+      const fingerprints = buildQuestionFingerprints(pool);
+      const llmFill = await generateTestQuestions({
+        subjects: [kbSubject],
+        subjectKey: subjectKey || "",
+        subjectName: subjectName || kbSubject,
+        siblingTopics,
+        topic: topicNormalized,
+        examType: "GS",
+        questionCount: stillNeed,
+        difficulty,
+        batchSize: BATCH_SIZE,
+        minAcceptable: Math.max(1, hardFloor - pool.length),
+        kbOnly: true,
+        allowLlmFallback: true,
+        ensureHindi: true,
+      });
+      if (llmFill.success && llmFill.questions?.length) {
+        const mapped = llmFill.questions.map((q) => pickBilingualQuestionFields(q));
+        const novel = filterOutPriorRepeats(mapped, fingerprints);
+        const extraOnTopic = filterQuestionsByTopic(novel, topicNormalized, {
+          soft: true,
+          subjectKey: subjectKey || "",
+          subjectName: subjectName || kbSubject,
+          siblingTopics,
+        });
+        const extraRetagged = retagQuestionsToPyqPatterns(
+          extraOnTopic.questions.length ? extraOnTopic.questions : novel,
+          { forceHard: true }
+        );
+        pool = filterStudentReadyQuestions(uniquePool([...pool, ...extraRetagged]));
+        generationResult.source = "knowledge_base+open";
+        console.log(
+          `[chapterPractice] LLM fill: +${novel.length} novel → pool ${pool.length} unique`
+        );
+      }
+    }
+
     if (pool.length < hardFloor) {
       const err = new Error(
         `Only ${pool.length} unique usable questions for "${topicNormalized}" (need ${hardFloor}+ after removing repeats). Please try again.`
@@ -788,14 +829,15 @@ async function createChapterPracticeTestInner({
 }
 
 /**
- * RAG top-up for Module Final: generate only the shortfall across chapter topics,
- * skipping near-duplicates already in the chapter bank.
+ * Module Final top-up: RAG first across chapter topics, then LLM for remaining unique stems.
+ * Skips near-duplicates already in the chapter bank / current paper.
  */
 async function generateModuleFinalTopUp({
   kbSubject,
   topicNames,
   need,
   excludeQuestions = [],
+  allowLlmFallback = false,
 }) {
   if (need <= 0 || !topicNames.length) return [];
 
@@ -805,15 +847,11 @@ async function generateModuleFinalTopUp({
   const fresh = [];
 
   console.log(
-    `[moduleFinal] top-up: need=${need}, generateTarget≈${generateTarget}, topics=${topicNames.length}, ~${perTopic}/topic`
+    `[moduleFinal] top-up: need=${need}, generateTarget≈${generateTarget}, topics=${topicNames.length}, ~${perTopic}/topic, llm=${allowLlmFallback}`
   );
 
-  for (const topic of topicNames) {
-    if (fresh.length >= generateTarget) break;
-
-    const want = Math.min(perTopic, generateTarget - fresh.length);
+  const pullTopic = async (topic, want, useLlm) => {
     const fingerprints = buildQuestionFingerprints([...excludeQuestions, ...fresh]);
-
     const generationResult = await generateTestQuestions({
       subjects: [kbSubject],
       topic,
@@ -823,7 +861,7 @@ async function generateModuleFinalTopUp({
       batchSize: Math.min(5, want),
       minAcceptable: 1,
       kbOnly: true,
-      allowLlmFallback: false,
+      allowLlmFallback: useLlm,
       ensureHindi: true,
     });
 
@@ -832,39 +870,40 @@ async function generateModuleFinalTopUp({
         `[moduleFinal] top-up batch failed for "${topic}":`,
         generationResult.error || "no questions"
       );
-      continue;
+      return;
     }
 
     const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
     const novel = filterOutPriorRepeats(mapped, fingerprints);
     console.log(
-      `[moduleFinal] top-up "${topic}": got ${mapped.length}, novel ${novel.length} (vs bank+fresh)`
+      `[moduleFinal] top-up "${topic}": got ${mapped.length}, novel ${novel.length} (vs bank+fresh, llm=${useLlm})`
     );
     fresh.push(...novel);
+  };
+
+  for (const topic of topicNames) {
+    if (fresh.length >= generateTarget) break;
+    const want = Math.min(perTopic, generateTarget - fresh.length);
+    await pullTopic(topic, want, false);
   }
 
-  // Still short → one more pass on first topics with smaller batches
   if (fresh.length < need) {
     const stillNeed = need - fresh.length + 3;
-    console.log(`[moduleFinal] top-up second pass for ${stillNeed} more…`);
+    console.log(`[moduleFinal] top-up second RAG pass for ${stillNeed} more…`);
     for (const topic of topicNames) {
       if (fresh.length >= need) break;
-      const fingerprints = buildQuestionFingerprints([...excludeQuestions, ...fresh]);
-      const generationResult = await generateTestQuestions({
-        subjects: [kbSubject],
-        topic,
-        examType: "GS",
-        questionCount: Math.min(5, stillNeed),
-        difficulty: "Hard",
-        batchSize: 5,
-        minAcceptable: 1,
-        kbOnly: true,
-        allowLlmFallback: false,
-        ensureHindi: true,
-      });
-      if (!generationResult.success || !generationResult.questions?.length) continue;
-      const mapped = generationResult.questions.map((q) => pickBilingualQuestionFields(q));
-      fresh.push(...filterOutPriorRepeats(mapped, fingerprints));
+      await pullTopic(topic, Math.min(5, stillNeed), false);
+    }
+  }
+
+  if (allowLlmFallback && fresh.length < need) {
+    const stillNeed = need - fresh.length + 3;
+    console.warn(
+      `[moduleFinal] RAG short ${fresh.length}/${need} — LLM fill ~${stillNeed} unique Qs`
+    );
+    for (const topic of topicNames) {
+      if (fresh.length >= need) break;
+      await pullTopic(topic, Math.min(8, stillNeed), true);
     }
   }
 
@@ -875,7 +914,7 @@ async function generateModuleFinalTopUp({
  * Module Final (50Q):
  * 1) Resume this student's unsubmitted attempt
  * 2) Reuse shared Module Final paper (any student) — 0 LLM / same questions
- * 3) Else build from chapter bank + RAG top-up (first generation only)
+ * 3) Else build from chapter bank + RAG, then LLM for remaining unique stems
  */
 export async function createModuleFinalTestFromChapterBank(params) {
   return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
@@ -1086,6 +1125,7 @@ async function createModuleFinalTestFromChapterBankInner({
       topicNames,
       need,
       excludeQuestions: bankUnique,
+      allowLlmFallback: true,
     });
     combined = filterStudentReadyQuestions(
       dedupeQuestionsByStem(dedupeQuestions([...bankUnique, ...topUp]))
@@ -1093,18 +1133,19 @@ async function createModuleFinalTestFromChapterBankInner({
     generatedCount = Math.max(0, combined.length - bankUnique.length);
     fromGeneration = generatedCount > 0;
     console.log(
-      `[moduleFinal] after RAG top-up: bank=${bankUnique.length} + generated≈${generatedCount} → ${combined.length}`
+      `[moduleFinal] after RAG+LLM top-up: bank=${bankUnique.length} + generated≈${generatedCount} → ${combined.length}`
     );
   }
 
   const weakCount = combined.filter((q) => !hasTeachingExplanation(q)).length;
   if (weakCount > Math.floor(showCount * 0.3) && combined.length >= Math.min(showCount, 10)) {
-    console.log(`[moduleFinal] ${weakCount} weak explanations — RAG refresh`);
+    console.log(`[moduleFinal] ${weakCount} weak explanations — RAG/LLM refresh`);
     const extra = await generateModuleFinalTopUp({
       kbSubject,
       topicNames,
       need: Math.min(20, weakCount),
       excludeQuestions: combined,
+      allowLlmFallback: true,
     });
     if (extra.length) {
       const teachingExtra = extra.filter((q) => hasTeachingExplanation(q));
@@ -1124,10 +1165,44 @@ async function createModuleFinalTestFromChapterBankInner({
   }
 
   if (combined.length < showCount) {
+    const stillNeed = showCount - combined.length;
+    console.warn(
+      `[moduleFinal] still short ${combined.length}/${showCount} — module-level LLM fill for "${moduleName}"`
+    );
+    const fingerprints = buildQuestionFingerprints(combined);
+    const llmPack = await generateTestQuestions({
+      subjects: [kbSubject],
+      topic: String(moduleName || topicNames[0] || moduleId).trim(),
+      examType: "GS",
+      questionCount: stillNeed + 6,
+      difficulty: "Hard",
+      batchSize: 8,
+      minAcceptable: 1,
+      kbOnly: true,
+      allowLlmFallback: true,
+      ensureHindi: true,
+    });
+    if (llmPack.success && llmPack.questions?.length) {
+      const novel = filterOutPriorRepeats(
+        llmPack.questions.map((q) => pickBilingualQuestionFields(q)),
+        fingerprints
+      );
+      combined = filterStudentReadyQuestions(
+        dedupeQuestionsByStem(dedupeQuestions([...combined, ...novel]))
+      );
+      generatedCount = Math.max(generatedCount, combined.length - bankUnique.length);
+      fromGeneration = true;
+      console.log(
+        `[moduleFinal] module LLM fill: +${novel.length} novel → ${combined.length} unique`
+      );
+    }
+  }
+
+  if (combined.length < showCount) {
     const err = new Error(
-      `Could not build a ${showCount}Q module final from Knowledge Base (have ${combined.length}` +
+      `Could not build a ${showCount}Q module final (have ${combined.length}` +
         `${bankUnique.length ? `: ${bankUnique.length} chapter bank` : ""}` +
-        `${generatedCount ? ` + ${generatedCount} RAG` : ""}). Sync notes/PDFs for this module, then retry.`
+        `${generatedCount ? ` + ${generatedCount} generated` : ""}). Please try again.`
     );
     err.status = 400;
     throw err;
@@ -1160,7 +1235,7 @@ async function createModuleFinalTestFromChapterBankInner({
     fromGeneration,
     bankCount: bankUnique.length,
     generatedCount,
-    source: fromGeneration ? "knowledge_base_rag" : "chapter_bank",
+    source: fromGeneration ? "knowledge_base+open" : "chapter_bank",
   });
 }
 
