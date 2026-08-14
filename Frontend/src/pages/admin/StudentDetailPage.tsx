@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../componen
 import { Badge } from "../../components/ui/badge";
 import { api } from "../../services/api";
 import { useTheme } from "../../hooks/useTheme";
+import { CopyEvaluationResultView } from "../../components/copy-evaluation/CopyEvaluationResultView";
 import {
   ArrowLeft,
   Mail,
@@ -167,6 +168,84 @@ interface EvaluationDetails {
   };
 }
 
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => String(item || "")).filter(Boolean);
+}
+
+function normalizeEvaluationDetails(raw: any): EvaluationDetails {
+  const vision = raw?.visionResult || {};
+  const obtained =
+    raw?.finalSummary?.overallScore?.obtained ??
+    vision.marks ??
+    vision.overallMarks ??
+    vision.overall_score ??
+    0;
+  const maximum =
+    raw?.finalSummary?.overallScore?.maximum ?? vision.maxMarks ?? 15;
+  const percentage =
+    raw?.finalSummary?.overallScore?.percentage ??
+    (maximum ? (Number(obtained) / Number(maximum)) * 100 : 0);
+
+  let evaluations = Array.isArray(raw?.evaluations) ? raw.evaluations : [];
+  if (!evaluations.length && (vision.questionText || vision.extractedAnswerText || vision.marks != null)) {
+    evaluations = [
+      {
+        questionNumber: "1",
+        answerText: vision.extractedAnswerText || "",
+        annotatedText: vision.questionText || "",
+        totalMarks: obtained,
+        maxMarks: maximum,
+        wordCount: vision.wordCount || 0,
+        strengths: asStringArray(vision.strengths),
+        weaknesses: asStringArray(vision.weaknesses),
+        examinerComment:
+          vision.examinerRemark ||
+          vision.overallFeedback ||
+          vision.examinerFeedback ||
+          vision.summary ||
+          "",
+        modelAnswer: "",
+        upscRange: raw?.finalSummary?.upscRange || vision.grade || "",
+      },
+    ];
+  }
+
+  return {
+    id: String(raw?._id || raw?.id || ""),
+    subject: raw?.subject || "General Studies",
+    paper: raw?.paper && String(raw.paper).toLowerCase() !== "unknown" ? raw.paper : "",
+    year: raw?.year,
+    pdfFileName: raw?.pdfFileName || raw?.fileName || "",
+    evaluations: evaluations.map((q: any, i: number) => ({
+      questionNumber: String(q.questionNumber || i + 1),
+      answerText: q.answerText || "",
+      annotatedText: q.annotatedText || "",
+      totalMarks: q.totalMarks ?? obtained,
+      maxMarks: q.maxMarks ?? maximum,
+      wordCount: q.wordCount || 0,
+      strengths: asStringArray(q.strengths),
+      weaknesses: asStringArray(q.weaknesses),
+      examinerComment: q.examinerComment || "",
+      modelAnswer: q.modelAnswer || "",
+      upscRange: q.upscRange || "",
+    })),
+    finalSummary: {
+      overallScore: {
+        obtained: Number(obtained) || 0,
+        maximum: Number(maximum) || 15,
+        percentage: Number(percentage) || 0,
+      },
+      strengths: asStringArray(raw?.finalSummary?.strengths || vision.strengths),
+      weaknesses: asStringArray(raw?.finalSummary?.weaknesses || vision.weaknesses),
+      improvementPlan: asStringArray(
+        raw?.finalSummary?.improvementPlan || vision.improvementPriority || vision.suggestions
+      ),
+      upscRange: raw?.finalSummary?.upscRange || vision.grade || "",
+    },
+  };
+}
+
 export const StudentDetailPage = () => {
   const { theme } = useTheme();
   const location = useLocation();
@@ -193,6 +272,7 @@ export const StudentDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedEvaluation, setSelectedEvaluation] = useState<EvaluationDetails | null>(null);
+  const [rawCopyEval, setRawCopyEval] = useState<any>(null);
   const [showEvaluationModal, setShowEvaluationModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [dartAnalytics, setDartAnalytics] = useState<any | null>(null);
@@ -357,9 +437,15 @@ export const StudentDetailPage = () => {
 
   const viewEvaluationDetails = async (evaluationId: string) => {
     try {
-      const res = await api.get(`/api/copy-evaluations/${evaluationId}`);
+      const res = await api.get(`/api/copy-evaluation/${evaluationId}`);
       if (res.data.success) {
-        setSelectedEvaluation(res.data.data);
+        const data = res.data.data;
+        if (data?.visionResult) {
+          const vr = data.visionResult;
+          if (vr.marks == null && vr.overallMarks != null) vr.marks = vr.overallMarks;
+        }
+        setRawCopyEval(data);
+        setSelectedEvaluation(normalizeEvaluationDetails(data));
         setShowEvaluationModal(true);
       }
     } catch (err: any) {
@@ -1589,7 +1675,7 @@ export const StudentDetailPage = () => {
                               >
                                 <ClipboardCheck className="h-5 w-5" />
                               </div>
-                              {evaluation.paper && (
+                              {evaluation.paper && evaluation.paper.toLowerCase() !== "unknown" && (
                                 <span
                                   className={`px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${
                                     theme === "dark"
@@ -2200,8 +2286,17 @@ export const StudentDetailPage = () => {
         </Dialog>
 
         {/* Evaluation Details Modal */}
-        <Dialog open={showEvaluationModal} onOpenChange={setShowEvaluationModal}>
-          <DialogContent className={`max-w-4xl max-h-[80vh] overflow-y-auto transition-colors duration-300 ${
+        <Dialog
+          open={showEvaluationModal}
+          onOpenChange={(open) => {
+            setShowEvaluationModal(open);
+            if (!open) {
+              setRawCopyEval(null);
+              setSelectedEvaluation(null);
+            }
+          }}
+        >
+          <DialogContent className={`max-w-6xl max-h-[90vh] overflow-y-auto transition-colors duration-300 ${
             theme === "dark"
               ? "bg-slate-900 border-slate-700"
               : "bg-white border-slate-300"
@@ -2209,9 +2304,38 @@ export const StudentDetailPage = () => {
             <DialogHeader>
               <DialogTitle className={`${
                 theme === "dark" ? "text-slate-100" : "text-slate-900"
-              }`}>Evaluation Details</DialogTitle>
+              }`}>
+                {rawCopyEval?.subject
+                  ? `${rawCopyEval.subject} — student copy evaluation`
+                  : "Evaluation Details"}
+              </DialogTitle>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowEvaluationModal(false);
+                  setRawCopyEval(null);
+                  setSelectedEvaluation(null);
+                }}
+                className="shrink-0"
+              >
+                Cancel
+              </Button>
             </DialogHeader>
-            {selectedEvaluation && (
+            {rawCopyEval?.visionResult ? (
+              <CopyEvaluationResultView
+                result={rawCopyEval.visionResult}
+                evaluationId={String(rawCopyEval._id)}
+                storedPages={rawCopyEval.storedPages}
+                subject={rawCopyEval.subject}
+                paper={
+                  rawCopyEval.paper && String(rawCopyEval.paper).toLowerCase() !== "unknown"
+                    ? rawCopyEval.paper
+                    : undefined
+                }
+                fileName={rawCopyEval.fileName || rawCopyEval.pdfFileName}
+                createdAt={rawCopyEval.createdAt}
+              />
+            ) : selectedEvaluation ? (
               <div className="space-y-6">
                 {/* Evaluation Summary */}
                 <Card className={`transition-colors duration-300 ${
@@ -2314,7 +2438,7 @@ export const StudentDetailPage = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {selectedEvaluation.evaluations.map((question, index) => (
+                      {(selectedEvaluation.evaluations || []).map((question, index) => (
                         <div key={index} className={`border rounded-lg p-4 transition-colors duration-200 ${
                           theme === "dark"
                             ? "border-slate-700 bg-slate-900/50"
@@ -2381,7 +2505,23 @@ export const StudentDetailPage = () => {
                   </CardContent>
                 </Card>
               </div>
-            )}
+            ) : null}
+            <div
+              className={`sticky bottom-0 flex justify-end gap-2 px-6 py-3 border-t ${
+                theme === "dark" ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200"
+              }`}
+            >
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowEvaluationModal(false);
+                  setRawCopyEval(null);
+                  setSelectedEvaluation(null);
+                }}
+              >
+                Close
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
 

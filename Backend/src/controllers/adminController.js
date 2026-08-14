@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { User } from "../models/User.js";
 import { Mentor } from "../models/Mentor.js";
 import { PricingPlan } from "../models/PricingPlan.js";
@@ -587,12 +588,17 @@ export const getStudentPrelims = async (req, res) => {
     }
 
     const tests = await Test.find({
-      userId: id,
+      $or: [
+        { userId: id },
+        ...(mongoose.Types.ObjectId.isValid(id)
+          ? [{ userId: new mongoose.Types.ObjectId(id) }]
+          : []),
+      ],
       isSubmitted: true,
       ...dateFilter
     })
     .sort({ createdAt: -1 })
-    .limit(50);
+    .limit(500);
 
     const prelimsData = {
       tests: tests.map(test => ({
@@ -796,21 +802,36 @@ export const getStudentMains = async (req, res) => {
       ...dateFilter
     })
     .sort({ createdAt: -1 })
-    .select('subject paper year finalSummary evaluations createdAt pdfFileName')
+    .select('subject paper year finalSummary evaluations visionResult questionMeta createdAt pdfFileName')
     .limit(50);
 
     const mainsData = {
-      evaluations: evaluations.map(evaluation => ({
-        id: evaluation._id,
-        subject: evaluation.subject,
-        paper: evaluation.paper,
-        year: evaluation.year,
-        pdfFileName: evaluation.pdfFileName,
-        overallScore: evaluation.finalSummary?.overallScore || null,
-        totalQuestions: evaluation.evaluations?.length || 0,
-        wordCount: evaluation.evaluations?.reduce((sum, q) => sum + (q.wordCount || 0), 0) || 0,
-        evaluatedAt: evaluation.createdAt
-      })),
+      evaluations: evaluations.map(evaluation => {
+        const vision = evaluation.visionResult || {};
+        const qCount =
+          evaluation.evaluations?.length ||
+          vision.answers?.length ||
+          (vision.questionText || vision.extractedAnswerText ? 1 : 0);
+        const wordCount =
+          (evaluation.evaluations || []).reduce((sum, q) => sum + (q.wordCount || 0), 0) ||
+          vision.wordCount ||
+          0;
+        const paper =
+          evaluation.paper && String(evaluation.paper).toLowerCase() !== "unknown"
+            ? evaluation.paper
+            : evaluation.questionMeta?.paper || "";
+        return {
+          id: evaluation._id,
+          subject: evaluation.subject,
+          paper,
+          year: evaluation.year,
+          pdfFileName: evaluation.pdfFileName,
+          overallScore: evaluation.finalSummary?.overallScore || null,
+          totalQuestions: qCount,
+          wordCount,
+          evaluatedAt: evaluation.createdAt
+        };
+      }),
       statistics: await getMainsStats(id, dateFilter)
     };
 
@@ -876,7 +897,12 @@ const getMainsStats = async (userId, dateFilter = {}) => {
 // Helper function to get prelims statistics
 const getPrelimsStats = async (userId, dateFilter = {}) => {
   const tests = await Test.find({
-    userId,
+    $or: [
+      { userId },
+      ...(mongoose.Types.ObjectId.isValid(userId)
+        ? [{ userId: new mongoose.Types.ObjectId(userId) }]
+        : []),
+    ],
     isSubmitted: true,
     ...dateFilter
   }).sort({ createdAt: -1 });

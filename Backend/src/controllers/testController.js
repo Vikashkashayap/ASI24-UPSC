@@ -5,6 +5,7 @@ import { generateTestQuestions, generateFullMockTestQuestions, isPrelimsRagEnabl
 import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
+import { archiveThenDeleteTests } from "../services/testBackup.service.js";
 import { ensureAttemptHasHindiFromParent } from "../services/syncHindiFromParent.js";
 import {
   getPrelimsDailyLockStatus,
@@ -840,7 +841,7 @@ export const deleteTest = async (req, res) => {
       });
     }
 
-    await Test.findByIdAndDelete(id);
+    await archiveThenDeleteTests({ _id: test._id }, { reason: "user_delete_test" });
 
     res.json({
       success: true,

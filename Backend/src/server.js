@@ -51,6 +51,7 @@ import downloadRoutes from "./routes/downloadRoutes.js";
 
 import { processScheduledPrelimsMocks } from "./controllers/prelimsMockController.js";
 import { startCurrentAffairsCron } from "./cron/currentAffairsCron.js";
+import { startTestBackupCron } from "./services/testBackup.service.js";
 
 import { authMiddleware } from "./middleware/authMiddleware.js";
 import { initializeSocketIO } from "./services/socketService.js";
@@ -244,6 +245,9 @@ setInterval(() => {
 
 // Start current affairs daily pipeline (6 AM Asia/Kolkata)
 startCurrentAffairsCron();
+
+// Tests collection backup every 72h (Backend/backups + keep last 14 files)
+startTestBackupCron();
 
 // Start AI Knowledge Processing Engine (BullMQ or inline fallback)
 startProcessingEngine().catch((err) => {

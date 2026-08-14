@@ -25,6 +25,9 @@ Thumbs.db
 # Uploaded PDFs (prelims tests)
 uploads/
 
+# DB exports (may contain student data)
+backups/
+
 # IDE
 .vscode/
 .idea/

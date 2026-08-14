@@ -1,4 +1,5 @@
 import CopyEvaluation from "../models/CopyEvaluation.js";
+import { User } from "../models/User.js";
 import {
   processUploadToImages,
   saveTempFile,
@@ -27,8 +28,23 @@ const TEXT_MODEL =
   process.env.OPENROUTER_MODEL ||
   "google/gemini-2.5-flash-lite";
 
-/**
- * Upload answer copy (PDF/image) and evaluate via vision AI
+async function findEvaluationForRequester(req, id) {
+  const evaluation = await CopyEvaluation.findById(id);
+  if (!evaluation) return null;
+
+  const role = String(req.user?.role || "");
+  const requesterId = String(req.user?._id || req.user?.id || "");
+  if (role === "admin" || role === "super_admin") return evaluation;
+  if (evaluation.userId && String(evaluation.userId) === requesterId) return evaluation;
+
+  if (role === "mentor" && evaluation.userId) {
+    const stud = await User.findById(evaluation.userId).select("mentorId").lean();
+    if (stud?.mentorId && String(stud.mentorId) === requesterId) return evaluation;
+  }
+  return null;
+}
+
+/** Upload answer copy (PDF/image) and evaluate via vision AI
  * POST /api/copy-evaluation/upload
  */
 export const uploadAndEvaluateCopy = async (req, res) => {
@@ -292,9 +308,7 @@ export const processEvaluation = async (req, res) => {
 export const getEvaluationById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
-
-    const evaluation = await CopyEvaluation.findOne({ _id: id, userId });
+    const evaluation = await findEvaluationForRequester(req, id);
 
     if (!evaluation) {
       return res.status(404).json({
@@ -407,10 +421,9 @@ export const getUserAnalytics = async (req, res) => {
 export const getEvaluationPageImage = async (req, res) => {
   try {
     const { id, pageNum } = req.params;
-    const userId = req.user._id;
     const pageNumber = parseInt(pageNum, 10);
 
-    const evaluation = await CopyEvaluation.findOne({ _id: id, userId });
+    const evaluation = await findEvaluationForRequester(req, id);
     if (!evaluation) {
       return res.status(404).json({ success: false, message: "Evaluation not found" });
     }
@@ -470,9 +483,8 @@ export const deleteEvaluation = async (req, res) => {
 export const getEvaluationStats = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user._id;
 
-    const evaluation = await CopyEvaluation.findOne({ _id: id, userId });
+    const evaluation = await findEvaluationForRequester(req, id);
 
     if (!evaluation) {
       return res.status(404).json({

@@ -28,6 +28,7 @@ import {
   runWithOpenRouterAppTitle,
 } from "../config/openRouterAppTitle.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
+import { archiveThenDeleteTests } from "./testBackup.service.js";
 import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS, buildEqualPatternQuota, retagQuestionsToPyqPatterns } from "../config/questionPatterns.js";
 import {
   resolveKbSubjectLabel,
@@ -548,7 +549,14 @@ async function createChapterPracticeTestInner({
     if (openAttempts.length > 0) {
       const [latest, ...stale] = openAttempts;
       if (stale.length > 0) {
-        await Test.deleteMany({ _id: { $in: stale.map((t) => t._id) } });
+        await archiveThenDeleteTests(
+          {
+            _id: { $in: stale.map((t) => t._id) },
+            userId,
+            isSubmitted: false,
+          },
+          { reason: "chapter_stale_unsubmitted" }
+        );
         console.log(
           `[chapterPractice] cleaned ${stale.length} stale unsubmitted duplicate(s) for "${topicNormalized}"`
         );
@@ -995,7 +1003,14 @@ async function createModuleFinalTestFromChapterBankInner({
     if (openAttempts.length > 0) {
       const [latest, ...stale] = openAttempts;
       if (stale.length > 0) {
-        await Test.deleteMany({ _id: { $in: stale.map((t) => t._id) } });
+        await archiveThenDeleteTests(
+          {
+            _id: { $in: stale.map((t) => t._id) },
+            userId,
+            isSubmitted: false,
+          },
+          { reason: "module_final_stale_unsubmitted" }
+        );
       }
       if (
         syllabusModuleTargetId &&
@@ -1327,9 +1342,10 @@ export async function listMyModuleTargetsPracticeHistory({
 
   // Drop older unfinished duplicates left from pre-fix "Start Test" clicks
   if (staleOpenIds.length > 0) {
-    void Test.deleteMany({ _id: { $in: staleOpenIds }, userId, isSubmitted: false }).catch((err) =>
-      console.warn("[chapterHistory] stale cleanup:", err.message)
-    );
+    void archiveThenDeleteTests(
+      { _id: { $in: staleOpenIds }, userId, isSubmitted: false },
+      { reason: "chapter_history_stale_open" }
+    ).catch((err) => console.warn("[chapterHistory] stale cleanup:", err.message));
   }
 
   return deduped;

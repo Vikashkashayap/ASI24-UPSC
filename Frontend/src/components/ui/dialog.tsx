@@ -98,15 +98,24 @@ export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) 
       document.body.style.overflow = 'unset';
     }
 
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange?.(false);
+    };
+    if (open) window.addEventListener("keydown", onKey);
+
     return () => {
       document.body.style.overflow = 'unset';
+      window.removeEventListener("keydown", onKey);
     };
-  }, [open]);
+  }, [open, onOpenChange]);
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={() => onOpenChange?.(false)}
+    >
       <div
         className={`relative ${theme === "dark" ? "bg-slate-900" : "bg-white"} rounded-lg shadow-xl max-h-[90vh] overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
