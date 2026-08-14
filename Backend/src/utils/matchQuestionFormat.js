@@ -1,7 +1,9 @@
 const MATCH_INTRO_RE =
-  /match\s+(?:the\s+)?following|consider the following pairs|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*(?:मिलान|युग्म)|(?:सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२])/i;
+  /match\s+(?:the\s+)?following|consider the following pairs|pairs?\s+(?:is\/are|are|is)\s+correctly\s+matched|correctly\s+matched|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|list[- ]?i\b[\s\S]{0,500}?list[- ]?ii\b|निम्नलिखित.*(?:मिलान|युग्म)|(?:सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२])/i;
 const MATCH_PROMPT_RE =
   /select the correct|code given below|नीचे दिए गए|सही उत्तर|सही जोड़ी|कूट/i;
+const STATEMENT_PROMPT_RE =
+  /which of the (?:statements|following statements)|statements given above|उपर्युक्त कथनों/i;
 const MATCH_SECTION_SKIP =
   /^(?:list[- ]?i|list[- ]?ii|सूची[- ]?[iI12१२])(?:\s*\([^)]+\))?\s*$/i;
 
@@ -111,12 +113,21 @@ export function parseMatchFollowingFromText(text) {
   const lines = trimmed.split(/\n+/).map((l) => l.trim()).filter(Boolean);
 
   for (const line of lines) {
+    if (STATEMENT_PROMPT_RE.test(line) && !/\b[A-D]\.\s/.test(line)) continue;
     if (MATCH_PROMPT_RE.test(line)) {
       if (!prompt && !/\b[A-D]\.\s/.test(line) && line.length < 120) prompt = line;
       continue;
     }
     if (MATCH_SECTION_SKIP.test(line)) continue;
     if (/^\([^)]{3,50}\)$/.test(line)) continue;
+
+    if (columnA.length < 2 && /\bA\.\s+\S/.test(line) && /\bB\.\s+\S/.test(line)) {
+      const extracted = extractLetteredColumnItems(line);
+      if (extracted.length >= 2) {
+        columnA.push(...extracted);
+        continue;
+      }
+    }
 
     const inline = line.match(/^([A-D])\.\s*(.+?)\s+(\d+)\.\s*(.+)$/i);
     if (inline) {

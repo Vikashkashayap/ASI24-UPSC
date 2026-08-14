@@ -1066,6 +1066,7 @@ export const startChapterPractice = async (req, res) => {
       chapterLabel: chapter,
       siblingTopics: (topics || []).filter((line) => String(line) !== String(chapter)),
       forceCache,
+      syllabusModuleTargetId: record._id,
     });
 
     console.log("[chapterPractice] test ready", {
@@ -1094,7 +1095,7 @@ export const startChapterPractice = async (req, res) => {
         ? forceCache
           ? "Chapter retake ready (cached questions from DB)"
           : "Chapter practice ready (shared DB cache — same paper as other students)"
-        : "Chapter practice generated from Knowledge Base";
+        : "Chapter practice generated via LLM";
 
     return res.status(resumed ? 200 : 201).json({
       success: true,
@@ -1127,9 +1128,8 @@ export const startChapterPractice = async (req, res) => {
 
 /**
  * POST /api/syllabus-targets/:id/module-final
- * All chapter tests done → 50Q module final:
- * reuse chapter-bank questions from DB, RAG-generate only the shortfall.
- * Submit of this test marks the module complete and unlocks the next module.
+ * All chapter tests done → 50Q module final via LLM (KB/RAG off).
+ * Shared cache reused for later students. Submit marks the module complete.
  */
 export const startModuleFinal = async (req, res) => {
   try {
@@ -1191,7 +1191,7 @@ export const startModuleFinal = async (req, res) => {
       chapterCount: topics.length,
       chapters: topics,
       questionCount: 50,
-      source: "chapter_bank_plus_rag_topup",
+      source: "llm_upsc_prelims",
       userId: String(userId),
     };
     console.log("\n========== [moduleFinal] REQUEST PAYLOAD ==========");
@@ -1208,14 +1208,10 @@ export const startModuleFinal = async (req, res) => {
       syllabusModuleTargetId: record._id,
     });
 
-    const bankPart = test.bankCount != null ? test.bankCount : null;
-    const genPart = test.generatedCount || 0;
     const fromCache = Boolean(test.fromCache || test.resumed);
     const detail = fromCache
       ? `${test.totalQuestions}Q from shared Module Final cache (0 new tokens)`
-      : genPart > 0
-        ? `${test.totalQuestions}Q ready (${Math.min(bankPart ?? test.totalQuestions, 50)} from chapter bank + ${genPart} newly generated)`
-        : `${test.totalQuestions} questions from chapter bank (canonical paper saved for other students)`;
+      : `${test.totalQuestions}Q generated via LLM (canonical paper saved for other students)`;
 
     return res.status(201).json({
       success: true,

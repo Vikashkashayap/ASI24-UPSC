@@ -459,6 +459,21 @@ export const adminAPI = {
   getMentors: () => api.get("/api/admin/mentors"),
   resetMentorPassword: (id: string) => api.post(`/api/admin/mentors/${id}/reset-password`),
   deleteMentor: (id: string) => api.delete(`/api/admin/mentors/${id}`),
+  getTrash: (params?: {
+    type?: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+    student?: string;
+  }) => api.get("/api/admin/trash", { params }),
+  restoreTrashItem: (kind: "test" | "evaluation", id: string) =>
+    api.post(`/api/admin/trash/${kind}/${id}/restore`),
+  permanentlyDeleteTrashItem: (kind: "test" | "evaluation", id: string) =>
+    api.delete(`/api/admin/trash/${kind}/${id}`),
+  bulkRestoreTrash: (items: Array<{ kind: "test" | "evaluation"; id: string }>) =>
+    api.post("/api/admin/trash/bulk-restore", { items }),
+  bulkDeleteTrash: (items: Array<{ kind: "test" | "evaluation"; id: string }>) =>
+    api.post("/api/admin/trash/bulk-delete", { items }),
 };
 
 /** Human mentor (staff): roster, feedback, analytics — under /api/mentor (distinct from AI chat paths). */
@@ -1055,7 +1070,7 @@ export const syllabusTargetsAPI = {
         completed: boolean;
       };
     }>(`/api/syllabus-targets/${id}/chapters/complete`, { chapter, completed }),
-  /** Tick chapter → 20 Hard RAG questions from Knowledge Base + start test */
+  /** Tick chapter → 20 Hard LLM UPSC Prelims MCQs + start test */
   startChapterPractice: (id: string, chapter: string, opts?: { retake?: boolean }) =>
     api.post<{
       success: boolean;

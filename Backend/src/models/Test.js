@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { applySoftTrash } from "./plugins/softTrash.js";
 
 /**
  * Test Schema for UPSC Prelims Test Generator
@@ -40,6 +41,12 @@ const testSchema = new mongoose.Schema(
      * Used for the daily practice limit so chapter/module/mock tests are not counted.
      */
     isPracticeGenerator: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    /** Chapter-wise / Module Final papers from Daily Targets — not Practice Test history */
+    isChapterModulePractice: {
       type: Boolean,
       default: false,
       index: true,
@@ -147,6 +154,8 @@ const testSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+applySoftTrash(testSchema);
 
 // Static method to get user analytics
 testSchema.statics.getUserAnalytics = async function(userId) {

@@ -1,7 +1,6 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
-import { getFrontendOrigin } from "../config/urlConfig.js";
-import { getOpenRouterAppTitle } from "../config/openRouterAppTitle.js";
+import { getOpenRouterAppTitle, getOpenRouterIdentHeaders } from "../config/openRouterAppTitle.js";
 import { buildMatchQuestionTextForTranslation, parseMatchFollowingFromText, buildMatchColumnsPayload } from "../utils/matchQuestionFormat.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 import {
@@ -32,6 +31,7 @@ import { questionPatternEngine } from "./ai/questionPatternEngine.js";
 import {
   generateUpscPrelimsMockPaper,
   isUpscPrelimsRagEnabled,
+  SKIP_KB_RAG_RETRIEVAL,
 } from "./ai/upscPrelimsGenerator.service.js";
 import {
   sanitizeHindiMcqFormat,
@@ -55,9 +55,11 @@ import {
   shouldUseLlmHindi,
 } from "./mtTranslateToHindi.js";
 
-/** GS Prelims uses Admin Knowledge Base RAG (Intelligence hybrid). Set PRELIMS_USE_RAG=false for legacy open LLM. */
+/** GS Prelims uses the UPSC generator (LLM now; RAG retrieval paused via SKIP_KB_RAG_RETRIEVAL). */
 export function isPrelimsRagEnabled(examType) {
-  return examType === "GS" && process.env.PRELIMS_USE_RAG !== "false";
+  if (examType !== "GS") return false;
+  if (SKIP_KB_RAG_RETRIEVAL) return true;
+  return process.env.PRELIMS_USE_RAG !== "false";
 }
 
 function normalizePrelimsDifficulty(difficulty) {
@@ -103,11 +105,10 @@ async function generateTestQuestionsFromKnowledgeBase({
   const syllabusLabel = String(subjectName || primarySubject).trim();
   const topicQuery = String(topic || "").trim();
   const difficultyKey = normalizePrelimsDifficulty(difficulty);
-  // kbOnly / PRELIMS_FORCE_KB_ONLY = strict RAG + PYQ-Hard. LLM fill is a separate switch.
-  const forceKbOnly =
-    Boolean(kbOnly) ||
-    String(process.env.PRELIMS_FORCE_KB_ONLY || "").toLowerCase() === "true";
-  const allowOpenKnowledge = !forceKbOnly || Boolean(allowLlmFallback);
+  // KB/RAG retrieval is off — always LLM open-syllabus. kbOnly is ignored.
+  const forceKbOnly = false;
+  const allowOpenKnowledge = true;
+  void kbOnly;
 
   if (!primarySubject || !topicQuery) {
     throw new Error("Subject and topic are required for knowledge-base generation");
@@ -123,6 +124,10 @@ async function generateTestQuestionsFromKnowledgeBase({
       3600
     : undefined;
 
+  let preferOpenKnowledge = Boolean(SKIP_KB_RAG_RETRIEVAL);
+  let openKnowledgeUsed = preferOpenKnowledge;
+
+  /*
   const probe = await getContextForPractice({
     subject: primarySubject,
     subjectKey,
@@ -135,7 +140,6 @@ async function generateTestQuestionsFromKnowledgeBase({
     ...(ragMaxTokens ? { maxTokens: ragMaxTokens } : {}),
   });
   const probeHasOnTopicKb = Boolean(probe.contextText && probe.contextText.length >= 80);
-  // Keyword/mongo-only retrieval is often weakly related — prefer LLM sooner
   const probeSource = String(probe.source || "");
   const probeWeakRetrieval =
     probeHasOnTopicKb &&
@@ -161,11 +165,18 @@ async function generateTestQuestionsFromKnowledgeBase({
     );
   }
 
-  let preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
-  let openKnowledgeUsed = preferOpenKnowledge;
+  preferOpenKnowledge = !probeHasOnTopicKb || (probeWeakRetrieval && allowOpenKnowledge);
+  openKnowledgeUsed = preferOpenKnowledge;
+  */
 
-  // Hard + KB-only (Module Targets): real UPSC Prelims / PYQ pattern mix
-  const pyqHardMode = forceKbOnly && difficultyKey === "hard";
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    console.log(
+      `🤖 Prelims gen: RAG skipped — LLM UPSC Prelims mode for "${topicQuery}" (${primarySubject})`
+    );
+  }
+
+  // Hard papers: real UPSC Prelims / PYQ pattern mix (even when RAG is paused)
+  const pyqHardMode = difficultyKey === "hard" && (forceKbOnly || SKIP_KB_RAG_RETRIEVAL);
   const selectedPatterns = resolveNotesPatterns(
     pyqHardMode ? PYQ_HARD_PATTERN_IDS : ALL_PATTERN_IDS
   );
@@ -206,7 +217,7 @@ async function generateTestQuestionsFromKnowledgeBase({
   }
 
   console.log(
-    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge} | maxRounds=${maxBatchRounds} | patterns=${selectedPatterns.length}`
+    `📚 Prelims gen: ${count}Q | batchSize=${batchSize} | subject=${primarySubject} | topic="${topicQuery}" | difficulty=${difficultyKey} | mode=${SKIP_KB_RAG_RETRIEVAL ? "LLM-UPSC" : preferOpenKnowledge ? "LLM-fallback" : "KB+LLM-fallback"} | openKnowledge=${allowOpenKnowledge} | maxRounds=${maxBatchRounds} | patterns=${selectedPatterns.length}`
   );
 
   const runBatch = async ({ need, round, openKnowledge, contextText, ragSource }) => {
@@ -309,7 +320,7 @@ async function generateTestQuestionsFromKnowledgeBase({
     let contextText = "";
     let ragSource = "";
 
-    if (!openKnowledge) {
+    if (!openKnowledge && !SKIP_KB_RAG_RETRIEVAL) {
       const rag = await getContextForPractice({
         subject: primarySubject,
         subjectKey,
@@ -1157,7 +1168,7 @@ function buildPrelimsGSSystemPrompt(subjects, topic, difficulty, currentAffairsP
 
   return `UPSC Prelims GS Paper-I MCQ generator. Subjects: ${subjectsText}. Topic: ${topic}. Difficulty: ${difficulty}.${extra}
 
-Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–5 statements, options like "1 only", "1 and 2 only"), assertion-reason, match/pair, chronology (3 options only), which correct/incorrect. Concise stems.
+Rules: UPSC-standard, eliminable options, at least one trap. Mix statement-based (2–5 statements, options like "1 only", "1 and 2 only"), how-many-correct / how-many-pairs, assertion-reason, match/pair, chronology (4 options A–D), which correct/incorrect. Concise stems. Never copy exact PYQs.
 TOPIC LOCK: Every question MUST be directly about "${topic}". Do not drift to other areas of the same subject.
 ${ANSWER_OPTION_LOCK}
 
@@ -1449,6 +1460,8 @@ IMPORTANT RULES:
 const PATTERN_LABELS = {
   statement_based: "Statement-based (which are correct)",
   statement_not_correct: "Statement-based (NOT correct)",
+  how_many_correct: "How many of the above statements are correct?",
+  how_many_pairs: "How many of the above pairs are correctly matched?",
   pair_matching: "Pair matching / Match the following",
   assertion_reason: "Assertion–Reason",
   direct_conceptual: "Direct conceptual MCQs",
@@ -3003,8 +3016,7 @@ async function callOpenRouterTestGeneration({
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": title,
+      ...getOpenRouterIdentHeaders(title),
     },
     body: JSON.stringify({
       model,
@@ -3936,8 +3948,8 @@ function getTestGenMaxBatchRounds(count, batchSize) {
 
 /**
  * Generate UPSC Prelims MCQs.
- * GS (default): Knowledge Base RAG → same grounded generator as Topic Practice.
- * CSAT / PRELIMS_USE_RAG=false: legacy open LLM syllabus generation.
+ * GS: LLM UPSC-Prelims generator (RAG retrieval paused). Same pattern mix + PYQ-Hard filters.
+ * CSAT / PRELIMS_USE_RAG=false (when RAG skip is off): legacy open LLM.
  * @param {Object} params
  * @param {string[]} params.subjects - Subject names (e.g. ["Polity", "History"])
  * @param {string} params.topic - Topic name

@@ -3,6 +3,7 @@
  * Same retrieval stack as Question Intelligence / Test Builder:
  * knowledge_intelligence Qdrant + DocumentChunk/KbDocument (+ optional website notes).
  */
+import { SKIP_KB_RAG_RETRIEVAL } from "../../config/generationMode.js";
 import { hybridSearch } from "../../intelligence/services/hybridSearch.service.js";
 import { relatedConcepts } from "../../intelligence/data/concepts.js";
 import { KbSubject } from "../../knowledge/models/KbSubject.js";
@@ -218,6 +219,17 @@ export async function getContextForPractice({
   topK,
   strictTopic = true,
 } = {}) {
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    return {
+      contextText: "",
+      chunks: [],
+      source: "skipped_llm_only",
+      tokens: 0,
+      chunkIds: [],
+      query: String(topic || "").trim(),
+    };
+  }
+
   const subjectRaw = String(subject || "").trim();
   const syllabusLabel = String(subjectName || subjectRaw).trim();
   const topicQuery = String(topic || "").trim();

@@ -113,7 +113,7 @@ function MatchFollowingTable({
   return (
     <div className={`space-y-2 ${paperMode ? "upsc-exam-serif" : ""}`}>
       {data.intro ? <p className={introClass}>{data.intro}</p> : null}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
         <div
           className={
             paperMode
@@ -129,6 +129,9 @@ function MatchFollowingTable({
             }
           >
             {listILabel}
+            {data.columnATitle ? (
+              <span className="normal-case font-semibold opacity-90"> ({data.columnATitle})</span>
+            ) : null}
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
             {data.columnA.map((item, i) => {
@@ -169,6 +172,9 @@ function MatchFollowingTable({
             }
           >
             {listIILabel}
+            {data.columnBTitle ? (
+              <span className="normal-case font-semibold opacity-90"> ({data.columnBTitle})</span>
+            ) : null}
           </div>
           <ol className={`${textSize} p-2 sm:p-2.5 space-y-1.5 list-none`}>
             {data.columnB.map((raw, i) => {
@@ -392,7 +398,7 @@ function getAssertionStemText(
   }
 
   const text = getQuestionEnglish(question);
-  if (text && isAssertionReasonText(text)) return text;
+  if (text && isAssertionReasonText(text)) return sanitizeHindiMcqFormat(text);
 
   if (question.assertionReason?.assertion) {
     return buildAssertionReasonStem({
@@ -615,11 +621,15 @@ function coerceDisplayItem(x: unknown): string {
 }
 
 function detectMatch(question: ExamQuestionBodyProps["question"]): boolean {
+  const type = String(question.questionType || "").toLowerCase();
+  if (type.includes("how_many")) return false;
+  if (type === "pair_matching" || type === "match" || type === "matching") return true;
   if (hasUsableMatchColumns(question.matchColumns) || hasUsableMatchColumns(question.matchColumns_hi)) {
     return true;
   }
   const en = getQuestionEnglish(question);
   const hi = getQuestionHindi(question, { strict: true });
+  if (/how many of the (above )?pairs/i.test(en) || /कितने युग्म/i.test(hi || "")) return false;
   const enParsed = parseMatchFollowingFromText(en);
   const hiParsed = hi ? parseMatchFollowingFromText(hi) : null;
   return Boolean(

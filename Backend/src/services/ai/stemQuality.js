@@ -159,10 +159,13 @@ export function isCompleteUpscStem(q) {
   const opts = q?.options || q?.options_en || {};
   const needsNumbers = optionsReferToNumberedItems(opts);
 
+  const looksHowManyPairs =
+    type.includes("how_many_pairs") || /how many of the (above )?pairs/i.test(text);
   const looksMatch =
-    type.includes("pair") ||
-    type.includes("match") ||
-    /match\s+(the\s+)?following|consider the following pairs|निम्नलिखित.*(?:मिलान|युग्म)/i.test(text);
+    !looksHowManyPairs &&
+    (type.includes("pair") ||
+      type.includes("match") ||
+      /match\s+(the\s+)?following|निम्नलिखित.*(?:मिलान|युग्म)/i.test(text));
   const looksAR =
     type.includes("assertion") || /assertion\s*\(A\)|अभिकथन\s*\(A\)/i.test(text);
   const looksChrono =
@@ -171,7 +174,9 @@ export function isCompleteUpscStem(q) {
     /arrange the following|chronological order|कालानुक्रम|milestones in/i.test(text);
   const looksStatement =
     type.includes("statement") ||
-    /consider the following(?:\s+\w+){0,4}\s*:|which of the following statements|which of the statements given above|निम्नलिखित(?: में से)?.*(?:कथन|पहलू|aspects)/i.test(
+    type.includes("how_many") ||
+    looksHowManyPairs ||
+    /consider the following(?:\s+\w+){0,4}\s*:|which of the following statements|which of the statements given above|how many of the above|निम्नलिखित(?: में से)?.*(?:कथन|पहलू|aspects|युग्म)/i.test(
       text
     );
 
@@ -233,12 +238,7 @@ export function isStudentReadyMcq(q) {
   if (/missing\s+item/i.test(stem)) return false;
 
   const opts = q.options_en || q.options || {};
-  const type = String(q.questionType || "").toLowerCase();
-  const isChrono =
-    type.includes("chronolog") ||
-    type.includes("sequence") ||
-    /arrange the following|chronological order/i.test(stem);
-  const keys = isChrono ? ["A", "B", "C"] : ["A", "B", "C", "D"];
+  const keys = ["A", "B", "C", "D"];
   if (keys.some((k) => !optionTextOk(opts[k]))) return false;
 
   const answer = String(q.correctAnswer || q.answer || "")

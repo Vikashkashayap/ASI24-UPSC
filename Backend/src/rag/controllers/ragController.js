@@ -13,6 +13,7 @@ import {
 } from "../services/ingest.service.js";
 import { searchKnowledgeBase } from "../services/search.service.js";
 import { generateQuestionsFromRag } from "../services/questionGen.service.js";
+import { SKIP_KB_RAG_RETRIEVAL } from "../../config/generationMode.js";
 import { ensureSubjectsSeeded } from "../models/Subject.js";
 import { pickUploadedPdfs } from "../middleware/uploadPdf.js";
 import { getRagJob } from "../queues/ragQueue.js";
@@ -71,6 +72,12 @@ export async function searchRag(req, res) {
 
 /** POST /api/rag/generate-questions */
 export async function generateRagQuestions(req, res) {
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    return res.status(503).json({
+      success: false,
+      message: "KB/RAG question generation is paused. Questions are generated via LLM only.",
+    });
+  }
   try {
     const { topic, subject, difficulty, count, force, filters } = req.body || {};
     const result = await generateQuestionsFromRag({

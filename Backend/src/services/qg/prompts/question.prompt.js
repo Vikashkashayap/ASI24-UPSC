@@ -37,8 +37,10 @@ FORBIDDEN: marking B when A's text is the true answer.
 QUESTION TYPES (vary across the batch):
 - statement_based: numbered statements; ask which is/are correct
 - assertion_reason: Assertion (A) + Reason (R) with standard UPSC option codes
+- how_many_correct: "How many of the above statements are correct?"
+- how_many_pairs: "How many of the above pairs are correctly matched?"
 - pair_matching: List-I / List-II with codes
-- chronology: arrange events in order
+- chronology: arrange events in order (4 options A–D)
 - elimination: options like "1 and 2 only" that reward careful reading
 - direct_conceptual: deep concept, not a trivia one-liner
 
@@ -48,7 +50,7 @@ OPTION QUALITY (accuracy-critical):
 - Avoid "all of the above" / "none of the above" unless CONTEXT clearly supports it
 - No two options may be identical, trivially synonymous, or differ only by filler words
 - Each option text ≥ 3 meaningful words (except standard codes like "1 and 2 only")
-- For chronology prefer 3 ordered codes (A–C); pad D only if needed
+- For chronology use four distinct order codes (A–D)
 - Option texts must be mutually exclusive (exactly one correct)
 - After writing options, re-read CONTEXT and confirm ONLY the marked correctAnswer is supported
 

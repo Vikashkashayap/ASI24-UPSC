@@ -113,8 +113,9 @@ export async function getPrelimsDailyLockStatus(userId, role) {
 
   const filter = practiceTestFilter(userId, start, end);
   const [usedCount, todayTest] = await Promise.all([
-    Test.countDocuments(filter),
+    Test.countDocuments(filter).setOptions({ withTrashed: true }),
     Test.findOne(filter)
+      .setOptions({ withTrashed: true })
       .sort({ createdAt: -1 })
       .select("_id topic subject createdAt isSubmitted")
       .lean(),

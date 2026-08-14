@@ -74,7 +74,15 @@ export function ensureFullQuestionStem(rawQuestion) {
     const intro = (question_en.split("\n")[0] || "Consider the following statements:").trim();
     const lines = [intro.endsWith(":") ? intro : `${intro}:`];
     statements.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
-    lines.push("Which of the statements given above is/are correct?");
+    const blob = `${intro} ${plain.questionType || plain.type || ""}`;
+    const ask = /not_correct|not correct|incorrect/i.test(blob)
+      ? "Which of the statements given above is/are not correct?"
+      : /how_many_pairs|how many of the (?:above )?pairs/i.test(blob)
+        ? "How many of the above pairs are correctly matched?"
+        : /how_many|how many of the above/i.test(blob)
+          ? "How many of the above statements are correct?"
+          : "Which of the statements given above is/are correct?";
+    lines.push(ask);
     question_en = lines.join("\n");
   }
 

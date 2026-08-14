@@ -21,6 +21,7 @@ import {
   Crown,
   Sparkles,
   LogOut,
+  Trash2,
 } from "lucide-react";
 import { SidebarNavItem, SidebarSection } from "./SidebarNavItem";
 import { SubscriptionCard } from "./SubscriptionCard";
@@ -276,6 +277,15 @@ const AdminSidebarNav = memo(function AdminSidebarNav({
         >
           <Tag className="w-4 h-4 flex-shrink-0" />
           {!collapsed && <span>Offer Manager</span>}
+        </NavLink>
+        <NavLink
+          to="/admin/trash"
+          className={(props) => navLinkClass({ ...props, theme, collapsed })}
+          title="Trash — restore or permanently delete tests and history"
+          onClick={onNavigate}
+        >
+          <Trash2 className="w-4 h-4 flex-shrink-0" />
+          {!collapsed && <span>Trash</span>}
         </NavLink>
 
         {!collapsed && (

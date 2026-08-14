@@ -209,7 +209,7 @@ const TestGeneratorPage: React.FC = () => {
     <div className="mx-auto max-w-4xl space-y-4 px-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] md:space-y-8 md:px-4 md:pb-8">
       <TestPageHeader
         title="Practice Test"
-        subtitle="Generate UPSC Prelims MCQs from your Knowledge Base"
+        subtitle="Generate UPSC Prelims MCQs with AI from subject & topic"
         icon={BookOpen}
         accent="amber"
         action={
@@ -381,7 +381,7 @@ const TestGeneratorPage: React.FC = () => {
               <CardDescription className="mt-0.5 md:mt-1 text-xs md:text-sm">
                 {isDailyLocked
                   ? "You can generate again after midnight (IST) tomorrow"
-                  : "Questions are grounded in your Admin Knowledge Base for the selected subject & topic"}
+                  : "AI generates UPSC Prelims MCQs from the selected subject and topic"}
               </CardDescription>
             </div>
           </div>
@@ -542,14 +542,14 @@ const TestGeneratorPage: React.FC = () => {
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"}`}>
-                <BookOpen className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
+                <Sparkles className={`w-6 h-6 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} />
               </div>
               <div>
                 <div className={`text-sm font-medium ${theme === "dark" ? "text-slate-300" : "text-slate-700"}`}>
-                  Knowledge Base
+                  AI generated
                 </div>
                 <div className={`text-xs ${theme === "dark" ? "text-slate-400" : "text-slate-600"}`}>
-                  Admin RAG sources
+                  LLM UPSC Prelims MCQs
                 </div>
               </div>
             </div>

@@ -74,11 +74,7 @@ function parseNotesQuestions(aiContent, expectedCount, meta = {}) {
     .map((q) => normalizeNotesQuestion(q, meta))
     .filter((q) => {
       if (!q || !q.question || !q.correctAnswer) return false;
-      const isChrono =
-        String(q.questionType || "").includes("chronolog") ||
-        String(q.questionType || "").includes("sequence") ||
-        /arrange the following|chronological order/i.test(q.question);
-      const requiredKeys = isChrono ? ["A", "B", "C"] : ["A", "B", "C", "D"];
+      const requiredKeys = ["A", "B", "C", "D"];
       if (requiredKeys.some((k) => !q.options?.[k] || isPlaceholderItemText(q.options[k]))) {
         return false;
       }
@@ -174,6 +170,9 @@ function stripArTrailingPrompt(text) {
       /(?:[.!?]?\s*)(?:In the context of the above,?\s*)?(?:Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??|Select the correct answer[^.?]*\??|उपर्युक्त के संदर्भ में[^.?]*\??|निम्नलिखित में से कौन[^.?]*\??)\s*$/i,
       ""
     )
+    .replace(/\s*[A-D]\s*[.)]\s*(?:A\s*और\s*R|Both\s*A\s*and\s*R|दोनों)[\s\S]*$/i, "")
+    .replace(/\s*\(\s*[A-D]\s*\)\s*(?:A\s*और\s*R|Both\s*A\s*and\s*R|दोनों)[\s\S]*$/i, "")
+    .replace(/\s*A\s*और\s*R\s*दोनों\s+(?:व्यक्तिगत रूप से\s+)?सत्य[\s\S]*$/i, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -209,12 +208,69 @@ function formatMatchStem(intro, columnA, columnB) {
   return lines.join("\n");
 }
 
-function formatStatementStem(intro, statements) {
-  const head = String(intro || "Consider the following statements:").replace(/\s+$/, "");
+function statementTrailingAsk(intro, questionType = "") {
+  const blob = `${intro} ${questionType}`;
+  if (/how_many_pairs|how many of the (?:above )?pairs/i.test(blob)) {
+    return "How many of the above pairs are correctly matched?";
+  }
+  if (/how_many_correct|how many of the above/i.test(blob)) {
+    return "How many of the above statements are correct?";
+  }
+  if (/not_correct|not correct|incorrect/i.test(blob)) {
+    return "Which of the statements given above is/are not correct?";
+  }
+  return "Which of the statements given above is/are correct?";
+}
+
+function normalizeStatementIntro(intro) {
+  let t = String(intro || "")
+    .replace(/[?:]+$/g, "")
+    .trim();
+  if (!t) return "Consider the following statements:";
+  const whichAsk = t.match(
+    /^(.*?)(?:,?\s*)which of the following statements is\/are\s+(?:not\s+)?correct(?:\s+(regarding|about|with reference to)\s+(.+))?$/i
+  );
+  if (whichAsk) {
+    const prefix = whichAsk[1].replace(/[,:]+$/g, "").trim();
+    const prep = whichAsk[2];
+    const topic = whichAsk[3]?.replace(/[?:]+$/g, "").trim();
+    if (prep && topic) return `Consider the following statements ${prep} ${topic}:`;
+    if (prefix) return `${prefix}, consider the following statements:`;
+    return "Consider the following statements:";
+  }
+  return /:$/.test(String(intro).trim()) ? String(intro).trim() : `${t}:`;
+}
+
+function formatStatementStem(intro, statements, questionType = "") {
+  const head = normalizeStatementIntro(intro || "Consider the following statements:");
   const lines = [head.endsWith(":") ? head : `${head}:`];
   statements.forEach((s, i) => lines.push(`${i + 1}. ${s}`));
-  lines.push("Which of the statements given above is/are correct?");
+  lines.push(statementTrailingAsk(intro, questionType));
   return lines.join("\n");
+}
+
+function isStatementAskLine(line) {
+  return /which of the (?:statements|following statements)|how many of the above|उपर्युक्त कथनों/i.test(
+    String(line || "")
+  );
+}
+
+function fixContradictoryStatementAsk(text, questionType = "") {
+  const raw = String(text || "").replace(/\\n/g, "\n").trim();
+  if (!raw) return raw;
+  if (/arrange the following|chronological order|match the following|list[\s-]*i\b/i.test(raw)) {
+    return raw;
+  }
+  const lines = raw.split(/\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 3) return raw;
+  const numbered = lines.filter((l) => /^\d+[.)]\s+\S/.test(l));
+  if (numbered.length < 2) return raw;
+  const first = lines[0];
+  const last = lines[lines.length - 1];
+  if (!isStatementAskLine(first) && !isStatementAskLine(last)) return raw;
+  const intro = normalizeStatementIntro(first);
+  const ask = statementTrailingAsk(`${first}\n${last}`, questionType);
+  return [intro, ...numbered, ask].join("\n");
 }
 
 function formatChronologyStem(intro, items) {
@@ -246,10 +302,13 @@ function assembleCompleteStem(q) {
   const statements = cleanStringList(q.statements);
   const chronologyItems = cleanStringList(q.chronologyItems || q.items || q.events);
 
+  const looksHowManyPairs =
+    questionType.includes("how_many_pairs") || /how many of the (above )?pairs/i.test(questionEn);
   const looksMatch =
-    questionType.includes("pair") ||
-    questionType.includes("match") ||
-    /match\s+(the\s+)?following|consider the following pairs/i.test(questionEn);
+    !looksHowManyPairs &&
+    (questionType.includes("pair") ||
+      questionType.includes("match") ||
+      /match\s+(the\s+)?following/i.test(questionEn));
   const looksAR =
     questionType.includes("assertion") || /assertion\s*\(A\)/i.test(questionEn);
   const looksChrono =
@@ -275,13 +334,15 @@ function assembleCompleteStem(q) {
 
   if (statements.length >= 2 && countNumberedItems(questionEn) < 2) {
     const intro = questionEn.split("\n")[0] || "Consider the following statements:";
-    questionEn = formatStatementStem(intro, statements);
+    questionEn = formatStatementStem(intro, statements, questionType);
   }
 
   if (chronologyItems.length >= 2 && countNumberedItems(questionEn) < 2) {
     const intro = questionEn.split("\n")[0] || "Arrange the following in chronological order:";
     questionEn = formatChronologyStem(intro, chronologyItems);
   }
+
+  questionEn = fixContradictoryStatementAsk(questionEn, questionType);
 
   // If still incomplete but looks like statement/chrono, keep as-is for reject filter
   void looksStatement;
@@ -330,18 +391,6 @@ function normalizeNotesQuestion(q, meta = {}) {
   const assembled = assembleCompleteStem(q);
   const questionEn = assembled.questionEn;
   const questionType = assembled.questionType || "direct_conceptual";
-  const isChrono =
-    questionType.includes("chronolog") ||
-    questionType.includes("sequence") ||
-    /arrange the following|chronological order/i.test(questionEn);
-
-  // Chronology UI shows 3 options; schema still stores D
-  if (isChrono && optionsArr[0] && optionsArr[1] && optionsArr[2] && !optionsArr[3]) {
-    optionsArr[3] = "None of the above";
-  }
-  if (isChrono && correct === "D") {
-    // prefer A–C for chronology; if model marked D, keep only if text exists
-  }
 
   const explanationRaw = String(q.explanation ?? q.explanation_en ?? "").trim();
   const optionsObj = {

@@ -10,6 +10,10 @@
 import CurrentAffair, { slugify } from "../models/CurrentAffair.js";
 import { fetchTopHeadlines } from "./gnewsService.js";
 import { isUpscRelevant, generateCurrentAffairFromNews } from "./aiService.js";
+import {
+  OPENROUTER_APP_TITLES,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 
 const MIN_DAILY = 5;
 const MAX_DAILY = 7;
@@ -24,12 +28,18 @@ async function isDuplicate(article) {
   return !!exists;
 }
 
+export async function runCurrentAffairsPipeline() {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.CURRENT_AFFAIRS, () =>
+    runCurrentAffairsPipelineInner()
+  );
+}
+
 /**
  * Run full pipeline: fetch (1 request) → relevance filter → dedupe by sourceUrl → publish 5–7 → generate & save.
  * Does NOT delete any existing current affairs.
  * @returns {{ created: number, skipped: number, totalFetched: number, message: string }}
  */
-export async function runCurrentAffairsPipeline() {
+async function runCurrentAffairsPipelineInner() {
   const result = { created: 0, skipped: 0, totalFetched: 0, message: "" };
 
   let articles = [];

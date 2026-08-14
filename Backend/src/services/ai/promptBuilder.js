@@ -8,122 +8,64 @@
 
 import { resolveNotesPatterns } from "../../config/questionPatterns.js";
 
+const QUESTION_TYPES =
+  "statement_based|statement_not_correct|how_many_correct|how_many_pairs|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|multi_statement_elimination";
+
+const SHARED_MCQ_RULES = `Return ONLY a JSON array (no markdown, no prose). Never copy or paraphrase an exact UPSC PYQ stem.
+
+CONSISTENCY (never reverse):
+1) Decide the single correct OPTION TEXT.
+2) Put it under exactly one of A–D (all four options required, non-empty, mutually exclusive).
+3) Set "answer" to that letter.
+4) Explain that same letter only. First sentence: Option {answer} ("{exact option text}") is correct. Then why it is right + one clause why each wrong option fails. 80–140 English words. Never shuffle texts after setting answer. If another letter is actually right, change "answer".
+
+FORBIDDEN: answer/explanation mismatch; identical options; intro-only stems; blank/"—" numbered lines; "Who was…/What is…" trivia; all/none of the above unless clearly justified.
+
+OUTPUT fields: question (complete stem), options {A,B,C,D}, answer (A|B|C|D), explanation, sourceParagraph, difficulty (easy|moderate|hard), questionType.
+
+STEM (full text inside "question"; skip the item if you cannot fill it):
+- statement_based / statement_not_correct / multi_statement_elimination: intro = "Consider the following statements:" (optionally regarding X). Numbered statements. ONE ask AFTER the statements — never also in the intro.
+  statement_based: "Which of the statements given above is/are correct?"
+  statement_not_correct: "Which of the statements given above is/are not correct?"
+  Never mix "NOT correct" in the intro with "is/are correct" after the statements.
+- how_many_correct: 3–4 statements; ask "How many of the above statements are correct?"; options: Only one / Only two / Only three / All four (adjust to statement count).
+- how_many_pairs: 3–4 pairs as "1. X — Y"; ask "How many of the above pairs are correctly matched?"; options Only one / Only two / Only three / All four. Not List-I/II codes.
+- pair_matching: List-I (A.) and List-II (1.) in question AND matchColumns{columnA,columnB}. Options are match codes (A-1, B-2…).
+- assertion_reason: full Assertion (A) and Reason (R) + assertionReason{}. Standard UPSC A–D codes.
+- chronology: full event names + chronologyItems[]. Options A–D are four distinct order codes (never omit D; never 3-option papers).
+- map_location: location logic in words (no image). Close distractors from neighbouring places/features.
+- direct_conceptual: conceptual stem, not one-fact recall.
+
+QUALITY (official CSE 2013–2025 toughness — harder than typical coaching sectionals):
+- Frames: "With reference to…", "Consider the following statements:", "Which of the following pairs is/are correctly matched?", "Which of the statements given above is/are not correct?", "How many of the above…".
+- Hard: ≥80% analytical (statements / how-many / A-R / matching / chronology / elimination). Cap recall. 30–60 seconds of elimination.
+- Cover Mix counts exactly. One concept per question. Near-miss traps (wrong year/article, partial truth, swapped cause/effect) — never absurd.
+- questionType one of: ${QUESTION_TYPES}`;
+
 /**
  * Gold-standard single-call system prompt.
  * Forces: decide correct OPTION TEXT → assign letter → explain that same letter.
  */
-const SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims question setter (Vision IAS / Insights / official UPSC PYQ standard).
+const SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims setter (official 2013–2025 PYQ toughness).
 
-SOURCE RULES:
-1. Use ONLY the user CONTEXT (knowledge-base excerpts). Never invent facts, dates, articles, figures, names, or schemes outside CONTEXT.
-2. If CONTEXT cannot support a high-quality question, skip that angle — do not pad with outside knowledge.
-3. NEVER generate questions from book apparatus or metadata:
-   - preface, foreword, publisher/edition/ISBN/copyright pages
-   - table of contents, index listings, bibliography, glossary, further reading
-   - Example/Exercise boxes, practice/model/sample question lists, "check your progress", "points to remember"
-   - page-number directories or chapter listing lines
-   Test ONLY substantive chapter subject matter (concepts, facts, chronology, institutions, places, provisions).
-4. If CONTEXT is mostly index/TOC/examples/exercises, return [] — do not invent questions from it.
-5. Return ONLY a JSON array (no markdown, no prose outside JSON).
+SOURCE: Use ONLY user CONTEXT. Never invent facts, dates, articles, figures, names, or schemes. Skip book apparatus (preface, TOC, index, glossary, exercises, page lists). If CONTEXT cannot support a question, skip it. If CONTEXT is mostly junk, return [].
+Facts in CONTEXT must be copied exactly — never approximate years/articles/schemes.
+${SHARED_MCQ_RULES}
+sourceParagraph: ≤20 words verbatim from CONTEXT supporting the answer.
+Wrong options = near-miss distractors grounded in CONTEXT.`;
 
-═══════════════════════════════════════════════════════════
-CRITICAL CONSISTENCY LOCK (students must never see a mismatch)
-═══════════════════════════════════════════════════════════
-For EVERY question you MUST follow this exact order — NEVER reverse it:
+/** Used when Knowledge Base RAG is skipped — LLM writes official UPSC CSE Prelims MCQs. */
+const OPEN_KNOWLEDGE_SYSTEM_PROMPT = `You are a senior UPSC CSE Prelims setter (official 2013–2025 PYQ toughness — conceptual and application-heavy, not coaching one-liners).
+Do NOT use retrieved textbook chunks. Write from standard GS-I sources (NCERT, Laxmikanth, Spectrum, GC Leong, Shankar, Economic Survey).
+Every item MUST stay on the user Topic — do not drift to a sibling syllabus area.
+${SHARED_MCQ_RULES}
+sourceParagraph: "standard UPSC syllabus".
 
-STEP 1 — Decide the SINGLE factually correct OPTION TEXT from CONTEXT.
-STEP 2 — Write options A–D. Put that correct text under EXACTLY one letter.
-STEP 3 — Set "answer" = that letter ONLY (A|B|C|D). Do not pick a letter first then invent text.
-STEP 4 — Write "explanation" that teaches the student (UPSC PYQ / coaching style):
-         - First sentence MUST be: Option {answer} ("{exact option text}") is correct.
-         - Then explain WHY that option is right (from CONTEXT).
-         - Then briefly explain WHY each wrong option (the other three) is wrong — so concepts clear.
-         - Target 50–70 English words; hard max 100 words. Dense, no fluff.
-         - NEVER say another letter is correct.
-         - NEVER defend a different option than "answer".
-         - NEVER shuffle option texts after setting "answer".
-
-SELF-CHECK before emitting each item (mandatory — re-read options after writing answer):
-□ options[answer] text is the ONE option CONTEXT supports as correct.
-□ explanation opens with that same letter and quotes that same option text.
-□ explanation covers correct reason + why the other three options fail.
-□ explanation does NOT claim Option X is correct when answer is Y.
-□ If you realize another letter's text is actually right → CHANGE "answer" to that letter (do not leave a mismatch).
-If ANY check fails → fix the JSON before output. Do not ship mismatched items.
-
-FORBIDDEN (instant fail):
-- answer = "B" but explanation says "Option A is correct"
-- answer letter points to wrong / empty option text
-- explanation praises one option while "answer" marks another
-- explanation only for correct option with zero mention of wrong options
-- swapping option texts between letters after answer is set
-- two options that are identical or trivially the same meaning
-- incomplete stems (intro-only without statements / lists / events)
-- numbered lines that are blank, "—", "...", or "[object Object]" (students must never see empty statements)
-
-OUTPUT each item MUST have:
-- question (COMPLETE stem)
-- options {A,B,C,D}
-- answer (exactly "A"|"B"|"C"|"D" — letter of the correct option text)
-- explanation (50–100 words; open with Option {answer}; justify correct + eliminate all three wrong options; 1–2 concrete facts from CONTEXT)
-- sourceParagraph (≤20 words verbatim from CONTEXT supporting the answer)
-- difficulty ("easy"|"moderate"|"hard")
-- questionType
-
-STEM COMPLETENESS (mandatory — students must see the full question):
-- Put the COMPLETE stem in "question" (never leave question empty or intro-only).
-- statement_based: numbered statements 1. 2. 3. inside question with FULL sentence text each (never "1. —"). Also set statements[] as plain strings.
-- chronology: number events inside question with FULL event names (never blank). Also set chronologyItems[] as plain strings. Prefer 3 order codes (A–C).
-- pair_matching: List-I (A.) and List-II (1.) items MUST appear inside question text AND in matchColumns{columnA,columnB} as plain strings. Options are match codes like "A-1, B-2…".
-- assertion_reason: full Assertion (A) and Reason (R) inside question. Also set assertionReason{assertion,reason}.
-- direct_conceptual: full clear MCQ stem in question.
-- elimination: options like "1 and 2 only" that reward careful reading.
-- NEVER output options without a complete stem.
-- NEVER use placeholder dashes for missing content — if CONTEXT is thin, skip that question.
-
-QUALITY BAR (UPSC aspirant / Hard Prelims — accuracy first):
-- Match official UPSC CSE Prelims toughness (recent PYQs / Vision IAS / Insights standard).
-- Prefer hard, elimination-based, multi-statement, assertion-reason, and matching questions over easy recall.
-- Close distractors from the SAME topic; no trivial giveaways or textbook one-liners.
-- Statements must be precise enough for serious CSE Prelims practice.
-- Facts (years, articles, schemes, bodies, places) MUST match CONTEXT exactly — never approximate.
-- Prefer PYQ-style framing: "With reference to…", "Consider the following statements…", "Which of the following…".
-- One clear concept per question; no compound trivia that confuses aspirants.
-- Wrong options = near-miss UPSC traps (wrong year/article, partial truth, swapped cause/effect) — never absurd.
-- When Difficulty is hard / PYQ-Hard: ≥80% multi-statement / assertion-reason / elimination / matching / chronology. Cap direct one-fact recall. Ban "Who was… / What is…" trivia unless embedded in a deeper stem.
-- Every Hard stem must force elimination thinking — a serious aspirant should need 30–60 seconds, not 5.
-- Cover EVERY pattern id listed in Mix with the exact counts — never skip pair_matching, chronology, sequence_arrangement, or assertion_reason when Mix asks for them.
-
-questionType one of: statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
-Cover Mix evenly — no pattern missing, no duplicate stems.
-
-OPTION QUALITY:
-- Wrong options = serious aspirant-level distractors from the SAME domain, grounded in CONTEXT (or a plausible misreading).
-- Avoid "all of the above" / "none of the above" unless CONTEXT clearly supports it.
-- Options must be mutually exclusive (exactly one correct).
-- Every option A–D must be non-empty real text (never "—" or blank).`;
-
-/** Used only when knowledge base returned zero on-topic chunks for the topic. */
-const OPEN_KNOWLEDGE_SYSTEM_PROMPT = `You are a UPSC CSE Prelims question setter.
-No on-topic knowledge-base CONTEXT was found. Use standard UPSC syllabus knowledge for the requested Topic ONLY.
-Return ONLY a JSON array (no markdown).
-
-TOPIC LOCK (mandatory):
-- Every question MUST be directly about the Topic given by the user.
-- Do NOT drift to related-but-different syllabus areas (e.g. if Topic is Cabinet/Council of Ministers, do NOT ask about Preamble, Fundamental Rights, Citizenship, or amendment procedure).
-- If you cannot write a high-quality on-topic question, omit it — never pad with off-topic MCQs.
-
-CRITICAL CONSISTENCY LOCK:
-1. Decide which option TEXT is correct first.
-2. Place that text under one letter; set "answer" to THAT letter (A|B|C|D).
-3. Explanation MUST open with: Option {answer} ("{option text}") is correct. Then why it is right AND why each of the other three options is wrong (50–100 words total).
-4. Never let explanation claim a different letter is correct than "answer".
-5. Before output: re-check options[answer] is truly correct; if not, fix "answer".
-
-Each item: question, options {A,B,C,D}, answer (A|B|C|D), explanation (50–100 words covering all options), sourceParagraph ("syllabus"), difficulty, questionType.
-COMPLETE stems. Set questionType to EXACTLY one of:
-statement_based|statement_not_correct|pair_matching|assertion_reason|direct_conceptual|chronology|sequence_arrangement|map_location|odd_one_out|multi_statement_elimination
-Cover the Mix evenly — do not skip patterns. No duplicate stems.`;
+ACCURACY — if not 100% sure, skip that fact (never guess):
+- Articles, years, judgments, bodies, schemes, places must match standard sources.
+- Polity: do not mix Arts 74/75, 123/213, 356/365, or Schedules.
+- Economy: do not invent Budget / GDP / fiscal numbers.
+- Environment: do not guess IUCN / Ramsar / CITES / species range.`;
 
 function compactPatternMix(count, patternsToInclude, batchIndex = 0, generationPlan = null) {
   if (generationPlan?.patternCounts && typeof generationPlan.patternCounts === "object") {
@@ -182,58 +124,27 @@ export function buildNotesQuestionUserPrompt(params) {
           .join(", ")}. If CONTEXT mixes those topics, ignore off-chapter passages.`
       : `TOPIC LOCK: Every question MUST be directly about "${topic}". Ignore CONTEXT about a different chapter/sub-topic.`;
 
-  const patternRules = `PATTERN RULES (mandatory — equal mix, none missing from Mix):
-- Follow Mix EXACTLY by count: ${mix}
-- If Mix says Nxpair_matching, write exactly N pair_matching items (do NOT substitute statement_based).
-- Same for assertion_reason, chronology, sequence_arrangement, statement_not_correct, multi_statement_elimination.
-- Every item MUST set "questionType" to the exact pattern id from Mix.
-- COMPLETE stems only (no empty statements / blank match lists).
-- No repeated or near-duplicate questions.
-- Cap direct_conceptual to at most what Mix asks — never flood the batch with recall MCQs.`;
+  const hardLine =
+    difficulty === "hard"
+      ? `Hard: every item difficulty="hard". Follow Mix exactly. In this batch include 1–2 Topic items that test a well-known current linkage (scheme/report/judgment/institution) still about "${topic}". Never copy exact PYQs.`
+      : "";
 
   if (openKnowledge) {
     return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
 Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
-Knowledge base had no on-topic chunks for this Topic. Generate EXACTLY ${count} complete UPSC Prelims MCQs from standard syllabus knowledge.
-
-HARD RULES:
-1. ${chapterLock}
-2. ${patternRules}
-3. Decide correct OPTION TEXT first, then set answer = that letter.
-4. explanation MUST start with: Option {answer} ("{that option text}") is correct. Then justify why correct AND why each wrong option fails (50–100 words).
-5. answer letter ↔ option text ↔ explanation must match.
+Generate EXACTLY ${count} UPSC CSE Prelims GS MCQs from standard syllabus knowledge.
+${chapterLock}
+Set questionType to the Mix ids (do not substitute). Skip any fact you are not sure of.
+${hardLine}
 JSON array only.`;
   }
 
   return `Topic: ${topic}${subject ? ` | ${subject}` : ""}
-Difficulty: ${difficulty}${difficulty === "hard" ? " (official UPSC CSE Prelims / recent PYQ toughness)" : ""}. Count: ${count}. Mix: ${mix}.
-Generate EXACTLY ${count} complete UPSC MCQs from CONTEXT only (Admin Knowledge Base / RAG excerpts).
-
-HARD RULES (student safety):
-1. Decide correct OPTION TEXT from CONTEXT first, then set answer = that letter.
-2. answer = letter of the option TEXT that CONTEXT supports (options[answer] must be that text).
-3. explanation = 50–100 words; MUST start with: Option {answer} ("{that option text}") is correct.
-4. explanation must NEVER say a different letter is correct.
-5. Before output, self-check: answer letter ↔ option text ↔ explanation = SAME. If wrong, fix answer.
-6. ${chapterLock}
-7. Never ask about "the provided context" order/sequence; ask about the Topic substance.
-8. ${patternRules}
-9. Explanation MUST teach: why the correct option is right + why EACH of the other three options is wrong (aspirant-level elimination). Include 1–2 concrete UPSC PYQ-style facts from CONTEXT (names/years/articles/schemes/places).
-10. SOURCE LOCK: Use ONLY CONTEXT. Do not invent facts outside CONTEXT. Better fewer grounded questions than padded outside knowledge.
-11. BOOK APPARATUS BAN: Never ask about Index, TOC, glossary, Example/Exercise boxes, practice lists, preface, or page numbers. If CONTEXT is only that junk, return [].
-${
-  difficulty === "hard"
-    ? `12. HARD / PYQ MODE (mandatory — official UPSC CSE Prelims level):
-- Write like recent UPSC CSE Prelims + Vision IAS / Insights sectional tests (NOT textbook MCQs).
-- Follow Mix counts EXACTLY — all listed patterns must appear in this batch.
-- ≥80% = statement_based / statement_not_correct / multi_statement_elimination / assertion_reason / pair_matching / chronology / sequence_arrangement.
-- ≤20% direct_conceptual, and those must be conceptual (not "Who founded…").
-- Ban short trivia stems. Each stem should need careful reading / elimination (30–60 sec).
-- Distractors = near-miss from CONTEXT (wrong year, partial truth, swapped cause/effect, closely related concept).
-- Prefer frames: "With reference to…", "Consider the following statements:", "Which of the following pairs is/are correctly matched?", "Which of the statements given above is/are not correct?".
-- difficulty field on every item MUST be "hard".`
-    : ""
-}
+Difficulty: ${difficulty}. Count: ${count}. Mix: ${mix}.
+Generate EXACTLY ${count} UPSC MCQs from CONTEXT only.
+${chapterLock}
+Ask about Topic substance, not "the provided context". Set questionType to Mix ids. If CONTEXT is TOC/index/exercises, return [].
+${hardLine}
 
 JSON array only.
 

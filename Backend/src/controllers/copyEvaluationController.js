@@ -9,7 +9,6 @@ import { evaluateCopyWithVision } from "../services/visionCopyEvaluationService.
 import {
   saveEvaluationPageImages,
   getPageImagePath,
-  deleteEvaluationFiles,
 } from "../services/copyEvaluationStorageService.js";
 import { getCopyEvalDailyStatus } from "../middleware/copyEvalRateLimit.js";
 import {
@@ -452,23 +451,26 @@ export const deleteEvaluation = async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const evaluation = await CopyEvaluation.findOneAndDelete({
+    const evaluation = await CopyEvaluation.findOne({
       _id: id,
       userId,
     });
 
-    if (!evaluation) {
+    if (!evaluation || evaluation.isTrashed) {
       return res.status(404).json({
         success: false,
         message: "Evaluation not found",
       });
     }
 
-    await deleteEvaluationFiles(id);
+    evaluation.isTrashed = true;
+    evaluation.trashedAt = new Date();
+    evaluation.trashedBy = userId;
+    await evaluation.save();
 
     res.status(200).json({
       success: true,
-      message: "Evaluation deleted successfully",
+      message: "Evaluation moved to trash. An admin can restore it within 30 days.",
     });
   } catch (error) {
     console.error("Error in deleteEvaluation:", error);

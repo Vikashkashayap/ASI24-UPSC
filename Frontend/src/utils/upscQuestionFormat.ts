@@ -1,3 +1,5 @@
+import { stripLeakedOptionsFromArBody } from "./sanitizeHindiMcqFormat";
+
 export type UpscStemPart =
   | { type: "intro"; text: string }
   | { type: "statement"; number: number; text: string }
@@ -69,10 +71,11 @@ const PROMPT_PATTERNS = [
 const AR_TRAILING_PROMPT_RE =
   /(?:[.!?]?\s*)(?:In the context of the above,?\s*)?(?:Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??|Select the correct answer[^.?]*\??|उपर्युक्त के संदर्भ में[^.?]*\??|निम्नलिखित में से कौन[^.?]*\??)\s*$/i;
 
-/** Strip leaked "Which of the following is correct?" (etc.) from A/R body. */
+/** Strip leaked "Which of the following is correct?" / option banks from A/R body. */
 export function stripAssertionReasonTrailingPrompt(text: string): string {
-  return String(text || "")
-    .replace(AR_TRAILING_PROMPT_RE, "")
+  return stripLeakedOptionsFromArBody(
+    String(text || "").replace(AR_TRAILING_PROMPT_RE, "")
+  )
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -82,9 +85,121 @@ const INTRO_PATTERNS = [
   /read the following/i,
   /with reference to/i,
   /regarding the following/i,
+  /which of the following statements/i,
   /निम्नलिखित(?: कथनों?| में से)?/,
   /निम्न(?: कथनों?)?(?: पर| के| में)?/,
 ];
+
+function isHindiStem(text: string): boolean {
+  return /[\u0900-\u097F]/.test(text);
+}
+
+function statementBlobAskKind(text: string): "how_many_pairs" | "how_many" | "not_correct" | "correct" {
+  const t = String(text || "");
+  if (/how many of the (?:above )?pairs|कितने युग्म/i.test(t)) return "how_many_pairs";
+  if (/how many of the above|उपर्युक्त कथनों में से कितने/i.test(t)) return "how_many";
+  if (/(?:is\/are|are|is)\s+not\s+correct|\bnot correct\b|\bincorrect\b|सही नहीं|गलत है/i.test(t)) {
+    return "not_correct";
+  }
+  return "correct";
+}
+
+function trailingAskForKind(
+  kind: ReturnType<typeof statementBlobAskKind>,
+  hindi: boolean
+): string {
+  if (kind === "how_many_pairs") {
+    return hindi
+      ? "उपर्युक्त युग्मों में से कितने सही सुमेलित हैं?"
+      : "How many of the above pairs are correctly matched?";
+  }
+  if (kind === "how_many") {
+    return hindi
+      ? "उपर्युक्त कथनों में से कितने सही हैं?"
+      : "How many of the above statements are correct?";
+  }
+  if (kind === "not_correct") {
+    return hindi
+      ? "उपर्युक्त कथनों में से कौन-सा/से सही नहीं है/हैं?"
+      : "Which of the statements given above is/are not correct?";
+  }
+  return hindi
+    ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
+    : "Which of the statements given above is/are correct?";
+}
+
+/** Intro = topic frame only; the single ask goes after the statements. */
+function rewriteStatementIntro(intro: string): string {
+  let t = String(intro || "")
+    .replace(/[?:]+$/g, "")
+    .trim();
+  if (!t) return "Consider the following statements:";
+
+  const hiWhich = t.match(
+    /^(.*?)निम्नलिखित(?: कथनों?)?(?: में से)?\s*कौन(?:-सा|-से)?\/?कौन-से\s+(?:सही नहीं|सही|गलत)[\s\S]*$/
+  );
+  if (hiWhich) {
+    const prefix = hiWhich[1].replace(/[,:]+$/g, "").trim();
+    return prefix
+      ? `${prefix}, निम्नलिखित कथनों पर विचार कीजिए:`
+      : "निम्नलिखित कथनों पर विचार कीजिए:";
+  }
+
+  const whichAsk = t.match(
+    /^(.*?)(?:,?\s*)which of the following statements is\/are\s+(?:not\s+)?correct(?:\s+(regarding|about|with reference to)\s+(.+))?$/i
+  );
+  if (whichAsk) {
+    const prefix = whichAsk[1].replace(/[,:]+$/g, "").trim();
+    const prep = whichAsk[2];
+    const topic = whichAsk[3]?.replace(/[?:]+$/g, "").trim();
+    if (prep && topic) {
+      return `Consider the following statements ${prep} ${topic}:`;
+    }
+    if (prefix) {
+      return `${prefix}, consider the following statements:`;
+    }
+    return "Consider the following statements:";
+  }
+
+  return /[:：]$/.test(intro.trim()) ? intro.trim() : `${t}:`;
+}
+
+function shouldReconcileStatementAsk(parts: UpscStemPart[]): boolean {
+  if (!parts.some((p) => p.type === "statement")) return false;
+  if (parts.some((p) => p.type === "assertion")) return false;
+  const blob = parts.map((p) => ("text" in p ? p.text : "")).join(" ");
+  if (
+    /arrange the following|chronological order|match the following|list[\s-]*i\b|कालानुक्रम|मिलान कीजिए/i.test(
+      blob
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/** One ask after statements; intro must not contradict the trailing prompt. */
+function reconcileStatementPromptParts(parts: UpscStemPart[]): UpscStemPart[] {
+  if (!shouldReconcileStatementAsk(parts)) return parts;
+  const blob = parts
+    .filter((p) => p.type === "intro" || p.type === "prompt")
+    .map((p) => ("text" in p ? p.text : ""))
+    .join(" ");
+  const hindi = isHindiStem(parts.map((p) => ("text" in p ? p.text : "")).join(" "));
+  const kind = statementBlobAskKind(blob);
+  const ask = trailingAskForKind(kind, hindi);
+  const next: UpscStemPart[] = [];
+  for (const p of parts) {
+    if (p.type === "prompt") continue;
+    if (p.type === "intro") {
+      next.push({ type: "intro", text: rewriteStatementIntro(p.text) });
+    } else {
+      next.push(p);
+    }
+  }
+  next.push({ type: "prompt", text: ask });
+  return next;
+}
 
 function extractTrailingPrompt(text: string): { body: string; prompt: string | null } {
   for (const pattern of PROMPT_PATTERNS) {
@@ -131,9 +246,7 @@ function parseStatementStem(text: string): UpscStemPart[] | null {
       else if (INTRO_PATTERNS.some((p) => p.test(intro || text))) {
         parts.push({
           type: "prompt",
-          text: /[\u0900-\u097F]/.test(text)
-            ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
-            : "Which of the statements given above is/are correct?",
+          text: trailingAskForKind(statementBlobAskKind(`${intro}\n${text}`), isHindiStem(text)),
         });
       }
     }
@@ -157,18 +270,7 @@ function parseAssertionReasonStem(text: string): UpscStemPart[] | null {
   if (rSplit.length < 2) return null;
 
   let assertion = stripAssertionReasonTrailingPrompt(rSplit[0]);
-  let reasonAndRest = rSplit[1].trim();
-
-  // Strip leaked option banks / code prompts from reason body
-  reasonAndRest = reasonAndRest
-    .replace(/\n?\s*नीचे दिए गए कूट[\s\S]*$/i, "")
-    .replace(/\n?\s*Select the correct answer using the code[\s\S]*$/i, "")
-    .replace(/\n?\s*In the context of the above[\s\S]*$/i, "")
-    .replace(/\n?\s*Which of the following(?:\s+is|\s+are|\s+options)?[^.]*\??\s*$/i, "")
-    .replace(/\n?\s*उपर्युक्त के संदर्भ में[\s\S]*$/i, "")
-    .replace(/\n?\s*\(\s*A\s*\)\s*(?:दोनों|Both)[\s\S]*$/i, "")
-    .replace(/\n?\s*A\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i, "")
-    .trim();
+  let reasonAndRest = stripLeakedOptionsFromArBody(rSplit[1].trim());
 
   const { body: reasonRaw, prompt } = extractTrailingPrompt(reasonAndRest);
   const reason = stripAssertionReasonTrailingPrompt(reasonRaw);
@@ -231,11 +333,10 @@ function parseNewlineStatements(text: string): UpscStemPart[] | null {
   }
 
   if (parts.some((p) => p.type === "statement") && !parts.some((p) => p.type === "prompt")) {
+    const introText = parts.find((p) => p.type === "intro")?.text || "";
     parts.push({
       type: "prompt",
-      text: /[\u0900-\u097F]/.test(text)
-        ? "उपर्युक्त कथनों में से कौन-सा/से सही है/हैं?"
-        : "Which of the statements given above is/are correct?",
+      text: trailingAskForKind(statementBlobAskKind(`${introText}\n${text}`), isHindiStem(text)),
     });
   }
 
@@ -258,15 +359,16 @@ export function parseUpscQuestionStem(text: string): UpscStemPart[] {
       parseNewlineStatements(trimmed) ||
       parseStatementStem(trimmed);
     if (structured && structured.some((p) => p.type === "statement" || p.type === "assertion")) {
-      return structured;
+      return reconcileStatementPromptParts(structured);
     }
   }
 
-  return (
+  const parsed =
     parseAssertionReasonStem(trimmed) ||
     parseNewlineStatements(trimmed) ||
-    parseStatementStem(trimmed) || [{ type: "plain", text: trimmed }]
-  );
+    parseStatementStem(trimmed);
+  if (parsed) return reconcileStatementPromptParts(parsed);
+  return [{ type: "plain", text: trimmed }];
 }
 
 export function isStructuredUpscStem(parts: UpscStemPart[]): boolean {
@@ -278,14 +380,38 @@ export interface ParsedMatchFollowing {
   columnA: string[];
   columnB: string[];
   prompt: string;
+  columnATitle?: string;
+  columnBTitle?: string;
 }
 
 const MATCH_INTRO_RE =
-  /match\s+(?:the\s+)?following|consider the following pairs|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|निम्नलिखित.*(?:मिलान|युग्म)|(?:सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२])/i;
+  /match\s+(?:the\s+)?following|consider the following pairs|pairs?\s+(?:is\/are|are|is)\s+correctly\s+matched|correctly\s+matched|match\s+list[- ]?i|list[- ]?i\s+with\s+list[- ]?ii|list[- ]?i\b[\s\S]{0,500}?list[- ]?ii\b|निम्नलिखित.*(?:मिलान|युग्म)|(?:सूची[- ]?[iI1१].*(?:सूची|list)[- ]?[iI2२])/i;
 const MATCH_PROMPT_RE =
   /select the correct|code given below|नीचे दिए गए|सही उत्तर|सही जोड़ी|कूट/i;
+const STATEMENT_PROMPT_RE =
+  /which of the (?:statements|following statements)|statements given above|उपर्युक्त कथनों/i;
 const MATCH_SECTION_SKIP =
   /^(?:list[- ]?i|list[- ]?ii|सूची[- ]?[iI12१२])(?:\s*\([^)]+\))?\s*$/i;
+
+function extractListTitles(text: string): { columnATitle?: string; columnBTitle?: string } {
+  const a = text.match(/list[- ]?i\s*\(([^)]+)\)/i)?.[1]?.trim();
+  const b = text.match(/list[- ]?ii\s*\(([^)]+)\)/i)?.[1]?.trim();
+  const aHi = text.match(/सूची[- ]?[iI1१]\s*\(([^)]+)\)/)?.[1]?.trim();
+  const bHi = text.match(/सूची[- ]?(?:II|2|२)\s*\(([^)]+)\)/)?.[1]?.trim();
+  return {
+    ...(a || aHi ? { columnATitle: a || aHi } : {}),
+    ...(b || bHi ? { columnBTitle: b || bHi } : {}),
+  };
+}
+
+export function looksLikeMatchFollowingText(text: string): boolean {
+  const t = String(text || "");
+  if (!t.trim()) return false;
+  if (MATCH_INTRO_RE.test(t)) return true;
+  const hasLists = /list[- ]?i\b/i.test(t) && /list[- ]?ii\b/i.test(t);
+  const hasLetters = /\bA\.\s+\S/.test(t) && /\bB\.\s+\S/.test(t);
+  return hasLists && hasLetters;
+}
 
 function extractLetteredColumnItems(text: string): string[] {
   const items: string[] = [];
@@ -338,17 +464,23 @@ function extractMatchIntro(fullText: string, beforeListII: string): string {
   return /[\u0900-\u097F]/.test(fullText) ? "निम्नलिखित का मिलान कीजिए:" : "Match the following:";
 }
 
+function defaultMatchPrompt(text: string): string {
+  return /[\u0900-\u097F]/.test(text)
+    ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
+    : "Select the correct answer using the code given below:";
+}
+
 function extractMatchPrompt(text: string): string {
+  const fallback = defaultMatchPrompt(text);
   for (const line of text.split(/\n+/)) {
     const trimmed = line.trim();
+    if (STATEMENT_PROMPT_RE.test(trimmed)) continue;
     if (!MATCH_PROMPT_RE.test(trimmed)) continue;
     if (/\b[A-D]\.\s/.test(trimmed) || /(?:सूची|list)[- ]?I\s*\(/i.test(trimmed)) continue;
     if (trimmed.length > 120) continue;
     return trimmed;
   }
-  return /[\u0900-\u097F]/.test(text)
-    ? "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:"
-    : "Select the correct answer using the code given below:";
+  return fallback;
 }
 
 /** Parse match columns from a single paragraph (common in Hindi translations). */
@@ -376,13 +508,14 @@ function parseMatchParagraph(text: string): ParsedMatchFollowing | null {
     columnA: cleanedA,
     columnB,
     prompt: extractMatchPrompt(text),
+    ...extractListTitles(text),
   };
 }
 
 /** Parse "Match the following" / List-I & List-II from plain question text. */
 export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing | null {
   const trimmed = String(text || "").trim();
-  if (!trimmed || !MATCH_INTRO_RE.test(trimmed)) return null;
+  if (!trimmed || !looksLikeMatchFollowingText(trimmed)) return null;
 
   const columnA: string[] = [];
   const columnB: string[] = [];
@@ -392,12 +525,21 @@ export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing 
   const lines = trimmed.split(/\n+/).map((l) => l.trim()).filter(Boolean);
 
   for (const line of lines) {
+    if (STATEMENT_PROMPT_RE.test(line) && !/\b[A-D]\.\s/.test(line)) continue;
     if (MATCH_PROMPT_RE.test(line)) {
       if (!prompt && !/\b[A-D]\.\s/.test(line) && line.length < 120) prompt = line;
       continue;
     }
     if (MATCH_SECTION_SKIP.test(line)) continue;
     if (/^\([^)]{3,50}\)$/.test(line)) continue;
+
+    if (columnA.length < 2 && /\bA\.\s+\S/.test(line) && /\bB\.\s+\S/.test(line)) {
+      const extracted = extractLetteredColumnItems(line);
+      if (extracted.length >= 2) {
+        columnA.push(...extracted);
+        continue;
+      }
+    }
 
     const inline = line.match(/^([A-D])\.\s*(.+?)\s+(\d+)\.\s*(.+)$/i);
     if (inline) {
@@ -457,6 +599,7 @@ export function parseMatchFollowingFromText(text: string): ParsedMatchFollowing 
     columnA,
     columnB,
     prompt: prompt || extractMatchPrompt(trimmed),
+    ...extractListTitles(trimmed),
   };
 }
 
@@ -479,7 +622,7 @@ export function isChronologyQuestion(q: {
 
 export type OptionKey = "A" | "B" | "C" | "D";
 
-/** Chronology MCQs use 3 options (UPSC style). */
+/** UPSC Prelims uses four options A–D. Blank keys (legacy 3-option chronology) are omitted. */
 export function getQuestionOptionKeys(q: {
   questionType?: string;
   question?: string;
@@ -487,13 +630,6 @@ export function getQuestionOptionKeys(q: {
   options?: Record<string, string>;
   options_en?: Record<string, string>;
 }): OptionKey[] {
-  if (isChronologyQuestion(q)) {
-    return (["A", "B", "C"] as OptionKey[]).filter((k) => {
-      const opts = q.options_en || q.options || {};
-      const v = String(opts[k] ?? "").trim();
-      return v && !isBlankUpscItemText(v);
-    });
-  }
   const opts = q.options_en || q.options || {};
   const keys: OptionKey[] = ["A", "B", "C", "D"];
   return keys.filter((k) => {
@@ -558,6 +694,7 @@ export function resolveMatchColumns(
           columnA,
           columnB,
           prompt: "नीचे दिए गए कूट का प्रयोग कर सही उत्तर चुनिए:",
+          ...extractListTitles(String(question.question_hi || "")),
         };
       }
     }
@@ -611,6 +748,7 @@ export function resolveMatchColumns(
         columnA,
         columnB,
         prompt: "Select the correct answer using the code given below:",
+        ...extractListTitles(String(question.question_en || question.question || "")),
       };
     }
   }

@@ -43,9 +43,13 @@ export function stripLeakedOptionsFromArBody(text: string): string {
     /(?:[.!?]?\s*)Which of the following(?:\s+options?)?(?:\s+is\/are|\s+are|\s+is)?[^.?]*\??\s*$/i,
     /\n?\s*उपर्युक्त के संदर्भ में[\s\S]*$/i,
     /(?:[.!?]?\s*)निम्नलिखित में से कौन[^.?]*\??\s*$/i,
-    // Option bank starting mid-body
-    /\n?\s*\(\s*A\s*\)\s*(?:दोनों|Both)[\s\S]*$/i,
-    /\n?\s*A\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i,
+    // Option bank: "(A) Both…" / "A. दोनों…"
+    /\n?\s*\(\s*[A-D]\s*\)\s*(?:दोनों|Both)[\s\S]*$/i,
+    /\n?\s*[A-D]\s*[.)]\s*(?:दोनों|Both)[\s\S]*$/i,
+    // Hindi/English AR codes: "A. A और R दोनों…" / "A. Both A and R…"
+    /\s*[A-D]\s*[.)]\s*(?:A\s*और\s*R|Both\s*A\s*and\s*R)[\s\S]*$/i,
+    /\s*\(\s*[A-D]\s*\)\s*(?:A\s*और\s*R|Both\s*A\s*and\s*R)[\s\S]*$/i,
+    /\s*A\s*और\s*R\s*दोनों\s+(?:व्यक्तिगत रूप से\s+)?सत्य[\s\S]*$/i,
   ];
   for (const re of cutPatterns) {
     const next = s.replace(re, "").trim();

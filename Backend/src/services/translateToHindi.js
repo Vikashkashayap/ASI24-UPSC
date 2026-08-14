@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
-import { getOpenRouterAppTitle } from "../config/openRouterAppTitle.js";
+import { getOpenRouterAppTitle, getOpenRouterIdentHeaders } from "../config/openRouterAppTitle.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
 import {
   getHindiTranslateProvider,
@@ -55,8 +54,9 @@ export async function translateToHindi(text) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": getFrontendOrigin(),
-        "X-Title": getOpenRouterAppTitle("UPSC Mentor - Hindi Translation"),
+        ...getOpenRouterIdentHeaders(
+          getOpenRouterAppTitle("UPSC Mentor - Hindi Translation")
+        ),
       },
       body: JSON.stringify({
         model: DEFAULT_MODEL,

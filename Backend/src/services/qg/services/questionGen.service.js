@@ -60,7 +60,15 @@ function assembleStem(q) {
       const t = coerceItemText(s);
       if (t) lines.push(`${i + 1}. ${t}`);
     });
-    lines.push("Which of the statements given above is/are correct?");
+    const blob = `${intro} ${type}`;
+    const ask = /not_correct|not correct|incorrect/i.test(blob)
+      ? "Which of the statements given above is/are not correct?"
+      : /how_many_pairs|how many of the (?:above )?pairs/i.test(blob)
+        ? "How many of the above pairs are correctly matched?"
+        : /how_many|how many of the above/i.test(blob)
+          ? "How many of the above statements are correct?"
+          : "Which of the statements given above is/are correct?";
+    lines.push(ask);
     question = lines.join("\n");
   }
 

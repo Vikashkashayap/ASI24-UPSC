@@ -688,6 +688,8 @@ export function filterQuestionsByTopic(questions, topic, opts = {}) {
 
 function normalizePatternIdLoose(questionType) {
   const t = String(questionType || "").toLowerCase().replace(/[\s-]+/g, "_");
+  if (t.includes("how_many") && (t.includes("pair") || t.includes("match"))) return "how_many_pairs";
+  if (t.includes("how_many")) return "how_many_correct";
   if (t.includes("not_correct") || t.includes("incorrect")) return "statement_not_correct";
   if (t.includes("elimin")) return "multi_statement_elimination";
   if (t.includes("pair") || t.includes("match")) return "pair_matching";
@@ -734,6 +736,8 @@ export function isPyqHardEnough(question) {
   const pyqPatterns = new Set([
     "statement_based",
     "statement_not_correct",
+    "how_many_correct",
+    "how_many_pairs",
     "multi_statement_elimination",
     "assertion_reason",
     "pair_matching",
@@ -744,6 +748,8 @@ export function isPyqHardEnough(question) {
   if (pyqPatterns.has(type)) {
     if (type === "assertion_reason") return hasAR || stem.length >= 140;
     if (type === "pair_matching") return hasMatch || stem.length >= 140;
+    if (type === "how_many_pairs") return hasMatch || hasNumbered || /pair/i.test(stem);
+    if (type === "how_many_correct") return hasNumbered || stem.length >= 140;
     if (type === "chronology" || type === "sequence_arrangement") {
       return hasChrono || hasNumbered || stem.length >= 140;
     }

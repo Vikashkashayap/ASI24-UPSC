@@ -1,6 +1,6 @@
 import { RunnableLambda } from "@langchain/core/runnables";
 import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import { getOpenRouterIdentHeaders } from "../config/openRouterAppTitle.js";
 
 /**
  * Translator Agent for real-time speech-to-speech translation
@@ -63,8 +63,7 @@ Do not add explanations or notes, only provide the translated text.`;
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": getFrontendOrigin(),
-          "X-Title": "Meeting Translator",
+          ...getOpenRouterIdentHeaders("meeting translator"),
         },
         body: JSON.stringify({
           model,

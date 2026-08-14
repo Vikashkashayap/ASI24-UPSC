@@ -1,6 +1,9 @@
 import { RunnableLambda } from "@langchain/core/runnables";
 import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import {
+  OPENROUTER_APP_TITLES,
+  getOpenRouterIdentHeaders,
+} from "../config/openRouterAppTitle.js";
 
 // Mentor agent powered by OpenRouter LLM, with safe fallback
 export const mentorAgent = new RunnableLambda({
@@ -72,8 +75,7 @@ export const mentorAgent = new RunnableLambda({
             "Content-Type": "application/json",
             Authorization: `Bearer ${apiKey}`,
             // Optional but recommended for OpenRouter analytics
-            "HTTP-Referer": getFrontendOrigin(),
-            "X-Title": "UPSC Mentor - AI Mentor",
+            ...getOpenRouterIdentHeaders(OPENROUTER_APP_TITLES.AI_MENTOR),
           },
           body: JSON.stringify({
             model,

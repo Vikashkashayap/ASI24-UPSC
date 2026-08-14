@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
+import { getOpenRouterIdentHeaders } from "../config/openRouterAppTitle.js";
 
 const BATCH_SYSTEM =
   "Translate each English UPSC exam string to formal Hindi (Devanagari). Return ONLY a JSON array of translated strings in the same order and length as input. No markdown.";
@@ -50,8 +50,7 @@ export async function translateTextsBatchToHindi(texts, { apiKey, model, batchSi
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${key}`,
-        "HTTP-Referer": getFrontendOrigin(),
-        "X-Title": "UPSC Mentor - Hindi Migration",
+        ...getOpenRouterIdentHeaders("hindi migration"),
       },
       body: JSON.stringify({
         model: resolvedModel,

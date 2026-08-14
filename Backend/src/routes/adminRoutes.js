@@ -117,6 +117,13 @@ import {
   adminOrdersStats,
 } from "../controllers/order.controller.js";
 import { requireAdminOrMentorTools } from "../middleware/adminMiddleware.js";
+import {
+  getTrash,
+  restoreFromTrash,
+  permanentDeleteFromTrash,
+  bulkRestoreFromTrash,
+  bulkPermanentDeleteFromTrash,
+} from "../controllers/trashController.js";
 
 const router = express.Router();
 
@@ -154,6 +161,12 @@ router.use(requireAdminOrMentorTools);
 
 // Dashboard statistics
 router.get("/dashboard", getDashboardStats);
+
+router.get("/trash", getTrash);
+router.post("/trash/bulk-restore", bulkRestoreFromTrash);
+router.post("/trash/bulk-delete", bulkPermanentDeleteFromTrash);
+router.post("/trash/:kind/:id/restore", restoreFromTrash);
+router.delete("/trash/:kind/:id", permanentDeleteFromTrash);
 
 // Notes Website orders / subscriptions (canonical APIs)
 router.get("/orders/stats", adminOrdersStats);

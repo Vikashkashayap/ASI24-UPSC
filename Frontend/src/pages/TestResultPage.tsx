@@ -62,6 +62,8 @@ interface TestResult {
   difficulty?: string;
   totalQuestions: number;
   durationMinutes?: number;
+  isPracticeGenerator?: boolean;
+  isChapterModulePractice?: boolean;
   totalMarks?: number;
   score: number;
   correctAnswers: number;
@@ -234,8 +236,15 @@ const TestResultPage: React.FC = () => {
   const backPath = useMemo(() => {
     if (fromMentor && studentId) return `/mentor-dashboard/students/${studentId}`;
     if (fromAdmin && studentId) return `/admin/students/${studentId}`;
+    if (
+      result?.isChapterModulePractice ||
+      /module\s*final/i.test(String(result?.topic || "")) ||
+      (Boolean(result?.durationMinutes) && result?.isPracticeGenerator !== true)
+    ) {
+      return "/module-chapter-history";
+    }
     return "/test-history";
-  }, [fromAdmin, fromMentor, studentId]);
+  }, [fromAdmin, fromMentor, studentId, result]);
 
   if (isLoading) {
     return (

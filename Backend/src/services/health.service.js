@@ -12,6 +12,7 @@ import {
   getModelForStage,
   QG_CONFIG,
 } from "./qg/index.js";
+import { getOpenRouterIdentHeaders } from "../config/openRouterAppTitle.js";
 
 function connectionStatus(readyState) {
   return readyState === 1 ? "connected" : "disconnected";
@@ -54,8 +55,7 @@ async function checkLlm() {
       method: "GET",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": process.env.OPENROUTER_HTTP_REFERER || "https://studentportal.mentorsdaily.com",
-        "X-Title": process.env.OPENROUTER_X_TITLE || "UPSC Mentor",
+        ...getOpenRouterIdentHeaders("health"),
       },
       signal: controller.signal,
     });

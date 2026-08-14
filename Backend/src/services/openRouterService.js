@@ -1,7 +1,9 @@
 import fetch from "node-fetch";
-import { getFrontendOrigin } from "../config/urlConfig.js";
 import { assertOpenRouterAllowed } from "../middleware/examAiGuard.js";
-import { getOpenRouterAppTitle } from "../config/openRouterAppTitle.js";
+import {
+  getOpenRouterAppTitle,
+  getOpenRouterIdentHeaders,
+} from "../config/openRouterAppTitle.js";
 
 /**
  * OpenRouter API Service
@@ -49,19 +51,17 @@ export const callOpenRouterAPI = async ({
     console.log("🌐 Base URL:", OPENROUTER_BASE_URL);
 
     const appTitle = xTitle || getOpenRouterAppTitle("UPSC Mentor");
-    // OpenRouter uses X-Title for the App column in logs
-    const frontendOrigin = getFrontendOrigin();
+    const ident = getOpenRouterIdentHeaders(appTitle);
     const headers = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
-      "HTTP-Referer": frontendOrigin,
-      "X-Title": appTitle,
+      ...ident,
     };
 
     console.log("📤 Request headers:");
     console.log("   Authorization:", `Bearer ${apiKey.substring(0, 15)}...`);
-    console.log("   HTTP-Referer:", frontendOrigin);
-    console.log("   X-Title:", appTitle);
+    console.log("   HTTP-Referer:", ident["HTTP-Referer"]);
+    console.log("   X-Title:", ident["X-Title"]);
 
     const requestBody = {
       model,
@@ -339,14 +339,12 @@ export const callOpenRouterVisionAPI = async ({
       throw new Error("At least one image is required for vision evaluation");
     }
 
-    const appTitle =
-      xTitle || getOpenRouterAppTitle("copy evaluation");
-    const frontendOrigin = getFrontendOrigin();
+    const appTitle = xTitle || getOpenRouterAppTitle("copy evaluation");
+    const ident = getOpenRouterIdentHeaders(appTitle);
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": frontendOrigin,
-      "X-Title": appTitle,
+      ...ident,
     };
 
     const userContent = [

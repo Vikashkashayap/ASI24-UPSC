@@ -3,6 +3,7 @@
  * Caches results in GeneratedQuestion so duplicate topic+difficulty skips the LLM.
  */
 
+import { SKIP_KB_RAG_RETRIEVAL } from "../../config/generationMode.js";
 import { callOpenRouterAPI } from "../../services/openRouterService.js";
 import { getPracticeGenerationModel } from "../../config/openRouterConfig.js";
 import { searchKnowledgeBase } from "./search.service.js";
@@ -134,6 +135,20 @@ function normalizeQuestion(q, meta) {
  * }} params
  */
 export async function generateQuestionsFromRag(params = {}) {
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    ragLogger.info("rag.generate.skipped", { reason: "SKIP_KB_RAG_RETRIEVAL" });
+    return {
+      cached: false,
+      skipped: true,
+      insufficient: true,
+      message: "KB/RAG question generation is paused — use LLM Prelims generator.",
+      subject: String(params.subject || "").trim(),
+      topic: String(params.topic || "").trim(),
+      questions: [],
+      count: 0,
+    };
+  }
+
   const topic = String(params.topic || "").trim();
   const subject = String(params.subject || "").trim();
   const difficulty = normalizeDifficulty(params.difficulty);

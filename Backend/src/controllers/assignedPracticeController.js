@@ -100,6 +100,8 @@ function selectFinalPracticeQuestions(questions = [], target = ASSIGNED_QUESTION
 const VALID_PATTERN_IDS = [
   "statement_based",
   "statement_not_correct",
+  "how_many_correct",
+  "how_many_pairs",
   "pair_matching",
   "assertion_reason",
   "direct_conceptual",

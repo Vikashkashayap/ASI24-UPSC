@@ -1,11 +1,11 @@
 import Test from "../models/Test.js";
 import { User } from "../models/User.js";
 import SyllabusModuleTarget from "../models/SyllabusModuleTarget.js";
-import { generateTestQuestions, generateFullMockTestQuestions, isPrelimsRagEnabled } from "../services/testGenerationService.js";
+import { generateTestQuestions, generateFullMockTestQuestions } from "../services/testGenerationService.js";
+import { practiceTestHistoryScopeFilters } from "../services/chapterModulePractice.service.js";
 import { getPerformanceSummary } from "../services/performanceService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
-import { archiveThenDeleteTests } from "../services/testBackup.service.js";
 import { ensureAttemptHasHindiFromParent } from "../services/syncHindiFromParent.js";
 import {
   getPrelimsDailyLockStatus,
@@ -129,7 +129,10 @@ export const generateFullMockTest = async (req, res) => {
     }
 
     console.log(`📝 Generating full-length mock (100 questions) for subject: ${subjectStr}...`);
-    const result = await generateFullMockTestQuestions({ subject: subjectStr });
+    const result = await runWithOpenRouterAppTitle(
+      OPENROUTER_APP_TITLES.PRELIMS,
+      () => generateFullMockTestQuestions({ subject: subjectStr })
+    );
 
     if (!result.success) {
       let errorMessage = result.error || "Failed to generate full mock";
@@ -289,7 +292,7 @@ export const generateTest = async (req, res) => {
 
     // ---------------------------------------------------------
     // CACHING: same subject + topic + difficulty + count → reuse DB questions
-    // Works for both RAG and legacy LLM paths. Excludes mocks / assigned practice.
+    // LLM path. Excludes mocks / assigned practice.
     // ---------------------------------------------------------
     if (examType === "GS" && difficultyKey) {
       const topicRegex = new RegExp(
@@ -373,9 +376,7 @@ export const generateTest = async (req, res) => {
     // ---------------------------------------------------------
 
     console.log(
-      `📝 Generating ${count} questions for ${subjectDisplay} - ${topicNormalized} (${examType})${
-        isPrelimsRagEnabled(examType) ? " [Knowledge Base RAG]" : ""
-      }...`
+      `📝 Generating ${count} questions for ${subjectDisplay} - ${topicNormalized} (${examType}) [LLM UPSC Prelims]...`
     );
     const generationResult = await runWithOpenRouterAppTitle(
       OPENROUTER_APP_TITLES.PRACTICE,
@@ -388,6 +389,8 @@ export const generateTest = async (req, res) => {
           difficulty: difficultyKey,
           csatCategories: examType === "CSAT" ? csatCategories : undefined,
           currentAffairsPeriod: currentAffairsPeriod || undefined,
+          kbOnly: false,
+          allowLlmFallback: true,
         })
     );
 
@@ -670,6 +673,8 @@ export const getTest = async (req, res) => {
           difficulty: test.difficulty,
           totalQuestions: test.totalQuestions,
           durationMinutes: test.durationMinutes,
+          isPracticeGenerator: Boolean(test.isPracticeGenerator),
+          isChapterModulePractice: Boolean(test.isChapterModulePractice),
           score: test.score,
           correctAnswers: test.correctAnswers,
           wrongAnswers: test.wrongAnswers,
@@ -693,6 +698,8 @@ export const getTest = async (req, res) => {
         difficulty: test.difficulty,
         totalQuestions: test.totalQuestions,
         durationMinutes: test.durationMinutes,
+        isPracticeGenerator: Boolean(test.isPracticeGenerator),
+        isChapterModulePractice: Boolean(test.isChapterModulePractice),
         questions: test.questions.map((q) => mapQuestionForClient(q)),
         createdAt: test.createdAt,
         isSubmitted: false,
@@ -729,21 +736,28 @@ export const getTests = async (req, res) => {
       $or: [{ userId }, { userId: { $exists: false } }],
     };
 
-    const query = subjectFilter
-      ? {
-          $and: [
-            ownership,
-            {
-              subject: new RegExp(
-                subjectFilter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-                "i"
-              ),
-            },
-          ],
-        }
-      : ownership;
+    const query = {
+      $and: [
+        ownership,
+        ...practiceTestHistoryScopeFilters(),
+        ...(subjectFilter
+          ? [
+              {
+                subject: new RegExp(
+                  subjectFilter.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                  "i"
+                ),
+              },
+            ]
+          : []),
+      ],
+    };
 
-    // Include tests with userId or without userId (for backward compatibility)
+    const subjectDistinctQuery = {
+      $and: [ownership, ...practiceTestHistoryScopeFilters()],
+    };
+
+    // Practice Test history only — chapter / module papers stay on Chapter Test History
     const tests = await Test.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -753,7 +767,7 @@ export const getTests = async (req, res) => {
     const total = await Test.countDocuments(query);
 
     const subjects = (
-      await Test.distinct("subject", ownership)
+      await Test.distinct("subject", subjectDistinctQuery)
     )
       .map((s) => String(s || "").trim())
       .filter(Boolean)
@@ -841,11 +855,21 @@ export const deleteTest = async (req, res) => {
       });
     }
 
-    await archiveThenDeleteTests({ _id: test._id }, { reason: "user_delete_test" });
+    if (test.isTrashed) {
+      return res.status(404).json({
+        success: false,
+        message: "Test not found",
+      });
+    }
+
+    test.isTrashed = true;
+    test.trashedAt = new Date();
+    test.trashedBy = userId;
+    await test.save();
 
     res.json({
       success: true,
-      message: "Test deleted successfully",
+      message: "Test moved to trash. An admin can restore it within 30 days.",
     });
   } catch (error) {
     console.error("Error deleting test:", error);

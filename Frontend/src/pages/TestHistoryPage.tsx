@@ -631,7 +631,7 @@ const TestHistoryPage: React.FC = () => {
       <ConfirmationDialog
         isOpen={showDeleteDialog}
         title="Delete Test"
-        message="Are you sure you want to delete this test? This action cannot be undone."
+        message="This test will move to trash. Only an admin can restore it. After 30 days it is permanently deleted."
         confirmText="Delete Test"
         onConfirm={confirmDeleteTest}
         onCancel={cancelDeleteTest}

@@ -3,6 +3,8 @@
 export const PATTERN_LABELS = {
   statement_based: "Statement-based (which are correct)",
   statement_not_correct: "Statement-based (NOT correct)",
+  how_many_correct: "How many of the above statements are correct?",
+  how_many_pairs: "How many of the above pairs are correctly matched?",
   pair_matching: "Pair matching / Match the following",
   assertion_reason: "Assertion–Reason",
   direct_conceptual: "Direct conceptual MCQs",
@@ -16,17 +18,18 @@ export const PATTERN_LABELS = {
 export const ALL_PATTERN_IDS = Object.keys(PATTERN_LABELS);
 
 /**
- * Real UPSC CSE Prelims (PYQ) Hard mix — heavy on elimination / statements / A-R.
- * Direct conceptual kept low (~1/8). Soft patterns (odd one out) excluded.
+ * Real UPSC CSE Prelims (PYQ) Hard mix — statements / how-many / A-R / matching.
+ * Direct conceptual kept low. Soft patterns (odd one out, sequence) excluded.
  */
 export const PYQ_HARD_PATTERN_IDS = [
   "statement_based",
   "statement_not_correct",
+  "how_many_correct",
+  "how_many_pairs",
   "multi_statement_elimination",
   "assertion_reason",
   "pair_matching",
   "chronology",
-  "sequence_arrangement",
   "direct_conceptual",
 ];
 
@@ -59,6 +62,8 @@ export function patternLabelForQuestionType(questionType) {
     statement: "Statement-based",
     match: "Pair matching",
     pair: "Pair matching",
+    how_many_correct: "How many statements correct",
+    how_many_pairs: "How many pairs matched",
     assertion: "Assertion–Reason",
     direct: "Direct conceptual",
     chronology: "Chronology",
@@ -120,6 +125,12 @@ export function inferPatternFromQuestion(q) {
     (Array.isArray(q.matchColumns?.columnA) &&
       q.matchColumns.columnA.filter((x) => String(x || "").trim()).length >= 2) ||
     /list[\s-]*i\b|match the following|su?melit|सुमेलित|which of the following pairs/i.test(stem);
+  if (
+    /how many of the (above )?pairs|how many pairs are correctly matched/i.test(stem) ||
+    (hasMatch && /how many of the/i.test(stem) && /pair/i.test(stem))
+  ) {
+    return "how_many_pairs";
+  }
   if (hasMatch) return "pair_matching";
 
   const hasChronoStruct =
@@ -147,6 +158,9 @@ export function inferPatternFromQuestion(q) {
   const elimOpts = /only\b|none of the above|all (of )?the above|how many of the/i.test(optBlob);
   if (numbered && (/how many of the (above|statements)|which of the statements/i.test(stem) || elimOpts)) {
     if (/not correct|incorrect|is\/are not/i.test(stem)) return "statement_not_correct";
+    if (/how many of the (above )?(statements|given above)|how many of the above are correct/i.test(stem)) {
+      return "how_many_correct";
+    }
     if (/how many|1 and 2 only|1, 2 and 3/i.test(optBlob) || /how many of the/i.test(stem)) {
       return "multi_statement_elimination";
     }

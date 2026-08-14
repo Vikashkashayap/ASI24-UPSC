@@ -61,7 +61,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  if (totalPages <= 1) return null;
+  if (totalItems <= 0) return null;
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
@@ -71,6 +71,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         </div>
       )}
 
+      {totalPages > 1 && (
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -121,6 +122,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
+      )}
     </div>
   );
 };

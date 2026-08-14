@@ -15,9 +15,7 @@
     "test:embeddings": "node scripts/test-embeddings.js",
     "test:search": "node scripts/test-semantic-search.js",
     "test:qg:unit": "node --test tests/qg/*.test.js",
-    "test:qg:pipeline": "node scripts/test-qg-pipeline.js",
-    "backup:tests": "node scripts/backupTestsCollection.js",
-    "restore:tests": "node scripts/restoreTestsFromBackup.js",
+    "test:qg:pipeline": "node scripts/test-qg-pipeline.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1095.0",

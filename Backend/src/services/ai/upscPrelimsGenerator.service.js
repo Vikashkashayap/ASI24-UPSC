@@ -1,18 +1,16 @@
 /**
- * Common UPSC CSE Prelims GS question generator — KB + RAG + LLM.
+ * Common UPSC CSE Prelims GS question generator.
  *
- * Single wiring for all admin/student GS paper creation:
- *   Topic Practice, chapter practice, Prelims Mock (subject / mix / PYQ-style),
- *   and any future GS test creator.
+ * TEMP: Admin KB / RAG retrieval is paused — retrieved chunks were noisy
+ * (TOC, OCR junk, thin excerpts) and produced weak MCQs. Generation now uses
+ * the LLM's standard UPSC syllabus knowledge (PYQ / Vision / Insights style).
+ * Re-enable RAG: set SKIP_KB_RAG_RETRIEVAL = false.
  *
- * Stack (same for every caller):
- *   Admin Knowledge Base → Intelligence hybrid RAG → generateQuestionsFromContextBatch
- *   → promptBuilder SYSTEM_PROMPT (UPSC patterns + consistency lock)
- *
- * CSAT stays on open-LLM elsewhere (not GS KB-grounded).
+ * CSAT stays on open-LLM elsewhere.
  */
 
-import { ALL_PATTERN_IDS, resolveNotesPatterns } from "../../config/questionPatterns.js";
+import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS, resolveNotesPatterns } from "../../config/questionPatterns.js";
+import { SKIP_KB_RAG_RETRIEVAL } from "../../config/generationMode.js";
 import { getContextForPractice } from "./kbContext.service.js";
 import { generateQuestionsFromContextBatch } from "./questionGenerator.service.js";
 import { questionPatternEngine } from "./questionPatternEngine.js";
@@ -23,6 +21,8 @@ import {
 import { pickBilingualQuestionFields } from "../questionTranslationService.js";
 import { filterQuestionsByTopic } from "../qg/utils/topicRelevance.js";
 import { getSyllabusPreviewForSubject } from "../syllabusTopicPool.js";
+
+export { SKIP_KB_RAG_RETRIEVAL };
 
 /** Real-exam GS Paper 1 subject mix (admin Prelims Mock). */
 export const UPSC_GS_MIX_SUBJECTS = [
@@ -110,6 +110,7 @@ function normalizeDifficulty(difficulty) {
 }
 
 function isRagEnabled() {
+  if (SKIP_KB_RAG_RETRIEVAL) return false;
   return String(process.env.PRELIMS_USE_RAG || "true").toLowerCase() !== "false";
 }
 
@@ -258,9 +259,15 @@ export async function generateUpscPrelimsQuestionsForTopic({
   const count = Math.max(1, Math.min(30, parseInt(questionCount, 10) || 10));
   const difficultyKey = normalizeDifficulty(difficulty);
   const selectedPatterns = resolveNotesPatterns(
-    patternsToInclude?.length ? patternsToInclude : ALL_PATTERN_IDS
+    patternsToInclude?.length
+      ? patternsToInclude
+      : difficultyKey === "hard"
+        ? PYQ_HARD_PATTERN_IDS
+        : ALL_PATTERN_IDS
   );
-  const openAllowed = Boolean(allowOpenKnowledge) && allowOpenKnowledgeFallback();
+  const openAllowed =
+    SKIP_KB_RAG_RETRIEVAL ||
+    (Boolean(allowOpenKnowledge) && allowOpenKnowledgeFallback());
 
   if (!primarySubject || !topicQuery) {
     throw new Error("subject and topic are required for UPSC Prelims generation");
@@ -277,13 +284,22 @@ export async function generateUpscPrelimsQuestionsForTopic({
     parseInt(process.env.QG_MAX_QUESTIONS_PER_CALL, 10) || 10
   );
 
+  // TEMP: RAG retrieval commented — LLM open-syllabus only
+  let preferOpen = true;
+  /*
   const probe = await getContextForPractice({
     subject: primarySubject,
     topic: topicQuery,
     batchIndex: batchIndexOffset,
   });
   const probeOk = Boolean(probe.contextText && probe.contextText.length >= 80);
-  let preferOpen = !probeOk && openAllowed;
+  preferOpen = !probeOk && openAllowed;
+  */
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    console.log(
+      `🤖 UPSC Prelims (LLM, RAG off): ${count}Q | ${primarySubject} | "${topicQuery}"`
+    );
+  }
   const usedChunkIds = new Set();
   let validated = [];
   let openUsed = preferOpen;
@@ -345,7 +361,7 @@ export async function generateUpscPrelimsQuestionsForTopic({
     let contextText = "";
     let ragSource = "";
 
-    if (!openKnowledge) {
+    if (!openKnowledge && !SKIP_KB_RAG_RETRIEVAL) {
       const rag = await getContextForPractice({
         subject: primarySubject,
         topic: topicQuery,
@@ -367,6 +383,8 @@ export async function generateUpscPrelimsQuestionsForTopic({
         ragSource = rag.source || "knowledge_intelligence";
       }
     } else {
+      openKnowledge = true;
+      preferOpen = true;
       openUsed = true;
     }
 
@@ -417,14 +435,14 @@ export async function generateUpscPrelimsQuestionsForTopic({
     success: validated.length > 0,
     questions: validated,
     count: validated.length,
-    source: openUsed ? "knowledge_base+open" : "knowledge_base",
+    source: SKIP_KB_RAG_RETRIEVAL || openUsed ? "llm_upsc_prelims" : "knowledge_base",
     subject: primarySubject,
     topic: topicQuery,
   };
 }
 
 /**
- * Full / sectional GS mock paper — same system prompt + RAG as Topic Practice.
+ * Full / sectional GS mock paper — same UPSC LLM generator as Topic Practice.
  * @param {"subject"|"mix"|"pyo"} [opts.mode]
  */
 export async function generateUpscPrelimsMockPaper({
@@ -439,15 +457,6 @@ export async function generateUpscPrelimsMockPaper({
   yearTo,
   testName,
 } = {}) {
-  if (!isRagEnabled()) {
-    return {
-      success: false,
-      error: "PRELIMS_USE_RAG=false — use legacy open-LLM mock generators",
-      questions: [],
-      skippedRag: true,
-    };
-  }
-
   const displayCount = Math.min(100, Math.max(10, parseInt(questionCount, 10) || 100));
   const subjectList = parseSubjects(subjects.length ? subjects : subject);
   const paperMode = mode === "subject" || mode === "pyo" ? mode : "mix";
@@ -469,7 +478,7 @@ export async function generateUpscPrelimsMockPaper({
   );
 
   console.log(
-    `📚 UPSC Prelims mock (KB+RAG): mode=${paperMode} | target=${displayCount} | slices=${plan.length} | difficulty=${difficultyKey} | patterns=${patterns.length}`
+    `📚 UPSC Prelims mock (${SKIP_KB_RAG_RETRIEVAL ? "LLM open-syllabus" : "KB+RAG"}): mode=${paperMode} | target=${displayCount} | slices=${plan.length} | difficulty=${difficultyKey} | patterns=${patterns.length}`
   );
 
   const all = [];
@@ -553,7 +562,7 @@ export async function generateUpscPrelimsMockPaper({
   if (!finalQuestions.length) {
     return {
       success: false,
-      error: "No valid UPSC questions generated via KB+RAG. Check Knowledge Base uploads.",
+      error: "No valid UPSC questions generated. Please try again.",
       questions: [],
     };
   }
@@ -561,7 +570,7 @@ export async function generateUpscPrelimsMockPaper({
   if (finalQuestions.length < displayCount) {
     return {
       success: false,
-      error: `Only ${finalQuestions.length} unique KB+RAG questions (need ${displayCount}). Upload more PDFs or try Go Live again.`,
+      error: `Only ${finalQuestions.length} unique questions (need ${displayCount}). Please try again.`,
       questions: finalQuestions,
       count: finalQuestions.length,
     };
@@ -577,7 +586,7 @@ export async function generateUpscPrelimsMockPaper({
           : "Prelims Mock - Full Length GS Mix";
 
   console.log(
-    `✅ UPSC Prelims mock ready: ${finalQuestions.length}Q via common KB+RAG+LLM (promptBuilder)`
+    `✅ UPSC Prelims mock ready: ${finalQuestions.length}Q via LLM (${SKIP_KB_RAG_RETRIEVAL ? "RAG off" : "KB+RAG"})`
   );
 
   return {
@@ -585,7 +594,7 @@ export async function generateUpscPrelimsMockPaper({
     questions: finalQuestions,
     count: finalQuestions.length,
     testName: testName || defaultName,
-    source: "kb_rag_common",
+    source: SKIP_KB_RAG_RETRIEVAL ? "llm_upsc_prelims" : "kb_rag_common",
     mode: paperMode,
   };
 }
@@ -600,11 +609,14 @@ export function getUpscPrelimsUserPrompt(params) {
 }
 
 export function isUpscPrelimsRagEnabled() {
+  // Still use the common UPSC generator even when KB retrieval is paused.
+  if (SKIP_KB_RAG_RETRIEVAL) return true;
   return isRagEnabled();
 }
 
 export default {
   UPSC_GS_MIX_SUBJECTS,
+  SKIP_KB_RAG_RETRIEVAL,
   getUpscTopicsForSubject,
   buildUpscPaperTopicPlan,
   generateUpscPrelimsQuestionsForTopic,

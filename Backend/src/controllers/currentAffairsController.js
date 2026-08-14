@@ -1,6 +1,10 @@
 import CurrentAffair from "../models/CurrentAffair.js";
 import { runCurrentAffairsPipeline } from "../services/currentAffairsPipeline.js";
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import {
+  OPENROUTER_APP_TITLES,
+  getOpenRouterIdentHeaders,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 
 /**
  * GET /api/current-affairs
@@ -190,20 +194,23 @@ For each question output STRICT JSON array of 2 objects:
 ]
 Return ONLY the JSON array, no other text.`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": getFrontendOrigin(),
-        "X-Title": "MentorsDaily - Current Affairs MCQs",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o-mini",
-        temperature: 0.3,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    const response = await runWithOpenRouterAppTitle(
+      OPENROUTER_APP_TITLES.CURRENT_AFFAIRS,
+      () =>
+        fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+            ...getOpenRouterIdentHeaders(OPENROUTER_APP_TITLES.CURRENT_AFFAIRS),
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-4o-mini",
+            temperature: 0.3,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        })
+    );
 
     if (!response.ok) {
       const errText = await response.text();

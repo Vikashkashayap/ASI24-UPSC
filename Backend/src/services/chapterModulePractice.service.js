@@ -1,10 +1,6 @@
 /**
- * Student Module Targets → chapter practice:
- * - Admin KB / RAG first for Hard MCQs; LLM fills any shortfall (no repeated stems)
- * - Always bilingual (EN + HI) for chapter practice
- * - Show 20 unique questions (teaching explanations: correct + all wrong options)
- * - Prefetch related UPSC topics for the *next* chapter into cache
- * Module Final (50Q): chapter bank + RAG top-up, then LLM fill if still short
+ * Student Module Targets → chapter practice + Module Final:
+ * LLM generates Hard UPSC Prelims MCQs (Admin KB / RAG retrieval off).
  */
 
 import Test from "../models/Test.js";
@@ -21,14 +17,13 @@ import {
   hasTeachingExplanation,
 } from "../services/testGenerationService.js";
 import { pickBilingualQuestionFields, filterStudentReadyQuestions } from "../services/questionTranslationService.js";
+import { SKIP_KB_RAG_RETRIEVAL } from "../config/generationMode.js";
 import { searchKnowledgeBase } from "../rag/services/search.service.js";
-import { generateQuestionsFromRag } from "../rag/services/questionGen.service.js";
 import {
   OPENROUTER_APP_TITLES,
   runWithOpenRouterAppTitle,
 } from "../config/openRouterAppTitle.js";
 import { mapBilingualQuestionForClient } from "../services/bilingualQuestionStorage.js";
-import { archiveThenDeleteTests } from "./testBackup.service.js";
 import { ALL_PATTERN_IDS, PYQ_HARD_PATTERN_IDS, buildEqualPatternQuota, retagQuestionsToPyqPatterns } from "../config/questionPatterns.js";
 import {
   resolveKbSubjectLabel,
@@ -108,6 +103,8 @@ function normalizeTopicKey(topic) {
 function normalizePatternId(questionType) {
   const t = String(questionType || "").toLowerCase().replace(/[\s-]+/g, "_");
   if (ALL_PATTERN_IDS.includes(t)) return t;
+  if (t.includes("how_many") && (t.includes("pair") || t.includes("match"))) return "how_many_pairs";
+  if (t.includes("how_many")) return "how_many_correct";
   if (t.includes("not_correct") || t.includes("incorrect")) return "statement_not_correct";
   if (t.includes("elimin")) return "multi_statement_elimination";
   if (t.includes("pair") || t.includes("match")) return "pair_matching";
@@ -123,7 +120,7 @@ function normalizePatternId(questionType) {
 
 /**
  * Pick `showCount` unique UPSC-Hard questions with equal quota across all PYQ patterns.
- * Guarantees every pattern appears when the pool has it (e.g. 20Q → 3/3/3/3/2/2/2/2).
+ * Guarantees every pattern appears when the pool has it (e.g. 20Q × 9 patterns → 3/3/3/3/2/2/2/2/2).
  */
 function pickBalancedPatternSet(pool, showCount) {
   const unique = retagQuestionsToPyqPatterns(
@@ -301,6 +298,13 @@ export async function cacheRelatedTopicsForChapter({
   const topic = String(topicName || "").trim();
   if (!topic || !kbSubject) return null;
 
+  if (SKIP_KB_RAG_RETRIEVAL) {
+    console.log(
+      `[chapterPractice] related-topic KB search skipped (LLM-only) for "${topic}"`
+    );
+    return null;
+  }
+
   const query = `UPSC Prelims ${kbSubject} ${topic} key concepts articles PYQ related topics`;
   let result;
   try {
@@ -343,7 +347,7 @@ export async function cacheRelatedTopicsForChapter({
  * Skips entirely when a shared Test paper already exists — avoids duplicate LLM spend.
  */
 export async function warmChapterQuestionCache(params) {
-  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.CHAPTER_PRACTICE, () =>
     warmChapterQuestionCacheInner(params)
   );
 }
@@ -380,13 +384,19 @@ async function warmChapterQuestionCacheInner({ kbSubject, topicName }) {
       return;
     }
 
+    // TEMP: skip RAG question cache — generation uses LLM UPSC Prelims path on first Start Test
+    /*
     await generateQuestionsFromRag({
       subject: kbSubject,
       topic: topicNormalized,
       difficulty: "Hard",
-      count: 30,
+      count: 25,
       force: false,
     });
+    */
+    console.log(
+      `[chapterPractice] warm skipped RAG cache — LLM will generate on first Start Test for "${topicNormalized}"`
+    );
   } catch (err) {
     console.warn("[chapterPractice] warm question cache:", err.message);
   }
@@ -396,7 +406,7 @@ async function warmChapterQuestionCacheInner({ kbSubject, topicName }) {
  * Prefetch next chapter: related topics + optional question cache warm.
  */
 export async function prefetchNextChapter(params) {
-  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.CHAPTER_PRACTICE, () =>
     prefetchNextChapterInner(params)
   );
 }
@@ -456,7 +466,7 @@ export async function loadRelatedTopicsMap(kbSubject, chapterLabels = []) {
 
 /**
  * Create (or reuse-from-cache) a chapter practice test.
- * RAG first for 30 Hard MCQs; LLM fills remaining unique stems if KB is thin.
+ * LLM generates 25 Hard UPSC Prelims MCQs; show 20 unique with teaching explanations.
  * English at generate time; Hindi via free client Google translate (0 OpenRouter tokens).
  * Show 20 unique questions with teaching explanations.
  *
@@ -482,17 +492,74 @@ function mapSavedChapterTestForClient(test, extra = {}) {
   };
 }
 
-/** Same scope filters used for chapter practice (exclude prelims / assigned practice). */
+/** Same scope filters used for chapter practice (exclude prelims / assigned / Practice Test page). */
 function chapterPracticeScopeFilters() {
   return [
     { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
     { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+    { $or: [{ isPracticeGenerator: false }, { isPracticeGenerator: { $exists: false } }] },
+    {
+      $or: [
+        { isChapterModulePractice: true },
+        { syllabusModuleTargetId: { $exists: true, $ne: null } },
+        { topic: /module\s*final/i },
+        { durationMinutes: { $type: "number" } },
+      ],
+    },
   ];
 }
 
+/** Practice Test page history only (exclude chapter / module / mock / assigned). */
+export function practiceTestHistoryScopeFilters() {
+  return [
+    { $or: [{ prelimsMockId: null }, { prelimsMockId: { $exists: false } }] },
+    { $or: [{ assignedPracticeTestId: null }, { assignedPracticeTestId: { $exists: false } }] },
+    { $or: [{ isChapterModulePractice: { $ne: true } }, { isChapterModulePractice: { $exists: false } }] },
+    { $or: [{ syllabusModuleTargetId: null }, { syllabusModuleTargetId: { $exists: false } }] },
+    { topic: { $not: /module\s*final/i } },
+    {
+      $or: [
+        { isPracticeGenerator: true },
+        {
+          $and: [
+            { $or: [{ isPracticeGenerator: false }, { isPracticeGenerator: { $exists: false } }] },
+            { $or: [{ durationMinutes: null }, { durationMinutes: { $exists: false } }] },
+          ],
+        },
+      ],
+    },
+  ];
+}
+
+/** Serialize Start Test for the same student + chapter (double-click / parallel requests). */
+const chapterPracticeLocks = new Map();
+
+function runExclusive(key, fn) {
+  const prev = chapterPracticeLocks.get(key) || Promise.resolve();
+  const run = prev.then(
+    () => fn(),
+    () => fn()
+  );
+  chapterPracticeLocks.set(
+    key,
+    run.then(
+      () => undefined,
+      () => undefined
+    )
+  );
+  return run;
+}
+
 export async function createChapterPracticeTest(params) {
-  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
-    createChapterPracticeTestInner(params)
+  const topicKey = String(params?.topicName || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+  const lockKey = `${params?.userId || "anon"}:${topicKey}`;
+  return runExclusive(lockKey, () =>
+    runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.CHAPTER_PRACTICE, () =>
+      createChapterPracticeTestInner(params)
+    )
   );
 }
 
@@ -505,15 +572,16 @@ async function createChapterPracticeTestInner({
   chapterLabel,
   siblingTopics = [],
   forceCache = false,
+  syllabusModuleTargetId = null,
 }) {
   const topicNormalized = String(topicName || "").trim().replace(/\s+/g, " ");
   const testSubject = resolveTestSubject(kbSubject);
   const difficulty = "Hard";
-  const GENERATE_COUNT = 30; // 10 × 3 batches — buffer so near-dupes can be dropped
+  const GENERATE_COUNT = 25; // buffer so near-dupes can be dropped; student still sees 20
   const SHOW_COUNT = 20; // student sees 20 unique only
   const MIN_ACCEPTABLE = 20; // full paper floor after filters
   /** Keep generating past 20 so post-filter near-dupe drops still leave ≥20 unique. */
-  const MIN_KEEP_GENERATE = Math.min(GENERATE_COUNT, SHOW_COUNT + 8); // 28
+  const MIN_KEEP_GENERATE = Math.min(GENERATE_COUNT, SHOW_COUNT + 5);
   const BATCH_SIZE = 10;
 
   /** Drop exact + near-duplicate / paraphrased stems; keep unique pool for the paper. */
@@ -549,17 +617,25 @@ async function createChapterPracticeTestInner({
     if (openAttempts.length > 0) {
       const [latest, ...stale] = openAttempts;
       if (stale.length > 0) {
-        await archiveThenDeleteTests(
-          {
-            _id: { $in: stale.map((t) => t._id) },
-            userId,
-            isSubmitted: false,
-          },
-          { reason: "chapter_stale_unsubmitted" }
-        );
+        await Test.deleteMany({
+          _id: { $in: stale.map((t) => t._id) },
+          userId,
+          isSubmitted: false,
+        });
         console.log(
           `[chapterPractice] cleaned ${stale.length} stale unsubmitted duplicate(s) for "${topicNormalized}"`
         );
+      }
+      if (
+        !latest.isChapterModulePractice ||
+        (syllabusModuleTargetId && !latest.syllabusModuleTargetId)
+      ) {
+        latest.isChapterModulePractice = true;
+        latest.isPracticeGenerator = false;
+        if (syllabusModuleTargetId && !latest.syllabusModuleTargetId) {
+          latest.syllabusModuleTargetId = syllabusModuleTargetId;
+        }
+        await latest.save();
       }
       console.log(
         `[chapterPractice] RESUME unsubmitted test ${latest._id} (topic="${topicNormalized}") — no new doc`
@@ -687,8 +763,8 @@ async function createChapterPracticeTestInner({
     );
   } else {
     console.log(
-      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q from Admin KB RAG` +
-        ` (LLM fills shortfall, no repeats) → show ${SHOW_COUNT} (topic="${topicNormalized}")`
+      `[chapterPractice] CACHE MISS → generate ${GENERATE_COUNT}Q via LLM (UPSC Prelims, RAG off)` +
+        ` → show ${SHOW_COUNT} (topic="${topicNormalized}")`
     );
   }
 
@@ -703,9 +779,9 @@ async function createChapterPracticeTestInner({
       questionCount: GENERATE_COUNT,
       difficulty,
       batchSize: BATCH_SIZE,
-      // Aim ~28 unique before early-stop so near-dupe + hardness drops still leave 20 to show
+      // Aim extra unique before early-stop so near-dupe + hardness drops still leave 20 to show
       minAcceptable: MIN_KEEP_GENERATE,
-      kbOnly: true,
+      kbOnly: false,
       allowLlmFallback: true,
       ensureHindi: true,
     });
@@ -750,7 +826,7 @@ async function createChapterPracticeTestInner({
     if (pool.length < hardFloor) {
       const stillNeed = hardFloor - pool.length + 8;
       console.warn(
-        `[chapterPractice] ${pool.length}/${hardFloor} unique after RAG filters — LLM fill ${stillNeed} for "${topicNormalized}"`
+        `[chapterPractice] ${pool.length}/${hardFloor} unique after filters — LLM fill ${stillNeed} for "${topicNormalized}"`
       );
       const fingerprints = buildQuestionFingerprints(pool);
       const llmFill = await generateTestQuestions({
@@ -764,7 +840,7 @@ async function createChapterPracticeTestInner({
         difficulty,
         batchSize: BATCH_SIZE,
         minAcceptable: Math.max(1, hardFloor - pool.length),
-        kbOnly: true,
+        kbOnly: false,
         allowLlmFallback: true,
         ensureHindi: true,
       });
@@ -782,7 +858,7 @@ async function createChapterPracticeTestInner({
           { forceHard: true }
         );
         pool = filterStudentReadyQuestions(uniquePool([...pool, ...extraRetagged]));
-        generationResult.source = "knowledge_base+open";
+        generationResult.source = "llm_upsc_prelims";
         console.log(
           `[chapterPractice] LLM fill: +${novel.length} novel → pool ${pool.length} unique`
         );
@@ -815,8 +891,10 @@ async function createChapterPracticeTestInner({
     difficulty,
     questions,
     totalQuestions: questions.length,
-    // 50Q → 60 min; 20Q → 24 min (proportional)
     durationMinutes: Math.max(15, Math.round((questions.length * 60) / 50)),
+    isChapterModulePractice: true,
+    isPracticeGenerator: false,
+    ...(syllabusModuleTargetId ? { syllabusModuleTargetId } : {}),
   });
   await test.save();
 
@@ -837,8 +915,8 @@ async function createChapterPracticeTestInner({
 }
 
 /**
- * Module Final top-up: RAG first across chapter topics, then LLM for remaining unique stems.
- * Skips near-duplicates already in the chapter bank / current paper.
+ * Module Final top-up: LLM across chapter topics (KB/RAG off).
+ * Skips near-duplicates already in the current paper.
  */
 async function generateModuleFinalTopUp({
   kbSubject,
@@ -851,7 +929,7 @@ async function generateModuleFinalTopUp({
 
   const buffer = Math.min(8, Math.max(3, need));
   const generateTarget = need + buffer;
-  const perTopic = Math.max(5, Math.ceil(generateTarget / topicNames.length));
+  const perTopic = Math.max(8, Math.ceil(generateTarget / topicNames.length));
   const fresh = [];
 
   console.log(
@@ -868,7 +946,7 @@ async function generateModuleFinalTopUp({
       difficulty: "Hard",
       batchSize: Math.min(5, want),
       minAcceptable: 1,
-      kbOnly: true,
+      kbOnly: false,
       allowLlmFallback: useLlm,
       ensureHindi: true,
     });
@@ -892,22 +970,22 @@ async function generateModuleFinalTopUp({
   for (const topic of topicNames) {
     if (fresh.length >= generateTarget) break;
     const want = Math.min(perTopic, generateTarget - fresh.length);
-    await pullTopic(topic, want, false);
+    await pullTopic(topic, want, true);
   }
 
   if (fresh.length < need) {
     const stillNeed = need - fresh.length + 3;
-    console.log(`[moduleFinal] top-up second RAG pass for ${stillNeed} more…`);
+    console.log(`[moduleFinal] top-up second pass for ${stillNeed} more…`);
     for (const topic of topicNames) {
       if (fresh.length >= need) break;
-      await pullTopic(topic, Math.min(5, stillNeed), false);
+      await pullTopic(topic, Math.min(5, stillNeed), true);
     }
   }
 
   if (allowLlmFallback && fresh.length < need) {
     const stillNeed = need - fresh.length + 3;
     console.warn(
-      `[moduleFinal] RAG short ${fresh.length}/${need} — LLM fill ~${stillNeed} unique Qs`
+        `[moduleFinal] LLM short ${fresh.length}/${need} — extra fill ~${stillNeed} unique Qs`
     );
     for (const topic of topicNames) {
       if (fresh.length >= need) break;
@@ -922,10 +1000,10 @@ async function generateModuleFinalTopUp({
  * Module Final (50Q):
  * 1) Resume this student's unsubmitted attempt
  * 2) Reuse shared Module Final paper (any student) — 0 LLM / same questions
- * 3) Else build from chapter bank + RAG, then LLM for remaining unique stems
+ * 3) Else LLM-generate 50 unique Hard Qs across chapter topics (no KB/RAG, no chapter-bank copy)
  */
 export async function createModuleFinalTestFromChapterBank(params) {
-  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE, () =>
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.MODULE_FINAL, () =>
     createModuleFinalTestFromChapterBankInner(params)
   );
 }
@@ -964,6 +1042,8 @@ async function createModuleFinalTestFromChapterBankInner({
       questions: cleaned,
       totalQuestions: cleaned.length,
       durationMinutes: Math.max(15, Math.round((cleaned.length * 60) / 50)),
+      isChapterModulePractice: true,
+      isPracticeGenerator: false,
       ...(syllabusModuleTargetId
         ? { syllabusModuleTargetId }
         : {}),
@@ -1003,14 +1083,11 @@ async function createModuleFinalTestFromChapterBankInner({
     if (openAttempts.length > 0) {
       const [latest, ...stale] = openAttempts;
       if (stale.length > 0) {
-        await archiveThenDeleteTests(
-          {
-            _id: { $in: stale.map((t) => t._id) },
-            userId,
-            isSubmitted: false,
-          },
-          { reason: "module_final_stale_unsubmitted" }
-        );
+        await Test.deleteMany({
+          _id: { $in: stale.map((t) => t._id) },
+          userId,
+          isSubmitted: false,
+        });
       }
       if (
         syllabusModuleTargetId &&
@@ -1072,7 +1149,7 @@ async function createModuleFinalTestFromChapterBankInner({
     });
   }
 
-  // 3) Cache miss — build from chapter bank + RAG (first student only)
+  // 3) Cache miss — LLM 50Q across chapter topics (first student only; no KB/RAG)
   const topicNames = (chapterLabels || [])
     .map((line) => parseChapterPreviewLine(line).topicName)
     .map((t) => String(t || "").trim())
@@ -1084,100 +1161,21 @@ async function createModuleFinalTestFromChapterBankInner({
     throw err;
   }
 
-  const topicOr = topicNames.map((name) => ({
-    topic: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i"),
-  }));
-
-  const tests = await Test.find({
-    examType: "GS",
-    difficulty: "Hard",
-    questions: { $exists: true, $not: { $size: 0 } },
-    $or: topicOr,
-    $and: chapterPracticeScopeFilters(),
-  })
-    .sort({ createdAt: -1 })
-    .limit(60)
-    .lean();
-
-  const chapterTests = tests.filter((t) => !/module final/i.test(String(t.topic || "")));
-  const ordered = [
-    ...chapterTests.filter((t) => String(t.userId || "") === String(userId)),
-    ...chapterTests.filter((t) => String(t.userId || "") !== String(userId)),
-  ];
-
-  const topicKeySet = new Set(topicNames.map((n) => n.toLowerCase()));
-  const pool = [];
-  for (const t of ordered) {
-    const key = String(t.topic || "").trim().toLowerCase();
-    if (!topicKeySet.has(key)) continue;
-    for (const q of t.questions || []) {
-      const plain = typeof q.toObject === "function" ? q.toObject() : { ...q };
-      pool.push(pickBilingualQuestionFields({ ...plain, userAnswer: null }));
-    }
-  }
-
-  let bankUnique = filterStudentReadyQuestions(dedupeQuestionsByStem(dedupeQuestions(pool)));
-  const bankTeaching = bankUnique.filter((q) => hasTeachingExplanation(q));
-  if (bankTeaching.length >= Math.min(20, Math.floor(showCount * 0.4))) {
-    bankUnique = [
-      ...bankTeaching,
-      ...bankUnique.filter((q) => !hasTeachingExplanation(q)),
-    ];
-  }
-
   console.log(
-    `[moduleFinal] CACHE MISS ${moduleId}: topics=${topicNames.length}, pool=${pool.length}, bank=${bankUnique.length} (teaching=${bankTeaching.length}), need=${showCount}`
+    `[moduleFinal] CACHE MISS ${moduleId}: LLM generate ${showCount}Q across ${topicNames.length} chapters (RAG off)`
   );
 
-  let combined = filterStudentReadyQuestions([...bankUnique]);
-  let generatedCount = 0;
-  let fromGeneration = false;
-
-  if (combined.length < showCount) {
-    const need = showCount - combined.length;
-    const topUp = await generateModuleFinalTopUp({
+  let combined = filterStudentReadyQuestions(
+    await generateModuleFinalTopUp({
       kbSubject,
       topicNames,
-      need,
-      excludeQuestions: bankUnique,
+      need: showCount,
+      excludeQuestions: [],
       allowLlmFallback: true,
-    });
-    combined = filterStudentReadyQuestions(
-      dedupeQuestionsByStem(dedupeQuestions([...bankUnique, ...topUp]))
-    );
-    generatedCount = Math.max(0, combined.length - bankUnique.length);
-    fromGeneration = generatedCount > 0;
-    console.log(
-      `[moduleFinal] after RAG+LLM top-up: bank=${bankUnique.length} + generated≈${generatedCount} → ${combined.length}`
-    );
-  }
-
-  const weakCount = combined.filter((q) => !hasTeachingExplanation(q)).length;
-  if (weakCount > Math.floor(showCount * 0.3) && combined.length >= Math.min(showCount, 10)) {
-    console.log(`[moduleFinal] ${weakCount} weak explanations — RAG/LLM refresh`);
-    const extra = await generateModuleFinalTopUp({
-      kbSubject,
-      topicNames,
-      need: Math.min(20, weakCount),
-      excludeQuestions: combined,
-      allowLlmFallback: true,
-    });
-    if (extra.length) {
-      const teachingExtra = extra.filter((q) => hasTeachingExplanation(q));
-      combined = filterStudentReadyQuestions(
-        dedupeQuestionsByStem(
-          dedupeQuestions([
-            ...combined.filter((q) => hasTeachingExplanation(q)),
-            ...teachingExtra,
-            ...combined,
-            ...extra,
-          ])
-        )
-      );
-      fromGeneration = true;
-      generatedCount += teachingExtra.length;
-    }
-  }
+    })
+  );
+  let generatedCount = combined.length;
+  let fromGeneration = generatedCount > 0;
 
   if (combined.length < showCount) {
     const stillNeed = showCount - combined.length;
@@ -1193,7 +1191,7 @@ async function createModuleFinalTestFromChapterBankInner({
       difficulty: "Hard",
       batchSize: 8,
       minAcceptable: 1,
-      kbOnly: true,
+      kbOnly: false,
       allowLlmFallback: true,
       ensureHindi: true,
     });
@@ -1205,7 +1203,7 @@ async function createModuleFinalTestFromChapterBankInner({
       combined = filterStudentReadyQuestions(
         dedupeQuestionsByStem(dedupeQuestions([...combined, ...novel]))
       );
-      generatedCount = Math.max(generatedCount, combined.length - bankUnique.length);
+      generatedCount = combined.length;
       fromGeneration = true;
       console.log(
         `[moduleFinal] module LLM fill: +${novel.length} novel → ${combined.length} unique`
@@ -1216,8 +1214,7 @@ async function createModuleFinalTestFromChapterBankInner({
   if (combined.length < showCount) {
     const err = new Error(
       `Could not build a ${showCount}Q module final (have ${combined.length}` +
-        `${bankUnique.length ? `: ${bankUnique.length} chapter bank` : ""}` +
-        `${generatedCount ? ` + ${generatedCount} generated` : ""}). Please try again.`
+        `${generatedCount ? ` via LLM` : ""}). Please try again.`
     );
     err.status = 400;
     throw err;
@@ -1241,16 +1238,16 @@ async function createModuleFinalTestFromChapterBankInner({
   }
 
   console.log(
-    `[moduleFinal] created CANONICAL ${picked.length}Q (bank=${bankUnique.length}, RAG=${generatedCount}, fromGeneration=${fromGeneration})`
+    `[moduleFinal] created CANONICAL ${picked.length}Q via LLM (generated=${generatedCount}, fromGeneration=${fromGeneration})`
   );
 
   return saveClone(picked, {
     fromCache: false,
-    fromChapterBank: bankUnique.length > 0,
-    fromGeneration,
-    bankCount: bankUnique.length,
+    fromChapterBank: false,
+    fromGeneration: true,
+    bankCount: 0,
     generatedCount,
-    source: fromGeneration ? "knowledge_base+open" : "chapter_bank",
+    source: "llm_upsc_prelims",
   });
 }
 
@@ -1321,8 +1318,8 @@ export async function listMyModuleTargetsPracticeHistory({
     )
     .lean();
 
-  // Keep every submitted attempt; only the latest unsubmitted per topic (no duplicate In progress cards)
-  const seenOpenTopic = new Set();
+  // One card per chapter (newest first). Extra unsubmitted copies are stale races.
+  const seenTopic = new Set();
   const staleOpenIds = [];
   const deduped = [];
   for (const row of rows) {
@@ -1330,22 +1327,21 @@ export async function listMyModuleTargetsPracticeHistory({
       .trim()
       .toLowerCase()
       .replace(/\s+/g, " ");
-    if (!row.isSubmitted) {
-      if (seenOpenTopic.has(key)) {
-        staleOpenIds.push(row._id);
-        continue;
-      }
-      seenOpenTopic.add(key);
+    if (seenTopic.has(key)) {
+      if (!row.isSubmitted) staleOpenIds.push(row._id);
+      continue;
     }
+    seenTopic.add(key);
     deduped.push(row);
   }
 
   // Drop older unfinished duplicates left from pre-fix "Start Test" clicks
   if (staleOpenIds.length > 0) {
-    void archiveThenDeleteTests(
-      { _id: { $in: staleOpenIds }, userId, isSubmitted: false },
-      { reason: "chapter_history_stale_open" }
-    ).catch((err) => console.warn("[chapterHistory] stale cleanup:", err.message));
+    void Test.deleteMany({
+      _id: { $in: staleOpenIds },
+      userId,
+      isSubmitted: false,
+    }).catch((err) => console.warn("[chapterHistory] stale cleanup:", err.message));
   }
 
   return deduped;

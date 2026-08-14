@@ -10,6 +10,10 @@ import {
   dedupeQuestionsByStem,
 } from "../services/testGenerationService.js";
 import { pickBilingualQuestionFields } from "../services/questionTranslationService.js";
+import {
+  OPENROUTER_APP_TITLES,
+  runWithOpenRouterAppTitle,
+} from "../config/openRouterAppTitle.js";
 
 const GS_SUBJECTS = ["Polity", "History", "Geography", "Economy", "Environment", "Science & Tech", "Art & Culture", "Current Affairs"];
 
@@ -27,6 +31,20 @@ function toPlainPrelimsQuestion(q) {
     return { ...q._doc };
   }
   return { ...q };
+}
+
+function generateQuestionsForPrelimsMock(mock, mixOpts, subjectOpts) {
+  return runWithOpenRouterAppTitle(OPENROUTER_APP_TITLES.PRELIMS, () => {
+    if (mock.isCsat) return generateFullMockCsatTestQuestions();
+    if (mock.isPyo) {
+      return generateFullMockPyoTestQuestions({
+        yearFrom: mock.yearFrom,
+        yearTo: mock.yearTo,
+      });
+    }
+    if (mock.isMix) return generateFullMockMixTestQuestions(mixOpts);
+    return generateFullMockTestQuestions(subjectOpts);
+  });
 }
 
 /**
@@ -49,6 +67,8 @@ function requiredPrelimsQuestionCount(mock) {
 const ALLOWED_PATTERNS = [
   "statement_based",
   "statement_not_correct",
+  "how_many_correct",
+  "how_many_pairs",
   "pair_matching",
   "assertion_reason",
   "direct_conceptual",
@@ -422,13 +442,7 @@ export const goLivePrelimsMock = async (req, res) => {
 
     const subjectOpts = { subject: mock.subject };
     if (Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0) subjectOpts.patternsToInclude = mock.patternsToInclude;
-    const result = mock.isCsat
-      ? await generateFullMockCsatTestQuestions()
-      : mock.isPyo
-        ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
-        : mock.isMix
-          ? await generateFullMockMixTestQuestions(mixOpts)
-          : await generateFullMockTestQuestions(subjectOpts);
+    const result = await generateQuestionsForPrelimsMock(mock, mixOpts, subjectOpts);
     if (!result.success || !result.questions || result.questions.length === 0) {
       mock.status = "scheduled";
       await mock.save();
@@ -528,13 +542,7 @@ export const processScheduledPrelimsMocks = async () => {
       }
       const subjectOpts = { subject: mock.subject };
       if (Array.isArray(mock.patternsToInclude) && mock.patternsToInclude.length > 0) subjectOpts.patternsToInclude = mock.patternsToInclude;
-      const result = mock.isCsat
-        ? await generateFullMockCsatTestQuestions()
-        : mock.isPyo
-          ? await generateFullMockPyoTestQuestions({ yearFrom: mock.yearFrom, yearTo: mock.yearTo })
-          : mock.isMix
-            ? await generateFullMockMixTestQuestions(mixOpts)
-            : await generateFullMockTestQuestions(subjectOpts);
+      const result = await generateQuestionsForPrelimsMock(mock, mixOpts, subjectOpts);
       if (result.success && result.questions && result.questions.length > 0) {
         const needed = requiredPrelimsQuestionCount(mock);
         const uniqueQuestions = dedupeQuestions(result.questions);

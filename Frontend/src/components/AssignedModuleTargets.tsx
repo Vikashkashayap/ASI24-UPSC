@@ -841,7 +841,7 @@ export function AssignedModuleTargets() {
 
       {practicingKey && (
         <p className="sd-assigned-gen-hint">
-          <Loader2 className="sd-assigned-spin" /> Generating questions from Knowledge Base…
+          <Loader2 className="sd-assigned-spin" /> Generating questions…
         </p>
       )}
 

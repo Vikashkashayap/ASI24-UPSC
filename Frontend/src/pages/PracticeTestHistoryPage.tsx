@@ -445,7 +445,7 @@ export const PracticeTestHistoryPage: React.FC = () => {
       <ConfirmationDialog
         isOpen={showDeleteDialog}
         title="Delete Test"
-        message="Are you sure you want to delete this modular test attempt? This action cannot be undone."
+        message="This modular test attempt will move to trash. Only an admin can restore it. After 30 days it is permanently deleted."
         confirmText="Delete Test"
         onConfirm={confirmDeleteTest}
         onCancel={() => {

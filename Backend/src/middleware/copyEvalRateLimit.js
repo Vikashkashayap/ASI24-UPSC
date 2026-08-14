@@ -62,7 +62,7 @@ export async function getCopyEvalDailyStatus(userId, role) {
     userId,
     createdAt: { $gte: dayStart },
     status: { $in: ["completed", "processing", "pending"] },
-  });
+  }).setOptions({ withTrashed: true });
 
   const remaining = Math.max(0, limit - used);
   return {

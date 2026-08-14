@@ -41,6 +41,8 @@ export type ExamType = "GS" | "CSAT";
 export const PRELIM_MOCK_PATTERNS = [
   { id: "statement_based", label: "Statement-based questions" },
   { id: "statement_not_correct", label: "Statement-based (NOT correct)" },
+  { id: "how_many_correct", label: "How many statements are correct?" },
+  { id: "how_many_pairs", label: "How many pairs are correctly matched?" },
   { id: "pair_matching", label: "Pair matching questions" },
   { id: "assertion_reason", label: "Assertion–Reason questions" },
   { id: "direct_conceptual", label: "Direct conceptual MCQs" },

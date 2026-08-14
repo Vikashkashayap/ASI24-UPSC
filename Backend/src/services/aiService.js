@@ -1,4 +1,7 @@
-import { getFrontendOrigin } from "../config/urlConfig.js";
+import {
+  OPENROUTER_APP_TITLES,
+  getOpenRouterIdentHeaders,
+} from "../config/openRouterAppTitle.js";
 
 /**
  * AI Service – OpenRouter (OpenAI GPT-4o mini) for UPSC current affairs structured output
@@ -71,8 +74,7 @@ export async function isUpscRelevant(article) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "MentorsDaily - UPSC Relevance",
+      ...getOpenRouterIdentHeaders(OPENROUTER_APP_TITLES.CURRENT_AFFAIRS),
     },
     body: JSON.stringify({
       model: MODEL,
@@ -155,8 +157,7 @@ export async function generateCurrentAffairFromNews(article, sourceUrl = null) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "HTTP-Referer": getFrontendOrigin(),
-      "X-Title": "MentorsDaily - Current Affairs",
+      ...getOpenRouterIdentHeaders(OPENROUTER_APP_TITLES.CURRENT_AFFAIRS),
     },
     body: JSON.stringify({
       model: MODEL,

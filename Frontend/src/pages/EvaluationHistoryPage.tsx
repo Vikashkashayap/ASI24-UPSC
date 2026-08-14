@@ -310,7 +310,7 @@ const EvaluationHistoryPage: React.FC = () => {
       <ConfirmationDialog
         isOpen={showDeleteDialog}
         title="Delete Evaluation"
-        message="Are you sure you want to delete this evaluation? This action cannot be undone."
+        message="This evaluation will move to trash. Only an admin can restore it. After 30 days it is permanently deleted."
         confirmText="Delete Evaluation"
         onConfirm={confirmDeleteEvaluation}
         onCancel={cancelDeleteEvaluation}

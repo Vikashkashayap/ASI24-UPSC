@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { applySoftTrash } from "./plugins/softTrash.js";
 
 const inlineFeedbackSchema = new mongoose.Schema({
   location: {
@@ -398,6 +399,8 @@ const copyEvaluationSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+applySoftTrash(copyEvaluationSchema);
 
 // Indexes for faster queries
 copyEvaluationSchema.index({ userId: 1, createdAt: -1 });

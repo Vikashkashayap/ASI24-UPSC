@@ -67,7 +67,19 @@ const ModuleChapterHistoryPage: React.FC = () => {
         setError(null);
         const res = await syllabusTargetsAPI.listMyChapterHistory();
         if (!cancelled && res.data?.success) {
-          setHistory(res.data.data.attempts || []);
+          const attempts = res.data.data.attempts || [];
+          const seen = new Set<string>();
+          const unique: ChapterAttempt[] = [];
+          for (const row of attempts) {
+            const key = String(row.topic || "")
+              .trim()
+              .toLowerCase()
+              .replace(/\s+/g, " ");
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            unique.push(row);
+          }
+          setHistory(unique);
         }
       } catch {
         if (!cancelled) setError("Could not load chapter test history");
@@ -496,7 +508,7 @@ const ModuleChapterHistoryPage: React.FC = () => {
       <ConfirmationDialog
         isOpen={showDeleteDialog}
         title="Delete Test"
-        message="Are you sure you want to delete this chapter test? This action cannot be undone."
+        message="This chapter test will move to trash. Only an admin can restore it. After 30 days it is permanently deleted."
         confirmText="Delete Test"
         onConfirm={confirmDeleteTest}
         onCancel={cancelDeleteTest}

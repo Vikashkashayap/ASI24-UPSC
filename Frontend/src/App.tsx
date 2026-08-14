@@ -148,6 +148,7 @@ const AdminNotesPaymentsPage = lazyPage(
 const StudentsListPage = lazyPage(() => import("./pages/admin/StudentsListPage"), "StudentsListPage");
 const StudentDetailPage = lazyPage(() => import("./pages/admin/StudentDetailPage"), "StudentDetailPage");
 const AdminMentorsPage = lazyPage(() => import("./pages/admin/AdminMentorsPage"), "AdminMentorsPage");
+const AdminTrashPage = lazyPage(() => import("./pages/admin/AdminTrashPage"), "AdminTrashPage");
 const AdminCurrentAffairsPage = lazyPage(() => import("./pages/admin/AdminCurrentAffairsPage"));
 const AdminMainsMaterialsPage = lazyPage(
   () => import("./pages/admin/AdminMainsMaterialsPage"),
@@ -259,6 +260,7 @@ function App() {
               <Route path="students" element={<StudentsListPage />} />
               <Route path="students/:id" element={<StudentDetailPage />} />
               <Route path="mentors" element={<AdminMentorsPage />} />
+              <Route path="trash" element={<AdminTrashPage />} />
               <Route path="current-affairs" element={<AdminCurrentAffairsPage />} />
               <Route path="mains-materials" element={<AdminMainsMaterialsPage />} />
             </Route>
