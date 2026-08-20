@@ -51,7 +51,7 @@ export const LandingLayout = () => {
         style={headerHeight > 0 ? { paddingTop: `${headerHeight}px` } : undefined}
         className={`w-full min-w-0 max-w-full overflow-x-hidden transition-[padding] duration-200 ${headerHeight > 0 ? "" : "pt-20 md:pt-28"}`}
       >
-        <TopBanner />
+        {/* <TopBanner /> */}
         <Outlet />
       </main>
       <WhatsAppWidget />

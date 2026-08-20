@@ -1,109 +1,149 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+
 import { offersAPI, type OfferType } from "../../services/api";
 
 const STORAGE_KEY = "offer_banner_dismissed";
-const DEFAULT_OFFER_ID = "default_offer";
-
-/** Fallback offer when backend returns no active offer (e.g. API down or no offer in DB). */
-const getDefaultOffer = (): OfferType => ({
-  _id: DEFAULT_OFFER_ID,
-  title: "Limited Time Offer",
-  description: "Get exclusive discounts on our courses. One conversation can change your journey!",
-  discount: 25,
-  startDate: new Date().toISOString(),
-  endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-  isActive: true,
-  isHidden: false,
-  ctaText: "Claim Offer",
-  redirectUrl: "/pricing",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-});
 
 export const OfferBanner = () => {
   const [offer, setOffer] = useState<OfferType | null>(null);
   const [visible, setVisible] = useState(false);
-  const [dismissedId, setDismissedId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    let dismissed: string | null = null;
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const { id, until } = JSON.parse(stored);
-        if (id && until && new Date(until) > new Date()) {
-          dismissed = id;
-          setDismissedId(id);
-        }
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
 
-    offersAPI
-      .getActive()
-      .then((res) => {
+    const loadOffer = async () => {
+      try {
+        // Check if user has dismissed an offer
+        let dismissedId: string | null = null;
+
+        const stored = localStorage.getItem(STORAGE_KEY);
+
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+
+            if (
+              parsed?.id &&
+              parsed?.until &&
+              new Date(parsed.until) > new Date()
+            ) {
+              dismissedId = parsed.id;
+            } else {
+              // Dismissal expired
+              localStorage.removeItem(STORAGE_KEY);
+            }
+          } catch {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+
+        // Get ONLY admin-created active offer
+        const res = await offersAPI.getActive();
+
         if (!mounted) return;
-        if (res.data.success && res.data.data && res.data.data._id !== dismissed) {
-          setOffer(res.data.data);
-          setVisible(true);
+
+        /*
+         * IMPORTANT:
+         * No fallback/default offer.
+         *
+         * If admin has not created an active offer,
+         * banner will not be displayed.
+         */
+        if (!res.data.success || !res.data.data) {
+          setOffer(null);
+          setVisible(false);
           return;
         }
-        // No active offer from API: show default offer if not dismissed
-        if (DEFAULT_OFFER_ID !== dismissed) {
-          setOffer(getDefaultOffer());
-          setVisible(true);
+
+        const activeOffer = res.data.data;
+
+        // Don't show an offer that user has dismissed
+        if (activeOffer._id === dismissedId) {
+          setOffer(null);
+          setVisible(false);
+          return;
         }
-      })
-      .catch(() => {
-        // API failed: show default offer so banner is always visible
-        if (mounted && DEFAULT_OFFER_ID !== dismissed) {
-          setOffer(getDefaultOffer());
-          setVisible(true);
+
+        // Admin-created active offer
+        setOffer(activeOffer);
+        setVisible(true);
+      } catch (error) {
+        /*
+         * API failed.
+         *
+         * Do NOT show any hardcoded offer.
+         */
+        console.error("Failed to load active offer:", error);
+
+        if (mounted) {
+          setOffer(null);
+          setVisible(false);
         }
-      });
+      }
+    };
+
+    loadOffer();
 
     return () => {
       mounted = false;
     };
   }, []);
 
+  // Close / dismiss current offer
   const handleClose = () => {
     if (!offer) return;
+
     const until = new Date(offer.endDate);
+
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ id: offer._id, until: until.toISOString() })
+      JSON.stringify({
+        id: offer._id,
+        until: until.toISOString(),
+      })
     );
-    setDismissedId(offer._id);
+
     setVisible(false);
   };
 
+  // CTA action
   const handleCta = () => {
     if (!offer?.redirectUrl) return;
+
     if (offer.redirectUrl.startsWith("/")) {
       window.location.href = offer.redirectUrl;
     } else {
-      window.open(offer.redirectUrl, "_blank", "noopener,noreferrer");
+      window.open(
+        offer.redirectUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
     }
   };
 
-  if (!offer || !visible) return null;
+  // Nothing to show
+  if (!offer || !visible) {
+    return null;
+  }
 
   const MarqueeSegment = () => (
-    <span className="inline-flex items-center gap-3 md:gap-4 mx-6 md:mx-8 flex-shrink-0">
-      <span className="font-bold text-sm md:text-base whitespace-nowrap">
+    <span className="mx-6 inline-flex flex-shrink-0 items-center gap-3 md:mx-8 md:gap-4">
+      {/* Offer title */}
+      <span className="whitespace-nowrap text-sm font-bold md:text-base">
         {offer.title}
       </span>
+
+      {/* Offer description */}
       {offer.description && (
-        <span className="text-white/95 text-xs md:text-sm whitespace-nowrap">
+        <span className="whitespace-nowrap text-xs text-white/95 md:text-sm">
           {offer.description}
         </span>
       )}
+
+      {/* Discount */}
       {offer.discount > 0 && (
-        <span className="inline-flex items-center rounded bg-amber-400 text-slate-900 font-bold text-xs md:text-sm px-2 py-1 whitespace-nowrap">
+        <span className="inline-flex whitespace-nowrap items-center rounded bg-amber-400 px-2 py-1 text-xs font-bold text-slate-900 md:text-sm">
           {offer.discount}% OFF
         </span>
       )}
@@ -116,33 +156,41 @@ export const OfferBanner = () => {
       role="banner"
       aria-label="Offer"
     >
-      <div className="banner-strip bg-gradient-to-r from-blue-600 via-blue-700 to-blue-700 text-white flex items-center overflow-hidden">
-        {/* Scrolling marquee – moves right */}
-        <div className="flex-1 min-w-0 overflow-hidden flex items-center">
-          <div className="pointer-events-none flex items-center animate-marquee-right whitespace-nowrap w-max h-full">
+      <div className="banner-strip flex items-center overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-blue-700 text-white">
+        {/* =====================================================
+            SCROLLING MARQUEE
+        ===================================================== */}
+        <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+          <div className="pointer-events-none flex h-full w-max items-center whitespace-nowrap animate-marquee-right">
             {[1, 2, 3].map((i) => (
               <MarqueeSegment key={i} />
             ))}
           </div>
         </div>
-        {/* Fixed CTA + close on the right */}
-        <div className="flex items-center gap-1.5 shrink-0 pl-2 pr-1.5 h-full bg-gradient-to-l from-blue-700/80 to-transparent sm:gap-2 sm:pl-4 sm:pr-2">
+
+        {/* =====================================================
+            FIXED CTA + CLOSE
+        ===================================================== */}
+        <div className="flex h-full shrink-0 items-center gap-1.5 bg-gradient-to-l from-blue-700/90 to-transparent pl-2 pr-1.5 sm:gap-2 sm:pl-4 sm:pr-2">
+          {/* CTA */}
           {offer.redirectUrl && (
             <button
               type="button"
               onClick={handleCta}
-              className="rounded-md bg-[#2563eb] text-white font-semibold text-[11px] sm:text-xs md:text-sm px-2 py-1 sm:px-3 sm:py-1.5 hover:bg-[#1d4ed8] transition-colors whitespace-nowrap"
+              className="whitespace-nowrap rounded-md bg-white px-2 py-1 text-[11px] font-semibold text-blue-700 transition-colors hover:bg-blue-50 sm:px-3 sm:py-1.5 sm:text-xs md:text-sm"
             >
               {offer.ctaText || "Claim Offer"}
             </button>
           )}
+
+          {/* Close */}
           <button
             type="button"
             onClick={handleClose}
-            className="p-1 rounded hover:bg-white/20 transition-colors"
+            className="rounded p-1 transition-colors hover:bg-white/20"
             aria-label="Close offer banner"
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>
