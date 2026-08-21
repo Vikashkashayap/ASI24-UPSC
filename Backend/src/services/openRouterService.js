@@ -252,6 +252,8 @@ function repairTruncatedJson(input) {
     s += '"';
   }
 
+  // Clean trailing uncompleted keys or key-values
+  s = s.replace(/:\s*$/g, ': ""');
   s = s.replace(/,\s*"[^"]*"\s*:\s*$/g, "");
   s = s.replace(/,\s*"[^"]*"\s*$/g, "");
   s = s.replace(/,\s*$/g, "");

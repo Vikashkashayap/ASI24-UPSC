@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { Badge } from "../../components/ui/badge";
-import { api } from "../../services/api";
+import { api, adminAPI } from "../../services/api";
 import { useTheme } from "../../hooks/useTheme";
 import { CopyEvaluationResultView } from "../../components/copy-evaluation/CopyEvaluationResultView";
 import {
@@ -32,7 +32,10 @@ import {
   CalendarDays,
   CalendarRange,
   Sunrise,
-  Smile
+  Smile,
+  Sparkles,
+  X,
+  Check
 } from "lucide-react";
 import {
   LineChart,
@@ -70,6 +73,17 @@ interface Student {
   joinedAt: string;
   lastActive: string;
   status: 'active' | 'inactive' | 'suspended';
+  copyEvalResetAt?: string | null;
+}
+
+interface CopyEvalDailyStatus {
+  limit: number;
+  used: number;
+  remaining: number;
+  locked: boolean;
+  resetsAt: string;
+  unlimited?: boolean;
+  resetAt?: string | null;
 }
 
 interface PerformanceSummary {
@@ -275,6 +289,13 @@ export const StudentDetailPage = () => {
   const [rawCopyEval, setRawCopyEval] = useState<any>(null);
   const [showEvaluationModal, setShowEvaluationModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [copyEvalStatus, setCopyEvalStatus] = useState<CopyEvalDailyStatus | null>(null);
+  const [resettingCopyEval, setResettingCopyEval] = useState(false);
+  const [showResetCopyEvalModal, setShowResetCopyEvalModal] = useState(false);
+  const [resetCopyEvalSuccess, setResetCopyEvalSuccess] = useState<string | null>(null);
+  const [resetCopyEvalError, setResetCopyEvalError] = useState<string | null>(null);
+  const [actionNotification, setActionNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [copiedTempPassword, setCopiedTempPassword] = useState(false);
   const [dartAnalytics, setDartAnalytics] = useState<any | null>(null);
   const [dartReportDownloading, setDartReportDownloading] = useState(false);
   const [resetPasswordResult, setResetPasswordResult] = useState<{ tempPassword: string } | null>(null);
@@ -331,6 +352,9 @@ export const StudentDetailPage = () => {
       if (studentRes.data.success) {
         setStudent(studentRes.data.data.student);
         setPerformanceSummary(studentRes.data.data.performanceSummary);
+        if (studentRes.data.data.copyEvalDailyStatus) {
+          setCopyEvalStatus(studentRes.data.data.copyEvalDailyStatus);
+        }
       }
 
       if (prelimsRes.data.success) {
@@ -376,9 +400,10 @@ export const StudentDetailPage = () => {
     }
   };
 
-  const handleStudentAction = async (action: 'suspend' | 'activate' | 'reset-password') => {
+  const handleStudentAction = async (action: 'suspend' | 'activate' | 'reset-password' | 'reset-copy-eval') => {
     try {
       setActionLoading(true);
+      setActionNotification(null);
       let endpoint = '';
       let method = 'patch';
       let data = {};
@@ -392,26 +417,61 @@ export const StudentDetailPage = () => {
       } else if (action === 'reset-password') {
         endpoint = `/api/admin/students/${id}/reset-password`;
         method = 'post';
+      } else if (action === 'reset-copy-eval') {
+        openResetCopyEvalModal();
+        setActionLoading(false);
+        return;
       }
 
-      const res = await api[method](endpoint, data);
+      const res = await (api as any)[method](endpoint, data);
       if (res.data.success) {
         if (action === 'reset-password') {
           if (res.data.data?.tempPassword) {
             setResetPasswordResult({ tempPassword: res.data.data.tempPassword });
           } else {
-            alert(res.data.message || "Password reset successfully.");
+            setActionNotification({ type: 'success', message: res.data.message || "Password reset successfully." });
           }
         } else {
-          alert(res.data.message);
+          setActionNotification({ type: 'success', message: res.data.message || "Status updated successfully." });
         }
         fetchStudentData(); // Refresh data
       }
     } catch (err: any) {
       console.error("Error performing student action:", err);
-      alert(err?.response?.data?.message || "Action failed");
+      setActionNotification({ type: 'error', message: err?.response?.data?.message || "Action failed" });
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const openResetCopyEvalModal = () => {
+    setResetCopyEvalSuccess(null);
+    setResetCopyEvalError(null);
+    setShowResetCopyEvalModal(true);
+  };
+
+  const executeResetCopyEval = async () => {
+    if (!id) return;
+    try {
+      setResettingCopyEval(true);
+      setResetCopyEvalError(null);
+      const res = await adminAPI.resetStudentCopyEval(id);
+      if (res.data.success) {
+        if (res.data.data?.status) {
+          setCopyEvalStatus(res.data.data.status);
+        }
+        setResetCopyEvalSuccess(
+          res.data.message || `Copy evaluation limit reset successfully for ${student?.name || "the student"}.`
+        );
+        fetchStudentData();
+      } else {
+        setResetCopyEvalError(res.data.message || "Failed to reset copy evaluation limit");
+      }
+    } catch (err: any) {
+      console.error("Error resetting copy evaluation limit:", err);
+      setResetCopyEvalError(err?.response?.data?.message || "Failed to reset copy evaluation limit");
+    } finally {
+      setResettingCopyEval(false);
     }
   };
 
@@ -901,9 +961,55 @@ export const StudentDetailPage = () => {
                     <RotateCcw className="h-4 w-4 mr-1.5" />
                     Reset Password
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={openResetCopyEvalModal}
+                    disabled={actionLoading || resettingCopyEval}
+                    title="Reset today's copy evaluation limit so the student can evaluate copies again"
+                    className={`flex-1 lg:flex-none h-10 px-4 rounded-xl border ${
+                      theme === "dark"
+                        ? "border-violet-500/40 bg-violet-500/10 hover:bg-violet-500/20 text-violet-300"
+                        : "border-violet-300 bg-violet-50 hover:bg-violet-100 text-violet-700"
+                    }`}
+                  >
+                    <RotateCcw className={`h-4 w-4 mr-1.5 ${resettingCopyEval ? "animate-spin" : ""}`} />
+                    Reset Copy Eval {copyEvalStatus ? `(${copyEvalStatus.used}/${copyEvalStatus.limit})` : ""}
+                  </Button>
                 </div>
               )}
             </div>
+            {copyEvalStatus && (
+              <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${
+                    copyEvalStatus.locked
+                      ? "border-amber-400/40 bg-amber-500/10 text-amber-500"
+                      : "border-emerald-400/40 bg-emerald-500/10 text-emerald-500"
+                  }`}>
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Copy Evaluation Today: <strong>{copyEvalStatus.used}/{copyEvalStatus.limit} used</strong>
+                    {copyEvalStatus.locked ? " (Limit reached)" : ` (${copyEvalStatus.remaining} remaining)`}
+                  </span>
+                  {copyEvalStatus.resetAt && (
+                    <span className="text-[11px] text-slate-400">
+                      (Last reset today)
+                    </span>
+                  )}
+                </div>
+                {!isMentorView && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={openResetCopyEvalModal}
+                    disabled={resettingCopyEval}
+                    className="h-8 px-3 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 rounded-lg"
+                  >
+                    <RotateCcw className={`h-3.5 w-3.5 mr-1 ${resettingCopyEval ? "animate-spin" : ""}`} />
+                    Reset Copy Eval Limit
+                  </Button>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -2580,6 +2686,162 @@ export const StudentDetailPage = () => {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* In-App Toast Notification */}
+        {actionNotification && (
+          <div className="fixed bottom-6 right-6 z-[100] max-w-md animate-in slide-in-from-bottom-5 duration-300">
+            <div className={`flex items-center justify-between gap-3 p-4 rounded-2xl border shadow-xl ${
+              actionNotification.type === 'success'
+                ? theme === "dark"
+                  ? "bg-slate-900 border-emerald-500/40 text-emerald-300"
+                  : "bg-white border-emerald-200 text-emerald-900"
+                : theme === "dark"
+                  ? "bg-slate-900 border-red-500/40 text-red-300"
+                  : "bg-white border-red-200 text-red-900"
+            }`}>
+              <div className="flex items-center gap-2.5">
+                {actionNotification.type === 'success' ? (
+                  <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
+                )}
+                <span className="text-sm font-medium">{actionNotification.message}</span>
+              </div>
+              <button
+                onClick={() => setActionNotification(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Reset Copy Evaluation In-App Modal (Clean UI, No localhost popup) */}
+        {showResetCopyEvalModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div
+              className={`w-full max-w-md rounded-3xl border shadow-2xl overflow-hidden ${
+                theme === "dark" ? "bg-slate-900 border-slate-700 text-slate-100" : "bg-white border-slate-200 text-slate-900"
+              }`}
+            >
+              <div className="h-1.5 w-full bg-gradient-to-r from-violet-500 via-blue-500 to-emerald-500" />
+
+              <div className="p-6">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-2xl bg-violet-500/15 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold tracking-tight">Reset Copy Evaluation</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Grant fresh daily evaluation quota
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (!resettingCopyEval) {
+                        setShowResetCopyEvalModal(false);
+                        setResetCopyEvalSuccess(null);
+                        setResetCopyEvalError(null);
+                      }
+                    }}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-xl hover:bg-slate-500/10"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {resetCopyEvalSuccess ? (
+                  <div className="space-y-4 py-2">
+                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                      <div className="text-sm font-medium leading-snug">
+                        {resetCopyEvalSuccess}
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 text-center">
+                      The student can now submit up to {copyEvalStatus?.limit || 2} new copy evaluations today.
+                    </p>
+                    <Button
+                      className="w-full bg-slate-900 hover:bg-black dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-2xl py-3 font-semibold"
+                      onClick={() => {
+                        setShowResetCopyEvalModal(false);
+                        setResetCopyEvalSuccess(null);
+                        setResetCopyEvalError(null);
+                      }}
+                    >
+                      Done
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className={`p-4 rounded-2xl border text-sm space-y-2 ${
+                      theme === "dark" ? "bg-slate-800/60 border-slate-700" : "bg-slate-50 border-slate-200"
+                    }`}>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Student:</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">{student?.name || "Student"}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-slate-500">Email:</span>
+                        <span className="font-mono text-slate-700 dark:text-slate-300">{student?.email || ""}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-200 dark:border-slate-700">
+                        <span className="text-slate-500">Today's Usage:</span>
+                        <span className={`font-bold ${copyEvalStatus?.locked ? "text-amber-500" : "text-emerald-500"}`}>
+                          {copyEvalStatus ? `${copyEvalStatus.used}/${copyEvalStatus.limit} used` : "2/2 used"}
+                          {copyEvalStatus?.locked ? " · Limit Reached" : ""}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Resetting will clear today's used count to <strong>0/{copyEvalStatus?.limit || 2}</strong> so {student?.name || "the student"} can perform fresh copy evaluations immediately. All previous reports, marks, and evaluation history will remain completely intact.
+                    </p>
+
+                    {resetCopyEvalError && (
+                      <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 shrink-0" />
+                        <span>{resetCopyEvalError}</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-end gap-2.5 pt-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowResetCopyEvalModal(false)}
+                        disabled={resettingCopyEval}
+                        className="rounded-xl px-4"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={executeResetCopyEval}
+                        disabled={resettingCopyEval}
+                        className="bg-violet-600 hover:bg-violet-700 text-white rounded-xl px-4 flex items-center gap-2 font-semibold shadow-sm shadow-violet-500/20"
+                      >
+                        {resettingCopyEval ? (
+                          <>
+                            <RotateCcw className="h-4 w-4 animate-spin" />
+                            Resetting...
+                          </>
+                        ) : (
+                          <>
+                            <RotateCcw className="h-4 w-4" />
+                            Reset Limit
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

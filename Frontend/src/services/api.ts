@@ -106,7 +106,7 @@ export const copyEvaluationAPI = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      timeout: 120000,
+      timeout: 600000,
     });
   },
 
@@ -173,7 +173,7 @@ export const copyEvaluationAPI = {
   },
 
   processEvaluation: (id: string) => {
-    return api.post(`/api/copy-evaluation/${id}/process`);
+    return api.post(`/api/copy-evaluation/${id}/process`, {}, { timeout: 600000 });
   },
 
   getMarks: (id: string) => {
@@ -443,6 +443,12 @@ export const adminAPI = {
   },
   resetPassword: async (id: string) => {
     return api.post(`/api/admin/students/${id}/reset-password`);
+  },
+  getStudentCopyEvalStatus: async (id: string) => {
+    return api.get(`/api/admin/students/${id}/copy-eval-status`);
+  },
+  resetStudentCopyEval: async (id: string) => {
+    return api.post(`/api/admin/students/${id}/reset-copy-eval`);
   },
   getDashboardStats: async () => {
     return api.get("/api/admin/dashboard");

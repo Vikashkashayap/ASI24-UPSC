@@ -9,6 +9,7 @@ import { MeetingRoom } from "../models/MeetingRoom.js";
 import { MentorChat } from "../models/MentorChat.js";
 import { MentorFeedback } from "../models/MentorFeedback.js";
 import { getDartAnalytics, getDart15DayReport, build15DayReportPdf } from "../services/dartService.js";
+import { getCopyEvalDailyStatus } from "../middleware/copyEvalRateLimit.js";
 
 /**
  * Legacy unpaid pro accounts (never completed payment) → MD Students with free access.
@@ -521,6 +522,7 @@ export const getStudentById = async (req, res) => {
 
     // Calculate improvement percentage (compare recent vs older attempts)
     const improvementPercentage = await calculateImprovementPercentage(id, mainsStats, prelimsStats);
+    const copyEvalStatus = await getCopyEvalDailyStatus(student._id, student.role);
 
     res.json({
       success: true,
@@ -532,7 +534,8 @@ export const getStudentById = async (req, res) => {
           role: student.role,
           joinedAt: student.createdAt,
           lastActive: lastActivityDate,
-          status: hasRecentActivity ? 'active' : 'inactive'
+          status: hasRecentActivity ? 'active' : 'inactive',
+          copyEvalResetAt: student.copyEvalResetAt || null,
         },
         performanceSummary: {
           totalEvaluations,
@@ -544,6 +547,7 @@ export const getStudentById = async (req, res) => {
           ),
           improvementPercentage
         },
+        copyEvalDailyStatus: copyEvalStatus,
         mainsStats,
         prelimsStats
       }
@@ -1554,6 +1558,80 @@ export const resetStudentPassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to reset student password"
+    });
+  }
+};
+
+export const resetStudentCopyEval = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const student = await User.findById(id);
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found"
+      });
+    }
+
+    student.copyEvalResetAt = new Date();
+    await student.save();
+
+    const status = await getCopyEvalDailyStatus(student._id, student.role);
+
+    res.json({
+      success: true,
+      message: `Copy evaluation limit reset successfully for ${student.name}. Fresh evaluations are now available.`,
+      data: {
+        status,
+        student: {
+          id: student._id,
+          name: student.name,
+          email: student.email,
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error resetting student copy evaluation:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to reset copy evaluation limit",
+      error: error.message
+    });
+  }
+};
+
+export const getStudentCopyEvalStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const student = await User.findById(id).select("name email role copyEvalResetAt");
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found"
+      });
+    }
+
+    const status = await getCopyEvalDailyStatus(student._id, student.role);
+
+    res.json({
+      success: true,
+      data: {
+        status,
+        student: {
+          id: student._id,
+          name: student.name,
+          email: student.email,
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching student copy eval status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch copy evaluation status",
+      error: error.message
     });
   }
 };

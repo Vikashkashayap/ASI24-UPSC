@@ -261,6 +261,9 @@ startIntelligenceEngine().catch((err) => {
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer(app);
+server.timeout = 600000;
+server.headersTimeout = 610000;
+server.keepAliveTimeout = 610000;
 
 initializeSocketIO(server);
 

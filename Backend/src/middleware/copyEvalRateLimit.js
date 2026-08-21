@@ -5,6 +5,7 @@
  */
 
 import CopyEvaluation from "../models/CopyEvaluation.js";
+import { User } from "../models/User.js";
 
 export const COPY_EVAL_DAILY_LIMIT = Math.max(
   1,
@@ -31,7 +32,7 @@ export function getIstDayEnd(dayStart = getIstDayStart()) {
 }
 
 /**
- * @returns {{ limit: number, used: number, remaining: number, locked: boolean, resetsAt: string, unlimited?: boolean }}
+ * @returns {{ limit: number, used: number, remaining: number, locked: boolean, resetsAt: string, unlimited?: boolean, resetAt?: string | null }}
  */
 export async function getCopyEvalDailyStatus(userId, role) {
   const limit = COPY_EVAL_DAILY_LIMIT;
@@ -44,6 +45,7 @@ export async function getCopyEvalDailyStatus(userId, role) {
       locked: false,
       resetsAt: getIstDayEnd().toISOString(),
       unlimited: true,
+      resetAt: null,
     };
   }
 
@@ -54,13 +56,27 @@ export async function getCopyEvalDailyStatus(userId, role) {
       remaining: 0,
       locked: true,
       resetsAt: getIstDayEnd().toISOString(),
+      resetAt: null,
     };
   }
 
   const dayStart = getIstDayStart();
+  let user = null;
+  try {
+    user = await User.findById(userId).select("copyEvalResetAt").lean();
+  } catch (err) {
+    console.error("Error loading user for copy eval status:", err);
+  }
+
+  const resetAtDate = user?.copyEvalResetAt ? new Date(user.copyEvalResetAt) : null;
+  const effectiveStart =
+    resetAtDate && !isNaN(resetAtDate.getTime()) && resetAtDate > dayStart
+      ? resetAtDate
+      : dayStart;
+
   const used = await CopyEvaluation.countDocuments({
     userId,
-    createdAt: { $gte: dayStart },
+    createdAt: { $gte: effectiveStart },
     status: { $in: ["completed", "processing", "pending"] },
   }).setOptions({ withTrashed: true });
 
@@ -71,6 +87,7 @@ export async function getCopyEvalDailyStatus(userId, role) {
     remaining,
     locked: remaining <= 0,
     resetsAt: getIstDayEnd(dayStart).toISOString(),
+    resetAt: resetAtDate ? resetAtDate.toISOString() : null,
   };
 }
 

@@ -14,6 +14,8 @@ import {
   getStudentDart15DayReport,
   updateStudentStatus,
   resetStudentPassword,
+  resetStudentCopyEval,
+  getStudentCopyEvalStatus,
   createStudent,
   getDashboardStats,
   searchUsers,
@@ -308,6 +310,8 @@ router.get("/students/:id/dart-analytics", getStudentDartAnalytics);
 router.get("/students/:id/dart-report-15day", getStudentDart15DayReport);
 router.patch("/students/:id/status", updateStudentStatus);
 router.post("/students/:id/reset-password", resetStudentPassword);
+router.get("/students/:id/copy-eval-status", getStudentCopyEvalStatus);
+router.post("/students/:id/reset-copy-eval", resetStudentCopyEval);
 
 // Catch-all for undefined student routes to help debug 404s
 router.all("/students*", (req, res) => {
